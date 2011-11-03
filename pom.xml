@@ -2,11 +2,23 @@
   
   <modelVersion>4.0.0</modelVersion>
   
+  <parent>
+  	<groupId>org.bonitasoft.engine</groupId>
+	<artifactId>bonita-engine</artifactId>
+	<version>6.0-SNAPSHOT</version>
+  </parent>
+  
   <groupId>org.bonitasoft.engine.sp</groupId>
   <artifactId>bos-engine-sp</artifactId>
-  <version>6.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+  
   <name>BOS Engine SP</name>
   
+  <modules>
+  	<module>bos-common</module>
+  	<module>bos-client-sp</module>
+  	<module>bos-server-sp</module>
+  	<module>bos-deploy-sp</module>
+  </modules>
   
 </project>
