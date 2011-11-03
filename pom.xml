@@ -15,10 +15,10 @@
   <name>BOS Engine SP</name>
   
   <modules>
-  	<module>bos-common</module>
+  	<module>bos-common-sp</module>
   	<module>bos-client-sp</module>
   	<module>bos-server-sp</module>
-  	<module>bos-deploy-sp</module>
+  	<module>bos-engine-deploy-sp</module>
   </modules>
   
 </project>
