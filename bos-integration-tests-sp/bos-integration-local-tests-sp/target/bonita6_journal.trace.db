@@ -1,4 +1,0 @@
-11-03 19:13:18 jdbc[2]: exception
-org.h2.jdbc.JdbcSQLException: Table "PLATFORM" not found; SQL statement:
-SELECT *
-		FROM platform [42102-160]
