@@ -17,19 +17,8 @@
   
   <dependencies>
   <dependency>
-      <groupId>org.bonitasoft.engine</groupId>
-      <artifactId>bos-client-integration-tests</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-      <exclusion>
-          <groupId>org.bonitasoft.engine</groupId>
-          <artifactId>bonita-client</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.bonitasoft.engine.sp</groupId>
-      <artifactId>bos-client-sp</artifactId>
+      <artifactId>bos-integration-client-tests-sp</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

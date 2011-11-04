@@ -16,7 +16,8 @@
 		<module>bos-common</module>
 		<module>bos-client</module>
 		<module>bos-server</module>
-		<module>bos-engine-deploy</module>
+		<module>bos-core</module>
+		<module>bos-deploy</module>
 	</modules>
 
 </project>

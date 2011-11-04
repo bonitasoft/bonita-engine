@@ -25,6 +25,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.bonitasoft.engine.sp</groupId>
 			<artifactId>bos-common-sp</artifactId>
@@ -54,6 +55,25 @@
 			<artifactId>bonita-platform-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform</groupId>
+			<artifactId>bonita-platform-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform</groupId>
+			<artifactId>bonita-platform-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.login.sp</groupId>
+			<artifactId>bos-login-api-impl-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -75,6 +95,7 @@
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-mybatis</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core.login.sp:bos-login-api-impl-sp</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>

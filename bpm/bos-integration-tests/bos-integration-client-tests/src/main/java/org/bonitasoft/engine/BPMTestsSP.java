@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.engine.test;
+package org.bonitasoft.engine;
 
-
-import org.bonitasoft.engine.BPMTestsSP;
+import org.bonitasoft.engine.identity.UserTestSP;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -29,8 +28,9 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  BPMTestsSP.class
+  BPMTests.class,
+  UserTestSP.class
 })
-public class LocalIntegrationTests {
+public class BPMTestsSP {
 
 }

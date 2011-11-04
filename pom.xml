@@ -14,9 +14,44 @@
   
   <name>BOS Engine SP</name>
   
-  <modules>
-  	<module>services</module>
-  	<module>bpm</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>developer</id>
+      <properties>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>fast</id>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>package</id>
+      <modules>
+        <module>services</module>
+        <module>bpm</module>
+      </modules>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   
 </project>
