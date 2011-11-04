@@ -1,14 +1,93 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <artifactId>bos-engine-sp</artifactId>
-    <groupId>org.bonitasoft.engine.sp</groupId>
-    <version>6.0-SNAPSHOT</version>
-  </parent>
-  
-  <groupId>org.bonitasoft.engine.sp</groupId>
-  <artifactId>bos-server-sp</artifactId>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bos-engine-sp</artifactId>
+		<groupId>org.bonitasoft.engine.sp</groupId>
+		<version>6.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.sp</groupId>
+	<artifactId>bos-server-sp</artifactId>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-server</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bonita-common</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.sp</groupId>
+			<artifactId>bos-common-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bonitasoft.engine.identity</groupId>
+			<artifactId>bonita-identity-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-persistence-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform</groupId>
+			<artifactId>bonita-platform-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>org.bonitasoft.engine:bonita-server</include>
+									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.log:bonita-log-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.persistence:bonita-persistence-mybatis</include>
+									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl-mybatis</include>
+								</includes>
+							</artifactSet>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<destFileName>${project.build.finalName}.jar</destFileName>
+							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+							<createDependencyReducedPom>true</createDependencyReducedPom>
+							<createSourcesJar>true</createSourcesJar>
+						</configuration>
+					</execution>
+				</executions>
+
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
