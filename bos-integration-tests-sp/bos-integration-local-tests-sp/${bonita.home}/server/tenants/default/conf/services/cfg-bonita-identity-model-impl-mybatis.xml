@@ -1,0 +1,105 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<import resource="impl/mybatis/cfg-statementsMapping.xml" />
+	<import resource="impl/mybatis/cfg-dbStatementsMapping.xml" />
+
+	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+		<constructor-arg name="typeAliases">
+			<map>
+				<entry key="user" value="org.bonitasoft.engine.identity.model.impl.SUserImpl"/>
+				<entry key="role" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl"/>
+				<entry key="group_" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl"/>
+				<entry key="membership" value="org.bonitasoft.engine.identity.model.impl.SMembershipImpl"/>
+				<entry key="user_membership" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl"/>
+				<entry key="p_metadata_def" value="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl"/>
+				<entry key="p_metadata_val" value="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl"/>
+			</map>
+		</constructor-arg>
+		<constructor-arg name="mappers">
+			<list>
+				<value>org/bonitasoft/engine/identity/model/impl/mybatis/UserMapper.xml</value>
+				<value>org/bonitasoft/engine/identity/model/impl/mybatis/RoleMapper.xml</value>
+				<value>org/bonitasoft/engine/identity/model/impl/mybatis/GroupMapper.xml</value>
+				<value>org/bonitasoft/engine/identity/model/impl/mybatis/MembershipMapper.xml</value>
+				<value>org/bonitasoft/engine/identity/model/impl/mybatis/UserMembershipMapper.xml</value>
+				<value>org/bonitasoft/engine/identity/model/impl/mybatis/ProfileMetadataDefinitionMapper.xml</value>
+				<value>org/bonitasoft/engine/identity/model/impl/mybatis/ProfileMetadataValueMapper.xml</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="sequencesMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="20" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="21" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="22" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SMembershipImpl" value="23" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl" value="24" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl" value="25" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="26" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.identity.model.SUser" value="u" />
+				<entry key="org.bonitasoft.engine.identity.model.SRole" value="r" />
+				<entry key="org.bonitasoft.engine.identity.model.SGroup" value="g" />
+				<entry key="org.bonitasoft.engine.identity.model.SMembership" value="m" />
+				<entry key="org.bonitasoft.engine.identity.model.SProfileMetadataDefinition" value="pmdd" />
+				<entry key="org.bonitasoft.engine.identity.model.SProfileMetadataValue" value="pmdv" />
+				<entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="um" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classFieldAliasMappings">
+			<map>
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalEmail" value="PERSOEMAIL" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalPhoneNumber" value="PERSOPHONE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalMobileNumber" value="PERSOMOBILE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalFaxNumber" value="PERSOFAX" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalBuilding" value="PERSOBUILDING" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalRoom" value="PERSOROOM" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalAddress" value="PERSOADDRESS" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalZipCode" value="PERSOZIPCODE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalCity" value="PERSOCITY" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalState" value="PERSOSTATE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalCountry" value="PERSOCOUNTRY" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.personalWebsite" value="PERSOWEBSITE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalEmail" value="PROEMAIL" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalPhoneNumber" value="PROPHONE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalMobileNumber" value="PROMOBILE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalFaxNumber" value="PROFAX" />
+    	  		<entry key="org.bonitasoft.engine.identity.model.SUser.professionalBuilding" value="PROBUILDING" />
+	      		<entry key="org.bonitasoft.engine.identity.model.SUser.professionalRoom" value="PROROOM" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalAddress" value="PROADDRESS" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalZipCode" value="PROZIPCODE" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalCity" value="PROCITY" />
+      			<entry key="org.bonitasoft.engine.identity.model.SUser.professionalState" value="PROSTATE" />
+    	  		<entry key="org.bonitasoft.engine.identity.model.SUser.professionalCountry" value="PROCOUNTRY" />
+  	    		<entry key="org.bonitasoft.engine.identity.model.SUser.professionalWebsite" value="PROWEBSITE" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="statementMapping" ref="statementsMapping"></constructor-arg>
+		<constructor-arg name="dbStatementsMapping" ref="dbStatementsMapping"></constructor-arg>
+		<constructor-arg name="entityMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl"/>
+				<entry key="org.bonitasoft.engine.identity.model.SRole" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl"/>
+				<entry key="org.bonitasoft.engine.identity.model.SGroup" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl"/>
+				<entry key="org.bonitasoft.engine.identity.model.SMembership" value="org.bonitasoft.engine.identity.model.impl.SMembershipImpl"/>
+				<entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl"/>
+				<entry key="org.bonitasoft.engine.identity.model.SProfileMetadataDefinition" value="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl"/>
+				<entry key="org.bonitasoft.engine.identity.model.SProfileMetadataValue" value="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl"/>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+    	<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-createTables.sql" />
+    	<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-dropTables.sql" />
+    	<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="filter" value="tenant"/>
+  	</bean>
+</beans>

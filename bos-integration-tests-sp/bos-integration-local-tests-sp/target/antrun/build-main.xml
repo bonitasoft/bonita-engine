@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <mkdir dir="C:\workspaces\bonita-trunk\dev5\bos-engine-sp\bos-integration-tests-sp\bos-integration-local-tests-sp\target/bonita home"/>
+  <copy todir="C:\workspaces\bonita-trunk\dev5\bos-engine-sp\bos-integration-tests-sp\bos-integration-local-tests-sp\target/bonita home">
+    <fileset dir="C:\workspaces\bonita-trunk\dev5\bos-engine-sp\bos-integration-tests-sp\bos-integration-local-tests-sp/home/"/>
+  </copy>
+</target>
+</project>

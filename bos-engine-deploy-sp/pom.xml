@@ -11,4 +11,41 @@
   <groupId>org.bonitasoft.engine.sp</groupId>
   <artifactId>bos-engine-deploy-sp</artifactId>
   
+  <dependencies>
+    <dependency>
+      <groupId>org.bonitasoft.engine.sp</groupId>
+      <artifactId>bos-client-sp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.engine.sp</groupId>
+      <artifactId>bos-server-sp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>distrib-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  
 </project>
