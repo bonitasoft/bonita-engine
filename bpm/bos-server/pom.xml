@@ -74,6 +74,14 @@
 			<version>${project.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<artifactId>bonita-process-instance-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		
+		
 	</dependencies>
 
 	<build>
@@ -96,6 +104,7 @@
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-mybatis</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.login.sp:bos-login-api-impl-sp</include>
+									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-mybatis</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
