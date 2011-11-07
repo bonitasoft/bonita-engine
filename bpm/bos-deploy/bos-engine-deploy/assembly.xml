@@ -11,7 +11,7 @@
       <useProjectArtifact>false</useProjectArtifact>
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <includes>
-        <include>org.bonitasoft.engine.sp:bos-client-sp</include>
+        <include>com.bonitasoft.engine:bos-client-sp</include>
       </includes>
       <outputDirectory>lib/client</outputDirectory>
     </dependencySet>
@@ -19,10 +19,14 @@
       <useProjectArtifact>false</useProjectArtifact>
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <includes>
-        <include>org.bonitasoft.engine.sp:bos-server-sp</include>
+        <include>com.bonitasoft.engine:bos-server-sp</include>
       </includes>
+      <excludes>
+      	<exclude>org.bonitasoft.engine:bonita-common</exclude>
+      </excludes>
       <outputDirectory>lib/server</outputDirectory>
     </dependencySet>
+    
   </dependencySets>
 
   <fileSets>

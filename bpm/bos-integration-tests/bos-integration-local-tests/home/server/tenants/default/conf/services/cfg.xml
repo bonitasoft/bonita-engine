@@ -3,10 +3,6 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans
      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <bean id="businessLoggerServiceConfig"
-    class="org.bonitasoft.engine.test.MockBusinessLoggerServiceConfigurationImpl">
-  </bean>
-
   <bean id="businessLogSessionProvider"
     class="org.bonitasoft.engine.test.MockBusinessLogSessionProviderImpl">
   </bean>

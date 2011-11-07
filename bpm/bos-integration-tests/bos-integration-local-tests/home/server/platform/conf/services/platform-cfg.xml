@@ -22,10 +22,6 @@
     <constructor-arg name="eventService" ref="eventService"></constructor-arg>
   </bean>
 
-  <bean id="businessLoggerServiceConfig"
-    class="org.bonitasoft.engine.test.MockBusinessLoggerServiceConfigurationImpl">
-  </bean>
-
   <bean id="businessLogSessionProvider"
     class="org.bonitasoft.engine.test.MockBusinessLogSessionProviderImpl">
   </bean>

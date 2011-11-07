@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>bpm-sp</artifactId>
-    <groupId>org.bonitasoft.engine.sp</groupId>
+    <groupId>com.bonitasoft.engine</groupId>
     <version>6.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.bonitasoft.engine.core.sp</groupId>
+  <groupId>com.bonitasoft.engine.core</groupId>
   <artifactId>bos-core-sp</artifactId>
   <packaging>pom</packaging>
 

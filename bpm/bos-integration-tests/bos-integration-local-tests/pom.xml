@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>org.bonitasoft.engine.sp</groupId>
+    <groupId>com.bonitasoft.engine</groupId>
     <artifactId>bos-integration-tests-sp</artifactId>
     <version>6.0-SNAPSHOT</version>
   </parent>
   
-  <groupId>org.bonitasoft.engine.sp</groupId>
+  <groupId>com.bonitasoft.engine</groupId>
   <artifactId>bos-integration-local-tests-sp</artifactId>
   
   <properties>
@@ -17,12 +17,12 @@
   
   <dependencies>
   <dependency>
-      <groupId>org.bonitasoft.engine.sp</groupId>
+      <groupId>com.bonitasoft.engine</groupId>
       <artifactId>bos-integration-client-tests-sp</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.bonitasoft.engine.sp</groupId>
+      <groupId>com.bonitasoft.engine</groupId>
       <artifactId>bos-server-sp</artifactId>
       <version>${project.version}</version>
     </dependency>

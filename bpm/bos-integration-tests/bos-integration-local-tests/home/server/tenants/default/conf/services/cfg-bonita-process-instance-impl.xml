@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
      
-	<bean id="activityService"
+	<bean id="activityInstanceService"
 		class="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl">
 		<constructor-arg name="logModelBuilder" ref="processInstanceBuilderAccessor" />
 		<constructor-arg name="recorder" ref="recorderSync" />
@@ -18,15 +18,43 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="activityService" ref="activityService" />
+		<constructor-arg name="activityService" ref="activityInstanceService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders"></constructor-arg>
+		<constructor-arg name="logModelBuilder" ref="processInstanceBuilderAccessor"></constructor-arg>
 	</bean>
-	
-	<bean id="activityEngine" class="org.bonitasoft.engine.core.process.instance.impl.ActivityExecutorImpl">
-		<constructor-arg name="activityStateManager" ref="activityStateManager"/>
-		<constructor-arg name="activityInstanceManager" ref="activityService"/>
+
+	<bean id="activityInstanceExecutor"
+		class="org.bonitasoft.engine.core.process.instance.impl.ActivityExecutorImpl">
+		<constructor-arg name="activityStateManager"
+			ref="activityStateManager" />
+		<constructor-arg name="activityInstanceManager"
+			ref="activityInstanceService" />
+		<constructor-arg name="transactionExecutor" ref="transactionExecutor"></constructor-arg>
 	</bean>
 
 	<bean id="activityStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ActivityStateManagerImpl">
+	</bean>
+	
+	<bean id="processInstanceExecutor"
+		class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceExecutorImpl">
+		<constructor-arg name="instanceBuilders"
+			ref="bpmInstanceBuilders" />
+		<constructor-arg name="activityInstanceService"
+			ref="activityInstanceService" />
+		<constructor-arg name="processInstanceService"
+			ref="processInstanceService" />
+		<constructor-arg name="activityStateManager"
+			ref="activityStateManager" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="activityExecutor"
+			ref="activityInstanceExecutor" />
+		<constructor-arg name="transactionExecutor" ref="transactionExecutor"></constructor-arg>
+	</bean>
+
+	<bean id="transactionExecutor"
+		class="org.bonitasoft.engine.core.process.instance.impl.TransactionExecutorImpl">
+		<constructor-arg name="transactionService" ref="transactionService"></constructor-arg>
 	</bean>
 
 </beans>
