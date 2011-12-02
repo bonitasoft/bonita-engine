@@ -70,7 +70,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
@@ -143,6 +142,13 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Parameter -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.parameter</groupId>
+			<artifactId>bos-parameter-propertyfile</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
@@ -187,6 +193,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
 			<version>${project.version}</version>
@@ -213,6 +224,11 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
 			<artifactId>bonita-scheduler-quartz</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.scheduler</groupId>
+			<artifactId>bos-scheduler-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -284,12 +300,14 @@
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
 									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>
+									<include>org.bonitasoft.engine.core.parameter:bos-parameter-propertyfile</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
+									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
@@ -336,6 +354,7 @@
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-quartz</include>
+									<include>org.bonitasoft.engine.scheduler:bos-scheduler-impl-mybatis</include>
 									<include>org.bonitasoft.engine.session:bonita-session-api</include>
 									<include>org.bonitasoft.engine.session:bonita-session-api-impl</include>
 									<include>org.bonitasoft.engine.session:bonita-session-model</include>

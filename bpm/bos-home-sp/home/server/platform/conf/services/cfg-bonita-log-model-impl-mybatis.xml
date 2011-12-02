@@ -1,9 +1,5 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-
-	<import resource="impl/mybatis/cfg-statementsMapping.xml" />
-	<import resource="impl/mybatis/cfg-dbStatementsMapping.xml" />
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
@@ -48,8 +44,12 @@
 				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex5" value="txtIdx5" />
 			</map>
 		</constructor-arg>
-		<constructor-arg name="statementMapping" ref="statementsMapping"></constructor-arg>
-		<constructor-arg name="dbStatementsMapping" ref="dbStatementsMapping"></constructor-arg>
+		<constructor-arg name="statementMapping">
+			<set />
+		</constructor-arg>
+		<constructor-arg name="dbStatementsMapping">
+			<map />
+		</constructor-arg>
 		<constructor-arg name="entityMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" />

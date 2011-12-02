@@ -13,17 +13,12 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.LoginException;
-import org.bonitasoft.engine.session.PlatformSession;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -31,43 +26,14 @@ import org.junit.Test;
  * @author Matthieu Chaffotte
  * 
  */
-public class UserTestSP {
-
-    private static final String DEFAULT_TENANT = "default";
-    private static long tenantId;
-
-    @BeforeClass
-    public static void beforeClass() throws BonitaException, BonitaHomeNotSetException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.createPlatform();
-        platformAPI.startPlatform();
-        tenantId = platformAPI.createTenant(DEFAULT_TENANT, "no desc", "matti", "suomi");
-        platformAPI.activateTenant(tenantId);
-
-        platformLoginAPI.logout(session);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BonitaException, BonitaHomeNotSetException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.deactiveTenant(tenantId);
-        platformAPI.stopPlatform();
-        platformAPI.deleteTenant(tenantId);
-        platformAPI.deletePlaftorm();
-        platformLoginAPI.logout(session);
-
-    }
+public class UserTestSP extends CommonAPITest {
 
     @Test(expected = LoginException.class)
     public void loginFailsUsingWrongUser() throws BonitaException, BonitaHomeNotSetException {
         final String userName = "hannu";
         final String password = "revontuli";
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        loginAPI.login(tenantId, userName, password);
+        loginAPI.login(1, userName, password);
     }
 
     @Test(expected = LoginException.class)
@@ -75,7 +41,7 @@ public class UserTestSP {
         final String userName = "matti";
         final String password = "suomi";
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        loginAPI.login(tenantId, userName, password);
+        loginAPI.login(1, userName, password);
     }
 
 }
