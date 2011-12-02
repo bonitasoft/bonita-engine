@@ -1,70 +1,72 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <groupId>com.bonitasoft.engine</groupId>
-    <artifactId>bos-integration-tests-sp</artifactId>
-    <version>6.0-SNAPSHOT</version>
-  </parent>
-  
-  <groupId>com.bonitasoft.engine</groupId>
-  <artifactId>bos-integration-local-tests-sp</artifactId>
-  
-  <properties>
-    <bonita.home>${project.build.directory}/bonita home</bonita.home>
-  </properties>
-  
-  <dependencies>
-  <dependency>
-      <groupId>com.bonitasoft.engine</groupId>
-      <artifactId>bos-integration-client-tests-sp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.bonitasoft.engine</groupId>
-      <artifactId>bos-server-sp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate bonita home</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>compile</phase>
-            <inherited>false</inherited>
-            <configuration>
-              <target>
-                <mkdir dir="${bonita.home}" />
-                <copy todir="${bonita.home}">
-                  <fileset dir="${basedir}/home/" />
-                </copy>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <systemPropertyVariables>
-            <bonita.home>${bonita.home}</bonita.home>
-          </systemPropertyVariables>
-          <includes>
-            <include>org/bonitasoft/engine/test/LocalIntegrationTestsSP.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.bonitasoft.engine</groupId>
+		<artifactId>bos-integration-tests-sp</artifactId>
+		<version>6.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bos-integration-local-tests-sp</artifactId>
+
+	<properties>
+		<bonita.home>${project.build.directory}/home</bonita.home>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bos-integration-client-tests-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bos-server-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.bonitasoft.engine</groupId>
+									<artifactId>bos-home-sp</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<includes>**/*.*</includes>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<bonita.home>${bonita.home}</bonita.home>
+					</systemPropertyVariables>
+					<includes>
+						<include>org/bonitasoft/engine/test/LocalIntegrationTestsSP.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

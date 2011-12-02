@@ -1,0 +1,60 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:set id="statementsMapping" set-class="java.util.HashSet">
+	</util:set>
+	
+	<util:map id="dbStatementsMapping" map-class="java.util.HashMap">
+	</util:map>
+
+	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+		<constructor-arg name="typeAliases">
+			<map>
+				<entry key="process_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+				<entry key="activity_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="mappers">
+			<list>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ActivityInstanceMapper.xml</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="sequencesMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="10010" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" value="10011" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="process_instance" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="activity_instance" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classFieldAliasMappings">
+			<map>
+			</map>
+		</constructor-arg>
+		<constructor-arg name="statementMapping" ref="statementsMapping"></constructor-arg>
+		<constructor-arg name="dbStatementsMapping" ref="dbStatementsMapping"></constructor-arg>
+		<constructor-arg name="entityMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-createTables.sql"/>
+	    <constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-initTables.sql"/>
+	    <constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-dropTables.sql"/>
+		<constructor-arg name="filter" value="tenant"/>
+	</bean>
+
+</beans>

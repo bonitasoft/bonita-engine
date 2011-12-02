@@ -33,25 +33,25 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginService {
 
-  private final AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
-  public SecuredLoginServiceImpl(final AuthenticationService authenticationService, final SessionService sessionService) {
-    super(sessionService);
-    this.authenticationService = authenticationService;
-  }
-
-  @Override
-  public SSession login(final String userName, final String password) throws LoginException {
-    try {
-      authenticationService.checkUserCredentials(userName, password);
-      return getSessionService().createSession(userName);
-    } catch (UserNotFoundException e) {
-      throw new LoginException(e);
-    } catch (InvalidPasswordException e) {
-      throw new LoginException(e);
-    } catch (SessionException e) {
-      throw new LoginException(e);
+    public SecuredLoginServiceImpl(final AuthenticationService authenticationService, final SessionService sessionService) {
+        super(sessionService);
+        this.authenticationService = authenticationService;
     }
-  }
+
+    @Override
+    public SSession login(final long tenantId, final String userName, final String password) throws LoginException {
+        try {
+            authenticationService.checkUserCredentials(userName, password);
+            return getSessionService().createSession(tenantId, userName);
+        } catch (UserNotFoundException e) {
+            throw new LoginException(e);
+        } catch (InvalidPasswordException e) {
+            throw new LoginException(e);
+        } catch (SessionException e) {
+            throw new LoginException(e);
+        }
+    }
 
 }
