@@ -36,7 +36,12 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="activityExecutor" ref="activityInstanceExecutor" />
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
-		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="processInstanceExecutorDelegate">
+			<bean class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceExecutorDelegateScheduling">
+				<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
+				<constructor-arg name="schedulerService" ref="scheduler" />
+			</bean>
+		</constructor-arg>
 	</bean>
 
 	<bean id="transactionExecutor" class="org.bonitasoft.engine.core.process.instance.impl.TransactionExecutorImpl">

@@ -46,11 +46,4 @@
 		</constructor-arg>
 	</bean>
 
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-createTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-initTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="tenant" />
-	</bean>
-
 </beans>
