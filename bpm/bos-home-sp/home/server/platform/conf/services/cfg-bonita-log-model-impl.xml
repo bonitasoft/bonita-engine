@@ -3,4 +3,12 @@
 
 	<bean id="logModelBuilder" class="org.bonitasoft.engine.businesslogger.model.builder.impl.BusinessLogModelBuilderImpl" />
 
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/businesslogger/model/impl/db/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/businesslogger/model/impl/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/businesslogger/model/impl/db/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="filter" value="tenant" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/businesslogger/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
+	</bean>
+
 </beans>
