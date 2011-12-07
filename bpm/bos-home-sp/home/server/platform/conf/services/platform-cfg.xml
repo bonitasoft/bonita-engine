@@ -19,9 +19,6 @@
 
 	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="handlers">
-			<null />
-		</constructor-arg>
 		<constructor-arg name="logModelBuilder" ref="logModelBuilder" />
 		<constructor-arg name="businessLogService" ref="syncBusinessLogService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -30,9 +27,6 @@
 
 	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="handlers">
-			<null />
-		</constructor-arg>
 		<constructor-arg name="logModelBuilder" ref="logModelBuilder" />
 		<constructor-arg name="businessLogService" ref="asyncBusinessLogService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />

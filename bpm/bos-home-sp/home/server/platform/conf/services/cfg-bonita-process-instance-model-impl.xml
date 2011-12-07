@@ -3,8 +3,6 @@
 
 	<bean id="bpmInstanceBuilders" class="org.bonitasoft.engine.core.process.instance.model.builder.impl.BPMinstanceBuildersImpl" />
 
-	<bean id="processInstanceBuilderAccessor" class="org.bonitasoft.engine.core.process.instance.model.builder.impl.ProcessInstanceBuilderAccessorImpl" />
-
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-initTables.sql" />

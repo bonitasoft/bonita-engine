@@ -1,0 +1,47 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
+		<constructor-arg name="definitivePersistenceServices">
+			<map>
+				<entry key="persistenceService" value-ref="persistenceService"/>
+			</map>
+		</constructor-arg>
+		<constructor-arg name="definitiveArchiveDescriptors">
+			<list>
+				<bean id="year2011" class="org.bonitasoft.engine.archive.impl.ArchiveDescriptorImpl">
+					<constructor-arg name="name" value="persistenceService" />
+					<constructor-arg name="startTime" value="1293880039160" /> <!-- 01/01/2011 -->
+					<constructor-arg name="endTime" value="1325329667316" /> <!-- 12/31/2011 -->
+				</bean>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="slidingArchivePersistenceService" ref="persistenceService" />
+		<constructor-arg name="slidingArchiveDuration" value="15552000000" /> <!-- 180 days -->
+		<constructor-arg name="selectListDescriptors" >
+			<list>
+<!-- 				<bean id="selectListDescriptorByDate" class="org.bonitasoft.engine.persistence.SelectListDescriptor"> -->
+<!--                     <constructor-arg name="queryName" value="getSAEmployeesByArchivedDate"/> -->
+<!-- 					<constructor-arg name="inputParameters"> -->
+<!-- 						<map> -->
+<!-- 						</map> -->
+<!-- 					</constructor-arg>       -->
+<!-- 					<constructor-arg name="entityType" value="org.bonitasoft.engine.archive.test.model.SAEmployee"/> -->
+<!-- 					<constructor-arg name="queryOptions"> -->
+<!-- 						<bean class="org.bonitasoft.engine.persistence.QueryOptions"> -->
+<!-- 							<constructor-arg name="fromIndex" value="0" /> -->
+<!-- 							<constructor-arg name="numberOfResults" value="600" /> -->
+<!-- 						</bean> -->
+<!-- 					</constructor-arg> -->
+<!-- 				</bean> -->
+			</list>
+		</constructor-arg>
+		<constructor-arg name="logger" ref="technicalLoggerService"/>
+	</bean>
+	
+
+
+
+
+</beans>
