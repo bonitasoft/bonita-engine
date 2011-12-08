@@ -5,7 +5,7 @@
      http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformMybatisPersistenceService" depends-on="dbProperties">
-		<constructor-arg name="name" value="platformPersistenceService" />
+		<constructor-arg name="name" value="platform" />
 		<constructor-arg name="dbIdentifier" value="${db.vendor}" />
 		<constructor-arg ref="transactionService" />
 		<constructor-arg name="cacheEnabled" value="true" />
@@ -17,7 +17,7 @@
 	</bean>
 
 	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantMybatisPersistenceService" depends-on="dbProperties">
-		<constructor-arg name="name" value="persistenceService" />
+		<constructor-arg name="name" value="journal" />
 		<constructor-arg name="dbIdentifier" value="${db.vendor}" />
 		<constructor-arg ref="transactionService" />
 		<constructor-arg ref="sessionAccessor" />

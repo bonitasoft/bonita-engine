@@ -9,7 +9,7 @@
 			<null />
 		</constructor-arg>
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="tenant" />
+		<constructor-arg name="filter" value="journal|history" />
 	</bean>
 
 </beans>

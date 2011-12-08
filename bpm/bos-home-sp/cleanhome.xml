@@ -1,0 +1,10 @@
+<project default="cleanhome">
+
+    <target name="cleanhome">
+        <delete dir="${basedir}/target/home"/>
+      	<copy todir="${basedir}/target/home">
+        	<fileset dir="${basedir}/home"  excludes="**/.svn"/>
+       	</copy>
+    </target>
+
+</project>
