@@ -3,22 +3,18 @@
      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
-		<constructor-arg name="definitivePersistenceServices">
-			<map>
-				<entry key="persistenceService" value-ref="persistenceService"/>
-			</map>
-		</constructor-arg>
-		<constructor-arg name="definitiveArchiveDescriptors">
-			<list>
-				<bean id="year2011" class="org.bonitasoft.engine.archive.impl.ArchiveDescriptorImpl">
-					<constructor-arg name="name" value="persistenceService" />
-					<constructor-arg name="startTime" value="1293880039160" /> <!-- 01/01/2011 -->
-					<constructor-arg name="endTime" value="1325329667316" /> <!-- 12/31/2011 -->
-				</bean>
-			</list>
-		</constructor-arg>
 		<constructor-arg name="slidingArchivePersistenceService" ref="persistenceService" />
 		<constructor-arg name="slidingArchiveDuration" value="15552000000" /> <!-- 180 days -->
+		<constructor-arg name="definitivePersistenceServices">
+			<map>
+				<entry>
+					<key>
+						<bean class="org.bonitasoft.engine.archive.impl.ArchiveDescriptorImpl" /><!-- all time archive -->
+					</key>
+					<ref bean="history"/>
+				</entry>
+			</map>
+		</constructor-arg>
 		<constructor-arg name="selectListDescriptors" >
 			<list>
 <!-- 				<bean id="selectListDescriptorByDate" class="org.bonitasoft.engine.persistence.SelectListDescriptor"> -->

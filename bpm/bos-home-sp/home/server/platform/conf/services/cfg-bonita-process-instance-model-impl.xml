@@ -10,5 +10,14 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 	</bean>
+	
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration"><!-- archived objects are both in journal and history db -->
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-initTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="filter" value="journal|history" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
+	</bean>
+	
 
 </beans>

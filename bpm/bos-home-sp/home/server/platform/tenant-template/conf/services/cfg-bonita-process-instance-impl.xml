@@ -20,6 +20,7 @@
 						<constructor-arg name="archiveService" ref="archiveService"/>
 						<constructor-arg name="instancesBuilders" ref="bpmInstanceBuilders"/>
 						<constructor-arg name="logger" ref="technicalLoggerService"/>
+						<constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
 					</bean>
 				</entry>
 			</map>
