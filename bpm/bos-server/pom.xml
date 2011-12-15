@@ -133,11 +133,6 @@
 		<!-- Monitoring -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.monitoring</groupId>
-			<artifactId>bonita-monitoring-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
 			<artifactId>bonita-monitoring-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -338,8 +333,6 @@
 									<include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-model</include>
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-model-impl</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-mybatis</include>
