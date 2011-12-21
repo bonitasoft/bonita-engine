@@ -1,3 +1,5 @@
 platformClassName org.bonitasoft.engine.service.impl.SpringPlatformServiceAccessor
 
 tenantClassName org.bonitasoft.engine.service.impl.SpringTenantServiceAccessor
+
+sessionAccessor org.bonitasoft.engine.service.impl.SpringSessionAccessor

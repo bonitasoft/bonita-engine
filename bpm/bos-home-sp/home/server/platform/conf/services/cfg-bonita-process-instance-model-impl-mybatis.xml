@@ -1,51 +1,95 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
-     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<bean class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-		<property name="resources">
+	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+		<constructor-arg name="typeAliases">
+			<map>
+				<entry key="process_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+				<entry key="activity_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
+				<entry key="automatic_task_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
+				<entry key="user_task_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="mappers">
+			<list>																	  
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ActivityInstanceMapper.xml</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="sequencesMappings">
+			<map>
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl"
+					value="10010" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl"
+					value="10011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl"
+					value="10011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl"
+					value="10011" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classAliasMappings">
+			<map>
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance"
+					value="process_instance" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance"
+					value="activity_instance" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl"
+					value="automatic_task_instance" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl"
+					value="user_task_instance" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classFieldAliasMappings">
+			<map>
+			</map>
+		</constructor-arg>
+		<constructor-arg name="statementMapping">
 			<set>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl.insertSAutomaticTaskInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.insertSAutomaticTaskInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.insertSUserTaskInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.insertSUserTaskInstanceImpl" />
+				</bean>
+
 			</set>
-		</property>
-		<property name="sequencesMappings">
+		</constructor-arg>
+		<constructor-arg name="dbStatementsMapping">
+			<map />
+		</constructor-arg>
+		<constructor-arg name="entityMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="10010" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" value="10011" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" value="10011" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" value="10011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
 			</map>
-		</property>
-		<property name="classAliasMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="process_instance" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="activity_instance" />
-			</map>
-		</property>
+		</constructor-arg>
 	</bean>
-	
-	<bean class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-		<property name="resources">
-			<set>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
-			</set>
-		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" value="20011" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" value="20011" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" value="20011" />
-			</map>
-		</property>
-		<property name="classAliasMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="arch_process_instance" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="arch_activity_instance" />
-			</map>
-		</property>
-	</bean>
+
 </beans>
