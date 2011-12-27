@@ -13,7 +13,15 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="businessLoggerServiceConfig" class="org.bonitasoft.engine.test.MockBusinessLoggerServiceConfigurationImpl" />
+	<bean id="businessLoggerServiceConfig" class="org.bonitasoft.engine.log.api.impl.BusinessLoggerServiceOptions" >
+		<constructor-arg name="needsInferCall" value="false" />
+        <constructor-arg name="loggableLevels">
+            <list>
+                <value>IDENTITY_USER_UPDATED:INTERNAL</value>
+                <value>IDENTITY_USER_DELETED:INTERNAL</value>
+            </list>
+        </constructor-arg>
+    </bean>
 
 	<bean id="businessLogSessionProvider" class="org.bonitasoft.engine.test.MockBusinessLogSessionProviderImpl" />
 

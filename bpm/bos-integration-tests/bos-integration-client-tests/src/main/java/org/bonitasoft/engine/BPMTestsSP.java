@@ -17,6 +17,7 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.identity.UserTestSP;
+import org.bonitasoft.engine.log.LogTestSP;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -28,7 +29,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
   BPMTests.class,
-  UserTestSP.class
+  UserTestSP.class,
+  LogTestSP.class
 })
 public class BPMTestsSP {
 
