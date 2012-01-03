@@ -103,11 +103,6 @@
 
 		<!-- Login -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.login</groupId>
-			<artifactId>bonita-login-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.bonitasoft.engine.core.login</groupId>
 			<artifactId>bos-login-api-impl-sp</artifactId>
 			<version>${project.version}</version>
@@ -127,6 +122,11 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
 			<artifactId>bonita-log-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.log</groupId>
+			<artifactId>bos-log-api-impl-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -331,6 +331,7 @@
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.log:bonita-log-technical-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>
+									<include>com.bonitasoft.engine.log:bos-log-api-impl-sp</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
