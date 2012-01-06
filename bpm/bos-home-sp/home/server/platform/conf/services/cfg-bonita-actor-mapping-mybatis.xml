@@ -1,0 +1,46 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:set id="statementsMapping" set-class="java.util.HashSet">
+	</util:set>
+	
+	<util:map id="dbStatementsMapping" map-class="java.util.HashMap">
+	</util:map>
+
+	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+		<constructor-arg name="typeAliases">
+			<map>
+				<entry key="actor" value="org.bonitasoft.engine.actor.mapping.impl.PersistedActor" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="mappers">
+			<list>
+				<value>org/bonitasoft/engine/actor/mapping/mybatis/ActorMapper.xml</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="sequencesMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.actor.mapping.impl.PersistedActor" value="10000" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.actor.mapping.impl.PersistedActor" value="actor" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classFieldAliasMappings">
+			<map>
+			</map>
+		</constructor-arg>
+		<constructor-arg name="statementMapping" ref="statementsMapping"></constructor-arg>
+		<constructor-arg name="dbStatementsMapping" ref="dbStatementsMapping"></constructor-arg>
+		<constructor-arg name="entityMappings">
+			<map/>
+		</constructor-arg>
+	</bean>
+
+</beans>

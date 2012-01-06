@@ -33,6 +33,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- Actor Mapping -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
+			<artifactId>bos-actor-mapping-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
+			<artifactId>bos-actor-mapping-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- API -->
 		<dependency>
@@ -74,6 +86,23 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>
 			<artifactId>bonita-cache-ehcache</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- Category -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.category</groupId>
+			<artifactId>bos-process-category-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.category</groupId>
+			<artifactId>bos-process-category-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.category</groupId>
+			<artifactId>bos-process-category-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -266,6 +295,23 @@
 			<artifactId>bonita-transaction-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- XML -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.xml</groupId>
+			<artifactId>bonita-xml-parse-sax</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.xml</groupId>
+			<artifactId>bonita-xml-validate-sax</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.xml</groupId>
+			<artifactId>bonita-xml-write-dom</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
@@ -293,6 +339,9 @@
 									<include>org.bonitasoft.engine.api:bos-server-api-local</include>
 									<include>org.bonitasoft.engine.api:bos-server-api-ejb2</include>
 									<include>org.bonitasoft.engine.api:bos-server-api-ejb3</include>
+									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-api</include>
+									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl</include>
+									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core:bos-process-engine</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
@@ -349,6 +398,11 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
+									<include>org.bonitasoft.engine.core.process.category:bos-process-category-api</include>
+									<include>org.bonitasoft.engine.core.process.category:bos-process-category-api-impl</include>
+									<include>org.bonitasoft.engine.core.process.category:bos-process-category-model</include>
+									<include>org.bonitasoft.engine.core.process.category:bos-process-category-model-impl</include>
+									<include>org.bonitasoft.engine.core.process.category:bos-process-category-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
@@ -365,6 +419,9 @@
 									<include>org.bonitasoft.engine.sessionaccessor:bos-session-accessor-threadlocal</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-validate-sax</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-write-dom</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
