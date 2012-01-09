@@ -6,6 +6,7 @@
   <bean id="securedLoginService" class="org.bonitasoft.engine.core.login.impl.SecuredLoginServiceImpl">
     <constructor-arg name="authenticationService" ref="authenticationService" />
     <constructor-arg name="sessionService" ref="sessionService" />
+    <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
   </bean>
 
 </beans>

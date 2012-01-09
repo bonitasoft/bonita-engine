@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.log;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -54,12 +55,12 @@ public class LogTestSP extends CommonAPITest {
         final List<Log> logs = logAPI.getLogs(0, 2, LogCriterion.DEFAULT);
         assertEquals("IDENTITY_USER_UPDATED", logs.get(0).getActionType());
         assertEquals(SBusinessLogSeverity.INTERNAL, logs.get(0).getSeverity());
-        assertNotNull(logs.get(0).getCallerClassName());
-        assertNotNull(logs.get(0).getCallerMethodName());
+        assertNull(logs.get(0).getCallerClassName());
+        assertNull(logs.get(0).getCallerMethodName());
 
         assertEquals("IDENTITY_USER_DELETED", logs.get(1).getActionType());
         assertEquals(SBusinessLogSeverity.INTERNAL, logs.get(1).getSeverity());
-        assertNotNull(logs.get(1).getCallerClassName());
-        assertNotNull(logs.get(1).getCallerMethodName());
+        assertNull(logs.get(1).getCallerClassName());
+        assertNull(logs.get(1).getCallerMethodName());
     }
 }
