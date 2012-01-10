@@ -1,8 +1,7 @@
 package org.bonitasoft.engine.log;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.businesslogger.model.SBusinessLogSeverity;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserBuilder;
+import org.bonitasoft.engine.identity.UserUpdateDescriptor;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -43,11 +42,13 @@ public class LogTestSP extends CommonAPITest {
     @Test
     public void TestLogable() throws BonitaException {
         User userOld = identityAPI.createUser("old", "oldPassword");
-        UserBuilder userBuilder = new UserBuilder();
-        User userNew = userBuilder.createNewInstance("new", "newPassword").done();
+        UserUpdateDescriptor updateDescriptor = new UserUpdateDescriptor();
+        updateDescriptor.updateUserName("new");
+        updateDescriptor.updatePassword("newPassword");
+
         assertEquals(0, logAPI.getNumberOfLogs());
 
-        identityAPI.updateUser(userOld.getId(), userNew);
+        identityAPI.updateUser(userOld.getId(), updateDescriptor);
         assertEquals(1, logAPI.getNumberOfLogs());
         identityAPI.deleteUser(userOld.getId());
         assertEquals(2, logAPI.getNumberOfLogs());
