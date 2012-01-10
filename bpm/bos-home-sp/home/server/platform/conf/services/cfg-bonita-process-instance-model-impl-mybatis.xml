@@ -44,7 +44,7 @@
 			<map>
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance"
-					value="processInst" />
+					value="p" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance"
 					value="activityInst" />
@@ -179,7 +179,7 @@
 			<map>
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance"
-					value="arch_process_instance" />
+					value="p" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance"
 					value="arch_activity_instance" />
