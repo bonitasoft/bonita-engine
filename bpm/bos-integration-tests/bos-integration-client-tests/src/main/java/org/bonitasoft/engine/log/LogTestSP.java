@@ -10,7 +10,6 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LogAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.businesslogger.model.SBusinessLogSeverity;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdateDescriptor;
@@ -40,7 +39,7 @@ public class LogTestSP extends CommonAPITest {
     }
 
     @Test
-    public void TestLogable() throws BonitaException {
+    public void log() throws BonitaException {
         User userOld = identityAPI.createUser("old", "oldPassword");
         UserUpdateDescriptor updateDescriptor = new UserUpdateDescriptor();
         updateDescriptor.updateUserName("new");
@@ -55,13 +54,14 @@ public class LogTestSP extends CommonAPITest {
 
         final List<Log> logs = logAPI.getLogs(0, 2, LogCriterion.DEFAULT);
         assertEquals("IDENTITY_USER_UPDATED", logs.get(0).getActionType());
-        assertEquals(SBusinessLogSeverity.INTERNAL, logs.get(0).getSeverity());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(0).getSeverity());
         assertNull(logs.get(0).getCallerClassName());
         assertNull(logs.get(0).getCallerMethodName());
 
         assertEquals("IDENTITY_USER_DELETED", logs.get(1).getActionType());
-        assertEquals(SBusinessLogSeverity.INTERNAL, logs.get(1).getSeverity());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(1).getSeverity());
         assertNull(logs.get(1).getCallerClassName());
         assertNull(logs.get(1).getCallerMethodName());
     }
+
 }
