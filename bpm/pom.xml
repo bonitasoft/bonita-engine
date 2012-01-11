@@ -18,5 +18,4 @@
 		<module>bos-deploy</module>
 		<module>bos-home-sp</module>
 	</modules>
-
 </project>

@@ -25,6 +25,5 @@
 			<artifactId>bos-session-accessor-write</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 	</dependencies>
 </project>

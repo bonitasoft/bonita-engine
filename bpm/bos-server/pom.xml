@@ -11,18 +11,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>0.9.28</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bos-process-engine</artifactId>
 			<version>${project.version}</version>
@@ -33,7 +21,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- Actor Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
@@ -74,7 +62,7 @@
 			<artifactId>bonita-authentication-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Archive -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.archive</groupId>
@@ -88,7 +76,7 @@
 			<artifactId>bonita-cache-ehcache</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Category -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.category</groupId>
@@ -295,7 +283,7 @@
 			<artifactId>bonita-transaction-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- XML -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.xml</groupId>
@@ -312,13 +300,11 @@
 			<artifactId>bonita-xml-write-dom</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bos-common-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -432,9 +418,7 @@
 						</configuration>
 					</execution>
 				</executions>
-
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

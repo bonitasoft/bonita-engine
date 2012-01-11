@@ -1,57 +1,55 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-  	<groupId>org.bonitasoft.engine</groupId>
-	<artifactId>bonita-engine</artifactId>
-	<version>6.0-SNAPSHOT</version>
-  </parent>
-  
-  <groupId>com.bonitasoft.engine</groupId>
-  <artifactId>bos-engine-sp</artifactId>
-  <packaging>pom</packaging>
-  
-  <name>BOS Engine SP</name>
-  
-  <profiles>
-    <profile>
-      <id>developer</id>
-      <properties>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-      </properties>
-    </profile>
+	<modelVersion>4.0.0</modelVersion>
 
-    <profile>
-      <id>fast</id>
-      <properties>
-        <maven.test.skip>true</maven.test.skip>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-      </properties>
-    </profile>
+	<parent>
+		<groupId>org.bonitasoft.engine</groupId>
+		<artifactId>bonita-engine</artifactId>
+		<version>6.0-SNAPSHOT</version>
+	</parent>
 
-    <profile>
-      <id>package</id>
-      <modules>
-        <module>services</module>
-        <module>bpm</module>
-      </modules>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  
+	<groupId>com.bonitasoft.engine</groupId>
+	<artifactId>bos-engine-sp</artifactId>
+	<packaging>pom</packaging>
+
+	<name>BOS Engine SP</name>
+
+	<profiles>
+		<profile>
+			<id>developer</id>
+			<properties>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>fast</id>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>package</id>
+			<modules>
+				<module>services</module>
+				<module>bpm</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

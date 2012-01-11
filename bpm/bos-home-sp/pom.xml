@@ -5,7 +5,6 @@
 		<artifactId>bpm-sp</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-SNAPSHOT</version>
-
 	</parent>
 
 	<artifactId>bos-home-sp</artifactId>
