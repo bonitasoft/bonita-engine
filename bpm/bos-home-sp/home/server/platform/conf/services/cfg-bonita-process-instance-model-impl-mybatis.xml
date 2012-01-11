@@ -47,13 +47,13 @@
 					value="p" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance"
-					value="activityInst" />
+					value="a" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance"
-					value="autoTaskIinst" />
+					value="a" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance"
-					value="useTaskInst" />
+					value="a" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -179,16 +179,16 @@
 			<map>
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance"
-					value="p" />
+					value="ap" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance"
-					value="arch_activity_instance" />
+					value="aa" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance"
-					value="arch_automatic_task_instance" />
+					value="aa" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance"
-					value="arch_user_task_instance" />
+					value="aa" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
