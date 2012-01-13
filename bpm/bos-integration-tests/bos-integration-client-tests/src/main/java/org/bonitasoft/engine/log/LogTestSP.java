@@ -28,7 +28,7 @@ public class LogTestSP extends CommonAPITest {
 
     @BeforeClass
     public static void beforeTest() throws BonitaException {
-        session = BPMTestUtil.loginTenant();
+        session = BPMTestUtil.loginDefaultTenant();
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         logAPI = TenantAPIAccessor.getLogAPI(session);
     }
