@@ -62,11 +62,10 @@ public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginSe
         } catch (final InvalidPasswordException e) {
             handleInvalidUser(tenantId, userName, password, e);
         }  
-        
         try {
             return getSessionService().createSession(tenantId, userName);
-        } catch (final SessionException e) {
-            throw new LoginException(e);
+        } catch (final SessionException se) {
+            throw new LoginException(se);
         }
     }
 
@@ -76,19 +75,17 @@ public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginSe
             if (!isTechnicalUser) {
                 throw new LoginException(originalException);
             }
-        } catch (final BonitaHomeNotSetException e1) {
-            throw new LoginException(e1);
-        } catch (final FileNotFoundException e1) {
-            throw new LoginException(e1);
+        } catch (final BonitaHomeNotSetException bhnse) {
+            throw new LoginException(bhnse);
+        } catch (final FileNotFoundException fnfe) {
+            throw new LoginException(fnfe);
         } 
     }
 
     private boolean checkTechinicalUserCredentials(final long tenantId, final String userName, final String password) throws BonitaHomeNotSetException, FileNotFoundException, LoginException {
         final String technicalUserPropertiesPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "technical-user.properties";
         final Properties techProp = new Properties();
-        
         final FileInputStream fis = new FileInputStream(technicalUserPropertiesPath);
-        
         try {
             techProp.load(fis);
             final String techinicalUser = (String) techProp.get("userName");
@@ -105,7 +102,6 @@ public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginSe
                 }
             }
         }
-        
     }
 
 }
