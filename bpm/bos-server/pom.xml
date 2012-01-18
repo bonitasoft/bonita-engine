@@ -414,6 +414,8 @@
 		    						<include>org.bonitasoft.engine.core.category:bos-category-model</include>
 		    						<include>org.bonitasoft.engine.core.category:bos-category-model-impl</include>
 		    						<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.expression:bos-expression-api</include>
+									<include>org.bonitasoft.engine.expression:bos-expression-model</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
