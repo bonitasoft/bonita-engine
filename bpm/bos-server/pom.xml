@@ -337,6 +337,7 @@
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
 									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>
+									<include>org.bonitasoft.engine.core.parameter:bos-parameter-api</include>
 									<include>org.bonitasoft.engine.core.parameter:bos-parameter-propertyfile</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
