@@ -79,18 +79,18 @@
 
 		<!-- Category -->
 		<dependency>
-		    <groupId>org.bonitasoft.engine.core.category</groupId>
-  			<artifactId>bos-category-api-impl</artifactId>
+			<groupId>org.bonitasoft.engine.core.category</groupId>
+			<artifactId>bos-category-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.bonitasoft.engine.core.category</groupId>
-  			<artifactId>bos-category-model-impl</artifactId>
+			<groupId>org.bonitasoft.engine.core.category</groupId>
+			<artifactId>bos-category-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.bonitasoft.engine.core.category</groupId>
-  			<artifactId>bos-category-model-impl-mybatis</artifactId>
+			<groupId>org.bonitasoft.engine.core.category</groupId>
+			<artifactId>bos-category-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -385,6 +385,11 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-api</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-model-impl</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
