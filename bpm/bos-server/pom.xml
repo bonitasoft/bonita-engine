@@ -334,6 +334,11 @@
 									<include>org.bonitasoft.engine:bonita-commons</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-api</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-model-impl</include>
+									<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
 									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>
@@ -385,11 +390,6 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bos-category-api</include>
-									<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
-									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
-									<include>org.bonitasoft.engine.core.category:bos-category-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
