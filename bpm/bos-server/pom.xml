@@ -94,6 +94,23 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Command -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.command</groupId>
+			<artifactId>bos-command-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.command</groupId>
+			<artifactId>bos-command-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.command</groupId>
+			<artifactId>bos-command-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
@@ -334,6 +351,11 @@
 									<include>org.bonitasoft.engine:bonita-commons</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
+									<include>org.bonitasoft.engine.command:bos-command-api</include>
+									<include>org.bonitasoft.engine.command:bos-command-api-impl</include>
+									<include>org.bonitasoft.engine.command:bos-command-model</include>
+									<include>org.bonitasoft.engine.command:bos-command-model-impl</include>
+									<include>org.bonitasoft.engine.command:bos-command-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
