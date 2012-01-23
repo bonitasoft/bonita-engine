@@ -122,6 +122,18 @@
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Expression -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.expression</groupId>
+			<artifactId>bos-expression-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.expression</groupId>
+			<artifactId>bos-expression-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Identity -->
 		<dependency>
@@ -382,6 +394,10 @@
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model-impl</include>
+									<include>org.bonitasoft.engine.expression:bos-expression-api</include>
+									<include>org.bonitasoft.engine.expression:bos-expression-api-impl</include>
+									<include>org.bonitasoft.engine.expression:bos-expression-model</include>
+									<include>org.bonitasoft.engine.expression:bos-expression-model-impl</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-api</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-impl</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model</include>
