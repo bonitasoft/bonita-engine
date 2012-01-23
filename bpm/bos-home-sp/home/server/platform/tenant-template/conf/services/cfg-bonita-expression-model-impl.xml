@@ -3,6 +3,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
      
-     <bean id="expressionBuilder"
-		class="org.bonitasoft.engine.expression.model.builder.impl.ExpressionBuilderImpl" />
+     <bean id="sExpressionBuilders"
+		class="org.bonitasoft.engine.expression.model.builder.impl.SExpressionBuildersImpl" />
 </beans>
