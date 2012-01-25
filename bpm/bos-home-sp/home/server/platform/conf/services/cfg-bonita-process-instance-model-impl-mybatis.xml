@@ -16,12 +16,21 @@
 					value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
 				<entry key="user_task_instance"
 					value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
+				<entry key="transition_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SUsTransitionInstanceImpl" />
+				<entry key="flownode_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
+				<entry key="gateway_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
+				<entry key="transition_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>																	  
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ActivityInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/FlowNodeInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/TransitionInstanceMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -38,6 +47,12 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl"
 					value="10011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl"
+					value="10011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl"
+					value="10013" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -47,13 +62,22 @@
 					value="p" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance"
-					value="a" />
+					value="f" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance"
-					value="a" />
+					value="f" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance"
-					value="a" />
+					value="f" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance"
+					value="f" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl"
+					value="f" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl"
+					value="t" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -67,7 +91,7 @@
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl.insertSAutomaticTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.insertSActivityInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="auto" />
 				</bean>
@@ -75,9 +99,17 @@
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.insertSUserTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.insertSActivityInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="user" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.insertSGatewayInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="gate" />
 				</bean>
 				
 				<!-- update -->
@@ -86,13 +118,19 @@
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.updateSUserTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.updateSActivityInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl.updateSAutomaticTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.updateSActivityInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.updateSGatewayInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
 				
 				<!-- delete -->
@@ -100,13 +138,13 @@
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.deleteSUserTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.deleteSActivityInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl.deleteSAutomaticTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.deleteSActivityInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
 				</bean>
 				
 				<!-- get -->
@@ -114,9 +152,50 @@
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getPendingUserTasks" />
 					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getPendingUserTasks" />
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getPendingUserTasks" />
 				</bean>
-
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getActivitiesFromProcessInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getActivitiesFromProcessInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getOpenActivitiesFromProcessInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getOpenActivitiesFromProcessInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getActivityInstanceById" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getFlowNodeInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.getGatewayInstanceById" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getFlowNodeInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.getActiveGatewayInstanceOfProcess" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getActiveGatewayInstanceOfProcess" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getActivitiesWithStates" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getActivitiesWithStates" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getNumberOfOpenActivities" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfOpenActivities" />
+				</bean>
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
@@ -136,6 +215,15 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance"
 					value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
