@@ -368,6 +368,7 @@
 									<include>org.bonitasoft.engine.command:bos-command-model</include>
 									<include>org.bonitasoft.engine.command:bos-command-model-impl</include>
 									<include>org.bonitasoft.engine.command:bos-command-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core:bos-home-server</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
