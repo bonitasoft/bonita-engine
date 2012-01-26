@@ -8,7 +8,8 @@
 	</parent>
 
 	<artifactId>bos-log-api-impl-sp</artifactId>
-	<name>bos-log-api-impl-sp</name>
+
+	<name>BOS LOG Service API: implementation</name>
 
 	<dependencies>
 		<dependency>

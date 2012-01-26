@@ -9,6 +9,8 @@
 
 	<artifactId>bos-server-sp</artifactId>
 
+	<name>BOS Server SP</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
@@ -56,17 +58,17 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Authentication -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.authentication</groupId>
-			<artifactId>bonita-authentication-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Archive -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.archive</groupId>
 			<artifactId>bonita-archive-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Authentication -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.authentication</groupId>
+			<artifactId>bonita-authentication-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -85,12 +87,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bos-category-model-impl</artifactId>
+			<artifactId>bos-category-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- Class loader -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bos-category-model-impl-mybatis</artifactId>
+			<groupId>org.bonitasoft.engine.classloader</groupId>
+			<artifactId>bonita-classloader-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -111,6 +115,23 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Dependency -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bonita-dependency-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bonita-dependency-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bonita-dependency-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
@@ -122,7 +143,7 @@
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Expression -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
@@ -183,17 +204,17 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Persistence -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-persistence-mybatis</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Parameter -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.parameter</groupId>
 			<artifactId>bos-parameter-propertyfile</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Persistence -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-persistence-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -350,24 +371,28 @@
 						<configuration>
 							<artifactSet>
 								<includes>
+									<include>org.bonitasoft.engine:bonita-commons</include>
 									<include>org.bonitasoft.engine.api:bos-server-api</include>
 									<include>org.bonitasoft.engine.api:bos-server-api-local</include>
 									<include>org.bonitasoft.engine.api:bos-server-api-ejb2</include>
 									<include>org.bonitasoft.engine.api:bos-server-api-ejb3</include>
-									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-api</include>
-									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl</include>
-									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl-mybatis</include>
-									<include>org.bonitasoft.engine.core:bos-process-engine</include>
+									<include>org.bonitasoft.engine.archive:bonita-archive-api</include>
+									<include>org.bonitasoft.engine.archive:bonita-archive-impl</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
-									<include>org.bonitasoft.engine:bonita-commons</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
+									<include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
+									<include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
 									<include>org.bonitasoft.engine.command:bos-command-api</include>
 									<include>org.bonitasoft.engine.command:bos-command-api-impl</include>
 									<include>org.bonitasoft.engine.command:bos-command-model</include>
 									<include>org.bonitasoft.engine.command:bos-command-model-impl</include>
 									<include>org.bonitasoft.engine.command:bos-command-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-api</include>
+									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl</include>
+									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core:bos-process-engine</include>
 									<include>org.bonitasoft.engine.core:bos-home-server</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
@@ -391,6 +416,11 @@
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
+									<include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
+									<include>org.bonitasoft.engine.dependency:bonita-dependency-model</include>
+									<include>org.bonitasoft.engine.dependency:bonita-dependency-model-impl</include>
+									<include>org.bonitasoft.engine.dependency:bonita-dependency-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model</include>
@@ -451,15 +481,6 @@
 									<include>org.bonitasoft.engine.xml:bonita-xml-validate-sax</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-write-api</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-write-dom</include>
-									<include>org.bonitasoft.engine.archive:bonita-archive-api</include>
-									<include>org.bonitasoft.engine.archive:bonita-archive-impl</include>
-		    						<include>org.bonitasoft.engine.core.category:bos-category-api</include>
-		    						<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
-		    						<include>org.bonitasoft.engine.core.category:bos-category-model</include>
-		    						<include>org.bonitasoft.engine.core.category:bos-category-model-impl</include>
-		    						<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
-									<include>org.bonitasoft.engine.expression:bos-expression-api</include>
-									<include>org.bonitasoft.engine.expression:bos-expression-model</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
