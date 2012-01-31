@@ -24,6 +24,10 @@
 					value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
 				<entry key="transition_instance"
 					value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
+				<entry key="start_event_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
+				<entry key="end_event_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -51,6 +55,12 @@
 					key="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl"
 					value="10011" />
 				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl"
+					value="10011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl"
+					value="10011" />
+				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl"
 					value="10013" />
 			</map>
@@ -74,6 +84,12 @@
 					value="f" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl"
+					value="f" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl"
+					value="f" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl"
 					value="f" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl"
@@ -111,6 +127,22 @@
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="gate" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl.insertSStartEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="startEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl.insertSEndEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="endEvent" />
+				</bean>
 				
 				<!-- update -->
 				
@@ -132,6 +164,18 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl.updateSStartEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl.updateSEndEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
+				</bean>
 				
 				<!-- delete -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -143,6 +187,24 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl.deleteSAutomaticTaskInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.deleteSGatewayInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl.deleteSStartEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl.deleteSEndEventInstanceImpl" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
 				</bean>
@@ -230,6 +292,13 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance"
 					value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
+				<entry
+				 	key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance"
+				 	value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl"/>
+			 	<entry
+				 	key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance"
+				 	value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl"/>
+				
 			</map>
 		</constructor-arg>
 	</bean>
@@ -245,12 +314,18 @@
 					value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" />
 				<entry key="arch_user_task_instance"
 					value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" />
+				<entry key="arch_flow_node_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
+				<entry key="arch_start_event_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
+				<entry key="arch_end_event_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>																	  
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedProcessInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedActivityInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedFlowNodeInstanceMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -267,6 +342,12 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl"
 					value="20011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl"
+					value="20011" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl"
+					value="20011" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -276,13 +357,19 @@
 					value="ap" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance"
-					value="aa" />
+					value="af" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance"
-					value="aa" />
+					value="af" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance"
-					value="aa" />
+					value="af" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance"
+					value="af" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance"
+					value="af" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -308,6 +395,22 @@
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="user" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl.insertSAStartEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.insertAActivityInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="startEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl.insertSAEndEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.insertAActivityInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="endEvent" />
+				</bean>
 				
 				<!-- delete -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -319,6 +422,18 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl.deleteSAUserTaskInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl.deleteSAStartEventInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl.deleteSAEndEventInstanceImpl" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
@@ -342,6 +457,12 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance"
 					value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance"
+					value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance"
+					value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
 			</map>
 		</constructor-arg>
 	</bean>

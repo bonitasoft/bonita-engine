@@ -63,6 +63,7 @@
 		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
 		<constructor-arg name="transitionService" ref="transitionService" />
 		<constructor-arg name="expressionService" ref="expressionService" />
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 	</bean>
 
 	<bean id="transactionExecutor" class="org.bonitasoft.engine.core.process.instance.impl.TransactionExecutorImpl">
@@ -83,4 +84,12 @@
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 	</bean>
+	
+	<bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl">
+		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="persistenceRead" ref="persistenceService" />
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
+	</bean>
+	
 </beans>
