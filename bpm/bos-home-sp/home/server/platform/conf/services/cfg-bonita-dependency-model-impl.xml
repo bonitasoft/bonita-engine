@@ -3,8 +3,11 @@
 
 	<bean id="dependencyBuilderAccessor" class="org.bonitasoft.engine.dependency.model.builder.impl.DependencyBuilderAccessorImpl" />
 
-	<bean id="dependencyBuilder" class="org.bonitasoft.engine.dependency.model.builder.impl.DependencyBuilderImpl" />
-
-	<bean id="dependencyMappingBuilder" class="org.bonitasoft.engine.dependency.model.builder.impl.DependencyMappingBuilderImpl" />
-
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/dependency/model/impl/db/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/dependency/model/impl/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/dependency/model/impl/db/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="filter" value="journal" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/dependency/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
+	</bean>
 </beans>

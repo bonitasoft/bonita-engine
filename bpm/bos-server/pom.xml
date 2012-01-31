@@ -131,6 +131,21 @@
 			<artifactId>bonita-dependency-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bos-dependency-platform-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bos-dependency-platform-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bos-dependency-platform-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Event -->
 		<dependency>
@@ -418,6 +433,9 @@
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
+									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl</include>
+									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-impl</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-model</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-model-impl</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-model-impl-mybatis</include>
