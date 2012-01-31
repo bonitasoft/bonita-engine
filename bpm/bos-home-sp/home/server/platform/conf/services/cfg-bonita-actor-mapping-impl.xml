@@ -6,7 +6,7 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="parser" ref="parser" />
+		<constructor-arg name="parserFactory" ref="parserFactory" />
 		<constructor-arg name="xmlWriter" ref="xmlWriter" />
 	</bean>
 
@@ -18,7 +18,7 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/actor/mapping/db/${db.vendor}-deleteTenantObjects.sql" />
 	</bean>
 
-	<bean id="parser" class="org.bonitasoft.engine.xml.parse.SAXParser">
+	<bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
 		<constructor-arg name="validator" ref="validator" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
