@@ -114,6 +114,19 @@
 			<artifactId>bos-command-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- connector executor -->
+		<dependency>
+			<artifactId>bos-connector-executor-api-impl</artifactId>
+			<groupId>org.bonitasoft.engine.connector</groupId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- connector service -->
+		<dependency>
+			<artifactId>bos-connector-service-api-impl</artifactId>
+			<groupId>org.bonitasoft.engine.core.connector</groupId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Dependency -->
 		<dependency>
@@ -404,6 +417,8 @@
 									<include>org.bonitasoft.engine.command:bos-command-model</include>
 									<include>org.bonitasoft.engine.command:bos-command-model-impl</include>
 									<include>org.bonitasoft.engine.command:bos-command-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.connector:bos-connector-executor-api</include>
+									<include>org.bonitasoft.engine.connector:bos-connector-executor-api-impl</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl-mybatis</include>
@@ -414,6 +429,8 @@
 									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-model-impl</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api</include>
+									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api-impl</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
 									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>

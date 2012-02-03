@@ -40,7 +40,12 @@
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 	</bean>
 
-	<bean id="activityStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ActivityStateManagerImpl" />
+	<bean id="activityStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ActivityStateManagerImpl">
+		<constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
+		<constructor-arg name="connectorService" ref="connectorService"></constructor-arg>
+		<constructor-arg name="processInstanceService" ref="processInstanceService"></constructor-arg>
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager"></constructor-arg>
+	</bean>
 	
 	<bean id="processInstanceStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceStateManagerImpl" />
 
@@ -64,6 +69,7 @@
 		<constructor-arg name="transitionService" ref="transitionService" />
 		<constructor-arg name="expressionService" ref="expressionService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+		<constructor-arg name="connectorService" ref="connectorService" />
 	</bean>
 
 	<bean id="transactionExecutor" class="org.bonitasoft.engine.core.process.instance.impl.TransactionExecutorImpl">

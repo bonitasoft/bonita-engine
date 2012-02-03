@@ -28,6 +28,8 @@
 					value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
 				<entry key="end_event_instance"
 					value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
+				<entry key="connector_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -35,6 +37,7 @@
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/FlowNodeInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/TransitionInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ConnectorInstanceMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -63,6 +66,9 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl"
 					value="10013" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl"
+					value="10014" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -94,6 +100,9 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl"
 					value="t" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl"
+					value="c" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -298,6 +307,9 @@
 			 	<entry
 				 	key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance"
 				 	value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl"/>
+			 	<entry
+				 	key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance"
+				 	value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl"/>
 				
 			</map>
 		</constructor-arg>
