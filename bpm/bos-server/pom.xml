@@ -159,7 +159,24 @@
 			<artifactId>bos-dependency-platform-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		
+		<!-- Document -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
+			<artifactId>bos-process-document-mapping-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
+			<artifactId>bos-process-document-mapping-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
+			<artifactId>bos-process-document-mapping-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
@@ -443,6 +460,9 @@
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-api-impl</include>
+									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-model-impl</include>
+									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
