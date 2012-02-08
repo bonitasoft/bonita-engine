@@ -295,6 +295,23 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Platform Command -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bos-platform-command-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bos-platform-command-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bos-platform-command-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Process -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
@@ -453,6 +470,11 @@
 									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>
 									<include>org.bonitasoft.engine.core.parameter:bos-parameter-api</include>
 									<include>org.bonitasoft.engine.core.parameter:bos-parameter-propertyfile</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-api</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-api-impl</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model-impl</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
