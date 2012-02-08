@@ -516,8 +516,6 @@
 									<include>org.bonitasoft.engine.log:bonita-log-model</include>
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl-mybatis</include>
-									<include>org.bonitasoft.engine.log:bonita-log-technical-api</include>
-									<include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>
 									<include>com.bonitasoft.engine.log:bos-log-api-impl-sp</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
@@ -552,12 +550,6 @@
 									<include>org.bonitasoft.engine.sessionaccessor:bos-session-accessor-threadlocal</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-parse-api</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-validate-api</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-validate-sax</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-write-api</include>
-									<include>org.bonitasoft.engine.xml:bonita-xml-write-dom</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
