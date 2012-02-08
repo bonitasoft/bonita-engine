@@ -417,6 +417,13 @@
 			<artifactId>bos-common-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- ??? -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.profile</groupId>
+			<artifactId>bos-profile-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -534,6 +541,9 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
+									<include>org.bonitasoft.engine.profile:bos-profile-api</include>
+									<include>org.bonitasoft.engine.profile:bos-profile-impl</include>
+									<include>org.bonitasoft.engine.profile:bos-profile-impl-hibernate</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
