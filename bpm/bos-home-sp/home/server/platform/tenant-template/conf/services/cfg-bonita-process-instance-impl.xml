@@ -70,6 +70,8 @@
 		<constructor-arg name="expressionService" ref="expressionService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="connectorService" ref="connectorService" />
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 	</bean>
 
 	<bean id="transactionExecutor" class="org.bonitasoft.engine.core.process.instance.impl.TransactionExecutorImpl">

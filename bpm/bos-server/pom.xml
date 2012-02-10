@@ -115,16 +115,68 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-		<!-- connector executor -->
+		<!-- Connector executor -->
 		<dependency>
 			<artifactId>bos-connector-executor-api-impl</artifactId>
 			<groupId>org.bonitasoft.engine.connector</groupId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- connector service -->
+
+		<!-- Connector service -->
 		<dependency>
 			<artifactId>bos-connector-service-api-impl</artifactId>
 			<groupId>org.bonitasoft.engine.core.connector</groupId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Data -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-data-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-data-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-data-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Data Definition -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.data.definition</groupId>
+			<artifactId>bos-data-definition-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Data Instance -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.data.instance</groupId>
+			<artifactId>bos-data-instance-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.data.instance</groupId>
+			<artifactId>bos-data-instance-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.data.instance</groupId>
+			<artifactId>bos-data-instance-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.data.instance</groupId>
+			<artifactId>bos-data-instance-data-source-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.data</groupId>
+			<artifactId>bos-data-instance-transient-data-source</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -162,6 +214,16 @@
 		
 		<!-- Document -->
 		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-opencmis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
 			<artifactId>bos-process-document-mapping-api-impl</artifactId>
 			<version>${project.version}</version>
@@ -176,7 +238,17 @@
 			<artifactId>bos-process-document-mapping-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document</groupId>
+			<artifactId>bos-process-document-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document</groupId>
+			<artifactId>bos-process-document-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
@@ -497,6 +569,21 @@
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.data:bonita-data-api</include>
+									<include>org.bonitasoft.engine.data:bonita-data-impl</include>
+									<include>org.bonitasoft.engine.data:bonita-data-model</include>
+									<include>org.bonitasoft.engine.data:bonita-data-model-impl</include>
+									<include>org.bonitasoft.engine.data:bonita-data-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.data.definition:bos-data-definition-model</include>
+									<include>org.bonitasoft.engine.data.definition:bos-data-definition-model-impl</include>
+									<include>org.bonitasoft.engine.data.instance:bos-data-instance-api</include>
+									<include>org.bonitasoft.engine.data.instance:bos-data-instance-api-impl</include>
+									<include>org.bonitasoft.engine.data.instance:bos-data-instance-data-source</include>
+									<include>org.bonitasoft.engine.data.instance:bos-data-instance-data-source-impl</include>
+									<include>org.bonitasoft.engine.data.instance:bos-data-instance-model</include>
+									<include>org.bonitasoft.engine.data.instance:bos-data-instance-model-impl</include>
+									<include>org.bonitasoft.engine.data.instance:bos-data-instance-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core.data:bos-data-instance-transient-data-source</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
 									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl</include>
