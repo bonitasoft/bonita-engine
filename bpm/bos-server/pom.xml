@@ -562,6 +562,7 @@
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-api-impl</include>
+									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-model</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
