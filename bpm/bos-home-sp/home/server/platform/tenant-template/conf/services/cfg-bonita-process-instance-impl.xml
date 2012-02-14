@@ -32,6 +32,7 @@
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
 	</bean>
 
 	<bean id="activityInstanceExecutor" class="org.bonitasoft.engine.core.process.instance.impl.ActivityExecutorImpl">

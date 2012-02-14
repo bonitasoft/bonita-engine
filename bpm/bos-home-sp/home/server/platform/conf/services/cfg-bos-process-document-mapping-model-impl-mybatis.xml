@@ -39,7 +39,11 @@
 		<constructor-arg name="statementMapping" ref="statementsMapping"></constructor-arg>
 		<constructor-arg name="dbStatementsMapping" ref="dbStatementsMapping"></constructor-arg>
 		<constructor-arg name="entityMappings">
-			<map/>
+			<map>
+				<entry
+					key="org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping"
+					value="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" />
+			</map>
 		</constructor-arg>
 	</bean>
 	

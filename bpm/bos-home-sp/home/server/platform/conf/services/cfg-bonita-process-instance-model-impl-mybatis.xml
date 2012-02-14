@@ -30,6 +30,10 @@
 					value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
 				<entry key="connector_instance"
 					value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
+				<entry key="event_trigger_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" />
+				<entry key="timer_event_trigger_instance"
+					value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -38,6 +42,7 @@
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/FlowNodeInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/TransitionInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ConnectorInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/EventTriggerInstanceMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -69,6 +74,9 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl"
 					value="10014" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl"
+					value="10015" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -89,6 +97,9 @@
 					key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance"
 					value="f" />
 				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance"
+					value="f" />
+				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl"
 					value="f" />
 				<entry
@@ -103,6 +114,15 @@
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl"
 					value="c" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl"
+					value="te" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl"
+					value="e" />
+				<entry
+					key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance"
+					value="e" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -152,6 +172,14 @@
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="endEvent" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.insertSTimerEventTriggerInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.insertSEventTriggerInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="timer" />
+				</bean>
 				
 				<!-- update -->
 				
@@ -185,6 +213,12 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.updateSTimerEventTriggerInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.updateSEventTriggerInstanceImpl" />
+				</bean>
 				
 				<!-- delete -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -216,6 +250,12 @@
 						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl.deleteSEndEventInstanceImpl" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.deleteSTimerEventTriggerInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.deleteSEventTriggerInstanceImpl" />
 				</bean>
 				
 				<!-- get -->
@@ -273,6 +313,30 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getAssigneeUserTasks" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance.getEventInstancesFromRootContainer" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getEventInstancesFromRootContainer" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance.getEventInstanceById" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getEventInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.getEventTriggerInstances" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getEventTriggerInstances" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.getEventTriggerInstanceById" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getEventTriggerInstanceById" />
+				</bean>
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
@@ -310,6 +374,9 @@
 			 	<entry
 				 	key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance"
 				 	value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl"/>
+			 	<entry
+				 	key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance"
+				 	value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl"/>
 				
 			</map>
 		</constructor-arg>
