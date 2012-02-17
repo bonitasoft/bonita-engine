@@ -36,9 +36,11 @@
 	</bean>
 
 	<bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
-		<constructor-arg name="validator" ref="xmlValidator" />
+		<constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
+
+	<bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
 
 	<bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
 
