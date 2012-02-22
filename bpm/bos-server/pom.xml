@@ -532,11 +532,12 @@
 									<include>org.bonitasoft.engine.command:bos-command-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.connector:bos-connector-executor-api</include>
 									<include>org.bonitasoft.engine.connector:bos-connector-executor-api-impl</include>
+									<include>org.bonitasoft.engine.core:bos-expression-resolver-api</include>
+									<include>org.bonitasoft.engine.core:bos-home-server</include>
+									<include>org.bonitasoft.engine.core:bos-process-engine</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bos-actor-mapping-impl-mybatis</include>
-									<include>org.bonitasoft.engine.core:bos-process-engine</include>
-									<include>org.bonitasoft.engine.core:bos-home-server</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-api-impl</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
@@ -544,16 +545,12 @@
 									<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api</include>
 									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api-impl</include>
+									<include>org.bonitasoft.engine.core.data:bos-data-instance-transient-data-source</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
 									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>
 									<include>org.bonitasoft.engine.core.parameter:bos-parameter-api</include>
 									<include>org.bonitasoft.engine.core.parameter:bos-parameter-propertyfile</include>
-									<include>org.bonitasoft.engine.platform.command:bos-platform-command-api</include>
-									<include>org.bonitasoft.engine.platform.command:bos-platform-command-api-impl</include>
-									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model</include>
-									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model-impl</include>
-									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
@@ -561,6 +558,11 @@
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core.process.document:bos-process-document-api</include>
+									<include>org.bonitasoft.engine.core.process.document:bos-process-document-impl</include>
+									<include>org.bonitasoft.engine.core.process.document:bos-process-document-model</include>
+									<include>org.bonitasoft.engine.core.process.document:bos-process-document-model-impl</include>
+									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-api</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-api-impl</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-model</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bos-process-document-mapping-model-impl</include>
@@ -584,15 +586,18 @@
 									<include>org.bonitasoft.engine.data.instance:bos-data-instance-model</include>
 									<include>org.bonitasoft.engine.data.instance:bos-data-instance-model-impl</include>
 									<include>org.bonitasoft.engine.data.instance:bos-data-instance-model-impl-mybatis</include>
-									<include>org.bonitasoft.engine.core.data:bos-data-instance-transient-data-source</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
-									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl</include>
-									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl-mybatis</include>
-									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-impl</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-model</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-model-impl</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-impl</include>
+									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl</include>
+									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.document:bonita-document-api</include>
+									<include>org.bonitasoft.engine.document:bonita-document-model</include>
+									<include>org.bonitasoft.engine.document:bonita-document-model-impl</include>
+									<include>org.bonitasoft.engine.document:bonita-document-opencmis</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model</include>
@@ -611,6 +616,8 @@
 									<include>org.bonitasoft.engine.log:bonita-log-model</include>
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.log:bonita-log-technical-api</include>
+									<include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>
 									<include>com.bonitasoft.engine.log:bos-log-api-impl-sp</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
@@ -620,18 +627,23 @@
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-read</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-api</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-api-impl</include>
-									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api</include>
-									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api-impl</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api</include>
+									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api-impl</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-api</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-api-impl</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model-impl</include>
+									<include>org.bonitasoft.engine.platform.command:bos-platform-command-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-api</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-impl</include>
-									<include>org.bonitasoft.engine.profile:bos-profile-impl-hibernate</include>
+									<include>org.bonitasoft.engine.profile:bos-profile-impl-mybatis</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
@@ -648,6 +660,12 @@
 									<include>org.bonitasoft.engine.sessionaccessor:bos-session-accessor-threadlocal</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-parse-api</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-validate-api</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-validate-sax</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-write-api</include>
+									<include>org.bonitasoft.engine.xml:bonita-xml-write-dom</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
