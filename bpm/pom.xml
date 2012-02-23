@@ -18,4 +18,27 @@
 		<module>bos-deploy</module>
 		<module>bos-home-sp</module>
 	</modules>
+	<profiles>
+		<profile>
+			<id>tests</id>
+			<modules>
+				<module>bos-integration-tests</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

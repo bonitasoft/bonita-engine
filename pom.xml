@@ -51,5 +51,27 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>tests</id>
+			<modules>
+				<module>services</module>
+				<module>bpm</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>
