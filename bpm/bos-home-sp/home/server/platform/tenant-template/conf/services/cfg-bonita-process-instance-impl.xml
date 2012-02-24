@@ -35,6 +35,7 @@
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 	</bean>
 
 	<bean id="activityInstanceExecutor" class="org.bonitasoft.engine.core.process.instance.impl.ActivityExecutorImpl">
@@ -44,7 +45,7 @@
 	</bean>
 
 	<bean id="activityStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ActivityStateManagerImpl">
-		<constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
+		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="connectorService" ref="connectorService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
@@ -81,7 +82,6 @@
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
-		
 	</bean>
 
 	<bean id="transactionExecutor" class="org.bonitasoft.engine.core.process.instance.impl.TransactionExecutorImpl">
