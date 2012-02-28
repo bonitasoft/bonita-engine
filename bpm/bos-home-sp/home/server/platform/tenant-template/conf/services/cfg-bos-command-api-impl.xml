@@ -109,4 +109,76 @@
 		</constructor-arg>
 	</bean>
 	
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>addProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Add profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.AddProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Get profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.GetProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>countProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Count profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.CountProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>deleteProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Delete profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.DeleteProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>updateProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Update profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.UpdateProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>searchProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Search profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.SearchProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>addProfileEntry</value></constructor-arg>
+		<constructor-arg name="description"><value>Add profile Entry</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.AddProfileEntry</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getProfileEntry</value></constructor-arg>
+		<constructor-arg name="description"><value>Get profile entry</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.GetProfileEntry</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>countProfileEntry</value></constructor-arg>
+		<constructor-arg name="description"><value>Count profile entry</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.CountProfileEntry</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>deleteProfileEntry</value></constructor-arg>
+		<constructor-arg name="description"><value>Delete Profile entry</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.DeleteProfileEntry</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>updateProfileEntry</value></constructor-arg>
+		<constructor-arg name="description"><value>Update profile entry</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.UpdateProfileEntry</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>searchProfileEntry</value></constructor-arg>
+		<constructor-arg name="description"><value>Search profile entry</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.SearchProfileEntry</value></constructor-arg>
+	</bean>
 </beans>
