@@ -53,7 +53,9 @@
 		<constructor-arg name="expressionService" ref="expressionService" />
 		<constructor-arg name="schedulerService" ref="scheduler" />
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 	</bean>
 	
 	<bean id="processInstanceStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceStateManagerImpl" />
