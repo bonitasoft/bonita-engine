@@ -181,4 +181,53 @@
 		<constructor-arg name="description"><value>Search profile entry</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.SearchProfileEntry</value></constructor-arg>
 	</bean>
+	
+		<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>addUserProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Add user profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.AddUserProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>countUserForProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Count user for profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.CountUsersForProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>deleteUserProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Delete user profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.DeleteUserProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getProfilesForUser</value></constructor-arg>
+		<constructor-arg name="description"><value>Get profiles for user</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.GetProfilesForUser</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>searchUsersForProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Search users for profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.SearchUsersForProfile</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>isAllowedToStartProcess</value></constructor-arg>
+		<constructor-arg name="description"><value>Check if one of many actors can be allowed to start process.(who's the process Initiator)</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcess</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>isAllowedToSeeOverviewForm</value></constructor-arg>
+		<constructor-arg name="description"><value>Check if one of many actors can be allowed to read overview form.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToSeeOverviewForm</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>isAllowedToSeeInstanciationForm</value></constructor-arg>
+		<constructor-arg name="description"><value>Check if one of many actors can be allowed to read Instanciation form.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToSeeInstanciationForm</value></constructor-arg>
+	</bean>
+	
 </beans>

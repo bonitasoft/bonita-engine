@@ -23,4 +23,10 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
+	<bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
+		<constructor-arg name="platformDependencyService" ref="platformDependencyService" />
+		<constructor-arg name="dependencyService" ref="dependencyService" />
+		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
+	</bean>
+
 </beans>

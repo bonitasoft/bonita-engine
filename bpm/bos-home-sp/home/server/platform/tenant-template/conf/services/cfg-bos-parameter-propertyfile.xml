@@ -5,4 +5,8 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 	</bean>
 
+	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.parameter.ParameterExpressionExecutorStrategy">
+		<constructor-arg name="parameterService" ref="parameterService"></constructor-arg>
+	</bean>
+
 </beans>
