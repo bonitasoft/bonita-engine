@@ -42,8 +42,8 @@
 					value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
 				<entry key="waiting_event"
 					value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" />
-				<entry key="waiting_message_start_event"
-					value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageStartEventImpl" />
+				<entry key="waiting_message_event"
+					value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -96,7 +96,7 @@
 					key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl"
 					value="10015" />
 				<entry
-					key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageStartEventImpl"
+					key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl"
 					value="10016" />
 				<entry
 					key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl"
@@ -160,7 +160,7 @@
 					key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent"
 					value="w" />
 				<entry
-					key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageStartEvent"
+					key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent"
 					value="w" />
 			</map>
 		</constructor-arg>
@@ -237,11 +237,11 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageStartEventImpl.insertSWaitingMessageStartEventImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.insertSWaitingMessageEventImpl" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.insertSWaitingEventImpl" />
 					<constructor-arg name="parameterName" value="kind" />
-					<constructor-arg name="parameterValue" value="startMessage" />
+					<constructor-arg name="parameterValue" value="message" />
 				</bean>
 				
 				<!-- update -->
@@ -340,7 +340,7 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageStartEventImpl.deleteSWaitingMessageStartEventImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.deleteSWaitingMessageEventImpl" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.deleteSWaitingEventImpl" />
 				</bean>
@@ -432,7 +432,7 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageStartEventImpl.getCaughtMessagesByNameAndSource" />
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getCaughtMessagesByNameAndSource" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getCaughtMessagesByNameAndSource" />
 				</bean>
@@ -483,8 +483,8 @@
 				 	key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent"
 				 	value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl"/>
 			 	<entry
-				 	key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageStartEvent"
-				 	value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageStartEventImpl"/>
+				 	key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent"
+				 	value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl"/>
 			 	<entry
 				 	key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance"
 				 	value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl"/>
