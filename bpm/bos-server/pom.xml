@@ -36,6 +36,18 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Supervisor Mapping -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
+			<artifactId>bos-supervisor-mapping-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
+			<artifactId>bos-supervisor-mapping-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- API -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
@@ -575,6 +587,9 @@
 									<include>org.bonitasoft.engine.core.category:bos-category-model</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-model-impl</include>
 									<include>org.bonitasoft.engine.core.category:bos-category-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.core.supervisor.mapping:bos-supervisor-mapping-api</include>
+									<include>org.bonitasoft.engine.core.supervisor.mapping:bos-supervisor-mapping-impl</include>
+									<include>org.bonitasoft.engine.core.supervisor.mapping:bos-supervisor-mapping-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api</include>
 									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api-impl</include>
 									<include>org.bonitasoft.engine.core.data:bos-data-instance-transient-data-source</include>
