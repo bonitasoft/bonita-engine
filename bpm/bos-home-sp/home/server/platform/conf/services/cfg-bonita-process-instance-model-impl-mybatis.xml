@@ -25,6 +25,7 @@
 				<entry key="waiting_event" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" />
 				<entry key="waiting_message_event" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
 				<entry key="waiting_signal_event" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />
+				<entry key="message_event_couple" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -36,6 +37,7 @@
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/EventTriggerInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/MessageInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/WaitingEventMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/MessageEventCoupleMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -211,6 +213,12 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.updateSEventTriggerInstanceImpl" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.updateSWaitingMessageEventImpl" />
+					<constructor-arg name="destinationStatement"
+						 value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.updateSWaitingEventImpl" />
+				</bean>
 
 				<!-- delete -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -355,6 +363,12 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getWaitingMessageEventById" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getWaitingMessageEventById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getListeningSignals" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getListeningSignals" />
@@ -383,6 +397,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
