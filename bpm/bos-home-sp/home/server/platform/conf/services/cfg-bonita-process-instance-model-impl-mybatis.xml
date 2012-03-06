@@ -14,6 +14,7 @@
 				<entry key="transition_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 				<entry key="start_event_instance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
 				<entry key="intermediate_catch_event_instance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
+				<entry key="intermediate_throw_event_instance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" />
 				<entry key="end_event_instance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
 				<entry key="connector_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
 				<entry key="event_trigger_instance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" />
@@ -46,6 +47,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="10013" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="10014" />
@@ -68,6 +70,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" value="f" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="t" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="c" />
@@ -118,6 +121,13 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="intermediateCatchEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl.insertSIntermediateThrowEventInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="intermediateThrowEvent" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl.insertSEndEventInstanceImpl" />
@@ -187,6 +197,11 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl.updateSIntermediateThrowEventInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl.updateSEndEventInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
@@ -217,6 +232,11 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl.deleteSIntermediateCatchEventInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl.deleteSIntermediateThrowEventInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -321,6 +341,12 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getCaughtMessagesByNameAndSource" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getListeningSignals" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getListeningSignals" />
+				</bean>
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
@@ -337,6 +363,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" />
