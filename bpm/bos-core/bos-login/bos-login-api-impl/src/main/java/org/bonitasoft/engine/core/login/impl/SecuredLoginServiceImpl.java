@@ -47,7 +47,7 @@ public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginSe
             final SessionAccessor sessionAccessor, final IdentityService identityService) {
         super(sessionService, identityService);
         this.authenticationService = authenticationService;
-        this.sessionAccesor = sessionAccessor;
+        sessionAccesor = sessionAccessor;
     }
 
     @Override
@@ -62,7 +62,9 @@ public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginSe
             handleInvalidUser(tenantId, userName, password, e);
         }
         try {
-            return getSessionService().createSession(tenantId, userName, userId);
+            final SSession createSession = getSessionService().createSession(tenantId, userName);
+            getSessionService().setCurrentUserId(createSession, userId);
+            return createSession;
         } catch (final SessionException se) {
             throw new LoginException(se);
         }
