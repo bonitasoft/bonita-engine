@@ -36,6 +36,23 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Actor Privileges -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
+			<artifactId>bos-actor-privilege-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
+			<artifactId>bos-actor-privilege-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.bonitasoft.engine.actor.privilege</groupId> -->
+<!-- 			<artifactId>bos-actor-privilege-model-impl-mybatis</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+
 		<!-- Supervisor Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
@@ -303,7 +320,6 @@
 			<version>${project.version}</version>
 		</dependency> 
 		
-
 		<!-- Expression resolver -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
@@ -419,6 +435,23 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>
 			<artifactId>bos-platform-command-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Privileges -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.privilege</groupId>
+			<artifactId>bos-privilege-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.privilege</groupId>
+			<artifactId>bos-privilege-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.privilege</groupId>
+			<artifactId>bos-privilege-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -556,6 +589,11 @@
 							<artifactSet>
 								<includes>
 									<include>org.bonitasoft.engine:bonita-commons</include>
+									<include>org.bonitasoft.engine.actor.privilege:bos-actor-privilege-api</include>
+									<include>org.bonitasoft.engine.actor.privilege:bos-actor-privilege-api-impl</include>
+									<include>org.bonitasoft.engine.actor.privilege:bos-actor-privilege-model</include>
+									<include>org.bonitasoft.engine.actor.privilege:bos-actor-privilege-model-impl</include>
+									<include>org.bonitasoft.engine.actor.privilege:bos-actor-privilege-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.api:bos-server-api</include>
 									<include>org.bonitasoft.engine.api:bos-server-api-local</include>
 									<include>org.bonitasoft.engine.api:bos-server-api-ejb2</include>
@@ -693,6 +731,11 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
+									<include>org.bonitasoft.engine.privilege:bonita-privilege-api</include>
+									<include>org.bonitasoft.engine.privilege:bonita-privilege-api-impl</include>
+									<include>org.bonitasoft.engine.privilege:bonita-privilege-model</include>
+									<include>org.bonitasoft.engine.privilege:bonita-privilege-model-impl</include>
+									<include>org.bonitasoft.engine.privilege:bonita-privilege-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-api</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-impl</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-impl-mybatis</include>
