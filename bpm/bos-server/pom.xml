@@ -308,17 +308,6 @@
 			<artifactId>bos-expression-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.operation</groupId>
-			<artifactId>bos-operation-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.operation</groupId>
-			<artifactId>bos-operation-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency> 
 		
 		<!-- Expression resolver -->
 		<dependency>
@@ -374,6 +363,18 @@
 			<artifactId>bonita-monitoring-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- Operation -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.operation</groupId>
+			<artifactId>bos-operation-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.operation</groupId>
+			<artifactId>bos-operation-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency> 
 
 		<!-- Parameter -->
 		<dependency>

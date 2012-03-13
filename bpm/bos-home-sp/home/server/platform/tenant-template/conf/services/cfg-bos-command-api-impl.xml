@@ -248,5 +248,17 @@
 		<constructor-arg name="description"><value>Check if one of many actors can be allowed to read Instanciation form.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToSeeInstanciationForm</value></constructor-arg>
 	</bean>
-	
+
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getNumberOfAssignedTasksSupervisedBy</value></constructor-arg>
+		<constructor-arg name="description"><value>Returns the total number of assigned user tasks of process definitions supervised by a user.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.supervisor.GetNumberOfAssignedTasksSupervisedBy</value></constructor-arg>
+	</bean>
+
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getAssignedTasksSupervisedBy</value></constructor-arg>
+		<constructor-arg name="description"><value>Returns the list of assigned user tasks of process definition supervised by a user.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.supervisor.GetAssignedTasksSupervisedBy</value></constructor-arg>
+	</bean>
+
 </beans>

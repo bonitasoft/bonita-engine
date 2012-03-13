@@ -282,6 +282,18 @@
 
 				<!-- get -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getUserTaskInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getFlowNodeInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getNumberOfAssignedTasksSupervisedBy" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfAssignedTasksSupervisedBy" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getAssignedTasksSupervisedBy" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getAssignedTasksSupervisedBy" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getPendingUserTasks" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getPendingUserTasks" />
 				</bean>

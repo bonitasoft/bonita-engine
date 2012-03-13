@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.core.login.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -29,6 +27,7 @@ import org.bonitasoft.engine.core.login.LoginServiceImpl;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.session.SessionException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
@@ -79,32 +78,18 @@ public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginSe
             }
         } catch (final BonitaHomeNotSetException bhnse) {
             throw new LoginException(bhnse);
-        } catch (final FileNotFoundException fnfe) {
-            throw new LoginException(fnfe);
+        } catch (final IOException ioe) {
+            throw new LoginException(ioe);
         }
     }
 
     private boolean checkTechinicalUserCredentials(final long tenantId, final String userName, final String password) throws BonitaHomeNotSetException,
-            FileNotFoundException, LoginException {
+            LoginException, IOException {
         final String technicalUserPropertiesPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "technical-user.properties";
-        final Properties techProp = new Properties();
-        final FileInputStream fis = new FileInputStream(technicalUserPropertiesPath);
-        try {
-            techProp.load(fis);
-            final String techinicalUser = (String) techProp.get("userName");
-            final String techinicalPassword = (String) techProp.get("userPassword");
-            return userName.equals(techinicalUser) && password.equals(techinicalPassword);
-        } catch (final IOException e) {
-            throw new LoginException(e);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (final IOException e) {
-                    throw new LoginException(e);
-                }
-            }
-        }
+        final Properties properties = PropertiesManager.getPropertiesFromFile(new String(technicalUserPropertiesPath));
+        final String techinicalUser = (String) properties.get("userName");
+        final String techinicalPassword = (String) properties.get("userPassword");
+        return techinicalUser != null && techinicalUser.equals(userName) && techinicalPassword != null && techinicalPassword.equals(password);
     }
 
 }
