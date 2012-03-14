@@ -42,6 +42,7 @@
 		<constructor-arg name="activityStateManager" ref="activityStateManager" />
 		<constructor-arg name="activityInstanceManager" ref="activityInstanceService" />
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
+		<constructor-arg name="operationService" ref="operationService" />
 	</bean>
 
 	<bean id="activityStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ActivityStateManagerImpl">
