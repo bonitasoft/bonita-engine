@@ -544,6 +544,12 @@
 			<artifactId>bonita-transaction-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- UserFilter -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.filter</groupId>
+			<artifactId>bos-user-filter-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- XML -->
 		<dependency>
@@ -632,6 +638,8 @@
 									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api</include>
 									<include>org.bonitasoft.engine.core.connector:bos-connector-service-api-impl</include>
 									<include>org.bonitasoft.engine.core.data:bos-data-instance-transient-data-source</include>
+									<include>org.bonitasoft.engine.core.filter:bos-user-filter-api</include>
+									<include>org.bonitasoft.engine.core.filter:bos-user-filter-impl</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
 									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>
