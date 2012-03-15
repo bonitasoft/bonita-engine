@@ -10,7 +10,8 @@
 		<constructor-arg name="eventService" ref="eventService"></constructor-arg>
 		<constructor-arg name="parserFactory" ref="parserFactory" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="expressionService" ref="expressionService" />
+		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+		<constructor-arg name="operationService" ref="operationService" />
 	</bean>
 	
 </beans>
