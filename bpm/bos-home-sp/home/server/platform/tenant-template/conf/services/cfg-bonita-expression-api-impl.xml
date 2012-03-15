@@ -1,23 +1,16 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="expressionService"
-		class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
-		<constructor-arg name="expressionExecutorStrategyProvider"
-			ref="expressionExecutorStrategyProvider"></constructor-arg>
+	<bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
+		<constructor-arg name="expressionExecutorStrategyProvider" ref="expressionExecutorStrategyProvider" />
 	</bean>
 
-	<bean id="expressionExecutorStrategyProvider"
-		class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider" autowire="byType">
-	</bean>
+	<bean id="expressionExecutorStrategyProvider" class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider" autowire="byType" />
 
-	<bean id="ConstantExpressionExecutorStrategy"
-		class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy">
-	</bean>
+	<bean id="ConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
 
-	<bean id="GroovyScriptExpressionExecutorStrategy"
-		class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorStrategy">
-	</bean>
+	<bean id="GroovyScriptExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorStrategy" />
+	
+	<bean id="InputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
+
 </beans>
