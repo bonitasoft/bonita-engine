@@ -740,11 +740,11 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-api</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-api-impl</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-model</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-model-impl</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-model-impl-mybatis</include>
+									<include>org.bonitasoft.engine.privilege:bos-privilege-api</include>
+									<include>org.bonitasoft.engine.privilege:bos-privilege-api-impl</include>
+									<include>org.bonitasoft.engine.privilege:bos-privilege-model</include>
+									<include>org.bonitasoft.engine.privilege:bos-privilege-model-impl</include>
+									<include>org.bonitasoft.engine.privilege:bos-privilege-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-api</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-impl</include>
 									<include>org.bonitasoft.engine.profile:bos-profile-impl-mybatis</include>
