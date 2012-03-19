@@ -275,4 +275,16 @@
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForProcessDefinition</value></constructor-arg>
 	</bean>
 	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getNumberOfPendingTasksSupervisedBy</value></constructor-arg>
+		<constructor-arg name="description"><value>Returns the total number of pending user tasks of process definitions supervised by a user.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.supervisor.GetNumberOfPendingTasksSupervisedBy</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getPendingTasksSupervisedBy</value></constructor-arg>
+		<constructor-arg name="description"><value>Returns the list of pending user tasks of process definition supervised by a user.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.supervisor.GetPendingTasksSupervisedBy</value></constructor-arg>
+	</bean>
+	
 </beans>
