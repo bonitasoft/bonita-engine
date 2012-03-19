@@ -47,11 +47,11 @@
 			<artifactId>bos-actor-privilege-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.bonitasoft.engine.actor.privilege</groupId> -->
-<!-- 			<artifactId>bos-actor-privilege-model-impl-mybatis</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
+			<artifactId>bos-actor-privilege-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Supervisor Mapping -->
 		<dependency>

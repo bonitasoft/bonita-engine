@@ -405,6 +405,10 @@
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getNumberOfAssignedUserTaskInstances" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfAssignedUserTaskInstances" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getNumberOfPendingTasksSupervisedBy" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfPendingTasksSupervisedBy" />
+				</bean>
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
