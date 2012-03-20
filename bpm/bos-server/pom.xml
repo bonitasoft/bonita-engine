@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -150,7 +151,7 @@
 			<artifactId>bos-web-commands</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Connector executor -->
 		<dependency>
 			<artifactId>bos-connector-executor-api-impl</artifactId>
@@ -247,7 +248,7 @@
 			<artifactId>bos-dependency-platform-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Document -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.document</groupId>
@@ -374,7 +375,7 @@
 			<groupId>org.bonitasoft.engine.core.operation</groupId>
 			<artifactId>bos-operation-model-impl</artifactId>
 			<version>${project.version}</version>
-		</dependency> 
+		</dependency>
 
 		<!-- Parameter -->
 		<dependency>
@@ -777,6 +778,24 @@
 							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
 							<createDependencyReducedPom>true</createDependencyReducedPom>
 							<createSourcesJar>true</createSourcesJar>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>javadoc-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<includeDependencySources>true</includeDependencySources>
+							<dependencySourceIncludes>
+								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
+							</dependencySourceIncludes>
 						</configuration>
 					</execution>
 				</executions>
