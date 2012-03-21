@@ -130,6 +130,12 @@
 	</bean>
 	
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>searchProcessSupervisors</value></constructor-arg>
+		<constructor-arg name="description"><value>Search process supervisor for process definition.</value></constructor-arg>
+		<constructor-arg name="implementation"><value>org.bonitasoft.engine.external.process.SearchProcessSupervisors</value></constructor-arg>
+	</bean>
+	
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>addProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Add profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.AddProfile</value></constructor-arg>
@@ -274,7 +280,15 @@
 		</constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForProcessDefinition</value></constructor-arg>
 	</bean>
-	
+
+	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>getUpdatedVariableValuesForActivityInstance</value></constructor-arg>
+		<constructor-arg name="description">
+			<value>Returns the map of updatedVariable after executing operations. Use parameter keys OPERATIONS_WITH_CONTEXT_MAP_KEY, CURRENT_VARIABLE_VALUES_MAP_KEY, ACTIVITY_INSTANCE_ID_KEY</value>
+		</constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForActivityInstance</value></constructor-arg>
+	</bean>
+		
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>getNumberOfPendingTasksSupervisedBy</value></constructor-arg>
 		<constructor-arg name="description"><value>Returns the total number of pending user tasks of process definitions supervised by a user.</value></constructor-arg>
