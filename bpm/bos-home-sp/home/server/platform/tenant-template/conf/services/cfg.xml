@@ -29,4 +29,8 @@
 		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
 	</bean>
 
+	<bean id="searchEntitiesDescriptor" class="org.bonitasoft.engine.search.SearchEntitiesDescriptor">
+		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
+	</bean>
+
 </beans>
