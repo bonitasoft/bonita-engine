@@ -47,4 +47,5 @@
 	<bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
 		<constructor-arg name="validator" ref="xmlValidator" />
 	</bean>
+	
 </beans>

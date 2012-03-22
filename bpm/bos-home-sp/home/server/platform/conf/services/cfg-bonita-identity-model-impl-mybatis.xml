@@ -90,12 +90,5 @@
 			</map>
 		</constructor-arg>
 	</bean>
-	
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-createTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-initTables.sql" />
-		<constructor-arg name="filter" value="journal" />
-	</bean>
 
 </beans>

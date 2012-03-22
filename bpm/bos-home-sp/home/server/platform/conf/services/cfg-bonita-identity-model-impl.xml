@@ -2,5 +2,13 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="identityModelBuilder" class="org.bonitasoft.engine.identity.model.builder.impl.IdentityModelBuilderImpl" />
+	
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="filter" value="journal" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/identity/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
+	</bean>
 
 </beans>
