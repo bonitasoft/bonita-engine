@@ -10,7 +10,7 @@
 	<bean id="ConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
 
 	<bean id="GroovyScriptExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorStrategy" />
-	
+
 	<bean id="InputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
 
 </beans>

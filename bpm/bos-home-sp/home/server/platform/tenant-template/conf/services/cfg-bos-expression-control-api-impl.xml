@@ -4,4 +4,5 @@
 	<bean id="expressionResolverService" class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl">
 		<constructor-arg name="expressionService" ref="expressionService" />
 	</bean>
+
 </beans>

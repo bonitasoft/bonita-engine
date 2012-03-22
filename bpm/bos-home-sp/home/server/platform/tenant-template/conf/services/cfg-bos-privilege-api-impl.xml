@@ -7,4 +7,5 @@
 		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 	</bean>
+
 </beans>

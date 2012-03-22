@@ -8,4 +8,5 @@
 	<bean id="technicalLoggerConfiguration" class="org.bonitasoft.engine.log.technical.BaseTechnicalLoggerConfiguration">
 		<constructor-arg name="needsInferCaller" value="true" />
 	</bean>
+
 </beans>

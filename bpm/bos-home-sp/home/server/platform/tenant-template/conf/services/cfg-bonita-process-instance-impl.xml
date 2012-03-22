@@ -45,7 +45,7 @@
 		<constructor-arg name="operationService" ref="operationService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />		
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="activityStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ActivityStateManagerImpl">
@@ -61,7 +61,7 @@
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 	</bean>
-	
+
 	<bean id="processInstanceStateManager" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceStateManagerImpl" />
 
 	<bean id="processInstanceExecutor" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceExecutorImpl">
@@ -79,7 +79,7 @@
 			</bean>
 		</constructor-arg>
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
-		<constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
 		<constructor-arg name="transitionService" ref="transitionService" />
 		<constructor-arg name="expressionService" ref="expressionService" />
@@ -112,7 +112,7 @@
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 	</bean>
-	
+
 	<bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl">
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
@@ -120,5 +120,5 @@
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 	</bean>
-	
+
 </beans>

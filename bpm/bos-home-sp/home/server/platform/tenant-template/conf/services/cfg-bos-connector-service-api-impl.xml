@@ -13,5 +13,5 @@
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="operationService" ref="operationService" />
 	</bean>
-	
+
 </beans>

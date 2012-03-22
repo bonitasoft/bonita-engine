@@ -1,16 +1,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.BusinessLoggerServiceOptions" >
+	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.BusinessLoggerServiceOptions">
 		<constructor-arg name="needsInferCall" value="false" />
-        <constructor-arg name="loggableLevels">
-            <list>
-                <value>IDENTITY_USER_UPDATED:INTERNAL</value>
-                <value>IDENTITY_USER_DELETED:INTERNAL</value>
-                <value>execute_connector:BUSINESS</value>
-            </list>
-        </constructor-arg>
-    </bean>
+		<constructor-arg name="loggableLevels">
+			<list>
+				<value>IDENTITY_USER_UPDATED:INTERNAL</value>
+				<value>IDENTITY_USER_DELETED:INTERNAL</value>
+				<value>execute_connector:BUSINESS</value>
+			</list>
+		</constructor-arg>
+	</bean>
 
 	<bean id="syncBusinessLogService" class="org.bonitasoft.engine.services.impl.SyncBusinessLoggerServiceImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />

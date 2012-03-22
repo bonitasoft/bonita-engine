@@ -6,4 +6,5 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
+
 </beans>
