@@ -45,6 +45,8 @@
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="operationService" ref="operationService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
