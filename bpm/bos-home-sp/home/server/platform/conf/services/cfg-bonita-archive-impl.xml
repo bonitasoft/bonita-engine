@@ -9,7 +9,11 @@
 			<map>
 				<entry>
 					<key>
-						<bean class="org.bonitasoft.engine.archive.impl.ArchiveDescriptorImpl" /><!-- all time archive -->
+						<bean id="archiveDescriptor1" class="org.bonitasoft.engine.archive.impl.SArchiveDescriptorImpl">
+							<constructor-arg name="name" value="DEFINITIVE_0" />
+							<constructor-arg name="oldestTime" value="1230739200052" /> <!-- 01/01/2009 -->
+							<constructor-arg name="newestTime" value="9999999999999" /> <!-- ever -->
+						</bean>
 					</key>
 					<ref bean="history"/>
 				</entry>
