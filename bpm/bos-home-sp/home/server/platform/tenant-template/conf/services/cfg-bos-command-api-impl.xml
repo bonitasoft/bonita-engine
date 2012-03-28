@@ -327,39 +327,21 @@
 	</bean>
 
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
-		<constructor-arg name="name">
-			<value>addUserProfile</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Add user profile</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.web.userprofile.command.AddUserProfile</value>
-		</constructor-arg>
+		<constructor-arg name="name"><value>addProfileMember</value></constructor-arg>
+		<constructor-arg name="description"><value>Add profile member</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.AddProfileMember</value></constructor-arg>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
-		<constructor-arg name="name">
-			<value>countUserForProfile</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Count user for profile</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.web.userprofile.command.CountUsersForProfile</value>
-		</constructor-arg>
+		<constructor-arg name="name"><value>countProfileMembersForProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Count profile members for profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.CountProfileMembersForProfile</value></constructor-arg>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
-		<constructor-arg name="name">
-			<value>deleteUserProfile</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Delete user profile</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.web.userprofile.command.DeleteUserProfile</value>
-		</constructor-arg>
+		<constructor-arg name="name"><value>deleteProfileMember</value></constructor-arg>
+		<constructor-arg name="description"><value>Delete profile member</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.DeleteProfileMember</value></constructor-arg>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
@@ -375,15 +357,9 @@
 	</bean>
 
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
-		<constructor-arg name="name">
-			<value>searchUsersForProfile</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Search users for profile</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.web.userprofile.command.SearchUsersForProfile</value>
-		</constructor-arg>
+		<constructor-arg name="name"><value>searchProfileMembersForProfile</value></constructor-arg>
+		<constructor-arg name="description"><value>Search profile members for profile</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.SearchProfileMembersForProfile</value></constructor-arg>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
