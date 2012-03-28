@@ -92,6 +92,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="w" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="w" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="mapping" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="usertask" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
