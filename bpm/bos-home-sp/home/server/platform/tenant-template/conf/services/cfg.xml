@@ -31,6 +31,8 @@
 
 	<bean id="searchEntitiesDescriptor" class="org.bonitasoft.engine.search.SearchEntitiesDescriptor">
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
+		<constructor-arg name="privilegeBuilders" ref="privilegeBuilders" />
+		<constructor-arg name="actorPrivilegeBuilders" ref="actorPrivilegeBuilders" />
 	</bean>
 
 </beans>
