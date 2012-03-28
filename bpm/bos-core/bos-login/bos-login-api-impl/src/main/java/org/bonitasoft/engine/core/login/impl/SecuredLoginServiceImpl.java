@@ -42,9 +42,9 @@ public class SecuredLoginServiceImpl extends LoginServiceImpl implements LoginSe
 
     private final SessionAccessor sessionAccesor;
 
-    public SecuredLoginServiceImpl(final AuthenticationService authenticationService, final SessionService SSessionService,
+    public SecuredLoginServiceImpl(final AuthenticationService authenticationService, final SessionService sessionService,
             final SessionAccessor sessionAccessor, final IdentityService identityService) {
-        super(SSessionService, identityService);
+        super(sessionService, identityService);
         this.authenticationService = authenticationService;
         sessionAccesor = sessionAccessor;
     }
