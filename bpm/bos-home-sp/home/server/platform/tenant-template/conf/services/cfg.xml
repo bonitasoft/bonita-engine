@@ -33,6 +33,8 @@
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="privilegeBuilders" ref="privilegeBuilders" />
 		<constructor-arg name="actorPrivilegeBuilders" ref="actorPrivilegeBuilders" />
+		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="activityStateManager" ref="activityStateManager" />
 	</bean>
 
 </beans>
