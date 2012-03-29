@@ -36,6 +36,7 @@
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="activityStateManager" ref="activityStateManager" />
 		<constructor-arg name="sSupervisorBuilders" ref="sSupervisorBuilders" />
+		<constructor-arg name="definitionBuilders" ref="bpmDefinitionBuilders" />
 	</bean>
 
 </beans>
