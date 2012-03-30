@@ -13,7 +13,7 @@
 		<constructor-arg ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="transactionExecutor" class="org.bonitasoft.engine.core.process.instance.impl.TransactionExecutorImpl">
+	<bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">
 		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 
