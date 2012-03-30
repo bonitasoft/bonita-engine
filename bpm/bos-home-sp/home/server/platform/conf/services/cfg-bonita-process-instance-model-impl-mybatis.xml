@@ -73,6 +73,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="f" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="f" />
@@ -453,6 +454,14 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfPendingTasksSupervisedBy" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfPendingTasksSupervisedBy" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstanceManagedBy" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstanceManagedBy" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.searchSHumanTaskInstanceManagedBy" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstanceManagedBy" />
 				</bean>
 			</set>
 		</constructor-arg>
