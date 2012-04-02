@@ -37,6 +37,7 @@
 		<constructor-arg name="activityStateManager" ref="activityStateManager" />
 		<constructor-arg name="sSupervisorBuilders" ref="sSupervisorBuilders" />
 		<constructor-arg name="definitionBuilders" ref="bpmDefinitionBuilders" />
+		<constructor-arg name="commentBuilders" ref="commentBuilders" />
 	</bean>
 
 	<bean id="activityInstanceExecutor" class="org.bonitasoft.engine.execution.ActivityExecutorImpl">
@@ -77,7 +78,7 @@
 		<constructor-arg name="activityExecutor" ref="activityInstanceExecutor" />
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="processInstanceExecutorDelegate">
-			<bean class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceExecutorDelegateScheduling">
+			<bean class="org.bonitasoft.engine.execution.ProcessInstanceExecutorDelegateScheduling">
 				<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 				<constructor-arg name="schedulerService" ref="scheduler" />
 			</bean>
@@ -103,7 +104,7 @@
 					<key>
 						<value>PROCESSINSTANCE_STATE_IS_MODIFIED</value>
 					</key>
-					<bean class="org.bonitasoft.engine.core.process.instance.handlers.ArchiveProcesseInstancesHandler">
+					<bean class="org.bonitasoft.engine.execution.handler.ArchiveProcesseInstancesHandler">
 						<constructor-arg name="archiveService" ref="archiveService" />
 						<constructor-arg name="instancesBuilders" ref="bpmInstanceBuilders" />
 						<constructor-arg name="logger" ref="technicalLoggerService" />
