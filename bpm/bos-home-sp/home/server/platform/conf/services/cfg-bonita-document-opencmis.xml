@@ -10,14 +10,17 @@
 
 	<bean id="documentBuilder" class="org.bonitasoft.engine.document.model.impl.SDocumentBuilderImpl" />
 
+<!-- 	<bean -->
+<!-- 		class="org.bonitasoft.engine.document.impl.CMISDocumentServiceImpl" id="documentService"> -->
+<!-- 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" /> -->
+<!-- 		<constructor-arg name="sessionService" ref="sessionService" /> -->
+<!-- 		<constructor-arg value="http://192.168.1.217:8387/xcmis/rest/cmisatom" /> -->
+<!-- 		<constructor-arg value="default" /> -->
+<!-- 		<constructor-arg ref="xCmisUserProvider"/> -->
+<!-- 		<constructor-arg ref="documentBuilder"/> -->
+<!-- 	</bean> -->
 	<bean
-		class="org.bonitasoft.engine.document.impl.CMISDocumentServiceImpl" id="documentService">
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="sessionService" ref="sessionService" />
-		<constructor-arg value="http://192.168.1.217:8387/xcmis/rest/cmisatom" />
-		<constructor-arg value="default" />
-		<constructor-arg ref="xCmisUserProvider"/>
-		<constructor-arg ref="documentBuilder"/>
+		class="org.bonitasoft.engine.document.impl.InMemoryTemporaryDocumentServiceImpl" id="documentService">
 	</bean>
 
 </beans>

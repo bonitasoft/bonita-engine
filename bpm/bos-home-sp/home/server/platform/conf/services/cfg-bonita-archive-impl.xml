@@ -38,10 +38,12 @@
 			</list>
 		</constructor-arg>
 		<constructor-arg name="logger" ref="technicalLoggerService"/>
+		<constructor-arg name="configurator" ref="archiveServiceConfigurator" />
 	</bean>
 	
-
-
-
+	
+	<bean id="archiveServiceConfigurator" class="org.bonitasoft.engine.archive.impl.ArchiveServiceConfiguratorImpl">
+		<constructor-arg name="regexp" value=".*" />
+	</bean>
 
 </beans>

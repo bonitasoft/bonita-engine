@@ -11,4 +11,12 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 	</bean>
 	
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-initTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="filter" value="journal|history" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
+	</bean>
+	
 </beans>
