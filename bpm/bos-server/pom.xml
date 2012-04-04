@@ -348,8 +348,8 @@
 
 		<!-- Login -->
 		<dependency>
-			<groupId>com.bonitasoft.engine.core.login</groupId>
-			<artifactId>bos-login-api-impl-sp</artifactId>
+			<groupId>org.bonitasoft.engine.core.login</groupId>
+			<artifactId>bonita-login-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -662,7 +662,6 @@
 									<include>org.bonitasoft.engine.core.filter:bos-user-filter-impl</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
-									<include>com.bonitasoft.engine.core.login:bos-login-api-impl-sp</include>
 									<include>org.bonitasoft.engine.core.operation:bos-operation-api</include>
 									<include>org.bonitasoft.engine.core.operation:bos-operation-api-impl</include>
 									<include>org.bonitasoft.engine.core.operation:bos-operation-model</include>

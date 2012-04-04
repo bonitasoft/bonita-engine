@@ -11,7 +11,4 @@
 	<artifactId>bos-core-sp</artifactId>
 	<packaging>pom</packaging>
 
-	<modules>
-		<module>bos-login</module>
-	</modules>
 </project>
