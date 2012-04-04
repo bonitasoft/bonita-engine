@@ -52,4 +52,5 @@ public class LogTestSP extends CommonAPITest {
         assertNull(logs.get(2).getCallerMethodName());
         logout();
     }
+
 }

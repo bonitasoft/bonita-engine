@@ -235,8 +235,7 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.updateSWaitingMessageEventImpl" />
-					<constructor-arg name="destinationStatement"
-						 value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.updateSWaitingEventImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.updateSWaitingEventImpl" />
 				</bean>
 
 				<!-- delete -->
@@ -305,8 +304,10 @@
 
 				<!-- get -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl.getLastAProcessInstanceByProcessInstanceId" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl.getLastAProcessInstanceByProcessInstanceId" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl.getLastAProcessInstanceByProcessInstanceId" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl.getLastAProcessInstanceByProcessInstanceId" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getUserTaskInstanceById" />
@@ -341,8 +342,10 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getPendingUserTasksWithoutActorIds" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstanceSupervisedBy" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstanceSupervisedBy" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstanceSupervisedBy" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstanceSupervisedBy" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.searchSHumanTaskInstanceSupervisedBy" />
@@ -435,14 +438,11 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getWaitingMessageEventById" />
-					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getWaitingMessageEventById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getWaitingMessageEventById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getListeningSignals" />
-					<constructor-arg name="destinationStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getListeningSignals" />
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getListeningSignals" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getListeningSignals" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfAssignedUserTaskInstances" />
@@ -453,7 +453,8 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfPendingTasksSupervisedBy" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstanceManagedBy" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstanceManagedBy" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstanceManagedBy" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -461,12 +462,16 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstanceManagedBy" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstancewithSSupervisor" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstancewithSSupervisor" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstancewithSSupervisor" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstancewithSSupervisor" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.searchSHumanTaskInstancewithSSupervisor" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstancewithSSupervisor" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.searchSHumanTaskInstancewithSSupervisor" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstancewithSSupervisor" />
 				</bean>
 			</set>
 		</constructor-arg>
@@ -562,7 +567,8 @@
 					<constructor-arg name="parameterValue" value="user" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl.insertSAManualTaskInstanceImpl" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl.insertSAManualTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.insertAActivityInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="manual" />
@@ -602,35 +608,43 @@
 						value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl.deleteSAEndEventInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
-				
+
 				<!-- get -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl.getNumberOfSAHumanTaskInstanceSupervisedBy" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getNumberOfSAHumanTaskInstanceSupervisedBy" />
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.getNumberOfSAHumanTaskInstanceSupervisedBy" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getNumberOfSAHumanTaskInstanceSupervisedBy" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl.searchSAHumanTaskInstanceSupervisedBy" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAHumanTaskInstanceSupervisedBy" />
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.searchSAHumanTaskInstanceSupervisedBy" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAHumanTaskInstanceSupervisedBy" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.searchSAHumanTaskInstance" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAHumanTaskInstance" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.getNumberOfSAHumanTaskInstance" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getNumberOfSAHumanTaskInstance" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.getNumberOfSAHumanTaskInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getNumberOfSAHumanTaskInstance" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.searchSAHumanTaskInstanceManagedBy" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAHumanTaskInstanceManagedBy" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.searchSAHumanTaskInstanceManagedBy" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAHumanTaskInstanceManagedBy" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.getNumberOfSAHumanTaskInstanceManagedBy" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getNumberOfSAHumanTaskInstanceManagedBy" />
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl.getNumberOfSAHumanTaskInstanceManagedBy" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getNumberOfSAHumanTaskInstanceManagedBy" />
 				</bean>
-				
+
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
