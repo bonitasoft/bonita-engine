@@ -9,6 +9,6 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/profile/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 	</bean>
 
-	<bean id="SProfileBuilderAccessor" class="org.bonitasoft.engine.profile.model.impl.SProfileBuilderAccessorImpl"/>
+	<bean id="sProfileBuilderAccessor" class="org.bonitasoft.engine.profile.model.impl.SProfileBuilderAccessorImpl"/>
 	
 </beans>

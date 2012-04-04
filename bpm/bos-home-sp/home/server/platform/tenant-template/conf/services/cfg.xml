@@ -37,6 +37,7 @@
 		<constructor-arg name="activityStateManager" ref="activityStateManager" />
 		<constructor-arg name="sSupervisorBuilders" ref="sSupervisorBuilders" />
 		<constructor-arg name="definitionBuilders" ref="bpmDefinitionBuilders" />
+		<constructor-arg name="sProfileBuilderAccessor" ref="sProfileBuilderAccessor" />
 		<constructor-arg name="commentBuilders" ref="commentBuilders" />
 	</bean>
 
