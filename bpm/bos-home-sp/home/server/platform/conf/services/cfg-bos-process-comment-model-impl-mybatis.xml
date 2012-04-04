@@ -5,12 +5,12 @@
 	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
 			<map>
-				<entry key="sComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" />
+				<entry key="process_comment" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-<!-- 				<value>org/bonitasoft/engine/core/process/comment/model/impl/mybatis/CommentMapper.xml</value> -->
+				<value>org/bonitasoft/engine/core/process/comment/model/impl/mybatis/CommentMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">

@@ -165,7 +165,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
-			<artifactId>bos-process-comment-model-impl-hibernate</artifactId>
+			<artifactId>bos-process-comment-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -640,7 +640,7 @@
 									<include>org.bonitasoft.engine.core.process.comment:bos-process-comment-api-impl</include>
 									<include>org.bonitasoft.engine.core.process.comment:bos-process-comment-model</include>
 									<include>org.bonitasoft.engine.core.process.comment:bos-process-comment-model-impl</include>
-									<include>org.bonitasoft.engine.core.process.comment:bos-process-comment-model-impl-hibernate</include>
+									<include>org.bonitasoft.engine.core.process.comment:bos-process-comment-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.connector:bos-connector-executor-api</include>
 									<include>org.bonitasoft.engine.connector:bos-connector-executor-api-impl</include>
 									<include>org.bonitasoft.engine.core:bos-expression-resolver-api</include>
