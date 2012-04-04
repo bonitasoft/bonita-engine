@@ -5,6 +5,7 @@
 		<constructor-arg name="needsInferCall" value="false" />
 		<constructor-arg name="loggableLevels">
 			<list>
+				<value>IDENTITY_USER_CREATED:INTERNAL</value>
 				<value>IDENTITY_USER_UPDATED:INTERNAL</value>
 				<value>IDENTITY_USER_DELETED:INTERNAL</value>
 				<value>execute_connector:BUSINESS</value>
