@@ -39,6 +39,7 @@
 		<constructor-arg name="definitionBuilders" ref="bpmDefinitionBuilders" />
 		<constructor-arg name="sProfileBuilderAccessor" ref="sProfileBuilderAccessor" />
 		<constructor-arg name="commentBuilders" ref="commentBuilders" />
+		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
 	</bean>
 
 	<bean id="activityInstanceExecutor" class="org.bonitasoft.engine.execution.ActivityExecutorImpl">
