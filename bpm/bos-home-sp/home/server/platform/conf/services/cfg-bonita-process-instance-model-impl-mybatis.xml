@@ -481,6 +481,18 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstancewithSSupervisor" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstancePendingManagedBy" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstancePendingManagedBy" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.searchSHumanTaskInstancePendingManagedBy" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstancePendingManagedBy" />
+				</bean>					
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
