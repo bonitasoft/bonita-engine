@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.BPMTestsSP;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -10,7 +11,9 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    BPMTestsSP.class
+    BPMTestsSP.class,
+    BPMLocalTests.class,
+    BPMRemoteTests.class
 })
 public class LocalIntegrationTestsSP {
 

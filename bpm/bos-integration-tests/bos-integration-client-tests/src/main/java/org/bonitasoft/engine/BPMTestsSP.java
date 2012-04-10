@@ -12,7 +12,6 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  BPMLocalTests.class,
   UserTestSP.class,
   LogTestSP.class
 })
