@@ -7,13 +7,57 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
 		<constructor-arg name="defaultCommandProvider">
-			<bean class="org.bonitasoft.engine.command.api.impl.DefaultCommandProvider" autowire="byType" />
+			<bean class="org.bonitasoft.engine.command.api.impl.DefaultCommandProvider">
+				<property name="defaultCommands">
+					<list>
+						<ref bean="getActorIdsForUserIdIncludingTeam"/>
+						<ref bean="evaluateExpressionsOnProcessInstance"/>
+						<ref bean="evaluateExpressionsOnProcessDefinition"/>
+						<ref bean="evaluateExpressionsOnActivityInstance"/>
+						<ref bean="evaluateExpressionsOnCompletedActivityInstance"/>
+						<ref bean="evaluateExpressionOnCompletedProcessInstance"/>
+						<ref bean="evaluateExpressionAtProcessInstanciation"/>
+						<ref bean="isUserProcessSupervisor"/>
+						<ref bean="createSupervisor"/>
+						<ref bean="getSupervisor"/>
+						<ref bean="deleteSupervisor"/>
+						<ref bean="searchProcessSupervisors"/>
+						<ref bean="addProfile"/>
+						<ref bean="getProfile"/>
+						<ref bean="countProfile"/>
+						<ref bean="deleteProfile"/>
+						<ref bean="updateProfile"/>
+						<ref bean="searchProfile"/>
+						<ref bean="addProfileEntry"/>
+						<ref bean="getProfileEntry"/>
+						<ref bean="countProfileEntry"/>
+						<ref bean="deleteProfileEntry"/>
+						<ref bean="updateProfileEntry"/>
+						<ref bean="searchProfileEntry"/>
+						<ref bean="executeActionsAndTerminate"/>
+						<ref bean="addProfileMember"/>
+						<ref bean="countProfileMembersForProfile"/>
+						<ref bean="deleteProfileMember"/>
+						<ref bean="getProfilesForUser"/>
+						<ref bean="searchProfileMembersForProfile"/>
+						<ref bean="isAllowedToStartProcess"/>
+						<ref bean="isAllowedToSeeOverviewForm"/>
+						<ref bean="isAllowedToSeeInstanciationForm"/>
+						<ref bean="searchAssignedTasksSupervisedBy"/>
+						<ref bean="searchArchivedTasksSupervisedBy"/>
+						<ref bean="getUpdatedVariableValuesForProcessDefinition"/>
+						<ref bean="getUpdatedVariableValuesForActivityInstance"/>
+						<ref bean="searchProcessDefinitionsSupervisedBy"/>
+						<ref bean="searchSCommentSupervisedBy"/>
+					</list>
+				</property>
+			</bean>
 		</constructor-arg>
 	</bean>
 
 	<bean name="commandBuilderAccessor" class="org.bonitasoft.engine.command.model.SCommandBuilderAccessorImpl" />
 
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="getActorIdsForUserIdIncludingTeam" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name">
 			<value>getActorIdsForUserIdIncludingTeam</value>
 		</constructor-arg>
@@ -25,7 +69,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="evaluateExpressionsOnProcessInstance" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name">
 			<value>evaluateExpressionsOnProcessInstance</value>
 		</constructor-arg>
@@ -37,7 +81,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="evaluateExpressionsOnProcessDefinition" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name">
 			<value>evaluateExpressionsOnProcessDefinition</value>
 		</constructor-arg>
@@ -49,7 +93,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="evaluateExpressionsOnActivityInstance" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name">
 			<value>evaluateExpressionsOnActivityInstance</value>
 		</constructor-arg>
@@ -61,7 +105,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="evaluateExpressionsOnCompletedActivityInstance" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name">
 			<value>evaluateExpressionsOnCompletedActivityInstance</value>
 		</constructor-arg>
@@ -73,7 +117,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="evaluateExpressionOnCompletedProcessInstance" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name">
 			<value>evaluateExpressionOnCompletedProcessInstance</value>
 		</constructor-arg>
@@ -85,7 +129,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="evaluateExpressionAtProcessInstanciation" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name">
 			<value>evaluateExpressionAtProcessInstanciation</value>
 		</constructor-arg>
@@ -97,7 +141,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="isUserProcessSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>isUserProcessSupervisor</value></constructor-arg>
 		<constructor-arg name="description">
 			<value>Get if the user a supervisor of processDefinition. Use parameter keys USER_ID_KEY, PROCESS_DEFINITION_ID_KEY</value>
@@ -105,175 +149,169 @@
 		<constructor-arg name="implementation"><value>org.bonitasoft.engine.external.process.IsUserProcessSupervisor</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="createSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>createSupervisor</value></constructor-arg>
 		<constructor-arg name="description"><value>Create process supervisor.</value></constructor-arg>
 		<constructor-arg name="implementation"><value>org.bonitasoft.engine.external.process.CreateSupervisor</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="getSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>getSupervisor</value></constructor-arg>
 		<constructor-arg name="description"><value>Get process supervisor. Use parameter key SUPERVISOR_ID_KEY</value></constructor-arg>
 		<constructor-arg name="implementation"><value>org.bonitasoft.engine.external.process.GetSupervisor</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="deleteSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>deleteSupervisor</value></constructor-arg>
 		<constructor-arg name="description"><value>Delete process supervisor. Use parameter key SUPERVISOR_ID_KEY</value></constructor-arg>
 		<constructor-arg name="implementation"><value>org.bonitasoft.engine.external.process.DeleteSupervisor</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
-		<constructor-arg name="name"><value>countSupervisor</value></constructor-arg>
-		<constructor-arg name="description"><value>Count process supervisor for process definition. Use parameter key PROCESS_DEFINITION_ID_KEY</value></constructor-arg>
-		<constructor-arg name="implementation"><value>org.bonitasoft.engine.external.process.GetSupervisorCountOfProcess</value></constructor-arg>
-	</bean>
-	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="searchProcessSupervisors" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchProcessSupervisors</value></constructor-arg>
 		<constructor-arg name="description"><value>Search process supervisor for process definition.</value></constructor-arg>
 		<constructor-arg name="implementation"><value>org.bonitasoft.engine.external.process.SearchProcessSupervisors</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="addProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>addProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Add profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.AddProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="getProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>getProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Get profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.GetProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="countProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>countProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Count profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.CountProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="deleteProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>deleteProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Delete profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.DeleteProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="updateProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>updateProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Update profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.UpdateProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="searchProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Search profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.SearchProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="addProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>addProfileEntry</value></constructor-arg>
 		<constructor-arg name="description"><value>Add profile Entry</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.AddProfileEntry</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="getProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>getProfileEntry</value></constructor-arg>
 		<constructor-arg name="description"><value>Get profile entry</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.GetProfileEntry</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="countProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>countProfileEntry</value></constructor-arg>
 		<constructor-arg name="description"><value>Count profile entry</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.CountProfileEntry</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="deleteProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>deleteProfileEntry</value></constructor-arg>
 		<constructor-arg name="description"><value>Delete Profile entry</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.DeleteProfileEntry</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="updateProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>updateProfileEntry</value></constructor-arg>
 		<constructor-arg name="description"><value>Update profile entry</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.UpdateProfileEntry</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="searchProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchProfileEntry</value></constructor-arg>
 		<constructor-arg name="description"><value>Search profile entry</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profileentry.command.SearchProfileEntry</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="executeActionsAndTerminate" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>executeActionsAndTerminate</value></constructor-arg>
 		<constructor-arg name="description"><value>execute actions and terminate a user task instance</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="addProfileMember" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>addProfileMember</value></constructor-arg>
 		<constructor-arg name="description"><value>Add profile member</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.AddProfileMember</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="countProfileMembersForProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>countProfileMembersForProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Count profile members for profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.CountProfileMembersForProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="deleteProfileMember" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>deleteProfileMember</value></constructor-arg>
 		<constructor-arg name="description"><value>Delete profile member</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.DeleteProfileMember</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="getProfilesForUser" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>getProfilesForUser</value></constructor-arg>
 		<constructor-arg name="description"><value>Get profiles for user</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.GetProfilesForUser</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="searchProfileMembersForProfile" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchProfileMembersForProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Search profile members for profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.userprofile.command.SearchProfileMembersForProfile</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="isAllowedToStartProcess" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>isAllowedToStartProcess</value></constructor-arg>
 		<constructor-arg name="description"><value>Check if one of many actors can be allowed to start process.(who's the process Initiator)</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcess</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="isAllowedToSeeOverviewForm" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>isAllowedToSeeOverviewForm</value></constructor-arg>
 		<constructor-arg name="description"><value>Check if one of many actors can be allowed to read overview form.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToSeeOverviewForm</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="isAllowedToSeeInstanciationForm" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>isAllowedToSeeInstanciationForm</value></constructor-arg>
 		<constructor-arg name="description"><value>Check if one of many actors can be allowed to read Instanciation form.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToSeeInstanciationForm</value></constructor-arg>
 	</bean>
 
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="searchAssignedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchAssignedTasksSupervisedBy</value></constructor-arg>
 		<constructor-arg name="description"><value>Returns the list of assigned user tasks of process definition supervised by a user.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.task.supervisor.SearchAssignedTasksSupervisedBy</value></constructor-arg>
 	</bean>
 	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="searchArchivedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchArchivedTasksSupervisedBy</value></constructor-arg>
 		<constructor-arg name="description"><value>Returns the list of archived user tasks of process definition supervised by a user.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.task.supervisor.SearchArchivedTasksSupervisedBy</value></constructor-arg>
 	</bean>
 
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="getUpdatedVariableValuesForProcessDefinition" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>getUpdatedVariableValuesForProcessDefinition</value></constructor-arg>
 		<constructor-arg name="description">
 			<value>Returns the map of updatedVariable after executing operations. Use parameter keys OPERATIONS_WITH_CONTEXT_MAP_KEY, CURRENT_VARIABLE_VALUES_MAP_KEY, PROCESS_DEFINITION_ID_KEY</value>
@@ -281,7 +319,7 @@
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForProcessDefinition</value></constructor-arg>
 	</bean>
 
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="getUpdatedVariableValuesForActivityInstance" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>getUpdatedVariableValuesForActivityInstance</value></constructor-arg>
 		<constructor-arg name="description">
 			<value>Returns the map of updatedVariable after executing operations. Use parameter keys OPERATIONS_WITH_CONTEXT_MAP_KEY, CURRENT_VARIABLE_VALUES_MAP_KEY, ACTIVITY_INSTANCE_ID_KEY</value>
@@ -289,25 +327,16 @@
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForActivityInstance</value></constructor-arg>
 	</bean>
 		
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
-		<constructor-arg name="name"><value>getNumberOfPendingTasksSupervisedBy</value></constructor-arg>
-		<constructor-arg name="description"><value>Returns the total number of pending user tasks of process definitions supervised by a user.</value></constructor-arg>
-		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.supervisor.GetNumberOfPendingTasksSupervisedBy</value></constructor-arg>
-	</bean>
-	
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
-		<constructor-arg name="name"><value>getPendingTasksSupervisedBy</value></constructor-arg>
-		<constructor-arg name="description"><value>Returns the list of pending user tasks of process definition supervised by a user.</value></constructor-arg>
-		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.supervisor.GetPendingTasksSupervisedBy</value></constructor-arg>
-	</bean>
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+	<bean id="searchProcessDefinitionsSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchProcessDefinitionsSupervisedBy</value></constructor-arg>
 		<constructor-arg name="description"><value>Searching processeDefinitions whose supervisor is the specified user.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.supervisor.SearchProcessDefinitionsSupervisedBy</value></constructor-arg>
 	</bean>
-	<bean class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+
+	<bean id="searchSCommentSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchSCommentSupervisedBy</value></constructor-arg>
 		<constructor-arg name="description"><value>Returns the list comment of process definition supervised by a user.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value></constructor-arg>
 	</bean>
+	
 </beans>
