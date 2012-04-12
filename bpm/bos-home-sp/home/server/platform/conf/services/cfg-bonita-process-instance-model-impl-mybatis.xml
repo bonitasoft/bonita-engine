@@ -504,7 +504,19 @@
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfPendingTasksForUser" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfPendingTasksForUser" />
-				</bean>				
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumbersOfAssignedOverdueTasksForUsers" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumbersOfAssignedOverdueTasksForUsers" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfPendingOverdueTasksForUser" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfPendingOverdueTasksForUser" />
+				</bean>	
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
