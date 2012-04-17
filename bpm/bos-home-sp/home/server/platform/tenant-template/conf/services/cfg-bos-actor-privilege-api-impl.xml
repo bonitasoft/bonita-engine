@@ -4,6 +4,7 @@
 	<bean id="actorPrivilegeService" class="org.bonitasoft.engine.actor.privilege.api.impl.ActorPrivilegeServiceImpl">
 		<constructor-arg name="actorPrivilegeBuilders" ref="actorPrivilegeBuilders" />
 		<constructor-arg name="privilegeService" ref="privilegeService" />
+		<constructor-arg name="actorMappingService" ref="actorMappingService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
