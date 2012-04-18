@@ -8,23 +8,35 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>
 		<dependencySet>
-			<useProjectArtifact>false</useProjectArtifact>
-			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputDirectory>lib/client</outputDirectory>
 			<includes>
 				<include>com.bonitasoft.engine:bos-client-sp</include>
 			</includes>
-			<outputDirectory>lib/client</outputDirectory>
-		</dependencySet>
-		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>lib/server</outputDirectory>
 			<includes>
 				<include>com.bonitasoft.engine:bos-server-sp</include>
 			</includes>
-			<excludes>
-				<exclude>org.bonitasoft.engine:bos-common</exclude>
-			</excludes>
-			<outputDirectory>lib/server</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>ear/ejb3</outputDirectory>
+			<includes>
+				<include>com.bonitasoft.engine:bos-deploy-ear-sp</include>
+			</includes>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>resources</outputDirectory>
+			<includes>
+				<include>com.bonitasoft.engine:bos-home-sp</include>
+			</includes>
+			<unpack>true</unpack>
 		</dependencySet>
 	</dependencySets>
 

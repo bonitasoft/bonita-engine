@@ -20,6 +20,18 @@
 			<artifactId>bos-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bos-home-sp</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bos-deploy-ear-sp</artifactId>
+			<version>${project.version}</version>
+			<type>ear</type>
+		</dependency>
 	</dependencies>
 
 	<build>

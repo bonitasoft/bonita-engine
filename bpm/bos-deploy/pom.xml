@@ -11,6 +11,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>bos-deploy-ear</module>
 		<module>bos-engine-deploy</module>
 	</modules>
 </project>
