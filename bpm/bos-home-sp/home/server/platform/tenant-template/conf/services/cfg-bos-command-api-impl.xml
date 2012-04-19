@@ -49,6 +49,7 @@
 						<ref bean="getUpdatedVariableValuesForActivityInstance"/>
 						<ref bean="searchProcessDefinitionsSupervisedBy"/>
 						<ref bean="searchSCommentSupervisedBy"/>
+						<ref bean="isAllowedToStartProcesses"/>
 					</list>
 				</property>
 			</bean>
@@ -338,5 +339,9 @@
 		<constructor-arg name="description"><value>Returns the list comment of process definition supervised by a user.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value></constructor-arg>
 	</bean>
-	
+	<bean id="isAllowedToStartProcesses" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>isAllowedToStartProcesses</value></constructor-arg>
+		<constructor-arg name="description"><value>Check if the user can be allowed to start all of processes.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcesses</value></constructor-arg>
+	</bean>
 </beans>
