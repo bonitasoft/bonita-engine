@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wls:weblogic-application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wls="http://www.bea.com/ns/weblogic/weblogic-application" xsi:schemaLocation="http://www.bea.com/ns/weblogic/weblogic-application http://www.oracle.com/technology/weblogic/10.3/weblogic-application/1.0/weblogic-application.xsd http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/j2ee_1_4.xsd">
+
+  
+  <wls:prefer-application-packages>
+  	<wls:package-name>org.apache.log4j.*</wls:package-name>
+  	<wls:package-name>antlr.*</wls:package-name>
+  </wls:prefer-application-packages>
+ 
+      
+</wls:weblogic-application>

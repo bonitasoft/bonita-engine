@@ -11,14 +11,16 @@
 			<outputDirectory>lib/client</outputDirectory>
 			<includes>
 				<include>com.bonitasoft.engine:bos-client-sp</include>
+				<include>com.bonitasoft.engine:bos-common-sp</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
-			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<useTransitiveFiltering>false</useTransitiveFiltering>
 		</dependencySet>
 		<dependencySet>
 			<outputDirectory>lib/server</outputDirectory>
 			<includes>
 				<include>com.bonitasoft.engine:bos-server-sp</include>
+				<include>com.bonitasoft.engine:bos-common-sp</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveFiltering>true</useTransitiveFiltering>

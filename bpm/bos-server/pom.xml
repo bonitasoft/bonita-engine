@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -16,6 +15,17 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bos-process-engine</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bos-common</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bos-common-sp</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
@@ -53,7 +63,6 @@
 			<artifactId>bos-actor-privilege-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<!-- Supervisor Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
@@ -71,6 +80,12 @@
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bos-server-api</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bos-common</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
@@ -482,6 +497,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-model</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bos-common</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -562,6 +588,7 @@
 			<artifactId>bonita-transaction-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<!-- UserFilter -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.filter</groupId>
@@ -793,6 +820,9 @@
 									<include>org.bonitasoft.engine.xml:bonita-xml-write-api</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-write-dom</include>
 								</includes>
+								<excludes>
+									<exclude>org.bonitasoft.engine:bos-common</exclude>
+								</excludes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
 							<destFileName>${project.build.finalName}.jar</destFileName>
