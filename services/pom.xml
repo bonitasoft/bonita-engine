@@ -13,5 +13,31 @@
 
 	<modules>
 		<module>bos-log-sp</module>
+		<module>bos-events-sp</module>
 	</modules>
+	
+	<profiles>
+		<profile>
+			<id>tests</id>
+			<modules>
+				<module>bos-services-integration-tests-sp</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
 </project>

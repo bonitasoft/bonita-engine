@@ -1,0 +1,7 @@
+<project default="cleantarget">
+
+    <target name="cleantarget">
+        <delete dir="${basedir}/target" includes="*.db"/>
+    </target>
+
+</project>

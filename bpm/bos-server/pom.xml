@@ -325,8 +325,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl</artifactId>
+			<groupId>com.bonitasoft.engine.events</groupId>
+			<artifactId>bos-events-api-impl-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -747,6 +747,7 @@
 									<include>org.bonitasoft.engine.document:bonita-document-opencmis</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
+									<include>com.bonitasoft.engine.events:bos-events-api-impl-sp</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model-impl</include>
 									<include>org.bonitasoft.engine.expression:bos-expression-api</include>
