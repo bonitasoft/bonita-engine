@@ -12,7 +12,7 @@
 				<entry key="ShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" />
 				<entry key="LongDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" />
 				<entry key="BlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
-				<entry key="DATEDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDATEDataInstanceImpl" />
+				<entry key="DateDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" />
 				<entry key="LongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" />
 				<entry key="XMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
 				<entry key="DataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" />
@@ -33,7 +33,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="10020" />
-				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDATEDataInstanceImpl" value="10020" />
+				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="10021" />
@@ -48,7 +48,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" value="shortTextdaInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" value="longDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="blobDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDATEDataInstanceImpl" value="dateDataInst" />
+				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" value="dateDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" value="longTextDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" value="xmlDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="dataMapping" />
@@ -225,7 +225,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.SShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SShortDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SLongDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
-				<entry key="org.bonitasoft.engine.data.instance.model.SDATEDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDATEDataInstanceImpl" />
+				<entry key="org.bonitasoft.engine.data.instance.model.SDateDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SLongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" />
@@ -243,7 +243,7 @@
 				<entry key="ArchShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" />
 				<entry key="ArchLongDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" />
 				<entry key="ArchBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
-				<entry key="ArchDATEDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" />
+				<entry key="ArchDateDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" />
 				<entry key="ArchLongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" />
 				<entry key="ArchXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" />
 			</map>
