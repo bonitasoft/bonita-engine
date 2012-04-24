@@ -9,4 +9,5 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 	</bean>
+
 </beans>

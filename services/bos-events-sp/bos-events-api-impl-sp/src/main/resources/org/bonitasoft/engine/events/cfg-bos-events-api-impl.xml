@@ -1,10 +1,8 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="eventService" class="org.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
-		<constructor-arg name="eventBuilders" ref="eventBuilders"></constructor-arg>
+		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 		<constructor-arg name="handlers">
 			<map>
 				<entry key="USER_IS_UPDATED">
@@ -15,15 +13,11 @@
 				</entry>
 			</map>
 		</constructor-arg>
-		<constructor-arg name="logger" ref="technicalLoggerService"/>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
-	
-	<bean id ="employeeHandler" 
-		class="org.bonitasoft.engine.archive.test.model.SEmployeeHandlerImpl">
-	</bean>
-	
-	<bean id="userPasswordHandler"
-		class="org.bonitasoft.engine.identity.test.TestUserPasswordUpdateEventHandler">
-	</bean>
+
+	<bean id="employeeHandler" class="org.bonitasoft.engine.archive.test.model.SEmployeeHandlerImpl" />
+
+	<bean id="userPasswordHandler" class="org.bonitasoft.engine.identity.test.TestUserPasswordUpdateEventHandler" />
 
 </beans>

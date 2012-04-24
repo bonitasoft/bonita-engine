@@ -10,4 +10,5 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 	</bean>
+
 </beans>

@@ -1,7 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean class="org.bonitasoft.engine.document.impl.XCmisUserProvider" id="xCmisUserProvider">
 		<constructor-arg value="root" />
@@ -10,17 +8,16 @@
 
 	<bean id="documentBuilder" class="org.bonitasoft.engine.document.model.impl.SDocumentBuilderImpl" />
 
-<!-- 	<bean -->
-<!-- 		class="org.bonitasoft.engine.document.impl.CMISDocumentServiceImpl" id="documentService"> -->
-<!-- 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" /> -->
-<!-- 		<constructor-arg name="sessionService" ref="sessionService" /> -->
-<!-- 		<constructor-arg value="http://192.168.1.217:8387/xcmis/rest/cmisatom" /> -->
-<!-- 		<constructor-arg value="default" /> -->
-<!-- 		<constructor-arg ref="xCmisUserProvider"/> -->
-<!-- 		<constructor-arg ref="documentBuilder"/> -->
-<!-- 	</bean> -->
-	<bean
-		class="org.bonitasoft.engine.document.impl.InMemoryTemporaryDocumentServiceImpl" id="documentService">
+	<!-- <bean -->
+	<!-- class="org.bonitasoft.engine.document.impl.CMISDocumentServiceImpl" id="documentService"> -->
+	<!-- <constructor-arg name="sessionAccessor" ref="sessionAccessor" /> -->
+	<!-- <constructor-arg name="sessionService" ref="sessionService" /> -->
+	<!-- <constructor-arg value="http://192.168.1.217:8387/xcmis/rest/cmisatom" /> -->
+	<!-- <constructor-arg value="default" /> -->
+	<!-- <constructor-arg ref="xCmisUserProvider"/> -->
+	<!-- <constructor-arg ref="documentBuilder"/> -->
+	<!-- </bean> -->
+	<bean class="org.bonitasoft.engine.document.impl.InMemoryTemporaryDocumentServiceImpl" id="documentService">
 	</bean>
 
 </beans>

@@ -11,6 +11,7 @@
 	</bean>
 
 	<bean name="processDocumentBuilder" class="org.bonitasoft.engine.core.process.document.model.builder.impl.SProcessDocumentBuilderImpl" />
+
 	<bean name="documentURLProvider" class="org.bonitasoft.engine.core.process.document.api.impl.SDocumentDownloadURLProviderImpl" />
 
 </beans>
