@@ -19,7 +19,7 @@
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.privilege.model.SPrivilege" value="bos_privilege" />
+				<entry key="org.bonitasoft.engine.privilege.model.SPrivilege" value="priv" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
