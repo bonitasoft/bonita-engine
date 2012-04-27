@@ -41,6 +41,7 @@
 		<constructor-arg name="commentBuilders" ref="commentBuilders" />
 		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
 		<constructor-arg name="sBusinessLogModelBuilder" ref="logModelBuilder" />
+		<constructor-arg name="sDocumentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
 	</bean>
 
 	<bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
