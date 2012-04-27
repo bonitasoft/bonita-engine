@@ -55,6 +55,7 @@
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />		
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />		
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -91,6 +92,9 @@
 		<constructor-arg name="operationService" ref="operationService" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+		<constructor-arg name="archiveService" ref="archiveService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="documentMappingService" ref="documentMappingService" />
 	</bean>
 	
 	<bean id="processInstanceStateManager" class="org.bonitasoft.engine.execution.ProcessInstanceStateManagerImpl" />
@@ -125,11 +129,10 @@
 					<key>
 						<value>PROCESSINSTANCE_STATE_IS_MODIFIED</value>
 					</key>
-					<bean class="org.bonitasoft.engine.execution.handler.ArchiveProcesseInstancesHandler">
+					<bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
 						<constructor-arg name="archiveService" ref="archiveService" />
 						<constructor-arg name="instancesBuilders" ref="bpmInstanceBuilders" />
 						<constructor-arg name="logger" ref="technicalLoggerService" />
-						<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 						<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 						<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 						<constructor-arg name="documentMappingService" ref="documentMappingService" />
