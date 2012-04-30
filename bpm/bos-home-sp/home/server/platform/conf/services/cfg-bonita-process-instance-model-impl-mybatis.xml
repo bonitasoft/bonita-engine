@@ -581,6 +581,7 @@
 				<entry key="arch_automatic_task_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" />
 				<entry key="arch_user_task_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" />
 				<entry key="arch_manual_task_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" />
+				<entry key="arch_loop_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" />
 				<entry key="arch_call_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" />
 				<entry key="arch_flow_node_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
 				<entry key="arch_start_event_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
@@ -600,6 +601,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" value="20011" />
@@ -613,6 +615,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance" value="af" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="af" />
@@ -650,6 +653,13 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.insertAActivityInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="manual" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl.insertSALoopActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.insertAActivityInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="loop" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
