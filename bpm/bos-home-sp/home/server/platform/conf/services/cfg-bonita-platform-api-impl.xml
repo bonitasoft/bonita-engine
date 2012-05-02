@@ -6,7 +6,6 @@
 		<constructor-arg name="tenantPersistenceServices">
 			<list>
 				<ref bean="persistenceService" />
-				<ref bean="history" />
 			</list>
 		</constructor-arg>
 		<constructor-arg ref="tenantBuilder" />

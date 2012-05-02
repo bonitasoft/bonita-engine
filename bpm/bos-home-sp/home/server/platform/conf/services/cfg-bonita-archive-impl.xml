@@ -2,44 +2,17 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
-		<constructor-arg name="slidingArchivePersistenceService" ref="persistenceService" />
-		<constructor-arg name="slidingArchiveDuration" value="15552000000" /> <!-- 180 days -->
-		<constructor-arg name="definitivePersistenceServices">
-			<map>
-				<entry>
-					<key>
-						<bean id="archiveDescriptor1" class="org.bonitasoft.engine.archive.impl.SArchiveDescriptorImpl">
-							<constructor-arg name="name" value="DEFINITIVE_0" />
-							<constructor-arg name="oldestTime" value="1230739200052" /> <!-- 01/01/2009 -->
-							<constructor-arg name="newestTime" value="9999999999999" /> <!-- ever -->
-						</bean>
-					</key>
-					<ref bean="history" />
-				</entry>
-			</map>
-		</constructor-arg>
-		<constructor-arg name="selectListDescriptors">
-			<list>
-				<!-- <bean id="selectListDescriptorByDate" class="org.bonitasoft.engine.persistence.SelectListDescriptor"> -->
-				<!-- <constructor-arg name="queryName" value="getSAEmployeesByArchivedDate"/> -->
-				<!-- <constructor-arg name="inputParameters"> -->
-				<!-- <map> -->
-				<!-- </map> -->
-				<!-- </constructor-arg> -->
-				<!-- <constructor-arg name="entityType" value="org.bonitasoft.engine.archive.test.model.SAEmployee"/> -->
-				<!-- <constructor-arg name="queryOptions"> -->
-				<!-- <bean class="org.bonitasoft.engine.persistence.QueryOptions"> -->
-				<!-- <constructor-arg name="fromIndex" value="0" /> -->
-				<!-- <constructor-arg name="numberOfResults" value="600" /> -->
-				<!-- </bean> -->
-				<!-- </constructor-arg> -->
-				<!-- </bean> -->
-			</list>
-		</constructor-arg>
+		<constructor-arg name="definitiveArchiveDescriptor" ref="definitiveArchiveDescriptor" />
+		<constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="configurator" ref="archiveServiceConfigurator" />
 	</bean>
 
+	<bean id="definitiveArchiveDescriptor" class="org.bonitasoft.engine.archive.impl.SArchiveDescriptorImpl">
+		<constructor-arg name="name" value="DEFINITIVE_0" />
+		<constructor-arg name="oldestTime" value="1230739200052" /> <!-- 01/01/2009 -->
+		<constructor-arg name="newestTime" value="9999999999999" /> <!-- ever -->
+	</bean>
 
 	<bean id="archiveServiceConfigurator" class="org.bonitasoft.engine.archive.impl.ArchiveServiceConfiguratorImpl">
 		<constructor-arg name="regexp" value=".*" />

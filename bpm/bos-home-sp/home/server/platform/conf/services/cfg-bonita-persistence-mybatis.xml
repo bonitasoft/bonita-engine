@@ -26,19 +26,6 @@
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 	</bean>
 
-	<bean id="history" class="org.bonitasoft.engine.persistence.TenantMybatisPersistenceService" depends-on="dbProperties">
-		<constructor-arg name="name" value="history" />
-		<constructor-arg name="dbIdentifier" value="${db.vendor}" />
-		<constructor-arg ref="transactionService" />
-		<constructor-arg ref="sessionAccessor" />
-		<constructor-arg name="cacheEnabled" value="true" />
-		<constructor-arg ref="mybatisHistorySqlSessionFactoryProvider" />
-		<constructor-arg ref="myBatisConfigurations" />
-		<constructor-arg name="rangeSize" value="100" />
-		<constructor-arg ref="dbConfigurationsProvider" />
-		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
-	</bean>
-
 	<bean id="mybatisJournalSqlSessionFactoryProvider" class="org.bonitasoft.engine.persistence.MybatisSqlSessionFactoryProvider">
 		<constructor-arg name="configuration" value="/org/bonitasoft/engine/persistence/mybatis/mybatis.config.xml" />
 		<constructor-arg>
@@ -56,24 +43,6 @@
 			</props>
 		</constructor-arg>
 	</bean>
-	<bean id="mybatisHistorySqlSessionFactoryProvider" class="org.bonitasoft.engine.persistence.MybatisSqlSessionFactoryProvider">
-		<constructor-arg name="configuration" value="/org/bonitasoft/engine/persistence/mybatis/mybatis.config.xml" />
-		<constructor-arg>
-			<list>
-				<ref bean="myBatisConfigurations" />
-				<ref bean="platformMyBatisConfigurations" />
-			</list>
-		</constructor-arg>
-		<constructor-arg name="properties">
-			<props>
-				<prop key="database.connection.driver_class">${database.history.connection.driver_class}</prop>
-				<prop key="database.connection.url">${database.history.connection.url}</prop>
-				<prop key="database.connection.username">${database.history.connection.username}</prop>
-				<prop key="database.connection.password">${database.history.connection.password}</prop>
-			</props>
-		</constructor-arg>
-	</bean>
-
 
 	<bean id="myBatisConfigurations" class="org.bonitasoft.engine.persistence.MyBatisConfigurationsProvider" autowire="byType" />
 
