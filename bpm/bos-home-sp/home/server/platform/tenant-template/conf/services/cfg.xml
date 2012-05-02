@@ -127,7 +127,7 @@
 			<map>
 				<entry>
 					<key>
-						<value>PROCESSINSTANCE_STATE_IS_MODIFIED</value>
+						<value>PROCESSINSTANCE_STATE_UPDATED</value>
 					</key>
 					<bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
 						<constructor-arg name="archiveService" ref="archiveService" />
