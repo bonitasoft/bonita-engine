@@ -26,6 +26,7 @@ import org.bonitasoft.engine.businesslogger.model.SBusinessLogSeverity;
 import org.bonitasoft.engine.businesslogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.businesslogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.businesslogger.model.builder.SLogBuilder;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -40,6 +41,7 @@ import org.bonitasoft.engine.test.ServicesBuilder;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -115,11 +117,17 @@ public class RecorderAndEventServiceTest {
     @BeforeClass
     public static void setUpPersistence() throws Exception {
         TestUtil.createPlatformAndDefaultTenant(txService, platformService, sessionAccessor, platformBuilder, tenantBuilder, sessionService);
+        TestUtil.startScheduler(servicesBuilder.buildSchedulerService());
+    }
+
+    @After
+    public void clean() throws SBonitaException {
+        TestUtil.closeTransactionIfOpen(txService);
     }
 
     @AfterClass
     public static void tearDownPersistence() throws Exception {
-        TestUtil.closeTransactionIfOpen(txService);
+        TestUtil.stopScheduler(servicesBuilder.buildSchedulerService());
         TestUtil.deleteDefaultTenantAndPlatForm(txService, platformService, sessionAccessor, sessionService);
     }
 
@@ -165,7 +173,7 @@ public class RecorderAndEventServiceTest {
         final Employee oldEmployee = new Employee(employee);
         updateEvent.setOldObject(oldEmployee);
 
-        final SEmployeeHandlerImpl employeeHandler = resetEmployeeHandler(eventService, eventType);
+        final SEmployeeHandlerImpl employeeHandler = resetEmployeeHandler(eventService, eventType + "_UPDATED");
 
         recorder.recordUpdate(updateRecord, updateLog, updateEvent);
         assertEquals(true, employeeHandler.isUpdated());
@@ -201,7 +209,7 @@ public class RecorderAndEventServiceTest {
         final Employee oldEmployee = new Employee(employee);
         updateEvent.setOldObject(oldEmployee);
 
-        final SEmployeeHandlerImpl employeeHandler = resetEmployeeHandler(eventService, eventType);
+        final SEmployeeHandlerImpl employeeHandler = resetEmployeeHandler(eventService, eventType + "_UPDATED");
 
         recorder.recordUpdate(updateRecord, updateLog, updateEvent);
 
@@ -219,7 +227,7 @@ public class RecorderAndEventServiceTest {
 
     private String getEventType(final Employee employee) {
         final String discriminator = employee.getDiscriminator();
-        final String eventType = discriminator.substring(discriminator.lastIndexOf(".") + 1, discriminator.length()).toUpperCase() + "_IS_UPDATED";
-        return eventType;
+        return discriminator.substring(discriminator.lastIndexOf(".") + 1, discriminator.length()).toUpperCase();
     }
+
 }

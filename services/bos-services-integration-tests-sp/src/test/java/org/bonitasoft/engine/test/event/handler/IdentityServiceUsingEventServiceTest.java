@@ -181,7 +181,7 @@ public class IdentityServiceUsingEventServiceTest {
     }
 
     private UserUpdateEventHandler resetUserPasswordUpdateEventHandler(final EventService eventService) {
-        final UserUpdateEventHandler userPasswordHandler = (UserUpdateEventHandler) eventService.getHandlers("USER_IS_UPDATED").toArray()[0];
+        final UserUpdateEventHandler userPasswordHandler = (UserUpdateEventHandler) eventService.getHandlers("USER_UPDATED").toArray()[0];
         userPasswordHandler.cleanUserMap();
         return userPasswordHandler;
     }

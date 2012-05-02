@@ -10,6 +10,7 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -45,23 +46,23 @@ public class ServicesBuilder extends BaseServicesBuilder {
     }
 
     public IdentityModelBuilder buildIdentityModelBuilder() {
-        return this.getInstanceOf(IdentityModelBuilder.class);
+        return getInstanceOf(IdentityModelBuilder.class);
     }
 
     public PersistenceService buildPersistence() {
-        return this.buildPersistence("persistenceService");
+        return buildPersistence("persistenceService");
     }
 
     public PersistenceService buildPersistence(final String name) {
-        return this.getInstanceOf(name, PersistenceService.class);
+        return getInstanceOf(name, PersistenceService.class);
     }
 
     public PersistenceService buildJournal() {
-        return this.buildPersistence();
+        return buildPersistence();
     }
 
     public PersistenceService buildHistory() {
-        return this.buildPersistence("history");
+        return buildPersistence("history");
     }
 
     public Recorder buildRecorder(final boolean sync) {
@@ -69,43 +70,47 @@ public class ServicesBuilder extends BaseServicesBuilder {
         if (sync) {
             synchType = "recorderSync";
         }
-        return this.getInstanceOf(synchType, Recorder.class);
+        return getInstanceOf(synchType, Recorder.class);
     }
 
     public TransactionService buildTransactionService() {
-        return this.getInstanceOf(TransactionService.class);
+        return getInstanceOf(TransactionService.class);
     }
 
     public PlatformService buildPlatformService() {
-        return this.getInstanceOf(PlatformService.class);
+        return getInstanceOf(PlatformService.class);
     }
 
     public SPlatformBuilder buildPlatformBuilder() {
-        return this.getInstanceOf(SPlatformBuilder.class);
+        return getInstanceOf(SPlatformBuilder.class);
     }
 
     public STenantBuilder buildTenantBuilder() {
-        return this.getInstanceOf(STenantBuilder.class);
+        return getInstanceOf(STenantBuilder.class);
     }
 
     public SessionAccessor buildSessionAccessor() {
-        return this.getInstanceOf(SessionAccessor.class);
+        return getInstanceOf(SessionAccessor.class);
     }
 
     public IdentityService buildIdentityService() {
-        return this.getInstanceOf(IdentityService.class);
+        return getInstanceOf(IdentityService.class);
     }
 
     public EventService buildEventService() {
-        return this.getInstanceOf(EventService.class);
+        return getInstanceOf(EventService.class);
     }
 
     public SessionService buildSessionService() {
-        return this.getInstanceOf(SessionService.class);
+        return getInstanceOf(SessionService.class);
     }
 
     public TechnicalLoggerService buildTechnicalLoggerService() {
-        return this.getInstanceOf(TechnicalLoggerService.class);
+        return getInstanceOf(TechnicalLoggerService.class);
+    }
+
+    public SchedulerService buildSchedulerService() {
+        return getInstanceOf(SchedulerService.class);
     }
 
 }

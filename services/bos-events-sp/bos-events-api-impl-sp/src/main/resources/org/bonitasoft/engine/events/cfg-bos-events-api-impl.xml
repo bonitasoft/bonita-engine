@@ -5,10 +5,10 @@
 		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 		<constructor-arg name="handlers">
 			<map>
-				<entry key="USER_IS_UPDATED">
+				<entry key="USER_UPDATED">
 					<ref bean="userPasswordHandler" />
 				</entry>
-				<entry key="EMPLOYEE_IS_UPDATED">
+				<entry key="EMPLOYEE_UPDATED">
 					<ref bean="employeeHandler" />
 				</entry>
 			</map>
