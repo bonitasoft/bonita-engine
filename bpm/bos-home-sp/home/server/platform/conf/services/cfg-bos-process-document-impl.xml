@@ -3,6 +3,7 @@
 
 	<bean id="processDocumentService" class="org.bonitasoft.engine.core.process.document.api.impl.ProcessDocumentServiceImpl">
 		<constructor-arg name="processDocumentBuilder" ref="processDocumentBuilder" />
+		<constructor-arg name="archivedProcessDocumentBuilder" ref="archivedProcessDocumentBuilder" />
 		<constructor-arg name="documentService" ref="documentService" />
 		<constructor-arg name="documentMappingService" ref="documentMappingService" />
 		<constructor-arg name="documentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
@@ -11,6 +12,8 @@
 	</bean>
 
 	<bean name="processDocumentBuilder" class="org.bonitasoft.engine.core.process.document.model.builder.impl.SProcessDocumentBuilderImpl" />
+
+	<bean name="archivedProcessDocumentBuilder" class="org.bonitasoft.engine.core.process.document.model.builder.impl.SAProcessDocumentBuilderImpl" />
 
 	<bean name="documentURLProvider" class="org.bonitasoft.engine.core.process.document.api.impl.SDocumentDownloadURLProviderImpl" />
 
