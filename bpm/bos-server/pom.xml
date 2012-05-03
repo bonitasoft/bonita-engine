@@ -349,6 +349,18 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- External Identity Mapping -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
+			<artifactId>bos-external-identity-mapping-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
+			<artifactId>bos-external-identity-mapping-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
@@ -755,6 +767,9 @@
 									<include>org.bonitasoft.engine.expression:bos-expression-model</include>
 									<include>org.bonitasoft.engine.expression:bos-expression-model-impl</include>
 									<include>org.bonitasoft.engine.external:bos-web-commands</include>
+									<include>org.bonitasoft.engine.external.identity.mapping:bos-external-identity-mapping-api</include>
+									<include>org.bonitasoft.engine.external.identity.mapping:bos-external-identity-mapping-impl</include>
+									<include>org.bonitasoft.engine.external.identity.mapping:bos-external-identity-mapping-impl-mybatis</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-api</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-impl</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model</include>

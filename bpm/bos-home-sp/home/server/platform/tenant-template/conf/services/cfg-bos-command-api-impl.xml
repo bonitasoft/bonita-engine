@@ -51,6 +51,11 @@
 						<ref bean="searchProcessDefinitionsSupervisedBy"/>
 						<ref bean="searchSCommentSupervisedBy"/>
 						<ref bean="isAllowedToStartProcesses"/>
+						<ref bean="addEntityMemberCommand"/>
+						<ref bean="removeEntityMemberCommand"/>
+						<ref bean="searchEntityMembersCommand"/>
+						<ref bean="searchEntityMembersForUserCommand"/>
+						<ref bean="deleteEntityMembersCommand"/>
 					</list>
 				</property>
 			</bean>
@@ -309,7 +314,7 @@
 	
 	<bean id="searchArchivedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchArchivedTasksSupervisedBy</value></constructor-arg>
-		<constructor-arg name="description"><value>Returns the list of archived user tasks of process definition supervised by a user.</value></constructor-arg>
+		<constructor-arg name="description"><value>Returns the list of archived user tasks of process definition supervised by a user. Use parameter keys SUPERVISOR_ID_KEY: id of the supervisor, SEARCH_OPTIONS_KEY: the object containing all the search parameters</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.task.supervisor.SearchArchivedTasksSupervisedBy</value></constructor-arg>
 	</bean>
 
@@ -348,9 +353,41 @@
 		<constructor-arg name="description"><value>Returns the list comment of process definition supervised by a user.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value></constructor-arg>
 	</bean>
+
 	<bean id="isAllowedToStartProcesses" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>isAllowedToStartProcesses</value></constructor-arg>
 		<constructor-arg name="description"><value>Check if the user can be allowed to start all of processes.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcesses</value></constructor-arg>
 	</bean>
+
+	<bean id="addEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>addEntityMemberCommand</value></constructor-arg>
+		<constructor-arg name="description"><value>Adds a Entity member to the provided identity notions. Parameter keys: EXTERNAL_ID_KEY: Entity member id provided as is by the external system, userId: -1 is not needed, roleId: -1 is not needed, groupId: -1 is not needed</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.identitymapping.AddEntityMemberCommand</value></constructor-arg>
+	</bean>
+
+	<bean id="removeEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>removeEntityMemberCommand</value></constructor-arg>
+		<constructor-arg name="description"><value>Removes a Entity member mapping: ENTITY_MEMBER_ID_KEY: Entity member id to remove</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.identitymapping.RemoveEntityMemberCommand</value></constructor-arg>
+	</bean>
+
+	<bean id="searchEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>searchEntityMembersCommand</value></constructor-arg>
+		<constructor-arg name="description"><value>Searches Entity member mappings: Parameter keys: DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions, SEARCH_OPTIONS_KEY: the Search options to filter and sort the results, MEMBER_TYPE_KEY: Member Type to search for (USER, GROUP, ROLE, or MEMBERSHIP).</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersCommand</value></constructor-arg>
+	</bean>
+
+	<bean id="searchEntityMembersForUserCommand" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>searchEntityMembersForUserCommand</value></constructor-arg>
+		<constructor-arg name="description"><value>Searches Entity member mappings: Parameter keys: USER_ID_KEY: the ID of the user to search Entity members for (directly associated, or through role or group), DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions, SEARCH_OPTIONS_KEY: the Search options to filter and sort the results.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersForUserCommand</value></constructor-arg>
+	</bean>
+
+	<bean id="deleteEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>deleteEntityMembersCommand</value></constructor-arg>
+		<constructor-arg name="description"><value>Delete all Entity member mappings associated with provided externalId, for specific Discriminator. Parameter keys: EXTERNAL_ID_KEY: external id provided as is by the external system, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.identitymapping.DeleteEntityMembersCommand</value></constructor-arg>
+	</bean>
+
 </beans>

@@ -42,6 +42,7 @@
 		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
 		<constructor-arg name="sBusinessLogModelBuilder" ref="logModelBuilder" />
 		<constructor-arg name="sDocumentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
+		<constructor-arg name="sExternalIdentityMappingBuilders" ref="sExternalIdentityMappingBuilders" />
 	</bean>
 
 	<bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
@@ -58,9 +59,11 @@
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 	</bean>
 
+
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
 		<constructor-arg name="flowElementExecutorDelegate" ref="flowElementExecutorDelegate" />
 	</bean>
+
 
 	<bean id="bpmInstancesCreator" class="org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator">
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
