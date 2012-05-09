@@ -12,6 +12,7 @@
 				<entry key="manual_task_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" />
 				<entry key="transition_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 				<entry key="loop_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" />
+				<entry key="multi_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" />
 				<entry key="call_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" />
 				<entry key="flownode_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
 				<entry key="gateway_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
@@ -55,6 +56,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" value="10011" />
@@ -79,6 +81,8 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="f" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="f" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="f" />
@@ -130,6 +134,12 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="loop" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl.insertSMultiInstanceActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="multi" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl.insertSCallActivityInstanceImpl" />
@@ -226,6 +236,10 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl.updateSMultiInstanceActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl.updateSCallActivityInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
@@ -278,6 +292,10 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl.deleteSLoopActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl.deleteSMultiInstanceActivityInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
