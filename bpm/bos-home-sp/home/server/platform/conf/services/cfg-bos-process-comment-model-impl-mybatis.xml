@@ -38,41 +38,4 @@
 		</constructor-arg>
 	</bean>
 
-	
-	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
-		<constructor-arg name="typeAliases">
-			<map>
-				<entry key="arch_process_comment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
-			</map>
-		</constructor-arg>
-		<constructor-arg name="mappers">
-			<list>
-				<value>org/bonitasoft/engine/core/process/comment/model/impl/mybatis/ArchivedCommentMapper.xml</value>
-			</list>
-		</constructor-arg>
-		<constructor-arg name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
-			</map>
-		</constructor-arg>
-		<constructor-arg name="classAliasMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="arch_process_comment" />
-			</map>
-		</constructor-arg>
-		<constructor-arg name="classFieldAliasMappings">
-			<map />
-		</constructor-arg>
-		<constructor-arg name="statementMapping">
-			<set />
-		</constructor-arg>
-		<constructor-arg name="dbStatementsMapping">
-			<map />
-		</constructor-arg>
-		<constructor-arg name="entityMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
-			</map>
-		</constructor-arg>
-	</bean>	
 </beans>
