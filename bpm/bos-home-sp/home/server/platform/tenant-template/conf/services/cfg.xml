@@ -139,6 +139,8 @@
 						<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 						<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 						<constructor-arg name="documentMappingService" ref="documentMappingService" />
+						<constructor-arg name="commentService" ref="commentService" />
+						<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
 					</bean>
 				</entry>
 			</map>
