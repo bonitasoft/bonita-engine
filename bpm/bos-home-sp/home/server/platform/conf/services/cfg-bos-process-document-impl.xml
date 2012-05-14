@@ -15,6 +15,9 @@
 
 	<bean name="archivedProcessDocumentBuilder" class="org.bonitasoft.engine.core.process.document.model.builder.impl.SAProcessDocumentBuilderImpl" />
 
-	<bean name="documentURLProvider" class="org.bonitasoft.engine.core.process.document.api.impl.SDocumentDownloadURLProviderImpl" />
+	<bean name="documentURLProvider" class="org.bonitasoft.engine.core.process.document.api.impl.SDocumentDownloadURLProviderImpl" >
+		<constructor-arg name="servletUrl" value="${document.servlet.url}"></constructor-arg>
+	</bean>
+
 
 </beans>

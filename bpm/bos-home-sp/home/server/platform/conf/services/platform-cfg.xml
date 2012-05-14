@@ -2,8 +2,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location">
-			<value>${bonita.home}/server/platform/conf/db.properties</value>
+		<property name="locations">
+			<list>
+				<value>${bonita.home}/server/platform/conf/db.properties</value>
+				<value>${bonita.home}/server/platform/conf/cmis.properties</value>
+			</list>
 		</property>
 	</bean>
 
