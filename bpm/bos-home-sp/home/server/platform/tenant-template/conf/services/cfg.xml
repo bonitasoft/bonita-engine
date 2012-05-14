@@ -149,5 +149,10 @@
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
 	</bean>
+	
+	<bean id="documentReferenceExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DocumentReferenceExpressionExecutorStrategy">
+		<constructor-arg name="processDocumentService" ref="processDocumentService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+	</bean>
 
 </beans>
