@@ -3,7 +3,9 @@
 
 	<bean id="commentBuilders" class="org.bonitasoft.engine.core.process.comment.model.builder.impl.SCommentBuildersImpl" />
 
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+	<bean id="saCommentBuilder" class="org.bonitasoft.engine.core.process.comment.model.archive.builder.impl.SACommentBuilderImpl" />
+	
+	<bean id="db-bos-process-comment-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/${db.vendor}-dropTables.sql" />
@@ -11,4 +13,11 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 	</bean>
 
+	<bean id="db-bos-process-comment-model-arch" class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/archive/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/archive/${db.vendor}-initTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/archive/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="filter" value="journal" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
+	</bean>	
 </beans>
