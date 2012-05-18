@@ -31,7 +31,9 @@
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
-			<map />
+			<map>
+				<entry key="org.bonitasoft.engine.profile.model.SProfileEntry.index" value="index_" />
+			</map>
 		</constructor-arg>
 		<constructor-arg name="statementMapping">
 			<set />
