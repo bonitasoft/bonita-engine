@@ -764,9 +764,11 @@
 									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl</include>
 									<include>org.bonitasoft.engine.dependency:bos-dependency-platform-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.document:bonita-document-api</include>
+									<include>org.bonitasoft.engine.document:bonita-document-impl</include>
 									<include>org.bonitasoft.engine.document:bonita-document-model</include>
 									<include>org.bonitasoft.engine.document:bonita-document-model-impl</include>
 									<include>org.bonitasoft.engine.document:bonita-document-opencmis</include>
+									<include>org.bonitasoft.engine.document:bonita-document-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<include>com.bonitasoft.engine.events:bos-events-api-impl-sp</include>
