@@ -293,6 +293,16 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
 			<artifactId>bos-process-document-mapping-api-impl</artifactId>
 			<version>${project.version}</version>

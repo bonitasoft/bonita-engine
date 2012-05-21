@@ -17,7 +17,7 @@
 	<!-- <constructor-arg ref="xCmisUserProvider"/> -->
 	<!-- <constructor-arg ref="documentBuilder"/> -->
 	<!-- </bean> -->
-	<bean class="org.bonitasoft.engine.document.impl.InMemoryTemporaryDocumentServiceImpl" id="documentService">
-	</bean>
+	<!--<bean class="org.bonitasoft.engine.document.impl.InMemoryTemporaryDocumentServiceImpl" id="documentService">
+	</bean>-->
 
 </beans>
