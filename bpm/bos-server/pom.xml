@@ -166,6 +166,11 @@
 			<artifactId>bos-web-commands</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.external</groupId>
+			<artifactId>bos-web-commands-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Comment -->
 		<dependency>
@@ -779,6 +784,7 @@
 									<include>org.bonitasoft.engine.expression:bos-expression-model</include>
 									<include>org.bonitasoft.engine.expression:bos-expression-model-impl</include>
 									<include>org.bonitasoft.engine.external:bos-web-commands</include>
+									<include>org.bonitasoft.engine.external:bos-web-commands-sp</include>
 									<include>org.bonitasoft.engine.external.identity.mapping:bos-external-identity-mapping-api</include>
 									<include>org.bonitasoft.engine.external.identity.mapping:bos-external-identity-mapping-impl</include>
 									<include>org.bonitasoft.engine.external.identity.mapping:bos-external-identity-mapping-impl-mybatis</include>

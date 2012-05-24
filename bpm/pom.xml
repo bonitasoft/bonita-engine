@@ -17,6 +17,7 @@
 		<module>bos-core</module>
 		<module>bos-deploy</module>
 		<module>bos-home-sp</module>
+		<module>bos-external-sp</module>
 	</modules>
 	<profiles>
 		<profile>
