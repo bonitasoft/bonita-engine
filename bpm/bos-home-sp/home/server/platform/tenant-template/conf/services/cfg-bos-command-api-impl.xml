@@ -35,6 +35,8 @@
 						<ref bean="updateProfileEntry"/>
 						<ref bean="searchProfileEntry"/>
 						<ref bean="executeActionsAndTerminate"/>
+						<ref bean="executeActionsAndTerminateExt"/>
+						<ref bean="executeActionsAndStartInstanceExt"/>
 						<ref bean="addProfileMember"/>
 						<ref bean="countProfileMembersForProfile"/>
 						<ref bean="deleteProfileMember"/>
@@ -258,6 +260,18 @@
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask</value></constructor-arg>
 	</bean>
 	
+	<bean id="executeActionsAndStartInstanceExt" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>executeActionsAndStartInstanceExt</value></constructor-arg>
+		<constructor-arg name="description"><value>execute actions and start a process instance</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.forms.ExecuteActionsAndStartInstanceExt</value></constructor-arg>
+	</bean>
+	
+	<bean id="executeActionsAndTerminateExt" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>executeActionsAndTerminateExt</value></constructor-arg>
+		<constructor-arg name="description"><value>execute actions and terminate a user task instance ext</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTaskExt</value></constructor-arg>
+	</bean>
+		
 	<bean id="addProfileMember" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>addProfileMember</value></constructor-arg>
 		<constructor-arg name="description"><value>Add profile member</value></constructor-arg>
