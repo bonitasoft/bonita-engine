@@ -47,25 +47,25 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bos-dependency-platform-model-impl-mybatis</artifactId>
+			<artifactId>bonita-dependency-platform-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bos-dependency-platform-model-impl-hibernate</artifactId>
+			<artifactId>bonita-dependency-platform-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bos-dependency-platform-model-impl</artifactId>
+			<artifactId>bonita-dependency-platform-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bos-dependency-platform-impl</artifactId>
+			<artifactId>bonita-dependency-platform-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -235,13 +235,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bos-scheduler-impl-mybatis</artifactId>
+			<artifactId>bonita-scheduler-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bos-scheduler-impl-hibernate</artifactId>
+			<artifactId>bonita-scheduler-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -275,7 +275,7 @@
 		<!-- Session Accessor -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-			<artifactId>bos-session-accessor-threadlocal</artifactId>
+			<artifactId>bonita-session-accessor-threadlocal</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
