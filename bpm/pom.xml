@@ -15,15 +15,15 @@
 		<module>bonita-client</module>
 		<module>bonita-server</module>
 		<module>bonita-core</module>
-		<module>bos-deploy</module>
+		<module>bonita-deploy</module>
 		<module>bonita-home-sp</module>
-		<module>bos-external-sp</module>
+		<module>bonita-external-sp</module>
 	</modules>
 	<profiles>
 		<profile>
 			<id>tests</id>
 			<modules>
-				<module>bos-integration-tests</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
 				<plugins>
