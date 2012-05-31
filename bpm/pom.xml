@@ -11,12 +11,12 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bos-common</module>
-		<module>bos-client</module>
-		<module>bos-server</module>
-		<module>bos-core</module>
+		<module>bonita-common</module>
+		<module>bonita-client</module>
+		<module>bonita-server</module>
+		<module>bonita-core</module>
 		<module>bos-deploy</module>
-		<module>bos-home-sp</module>
+		<module>bonita-home-sp</module>
 		<module>bos-external-sp</module>
 	</modules>
 	<profiles>

@@ -11,7 +11,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bos-integration-client-tests</module>
-		<module>bos-integration-local-tests</module>
+		<module>bonita-integration-client-tests</module>
+		<module>bonita-integration-local-tests</module>
 	</modules>
 </project>

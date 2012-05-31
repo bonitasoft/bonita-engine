@@ -12,15 +12,15 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bos-log-sp</module>
-		<module>bos-events-sp</module>
+		<module>bonita-log-sp</module>
+		<module>bonita-events-sp</module>
 	</modules>
 	
 	<profiles>
 		<profile>
 			<id>tests</id>
 			<modules>
-				<module>bos-services-integration-tests-sp</module>
+				<module>bonita-services-integration-tests-sp</module>
 			</modules>
 			<build>
 				<plugins>

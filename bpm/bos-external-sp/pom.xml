@@ -15,6 +15,6 @@
 	<description>Not Monitored by the Engine team :)</description>
 
 	<modules>
-		<module>bos-web-commands-sp</module>
+		<module>bonita-web-commands-sp</module>
 	</modules>
 </project>
