@@ -12,6 +12,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bos-log-api-impl-sp</module>
+		<module>bonita-log-api-impl-sp</module>
 	</modules>
 </project>

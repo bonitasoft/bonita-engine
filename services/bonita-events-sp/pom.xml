@@ -13,7 +13,7 @@
   <packaging>pom</packaging>
   
   <modules>
-  	<module>bos-events-api-impl-sp</module>
+  	<module>bonita-events-api-impl-sp</module>
   </modules>
   
 </project>
