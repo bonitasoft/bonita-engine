@@ -9,7 +9,7 @@
 
 	<artifactId>bonita-server-sp</artifactId>
 
-	<name>BOS Server SP</name>
+	<name>Bonita Server SP</name>
 
 	<dependencies>
 		<dependency>

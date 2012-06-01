@@ -11,7 +11,7 @@
 	<artifactId>bonita-engine-sp</artifactId>
 	<packaging>pom</packaging>
 
-	<name>BOS Engine SP</name>
+	<name>Bonita Engine SP</name>
 
 	<profiles>
 		<profile>

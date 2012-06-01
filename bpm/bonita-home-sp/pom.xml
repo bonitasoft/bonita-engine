@@ -10,7 +10,7 @@
 	<artifactId>bonita-home-sp</artifactId>
 	<packaging>pom</packaging>
 
-	<name>BOS Home SP</name>
+	<name>Bonita Home SP</name>
 
 	<build>
 		<plugins>

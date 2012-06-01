@@ -9,7 +9,7 @@
 
 	<artifactId>bonita-log-api-impl-sp</artifactId>
 
-	<name>BOS LOG Service API: implementation</name>
+	<name>Bonita LOG Service API: implementation</name>
 
 	<dependencies>
 		<dependency>

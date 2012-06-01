@@ -11,7 +11,7 @@
 	<artifactId>bonita-external-sp</artifactId>
 	<packaging>pom</packaging>
 
-	<name>BOS-SP External Features</name>
+	<name>Bonita-SP External Features</name>
 	<description>Not Monitored by the Engine team :)</description>
 
 	<modules>

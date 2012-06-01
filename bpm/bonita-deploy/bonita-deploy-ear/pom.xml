@@ -10,7 +10,7 @@
 	<artifactId>bonita-deploy-ear-sp</artifactId>
 	<packaging>ear</packaging>
 
-	<name>BOS Deploy: EAR</name>
+	<name>Bonita Deploy: EAR</name>
 
 	<dependencies>
 		<dependency>
