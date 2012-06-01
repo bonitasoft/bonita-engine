@@ -3,11 +3,11 @@
 
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
-		<artifactId>bos-integration-tests-sp</artifactId>
+		<artifactId>bonita-integration-tests-sp</artifactId>
 		<version>6.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bos-integration-local-tests-sp</artifactId>
+	<artifactId>bonita-integration-local-tests-sp</artifactId>
 
 	<properties>
 		<bonita.home>${project.build.directory}/home</bonita.home>
@@ -16,17 +16,17 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-integration-client-tests-sp</artifactId>
+			<artifactId>bonita-integration-client-tests-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bos-local-integration-tests</artifactId>
+			<artifactId>bonita-local-integration-tests</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-server-sp</artifactId>
+			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -81,7 +81,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bos-home-sp</artifactId>
+									<artifactId>bonita-home-sp</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
 								</artifactItem>

@@ -8,7 +8,7 @@
 	</parent>
 
 	<groupId>com.bonitasoft.engine.log</groupId>
-	<artifactId>bos-log-sp</artifactId>
+	<artifactId>bonita-log-sp</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>

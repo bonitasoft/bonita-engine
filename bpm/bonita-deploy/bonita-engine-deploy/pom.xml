@@ -2,33 +2,33 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bos-deploy-sp</artifactId>
+		<artifactId>bonita-deploy-sp</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bos-engine-deploy-sp</artifactId>
+	<artifactId>bonita-engine-deploy-sp</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-client-sp</artifactId>
+			<artifactId>bonita-client-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-server-sp</artifactId>
+			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-home-sp</artifactId>
+			<artifactId>bonita-home-sp</artifactId>
 			<version>${project.version}</version>
 			<type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-deploy-ear-sp</artifactId>
+			<artifactId>bonita-deploy-ear-sp</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
 		</dependency>

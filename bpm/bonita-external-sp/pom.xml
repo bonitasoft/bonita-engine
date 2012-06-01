@@ -8,7 +8,7 @@
 	</parent>
 
 	<groupId>org.bonitasoft.engine.external</groupId>
-	<artifactId>bos-external-sp</artifactId>
+	<artifactId>bonita-external-sp</artifactId>
 	<packaging>pom</packaging>
 
 	<name>BOS-SP External Features</name>

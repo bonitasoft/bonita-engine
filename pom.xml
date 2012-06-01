@@ -8,7 +8,7 @@
 	</parent>
 
 	<groupId>com.bonitasoft.engine</groupId>
-	<artifactId>bos-engine-sp</artifactId>
+	<artifactId>bonita-engine-sp</artifactId>
 	<packaging>pom</packaging>
 
 	<name>BOS Engine SP</name>

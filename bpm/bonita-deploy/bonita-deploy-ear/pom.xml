@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bos-deploy-sp</artifactId>
+		<artifactId>bonita-deploy-sp</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bos-deploy-ear-sp</artifactId>
+	<artifactId>bonita-deploy-ear-sp</artifactId>
 	<packaging>ear</packaging>
 
 	<name>BOS Deploy: EAR</name>
@@ -15,13 +15,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bos-deploy-ejb</artifactId>
+			<artifactId>bonita-deploy-ejb</artifactId>
 			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-server-sp</artifactId>
+			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -55,12 +55,12 @@
 					<modules>
 						<ejbModule>
 							<groupId>org.bonitasoft.engine</groupId>
-							<artifactId>bos-deploy-ejb</artifactId>
+							<artifactId>bonita-deploy-ejb</artifactId>
 							<bundleDir>/</bundleDir>
 						</ejbModule>
 						<jarModule>
 							<groupId>com.bonitasoft.engine</groupId>
-							<artifactId>bos-server-sp</artifactId>
+							<artifactId>bonita-server-sp</artifactId>
 						</jarModule>
 						<jarModule>
 							<groupId>ch.qos.logback</groupId>

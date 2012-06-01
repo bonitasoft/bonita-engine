@@ -9,7 +9,7 @@
   </parent>
   
   <groupId>com.bonitasoft.engine.events</groupId>
-  <artifactId>bos-events-sp</artifactId>
+  <artifactId>bonita-events-sp</artifactId>
   <packaging>pom</packaging>
   
   <modules>

@@ -2,17 +2,17 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bos-integration-tests-sp</artifactId>
+		<artifactId>bonita-integration-tests-sp</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bos-integration-client-tests-sp</artifactId>
+	<artifactId>bonita-integration-client-tests-sp</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bos-client-integration-tests</artifactId>
+			<artifactId>bonita-client-integration-tests</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
@@ -23,7 +23,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bos-client-sp</artifactId>
+			<artifactId>bonita-client-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
