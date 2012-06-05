@@ -32,7 +32,7 @@
 						<configuration>
 							<artifactSet>
 								<includes>
-									<include>org.bonitasoft.engine:bos-common</include>
+									<include>org.bonitasoft.engine:bonita-common</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>

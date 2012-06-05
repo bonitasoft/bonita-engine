@@ -42,7 +42,7 @@
 						<configuration>
 							<artifactSet>
 								<includes>
-									<include>org.bonitasoft.engine:bos-client</include>
+									<include>org.bonitasoft.engine:bonita-client</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
