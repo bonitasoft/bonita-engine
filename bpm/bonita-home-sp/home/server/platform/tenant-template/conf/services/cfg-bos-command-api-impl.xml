@@ -28,6 +28,8 @@
 						<ref bean="deleteProfile"/>
 						<ref bean="updateProfile"/>
 						<ref bean="searchProfile"/>
+						<ref bean="exportAllProfiles"/>
+						<ref bean="exportProfilesWithIdsSpecified"/>
 						<ref bean="addProfileEntry"/>
 						<ref bean="getProfileEntry"/>
 						<ref bean="countProfileEntry"/>
@@ -216,6 +218,18 @@
 		<constructor-arg name="name"><value>searchProfile</value></constructor-arg>
 		<constructor-arg name="description"><value>Search profile</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.SearchProfile</value></constructor-arg>
+	</bean>
+	
+	<bean id="exportAllProfiles" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>exportAllProfiles</value></constructor-arg>
+		<constructor-arg name="description"><value>Export all profiles</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.ExportAllProfiles</value></constructor-arg>
+	</bean>
+	
+	<bean id="exportProfilesWithIdsSpecified" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>exportProfilesWithIdsSpecified</value></constructor-arg>
+		<constructor-arg name="description"><value>Export all profiles with profileIds specified</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.ExportProfilesWithIdsSpecified</value></constructor-arg>
 	</bean>
 	
 	<bean id="addProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
