@@ -5,6 +5,7 @@
 		<constructor-arg name="platformDependencyService" ref="platformDependencyService" />
 		<constructor-arg name="dependencyService" ref="dependencyService" />
 		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 </beans>

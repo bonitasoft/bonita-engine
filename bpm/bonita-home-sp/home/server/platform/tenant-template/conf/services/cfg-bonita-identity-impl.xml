@@ -6,6 +6,7 @@
 		<constructor-arg name="persistence" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 </beans>

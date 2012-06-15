@@ -3,6 +3,7 @@
 
 	<bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
 		<constructor-arg name="expressionExecutorStrategyProvider" ref="expressionExecutorStrategyProvider" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="expressionExecutorStrategyProvider" class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider" autowire="byType" />

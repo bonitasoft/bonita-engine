@@ -3,6 +3,7 @@
 
 	<bean id="authenticationService" class="org.bonitasoft.engine.authentication.impl.AuthenticationServiceImpl">
 		<constructor-arg name="identityService" ref="identityService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 </beans>

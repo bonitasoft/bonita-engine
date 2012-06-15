@@ -6,6 +6,7 @@
 		<constructor-arg name="persistence" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="defaultCommandProvider">
 			<bean class="org.bonitasoft.engine.command.api.impl.DefaultCommandProvider">
 				<property name="defaultCommands">

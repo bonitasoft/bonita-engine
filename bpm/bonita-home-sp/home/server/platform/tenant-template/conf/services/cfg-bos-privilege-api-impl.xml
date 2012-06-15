@@ -6,6 +6,7 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 </beans>

@@ -13,6 +13,7 @@
 				<ref bean="transientDataInstanceDSConf" />
 			</list>
 		</constructor-arg>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 </beans>

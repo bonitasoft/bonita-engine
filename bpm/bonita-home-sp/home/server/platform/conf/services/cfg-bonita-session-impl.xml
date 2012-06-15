@@ -6,6 +6,7 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="platformService" ref="platformService" />
 		<constructor-arg name="applicationName" value="BPM" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 </beans>
