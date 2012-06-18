@@ -93,13 +93,20 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         } catch (final Exception e) {
             throw new SCommandParameterizationException("Mandatory parameter " + PROCESS_DEFINITION_ID_KEY + " is missing or not convertible to long.", e);
         }
+        
+        String userName = null;
+        try {
+            userName = (String) parameters.get(USER_NAME_KEY);
+        } catch (final Exception e) {
+            throw new SCommandParameterizationException("Mandatory parameter " + USER_NAME_KEY + " is missing or not convertible to String.", e);
+        }
 
         try {
             executeConnectors(sProcessDefinitionID, connectorsInputValues, operationsMap);
-            return startProcess(getUserFromSession(), sProcessDefinitionID, operationsMap).getId();
-        } catch (BonitaException e) {
+            return startProcess(userName, sProcessDefinitionID, operationsMap).getId();
+        } catch (final BonitaException e) {
             throw new SCommandExecutionException(
-                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstance(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
+                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
                     e);
         }
 
@@ -115,14 +122,14 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
      * @throws ClassLoaderException 
      * @throws InvalidSessionException 
      */
-    private void executeConnectors(long sProcessDefinitionID, Map<ConnectorDefinition, Map<String, Map<String, Serializable>>>  connectorsMap, Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException {
-        Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator =  connectorsMap.entrySet().iterator();
+    private void executeConnectors(final long sProcessDefinitionID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>>  connectorsMap, final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException {
+        final Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator =  connectorsMap.entrySet().iterator();
         while(iterator.hasNext()){
-            Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry =  iterator.next();
-            ConnectorDefinition connectorDefinition = entry.getKey();
-            Map<String, Map<String, Serializable>> contextInputValues = entry.getValue();
-            Map<String, Serializable> resultMap = executeConnectorOnProcessDefinition(connectorDefinition.getConnectorId(),connectorDefinition.getVersion(),connectorDefinition.getInputs(),contextInputValues,sProcessDefinitionID);
-            for(Operation operation : connectorDefinition.getOutputs()){
+            final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry =  iterator.next();
+            final ConnectorDefinition connectorDefinition = entry.getKey();
+            final Map<String, Map<String, Serializable>> contextInputValues = entry.getValue();
+            final Map<String, Serializable> resultMap = executeConnectorOnProcessDefinition(connectorDefinition.getConnectorId(),connectorDefinition.getVersion(),connectorDefinition.getInputs(),contextInputValues,sProcessDefinitionID);
+            for(final Operation operation : connectorDefinition.getOutputs()){
                 operationsMap.put(operation, resultMap); 
             }
         }
