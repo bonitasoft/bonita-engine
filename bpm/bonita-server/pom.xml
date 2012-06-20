@@ -87,21 +87,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-server-api-local</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-server-api-ejb2</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-server-api-ejb3</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Archive -->
 		<dependency>
@@ -674,10 +659,7 @@
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model</include>
-									<include>org.bonitasoft.engine.api:bonita-server-api-ejb2</include>
-									<include>org.bonitasoft.engine.api:bonita-server-api-ejb3</include>
 									<include>org.bonitasoft.engine.api:bonita-server-api</include>
-									<include>org.bonitasoft.engine.api:bonita-server-api-local</include>
 									<include>org.bonitasoft.engine.archive:bonita-archive-api</include>
 									<include>org.bonitasoft.engine.archive:bonita-archive-impl</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
