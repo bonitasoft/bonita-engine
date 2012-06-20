@@ -92,7 +92,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" value="f" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="t" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance" value="t" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="c" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" value="te" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="te" />
