@@ -101,6 +101,7 @@
 		<constructor-arg name="documentMappingService" ref="documentMappingService" />
 		<constructor-arg name="commentService" ref="commentService" />
 		<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />		
+		<constructor-arg name="breakpointService" ref="breakpointService" />
 	</bean>
 	
 	<bean id="processInstanceStateManager" class="org.bonitasoft.engine.execution.ProcessInstanceStateManagerImpl" />

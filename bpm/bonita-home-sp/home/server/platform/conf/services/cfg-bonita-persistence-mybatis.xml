@@ -11,6 +11,7 @@
 		<constructor-arg name="rangeSize" value="100" />
 		<constructor-arg ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
+		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantMybatisPersistenceService" depends-on="dbProperties">
@@ -24,6 +25,7 @@
 		<constructor-arg name="rangeSize" value="100" />
 		<constructor-arg ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
+		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="mybatisJournalSqlSessionFactoryProvider" class="org.bonitasoft.engine.persistence.MybatisSqlSessionFactoryProvider">
