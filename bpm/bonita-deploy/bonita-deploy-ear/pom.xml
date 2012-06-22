@@ -55,7 +55,7 @@
 					<modules>
 						<ejbModule>
 							<groupId>org.bonitasoft.engine</groupId>
-							<artifactId>bonita-deploy-ejb</artifactId>
+							<artifactId>bonita-deploy-ejb3</artifactId>
 							<bundleDir>/</bundleDir>
 						</ejbModule>
 						<jarModule>
