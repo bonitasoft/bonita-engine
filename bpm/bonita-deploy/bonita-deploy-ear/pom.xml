@@ -15,7 +15,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-deploy-ejb</artifactId>
+			<artifactId>bonita-deploy-ejb3</artifactId>
 			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
