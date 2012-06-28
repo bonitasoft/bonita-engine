@@ -11,7 +11,8 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bonita-deploy-ear</module>
+		<module>bonita-deploy-ear2-sp</module>
+		<module>bonita-deploy-ear3-sp</module>
 		<module>bonita-engine-deploy</module>
 	</modules>
 </project>
