@@ -525,11 +525,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -622,11 +617,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.xml</groupId>
 			<artifactId>bonita-xml-write-dom</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
