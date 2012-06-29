@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <artifactId>bonita-deploy-sp</artifactId>
-    <groupId>com.bonitasoft.engine</groupId>
-    <version>6.0-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<artifactId>bonita-deploy-sp</artifactId>
+		<groupId>com.bonitasoft.engine</groupId>
+		<version>6.0-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>bonita-deploy-ear2-sp</artifactId>
-  <packaging>ear</packaging>
+	<artifactId>bonita-deploy-ear2-sp</artifactId>
+	<packaging>ear</packaging>
 
-<name>Bonita Deploy: EAR-EJB2</name>
+	<name>Bonita Deploy: EAR-EJB2</name>
 
 	<dependencies>
 		<dependency>
@@ -18,6 +18,11 @@
 			<artifactId>bonita-deploy-ejb2</artifactId>
 			<version>${project.version}</version>
 			<type>ejb</type>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-common-sp</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
@@ -60,6 +65,10 @@
 						</ejbModule>
 						<jarModule>
 							<groupId>com.bonitasoft.engine</groupId>
+							<artifactId>bonita-common-sp</artifactId>
+						</jarModule>
+						<jarModule>
+							<groupId>com.bonitasoft.engine</groupId>
 							<artifactId>bonita-server-sp</artifactId>
 						</jarModule>
 						<jarModule>
@@ -79,6 +88,16 @@
 							<artifactId>commons-pool</artifactId>
 						</jarModule>
 					</modules>
+
+					<displayName>Bonita Application</displayName>
+					<description>Bonita Application</description>
+					<generateApplicationXml>true</generateApplicationXml>
+					<version>1.4</version>
+
+					<jboss>
+						<version>4.2</version>
+						<loader-repository>org.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear</loader-repository>
+					</jboss>
 				</configuration>
 			</plugin>
 		</plugins>

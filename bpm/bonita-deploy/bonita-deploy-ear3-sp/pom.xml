@@ -21,6 +21,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-common-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -60,6 +65,10 @@
 						</ejbModule>
 						<jarModule>
 							<groupId>com.bonitasoft.engine</groupId>
+							<artifactId>bonita-common-sp</artifactId>
+						</jarModule>
+						<jarModule>
+							<groupId>com.bonitasoft.engine</groupId>
 							<artifactId>bonita-server-sp</artifactId>
 						</jarModule>
 						<jarModule>
@@ -79,6 +88,16 @@
 							<artifactId>commons-pool</artifactId>
 						</jarModule>
 					</modules>
+
+					<generateApplicationXml>true</generateApplicationXml>
+					<version>1.4</version>
+					<displayName>Bonita Application</displayName>
+					<description>Bonita Application</description>
+
+					<jboss>
+						<version>4.2</version>
+						<loader-repository>com.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear</loader-repository>
+					</jboss>
 				</configuration>
 			</plugin>
 		</plugins>
