@@ -58,6 +58,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />		
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />		
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+		<constructor-arg name="commentService" ref="commentService" />
 	</bean>
 
 

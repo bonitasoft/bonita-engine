@@ -5,6 +5,8 @@
 		<constructor-arg name="typeAliases">
 			<map>
 				<entry key="process_comment" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" />
+				<entry key="human_comment" value="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" />
+				<entry key="system_comment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -14,19 +16,37 @@
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="10060" />
+				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" value="10060" />
+				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" value="10060" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="process_comment" />
+				<entry key="org.bonitasoft.engine.core.process.comment.model.SHumanComment" value="process_comment" />
+				<entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="process_comment" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
 			<map />
 		</constructor-arg>
 		<constructor-arg name="statementMapping">
-			<set />
+			<set>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl.insertSHumanCommentImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl.insertSCommentImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="human" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl.insertSSystemCommentImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl.insertSCommentImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="system" />
+				</bean>
+
+			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
 			<map />
@@ -34,6 +54,8 @@
 		<constructor-arg name="entityMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" />
+				<entry key="org.bonitasoft.engine.core.process.comment.model.SHumanComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" />
+				<entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
