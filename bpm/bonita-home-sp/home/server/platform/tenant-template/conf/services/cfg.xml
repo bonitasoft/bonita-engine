@@ -44,6 +44,7 @@
 		<constructor-arg name="sBusinessLogModelBuilder" ref="logModelBuilder" />
 		<constructor-arg name="sDocumentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
 		<constructor-arg name="sExternalIdentityMappingBuilders" ref="sExternalIdentityMappingBuilders" />
+		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
 	</bean>
 
 	<bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
