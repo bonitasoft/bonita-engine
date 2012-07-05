@@ -8,6 +8,8 @@
 		<constructor-arg name="parserFactory" ref="parserFactory" />
 		<constructor-arg name="sExpressionBuilders" ref="sExpressionBuilders" />
 		<constructor-arg name="sOperationBuilders" ref="sOperationBuilders" />
+		<constructor-arg name="cacheService" ref="cacheService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 	</bean>
 	
 </beans>
