@@ -156,6 +156,7 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+		<constructor-arg name="archiveService" ref="archiveService" />
 	</bean>
 	
 	<bean id="documentReferenceExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DocumentReferenceExpressionExecutorStrategy">

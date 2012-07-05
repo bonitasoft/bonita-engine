@@ -714,12 +714,14 @@
 				<entry key="arch_start_event_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
 				<entry key="arch_end_event_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
 				<entry key="arch_gateway_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
+				<entry key="arch_transition_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedProcessInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedFlowNodeInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedTransitionInstanceMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -734,6 +736,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" value="20012" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -749,6 +752,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="af" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="at" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -987,6 +991,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
