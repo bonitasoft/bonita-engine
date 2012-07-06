@@ -31,6 +31,7 @@
 						<ref bean="searchProfile"/>
 						<ref bean="exportAllProfiles"/>
 						<ref bean="exportProfilesWithIdsSpecified"/>
+						<ref bean="importProfilesUsingSpecifiedPolicy"/>
 						<ref bean="addProfileEntry"/>
 						<ref bean="getProfileEntry"/>
 						<ref bean="countProfileEntry"/>
@@ -231,6 +232,12 @@
 		<constructor-arg name="name"><value>exportProfilesWithIdsSpecified</value></constructor-arg>
 		<constructor-arg name="description"><value>Export all profiles with profileIds specified</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.ExportProfilesWithIdsSpecified</value></constructor-arg>
+	</bean>
+	
+	<bean id="importProfilesUsingSpecifiedPolicy" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>importProfilesUsingSpecifiedPolicy</value></constructor-arg>
+		<constructor-arg name="description"><value>Import profiles ,profileEntries and profile mappings by specified policy</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.web.profile.command.ImportProfilesUsingSpecifiedPolicy</value></constructor-arg>
 	</bean>
 	
 	<bean id="addProfileEntry" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
