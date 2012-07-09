@@ -26,10 +26,12 @@
 				<entry key="timer_event_trigger_instance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" />
 				<entry key="throw_message_event_trigger_instance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" />
 				<entry key="throw_signal_event_trigger_instance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" />
+				<entry key="throw_error_event_trigger_instance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" />
 				<entry key="message_instance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
 				<entry key="waiting_event" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" />
 				<entry key="waiting_message_event" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
 				<entry key="waiting_signal_event" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />
+				<entry key="waiting_error_event" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" />
 				<entry key="message_event_couple" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl" />
 				<entry key="mapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
 				<entry key="breakpoint" value="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
@@ -69,8 +71,10 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" value="10015" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" value="10015" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" value="10015" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" value="10015" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" value="10016" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" value="10016" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" value="10016" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" value="10017" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="10018" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="10019" />
@@ -97,15 +101,17 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance" value="t" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="c" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="te" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="te" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="te" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="m" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="w" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="w" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="w" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="w" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="mapping" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
 			</map>
@@ -217,6 +223,14 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.insertSThrowErrorEventTriggerInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.insertSEventTriggerInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="throwError" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.insertSWaitingMessageEventImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.insertSWaitingEventImpl" />
 					<constructor-arg name="parameterName" value="kind" />
@@ -228,6 +242,13 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.insertSWaitingEventImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="signal" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.insertSWaitingErrorEventImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.insertSWaitingEventImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="error" />
 				</bean>
 
 				<!-- update -->
@@ -356,12 +377,23 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.deleteSThrowErrorEventTriggerInstanceImpl" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.deleteSEventTriggerInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.deleteSWaitingMessageEventImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.deleteSWaitingEventImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.deleteSWaitingSignalEventImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.deleteSWaitingEventImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.deleteSWaitingErrorEventImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.deleteSWaitingEventImpl" />
 				</bean>
 
@@ -487,6 +519,18 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.getEventTriggerInstanceById" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getEventTriggerInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.getEventTriggerInstanceById" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getEventTriggerInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.getEventTriggerInstanceById" />
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getEventTriggerInstanceById" />
 				</bean>
@@ -666,6 +710,386 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstancewithSActivityInstance" />
 				</bean>
+				
+				<!-- search -->
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.searchSWaitingEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.searchSWaitingEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.searchSWaitingEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getNumberOfSWaitingEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getNumberOfSWaitingEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.getNumberOfSWaitingEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.searchSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingSignalEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.searchSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingSignalEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.searchSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingSignalEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getNumberOfSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingSignalEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getNumberOfSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingSignalEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.getNumberOfSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingSignalEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.searchSWaitingMessageEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingMessageEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.searchSWaitingMessageEventImpl.searchSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingMessageEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.searchSWaitingMessageEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingMessageEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getNumberOfSWaitingMessageEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingMessageEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getNumberOfSWaitingMessageEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingMessageEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.getNumberOfSWaitingMessageEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingMessageEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.searchSWaitingErrorEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingErrorEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.searchSWaitingErrorEventImpl.searchSWaitingSignalEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingErrorEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.searchSWaitingErrorEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.searchSWaitingErrorEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getNumberOfSWaitingErrorEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingErrorEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getNumberOfSWaitingErrorEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingErrorEvent" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.getNumberOfSWaitingErrorEvent" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getNumberOfSWaitingErrorEvent" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSEventTriggerInstance" />
+				</bean>
+
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSEventTriggerInstance" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSTimerEventTriggerInstance" />
+				</bean>
+
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSTimerEventTriggerInstance" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowMessageEventTriggerInstance" />
+				</bean>
+
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowMessageEventTriggerInstance" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowSignalEventTriggerInstance" />
+				</bean>
+
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowSignalEventTriggerInstance" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.searchSThrowErrorEventTriggerInstance" />
+				</bean>
+
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+					<constructor-arg name="destinationStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
+				</bean>
+				
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
@@ -689,9 +1113,14 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
@@ -817,7 +1246,7 @@
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="gate" />
 				</bean>
-				
+
 				<!-- delete -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
