@@ -94,7 +94,6 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="f" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="f" />
@@ -1171,6 +1170,7 @@
 		<constructor-arg name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="ap" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance" value="af" />
@@ -1246,7 +1246,7 @@
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="gate" />
 				</bean>
-
+				
 				<!-- delete -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
@@ -1403,6 +1403,14 @@
 					<constructor-arg name="destinationStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAHumanTaskInstancewithSAActivityInstance" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl.getNumberOfSAFlowNodeInstance" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getNumberOfSAFlowNodeInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl.searchSAFlowNodeInstance" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAFlowNodeInstance" />
+				</bean>
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
@@ -1410,6 +1418,7 @@
 		</constructor-arg>
 		<constructor-arg name="entityMappings">
 			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" />
