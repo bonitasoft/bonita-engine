@@ -35,6 +35,7 @@
 				<entry key="message_event_couple" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl" />
 				<entry key="mapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
 				<entry key="breakpoint" value="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
+				<entry key="hidden_activity" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -49,6 +50,7 @@
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/MessageEventCoupleMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/PendingActivityMappingMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/BreakpointMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/HiddenTaskMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -78,6 +80,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" value="10017" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="10018" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="10019" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -113,6 +116,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="w" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="mapping" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="h" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -1089,6 +1093,39 @@
 						value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl.getNumberOfSThrowErrorEventTriggerInstance" />
 				</bean>
 				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getNumberOfSHumanTaskInstancePendingHiddenForUser" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstancePendingHiddenForUser" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.searchSHumanTaskInstancePendingHiddenForUser" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstancePendingHiddenForUser" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstancePendingHiddenForUser" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getNumberOfSHumanTaskInstancePendingHiddenForUser" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.searchSHumanTaskInstancePendingHiddenForUser" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.searchSHumanTaskInstancePendingHiddenForUser" />
+				</bean>
+				<!-- bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl.getSHiddenTaskInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getSHiddenTaskInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl.getSHiddenTaskByUserAndActivity" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getSHiddenTaskByUserAndActivity" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl.getSHiddenTasksForActivity" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getSHiddenTasksForActivity" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl.getSHiddenTasks" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getSHiddenTasks" />
+				</bean-->
+				
 			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
@@ -1123,9 +1160,11 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
+
 
 	<!-- Archived objects -->
 	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
