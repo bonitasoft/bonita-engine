@@ -372,6 +372,13 @@
 			<artifactId>bonita-identity-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Lock -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.lock</groupId>
+			<artifactId>bonita-lock-api-memory-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>	
 
 		<!-- Login -->
 		<dependency>
@@ -782,6 +789,8 @@
 									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model</include>
+									<include>org.bonitasoft.engine.lock:bonita-lock-api</include>
+									<include>org.bonitasoft.engine.lock:bonita-lock-api-memory-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
