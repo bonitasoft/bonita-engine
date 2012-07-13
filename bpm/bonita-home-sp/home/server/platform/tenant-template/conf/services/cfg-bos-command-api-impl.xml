@@ -62,6 +62,7 @@
 						<ref bean="searchEntityMembersCommand"/>
 						<ref bean="searchEntityMembersForUserCommand"/>
 						<ref bean="deleteEntityMembersCommand"/>
+						<ref bean="searchWaitingEventsCommand"/>
 					</list>
 				</property>
 			</bean>
@@ -424,6 +425,12 @@
 		<constructor-arg name="name"><value>deleteEntityMembersCommand</value></constructor-arg>
 		<constructor-arg name="description"><value>Delete all Entity member mappings associated with provided externalId, for specific Discriminator. Parameter keys: EXTERNAL_ID_KEY: external id provided as is by the external system, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.identitymapping.DeleteEntityMembersCommand</value></constructor-arg>
+	</bean>
+	
+	<bean id="searchWaitingEventsCommand" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
+		<constructor-arg name="name"><value>searchWaitingEventsCommand</value></constructor-arg>
+		<constructor-arg name="description"><value>Search waiting events. Parameter keys: searchOptions.</value></constructor-arg>
+		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.command.system.SearchWaitingEventsCommand</value></constructor-arg>
 	</bean>
 
 </beans>
