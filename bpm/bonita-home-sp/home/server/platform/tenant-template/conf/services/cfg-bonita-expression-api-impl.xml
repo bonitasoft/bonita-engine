@@ -18,4 +18,6 @@
 
 	<bean id="EngineConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" />
 
+	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
+
 </beans>
