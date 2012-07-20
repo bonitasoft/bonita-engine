@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -56,20 +54,14 @@ import org.bonitasoft.engine.execution.state.ProcessInstanceStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
-import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Ruiheng Fan
- * 
  */
 public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.engine.command.Command#execute(java.util.Map, org.bonitasoft.engine.service.ServiceAccessor)
-     */
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
@@ -93,7 +85,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         } catch (final Exception e) {
             throw new SCommandParameterizationException("Mandatory parameter " + PROCESS_DEFINITION_ID_KEY + " is missing or not convertible to long.", e);
         }
-        
+
         String userName = null;
         try {
             userName = (String) parameters.get(USER_NAME_KEY);
@@ -116,21 +108,24 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
      * @param sProcessDefinitionID
      * @param connectorsMap
      * @param operationsMap
-     * @throws InvalidProcessDefinitionException 
-     * @throws InvalidEvaluationConnectorCondition 
-     * @throws ConnectorException 
-     * @throws ClassLoaderException 
-     * @throws InvalidSessionException 
+     * @throws InvalidProcessDefinitionException
+     * @throws InvalidEvaluationConnectorCondition
+     * @throws ConnectorException
+     * @throws ClassLoaderException
+     * @throws InvalidSessionException
      */
-    private void executeConnectors(final long sProcessDefinitionID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>>  connectorsMap, final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException {
-        final Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator =  connectorsMap.entrySet().iterator();
-        while(iterator.hasNext()){
-            final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry =  iterator.next();
+    private void executeConnectors(final long sProcessDefinitionID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap,
+            final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException {
+        final Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator = connectorsMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry = iterator.next();
             final ConnectorDefinition connectorDefinition = entry.getKey();
             final Map<String, Map<String, Serializable>> contextInputValues = entry.getValue();
-            final Map<String, Serializable> resultMap = executeConnectorOnProcessDefinition(connectorDefinition.getConnectorId(),connectorDefinition.getVersion(),connectorDefinition.getInputs(),contextInputValues,sProcessDefinitionID);
-            for(final Operation operation : connectorDefinition.getOutputs()){
-                operationsMap.put(operation, resultMap); 
+            final Map<String, Serializable> resultMap = executeConnectorOnProcessDefinition(connectorDefinition.getConnectorId(),
+                    connectorDefinition.getVersion(), connectorDefinition.getInputs(), contextInputValues, sProcessDefinitionID);
+            for (final Operation operation : connectorDefinition.getOutputs()) {
+                operationsMap.put(operation, resultMap);
             }
         }
     }
