@@ -17,7 +17,9 @@
 	
 	<bean id="patternExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.PatternExpressionExecutorStrategy" />
 
-	<bean id="EngineConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" />
+	<bean id="EngineConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" >
+		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+	</bean>
 
 	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
 
