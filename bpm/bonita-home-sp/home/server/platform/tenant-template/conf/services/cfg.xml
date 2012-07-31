@@ -109,6 +109,8 @@
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
+		<constructor-arg name="userFilterService" ref="userFilterService" />
+		<constructor-arg name="actorMappingService" ref="actorMappingService" />
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
