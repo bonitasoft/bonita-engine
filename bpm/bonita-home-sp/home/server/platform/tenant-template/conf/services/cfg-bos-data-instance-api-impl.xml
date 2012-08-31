@@ -20,7 +20,6 @@
 
 	<bean id="transientDataInstanceDSConf" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSourceConfiguration">
 		<constructor-arg name="cacheService" ref="cacheService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 	</bean>
 
 	<bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy">

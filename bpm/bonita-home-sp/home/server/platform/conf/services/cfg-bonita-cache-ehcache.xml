@@ -3,6 +3,7 @@
 
 	<bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 	</bean>
 
 </beans>
