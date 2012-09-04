@@ -28,6 +28,7 @@
 		<constructor-arg name="dependencyService" ref="dependencyService" />
 		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 
 	<bean id="searchEntitiesDescriptor" class="org.bonitasoft.engine.search.SearchEntitiesDescriptor">
