@@ -4,6 +4,20 @@
 	<bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheConfigurations">
+			<map>
+				<entry key="GROOVY_SCRIPT_CACHE_NAME">
+					<ref bean="groovyScriptCacheConfig" />
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<constructor-arg name="timeToLiveSeconds" value="3600"/>
+		<constructor-arg name="maxElementsInMemory" value="10000"/>
+		<constructor-arg name="maxElementsOnDisk" value="20000"/>
+		<constructor-arg name="inMemoryOnly" value="true"/>
 	</bean>
 
 </beans>
