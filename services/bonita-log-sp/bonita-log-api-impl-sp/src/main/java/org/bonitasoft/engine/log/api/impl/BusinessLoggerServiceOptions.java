@@ -36,7 +36,7 @@ public class BusinessLoggerServiceOptions implements BusinessLoggerServiceConfig
 
     @Override
     public boolean isLoggable(final String actionType, final SBusinessLogSeverity severity) {
-        if (loggableLevels == null) {
+        if (loggableLevels == null || loggableLevels.isEmpty()) {
             return false;
         }
         return loggableLevels.contains(actionType + ":" + severity);
