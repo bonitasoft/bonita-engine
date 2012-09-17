@@ -35,6 +35,7 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="archiveService" ref="archiveService" />
 	</bean>
 
 	<bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.SEventInstanceServiceImpl">

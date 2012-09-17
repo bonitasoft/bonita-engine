@@ -45,6 +45,20 @@
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="system" />
 				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl.deleteSHumanCommentImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl.deleteSCommentImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="human" />
+				</bean>
+				
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl.deleteSSystemCommentImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl.deleteSCommentImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="system" />
+				</bean>
 
 			</set>
 		</constructor-arg>

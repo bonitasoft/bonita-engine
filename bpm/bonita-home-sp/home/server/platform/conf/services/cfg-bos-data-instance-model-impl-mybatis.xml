@@ -11,7 +11,7 @@
 				<entry key="ShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" />
 				<entry key="LongDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" />
 				<entry key="BlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
-				<entry key="DateDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" />
+				<entry key="DATEDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" />
 				<entry key="LongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" />
 				<entry key="XMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
 				<entry key="DataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" />
@@ -244,11 +244,13 @@
 				<entry key="ArchDateDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" />
 				<entry key="ArchLongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" />
 				<entry key="ArchXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" />
+				<entry key="ArchDataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
 				<value>org/bonitasoft/engine/data/instance/model/impl/mybatis/ArchivedDataInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/data/instance/model/impl/mybatis/ArchivedDataInstanceVisibilityMappingMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
@@ -263,6 +265,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="20050" />
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="20051" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -277,6 +280,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" value="dateDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" value="longTextDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="xmlDataInst" />
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="dataMapping" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -455,6 +459,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADateDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" />
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
 			</map>
 		</constructor-arg>
 	</bean>

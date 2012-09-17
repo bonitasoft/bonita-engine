@@ -169,6 +169,14 @@
 						<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
 					</bean>
 				</entry>
+				<entry>
+					<key>
+						<value>PROCESSINSTANCE_DELETED</value>
+					</key>
+					<bean class="org.bonitasoft.engine.execution.handler.ProcessInstancesDeletedHandler">
+						<constructor-arg name="commentService" ref="commentService" />
+					</bean>
+				</entry>
 			</map>
 		</constructor-arg>
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />
