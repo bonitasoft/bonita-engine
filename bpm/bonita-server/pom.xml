@@ -665,6 +665,7 @@
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model</include>
 									<include>org.bonitasoft.engine.api:bonita-server-api</include>
+									<include>org.bonitasoft.engine.api:bonita-server-api-http</include>
 									<include>org.bonitasoft.engine.archive:bonita-archive-api</include>
 									<include>org.bonitasoft.engine.archive:bonita-archive-impl</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
