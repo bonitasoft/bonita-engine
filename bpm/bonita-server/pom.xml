@@ -377,6 +377,13 @@
 			<artifactId>bonita-identity-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Lock -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.lock</groupId>
+			<artifactId>bonita-lock-api-memory-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>	
 
 		<!-- Login -->
 		<dependency>
@@ -407,6 +414,18 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Migration instance -->
+		<dependency>
+			<artifactId>bonita-instance-migration-impl</artifactId>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>bonita-instance-migration-impl-mybatis</artifactId>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<!-- Monitoring -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.monitoring</groupId>
@@ -530,11 +549,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -629,11 +643,6 @@
 			<artifactId>bonita-xml-write-dom</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- ??? -->
 		<dependency>
@@ -688,6 +697,9 @@
 									<include>org.bonitasoft.engine.core:bonita-expression-resolver-api-impl</include>
 									<include>org.bonitasoft.engine.core:bonita-expression-resolver-api</include>
 									<include>org.bonitasoft.engine.core:bonita-home-server</include>
+									<include>org.bonitasoft.engine.core:bonita-instance-migration-api</include>
+									<include>org.bonitasoft.engine.core:bonita-instance-migration-impl</include>
+									<include>org.bonitasoft.engine.core:bonita-instance-migration-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core:bonita-process-engine</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api</include>
@@ -782,6 +794,8 @@
 									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model</include>
+									<include>org.bonitasoft.engine.lock:bonita-lock-api</include>
+									<include>org.bonitasoft.engine.lock:bonita-lock-api-memory-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
