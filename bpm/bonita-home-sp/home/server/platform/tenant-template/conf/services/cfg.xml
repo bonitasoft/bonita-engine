@@ -112,6 +112,7 @@
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="userFilterService" ref="userFilterService" />
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
+		<constructor-arg name="identityService" ref="identityService" />
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">

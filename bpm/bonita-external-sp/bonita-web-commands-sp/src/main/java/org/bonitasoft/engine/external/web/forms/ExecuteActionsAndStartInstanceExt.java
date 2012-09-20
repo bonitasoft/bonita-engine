@@ -141,7 +141,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         if (userName == null || userName.isEmpty()) {
-            userName = getUserFromSession();
+            userName = getUserNameFromSession();
         }
         // Retrieval of the process definition:
         SProcessDefinition sDefinition;
