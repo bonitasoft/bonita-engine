@@ -14,7 +14,7 @@
 				<prop key="org.quartz.dataSource.myds.user">${database.journal.connection.username}</prop>
 				<prop key="org.quartz.dataSource.myds.password">${database.journal.connection.password}</prop>
 				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-				<prop key="org.quartz.jobStore.misfireThreshold">200</prop><!-- the time before a misfire job will be executed -->
+<!-- 				<prop key="org.quartz.jobStore.misfireThreshold">200</prop>the time before a misfire job will be executed -->
 			</props>
 		</constructor-arg>
 	</bean>
