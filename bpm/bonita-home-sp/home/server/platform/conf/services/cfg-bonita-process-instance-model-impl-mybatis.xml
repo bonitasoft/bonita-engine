@@ -1192,6 +1192,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
