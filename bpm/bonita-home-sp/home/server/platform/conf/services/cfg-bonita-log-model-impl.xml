@@ -9,6 +9,13 @@
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/businesslogger/model/impl/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/businesslogger/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
+		<property name="sqlTransformers">
+			<map>
+				<entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" >
+					<bean class="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImplSqlTransformer"></bean>
+				</entry>
+			</map>
+		</property>
 	</bean>
 
 </beans>
