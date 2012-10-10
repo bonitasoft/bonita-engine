@@ -38,18 +38,18 @@ public class LogTestSP extends CommonAPITest {
         final List<Log> logs = getLogAPI().getLogs(0, 3, LogCriterion.DEFAULT);
         assertEquals("IDENTITY_USER_DELETED", logs.get(0).getActionType());
         assertEquals(SeverityLevel.INTERNAL, logs.get(0).getSeverity());
-        assertNull(logs.get(0).getCallerClassName());
-        assertNull(logs.get(0).getCallerMethodName());
+        assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(0).getCallerClassName());
+        assertEquals("deleteUser", logs.get(0).getCallerMethodName());
 
         assertEquals("IDENTITY_USER_UPDATED", logs.get(1).getActionType());
         assertEquals(SeverityLevel.INTERNAL, logs.get(1).getSeverity());
-        assertNull(logs.get(1).getCallerClassName());
-        assertNull(logs.get(1).getCallerMethodName());
+        assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(1).getCallerClassName());
+        assertEquals("updateUser", logs.get(1).getCallerMethodName());
 
         assertEquals("IDENTITY_USER_CREATED", logs.get(2).getActionType());
         assertEquals(SeverityLevel.INTERNAL, logs.get(2).getSeverity());
-        assertNull(logs.get(2).getCallerClassName());
-        assertNull(logs.get(2).getCallerMethodName());
+        assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(2).getCallerClassName());
+        assertEquals("createUser", logs.get(2).getCallerMethodName());
         logout();
     }
 

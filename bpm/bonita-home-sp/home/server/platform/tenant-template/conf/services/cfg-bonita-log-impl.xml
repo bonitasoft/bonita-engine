@@ -2,7 +2,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.BusinessLoggerServiceOptions">
-		<constructor-arg name="needsInferCall" value="false" />
 		<constructor-arg name="loggableLevels">
 			<list>
 				<value>IDENTITY_USER_CREATED:INTERNAL</value>

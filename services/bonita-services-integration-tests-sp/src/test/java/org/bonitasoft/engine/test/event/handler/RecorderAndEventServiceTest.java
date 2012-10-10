@@ -20,12 +20,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.archive.test.model.Employee;
 import org.bonitasoft.engine.archive.test.model.SEmployeeHandlerImpl;
-import org.bonitasoft.engine.archive.test.model.TestLogBuilder;
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
-import org.bonitasoft.engine.businesslogger.model.SBusinessLogSeverity;
-import org.bonitasoft.engine.businesslogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.businesslogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.businesslogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
@@ -75,8 +69,6 @@ public class RecorderAndEventServiceTest {
 
     private static PersistenceService persistenceService;
 
-    private static TestLogBuilder logModelBuilder;
-
     private static Recorder recorder;
 
     static {
@@ -89,7 +81,6 @@ public class RecorderAndEventServiceTest {
         eventService = servicesBuilder.buildEventService();
         sessionService = servicesBuilder.buildSessionService();
         persistenceService = servicesBuilder.buildPersistence();
-        logModelBuilder = servicesBuilder.getInstanceOf(TestLogBuilder.class);
         recorder = servicesBuilder.buildRecorder(false);
     }
 
@@ -106,7 +97,7 @@ public class RecorderAndEventServiceTest {
         @Override
         public void failed(final Throwable cause, final Description d) {
             LOGGER.error("Failed test: " + this.getClass().getName() + "." + d.getMethodName());
-        };
+        }
 
         @Override
         public void succeeded(final Description d) {
@@ -131,20 +122,6 @@ public class RecorderAndEventServiceTest {
         TestUtil.deleteDefaultTenantAndPlatForm(txService, platformService, sessionAccessor, sessionService);
     }
 
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder) {
-        logBuilder.createNewInstance().actionStatus(SBusinessLog.STATUS_OK).severity(SBusinessLogSeverity.INTERNAL).rawMessage("sucessFull");
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
-    private TestLogBuilder getLogBuilder(final ActionType actionType) {
-        initializeLogBuilder(logModelBuilder);
-        updateLog(actionType, logModelBuilder);
-        return logModelBuilder;
-    }
-
     @Test
     public void testUpdateEmployeeName() throws Exception {
         // Add an Employee using persistence service
@@ -157,9 +134,6 @@ public class RecorderAndEventServiceTest {
         // Update an Employee using recorder
         btx = txService.createTransaction();
         btx.begin();
-
-        // Make log parameter
-        final TestLogBuilder updateLog = getLogBuilder(ActionType.UPDATED);
 
         // Make UpdateRecord parameter
         final Map<String, Object> fields = new HashMap<String, Object>();
@@ -175,7 +149,7 @@ public class RecorderAndEventServiceTest {
 
         final SEmployeeHandlerImpl employeeHandler = resetEmployeeHandler(eventService, eventType + "_UPDATED");
 
-        recorder.recordUpdate(updateRecord, updateLog, updateEvent);
+        recorder.recordUpdate(updateRecord, updateEvent);
         assertEquals(true, employeeHandler.isUpdated());
 
         btx.complete();
@@ -194,9 +168,6 @@ public class RecorderAndEventServiceTest {
         btx = txService.createTransaction();
         btx.begin();
 
-        // Make log parameter
-        final TestLogBuilder updateLog = getLogBuilder(ActionType.UPDATED);
-
         // Make UpdateRecord parameter
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("age", 20);
@@ -211,7 +182,7 @@ public class RecorderAndEventServiceTest {
 
         final SEmployeeHandlerImpl employeeHandler = resetEmployeeHandler(eventService, eventType + "_UPDATED");
 
-        recorder.recordUpdate(updateRecord, updateLog, updateEvent);
+        recorder.recordUpdate(updateRecord, updateEvent);
 
         // assert if employeeHandler is executed
         assertEquals(false, employeeHandler.isUpdated());
@@ -229,5 +200,4 @@ public class RecorderAndEventServiceTest {
         final String discriminator = employee.getDiscriminator();
         return discriminator.substring(discriminator.lastIndexOf(".") + 1, discriminator.length()).toUpperCase();
     }
-
 }

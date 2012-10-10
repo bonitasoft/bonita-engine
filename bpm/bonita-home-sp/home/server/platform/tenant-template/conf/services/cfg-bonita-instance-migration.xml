@@ -14,6 +14,7 @@
 		<constructor-arg name="breakpointService" ref="breakpointService" />
 		<constructor-arg name="breakpointBuilder" ref="bpmInstanceBuilders" />
 		<constructor-arg name="interruptingStateId" value="45" />
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
 	</bean>
 	
 </beans>

@@ -29,7 +29,7 @@
 	<bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerImpl">
 		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
 		<constructor-arg name="builderAccessor" ref="schedulerBuilderAccessor" />
-		<constructor-arg name="businessLogService" ref="syncBusinessLogService" />
+		<constructor-arg name="businessLogService" ref="syncBusinessLoggerService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="recorder" ref="recorderSync" />

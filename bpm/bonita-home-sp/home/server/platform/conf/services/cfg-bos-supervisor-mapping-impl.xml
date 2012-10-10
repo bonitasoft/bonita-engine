@@ -6,7 +6,8 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="sSupervisorBuilders" ref="sSupervisorBuilders" />
-	</bean>
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+    </bean>
 
 	<bean name="sSupervisorBuilders" class="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorBuildersImpl" />
 

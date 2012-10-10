@@ -9,16 +9,12 @@
 
 	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="logModelBuilder" ref="logModelBuilder" />
-		<constructor-arg name="businessLogService" ref="syncBusinessLogService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
 	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="logModelBuilder" ref="logModelBuilder" />
-		<constructor-arg name="businessLogService" ref="asyncBusinessLogService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>

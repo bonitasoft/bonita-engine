@@ -8,6 +8,7 @@
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
 	</bean>
 
 	<bean name="categoryBuilderAccessor" class="org.bonitasoft.engine.core.category.model.builder.impl.SCategoryBuilderAccessorImpl" />

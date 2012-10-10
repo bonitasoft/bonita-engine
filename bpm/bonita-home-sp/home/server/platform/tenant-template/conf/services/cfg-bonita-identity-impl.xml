@@ -7,6 +7,7 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
-	</bean>
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+    </bean>
 
 </beans>

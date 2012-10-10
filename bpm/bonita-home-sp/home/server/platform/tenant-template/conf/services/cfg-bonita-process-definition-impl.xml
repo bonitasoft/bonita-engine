@@ -14,6 +14,7 @@
 		<constructor-arg name="xmlWriter" ref="xmlWriter" />
 		<constructor-arg name="sDataDefinitionBuilders" ref="sDataDefinitionBuilders" />
 		<constructor-arg name="sOperationBuilders" ref="sOperationBuilders" />
-	</bean>
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+    </bean>
 
 </beans>

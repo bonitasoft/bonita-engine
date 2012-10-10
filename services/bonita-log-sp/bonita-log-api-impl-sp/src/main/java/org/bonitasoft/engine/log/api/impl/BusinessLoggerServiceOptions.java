@@ -20,18 +20,10 @@ import org.bonitasoft.engine.services.BusinessLoggerServiceConfiguration;
 
 public class BusinessLoggerServiceOptions implements BusinessLoggerServiceConfiguration {
 
-    private final boolean needsInferCall;
-
     private final List<String> loggableLevels;
 
-    public BusinessLoggerServiceOptions(final boolean needsInferCall, final List<String> loggableLevels) {
-        this.needsInferCall = needsInferCall;
+    public BusinessLoggerServiceOptions(final List<String> loggableLevels) {
         this.loggableLevels = loggableLevels;
-    }
-
-    @Override
-    public boolean needsInferCaller() {
-        return needsInferCall;
     }
 
     @Override

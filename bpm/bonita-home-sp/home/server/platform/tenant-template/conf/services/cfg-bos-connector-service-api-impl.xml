@@ -12,7 +12,8 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="operationService" ref="operationService" />
-	</bean>
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+    </bean>
 
 	<bean id="connectorService" class="org.bonitasoft.engine.connector.ConnectorServiceDecorator">
 		<constructor-arg name="connectorService" ref="connectorServiceSub" />

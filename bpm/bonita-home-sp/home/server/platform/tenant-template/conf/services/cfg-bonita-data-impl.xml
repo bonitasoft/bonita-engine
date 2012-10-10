@@ -7,7 +7,7 @@
 		<constructor-arg name="persistence" ref="persistenceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="dataSouceConfigurations">
+		<constructor-arg name="dataSourceConfigurations">
 			<list>
 				<ref bean="persistentDataInstanceDSConf" />
 				<ref bean="transientDataInstanceDSConf" />
@@ -15,6 +15,7 @@
 		</constructor-arg>
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
 	</bean>
 
 </beans>

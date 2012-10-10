@@ -13,6 +13,7 @@
             <entry key="STATE_CHANGE" value="true" />
         </map>
 		</constructor-arg>
-	</bean>
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+    </bean>
 
 </beans>

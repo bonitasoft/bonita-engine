@@ -67,7 +67,8 @@
 				</property>
 			</bean>
 		</constructor-arg>
-	</bean>
+        <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+    </bean>
 
 	<bean name="commandBuilderAccessor" class="org.bonitasoft.engine.command.model.SCommandBuilderAccessorImpl" />
 
