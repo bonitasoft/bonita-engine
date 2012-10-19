@@ -13,6 +13,7 @@
 
 	<bean id="GroovyScriptExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy" >
 		<constructor-arg name="cacheService" ref="cacheService" />
+		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 	</bean>
 
 	<bean id="InputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
