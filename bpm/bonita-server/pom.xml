@@ -627,6 +627,13 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Work -->
+		<dependency>
+			<groupId>com.bonitasoft.engine.work</groupId>
+			<artifactId>bonita-work-parallel</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<!-- XML -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.xml</groupId>
@@ -668,6 +675,7 @@
 								<includes>
 									<include>com.bonitasoft.engine.events:bonita-events-api-impl-sp</include>
 									<include>com.bonitasoft.engine.log:bonita-log-api-impl-sp</include>
+									<include>com.bonitasoft.engine.work:bonita-work-parallel</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-api-impl</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-api</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl</include>
@@ -849,6 +857,8 @@
 									<include>org.bonitasoft.engine.session:bonita-session-model</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
+									<include>org.bonitasoft.engine.work:bonita-work-api</include>
+									<include>org.bonitasoft.engine.work:bonita-work-impl</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-parse-api</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-validate-api</include>

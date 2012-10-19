@@ -14,6 +14,7 @@
 	<modules>
 		<module>bonita-log-sp</module>
 		<module>bonita-events-sp</module>
+		<module>bonita-work-sp</module>
 	</modules>
 	
 	<profiles>
