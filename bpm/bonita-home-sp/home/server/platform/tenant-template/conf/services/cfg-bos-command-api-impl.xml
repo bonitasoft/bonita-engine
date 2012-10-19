@@ -388,7 +388,7 @@
 
 	<bean id="searchSCommentSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDescriptor">
 		<constructor-arg name="name"><value>searchSCommentSupervisedBy</value></constructor-arg>
-		<constructor-arg name="description"><value>Returns the list comment of process definition supervised by a user.</value></constructor-arg>
+		<constructor-arg name="description"><value>Returns the list of comments for processes supervised by a user. One mandatory parameter: supervisorId: ID of the user supervisor of the processes on which comments are.</value></constructor-arg>
 		<constructor-arg name="implementation" ><value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value></constructor-arg>
 	</bean>
 

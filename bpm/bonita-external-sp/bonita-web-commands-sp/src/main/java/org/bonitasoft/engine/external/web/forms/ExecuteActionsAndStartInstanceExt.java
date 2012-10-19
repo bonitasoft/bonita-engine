@@ -86,16 +86,16 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             throw new SCommandParameterizationException("Mandatory parameter " + PROCESS_DEFINITION_ID_KEY + " is missing or not convertible to long.", e);
         }
 
-        String userName = null;
+        long userId;
         try {
-            userName = (String) parameters.get(USER_NAME_KEY);
+            userId = (Long) parameters.get(USER_ID_KEY);
         } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + USER_NAME_KEY + " is missing or not convertible to String.", e);
+            throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.", e);
         }
 
         try {
             executeConnectors(sProcessDefinitionID, connectorsInputValues, operationsMap);
-            return startProcess(userName, sProcessDefinitionID, operationsMap).getId();
+            return startProcess(userId, sProcessDefinitionID, operationsMap).getId();
         } catch (final BonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
@@ -130,7 +130,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         }
     }
 
-    private ProcessInstance startProcess(String userName, final long processDefinitionId, final Map<Operation, Map<String, Serializable>> operations)
+    private ProcessInstance startProcess(long userId, final long processDefinitionId, final Map<Operation, Map<String, Serializable>> operations)
             throws InvalidSessionException, ProcessDefinitionNotFoundException, ProcessInstanceCreationException, ProcessDefinitionReadException,
             ProcessDefinitionNotEnabledException, OperationExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -140,9 +140,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final ProcessInstanceStateManager processInstanceStateManager = tenantAccessor.getProcessInstanceStateManager();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-        if (userName == null || userName.isEmpty()) {
-            userName = getUserNameFromSession();
-        }
+        if (userId == 0)
+            userId = getUserIdFromSession();
         // Retrieval of the process definition:
         SProcessDefinition sDefinition;
         try {
@@ -164,7 +163,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessInstance startedInstance;
         try {
             final Map<SOperation, Map<String, Serializable>> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
-            startedInstance = processExecutor.start(userName, sDefinition, sOperations);
+            startedInstance = processExecutor.start(userId, sDefinition, sOperations);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new ProcessInstanceCreationException(e);
