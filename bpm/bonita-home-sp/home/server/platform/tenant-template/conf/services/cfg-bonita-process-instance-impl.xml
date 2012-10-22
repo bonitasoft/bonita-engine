@@ -7,6 +7,7 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
         <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
 	<bean id="processInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl">
@@ -49,6 +50,7 @@
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="eventBuilders" ref="eventBuilders" />
         <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
 	<bean id="breakpointService" class="org.bonitasoft.engine.core.process.instance.impl.BreakpointServiceImpl">
