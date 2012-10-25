@@ -45,10 +45,14 @@
 	<bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
 		<constructor-arg name="validator" ref="xmlValidator" />
 	</bean>
-	
-    <bean id="searchPlatformEntitiesDescriptor" class="org.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor">
+
+	<bean id="searchPlatformEntitiesDescriptor" class="org.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor">
 		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />
 	</bean>
 	
-	
+	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationmpl">
+		<constructor-arg name="shouldStartScheduler" value="true" />
+		<constructor-arg name="shouldRestartElements" value="true" />
+	</bean>
+
 </beans>
