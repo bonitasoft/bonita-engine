@@ -72,8 +72,6 @@
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
 		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
-		<constructor-arg name="userFilterService" ref="userFilterService" />
-		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="connectorService" ref="connectorService" />

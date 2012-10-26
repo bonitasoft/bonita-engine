@@ -4,10 +4,10 @@
 	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.BusinessLoggerServiceOptions">
 		<constructor-arg name="loggableLevels">
 			<list>
-				<!-- value>IDENTITY_USER_CREATED:INTERNAL</value>
+				<value>IDENTITY_USER_CREATED:INTERNAL</value>
 				<value>IDENTITY_USER_UPDATED:INTERNAL</value>
 				<value>IDENTITY_USER_DELETED:INTERNAL</value>
-				<value>execute_connector:BUSINESS</value -->
+				<value>execute_connector:BUSINESS</value>
 			</list>
 		</constructor-arg>
 	</bean>
