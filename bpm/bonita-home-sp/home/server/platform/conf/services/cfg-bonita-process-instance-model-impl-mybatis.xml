@@ -1328,12 +1328,23 @@
 				
 				<!-- delete -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl.deleteSAutomaticTaskInstanceImpl" />
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl.deleteSAUserTaskInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl.deleteSAUserTaskInstanceImpl" />
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl.deleteSAManualTaskInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl.deleteSAAutomaticTaskInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl.deleteSALoopActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl.deleteSAMultiInstanceActivityInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -1341,15 +1352,33 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl.deleteSAGatewayInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.archive.impl.SAStartEventInstanceImpl.deleteSAStartEventInstanceImpl"/> 
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />				
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl.deleteSAStartEventInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.event.archive.impl.SAIntermediateCatchEventInstanceImpl.deleteSAIntermediateCatchEventInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
-						value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl.deleteSAEndEventInstanceImpl" />
+						value="org.bonitasoft.engine.core.process.instance.model.event.archive.impl.SABoundaryEventInstanceImpl.deleteSABoundaryEventInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.archive.impl.SAIntermediateThrowEventInstanceImpl.deleteSAIntermediateThrowEventInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.archive.impl.SAEndEventInstanceImpl.deleteSAEndEventInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+
 
 				<!-- get -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -1489,6 +1518,10 @@
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl.searchSAFlowNodeInstance" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.searchSAFlowNodeInstance" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl.getArchivedFlowNodesFromProcessInstance" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.getArchivedFlowNodesFromProcessInstance" />
 				</bean>
 			</set>
 		</constructor-arg>

@@ -270,17 +270,7 @@
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" value="dataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" value="intDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" value="boolDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" value="doubleDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" value="shortTextdaInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" value="longDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="blobDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" value="dateDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" value="longTextDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="xmlDataInst" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="dataMapping" />
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="dataInst" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">

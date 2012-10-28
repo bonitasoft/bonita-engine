@@ -12,7 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
     BPMTestsSP.class,
-    BPMLocalTests.class,
+    BPMLocalSuiteTests.class,
     BPMRemoteTests.class
 })
 public class LocalIntegrationTestsSP {
