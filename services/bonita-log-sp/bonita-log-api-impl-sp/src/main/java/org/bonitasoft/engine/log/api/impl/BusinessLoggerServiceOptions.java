@@ -28,7 +28,7 @@ public class BusinessLoggerServiceOptions implements BusinessLoggerServiceConfig
 
     @Override
     public boolean isLoggable(final String actionType, final SBusinessLogSeverity severity) {
-        if (System.getProperty("org.bonitasoft.engine.services.queryable.disable") != null) {
+        if (System.getProperty("org.bonitasoft.engine.services.queryablelog.disable") != null) {
             return false;
         }
         if (loggableLevels == null || loggableLevels.isEmpty()) {
