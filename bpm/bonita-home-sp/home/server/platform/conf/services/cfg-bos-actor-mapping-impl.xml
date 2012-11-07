@@ -6,6 +6,7 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+		<constructor-arg name="identityService" ref="identityService" />
 	</bean>
 
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
