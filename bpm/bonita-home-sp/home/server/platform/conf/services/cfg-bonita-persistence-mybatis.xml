@@ -29,7 +29,7 @@
 	</bean>
 
 	<bean id="mybatisJournalSqlSessionFactoryProvider" class="org.bonitasoft.engine.persistence.MybatisSqlSessionFactoryProvider">
-		<constructor-arg name="configuration" value="file://${bonita.home}/server/platform/conf/mybatis.config.xml" />
+		<constructor-arg name="configuration" value="/org/bonitasoft/engine/persistence/mybatis/mybatis.config.xml" />
 		<constructor-arg>
 			<list>
 				<ref bean="myBatisConfigurations" />
