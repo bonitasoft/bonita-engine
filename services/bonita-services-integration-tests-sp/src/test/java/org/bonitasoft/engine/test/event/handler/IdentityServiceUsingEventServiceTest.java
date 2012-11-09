@@ -92,7 +92,7 @@ public class IdentityServiceUsingEventServiceTest {
         @Override
         public void failed(final Throwable cause, final Description d) {
             LOGGER.error("Failed test: " + this.getClass().getName() + "." + d.getMethodName());
-        };
+        }
 
         @Override
         public void succeeded(final Description d) {
