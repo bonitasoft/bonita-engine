@@ -25,12 +25,14 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="deleteService" ref="deleteService" />
 	</bean>
 
 	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="deleteService" ref="deleteService" />
 	</bean>
 
 	<bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">

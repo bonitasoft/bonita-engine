@@ -243,6 +243,18 @@
 			<artifactId>bonita-data-instance-transient-data-source</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Delete -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-delete-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-delete-batch</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Dependency -->
 		<dependency>
@@ -675,6 +687,7 @@
 								<includes>
 									<include>com.bonitasoft.engine.events:bonita-events-api-impl-sp</include>
 									<include>com.bonitasoft.engine.log:bonita-log-api-impl-sp</include>
+									<include>org.bonitasoft.engine.persistence:bonita-delete-batch</include>
 									<include>com.bonitasoft.engine.work:bonita-work-parallel</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-api-impl</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-api</include>
@@ -813,6 +826,9 @@
 									<include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
+									<include>org.bonitasoft.engine.persistence:bonita-delete-api</include>
+									<include>org.bonitasoft.engine.persistence:bonita-delete-impl</include>
+									<include>org.bonitasoft.engine.persistence:bonita-delete-batch</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-mybatis</include>

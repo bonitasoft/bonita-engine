@@ -6,6 +6,7 @@
 		<constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="configurator" ref="archiveServiceConfigurator" />
+		<constructor-arg name="deleteService" ref="deleteService" />
 	</bean>
 
 	<bean id="definitiveArchiveDescriptor" class="org.bonitasoft.engine.archive.impl.SArchiveDescriptorImpl">
