@@ -9,8 +9,18 @@
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
+		<property name="sqlTransformers">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl">
+					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceSQLTransformer"></bean>
+				</entry>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl">
+					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceSQLTransformer"></bean>
+				</entry>
+			</map>
+		</property>
 	</bean>
-	
+
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-initTables.sql" />
@@ -18,6 +28,6 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
 	</bean>
-	
+
 
 </beans>

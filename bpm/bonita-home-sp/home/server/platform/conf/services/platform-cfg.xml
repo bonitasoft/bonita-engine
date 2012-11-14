@@ -52,7 +52,7 @@
 		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />
 	</bean>
 	
-	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationmpl">
+	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationmpl" autowire="byType">
 		<constructor-arg name="shouldStartScheduler" value="true" />
 		<constructor-arg name="shouldRestartElements" value="true" />
 	</bean>
