@@ -52,9 +52,11 @@
 		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />
 	</bean>
 	
-	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationmpl" autowire="byType">
-		<constructor-arg name="shouldStartScheduler" value="true" />
-		<constructor-arg name="shouldRestartElements" value="true" />
+	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
+        <property name="shouldStartScheduler" value="true" />
+        <property name="shouldRestartElements" value="true" />
+        <property name="eventHandlingJobCron" value="${event.job.frequency:*/5 * * * * ?}" />
+        <property name="shouldStartEventHandlingJob" value="true" />
 	</bean>
 
 </beans>
