@@ -30,13 +30,14 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.Trigger;
 import org.bonitasoft.engine.scheduler.UnixCronTrigger;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
  */
 public class DeleteBatchJobRegister implements RestartHandler {
 
-    private boolean mustStartJob = false;
+    private volatile boolean mustStartJob = false;
 
     private static final String DELETE_BATCH_JOB = "DeleteBatchJob";
 
@@ -57,11 +58,13 @@ public class DeleteBatchJobRegister implements RestartHandler {
      *            e.g. * *\/2 * * * ? to run it every 2 minutes
      */
     public DeleteBatchJobRegister(final PersistenceService persistenceService, final SchedulerService schedulerService,
-            final TechnicalLoggerService loggerService, final String repeat) {
+            final TechnicalLoggerService loggerService, final TransactionService transactionService, final List<String> classesToPurge, final String repeat) {
         this.schedulerService = schedulerService;
         this.loggerService = loggerService;
         this.repeat = repeat;
         DeleteBatchJob.setPersistenceService(persistenceService);
+        DeleteBatchJob.setTransactionService(transactionService);
+        DeleteBatchJob.setClassesToPurge(classesToPurge);
         INSTANCE = this;
     }
 
@@ -72,12 +75,22 @@ public class DeleteBatchJobRegister implements RestartHandler {
         return INSTANCE;
     }
 
-    public void registerWorkIfNotRegistered() {
+    public void registerJobIfNotRegistered() {
+        if (mustStartJob) {
+            synchronizedRegister();
+        }
+    }
+
+    /**
+     * 
+     */
+    private synchronized void synchronizedRegister() {
         if (mustStartJob) {
             try {
                 List<String> jobs;
                 jobs = schedulerService.getAllJobs();
                 if (!jobs.contains(DELETE_BATCH_JOB)) {
+                    System.err.println("Register delete batch job with repeat cron: " + repeat);
                     loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register delete batch job with repeat cron: " + repeat);
                     final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
                             .createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB).done();

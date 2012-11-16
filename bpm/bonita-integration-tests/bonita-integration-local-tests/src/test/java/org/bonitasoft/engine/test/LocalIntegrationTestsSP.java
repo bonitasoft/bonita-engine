@@ -11,16 +11,12 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author Elias Ricken de Medeiros
  */
 @RunWith(Suite.class)
-@SuiteClasses({
-    BPMTestsSP.class,
-    BPMLocalSuiteTests.class,
-    BPMRemoteTests.class
-})
+@SuiteClasses({ BPMTestsSP.class, BPMLocalSuiteTests.class, BPMRemoteTests.class })
 public class LocalIntegrationTestsSP {
 
     @BeforeClass
-    public static void setTestsProperties(){
-        System.setProperty("delete.job.frequency","*/30 * * * * ?");
+    public static void setTestsProperties() {
+        System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
-    
+
 }

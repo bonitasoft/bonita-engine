@@ -55,7 +55,7 @@
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
         <property name="shouldStartScheduler" value="true" />
         <property name="shouldRestartElements" value="true" />
-        <property name="eventHandlingJobCron" value="${event.job.frequency:*/5 * * * * ?}" />
+        <property name="eventHandlingJobCron" value="${event.job.frequency:0/5 * * * * ?}" />
         <property name="shouldStartEventHandlingJob" value="true" />
 	</bean>
 

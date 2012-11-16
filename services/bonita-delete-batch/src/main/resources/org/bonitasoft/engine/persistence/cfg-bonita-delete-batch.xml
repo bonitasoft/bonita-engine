@@ -8,7 +8,14 @@
 		<constructor-arg name="persistenceService" ref="persistenceService"/>
 		<constructor-arg name="schedulerService" ref="scheduler"/>
 		<constructor-arg name="loggerService" ref="technicalLoggerService"/>
-		<constructor-arg name="repeat" value="${delete.job.frequency:* * */1 * * ?}"/>
+		<constructor-arg name="transactionService" ref="transactionService"/>
+		<constructor-arg name="classesToPurge" >
+			<list>
+				<value>org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl</value>
+				<value>org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="repeat" value="* */2 * * * ?"/>
 	</bean>
 	
 
