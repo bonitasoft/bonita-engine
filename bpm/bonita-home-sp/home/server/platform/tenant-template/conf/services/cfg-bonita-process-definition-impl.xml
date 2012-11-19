@@ -15,6 +15,7 @@
 		<constructor-arg name="sDataDefinitionBuilders" ref="sDataDefinitionBuilders" />
 		<constructor-arg name="sOperationBuilders" ref="sOperationBuilders" />
         <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
+        <constructor-arg name="dependencyService" ref="dependencyService" />
     </bean>
 
 </beans>
