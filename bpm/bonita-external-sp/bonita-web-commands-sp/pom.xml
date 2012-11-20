@@ -6,7 +6,7 @@
   <parent>
     <artifactId>bonita-external-sp</artifactId>
     <groupId>org.bonitasoft.engine.external</groupId>
-    <version>6.0-SNAPSHOT</version>
+    <version>6.0-Alpha</version>
   </parent>
   
   <artifactId>bonita-web-commands-sp</artifactId>
