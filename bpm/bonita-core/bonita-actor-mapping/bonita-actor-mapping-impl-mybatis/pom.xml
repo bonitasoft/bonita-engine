@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-actor-mapping</artifactId>
+		<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
+		<version>6.0-Alpha</version>
+	</parent>
+
+	<artifactId>bonita-actor-mapping-impl-mybatis</artifactId>
+
+	<name>Bonita Actor Mapping: MyBatis Configuration Files</name>
+</project>

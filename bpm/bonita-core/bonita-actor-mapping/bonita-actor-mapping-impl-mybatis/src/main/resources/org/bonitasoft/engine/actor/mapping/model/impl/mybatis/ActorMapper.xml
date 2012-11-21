@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl">
+    <cache/>
+	<insert id="insertSActorImpl" parameterType="actor">
+		INSERT INTO actor (tenantid, id, scopeId, name, displayname, description, initiator)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.scopeId}, #{entity.name}, #{entity.displayName}, #{entity.description}, #{entity.initiator})
+	</insert>
+
+	<update id="updateSActorImpl" parameterType="actor">
+		UPDATE actor
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="displayName == '___bonitanull___'">displayname = NULL,</if>
+			<if test="displayName != null and displayName != '___bonitanull___'">displayname = #{displayName},</if>
+			<if test="description == '___bonitanull___'">description = NULL,</if>
+			<if test="description != null and description != '___bonitanull___'">description = #{description},</if>
+			<if test="initiator!= null">initiator=#{initiator},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSActorImpl" parameterType="actor">
+		DELETE FROM actor
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="actorResultMap" type="actor">
+		<result property="id" column="id" />
+		<result property="scopeId" column="scopeid" />
+		<result property="name" column="name" />
+		<result property="displayName" column="displayname" />
+		<result property="description" column="description" />
+		<result property="initiator" column="initiator" />
+	</resultMap>
+
+	<select id="getActorById" parameterType="long" resultMap="actorResultMap">
+		SELECT *
+		FROM actor
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getActorsByIds" parameterType="long" resultMap="actorResultMap">
+		SELECT *
+		FROM actor
+		WHERE tenantid = #{tenantid}
+		AND id IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="getActorFromNameAndScopeId" parameterType="map" resultMap="actorResultMap">
+		SELECT actor.*
+		FROM actor actor
+		WHERE actor.tenantid = #{tenantid}
+		AND actor.scopeid = #{scopeId}
+		AND actor.name = #{name}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorsOfScope" parameterType="list" resultMap="actorResultMap">
+		SELECT actor.*
+		FROM actor actor
+		WHERE actor.tenantid = #{tenantid}
+		AND actor.scopeid = #{scopeId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorsOfScopes" parameterType="list" resultMap="actorResultMap">
+		SELECT actor.*
+		FROM actor actor
+		WHERE actor.tenantid = #{tenantid}
+		AND actor.scopeid IN
+		<foreach item="scopeId" index="index" collection="scopeIds" open="(" separator="," close=")">
+			#{scopeId}
+		</foreach>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorsOfUserCanStartProcessDefinition" resultMap="actorResultMap">	
+	    SELECT actor.*
+		FROM actor, actormember
+		WHERE actor.tenantid = #{tenantid}
+		AND actormember.tenantid = actor.tenantid
+		AND actor.id = actormember.actorId 
+		AND actor.scopeId = #{processDefinitionid}
+		AND actor.initiator = TRUE 
+		AND (
+			actormember.userId = #{userId}
+			OR actormember.id IN (
+				SELECT am.id
+				FROM actormember am, 
+					(SELECT um.groupId, um.roleId
+					 FROM user_membership um
+					 WHERE um.tenantId = #{tenantid}
+					 AND um.userId = #{userId}) um 
+				WHERE am.tenantId = actor.tenantid
+				AND (
+					(am.groupId = um.groupId AND am.roleId &lt;= 0)
+					OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
+					OR (am.groupId = um.groupId AND am.roleId = um.roleId)
+				)
+			)
+		)
+	</select>
+
+	<select id="getActorsOfUser" parameterType="list" resultMap="actorResultMap">
+		SELECT actor.*
+		FROM actor, actormember
+		WHERE actor.tenantid = #{tenantid}
+		AND actormember.tenantid = actor.tenantid
+		AND actor.id = actormember.actorId 
+		AND actor.scopeId IN 
+		<foreach item="scopeId" index="index" collection="scopeIds" open="(" separator="," close=")">
+			#{scopeId}
+		</foreach>
+		AND (
+			actormember.userId = #{userId}
+		 	OR actormember.id IN (
+				SELECT am.id
+				FROM actormember am, 
+					(SELECT um.groupId, um.roleId
+					 FROM user_membership um
+					 WHERE um.tenantId = #{tenantid}
+					 AND um.userId = #{userId}) um 
+				WHERE am.tenantId = actor.tenantid
+				AND (
+					(am.groupId = um.groupId AND am.roleId &lt;= 0)
+					OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
+					OR (am.groupId = um.groupId AND am.roleId = um.roleId)
+				)
+			)
+		)
+	</select>
+
+</mapper>

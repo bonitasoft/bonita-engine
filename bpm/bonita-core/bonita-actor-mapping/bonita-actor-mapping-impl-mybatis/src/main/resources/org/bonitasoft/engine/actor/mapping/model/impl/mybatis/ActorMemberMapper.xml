@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl">
+    <cache/>
+	<select id="getActorMemberById" parameterType="long" resultMap="actorMemberResultMap">
+		SELECT *
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getNumberOfActorMembersOfActor" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND actorId = #{actorId}
+	</select>
+
+	<select id="getActorMembersOfActor" parameterType="long" resultMap="actorMemberResultMap">
+		SELECT *
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND actorId = #{actorId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorMembersOfUser" parameterType="long" resultMap="actorMemberResultMap">
+		SELECT *
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND userId = #{userId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorMembersOfGroup" parameterType="long" resultMap="actorMemberResultMap">
+		SELECT *
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND groupId = #{groupId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorMembersOfRole" parameterType="long" resultMap="actorMemberResultMap">
+		SELECT *
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND roleId = #{roleId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorMembersOfRoleAndGroup" parameterType="long" resultMap="actorMemberResultMap">
+		SELECT *
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND roleId = #{roleId}
+		AND groupId = #{groupId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<insert id="insertSActorMemberImpl" parameterType="actormember">
+		INSERT INTO actormember (tenantid, id, actorId, userId, groupId, roleId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.actorId}, #{entity.userId}, #{entity.groupId}, #{entity.roleId})
+	</insert>
+
+	<delete id="deleteSActorMemberImpl" parameterType="actormember">
+		DELETE FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="actorMemberResultMap" type="actormember">
+		<result property="id" column="id" />
+		<result property="actorId" column="actorid" />
+		<result property="userId" column="userId" />
+		<result property="groupId" column="groupId" />
+		<result property="roleId" column="roleId" />
+	</resultMap>
+
+</mapper>
