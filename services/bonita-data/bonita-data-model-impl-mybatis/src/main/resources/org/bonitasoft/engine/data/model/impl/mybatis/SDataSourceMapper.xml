@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.data.model.impl.SDataSourceImpl">
+    <cache/>
+	<insert id="insertSDataSourceImpl" parameterType="datasource">
+		INSERT INTO datasource (tenantid, id, name, version, implementationclassname, state)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.version}, #{entity.implementationClassName}, #{entity.state})
+	</insert>
+
+	<delete id="deleteSDataSourceImpl" parameterType="datasource">
+		DELETE FROM datasource
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="dataSourceResultMap" type="datasource">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="version" column="version" />
+		<result property="implementationClassName" column="implementationclassname" />
+		<result property="state" column="state" />
+	</resultMap>
+
+	<select id="getDataSourceById" parameterType="long" resultMap="dataSourceResultMap">
+		SELECT *
+		FROM datasource
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getDataSources" parameterType="long" resultMap="dataSourceResultMap">
+		SELECT datasource.*
+		FROM datasource datasource
+		WHERE datasource.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getDataSourceByNameAndVersion" parameterType="long" resultMap="dataSourceResultMap">
+		SELECT datasource.*
+		FROM datasource datasource
+		WHERE datasource.tenantid = #{tenantid}
+		AND datasource.name = #{name}
+		AND datasource.version = #{version}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
