@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl">
+    <cache/>
+	<insert id="insertSProfileEntryImpl" parameterType="profileentry">
+		INSERT INTO profileentry (tenantId, id, profileId, name, description, parentId, index_, type, page)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.profileId}, #{entity.name}, #{entity.description}, #{entity.parentId}, #{entity.index},
+			#{entity.type}, #{entity.page})
+	</insert>
+
+	<update id="updateSProfileEntryImpl" parameterType="profileentry">
+		UPDATE profileentry
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name == '___bonitanull___'">name = NULL,</if>
+			<if test="name != null and name != '___bonitanull___'">name = #{name},</if>
+			<if test="description == '___bonitanull___'">description = NULL,</if>
+			<if test="description != null and description != '___bonitanull___'">description = #{description},</if>
+			<if test="page == '___bonitanull___'">page = NULL,</if>
+			<if test="page != null and page != '___bonitanull___'">page = #{page},</if>
+			<if test="type == '___bonitanull___'">type = NULL,</if>
+			<if test="type != null and type != '___bonitanull___'">type = #{type},</if>
+			<if test="index != null">index_ = #{index}</if>
+		</trim>
+		WHERE tenantId = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSProfileEntryImpl" parameterType="profileentry">
+		DELETE FROM profileentry
+		WHERE tenantId = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="profileEntryResultMap" type="profileentry">
+		<id property="id" column="id" />
+		<result property="profileId" column="profileId" />
+		<result property="name" column="name" />
+		<result property="description" column="description" />
+		<result property="parentId" column="parentId" />
+		<result property="index" column="index_" />
+		<result property="type" column="type" />
+		<result property="page" column="page" />
+	</resultMap>
+
+	<select id="getProfileEntryById" parameterType="long" resultMap="profileEntryResultMap">
+		SELECT *
+		FROM profileentry
+		WHERE tenantId = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getNumberOfEntriesOfProfile" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM profileentry
+		WHERE tenantId = #{tenantid}
+		AND profileId = #{profileId}
+	</select>
+
+	<select id="getEntriesOfProfile" parameterType="long" resultMap="profileEntryResultMap">
+		SELECT *
+		FROM profileentry pe
+		WHERE pe.tenantId = #{tenantid}
+		AND pe.profileId = #{profileId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getEntriesOfProfileByParentId" parameterType="long" resultMap="profileEntryResultMap">
+		SELECT *
+		FROM profileentry pe
+		WHERE pe.tenantId = #{tenantid}
+		AND pe.profileId = #{profileId}
+		AND pe.parentId = #{parentId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>

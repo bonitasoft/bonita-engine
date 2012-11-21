@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.profile.model.impl.SProfileImpl">
+    <cache/>
+	<insert id="insertSProfileImpl" parameterType="profile">
+		INSERT INTO profile (tenantId, id, name, description, iconPath)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.iconPath})
+	</insert>
+
+	<update id="updateSProfileImpl" parameterType="profile">
+		UPDATE profile
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name == '___bonitanull___'">name = NULL,</if>
+			<if test="name != null and name != '___bonitanull___'">name = #{name},</if>
+			<if test="description == '___bonitanull___'">description = NULL,</if>
+			<if test="description != null and description != '___bonitanull___'">description = #{description},</if>
+			<if test="iconPath == '___bonitanull___'">iconPath = NULL,</if>
+			<if test="iconPath != null and iconPath != '___bonitanull___'">iconPath = #{iconPath},</if>
+		</trim>
+		WHERE tenantId = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSProfileImpl" parameterType="profile">
+		DELETE FROM profile
+		WHERE tenantId = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="profileResultMap" type="profile">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="description" column="description" />
+		<result property="iconPath" column="iconPath" />
+	</resultMap>
+
+	<select id="getProfileById" parameterType="long" resultMap="profileResultMap">
+		SELECT *
+		FROM profile
+		WHERE tenantId = #{tenantid}
+		AND id = #{id}
+	</select>
+
+    <select id="getProfileByName" parameterType="String" resultMap="profileResultMap">
+		SELECT *
+		FROM profile
+		WHERE tenantId = #{tenantid}
+		AND name = #{name}
+	</select>
+	
+	<select id="getNumberOfProfile" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM profile
+		WHERE tenantId = #{tenantid}
+	</select>
+
+	<select id="getProfiles" parameterType="long" resultMap="profileResultMap">
+		SELECT *
+		FROM profile p
+		WHERE p.tenantId = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getProfilesOfUser" parameterType="long" resultMap="profileResultMap">
+		SELECT p.*
+		FROM profile p,
+			 profilemember pm
+		WHERE p.tenantId = #{tenantid}
+		AND pm.tenantId = p.tenantId
+		AND pm.profileId = p.id
+		AND (
+			pm.userId = #{userId}
+			OR pm.id IN (
+				SELECT pm.id
+				FROM profilemember pm, 
+					(SELECT um.groupId, um.roleId
+					 FROM user_membership um
+					 WHERE um.tenantId = #{tenantid}
+					 AND um.userId = #{userId}) um 
+				WHERE pm.tenantId = p.tenantId
+				AND (
+					(pm.groupId = um.groupId AND pm.roleId &lt;= 0)
+					OR (pm.roleId = um.roleId AND pm.groupId &lt;= 0)
+					OR (pm.groupId = um.groupId AND pm.roleId = um.roleId)
+				)
+			)
+		)
+		GROUP BY pm.profileId		
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
