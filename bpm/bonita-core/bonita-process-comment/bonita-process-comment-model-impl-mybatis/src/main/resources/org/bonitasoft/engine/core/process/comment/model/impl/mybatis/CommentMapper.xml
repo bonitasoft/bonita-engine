@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl">
+    <cache/>
+	<insert id="insertSCommentImpl" parameterType="process_comment">
+		INSERT INTO process_comment (tenantid, id, kind, userId, processInstanceId, postDate, content)
+		VALUES (#{tenantid}, #{entity.id}, #{kind}, #{entity.userId}, #{entity.processInstanceId}, #{entity.postDate}, #{entity.content})
+	</insert>
+
+	<delete id="deleteSCommentImpl" parameterType="process_comment">
+		DELETE FROM process_comment
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="commentResultMap" type="process_comment">
+		<id property="id" column="id" />
+		<result property="userId" column="userId" />
+		<result property="processInstanceId" column="processInstanceId" />
+		<result property="postDate" column="postDate" />
+		<result property="content" column="content" />
+		<discriminator javaType="string" column="kind">
+			<case value="human" resultType="human_comment">
+			</case>
+			<case value="system" resultType="system_comment">
+			</case>
+		</discriminator>
+	</resultMap>
+
+	<select id="getSComments" parameterType="map" resultMap="commentResultMap">
+		SELECT *
+		FROM process_comment process_comment
+		WHERE process_comment.processInstanceId = #{processInstanceId}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="searchSComment" parameterType="map" resultMap="commentResultMap">
+		SELECT *
+		FROM process_comment process_comment
+		WHERE process_comment.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSComment" parameterType="long" resultType="long">
+		SELECT COUNT(process_comment.id)
+		FROM process_comment process_comment
+		WHERE process_comment.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSCommentwithSUser" parameterType="map" resultMap="commentResultMap">
+		SELECT process_comment.*
+		FROM process_comment process_comment,
+			 user_ u
+		WHERE process_comment.tenantid = #{tenantid}
+		AND u.tenantid = process_comment.tenantid
+		AND process_comment.userid = u.id
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSCommentwithSUser" parameterType="long" resultType="long">
+		SELECT COUNT(process_comment.id)
+		FROM process_comment process_comment,
+			 user_ u
+		WHERE process_comment.tenantid = #{tenantid}
+		AND u.tenantid = process_comment.tenantid
+		AND process_comment.userid = u.id
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="getNumberOfSCommentSupervisedBy" parameterType="list" resultType="long">
+		SELECT COUNT(process_comment.id)
+		FROM process_comment process_comment,
+		     arch_process_instance ap, user_ u
+		WHERE process_comment.tenantid = #{tenantid}
+		AND ap.tenantid = process_comment.tenantid
+	    AND process_comment.processInstanceId = ap.sourceObjectId
+	    AND process_comment.userId = u.id
+		AND ap.archiveDate = (
+			SELECT MAX(ap2.archiveDate)
+			FROM arch_process_instance ap2
+			WHERE ap2.tenantid = process_comment.tenantid
+			AND ap2.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = process_comment.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId 
+		)
+		AND ap.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = process_comment.tenantid
+			AND (
+				ps.userId = #{supervisorId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s,
+							 user_membership um
+						WHERE s.tenantid = process_comment.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{supervisorId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSCommentSupervisedBy" parameterType="list"  resultMap="commentResultMap">
+		SELECT process_comment.* 
+		FROM process_comment process_comment,
+		     arch_process_instance ap, user_ u
+		WHERE process_comment.tenantid = #{tenantid}
+		AND ap.tenantid = process_comment.tenantid
+	    AND process_comment.processInstanceId = ap.sourceObjectId
+	    AND process_comment.userId = u.id
+		AND ap.archiveDate = (
+			SELECT MAX(ap2.archiveDate)
+			FROM arch_process_instance ap2
+			WHERE ap2.tenantid = process_comment.tenantid
+			AND ap2.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = process_comment.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId 
+		)
+		AND ap.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = process_comment.tenantid
+			AND (
+				ps.userId = #{supervisorId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s,
+							 user_membership um
+						WHERE s.tenantid = process_comment.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{supervisorId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getNumberOfSCommentInvolvingUser" parameterType="list" resultType="long">
+		SELECT COUNT(DISTINCT process_comment.id)
+		FROM process_comment process_comment, user_ u
+		WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+		AND process_comment.userId = u.id
+		AND process_comment.tenantid = #{tenantid}
+		AND (process_comment.userId = #{userId}
+		OR process_comment.processinstanceid IN (
+			SELECT f.logicalGroup2
+			FROM flownode_instance f
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND f.tenantid = process_comment.tenantid
+			AND f.assigneeId = #{userId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT af.logicalGroup2
+			FROM arch_flownode_instance af
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND af.tenantid = process_comment.tenantid
+			AND af.assigneeId = #{userId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT pi.id
+			FROM process_instance pi,
+				 user_ u
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND pi.tenantid = process_comment.tenantid
+			AND u.tenantid = pi.tenantid
+			AND pi.startedBy = u.id
+			AND u.id = process_comment.userId
+			AND process_comment.userId = #{userId}
+			AND u.id = #{userId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT pi.id
+			FROM arch_process_instance pi,
+				 user_ u
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND pi.tenantid = process_comment.tenantid
+			AND u.tenantid = pi.tenantid
+			AND pi.startedBy = u.id
+			AND u.id = process_comment.userId
+			AND u.id = #{userId}
+		))
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSCommentInvolvingUser" parameterType="list"  resultMap="commentResultMap">
+		SELECT DISTINCT process_comment.*
+		FROM process_comment process_comment, user_ u
+		WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+		AND process_comment.userId = u.id
+		AND process_comment.tenantid = #{tenantid}
+		AND (process_comment.userId = #{userId}
+		OR process_comment.processinstanceid IN (
+			SELECT f.logicalGroup2
+			FROM flownode_instance f
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND  f.tenantid = process_comment.tenantid
+			AND f.assigneeId = #{userId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT af.logicalGroup2
+			FROM arch_flownode_instance af
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND af.tenantid = process_comment.tenantid
+			AND af.assigneeId = #{userId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT pi.id
+			FROM process_instance pi,
+				 user_ u
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND pi.tenantid = process_comment.tenantid
+			AND u.tenantid = pi.tenantid
+			AND pi.startedBy = u.id
+			AND u.id = process_comment.userId
+			AND process_comment.userId = #{userId}
+			AND u.id = #{userId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT pi.id
+			FROM arch_process_instance pi,
+				 user_ u
+			WHERE 
+			NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND pi.tenantid = process_comment.tenantid
+			AND u.tenantid = pi.tenantid
+			AND pi.startedBy = u.id
+			AND u.id = process_comment.userId
+			AND u.id = #{userId}
+		))
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getNumberOfSCommentManagedBy" parameterType="list" resultType="long">
+		SELECT COUNT(DISTINCT process_comment.id)
+		FROM process_comment process_comment, user_ u
+		WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+		AND process_comment.userId = u.id
+		AND process_comment.tenantid = #{tenantid}
+		AND (process_comment.userId IN (
+			SELECT u.id
+			FROM user_ u
+			WHERE u.tenantid = process_comment.tenantid
+			AND u.managerUserId = #{managerUserId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT f.logicalGroup2
+			FROM flownode_instance f
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND f.tenantid = process_comment.tenantid
+			AND f.assigneeId IN (
+				SELECT u.id
+				FROM user_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT af.logicalGroup2
+			FROM arch_flownode_instance af
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND af.tenantid = process_comment.tenantid
+			AND af.assigneeId IN (
+				SELECT u.id
+				FROM user_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT pi.id
+			FROM process_instance pi
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND pi.tenantid = process_comment.tenantid
+			AND pi.startedBy IN (
+				SELECT u.id
+				FROM USER_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT api.sourceObjectId
+			FROM arch_process_instance api
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND api.tenantid = process_comment.tenantid
+			AND api.startedBy IN (
+				SELECT u.id
+				FROM USER_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		))
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSCommentManagedBy" parameterType="list"  resultMap="commentResultMap">
+		SELECT DISTINCT process_comment.*
+		FROM process_comment process_comment, user_ u
+		WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+		AND process_comment.userId = u.id
+		AND process_comment.tenantid = #{tenantid}
+		AND (process_comment.userId IN (
+			SELECT u.id
+			FROM user_ u
+			WHERE u.tenantid = process_comment.tenantid
+			AND u.managerUserId = #{managerUserId}
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT f.logicalGroup2
+			FROM flownode_instance f
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND f.tenantid = process_comment.tenantid
+			AND f.assigneeId IN (
+				SELECT u.id
+				FROM user_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT af.logicalGroup2
+			FROM arch_flownode_instance af
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND af.tenantid = process_comment.tenantid
+			AND af.assigneeId IN (
+				SELECT u.id
+				FROM user_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT pi.id
+			FROM process_instance pi
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND pi.tenantid = process_comment.tenantid
+			AND pi.startedBy IN (
+				SELECT u.id
+				FROM USER_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		)
+		OR process_comment.processinstanceid IN (
+			SELECT api.sourceObjectId
+			FROM arch_process_instance api
+			WHERE NOT EXISTS  (select processinstanceid from ARCH_PROCESS_COMMENT a WHERE a.processinstanceid = process_comment.processinstanceid) 
+			AND api.tenantid = process_comment.tenantid
+			AND api.startedBy IN (
+				SELECT u.id
+				FROM USER_ u
+				WHERE u.tenantid = process_comment.tenantid
+				AND u.managerUserId = #{managerUserId}
+			)
+		))
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+</mapper>
