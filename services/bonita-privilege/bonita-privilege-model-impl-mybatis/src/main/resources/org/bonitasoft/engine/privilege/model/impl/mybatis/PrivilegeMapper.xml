@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl">
+    <cache/>
+	<insert id="insertSPrivilegeImpl" parameterType="sPrivilege">
+		INSERT INTO bos_privilege (tenantid, id, scope, level)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.scope}, #{entity.level})
+	</insert>
+
+	<delete id="deleteSPrivilegeImpl" parameterType="sPrivilege">
+		DELETE FROM bos_privilege
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="sPrivilegeImplResultMap" type="sPrivilege">
+		<id property="id" column="id" />
+		<result property="scope" column="scope" />
+		<result property="level" column="level" />
+	</resultMap>
+
+	<select id="getPrivilegeById" parameterType="long" resultMap="sPrivilegeImplResultMap">
+		SELECT priv.*
+		FROM bos_privilege priv
+		WHERE priv.tenantid = #{tenantid}
+		AND priv.id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPrivilegeByScopeAndLevel"  resultMap="sPrivilegeImplResultMap">
+		SELECT priv.*
+		FROM bos_privilege priv
+		WHERE priv.tenantid = #{tenantid}
+		AND priv.scope = #{scope}
+		AND priv.level = #{level}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPrivilegeByScope" parameterType="String" resultMap="sPrivilegeImplResultMap">
+		SELECT priv.*
+		FROM bos_privilege priv
+		WHERE priv.tenantid = #{tenantid}
+		AND priv.scope = #{scope}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPrivileges" resultMap="sPrivilegeImplResultMap">
+		SELECT priv.*
+		FROM bos_privilege priv
+		WHERE priv.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSPrivilege" parameterType="long" resultType="long">
+		SELECT COUNT(priv.id)
+		FROM bos_privilege priv
+		WHERE priv.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSPrivilege" parameterType="map" resultMap="sPrivilegeImplResultMap">
+		SELECT priv.*
+		FROM bos_privilege priv
+		WHERE priv.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
