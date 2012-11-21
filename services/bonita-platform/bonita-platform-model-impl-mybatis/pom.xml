@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-platform</artifactId>
+		<groupId>org.bonitasoft.engine.platform</groupId>
+		<version>6.0-Alpha</version>
+	</parent>
+
+	<artifactId>bonita-platform-model-impl-mybatis</artifactId>
+
+	<name>Bonita Platform: MyBatis COnfiguration Files</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform</groupId>
+			<artifactId>bonita-platform-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>
