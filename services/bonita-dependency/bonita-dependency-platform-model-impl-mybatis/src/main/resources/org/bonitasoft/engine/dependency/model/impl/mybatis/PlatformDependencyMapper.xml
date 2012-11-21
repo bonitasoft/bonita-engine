@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency">
+    <cache/>
+	<insert id="insertSPlatformDependency" parameterType="pdependency">
+		INSERT INTO pdependency (id, name, version, filename, description, value_)
+		VALUES (#{entity.id}, #{entity.name}, #{entity.version}, #{entity.fileName}, #{entity.description}, #{entity.value_})
+	</insert>
+
+	<delete id="deleteSPlatformDependency" parameterType="pdependency">
+		DELETE FROM pdependency
+		WHERE id = #{id}
+	</delete>
+
+	<resultMap id="pdependencyResultMap" type="pdependency">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="version" column="version" />
+		<result property="fileName" column="filename" />
+		<result property="description" column="description" />
+		<result property="value_" column="value_" />
+	</resultMap>
+
+	<select id="getPlatformDependencies" parameterType="long" resultMap="pdependencyResultMap">
+		SELECT *
+		FROM pdependency
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPlatformDependencyById" parameterType="long" resultMap="pdependencyResultMap">
+		SELECT *
+		FROM pdependency
+		WHERE id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPlatformDependencyByName" parameterType="String" resultMap="pdependencyResultMap">
+		SELECT *
+		FROM pdependency
+		WHERE name = #{name}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPlatformDependencyIds" parameterType="long" resultType="long">
+		SELECT dependencyId
+		FROM pdependencymapping
+		WHERE artifactId = #{artifactId}
+		AND artifactType = #{artifactType}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPlatformDependenciesById" parameterType="list" resultMap="pdependencyResultMap">
+		SELECT *
+		FROM pdependency
+		WHERE id IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
