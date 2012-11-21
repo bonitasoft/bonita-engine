@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl">
+
+	<insert id="insertSHiddenTaskInstanceImpl" parameterType="hidden_activity">
+		INSERT INTO hidden_activity (tenantid, id, activityId, userId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.activityId}, #{entity.userId})
+	</insert>
+
+	<delete id="deleteSHiddenTaskInstanceImpl" parameterType="hidden_activity">
+		DELETE FROM hidden_activity
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="hiddenTaskResultMap" type="hidden_activity">
+		<result property="id" column="id" />
+		<result property="activityId" column="activityId" />
+		<result property="userId" column="userId" />
+	</resultMap>
+
+	<select id="getSHiddenTaskInstanceById" resultMap="hiddenTaskResultMap">
+		SELECT h.*
+		FROM hidden_activity h
+		WHERE tenantid = #{tenantid}
+		AND h.id = #{id}
+	</select>
+	
+	<select id="getSHiddenTaskByUserAndActivity" resultMap="hiddenTaskResultMap">
+		SELECT h.*
+		FROM hidden_activity h
+		WHERE tenantid = #{tenantid}
+		AND h.activityId = #{activityInstanceId}
+		AND h.userId = #{userId}
+	</select>
+	
+	<select id="getSHiddenTasksForActivity" resultMap="hiddenTaskResultMap">
+		SELECT h.*
+		FROM hidden_activity h
+		WHERE tenantid = #{tenantid}
+		AND h.activityId = #{activityInstanceId}
+	</select>
+	
+	<select id="isTaskHidden" resultType="long">
+		SELECT COUNT(h.id)
+		FROM hidden_activity h
+		WHERE tenantid = #{tenantid}
+		AND h.activityId = #{activityId}
+		AND h.userId = #{userId}
+	</select>
+
+</mapper>

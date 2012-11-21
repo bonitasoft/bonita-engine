@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl">
+
+	<resultMap id="messageEventCoupleResultMap" type="message_event_couple">
+		<result property="waitingMessageId" column="waitingMessageId" />
+		<result property="eventType" column="eventType" />
+		<result property="waitingProcessefinitionId" column="waitingProcessefinitionId" />
+		<result property="processName" column="processName" />
+		<result property="waitingFlowNodeName" column="waitingFlowNodeName" />
+		<result property="waitingMessageName" column="waitingMessageName" />
+		<result property="messageId" column="messageId" />
+		<result property="messageName" column="messageName" />
+		<result property="targetProcess" column="targetProcess" />
+		<result property="targetFlowNode" column="targetFlowNode" />
+		<result property="sendMessageProcessefinitionId" column="sendMessageProcessefinitionId" />
+		<result property="sendMessageFlowNodeName" column="sendMessageFlowNodeName" />
+	</resultMap>
+
+	<select id="getMessageEventCouples" parameterType="List" resultMap="messageEventCoupleResultMap">
+		SELECT w.id AS waitingMessageId, w.eventType, w.processDefinitionId AS waitingProcessefinitionId, w.processName, w.flowNodeName,
+			w.messageName AS waitingMessageName, m.id AS messageId, m.messageName, m.targetProcess, m.targetFlowNode,
+			m.processDefinitionId AS sendMessageProcessefinitionId, m.flowNodeName AS sendMessageFlowNodeName
+		FROM waiting_event w, message_instance m
+		WHERE m.tenantid = #{tenantid}
+		AND w.tenantid = #{tenantid}
+		AND m.messageName = w.messageName
+		AND m.targetProcess = w.processName
+		AND m.targetFlowNode = w.flowNodeName
+		AND m.locked = FALSE
+		AND w.locked = FALSE
+		AND m.handled = FALSE
+		AND w.active = TRUE
+		AND w.correlation1 = m.correlation1
+		AND w.correlation2 = m.correlation2
+		AND w.correlation3 = m.correlation3
+		AND w.correlation4 = m.correlation4
+		AND w.correlation5 = m.correlation5
+		AND w.kind = 'message'
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+</mapper>

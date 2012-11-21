@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl">
+
+	<insert id="insertSAProcessInstanceImpl" parameterType="arch_process_instance">
+		INSERT INTO arch_process_instance (tenantid, id, name, processDefinitionId, startDate, startedBy, endDate, archiveDate, stateId, lastUpdate,
+			rootProcessInstanceId, callerId, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.processDefinitionId}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate},
+			#{entity.archiveDate}, #{entity.stateId}, #{entity.lastUpdate}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.sourceObjectId})
+	</insert>
+
+	<delete id="deleteSAProcessInstanceImpl" parameterType="arch_process_instance">
+		DELETE FROM arch_process_instance
+		WHERE tenantid = #{tenantid}
+		AND id = #{id} 
+	</delete>
+
+	<resultMap id="archivedProcessInstanceResultMap" type="arch_process_instance">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="processDefintionId" column="processDefintionId" />
+		<result property="stateId" column="stateId" />
+		<result property="startDate" column="startDate" />
+		<result property="endDate" column="endDate" />
+		<result property="startedBy" column="startedBy" />
+		<result property="archiveDate" column="archiveDate" /> 
+		<result property="lastUpdate" column="lastUpdate" />
+		<result property="rootProcessInstanceId" column="rootProcessInstanceId" />
+		<result property="callerId" column="callerId" />
+		<result property="sourceObjectId" column="sourceObjectId" />
+	</resultMap>
+
+	<select id="getAProcessInstances" parameterType="long" resultMap="archivedProcessInstanceResultMap">
+		SELECT *
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getAProcessInstanceByProcessInstanceId" parameterType="long" resultMap="archivedProcessInstanceResultMap">
+		SELECT *
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.sourceObjectId = #{processInstanceId}
+		AND ap.stateId != 8
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getAProcessInstanceByProcessDefinitionId" parameterType="long" resultMap="archivedProcessInstanceResultMap">
+		SELECT *
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.processDefinitionId = #{processDefinitionId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getLastAProcessInstanceByProcessInstanceId" parameterType="long" resultMap="archivedProcessInstanceResultMap">
+		SELECT *
+		FROM arch_process_instance ap
+		WHERE ap.sourceObjectId = #{processInstanceId}
+		AND ap.tenantid = #{tenantid}
+		AND ap.stateId != 8
+		ORDER BY ap.enddate DESC, ap.archivedate DESC
+		LIMIT 1
+	</select>
+
+	<select id="getNumberOfArchivedProcessInstances" parameterType="long" resultType="long">
+		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.stateId = 6
+	</select>
+
+	<select id="getNumberOfSAProcessInstance" resultType="long">
+		SELECT COUNT(DISTINCT ap.id)
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = api.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = api.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+ 	 </select>
+  
+	<select id="searchSAProcessInstance" resultMap="archivedProcessInstanceResultMap">
+		SELECT ap.*
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = api.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = api.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+  	</select>
+
+	<select id="getNumberOfSAProcessInstanceInvolvingUser" resultType="long">
+		SELECT COUNT(DISTINCT ap.id)
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		AND (
+			ap.startedBy = #{userId}
+			OR ap.id IN (
+				SELECT at.logicalGroup2
+				FROM arch_flownode_instance at
+				WHERE at.tenantid = ap.tenantid
+				AND at.assigneeId = #{userId}
+				AND at.kind IN ('user', 'manual')
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	 </select>
+
+	 <select id="searchSAProcessInstanceInvolvingUser" resultMap="archivedProcessInstanceResultMap">
+		SELECT *
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		AND (
+			ap.startedBy = #{userId}
+			OR ap.id IN (
+				SELECT at.logicalGroup2
+				FROM arch_flownode_instance at
+				WHERE at.tenantid = ap.tenantid
+				AND at.assigneeId = #{userId}
+				AND at.kind IN ('user', 'manual')
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	 </select>
+
+	<select id="getNumberOfSAProcessInstanceSupervisedBy" parameterType="long" resultType="long">
+		SELECT COUNT(DISTINCT ap.id)
+		FROM arch_process_instance ap, processsupervisor supervisor
+		WHERE ap.tenantid = #{tenantid}
+		AND supervisor.tenantid = ap.tenantid
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		AND ap.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = ap.tenantid
+			AND (
+				ps.userId = #{userId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s, user_membership um
+						WHERE s.tenantid = ap.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{userId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSAProcessInstanceSupervisedBy" parameterType="long" resultMap="archivedProcessInstanceResultMap">
+		SELECT DISTINCT ap.*
+		FROM arch_process_instance ap, processsupervisor supervisor
+		WHERE ap.tenantid = #{tenantid}
+		AND supervisor.tenantid = ap.tenantid
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		AND ap.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = ap.tenantid
+			AND (
+				ps.userId = #{userId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s, user_membership um
+						WHERE s.tenantid = ap.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{userId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSAProcessInstancewithSUserTaskInstance" parameterType="long" resultType="long">
+		SELECT COUNT(DISTINCT ap.id)
+		FROM arch_process_instance ap, flownode_instance f
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.tenantid = f.tenantid
+		AND ap.startedBy = #{userId}
+		AND ap.stateId != 8
+		OR (f.rootContainerId = ap.sourceObjectId
+			AND f.stable = TRUE
+			AND f.assigneeId = #{:userId}
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+  	</select>
+  
+	<select id="searchSAProcessInstancewithSUserTaskInstance" parameterType="long" resultMap="archivedProcessInstanceResultMap">
+		SELECT DISTINCT ap.*
+		FROM arch_process_instance ap, flownode_instance f
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.tenantid = f.tenantid
+		AND ap.startedBy = #{userId}
+		AND ap.stateId != 8
+		OR (f.rootContainerId = ap.sourceObjectId
+			AND f.stable = TRUE
+			AND f.assigneeId = #{:userId}
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+</mapper>

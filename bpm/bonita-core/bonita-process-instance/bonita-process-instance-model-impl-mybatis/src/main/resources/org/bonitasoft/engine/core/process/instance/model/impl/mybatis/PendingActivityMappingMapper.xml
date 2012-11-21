@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl">
+
+	<insert id="insertSPendingActivityMappingImpl" parameterType="map">
+		INSERT INTO pending_mapping (tenantid, id, activityId, actorId, userId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.activityId}, #{entity.actorId}, #{entity.userId})
+	</insert>
+
+	<delete id="deleteSPendingActivityMappingImpl" parameterType="map">
+		DELETE FROM pending_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+
+
+	<resultMap id="pendingMappingResultMap" type="mapping">
+		<result property="id" column="id" />
+		<result property="activityId" column="activityId" />
+		<result property="actorId" column="actorId" />
+		<result property="userId" column="userId" />
+	</resultMap>
+
+	<select id="getPendingMappingsOfTask" parameterType="map" resultMap="pendingMappingResultMap">
+		SELECT *
+		FROM pending_mapping mapping
+		WHERE mapping.tenantid = #{tenantid}
+		AND mapping.activityId = #{activityId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+</mapper>

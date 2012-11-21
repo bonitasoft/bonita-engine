@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl">
+
+	<insert id="insertSProcessInstanceImpl" parameterType="process_instance">
+		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, tokenCount, processDefinitionId, startDate, startedBy, endDate, stateId,
+			stateCategory, lastUpdate, migration_plan)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.tokenCount}, #{entity.processDefinitionId},
+			#{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId})
+	</insert>
+
+	<update id="updateSProcessInstanceImpl"  parameterType="process_instance">
+		UPDATE process_instance
+	    <trim prefix="SET" suffixOverrides=",">
+	      <if test="processDefinitionId != null">processDefinitionId=#{processDefinitionId},</if>
+	      <if test="tokenCount != null">tokenCount=#{tokenCount},</if>
+	      <if test="stateId != null">stateId=#{stateId},</if>
+	      <if test="stateCategory != null and stringIndex1 != '___bonitanull___'">stateCategory=#{stateCategory},</if>
+	      <if test="startDate != null">startDate=#{startDate},</if>
+	      <if test="endDate != null">endDate=#{endDate},</if>
+	      <if test="lastUpdate != null">lastUpdate=#{lastUpdate},</if>
+	      <if test="containerId != null">containerId=#{containerId},</if>
+	      <if test="migrationPlanId != null">migration_plan=#{migrationPlanId},</if>
+	      <if test="stringIndex1 == '___bonitanull___'">stringIndex1=NULL,</if>
+	      <if test="stringIndex1 != null and stringIndex1 != '___bonitanull___'">stringIndex1=#{stringIndex1},</if>
+	      <if test="stringIndex2 == '___bonitanull___'">stringIndex2=NULL,</if>
+	      <if test="stringIndex2 != null and stringIndex2 != '___bonitanull___'">stringIndex2=#{stringIndex2},</if>
+	      <if test="stringIndex3 == '___bonitanull___'">stringIndex3=NULL,</if>
+	      <if test="stringIndex3 != null and stringIndex3 != '___bonitanull___'">stringIndex3=#{stringIndex3},</if>
+	      <if test="stringIndex4 == '___bonitanull___'">stringIndex4=NULL,</if>
+	      <if test="stringIndex4 != null and stringIndex4 != '___bonitanull___'">stringIndex4=#{stringIndex4},</if>
+	      <if test="stringIndex5 == '___bonitanull___'">stringIndex5=NULL,</if>
+	      <if test="stringIndex5 != null and stringIndex5 != '___bonitanull___'">stringIndex5=#{stringIndex5},</if>
+	    </trim>
+	    WHERE tenantid = #{tenantid}
+	    AND id = #{id}
+	</update>
+
+	<delete id="deleteSProcessInstanceImpl" parameterType="process_instance">
+		DELETE FROM process_instance
+		WHERE tenantid = #{tenantid}
+		AND id = #{id} 
+	</delete>
+
+	<resultMap id="processInstanceResultMap" type="process_instance">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="containerId" column="containerId" />
+		<result property="rootProcessInstanceId" column="rootProcessInstanceId" />
+		<result property="callerId" column="callerId" />
+		<result property="tokenCount" column="tokenCount" />
+		<result property="processDefintionId" column="processDefintionId" />
+		<result property="stateId" column="stateId" />
+		<result property="stateCategory" column="stateCategory" />
+		<result property="startDate" column="startDate" />
+		<result property="endDate" column="endDate" />
+		<result property="startedBy" column="startedBy" />
+		<result property="lastUpdate" column="lastUpdate" />
+		<result property="migrationPlanId" column="migration_plan" />
+		<result property="stringIndex1" column="stringIndex1" />
+		<result property="stringIndex2" column="stringIndex2" />
+		<result property="stringIndex3" column="stringIndex3" />
+		<result property="stringIndex4" column="stringIndex4" />
+		<result property="stringIndex5" column="stringIndex5" />
+	</resultMap>
+
+	<select id="getProcessInstances" parameterType="long" resultMap="processInstanceResultMap">
+		SELECT p.*
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getProcessInstanceById" parameterType="long" resultMap="processInstanceResultMap">
+		SELECT p.*
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		AND p.id = #{id}
+	</select>
+	
+	<select id="getChildOfCallActivity" parameterType="long" resultMap="processInstanceResultMap">
+		SELECT p.*
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		AND p.callerId = #{callerId}
+	</select>
+
+	<select id="getProcessInstanceByDefinitionId" parameterType="long" resultMap="processInstanceResultMap">
+		SELECT p.*
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		AND p.processDefinitionId = #{processDefinitionId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getChildInstanceIdsOfProcessInstance" parameterType="long" resultType="long">
+		SELECT p.id
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		AND p.containerId = #{containerId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+
+	<select id="getNumberOfProcessInstances" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+	</select>
+
+	<select id="getNumberOfChildInstancesOfProcessInstance" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		AND p.containerId = #{containerId}
+	</select>
+
+	<select id="getNumberOfSProcessInstance" parameterType="long" resultType="long">
+		SELECT COUNT(DISTINCT p.id)
+		FROM process_instance p
+		WHERE p.stateId != 6
+		AND p.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSProcessInstance" parameterType="long" resultMap="processInstanceResultMap">
+		SELECT p.*
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		AND p.stateId != 6
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSProcessInstanceSupervisedBy" parameterType="long" resultType="long">
+		SELECT COUNT( distinct p.id)
+		FROM process_instance p,
+			 processsupervisor supervisor
+		WHERE p.tenantid = #{tenantid}
+		AND p.tenantid = supervisor.tenantid
+		AND p.stateId != 6
+		AND p.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = p.tenantid
+			AND (
+				ps.userId = #{userId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s,
+							 user_membership um
+						WHERE s.tenantid = p.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{userId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSProcessInstanceSupervisedBy" parameterType="long" resultMap="processInstanceResultMap">
+		SELECT distinct p.*
+		FROM process_instance p,
+			 processsupervisor supervisor
+		WHERE p.tenantid = #{tenantid}
+		AND p.tenantid = supervisor.tenantid
+		AND p.stateId != 6
+		AND p.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = p.tenantid
+			AND (
+				ps.userId = #{userId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s,
+							 user_membership um
+						WHERE s.tenantid = p.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{userId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSProcessInstanceInvolvingUser" resultType="long">
+		SELECT COUNT(DISTINCT p.id)
+		FROM process_instance p,
+			 flownode_instance f,
+			 arch_flownode_instance af
+		WHERE p.tenantid = #{tenantid}
+		AND f.tenantid = p.tenantid
+		AND af.tenantid = p.tenantid
+		AND p.stateId != 6
+		AND (
+			(
+				f.logicalGroup2 = p.id
+			  	AND f.assigneeId = #{userId}
+			)
+			OR (
+				af.logicalGroup2 = p.id
+				AND af.assigneeId = #{userId}
+			)
+			OR (
+				f.logicalGroup2 = p.id
+				AND f.stateId = 4
+				AND f.actorId IN (
+					SELECT actor.id
+					FROM actor actor,
+						 actormember actormember
+					WHERE actor.tenantid = p.tenantid
+					AND actormember.tenantid = actor.tenantid
+					AND actor.id = actormember.actorId 
+					AND (
+						actormember.userId = #{userId}
+						OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember am,
+								 user_membership um
+							WHERE am.tenantid = p.tenantid
+							AND am.tenantid = um.tenantid
+							AND um.userId = #{userId}
+							AND (
+								(am.groupId = um.groupId AND am.roleId &lt;= 0)
+								OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
+								OR (am.groupId = um.groupId AND am.roleId = um.roleId)
+							)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSProcessInstanceInvolvingUser" resultMap="processInstanceResultMap">
+		SELECT DISTINCT p.*
+		FROM process_instance p,
+			 flownode_instance f,
+			 arch_flownode_instance af
+		WHERE p.tenantid = #{tenantid}
+		AND f.tenantid = p.tenantid
+		AND af.tenantid = p.tenantid
+		AND p.stateId != 6
+		AND (
+			(
+				f.logicalGroup2 = p.id
+			  	AND f.assigneeId = #{userId}
+			)
+			OR (
+				af.logicalGroup2 = p.id
+				AND af.assigneeId = #{userId}
+			)
+			OR (
+				f.logicalGroup2 = p.id
+				AND f.stateId = 4
+				AND f.actorId IN (
+					SELECT actor.id
+					FROM actor actor,
+						 actormember actormember
+					WHERE actor.tenantid = p.tenantid
+					AND actormember.tenantid = actor.tenantid
+					AND actor.id = actormember.actorId 
+					AND (
+						actormember.userId = #{userId}
+						OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember am,
+								 user_membership um
+							WHERE am.tenantid = p.tenantid
+							AND am.tenantid = um.tenantid
+							AND um.userId = #{userId}
+							AND (
+								(am.groupId = um.groupId AND am.roleId &lt;= 0)
+								OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
+								OR (am.groupId = um.groupId AND am.roleId = um.roleId)
+							)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+</mapper>

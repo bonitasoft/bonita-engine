@@ -1,0 +1,1365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl">
+
+	<insert id="insertSFlowNodeInstanceImpl" parameterType="activity_instance">
+		INSERT INTO flownode_instance (tenantid, id, kind, rootContainerId, parentContainerId,
+		name, description, displayName, displayDescription, stateId, stateName, prev_state_id, terminal, stable, lastUpdateDate, reachedStateDate,
+		stateCategory, logicalGroup1, logicalGroup2, logicalGroup3, logicalGroup4, tokenCount, loop_counter
+		<if test="kind == 'user' or kind == 'manual'">, priority, expectedEndDate, claimedDate, actorId, assigneeId</if>
+		<if test="kind == 'gate'">, gatewayType, hitBys</if>
+		<if test="kind == 'loop'">, loop_max</if>
+		<if test="kind == 'multi'">, sequential, loopDataInputRef, loopDataOutputRef, dataInputItemRef,
+		 dataOutputItemRef, loopCardinality, nbActiveInst, nbCompletedInst, nbTerminatedInst</if>
+		<if test="kind == 'boundaryEvent'">, activityInstanceId</if>
+		)
+		VALUES
+		(#{tenantid}, #{entity.id}, #{kind}, #{entity.rootContainerId}, #{entity.parentContainerId}, #{entity.name}, #{entity.description},
+		#{entity.displayName}, #{entity.displayDescription}, #{entity.stateId}, #{entity.stateName}, #{entity.previousStateId}, #{entity.terminal}, #{entity.stable},
+		#{entity.lastUpdateDate}, #{entity.reachedStateDate},  #{entity.stateCategory}, #{entity.logicalGroup1}, #{entity.logicalGroup2}, #{entity.logicalGroup3}, 
+		#{entity.logicalGroup4}, #{entity.tokenCount}, #{entity.loopCounter}
+		<if test="kind == 'user' or kind == 'manual'">, #{entity.priority, javaType=org.bonitasoft.engine.core.process.instance.model.STaskPriority, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{entity.expectedEndDate}, #{entity.claimedDate}, #{entity.actorId}, #{entity.assigneeId}</if>
+		<if test="kind == 'gate'">, #{entity.gatewayType}, #{entity.hitBys}</if>
+		<if test="kind == 'loop'">, #{entity.loopMax}</if>
+		<if test="kind == 'multi'">, #{entity.sequential}, #{entity.loopDataInputRef}, #{entity.loopDataOutputRef}
+		, #{entity.dataInputItemRef}, #{entity.dataOutputItemRef}, #{entity.loopCardinality}, #{entity.numberOfActiveInstances}, #{entity.numberOfCompletedInstances}, #{entity.numberOfTerminatedInstances}</if>
+		<if test="kind == 'boundaryEvent'">, #{entity.activityInstanceId}</if>
+		)
+	</insert>
+
+	<update id="updateSFlowNodeInstanceImpl" parameterType="map">
+		UPDATE flownode_instance
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="stateId != null">stateId=#{stateId},</if>
+			<if test="previousStateId != null">prev_state_id=#{previousStateId},</if>
+			<if test="terminal != null">terminal=#{terminal},</if>
+			<if test="stable != null">stable=#{stable},</if>
+			<if test="actorId != null">actorId=#{actorId},</if>
+			<if test="lastUpdateDate != null">lastUpdateDate=#{lastUpdateDate},</if>
+			<if test="expectedEndDate != null">expectedEndDate=#{expectedEndDate},</if>
+            <if test="claimedDate != null">claimedDate=#{claimedDate},</if>
+			<if test="reachedStateDate != null">reachedStateDate=#{reachedStateDate},</if>
+			<if test="priority == '___bonitanull___'">priority=NULL,</if>
+            <if test="priority != null and priority != '___bonitanull___'">priority=#{priority, javaType=org.bonitasoft.engine.core.process.instance.model.STaskPriority, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler},</if>
+			<if test="assigneeId != null">assigneeId=#{assigneeId},</if>
+			<if test="gatewayType == '___bonitanull___'">gatewayType=NULL,</if>
+            <if test="gatewayType != null and gatewayType != '___bonitanull___'">gatewayType=#{gatewayType},</if>
+			<if test="hitBys == '___bonitanull___'">hitBys=NULL,</if>
+            <if test="hitBys != null and hitBys != '___bonitanull___'">hitBys=#{hitBys},</if>
+			<if test="description == '___bonitanull___'">description=NULL,</if>
+            <if test="description != null and description != '___bonitanull___'">description=#{description},</if>
+			<if test="displayName == '___bonitanull___'">displayName=NULL,</if>
+            <if test="displayName != null and displayName != '___bonitanull___'">displayName=#{displayName},</if>
+			<if test="displayDescription == '___bonitanull___'">displayDescription=NULL,</if>
+            <if test="displayDescription != null and displayDescription != '___bonitanull___'">displayDescription=#{displayDescription},</if>
+			<if test="loopCounter != null">loop_counter=#{loopCounter},</if>
+			<if test="loopMax != null">loop_max=#{loopMax},</if>
+			<if test="stateCategory != null and stateCategory != '___bonitanull___'">stateCategory=#{stateCategory},</if>
+			<if test="stateName != null and stateName != '___bonitanull___'">stateName=#{stateName},</if>
+			<if test="loopCardinality != null">loopCardinality=#{loopCardinality},</if>
+			<if test="numberOfActiveInstances != null">nbActiveInst=#{numberOfActiveInstances},</if>
+			<if test="numberOfCompletedInstances != null">nbCompletedInst=#{numberOfCompletedInstances},</if>
+			<if test="numberOfTerminatedInstances != null">nbTerminatedInst=#{numberOfTerminatedInstances},</if>
+			<if test="tokenCount != null">tokenCount=#{tokenCount},</if>
+			<if test="executedBy != null">executedBy=#{executedBy},</if>
+	      	<if test="deleted != null">deleted=#{deleted},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+	
+	<delete id="deleteSFlowNodeInstanceImpl" parameterType="activity_instance">
+		DELETE FROM flownode_instance
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+	<resultMap id="flowNodeInstanceResultMap" type="flownode_instance">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="displayName" column="displayName" />
+		<result property="displayDescription" column="displayDescription" />
+		<result property="rootContainerId" column="rootContainerId" />
+		<result property="parentContainerId" column="parentContainerId" />
+		<result property="stateId" column="stateId" />
+		<result property="stateName" column="stateName" />
+		<result property="previousStateId" column="prev_state_id" />
+		<result property="terminal" column="terminal" />
+		<result property="stable" column="stable" />
+		<result property="lastUpdateDate" column="lastUpdateDate" />
+		<result property="reachedStateDate" column="reachedStateDate" />
+		<result property="expectedEndDate" column="expectedEndDate" />
+        <result property="claimedDate" column="claimedDate" />
+		<result property="stateCategory" column="stateCategory" />
+		<result property="logicalGroup1" column="logicalGroup1" />
+		<result property="logicalGroup2" column="logicalGroup2" />
+		<result property="logicalGroup3" column="logicalGroup3" />
+		<result property="logicalGroup4" column="logicalGroup4" />
+		<result property="tokenCount" column="tokenCount" />
+		<result property="loopCounter" column="loop_counter" />
+		<result property="executedBy" column="executedBy" />
+		<result property="deleted" column="deleted" />
+		<discriminator javaType="string" column="kind">
+			<case value="auto" resultType="automatic_task_instance">
+			</case>
+			<case value="call" resultType="call_activity_instance">
+			</case>
+			<case value="user" resultType="user_task_instance">
+				<result property="actorId" column="actorId" />
+				<result property="assigneeId" column="assigneeId" />
+				<result property="priority" column="priority" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+			</case>
+			<case value="manual" resultType="manual_task_instance">
+				<result property="actorId" column="actorId" />
+				<result property="assigneeId" column="assigneeId" />
+				<result property="priority" column="priority" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+			</case>
+			<case value="gate" resultType="gateway_instance">
+				<result property="gatewayType" column="gatewayType" />
+				<result property="hitBys" column="hitBys" />
+			</case>
+			<case value="loop" resultType="loop_instance">
+				<result property="loopMax" column="loop_max" />
+			</case>
+			<case value="multi" resultType="multi_instance">
+				<result property="sequential" column="sequential" />
+				<result property="loopDataInputRef" column="loopDataInputRef" />
+				<result property="loopDataOutputRef" column="loopDataOutputRef" />
+				<result property="dataInputItemRef" column="dataInputItemRef" />
+				<result property="dataOutputItemRef" column="dataOutputItemRef" />
+				<result property="loopCardinality" column="loopCardinality" />
+				<result property="numberOfActiveInstances" column="nbActiveInst" />
+				<result property="numberOfCompletedInstances" column="nbCompletedInst" />
+				<result property="numberOfTerminatedInstances" column="nbTerminatedInst" />
+			</case>
+			<case value="startEvent" resultType="start_event_instance" />
+			<case value="intermediateCatchEvent" resultType="intermediate_catch_event_instance" />
+			<case value="boundaryEvent" resultType="boundary_event_instance" >
+				<result property="activityInstanceId" column="activityInstanceId" />
+			</case>
+			<case value="intermediateThrowEvent" resultType="intermediate_throw_event_instance" />
+			<case value="endEvent" resultType="end_event_instance" />
+		</discriminator>
+	</resultMap>
+
+	<select id="getChildrenOfAnActivity" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.logicalGroup3 = #{parentActivityInstanceId}
+		AND f.terminal = FALSE
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActivitiesFromProcessInstance" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.rootContainerId = #{rootContainerId}
+		AND f.kind IN ('user', 'manual', 'auto', 'call', 'loop', 'multi')
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getFlowNodesFromProcessInstance" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.rootContainerId = #{rootContainerId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActivitiesWithStates" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.rootContainerId = #{rootContainerId}
+		AND f.stateId IN
+		<foreach item="stateId" index="index" collection="stateIds" open="(" separator="," close=")">
+			#{stateId}
+		</foreach>
+	</select>
+
+	<select id="getOpenActivitiesFromProcessInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.rootContainerId = #{rootContainerId}
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.kind IN ('manual', 'user') 
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getFlowNodeInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPendingUserTasks" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId = 0
+		AND f.kind IN ('user', 'manual')
+		AND EXISTS (
+			SELECT mapping.id
+			FROM pending_mapping mapping
+			WHERE mapping.tenantid = f.tenantid
+			AND mapping.activityId = f.id
+			AND (
+				mapping.userId = #{userId}
+				OR mapping.actorId IN 
+			<foreach item="actorId" index="index" collection="actorIds" open="(" separator="," close=")">
+				#{actorId}
+			</foreach> 
+			)
+		)
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getPendingUserTasksWithoutActorIds" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId = 0
+		AND EXISTS (
+			SELECT mapping.id
+			FROM pending_mapping mapping
+			WHERE mapping.tenantid = f.tenantid
+			AND mapping.activityId = f.id
+			AND mapping.userId = #{userId}
+		)
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getAssignedUserTasks" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.assigneeId = #{assigneeId}
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfOpenActivities" parameterType="list" resultType="long">
+		SELECT COUNT(*)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.rootContainerId = #{rootContainerId}
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+	</select>
+
+	<select id="getNumberOfPendingUserTaskInstances" parameterType="list" resultType="long">
+		SELECT COUNT(*)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId = 0
+		AND f.actorId IN
+		<foreach item="actorId" index="index" collection="actorIds" open="(" separator="," close=")">
+			#{actorId}
+		</foreach>
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+	</select>
+
+	<select id="getNumberOfAssignedUserTaskInstances" parameterType="list" resultType="long">
+		SELECT COUNT(*)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId = #{assigneeId}
+	</select>
+
+	<!-- FIXME do not use logical group  -->
+	<select id="getActiveFlowNodes" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.logicalGroup4 = #{parentContainerId}
+		AND f.terminal = FALSE
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActiveGatewayInstanceOfProcess" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.logicalGroup4 = #{parentProcessInstanceId}
+		AND f.name = #{name}
+		AND f.terminal = FALSE
+	</select>
+
+	<select id="getEventInstancesFromRootContainer" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.rootContainerId = #{rootContainerId}
+		AND f.kind IN ('startEvent', 'intermediateCatchEvent', 'intermediateThrowEvent', 'endEvent', 'boundaryEvent') 
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getEventInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.id = #{id}
+	</select>
+
+	<!-- External Service Queries -->
+	<select id="getNumberOfSHumanTaskInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSHumanTaskInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSHumanTaskInstanceSupervisedBy" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f,
+		      process_instance p
+	    WHERE f.assigneeId > 0
+	    AND f.tenantid = #{tenantid}
+	    AND p.tenantid = #{tenantid}
+		AND f.rootContainerId = p.id
+		AND f.deleted = FALSE
+		AND p.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = p.tenantid
+			AND(
+				ps.userId = #{supervisorId}
+				OR ps.id IN (
+					SELECT s.id
+					FROM processsupervisor s, user_membership um
+					WHERE  um.userId = #{supervisorId}
+					AND s.tenantid = ps.tenantid
+					AND um.tenantid = s.tenantid 
+					AND (
+						(s.groupId = um.groupId AND s.roleId &lt;= 0)
+						OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+						OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSHumanTaskInstanceSupervisedBy" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT f.*
+		FROM flownode_instance f,
+		      process_instance p
+	    WHERE f.assigneeId > 0
+	    AND f.deleted = FALSE
+	    AND f.tenantid = #{tenantid}
+	    AND p.tenantid = #{tenantid}
+		AND f.rootContainerId = p.id
+		AND p.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = p.tenantid
+			AND(
+				ps.userId = #{supervisorId}
+				OR ps.id IN (
+					SELECT s.id
+					FROM processsupervisor s, user_membership um
+					WHERE  um.userId = #{supervisorId}
+					AND s.tenantid = ps.tenantid
+					AND um.tenantid = s.tenantid
+					AND (
+						(s.groupId = um.groupId AND s.roleId &lt;= 0)
+						OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+						OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSHumanTaskInstancePendingSupervisedBy" parameterType="list" resultType="long">
+		SELECT COUNT(DISTINCT f.id)
+		FROM flownode_instance f,
+		      process_instance p,
+		      processsupervisor supervisor
+	    WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+	    AND f.tenantid = p.tenantid
+	    AND f.tenantid = supervisor.tenantid
+	    AND f.assigneeId = 0
+		AND f.rootContainerId = p.id
+		AND p.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = f.tenantid
+			AND (
+				ps.userId = #{userId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s, user_membership um
+						WHERE s.tenantid = f.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{userId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSHumanTaskInstancePendingSupervisedBy" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT DISTINCT f.*
+		FROM flownode_instance f,
+		      process_instance p,
+		      processsupervisor supervisor
+	    WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+	    AND f.tenantid = p.tenantid
+	    AND f.tenantid = supervisor.tenantid
+	    AND f.assigneeId = 0
+		AND f.rootContainerId = p.id
+		AND p.processDefinitionId IN (
+			SELECT ps.processDefId
+			FROM processsupervisor ps
+			WHERE ps.tenantid = f.tenantid
+			AND (
+				ps.userId = #{userId}
+				OR (
+					ps.id IN (
+						SELECT s.id
+						FROM processsupervisor s, user_membership um
+						WHERE s.tenantid = f.tenantid
+						AND um.tenantid = s.tenantid
+						AND um.userId = #{userId} 
+						AND (
+							(s.groupId = um.groupId AND s.roleId &lt;= 0)
+							OR (s.roleId = um.roleId AND s.groupId &lt;= 0)
+							OR (s.groupId = um.groupId AND s.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSHumanTaskInstanceManagedBy"  parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId IN (
+			SELECT u.id
+			FROM user_ u
+			WHERE u.tenantid = f.tenantid
+			AND u.managerUserId = #{managerUserId}
+		)
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSHumanTaskInstanceManagedBy"  parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT f.*
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId IN (
+			SELECT u.id
+			FROM user_ u
+			WHERE u.tenantid = f.tenantid
+			AND u.managerUserId = #{managerUserId}
+		)
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumbersOfOpenTasksForUsers" parameterType="list" resultType="map">
+		SELECT f.assigneeId AS "userId", COUNT(f.id) AS "numberOfTasks"
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId IN
+		<foreach item="assigneeId" index="index" collection="assigneeIds" open="(" separator="," close=")">
+			#{assigneeId}
+		</foreach>
+		GROUP BY f.assigneeId
+	</select>
+
+	<select id="getNumberOfSHumanTaskInstancePendingForUser" parameterType="long" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId = 0
+		AND EXISTS (
+			SELECT mapping.id
+			FROM pending_mapping mapping
+			WHERE mapping.tenantid = f.tenantid
+			AND mapping.activityId = f.id
+			AND (
+				mapping.actorId IN (
+					SELECT actor.id
+					FROM actor, actormember
+					WHERE actor.tenantid = f.tenantid
+					AND actormember.tenantid = actor.tenantid
+					AND actor.id = actormember.actorId 
+					AND (
+						actormember.userId = #{userId}
+		 	  			OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember, 
+								(SELECT um.groupId, um.roleId
+						 		 FROM user_membership um
+						 		 WHERE um.tenantId = #{tenantid}
+						 		 AND um.userId = #{userId}) um 
+							WHERE actormember.tenantId =  f.tenantid
+							AND (
+								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+							)
+						)
+					)
+				)
+				OR  mapping.userId = #{userId}
+			)
+		)
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSHumanTaskInstancePendingForUser" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT f.*
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId = 0
+		AND EXISTS (
+			SELECT mapping.id
+			FROM pending_mapping mapping
+			WHERE mapping.tenantid = f.tenantid
+			AND mapping.activityId = f.id
+			AND (
+				mapping.actorId IN (
+					SELECT actor.id
+					FROM actor, actormember
+					WHERE actor.tenantid = f.tenantid
+					AND actormember.tenantid = actor.tenantid
+					AND actor.id = actormember.actorId 
+					AND (
+						actormember.userId = #{userId}
+		 	  			OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember, 
+								(SELECT um.groupId, um.roleId
+						 		 FROM user_membership um
+						 		 WHERE um.tenantId = #{tenantid}
+						 		 AND um.userId = #{userId}) um 
+							WHERE actormember.tenantId =  f.tenantid
+							AND (
+								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+							)
+						)
+					)
+				)
+				OR  mapping.userId = #{userId}
+			)
+		)
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+   		AND f.kind IN ('manual', 'user')
+   		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSHumanTaskInstancePendingOrAssigned" parameterType="long" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND (
+				(f.assigneeId = #{userId}) OR (
+				f.assigneeId = 0
+				AND EXISTS (
+					SELECT mapping.id
+					FROM pending_mapping mapping
+					WHERE mapping.tenantid = f.tenantid
+					AND mapping.activityId = f.id
+					AND (
+						mapping.actorId IN (
+							SELECT actor.id
+							FROM actor, actormember
+							WHERE actor.tenantid = f.tenantid
+							AND actormember.tenantid = actor.tenantid
+							AND actor.id = actormember.actorId 
+							AND (
+								actormember.userId = #{userId}
+				 	  			OR actormember.id IN (
+									SELECT actormember.id
+									FROM actormember, 
+										(SELECT um.groupId, um.roleId
+								 		 FROM user_membership um
+								 		 WHERE um.tenantId = #{tenantid}
+								 		 AND um.userId = #{userId}) um 
+									WHERE actormember.tenantId =  f.tenantid
+									AND (
+										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+									)
+								)
+							)
+						)
+						OR  mapping.userId = #{userId}
+					)
+				)
+			)
+		)
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSHumanTaskInstancePendingOrAssigned" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT f.*
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND (
+				(f.assigneeId = #{userId}) OR (
+				f.assigneeId = 0
+				AND EXISTS (
+					SELECT mapping.id
+					FROM pending_mapping mapping
+					WHERE mapping.tenantid = f.tenantid
+					AND mapping.activityId = f.id
+					AND (
+						mapping.actorId IN (
+							SELECT actor.id
+							FROM actor, actormember
+							WHERE actor.tenantid = f.tenantid
+							AND actormember.tenantid = actor.tenantid
+							AND actor.id = actormember.actorId 
+							AND (
+								actormember.userId = #{userId}
+				 	  			OR actormember.id IN (
+									SELECT actormember.id
+									FROM actormember, 
+										(SELECT um.groupId, um.roleId
+								 		 FROM user_membership um
+								 		 WHERE um.tenantId = #{tenantid}
+								 		 AND um.userId = #{userId}) um 
+									WHERE actormember.tenantId =  f.tenantid
+									AND (
+										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+									)
+								)
+							)
+						)
+						OR  mapping.userId = #{userId}
+					)
+				)
+			)
+		)
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+		AND f.kind IN ('manual', 'user')
+   		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSHumanTaskInstancePendingManagedBy"  parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stateId = 4
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND EXISTS (
+    		SELECT mapping.activityId
+        	FROM pending_mapping mapping
+        	WHERE mapping.tenantid = f.tenantid
+        	AND mapping.activityId = f.id
+        	AND (
+        		mapping.userId IN (
+           			SELECT u.id 
+           			FROM user_ u
+           			WHERE u.tenantid = f.tenantid
+           			AND u.managerUserId = #{managerUserId}
+           		)
+            	OR mapping.actorId IN (
+                	SELECT actor.id
+					FROM actor actor,
+						 actormember actormember
+					WHERE actor.tenantid = f.tenantid
+                	AND actormember.tenantid = actor.tenantid
+                	AND actor.id = actormember.actorId 
+                	AND (
+                		actormember.userId IN (
+                			SELECT u.id 
+                			FROM user_ u
+                			WHERE u.tenantid = f.tenantid
+                			AND u.managerUserId = #{managerUserId}
+                		)
+						OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember actormember, 
+								 user_membership um
+							WHERE actormember.tenantid = f.tenantid
+							AND actormember.tenantid = um.tenantid
+							AND um.userId IN (
+								SELECT u.id 
+								FROM user_ u
+								WHERE u.tenantid = f.tenantid
+								AND u.managerUserId = #{managerUserId}
+							)
+							AND (
+								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+							)
+						)
+					)
+				)
+			)
+		)
+   		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSHumanTaskInstancePendingManagedBy"  parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT f.*
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stateId = 4
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND EXISTS (
+    		SELECT mapping.activityId
+        	FROM pending_mapping mapping
+        	WHERE mapping.tenantid = f.tenantid
+        	AND mapping.activityId = f.id
+        	AND (
+        		mapping.userId IN (
+           			SELECT u.id 
+           			FROM user_ u
+           			WHERE u.tenantid = f.tenantid
+           			AND u.managerUserId = #{managerUserId}
+           		)
+            	OR mapping.actorId IN (
+                	SELECT actor.id
+					FROM actor actor,
+						 actormember actormember
+					WHERE actor.tenantid = f.tenantid
+                	AND actormember.tenantid = actor.tenantid
+                	AND actor.id = actormember.actorId 
+                	AND (
+                		actormember.userId IN (
+                			SELECT u.id 
+                			FROM user_ u
+                			WHERE u.tenantid = f.tenantid
+                			AND u.managerUserId = #{managerUserId}
+                		)
+						OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember actormember, 
+								 user_membership um
+							WHERE actormember.tenantid = f.tenantid
+							AND actormember.tenantid = um.tenantid
+							AND um.userId IN (
+								SELECT u.id 
+								FROM user_ u
+								WHERE u.tenantid = f.tenantid
+								AND u.managerUserId = #{managerUserId}
+							)
+							AND (
+								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+							)
+						)
+					)
+				)
+			)
+		)
+   		AND f.kind IN ('manual', 'user')
+   		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>	
+
+	<select id="getNumbersOfAssignedOverdueTasksForUsers" parameterType="list" resultType="map">
+		SELECT f.assigneeId AS "userId", COUNT(f.id) AS "numberOfTasks"
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.expectedEndDate &lt; #{currentTime}
+		AND f.assigneeId IN
+		<foreach item="assigneeId" index="index" collection="assigneeIds" open="(" separator="," close=")">
+			#{assigneeId}
+		</foreach>
+		GROUP BY f.assigneeId
+	</select>
+
+	<select id="getNumberOfPendingOverdueTasksForUser" parameterType="long" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.assigneeId = 0
+		AND f.expectedEndDate &lt; #{currentTime}
+		AND EXISTS (
+			SELECT mapping.id
+			FROM pending_mapping mapping
+			WHERE mapping.tenantid = f.tenantid
+			AND mapping.activityId = f.id
+			AND (
+				mapping.actorId IN (
+					SELECT actor.id
+					FROM actor, actormember
+					WHERE actor.tenantid = f.tenantid
+					AND actormember.tenantid = actor.tenantid 
+					AND actor.id = actormember.actorId 
+					AND (
+						actormember.userId = #{userId}
+		 	  			OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember, 
+								(SELECT um.groupId, um.roleId
+						 		 FROM user_membership um
+						 		 WHERE um.tenantId =  #{tenantid}
+						 		 AND um.userId = #{userId}) um 
+							WHERE actormember.tenantId =  f.tenantid
+							AND (
+								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+								OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+								OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+							)
+						)
+					)
+				)
+				OR  mapping.userId = #{userId}
+			)
+		)
+		AND NOT EXISTS (
+			SELECT h.id
+			FROM hidden_activity h
+			WHERE h.tenantid = #{tenantid}
+			AND f.id = h.activityId
+			AND h.userId = #{userId}
+		)
+	</select>
+
+	<select id="getNumberOfSActivityInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user', 'auto', 'call', 'loop', 'multi')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSActivityInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user', 'auto', 'call', 'loop', 'multi')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSFlowNodeInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSFlowNodeInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSAutomaticTaskInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('auto')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSAutomaticTaskInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('auto')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSUserTaskInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSUserTaskInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+		
+	<select id="getNumberOfSManualTaskInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSManualTaskInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSAutomaticTaskInstancewithSActivityInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('auto')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSAutomaticTaskInstancewithSActivityInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('auto')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSUserTaskInstancewithSActivityInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSUserTaskInstancewithSActivityInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+		
+	<select id="getNumberOfSManualTaskInstancewithSActivityInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSManualTaskInstancewithSActivityInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSHumanTaskInstancewithSActivityInstance" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSHumanTaskInstancewithSActivityInstance" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user')
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSHumanTaskInstancePendingHiddenForUser" parameterType="list" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f, hidden_activity h
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user')
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.id = h.activityId
+		AND h.userId = #{userId}
+		AND h.tenantid = #{tenantid}
+		AND (
+				(f.assigneeId = #{userId}) OR (
+				f.assigneeId = 0
+				AND EXISTS (
+					SELECT mapping.id
+					FROM pending_mapping mapping
+					WHERE mapping.tenantid = f.tenantid
+					AND mapping.activityId = f.id
+					AND (
+						mapping.actorId IN (
+							SELECT actor.id
+							FROM actor, actormember
+							WHERE actor.tenantid = f.tenantid
+							AND actormember.tenantid = actor.tenantid
+							AND actor.id = actormember.actorId 
+							AND (
+								actormember.userId = #{userId}
+				 	  			OR actormember.id IN (
+									SELECT actormember.id
+									FROM actormember, 
+										(SELECT um.groupId, um.roleId
+								 		 FROM user_membership um
+								 		 WHERE um.tenantId = #{tenantid}
+								 		 AND um.userId = #{userId}) um 
+									WHERE actormember.tenantId =  f.tenantid
+									AND (
+										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+									)
+								)
+							)
+						)
+						OR  mapping.userId = #{userId}
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSHumanTaskInstancePendingHiddenForUser" parameterType="list" resultMap="flowNodeInstanceResultMap">
+		SELECT f.*
+		FROM flownode_instance f, hidden_activity h
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.kind IN ('manual', 'user')
+		AND f.stable = TRUE
+		AND f.terminal = FALSE
+		AND f.id = h.activityId
+		AND h.userId = #{userId}
+		AND h.tenantid = #{tenantid}
+		AND (
+				(f.assigneeId = #{userId}) OR (
+				f.assigneeId = 0
+				AND EXISTS (
+					SELECT mapping.id
+					FROM pending_mapping mapping
+					WHERE mapping.tenantid = f.tenantid
+					AND mapping.activityId = f.id
+					AND (
+						mapping.actorId IN (
+							SELECT actor.id
+							FROM actor, actormember
+							WHERE actor.tenantid = f.tenantid
+							AND actormember.tenantid = actor.tenantid
+							AND actor.id = actormember.actorId 
+							AND (
+								actormember.userId = #{userId}
+				 	  			OR actormember.id IN (
+									SELECT actormember.id
+									FROM actormember, 
+										(SELECT um.groupId, um.roleId
+								 		 FROM user_membership um
+								 		 WHERE um.tenantId = #{tenantid}
+								 		 AND um.userId = #{userId}) um 
+									WHERE actormember.tenantId =  f.tenantid
+									AND (
+										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+									)
+								)
+							)
+						)
+						OR  mapping.userId = #{userId}
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
