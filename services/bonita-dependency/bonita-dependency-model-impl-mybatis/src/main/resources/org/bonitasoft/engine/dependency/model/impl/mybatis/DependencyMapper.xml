@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl">
+    <cache/>
+	<insert id="insertSDependencyImpl" parameterType="dependency">
+		INSERT INTO dependency (tenantId, id, name, version, filename, description, value_)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.version}, #{entity.fileName}, #{entity.description}, #{entity.value_})
+	</insert>
+
+	<delete id="deleteSDependencyImpl" parameterType="dependency">
+		DELETE FROM dependency
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="dependencyResultMap" type="dependency">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="version" column="version" />
+		<result property="fileName" column="filename" />
+		<result property="description" column="description" />
+		<result property="value_" column="value_" />
+	</resultMap>
+
+	<select id="getDependencies" parameterType="long" resultMap="dependencyResultMap">
+		SELECT *
+		FROM dependency dependency
+		WHERE dependency.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getDependencyById" parameterType="long" resultMap="dependencyResultMap">
+		SELECT *
+		FROM dependency
+		WHERE dependency.tenantid = #{tenantid}
+		AND dependency.id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getDependencyByName" parameterType="String" resultMap="dependencyResultMap">
+		SELECT *
+		FROM dependency
+		WHERE dependency.tenantid = #{tenantid}
+		AND dependency.name = #{name}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getDependencyIds" parameterType="long" resultType="long">
+		SELECT dependencyId
+		FROM dependencymapping
+		WHERE tenantid = #{tenantid}
+		AND artifactId = #{artifactId}
+		AND artifactType = #{artifactType}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getDependenciesByIds" parameterType="list" resultMap="dependencyResultMap">
+		SELECT *
+		FROM dependency dependency
+		WHERE dependency.tenantid = #{tenantid}
+		AND dependency.id IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
