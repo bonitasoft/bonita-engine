@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl">
+   <cache/>
+	<insert id="insertSProcessCategoryMappingImpl" parameterType="processcategorymapping">
+		INSERT INTO processcategorymapping (tenantId, id, categoryId, processId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.categoryId}, #{entity.processId})
+	</insert>
+
+	<delete id="deleteSProcessCategoryMappingImpl" parameterType="processcategorymapping">
+		DELETE FROM processcategorymapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="categorymappingResultMap" type="processcategorymapping">
+		<id property="id" column="id" />
+		<result property="categoryId" column="categoryId" />
+		<result property="processId" column="processId" />
+	</resultMap>
+
+	<select id="getProcessIdsOfCategory" parameterType="long" resultType="long">
+		SELECT processId
+		FROM processcategorymapping processcategorymapping
+		WHERE processcategorymapping.tenantid = #{tenantid}
+		AND processcategorymapping.categoryId = #{categoryId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfCategoriesOfProcess" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM processcategorymapping
+		WHERE tenantid = #{tenantid}
+		AND processId = #{processId}
+	</select>
+
+	<select id="getProcessCategoryMappingsOfCategory" parameterType="long" resultMap="categorymappingResultMap">
+		SELECT *
+		FROM processcategorymapping
+		WHERE tenantid = #{tenantid}
+		AND categoryId = #{categoryId}
+	</select>
+
+	<select id="getProcessCategoryMappingsOfProcess"  parameterType="long" resultMap="categorymappingResultMap">
+		SELECT *
+		FROM processcategorymapping
+		WHERE tenantid = #{tenantid}
+		AND processId = #{processId}
+	</select>
+
+	<select id="getNumberOfCategorizedProcessIds" parameterType="list" resultType="long">
+		SELECT COUNT(*)
+		FROM processcategorymapping
+		WHERE tenantid = #{tenantid}
+		AND processId IN
+		<foreach item="processId" index="index" collection="processIds" open="(" separator="," close=")">
+			#{processId}
+		</foreach>
+	</select>
+
+	<select id="getCategorizedProcessIds" parameterType="list" resultType="long">
+		SELECT DISTINCT processId
+		FROM processcategorymapping
+		WHERE tenantid = #{tenantid}
+		AND processId IN
+		<foreach item="processId" index="index" collection="processIds" open="(" separator="," close=")">
+			#{processId}
+		</foreach>
+	</select>
+
+</mapper>
