@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl">
+    <cache/>
+	<insert id="insertSDocumentContentImpl" parameterType="sDocumentContent">
+		INSERT INTO document_content (tenantid, id, documentId, content)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.documentId}, #{entity.content})
+	</insert>
+
+	<delete id="deleteSDocumentContentImpl" parameterType="sDocumentContent">
+		DELETE FROM document_content
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="sDocumentContentImplResultMap" type="sDocumentContent">
+		<id property="id" column="id" />
+		<result property="documentId" column="documentId" javaType="string" />
+		<result property="content" column="content" jdbcType="BLOB" />
+	</resultMap>
+
+	<select id="getDocContentByDocumentId" parameterType="long" resultMap="sDocumentContentImplResultMap">
+		SELECT sDocumentContent.*
+		FROM document_content sDocumentContent
+		WHERE sDocumentContent.tenantid = #{tenantid}
+		AND sDocumentContent.documentId = #{documentId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
