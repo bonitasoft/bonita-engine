@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl">
+    <cache/>
+	<select id="getExternalIdentityMappingWithoutDisplayNameById" parameterType="long" resultMap="externalIdentityResultMap">
+		SELECT *
+		FROM external_identity_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getExternalIdentityMappingById" parameterType="long" resultMap="externalIdentityResultMap">
+		SELECT *
+		FROM external_identity_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getExternalIdentityMappingByIdForUser" parameterType="long" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, u.firstName AS displayNamePart1, u.lastName AS displayNamePart2, u.userName AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			user_ u
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND u.tenantid = #{tenantid}
+		AND ext_ident_mapping.id = #{id}
+		AND u.id = ext_ident_mapping.userId
+	</select>
+
+	<select id="getExternalIdentityMappingByIdForGroup" parameterType="long" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, '' AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.id = #{id}
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.roleId &lt;= 0
+	</select>
+
+	<select id="getExternalIdentityMappingByIdForRole" parameterType="long" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND ext_ident_mapping.id = #{id}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId &lt;= 0
+	</select>
+
+	<select id="getExternalIdentityMappingByIdForRoleAndGroup" parameterType="long" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			group_ g,
+			role r
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.id = #{id}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+	</select>
+
+	<!-- used to retrieve the elements before deletion: -->
+	<select id="searchSExternalIdentityMapping" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*
+		FROM external_identity_mapping AS ext_ident_mapping
+		WHERE kind = #{kind}
+		AND ext_ident_mapping.tenantid = #{tenantid}
+		AND externalId = #{externalId}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingInvolving" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,user_ AS u
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND ext_ident_mapping.kind = #{kind}
+		AND ext_ident_mapping.externalId = #{externalId}
+		AND (ext_ident_mapping.userId = #{userId}
+		AND u.id = ext_ident_mapping.userid
+			OR (ext_ident_mapping.id IN (
+					SELECT eim.id
+					FROM external_identity_mapping AS eim,
+						 user_membership AS um
+					WHERE eim.tenantId = ext_ident_mapping.tenantId AND um.tenantId = eim.tenantId
+					AND um.userId = #{userId}
+					AND (
+						(eim.groupId = um.groupId AND eim.roleId &lt;= 0)
+						OR (eim.roleId = um.roleId AND eim.groupId &lt;= 0)
+						OR (eim.groupId = um.groupId AND eim.roleId = um.roleId)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingInvolving" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*
+		FROM external_identity_mapping AS ext_ident_mapping ,user_ AS u
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND ext_ident_mapping.kind = #{kind}
+		AND ext_ident_mapping.externalId = #{externalId}
+		AND (ext_ident_mapping.userId = #{userId}
+		AND u.id = ext_ident_mapping.userid
+			OR (ext_ident_mapping.id IN (
+					SELECT eim.id
+					FROM external_identity_mapping AS eim,
+						 user_membership AS um
+					WHERE eim.tenantId = ext_ident_mapping.tenantId AND um.tenantId = eim.tenantId
+					AND um.userId = #{userId}
+					AND (
+						(eim.groupId = um.groupId AND eim.roleId &lt;= 0)
+						OR (eim.roleId = um.roleId AND eim.groupId &lt;= 0)
+						OR (eim.groupId = um.groupId AND eim.roleId = um.roleId)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingForUser" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			user_ u
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND u.tenantid = #{tenantid}
+		AND ext_ident_mapping.userId = u.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingForUser" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, u.firstName AS displayNamePart1, u.lastName AS displayNamePart2, u.userName AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			user_ u
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND u.tenantid = #{tenantid}
+		AND ext_ident_mapping.userId = u.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingwithSUserForUser" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			user_ u
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND u.tenantid = #{tenantid}
+		AND ext_ident_mapping.userId = u.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingwithSUserForUser" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, u.firstName AS displayNamePart1, u.lastName AS displayNamePart2, u.userName AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			user_ u
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND u.tenantid = #{tenantid}
+		AND ext_ident_mapping.userId = u.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingForGroup" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.roleId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingForGroup" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, '' AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.roleId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingwithSGroupForGroup" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.roleId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingwithSGroupForGroup" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, '' AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.roleId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingForRole" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingForRole" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingwithSRoleForRole" parameterType="map" resultType="long">
+		SELECT COUNT(ext_ident_mapping.id)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingwithSRoleForRole" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId &lt;= 0
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingForRoleAndGroup" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingForRoleAndGroup" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingwithSGroupForRoleAndGroup" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingwithSGroupForRoleAndGroup" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingwithSRoleForRoleAndGroup" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingwithSRoleForRoleAndGroup" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSExternalIdentityMappingwithSGroupSRoleForRoleAndGroup" parameterType="map" resultType="long">
+		SELECT COUNT(*)
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSExternalIdentityMappingwithSGroupSRoleForRoleAndGroup" parameterType="map" resultMap="externalIdentityResultMap">
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
+		FROM external_identity_mapping AS ext_ident_mapping,
+			role r,
+			group_ g
+		WHERE ext_ident_mapping.tenantid = #{tenantid}
+		AND r.tenantid = #{tenantid}
+		AND g.tenantid = #{tenantid}
+		AND ext_ident_mapping.roleId = r.id
+		AND ext_ident_mapping.groupId = g.id
+		AND ext_ident_mapping.kind = #{kind}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<insert id="insertSExternalIdentityMappingImpl" parameterType="ext_ident_mapping">
+		INSERT INTO external_identity_mapping (tenantid, id, kind, externalId, userId, groupId, roleId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.kind}, #{entity.externalId}, #{entity.userId}, #{entity.groupId}, #{entity.roleId})
+	</insert>
+
+	<delete id="deleteSExternalIdentityMappingImpl" parameterType="ext_ident_mapping">
+		DELETE FROM external_identity_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="externalIdentityResultMap" type="ext_ident_mapping">
+		<result property="id" column="id" />
+		<result property="kind" column="kind" />
+		<result property="externalId" column="externalId" />
+		<result property="userId" column="userId" />
+		<result property="groupId" column="groupId" />
+		<result property="roleId" column="roleId" />
+		<result property="displayNamePart1" column="displayNamePart1" />
+		<result property="displayNamePart2" column="displayNamePart2" />
+		<result property="displayNamePart3" column="displayNamePart3" />
+	</resultMap>
+
+</mapper>
