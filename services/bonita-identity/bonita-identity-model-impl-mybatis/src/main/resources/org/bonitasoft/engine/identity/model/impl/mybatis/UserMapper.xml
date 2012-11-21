@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.identity.model.impl.SUserImpl">
+    <cache/>
+	<insert id="insertSUserImpl" parameterType="user">
+		INSERT INTO user_ (tenantid, id, firstName, lastName, password, userName, managerUserId, delegeeUserName, title, jobTitle, iconName, iconPath,
+			createdBy, creationDate, lastUpdate, lastConnection, PERSOEMAIL, PERSOPHONE, PERSOMOBILE, PERSOFAX, PERSOBUILDING, PERSOROOM, PERSOADDRESS,
+			PERSOZIPCODE, PERSOCITY, PERSOSTATE, PERSOCOUNTRY, PERSOWEBSITE, PROEMAIL, PROPHONE, PROMOBILE, PROFAX, PROBUILDING, PROROOM, PROADDRESS,
+			PROZIPCODE, PROCITY, PROSTATE, PROCOUNTRY, PROWEBSITE)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.firstName}, #{entity.lastName}, #{entity.password}, #{entity.userName}, #{entity.managerUserId},
+			#{entity.delegeeUserName}, #{entity.title}, #{entity.jobTitle}, #{entity.iconName}, #{entity.iconPath}, #{entity.createdBy},
+			#{entity.creationDate}, #{entity.lastUpdate}, #{entity.lastConnection}, #{entity.personalEmail}, #{entity.personalPhoneNumber},
+			#{entity.personalMobileNumber}, #{entity.personalFaxNumber}, #{entity.personalBuilding}, #{entity.personalRoom}, #{entity.personalAddress},
+			#{entity.personalZipCode}, #{entity.personalCity}, #{entity.personalState}, #{entity.personalCountry}, #{entity.personalWebsite},
+			#{entity.professionalEmail}, #{entity.professionalPhoneNumber}, #{entity.professionalMobileNumber}, #{entity.professionalFaxNumber},
+			#{entity.professionalBuilding}, #{entity.professionalRoom}, #{entity.professionalAddress}, #{entity.professionalZipCode},
+			#{entity.professionalCity}, #{entity.professionalState}, #{entity.professionalCountry}, #{entity.professionalWebsite})
+	</insert>
+
+	<update id="updateSUserImpl" parameterType="user">
+		UPDATE user_
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="firstName == '___bonitanull___'">firstName=NULL,</if>
+			<if test="firstName != null and firstName != '___bonitanull___'">firstName=#{firstName},</if>
+			<if test="lastName == '___bonitanull___'">lastName=NULL,</if>
+			<if test="lastName != null and lastName != '___bonitanull___'">lastName=#{lastName},</if>
+			<if test="password == '___bonitanull___'">password=NULL,</if>
+			<if test="password != null and password != '___bonitanull___'">password=#{password},</if>
+			<if test="userName == '___bonitanull___'">userName=NULL,</if>
+			<if test="userName != null and userName != '___bonitanull___'">userName=#{userName},</if>
+			<if test="managerUserId != null">managerUserId=#{managerUserId},</if>
+			<if test="delegeeUserName == '___bonitanull___'">delegeeUserName=NULL,</if>
+			<if test="delegeeUserName != null and delegeeUserName != '___bonitanull___'">delegeeUserName=#{delegeeUserName},</if>
+			<if test="title == '___bonitanull___'">title=NULL,</if>
+			<if test="title != null and title != '___bonitanull___'">title=#{title},</if>
+			<if test="jobTitle == '___bonitanull___'">jobTitle=NULL,</if>
+			<if test="jobTitle != null and jobTitle != '___bonitanull___'">jobTitle=#{jobTitle},</if>
+			<if test="iconName == '___bonitanull___'">iconName=NULL,</if>
+			<if test="iconName != null and iconName != '___bonitanull___'">iconName=#{iconName},</if>
+			<if test="iconPath == '___bonitanull___'">iconPath=NULL,</if>
+			<if test="iconPath != null and iconPath != '___bonitanull___'">iconPath=#{iconPath},</if>
+			<if test="createdBy == '___bonitanull___'">createdBy=NULL,</if>
+			<if test="createdBy != null and createdBy != '___bonitanull___'">createdBy=#{createdBy},</if>
+			<if test="creationDate != null">creationDate=#{creationDate},</if>
+			<if test="lastUpdate != null">lastUpdate=#{lastUpdate},</if>
+			<if test="lastConnection != null">lastConnection=#{lastConnection},</if>
+			<if test="personalEmail == '___bonitanull___'">PERSOEMAIL=NULL,</if>
+			<if test="personalEmail != null and personalEmail != '___bonitanull___'">PERSOEMAIL=#{personalEmail},</if>
+			<if test="personalPhoneNumber == '___bonitanull___'">PERSOPHONE=NULL,</if>
+			<if test="personalPhoneNumber != null and personalPhoneNumber != '___bonitanull___'">PERSOPHONE=#{personalPhoneNumber},</if>
+			<if test="personalMobileNumber == '___bonitanull___'">PERSOMOBILE=NULL,</if>
+			<if test="personalMobileNumber != null and personalMobileNumber != '___bonitanull___'">PERSOMOBILE=#{personalMobileNumber},</if>
+			<if test="personalFaxNumber == '___bonitanull___'">PERSOFAX=NULL,</if>
+			<if test="personalFaxNumber != null and personalFaxNumber != '___bonitanull___'">PERSOFAX=#{personalFaxNumber},</if>
+			<if test="personalBuilding == '___bonitanull___'">PERSOBUILDING=NULL,</if>
+			<if test="personalBuilding != null and personalBuilding != '___bonitanull___'">PERSOBUILDING=#{personalBuilding},</if>
+			<if test="personalRoom == '___bonitanull___'">PERSOROOM=NULL,</if>
+			<if test="personalRoom != null and personalRoom != '___bonitanull___'">PERSOROOM=#{personalRoom},</if>
+			<if test="personalAddress == '___bonitanull___'">PERSOADDRESS=NULL,</if>
+			<if test="personalAddress != null and personalAddress != '___bonitanull___'">PERSOADDRESS=#{personalAddress},</if>
+			<if test="personalZipCode == '___bonitanull___'">PERSOZIPCODE=NULL,</if>
+			<if test="personalZipCode != null and personalZipCode != '___bonitanull___'">PERSOZIPCODE=#{personalZipCode},</if>
+			<if test="personalCity == '___bonitanull___'">PERSOCITY=NULL,</if>
+			<if test="personalCity != null and personalCity != '___bonitanull___'">PERSOCITY=#{personalCity},</if>
+			<if test="personalState == '___bonitanull___'">PERSOSTATE=NULL,</if>
+			<if test="personalState != null and personalState != '___bonitanull___'">PERSOSTATE=#{personalState},</if>
+			<if test="personalCountry == '___bonitanull___'">PERSOCOUNTRY=NULL,</if>
+			<if test="personalCountry != null and personalCountry != '___bonitanull___'">PERSOCOUNTRY=#{personalCountry},</if>
+			<if test="personalWebsite == '___bonitanull___'">PERSOWEBSITE=NULL,</if>
+			<if test="personalWebsite != null and personalWebsite != '___bonitanull___'">PERSOWEBSITE=#{personalWebsite},</if>
+			<if test="professionalEmail == '___bonitanull___'">PROEMAIL=NULL,</if>
+			<if test="professionalEmail != null and professionalEmail != '___bonitanull___'">PROEMAIL=#{professionalEmail},</if>
+			<if test="professionalPhoneNumber == '___bonitanull___'">PROPHONE=NULL,</if>
+			<if test="professionalPhoneNumber != null and professionalPhoneNumber != '___bonitanull___'">PROPHONE=#{professionalPhoneNumber},</if>
+			<if test="professionalMobileNumber == '___bonitanull___'">PROMOBILE=NULL,</if>
+			<if test="professionalMobileNumber != null and professionalMobileNumber != '___bonitanull___'">PROMOBILE=#{professionalMobileNumber},</if>
+			<if test="professionalFaxNumber == '___bonitanull___'">PROFAX=NULL,</if>
+			<if test="professionalFaxNumber != null and professionalFaxNumber != '___bonitanull___'">PROFAX=#{professionalFaxNumber},</if>
+			<if test="professionalBuilding == '___bonitanull___'">PROBUILDING=NULL,</if>
+			<if test="professionalBuilding != null and professionalBuilding != '___bonitanull___'">PROBUILDING=#{professionalBuilding},</if>
+			<if test="professionalRoom == '___bonitanull___'">PROROOM=NULL,</if>
+			<if test="professionalRoom != null and professionalRoom != '___bonitanull___'">PROROOM=#{professionalRoom},</if>
+			<if test="professionalAddress == '___bonitanull___'">PROADDRESS=NULL,</if>
+			<if test="professionalAddress != null and professionalAddress != '___bonitanull___'">PROADDRESS=#{professionalAddress},</if>
+			<if test="professionalZipCode == '___bonitanull___'">PROZIPCODE=NULL,</if>
+			<if test="professionalZipCode != null and professionalZipCode != '___bonitanull___'">PROZIPCODE=#{professionalZipCode},</if>
+			<if test="professionalCity == '___bonitanull___'">PROCITY=NULL,</if>
+			<if test="professionalCity != null and professionalCity != '___bonitanull___'">PROCITY=#{professionalCity},</if>
+			<if test="professionalState == '___bonitanull___'">PROSTATE=NULL,</if>
+			<if test="professionalState != null and professionalState != '___bonitanull___'">PROSTATE=#{professionalState},</if>
+			<if test="professionalCountry == '___bonitanull___'">PROCOUNTRY=NULL,</if>
+			<if test="professionalCountry != null and professionalCountry != '___bonitanull___'">PROCOUNTRY=#{professionalCountry},</if>
+			<if test="professionalWebsite == '___bonitanull___'">PROWEBSITE=NULL,</if>
+			<if test="professionalWebsite != null and professionalWebsite != '___bonitanull___'">PROWEBSITE=#{professionalWebsite},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSUserImpl" parameterType="user">
+		DELETE FROM user_
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="userResultMap" type="user">
+		<result property="id" column="id" />
+		<result property="firstName" column="firstName" />
+		<result property="lastName" column="lastName" />
+		<result property="password" column="password" />
+		<result property="userName" column="userName" />
+		<result property="managerUserId" column="managerUserId" />
+		<result property="delegeeUserName" column="delegeeUserName" />
+		<result property="title" column="title" />
+		<result property="jobTitle" column="jobTitle" />
+		<result property="iconName" column="iconName" />
+		<result property="iconPath" column="iconPath" />
+		<result property="createdBy" column="createdBy" />
+		<result property="creationDate" column="creationDate" />
+		<result property="lastUpdate" column="lastUpdate" />
+		<result property="lastConnection" column="lastConnection" />
+		<result property="personalEmail" column="PERSOEMAIL" />
+		<result property="personalPhoneNumber" column="PERSOPHONE" />
+		<result property="personalMobileNumber" column="PERSOMOBILE" />
+		<result property="personalFaxNumber" column="PERSOFAX" />
+		<result property="personalBuilding" column="PERSOBUILDING" />
+		<result property="personalRoom" column="PERSOROOM" />
+		<result property="personalAddress" column="PERSOADDRESS" />
+		<result property="personalZipCode" column="PERSOZIPCODE" />
+		<result property="personalCity" column="PERSOCITY" />
+		<result property="personalState" column="PERSOSTATE" />
+		<result property="personalCountry" column="PERSOCOUNTRY" />
+		<result property="personalWebsite" column="PERSOWEBSITE" />
+		<result property="professionalEmail" column="PROEMAIL" />
+		<result property="professionalPhoneNumber" column="PROPHONE" />
+		<result property="professionalMobileNumber" column="PROMOBILE" />
+		<result property="professionalFaxNumber" column="PROFAX" />
+		<result property="professionalBuilding" column="PROBUILDING" />
+		<result property="professionalRoom" column="PROROOM" />
+		<result property="professionalAddress" column="PROADDRESS" />
+		<result property="professionalZipCode" column="PROZIPCODE" />
+		<result property="professionalCity" column="PROCITY" />
+		<result property="professionalState" column="PROSTATE" />
+		<result property="professionalCountry" column="PROCOUNTRY" />
+		<result property="professionalWebsite" column="PROWEBSITE" />
+	</resultMap>
+
+	<select id="getUserById" parameterType="long" resultMap="userResultMap">
+		SELECT *
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		AND u.id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUsersByIds" parameterType="list" resultMap="userResultMap">
+		SELECT *
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		AND u.id IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		ORDER BY u.userName
+	</select>
+
+	<select id="getUsers" parameterType="long" resultMap="userResultMap">
+		SELECT *
+		FROM user_ u
+		WHERE tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSUser" parameterType="long" resultType="long">
+		SELECT COUNT(id)
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSUser" parameterType="map" resultMap="userResultMap">
+		SELECT *
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSUserwithSUserMembership" parameterType="long" resultType="long">
+		SELECT COUNT(DISTINCT u.id)
+		FROM user_ u,
+			 user_membership um
+		WHERE u.tenantid = #{tenantid}
+		AND u.tenantid = um.tenantid
+		AND um.userId = u.id
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSUserwithSUserMembership" parameterType="map" resultMap="userResultMap">
+		SELECT DISTINCT u.*
+		FROM user_ u,
+			 user_membership um
+		WHERE u.tenantid = #{tenantid}
+		AND u.tenantid = um.tenantid
+		AND um.userId = u.id
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUserByUserName" parameterType="string" resultMap="userResultMap">
+		SELECT *
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		AND u.userName = #{userName}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUsersByManager" parameterType="list" resultMap="userResultMap">
+		SELECT *
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		AND u.managerUserId = #{managerUserId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUsersByDelegee" parameterType="string" resultMap="userResultMap">
+		SELECT *
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		AND u.delegeeUserName = #{delegeeUserName}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUsersByRole" parameterType="string" resultMap="userResultMap">
+		SELECT u.*
+		FROM user_ u,
+			 user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND u.tenantid = um.tenantid
+		AND u.id = um.userId
+		AND um.roleId = #{roleId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfUsersByRole" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND um.roleId = #{roleId}
+	</select>
+
+	<select id="getUsersByGroup" parameterType="string" resultMap="userResultMap">
+		SELECT DISTINCT u.*
+		FROM user_ u,
+			 user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND u.tenantid = um.tenantid
+		AND u.id = um.userId
+		AND um.groupId = #{groupId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfUsersByGroup" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND um.groupId = #{groupId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUsersByMembership" parameterType="long" resultMap="userResultMap">
+		SELECT DISTINCT u.*
+		FROM user_ u,
+			 user_membership um
+		WHERE u.tenantid = #{tenantid}
+		AND um.tenantid = u.tenantid
+		AND u.id = um.userId
+		AND um.roleId = #{roleId}
+		AND um.groupId = #{groupId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfUsersByMembership" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND um.roleId = #{roleId}
+		AND um.groupId = #{groupId}
+	</select>
+
+</mapper>

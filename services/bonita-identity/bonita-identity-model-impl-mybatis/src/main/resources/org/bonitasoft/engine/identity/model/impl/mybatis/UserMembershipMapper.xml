@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl">
+    <cache/>
+	<insert id="insertSUserMembershipImpl" parameterType="user_membership">
+		INSERT INTO user_membership (tenantid, id, roleId, groupId, userId, assignedBy, assignedDate)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.roleId}, #{entity.groupId}, #{entity.userId}, #{entity.assignedBy}, #{entity.assignedDate})
+	</insert>
+
+	<update id="updateSUserMembershipImpl" parameterType="user_membership">
+		UPDATE user_membership
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="roleId != null">roleId=#{roleId},</if>
+			<if test="groupId != null">groupId=#{groupId},</if>
+			<if test="userId != null">userId=#{userId},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSUserMembershipImpl" parameterType="user_membership">
+		DELETE FROM user_membership
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="userMembershipResultMap" type="user_membership">
+		<id property="id" column="id" />
+		<result property="roleId" column="roleId" />
+		<result property="groupId" column="groupId" />
+		<result property="userId" column="userId" />
+		<result property="assignedBy" column="assignedBy" />
+		<result property="assignedDate" column="assignedDate" />
+		<result property="userId" column="userId" />
+		<result property="roleName" column="r_name" />
+		<result property="groupName" column="g_name" />
+		<result property="username" column="userName" />
+	</resultMap>
+
+	<select id="getSUserMembershipById" parameterType="long" resultMap="userMembershipResultMap">
+		SELECT um.*, u.username, r.name as r_name, g.name as g_name
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		AND um.roleId = r.id 
+		AND um.groupId = g.id 
+		AND um.userId = u.id  
+		AND um.id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLightSUserMembershipById" parameterType="long" resultMap="userMembershipResultMap">
+		SELECT um.*
+		FROM user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND um.id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getUserMemberships" parameterType="long" resultMap="userMembershipResultMap">
+		SELECT um.*, u.username, r.name as r_name, g.name as g_name
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		AND um.roleId = r.id 
+		AND um.groupId = g.id 
+		AND um.userId = u.id  
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLightUserMemberships" parameterType="long" resultMap="userMembershipResultMap">
+		SELECT um.*
+		FROM user_membership um
+		WHERE um.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="searchUserMembership" parameterType="map" resultMap="userMembershipResultMap">
+		SELECT um.*, u.username, r.name as r_name, g.name as g_name
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		AND um.roleId = r.id 
+		AND um.groupId = g.id 
+		AND um.userId = u.id  
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getUserMembershipWithIds" parameterType="map" resultMap="userMembershipResultMap">
+		SELECT um.*, u.username, r.name as r_name, g.name as g_name
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		AND um.roleId = #{roleId}
+		AND um.userId = #{userId}
+		AND um.groupId = #{groupId}
+		AND r.id = #{roleId} 
+		AND g.id = #{groupId}
+		AND u.id = #{userId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLightUserMembershipWithIds" parameterType="map" resultMap="userMembershipResultMap">
+		SELECT um.*
+		FROM user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND um.roleId = #{roleId}
+		AND um.userId = #{userId}
+		AND um.groupId = #{groupId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getUserMembershipsOfUser" parameterType="map" resultMap="userMembershipResultMap">
+		SELECT um.*, u.username, r.name as r_name, g.name as g_name
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		AND um.roleId = r.id 
+		AND um.groupId = g.id 
+		AND um.userId = #{userId}
+		AND u.id = #{userId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUserMembershipsByRole" parameterType="map" resultMap="userMembershipResultMap">
+		SELECT um.*, u.username, r.name as r_name, g.name as g_name
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		AND um.roleId = r.id 
+		AND um.groupId = g.id 
+		AND um.userId = u.id
+		AND r.id = #{roleId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getUserMembershipsByGroup" parameterType="map" resultMap="userMembershipResultMap">
+		SELECT um.*, u.username, r.name as r_name, g.name as g_name
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		AND um.roleId = r.id 
+		AND um.groupId = g.id 
+		AND um.userId = u.id
+		AND g.id = #{groupId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>	
+
+	<select id="getNumberOfUserMembership" parameterType="string" resultType="long">
+		SELECT COUNT(*)
+		FROM user_membership um,
+			 user_ u,
+			 role r,
+			 group_ g
+		WHERE um.tenantid = #{tenantid}
+		AND r.tenantid = um.tenantid
+		AND g.tenantid = um.tenantid
+		AND u.tenantid = um.tenantid
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfUserMembershipsOfUser" parameterType="string" resultType="long">
+		SELECT COUNT(*)
+		FROM user_membership um
+		WHERE um.tenantid = #{tenantid}
+		AND um.userId = #{userId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
