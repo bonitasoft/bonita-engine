@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.persistence.model.Car">
+
+  <select id="getCarsByBrand" parameterType="map" resultMap="carResultMap">
+    SELECT *
+    FROM car
+    WHERE TENANTID = #{tenantid}
+      AND BRAND = #{brand}
+  </select>
+  <select id="getCarById" parameterType="long" resultMap="carResultMap">
+    SELECT *
+    FROM car
+    WHERE TENANTID = #{tenantid}
+      AND car.ID = #{id}
+  </select>
+
+  <select id="getAllCars" parameterType="map" resultMap="carResultMap">
+    SELECT *
+    FROM car
+    WHERE TENANTID = #{tenantid} 
+  </select>
+  <insert id="insertCar" parameterType="car">
+    INSERT INTO car
+      (TENANTID, ID, BRAND)
+    VALUES
+      (#{tenantid}, #{entity.id}, #{entity.brand})
+  </insert>
+  
+  <delete id="deleteCar" parameterType="car">
+    DELETE FROM car
+    WHERE TENANTID = #{tenantid}
+      AND ID = #{id}
+  </delete>
+  
+  <resultMap id="carResultMap" type="car">
+    <id property="id" column="ID" />
+    <result property="brand" column="BRAND"/>
+  </resultMap>
+
+
+</mapper>

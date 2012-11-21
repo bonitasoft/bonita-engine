@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.persistence.model.Human">
+
+	<select id="getHumanById" parameterType="long" resultMap="humanResultMap">
+		SELECT *
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getAllHumans" parameterType="map" resultMap="humanResultMap">
+		SELECT *
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		<if test="discriminant != null">
+			AND discriminant = #{discriminant}
+		</if>
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getParentsHavingAChildWithFirstName" parameterType="map" resultMap="humanResultMap">
+		SELECT parent.*
+		FROM human parent, human child
+		WHERE parent.TENANTID = #{tenantid}
+		AND child.TENANTID = #{tenantid}
+		AND parent.id = child.parent_id
+		AND child.firstname = #{firstName}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="searchHumans" parameterType="map" resultMap="humanResultMap">
+		SELECT *
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		<trim prefix="AND" prefixOverrides="AND | OR">
+			${whereClause}
+		</trim>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfHumans" parameterType="map" resultType="long">
+		SELECT count(*)
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		<if test="discriminant != null">
+			AND discriminant = #{discriminant}
+		</if>
+	</select>
+
+	<select id="getHumansById" parameterType="map" resultMap="humanResultMap">
+		SELECT *
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		AND id IN
+		<foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="getHumanByFirstName" parameterType="long" resultMap="humanResultMap">
+		SELECT *
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		AND human.firstname = #{firstName}
+	</select>
+
+	<select id="getHumanFirstName" parameterType="long" resultType="string">
+		SELECT firstname
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getParentChildren" parameterType="long" resultMap="humanResultMap">
+		SELECT *
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		AND parent_id = #{id}
+	</select>
+
+	<select id="getChildParent" parameterType="long" resultMap="humanResultMap">
+		SELECT *
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		AND id = (
+		SELECT parent_id
+		FROM human
+		WHERE TENANTID = #{tenantid}
+		AND id = #{id})
+	</select>
+
+	<insert id="insertHuman" parameterType="human">
+		INSERT INTO human
+		(TENANTID, ID, FIRSTNAME, LASTNAME, AGE, PARENT_ID, CAR_ID, DISCRIMINANT)
+		VALUES
+		(#{tenantid}, #{entity.id}, #{entity.firstName}, #{entity.lastName}, #{entity.age}, null, #{entity.carId}, 'human')
+	</insert>
+
+	<insert id="insertChild" parameterType="child">
+		INSERT INTO human
+		(TENANTID, ID, FIRSTNAME, LASTNAME, AGE, PARENT_ID, DISCRIMINANT)
+		VALUES
+		(#{tenantid}, #{entity.id}, #{entity.firstName}, #{entity.lastName}, #{entity.age}, #{entity.parentId}, 'child')
+	</insert>
+
+	<insert id="insertParent" parameterType="parent">
+		INSERT INTO human
+		(TENANTID, ID, FIRSTNAME, LASTNAME, AGE, PARENT_ID, DISCRIMINANT)
+		VALUES
+		(#{tenantid}, #{entity.id}, #{entity.firstName}, #{entity.lastName}, #{entity.age}, #{entity.parentId}, 'parent')
+	</insert>
+
+	<update id="updateHuman" parameterType="human">
+		UPDATE human
+		<set>
+			<if test="firstName == '___bonitanull___'">FIRSTNAME=NULL,</if>
+			<if test="firstName != null and firstName != '___bonitanull___'">FIRSTNAME=#{firstName},</if>
+			<if test="lastName != null">LASTNAME=#{lastName},</if>
+			<if test="age != null">AGE=#{age}</if>
+			<if test="carId != null">CAR_ID=#{carId}</if>
+		</set>
+		WHERE TENANTID = #{tenantid}
+		AND ID = #{id}
+	</update>
+
+
+
+	<delete id="deleteHuman" parameterType="human">
+		DELETE FROM human
+		WHERE TENANTID = #{tenantid}
+		AND ID = #{id}
+	</delete>
+
+	<delete id="deleteAllHuman" parameterType="human">
+		DELETE FROM human
+		WHERE TENANTID = #{tenantid}
+	</delete>
+
+	<delete id="deleteByIdsHuman" parameterType="human">
+		DELETE FROM human
+		WHERE TENANTID = #{tenantid}
+		AND ID IN
+		<foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<resultMap id="humanResultMap" type="human">
+		<id property="id" column="ID" />
+		<result property="firstName" column="FIRSTNAME" />
+		<result property="lastName" column="LASTNAME" />
+		<result property="age" column="AGE" />
+		<result property="carId" column="CAR_ID" />
+		<discriminator javaType="string" column="DISCRIMINANT">
+			<case value="child" resultType="child">
+				<result property="parentId" column="PARENT_ID" />
+			</case>
+			<case value="parent" resultType="parent">
+				<result property="parentId" column="PARENT_ID" />
+			</case>
+		</discriminator>
+	</resultMap>
+
+
+</mapper>
