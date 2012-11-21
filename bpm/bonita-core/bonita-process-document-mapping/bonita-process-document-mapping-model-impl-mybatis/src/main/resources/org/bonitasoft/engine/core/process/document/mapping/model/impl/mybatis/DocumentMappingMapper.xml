@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl">
+    <cache/>
+	<insert id="insertSDocumentMappingImpl" parameterType="document_mapping">
+		INSERT INTO document_mapping (tenantId, id, processinstanceid, documentName, documentAuthor, documentCreationDate, documentHasContent,
+			documentContentFileName, documentContentMimeType, contentStorageId, documentURL)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.processInstanceId}, #{entity.documentName}, #{entity.documentAuthor},
+			#{entity.documentCreationDate}, #{entity.documentHasContent}, #{entity.documentContentFileName}, #{entity.documentContentMimeType},
+			#{entity.contentStorageId}, #{entity.documentURL})
+	</insert>
+
+	<update id="updateSDocumentMappingImpl" parameterType="document_mapping">
+		UPDATE document_mapping
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="documentAuthor != null">documentAuthor=#{documentAuthor},</if>
+			<if test="documentCreationDate != null">documentCreationDate=#{documentCreationDate},</if>
+			<if test="documentHasContent != null">documentHasContent=#{documentHasContent},</if>
+			<if test="documentContentFileName == '___bonitanull___'">documentContentFileName=NULL,</if>
+			<if test="documentContentFileName != null and documentContentFileName != '___bonitanull___'">documentContentFileName=#{documentContentFileName},</if>
+			<if test="documentContentMimeType == '___bonitanull___'">documentContentMimeType=NULL,</if>
+			<if test="documentContentMimeType != null and documentContentMimeType != '___bonitanull___'">documentContentMimeType=#{documentContentMimeType},</if>
+			<if test="contentStorageId == '___bonitanull___'">contentStorageId=NULL,</if>
+			<if test="contentStorageId != null and contentStorageId != '___bonitanull___'">contentStorageId=#{contentStorageId},</if>
+			<if test="documentURL == '___bonitanull___'">documentURL=NULL,</if>
+			<if test="documentURL != null and documentURL != '___bonitanull___'">documentURL=#{documentURL},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSDocumentMappingImpl" parameterType="document_mapping">
+		DELETE FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="documentMappingResultMap" type="document_mapping">
+		<id property="id" column="id" />
+		<result property="processInstanceId" column="processInstanceId" />
+		<result property="documentName" column="documentName" />
+		<result property="documentAuthor" column="documentAuthor" />
+		<result property="documentCreationDate" column="documentCreationDate" />
+		<result property="documentHasContent" column="documentHasContent" />
+		<result property="documentContentFileName" column="documentContentFileName" />
+		<result property="documentContentMimeType" column="documentContentMimeType" />
+		<result property="contentStorageId" column="contentStorageId" />
+		<result property="documentURL" column="documentURL" />
+	</resultMap>
+
+	<select id="getDocumentMappingById" parameterType="long" resultMap="documentMappingResultMap">
+		SELECT *
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getDocumentMappingsByDocId" resultMap="documentMappingResultMap">
+		SELECT *
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		AND documentName = #{documentName}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfDocuments" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+	</select>
+
+	<select id="getDocumentMappings" parameterType="long" resultMap="documentMappingResultMap">
+		SELECT *
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getDocumentMappingsforProcessInstance" parameterType="document_mapping" resultMap="documentMappingResultMap">
+		SELECT *
+		FROM document_mapping document_mapping
+		WHERE document_mapping.tenantid = #{tenantid}
+		AND document_mapping.processInstanceId = #{processInstanceId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfDocumentMappingsforProcessInstance"  parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		AND processInstanceId = #{processInstanceId}
+	</select>
+
+	<select id="getDocumentMappingsforProcessInstanceAndName" parameterType="document_mapping" resultMap="documentMappingResultMap">
+		SELECT *
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		AND processInstanceId = #{processInstanceId}
+		AND documentName = #{documentName}
+	</select>
+	
+	<select id="getNumberOfSDocumentMapping" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>		
+	</select>
+	
+	<select id="searchSDocumentMapping" parameterType="document_mapping" resultMap="documentMappingResultMap">
+		SELECT *
+		FROM document_mapping
+		WHERE tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>		
+	</select>	
+
+	<select id="getNumberOfSDocumentMappingSupervisedBy" parameterType="long" resultType="long">
+		SELECT COUNT(document_mapping.id)
+		FROM document_mapping,
+			 process_instance AS p
+	    WHERE document_mapping.tenantid = #{tenantid}
+	    AND document_mapping.tenantid = p.tenantid
+		AND document_mapping.processInstanceId = p.id
+		AND p.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM processsupervisor AS supervisor
+			WHERE supervisor.tenantid = document_mapping.tenantid
+			AND (supervisor.userId = #{userId})
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM processsupervisor AS supervisor,
+					     user_membership AS um
+					WHERE supervisor.tenantid = document_mapping.tenantid
+					AND um.tenantid = supervisor.tenantid  
+					AND um.userId = #{userId}
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+					)
+				)
+			)	
+		)	
+		<if test="filter != null">
+			AND ${filter}
+		</if>		
+	</select>
+	
+	<select id="searchSDocumentMappingSupervisedBy" parameterType="document_mapping" resultMap="documentMappingResultMap">
+		SELECT document_mapping.*
+		FROM document_mapping,
+			 process_instance AS p
+	    WHERE document_mapping.tenantid = #{tenantid}
+	    AND document_mapping.tenantid = p.tenantid
+		AND document_mapping.processInstanceId = p.id
+		AND p.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM processsupervisor AS supervisor
+			WHERE supervisor.tenantid = document_mapping.tenantid
+			AND (supervisor.userId = #{userId})
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM processsupervisor AS supervisor,
+					     user_membership AS um
+					WHERE supervisor.tenantid = document_mapping.tenantid
+					AND um.tenantid = supervisor.tenantid  
+					AND um.userId = #{userId}
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+					)
+				)
+			)	
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>		
+	</select>	
+</mapper>

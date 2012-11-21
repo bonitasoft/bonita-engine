@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl">
+
+	<insert id="insertSADocumentMappingImpl" parameterType="archived_document_mapping">
+		INSERT INTO arch_document_mapping (tenantId, id, processinstanceid, sourceObjectId, archiveDate, documentName, documentAuthor,
+			documentCreationDate, documentHasContent, documentContentFileName, documentContentMimeType, contentStorageId, documentURL)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.processInstanceId}, #{entity.sourceObjectId}, #{entity.archiveDate}, #{entity.documentName},
+			#{entity.documentAuthor}, #{entity.documentCreationDate}, #{entity.documentHasContent}, #{entity.documentContentFileName},
+			#{entity.documentContentMimeType}, #{entity.contentStorageId}, #{entity.documentURL})
+	</insert>
+
+	<delete id="deleteSADocumentMappingImpl" parameterType="archived_document_mapping">
+		DELETE FROM arch_document_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="archivedDocumentMappingResultMap" type="archived_document_mapping">
+		<id property="id" column="id" />
+		<result property="sourceObjectId" column="sourceObjectId" />
+		<result property="archiveDate" column="archiveDate" />
+		<result property="processInstanceId" column="processInstanceId" />
+		<result property="documentName" column="documentName" />
+		<result property="documentAuthor" column="documentAuthor" />
+		<result property="documentCreationDate" column="documentCreationDate" />
+		<result property="documentHasContent" column="documentHasContent" />
+		<result property="documentContentFileName" column="documentContentFileName" />
+		<result property="documentContentMimeType" column="documentContentMimeType" />
+		<result property="contentStorageId" column="contentStorageId" />
+		<result property="documentURL" column="documentURL" />
+	</resultMap>
+
+	<select id="getSADocumentMappingsforProcessInstanceAndName" parameterType="map" resultMap="archivedDocumentMappingResultMap">
+		SELECT *
+		FROM arch_document_mapping docmapping
+		WHERE docmapping.tenantid = #{tenantid}
+		AND docmapping.processInstanceId = #{processInstanceId}
+		AND docmapping.documentName =  #{documentName}
+		AND docmapping.archiveDate >=  #{time}
+		ORDER BY docmapping.archiveDate ASC
+	</select>
+                
+	<select id="getNumberOfSADocumentMapping" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM arch_document_mapping archived_document_mapping
+		WHERE archived_document_mapping.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>		
+	</select>
+
+	<select id="getArchivedDocumentById" parameterType="long" resultMap="archivedDocumentMappingResultMap">
+		SELECT *
+		FROM arch_document_mapping archived_document_mapping
+		WHERE archived_document_mapping.sourceObjectId = #{sourceObjectId}
+		AND archived_document_mapping.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>		
+	</select>
+			
+	<select id="searchSADocumentMapping" parameterType="map" resultMap="archivedDocumentMappingResultMap">
+		SELECT *
+		FROM arch_document_mapping archived_document_mapping
+		WHERE archived_document_mapping.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>			
+	</select>
+
+	<select id="getNumberOfSADocumentMappingSupervisedBy" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM arch_document_mapping archived_document_mapping,
+			 arch_process_instance p
+	    WHERE archived_document_mapping.tenantid = #{tenantid}
+	    AND archived_document_mapping.tenantid = p.tenantid
+		AND archived_document_mapping.processInstanceId = p.id
+		AND p.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM processsupervisor AS supervisor
+			WHERE supervisor.tenantid = archived_document_mapping.tenantid
+			AND (supervisor.userId = #{userId})
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM processsupervisor AS supervisor,
+					     user_membership AS um
+					WHERE supervisor.tenantid = archived_document_mapping.tenantid
+					AND um.tenantid = supervisor.tenantid  
+					AND um.userId = #{userId}
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+					)
+				)
+			)	
+		)	
+		<if test="filter != null">
+			AND ${filter}
+		</if>		
+	</select>
+	
+	<select id="searchSADocumentMappingSupervisedBy" parameterType="map" resultMap="archivedDocumentMappingResultMap">
+		SELECT *
+		FROM arch_document_mapping archived_document_mapping,
+			 arch_process_instance p
+	    WHERE archived_document_mapping.tenantid = #{tenantid}
+	    AND archived_document_mapping.tenantid = p.tenantid
+		AND archived_document_mapping.processInstanceId = p.id
+		AND p.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM processsupervisor AS supervisor
+			WHERE supervisor.tenantid = archived_document_mapping.tenantid
+			AND (supervisor.userId = #{userId})
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM processsupervisor AS supervisor,
+					     user_membership AS um
+					WHERE supervisor.tenantid = archived_document_mapping.tenantid
+					AND um.tenantid = supervisor.tenantid  
+					AND um.userId = #{userId}
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+					)
+				)
+			)	
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>		
+	</select>	
+</mapper>
