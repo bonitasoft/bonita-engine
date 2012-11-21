@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl">
+    <cache/>
+	<insert id="insertSDataInstanceVisibilityMappingImpl" parameterType="DataInstanceVisibilityMapping">
+		INSERT INTO data_mapping (tenantid, id, containerId, containerType, dataName, dataInstanceId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.containerId}, #{entity.containerType}, #{entity.dataName}, #{entity.dataInstanceId})
+	</insert>
+
+	<delete id="deleteSDataInstanceImpl" parameterType="DataInstanceVisibilityMapping">
+		DELETE FROM data_mapping
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="dataInstanceVisibilityMappingResultMap" type="DataInstanceVisibilityMapping">
+		<result property="id" column="id" />
+		<result property="containerId" column="containerId" />
+		<result property="containerType" column="containerType" />
+		<result property="dataName" column="dataName" />
+		<result property="dataInstanceId" column="dataInstanceId" />
+	</resultMap>
+
+  	<select id="getDataInstanceIdFromMapping" parameterType="long" resultType="long">
+		SELECT dataMapping.dataInstanceId
+		FROM data_mapping dataMapping
+		WHERE dataMapping.tenantid = #{tenantid}
+		AND dataMapping.dataName = #{dataName}
+		AND dataMapping.containerType = #{containerType}
+		AND dataMapping.containerId = #{containerId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+  	<select id="getDataInstanceIdsFromMapping" parameterType="long" resultType="long">
+		SELECT dataMapping.dataInstanceId
+		FROM data_mapping dataMapping
+		WHERE dataMapping.tenantid = #{tenantid}
+		AND dataMapping.dataName IN
+		<foreach item="dataName" index="index" collection="dataNames" open="(" separator="," close=")">
+				#{dataName}
+		</foreach>
+		AND dataMapping.containerType = #{containerType}
+		AND dataMapping.containerId = #{containerId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+  	<select id="getDataInstanceVisibilityMappings" parameterType="long" resultMap="dataInstanceVisibilityMappingResultMap">
+		SELECT *
+		FROM data_mapping dataMapping
+		WHERE dataMapping.tenantid = #{tenantid}
+		AND dataMapping.containerType = #{containerType}
+		AND dataMapping.containerId = #{containerId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>

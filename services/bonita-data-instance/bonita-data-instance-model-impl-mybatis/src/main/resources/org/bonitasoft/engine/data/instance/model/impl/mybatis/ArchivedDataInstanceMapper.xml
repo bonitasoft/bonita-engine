@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl">
+
+	<insert id="insertSABooleanDataInstanceImpl" parameterType="ArchBooleanDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, 'SBooleanDataInstanceImpl', #{entity.archiveDate},
+			#{entity.sourceObjectId})
+	</insert>
+
+	<insert id="insertSAIntegerDataInstanceImpl" parameterType="ArchIntegerDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+		intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, NULL, 'SIntegerDataInstanceImpl', #{entity.archiveDate},
+			#{entity.sourceObjectId})
+	</insert>
+
+	<insert id="insertSALongDataInstanceImpl" parameterType="ArchLongDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, 'SLongDataInstanceImpl', #{entity.archiveDate},
+			#{entity.sourceObjectId})
+	</insert>
+
+	<insert id="insertSAShortTextDataInstanceImpl" parameterType="ArchShortTextDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, 'SShortTextDataInstanceImpl', #{entity.archiveDate},
+			#{entity.sourceObjectId})
+	</insert>
+
+	<insert id="insertSADoubleDataInstanceImpl" parameterType="ArchDoubleDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, 'SDoubleDataInstanceImpl', #{entity.archiveDate},
+			#{entity.sourceObjectId})
+	</insert>
+
+	<insert id="insertSABlobDataInstanceImpl" parameterType="ArchBlobDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value, typeHandler=org.bonitasoft.engine.persistence.SerializableTypeHandler},
+			NULL, 'SBlobDataInstanceImpl', #{entity.archiveDate}, #{entity.sourceObjectId})
+	</insert>
+
+	<insert id="insertSALongTextDataInstanceImpl" parameterType="ArchLongTextDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SLongTextDataInstanceImpl', #{entity.archiveDate},
+			#{entity.sourceObjectId})
+	</insert>
+
+	<insert id="insertSAXMLDataInstanceImpl" parameterType="ArchXMLDataInstance">
+		INSERT INTO	arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, #{entity.namespace}, #{entity.element}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SXMLDataInstanceImpl',
+			#{entity.archiveDate}, #{entity.sourceObjectId})
+	</insert>
+
+	<update id="updateSADataInstanceImpl" parameterType="ArchDataInstance">
+		UPDATE arch_data_instance
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name == '___bonitanull___'">name=NULL,</if>
+			<if test="name != null and name != '___bonitanull___'">name=#{name},</if>
+			<if test="transientData!= null">transientData=#{transientData},</if>
+			<if test="className != null and className != '___bonitanull___'">className=#{className},</if>
+			<if test="description == '___bonitanull___'">description=NULL,</if>
+			<if test="description != null and description != '___bonitanull___'">description=#{description},</if>
+			<if test="discriminant == 'SIntegerDataInstanceImpl' and value != null">intValue=#{value},</if>
+			<if test="discriminant == 'SLongDataInstanceImpl' and value != null">longValue=#{value},</if>
+			<if test="discriminant == 'SDoubleDataInstanceImpl' and value != null">doubleValue=#{value},</if>
+			<if test="discriminant == 'SShortTextDataInstanceImpl' and value == '___bonitanull___'">shortTextValue=NULL,</if>
+			<if test="discriminant == 'SShortTextDataInstanceImpl' and value != null and value != '___bonitanull___'">shortTextValue=#{value},</if>
+			<if test="discriminant == 'SBooleanDataInstanceImpl' and value != null">booleanValue=#{value},</if>
+			<if test="discriminant == 'SLongTextDataInstanceImpl' and value == '___bonitanull___'">clobValue=NULL,</if>
+			<if test="discriminant == 'SLongTextDataInstanceImpl' and value != null and value != '___bonitanull___'">clobValue=#{value},</if>
+			<if test="discriminant == 'SBlobDataInstanceImpl' and value == '___bonitanull___'">blobValue=NULL,</if>
+			<if test="discriminant == 'SBlobDataInstanceImpl' and value != null and value != '___bonitanull___'">blobValue=#{value, typeHandler=org.bonitasoft.engine.persistence.SerializableTypeHandler}</if>
+			<if test="discriminant == 'SXMLDataInstanceImpl' and value == '___bonitanull___'">clobValue=NULL,</if>
+			<if test="discriminant == 'SXMLDataInstanceImpl' and value != null and value != '___bonitanull___'">clobValue=#{value},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSADataInstanceImpl" parameterType="ArchDataInstance">
+		DELETE FROM arch_data_instance
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="archDataInstanceResultMap" type="ArchDataInstance">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="description" column="description" />
+		<result property="transientData" column="transientData" />
+		<result property="className" column="className" />
+		<result property="containerId" column="containerId" />
+		<result property="containerType" column="containerType" />
+		<result property="sourceObjectId" column="sourceObjectId" />
+		<discriminator javaType="string" column="discriminant">
+			<case value="SIntegerDataInstanceImpl" resultType="ArchIntegerDataInstance">
+				<result property="value" javaType="int" column="intValue" />
+			</case>
+			<case value="SLongDataInstanceImpl" resultType="ArchLongDataInstance">
+				<result property="value" javaType="long" column="longValue" />
+			</case>
+			<case value="SDoubleDataInstanceImpl" resultType="ArchDoubleDataInstance">
+				<result property="value" javaType="double" column="doubleValue" />
+			</case>
+			<case value="SShortTextDataInstanceImpl" resultType="ArchShortTextDataInstance">
+				<result property="value" javaType="string" column="shortTextValue" />
+			</case>
+			<case value="SBooleanDataInstanceImpl" resultType="ArchBooleanDataInstance">
+				<result property="value" javaType="boolean" jdbcType="BOOLEAN" column="booleanValue" />
+			</case>
+			<case value="SLongTextDataInstanceImpl" resultType="ArchLongTextDataInstance">
+				<result property="value" javaType="string" jdbcType="CLOB" column="clobValue" />
+			</case>
+			<case value="SXMLDataInstanceImpl" resultType="ArchXMLDataInstance">
+				<result property="value" javaType="string" jdbcType="CLOB" column="clobValue" />
+				<result property="namespace" column="namespace" />
+				<result property="element" column="element" />
+			</case>
+			<case value="SBlobDataInstanceImpl" resultType="ArchBlobDataInstance">
+				<result property="value" typeHandler="org.bonitasoft.engine.persistence.SerializableTypeHandler" jdbcType="BLOB" column="blobValue" />
+			</case>
+			<case value="SDateDataInstanceImpl" resultType="ArchDateDataInstance">
+				<result property="value" javaType="long" column="longValue" />
+			</case>
+		</discriminator>
+	</resultMap>
+
+	<select id="getDataInstanceById" parameterType="long" resultMap="archDataInstanceResultMap">
+		SELECT *
+		FROM arch_data_instance dataInst
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getSADataInstanceByDataInstanceId" parameterType="long" resultMap="archDataInstanceResultMap">
+		SELECT *
+		FROM arch_data_instance dataInst
+		WHERE tenantid = #{tenantid}
+		AND sourceObjectId = #{dataInstanceId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getDataInstancesByNameAndContainer" resultMap="archDataInstanceResultMap">
+		SELECT *
+		FROM arch_data_instance dataInst
+		WHERE tenantid = #{tenantid}
+		AND name = #{name}
+		AND containerId = #{containerId}
+		AND containerType = #{containerType}
+	</select>
+
+	<select id="getDataInstancesByContainer" resultMap="archDataInstanceResultMap">
+		SELECT *
+		FROM arch_data_instance dataInst
+		WHERE tenantid = #{tenantid}
+		AND containerId = #{containerId}
+		AND containerType = #{containerType}
+	</select>
+
+	<select id="getSADataInstanceByDataInstanceIdAndArchiveDate" resultMap="archDataInstanceResultMap">
+		SELECT *
+		FROM arch_data_instance dataInst
+		WHERE tenantid = #{tenantid}
+		AND sourceObjectId = #{dataInstanceId}
+		AND archiveDate >= #{time}
+		ORDER BY archiveDate ASC
+		LIMIT 1
+	</select>
+	<select id="getSADataInstancesByDataInstanceIdAndArchiveDate" resultMap="archDataInstanceResultMap">
+		SELECT *
+		FROM arch_data_instance dataInst
+		WHERE tenantid = #{tenantid}
+		AND dataInst.id IN ( 
+			SELECT min(sadi.id)
+			FROM arch_data_instance sadi
+			WHERE sadi.sourceObjectId IN 
+			<foreach item="dataInstanceId" index="index" collection="dataInstanceIds" open="(" separator="," close=")">
+					#{dataInstanceId}
+			</foreach>
+			AND sadi.archiveDate >= #{time}
+			GROUP BY sadi.sourceObjectId)
+	</select>
+	
+	<select id="getLocalSADataInstances" resultMap="archDataInstanceResultMap">
+		SELECT *
+		FROM arch_data_instance dataInst
+		WHERE dataInst.tenantid = #{tenantid}
+		AND dataInst.containerId = #{containerId}
+		AND dataInst.containerType = #{containerType}
+	</select>
+	
+</mapper>
