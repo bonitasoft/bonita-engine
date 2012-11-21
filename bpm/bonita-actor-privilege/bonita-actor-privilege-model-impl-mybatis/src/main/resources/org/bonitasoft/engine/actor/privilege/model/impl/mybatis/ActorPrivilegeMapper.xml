@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl">
+
+	<insert id="insertSActorPrivilegeImpl" parameterType="actorPrivilege">
+		INSERT INTO actor_privilege (tenantid, id, actorid, privilegeid, levelValue)
+		VALUES (#{entity.tenantId},#{entity.id}, #{entity.actorId}, #{entity.privilegeId}, #{entity.levelValue})
+	</insert>
+
+	<update id="updateSActorPrivilegeImpl" parameterType="actorPrivilege">
+		UPDATE actor_privilege
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="actorId != null">actorId=#{actorId},</if>
+			<if test="privilegeId != null">privilegeId=#{privilegeId},</if>
+			<if test="levelValue == '___bonitanull___'">levelValue=NULL,</if>
+			<if test="levelValue != null and levelValue != '___bonitanull___'">levelValue=#{levelValue},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<delete id="deleteSActorPrivilegeImpl" parameterType="actorPrivilege">
+		DELETE
+		FROM actor_privilege
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="sActorPrivilegeImplResultMap" type="actorPrivilege">
+		<id property="id" column="id" />
+		<result property="actorId" column="actorid" />
+		<result property="privilegeId" column="privilegeid" />
+		<result property="levelValue" column="levelValue" />
+	</resultMap>
+
+	<select id="getActorPrivilegesByActorId" parameterType="long" resultMap="sActorPrivilegeImplResultMap">
+		SELECT *
+		FROM actor_privilege actor_privilege
+		WHERE actor_privilege.tenantid = #{tenantid}
+		AND actor_privilege.actorid = #{actorId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorPrivilegeById"  parameterType="long" resultMap="sActorPrivilegeImplResultMap">
+		SELECT *
+		FROM actor_privilege
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</select>
+
+	<select id="getActorPrivilegeByActorAndPrivilegeId" resultMap="sActorPrivilegeImplResultMap">
+		SELECT *
+		FROM actor_privilege actor_privilege
+		WHERE actor_privilege.tenantid = #{tenantid}
+		AND actor_privilege.actorid = #{actorId}
+		AND actor_privilege.privilegeid = #{privilegeId}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getActorPrivileges" resultMap="sActorPrivilegeImplResultMap">
+		SELECT *
+		FROM actor_privilege actor_privilege
+		WHERE actor_privilege.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getActorPrivilegesByIds" resultMap="sActorPrivilegeImplResultMap">
+		SELECT *
+		FROM actor_privilege actor_privilege
+		WHERE actor_privilege.tenantid = #{tenantid}
+		AND id IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="getNumberOfSActorPrivilege" parameterType="long" resultType="long">
+		SELECT COUNT(actor_privilege.id)
+		FROM actor_privilege actor_privilege
+		WHERE actor_privilege.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSActorPrivilege" parameterType="map" resultMap="sActorPrivilegeImplResultMap">
+		SELECT *
+		FROM actor_privilege actor_privilege
+		WHERE actor_privilege.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+</mapper>
