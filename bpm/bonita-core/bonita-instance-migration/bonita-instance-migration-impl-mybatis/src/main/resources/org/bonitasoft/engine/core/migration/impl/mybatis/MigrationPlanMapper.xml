@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl">
+
+	<insert id="insertSMigrationPlanDescriptorImpl" parameterType="migration_plan">
+		INSERT INTO migration_plan (tenantid, id, description, source_name, source_version,
+		target_name, target_version, content)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.description}, #{entity.sourceProcessName}, #{entity.sourceProcessVersion},
+		#{entity.targetProcessName}, #{entity.targetProcessVersion}, #{entity.content})
+	</insert>
+
+	<delete id="deleteSMigrationPlanDescriptorImpl" parameterType="migration_plan">
+		DELETE FROM migration_plan
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="migrationPlanDescResult" type="migration_plan">
+		<id property="id" column="id" />
+		<result property="description" column="description" />
+		<result property="sourceProcessName" column="source_name" />
+		<result property="sourceProcessVersion" column="source_version" />
+		<result property="targetProcessName" column="target_name" />
+		<result property="targetProcessVersion" column="target_version" />
+		<result property="content" column="content" />
+	</resultMap>
+	
+	<select id="getMigrationPlanDescriptorById" parameterType="map" resultMap="migrationPlanDescResult">
+		SELECT *
+		FROM migration_plan mp
+		WHERE mp.tenantid = #{tenantid}
+		AND mp.id = #{id}
+	</select>
+	
+	<select id="getMigrationPlanDescriptors" parameterType="map" resultMap="migrationPlanDescResult">
+		SELECT *
+		FROM migration_plan mp
+		WHERE mp.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+
+	<select id="getNumberOfMigrationPlanDescriptors" parameterType="long" resultType="long">
+		SELECT COUNT(mp.id)
+		FROM migration_plan mp
+		WHERE mp.tenantid =	#{tenantid}
+	</select>
+
+
+</mapper>
