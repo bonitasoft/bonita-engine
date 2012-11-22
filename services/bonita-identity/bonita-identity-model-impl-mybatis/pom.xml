@@ -3,7 +3,7 @@
 
 	<parent>
 		<artifactId>bonita-identity</artifactId>
-		<groupId>org.bonitasoft.engine.identity</groupId>
+		<groupId>com.bonitasoft.engine.identity</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
@@ -18,7 +18,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<groupId>com.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>

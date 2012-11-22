@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>bonita-events-sp</artifactId>
+    <artifactId>bonita-events</artifactId>
     <groupId>com.bonitasoft.engine.events</groupId>
     <version>6.0-Alpha</version>
   </parent>
 
-  <artifactId>bonita-events-api-impl-sp</artifactId>
+  <artifactId>bonita-events-api-impl</artifactId>
   
   <dependencies>
 		<dependency>

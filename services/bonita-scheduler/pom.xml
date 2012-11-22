@@ -2,12 +2,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bonita-platform-command</artifactId>
-		<groupId>com.bonitasoft.engine.platform.command</groupId>
+		<artifactId>services</artifactId>
+		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bonita-platform-command-model-impl-mybatis</artifactId>
+	<groupId>com.bonitasoft.engine.scheduler</groupId>
+	<artifactId>bonita-scheduler</artifactId>
+	<packaging>pom</packaging>
 
-	<name>Bonita Platform Command: MyBatis Configuration Files</name>
+	<name>Bonita Scheduler</name>
+
+	<modules>
+		<module>bonita-scheduler-impl-mybatis</module>
+	</modules>
 </project>

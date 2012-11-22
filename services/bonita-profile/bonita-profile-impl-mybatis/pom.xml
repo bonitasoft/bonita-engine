@@ -3,7 +3,7 @@
 
 	<parent>
 		<artifactId>bonita-profile</artifactId>
-		<groupId>org.bonitasoft.engine.profile</groupId>
+		<groupId>com.bonitasoft.engine.profile</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 

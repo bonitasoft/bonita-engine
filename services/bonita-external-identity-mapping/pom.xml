@@ -2,18 +2,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>services-sp</artifactId>
+		<artifactId>services</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<groupId>com.bonitasoft.engine.work</groupId>
-	<artifactId>bonita-work-sp</artifactId>
-	<version>6.0-Alpha</version>
+	<groupId>com.bonitasoft.engine.external.identity.mapping</groupId>
+	<artifactId>bonita-external-identity-mapping</artifactId>
 	<packaging>pom</packaging>
 
+	<name>Bonita External Identity Mapping</name>
 
 	<modules>
-		<module>bonita-work-parallel</module>
+		<module>bonita-external-identity-mapping-impl-mybatis</module>
 	</modules>
 </project>
