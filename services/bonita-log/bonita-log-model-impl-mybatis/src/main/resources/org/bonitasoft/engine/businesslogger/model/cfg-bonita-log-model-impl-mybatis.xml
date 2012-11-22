@@ -1,0 +1,61 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+		<constructor-arg name="typeAliases">
+			<map>
+				<entry key="log" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" />
+				<entry key="log_parameter" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="mappers">
+			<list>
+				<value>org/bonitasoft/engine/businesslogger/model/impl/mybatis/BusinessLogMapper.xml</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="sequencesMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" value="30" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" value="31" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog" value="bl" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" value="blp" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="classFieldAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.applicationName" value="applicationName" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.productVersion" value="productVersion" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.clientApplicationName" value="clientApplicationName" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.callerClassName" value="callerClassName" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.callerMethodName" value="callerMethodName" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex1" value="numericIndex1" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex2" value="numericIndex2" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex3" value="numericIndex3" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex4" value="numericIndex4" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex5" value="numericIndex5" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex1" value="textualIndex1" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex2" value="textualIndex2" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex3" value="textualIndex3" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex4" value="textualIndex4" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex5" value="textualIndex5" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="statementMapping">
+			<set />
+		</constructor-arg>
+		<constructor-arg name="dbStatementsMapping">
+			<map />
+		</constructor-arg>
+		<constructor-arg name="entityMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" />
+				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLogParameter" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+</beans>

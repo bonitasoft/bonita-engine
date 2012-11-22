@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl">
+
+	<insert id="insertSBusinessLogImpl" parameterType="log">
+		INSERT INTO business_log (tenantid, id, timeStamp, year, month, day, hour, minute, second, millisecond, dayOfWeek, dayOfYear, weekOfYear, userId,
+			clientIP, threadNumber, clusterNode, applicationName, domain, productVersion, clientApplicationName, severity, actionType, actionScope,
+			actionStatus, rawMessage, callerClassName, callerMethodName, numericIndex1, numericIndex2, numericIndex3, numericIndex4, numericIndex5,
+			textualIndex1, textualIndex2, textualIndex3, textualIndex4, textualIndex5)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.timeStamp}, #{entity.year}, #{entity.month}, #{entity.day}, #{entity.hour}, #{entity.minute},
+			#{entity.second}, #{entity.millisecond}, #{entity.dayOfWeek}, #{entity.dayOfYear}, #{entity.weekOfYear}, #{entity.userId}, #{entity.clientIP},
+			#{entity.threadNumber}, #{entity.clusterNode}, #{entity.applicationName}, #{entity.domain}, #{entity.productVersion},
+			#{entity.clientApplicationName}, #{entity.severity}, #{entity.actionType}, #{entity.actionScope}, #{entity.actionStatus}, #{entity.rawMessage},
+			#{entity.callerClassName}, #{entity.callerMethodName}, #{entity.numericIndex1}, #{entity.numericIndex2}, #{entity.numericIndex3},
+			#{entity.numericIndex4}, #{entity.numericIndex5}, #{entity.textualIndex1}, #{entity.textualIndex2}, #{entity.textualIndex3},
+			#{entity.textualIndex4}, #{entity.textualIndex5})
+	</insert>
+
+	<delete id="deleteSBusinessLogImpl" parameterType="log">
+		DELETE FROM business_log
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<delete id="deleteAllSBusinessLog" parameterType="log">
+		DELETE FROM business_log
+		WHERE tenantid = #{tenantid}
+	</delete>
+
+	<resultMap id="logResultMap" type="log">
+		<id property="id" column="id" />
+		<result property="timeStamp" column="timeStamp" />
+		<result property="year" column="year" />
+		<result property="month" column="month" />
+		<result property="day" column="day" />
+		<result property="hour" column="hour" />
+		<result property="minute" column="minute" />
+		<result property="second" column="second" />
+		<result property="millisecond" column="millisecond" />
+		<result property="dayOfWeek" column="dayOfWeek" />
+		<result property="dayOfYear" column="dayOfYear" />
+		<result property="weekOfYear" column="weekOfYear" />
+		<result property="userId" column="userId" />
+		<result property="clientIP" column="clientIP" />
+		<result property="threadNumber" column="threadNumber" />
+		<result property="clusterNode" column="clusterNode" />
+		<result property="applicationName" column="applicationName" />
+		<result property="domain" column="domain" />
+		<result property="productVersion" column="productVersion" />
+		<result property="clientApplicationName" column="clientApplicationName" />
+		<result property="severity" column="severity" />
+		<result property="actionType" column="actionType" />
+		<result property="actionScope" column="actionScope" />
+		<result property="actionStatus" column="actionStatus" />
+		<result property="rawMessage" column="rawMessage" />
+		<result property="callerClassName" column="callerClassName" />
+		<result property="callerMethodName" column="callerMethodName" />
+		<result property="numericIndex1" column="numericIndex1" />
+		<result property="numericIndex2" column="numericIndex2" />
+		<result property="numericIndex3" column="numericIndex3" />
+		<result property="numericIndex4" column="numericIndex4" />
+		<result property="numericIndex5" column="numericIndex5" />
+		<result property="textualIndex1" column="textualIndex1" />
+		<result property="textualIndex2" column="textualIndex2" />
+		<result property="textualIndex3" column="textualIndex3" />
+		<result property="textualIndex4" column="textualIndex4" />
+		<result property="textualIndex5" column="textualIndex5" />
+	</resultMap>
+
+	<select id="getLogsFromNumericIndex1" parameterType="long" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.numericIndex1 = #{numericIndex1}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromNumericIndex2" parameterType="long" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.numericIndex2 = #{numericIndex2}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromNumericIndex3" parameterType="long" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.numericIndex3 = #{numericIndex3}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromNumericIndex4" parameterType="long" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.numericIndex4= #{numericIndex4}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromNumericIndex5" parameterType="long" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.numericIndex5 = #{numericIndex5}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromTextualIndex1" parameterType="string" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.textualIndex1 = #{textualIndex1}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromTextualIndex2" parameterType="string" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.textualIndex2 = #{textualIndex2}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromTextualIndex3" parameterType="string" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.textualIndex3 = #{textualIndex3}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromTextualIndex4" parameterType="string" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.textualIndex4 = #{textualIndex4}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getLogsFromTextualIndex5" parameterType="string" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.textualIndex5 = #{textualIndex5}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="searchBusinessLog" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		<trim prefix="AND" prefixOverrides="AND | OR">
+			${whereClause}
+		</trim>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getBusinessLogById" parameterType="long" resultType="log">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		AND bl.id = #{id}
+	</select>
+
+	<select id="getNumberOfLogs" resultType="Long">
+		SELECT COUNT(*)
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+	</select>
+
+	<select id="getLogs" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="searchSBusinessLog" parameterType="map" resultMap="logResultMap">
+		SELECT *
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+
+	<select id="getNumberOfSBusinessLog" parameterType="long" resultType="long">
+		SELECT COUNT(DISTINCT bl.id)
+		FROM business_log bl
+		WHERE bl.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+</mapper>
