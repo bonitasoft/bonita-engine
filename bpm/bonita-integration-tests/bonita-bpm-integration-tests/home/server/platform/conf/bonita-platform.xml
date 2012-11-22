@@ -1,0 +1,5 @@
+platformClassName org.bonitasoft.engine.bpm.BPMServicesBuilder
+
+tenantClassName org.bonitasoft.engine.bpm.BPMServicesBuilder
+
+sessionAccessor org.bonitasoft.engine.bpm.BPMServicesBuilder

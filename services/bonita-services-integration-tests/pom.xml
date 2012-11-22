@@ -92,7 +92,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl-sp</artifactId>
+			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

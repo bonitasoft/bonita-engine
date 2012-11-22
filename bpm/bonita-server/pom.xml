@@ -343,7 +343,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl-sp</artifactId>
+			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -685,8 +685,8 @@
 						<configuration>
 							<artifactSet>
 								<includes>
-									<include>com.bonitasoft.engine.events:bonita-events-api-impl-sp</include>
-									<include>com.bonitasoft.engine.log:bonita-log-api-impl-sp</include>
+									<include>com.bonitasoft.engine.events:bonita-events-api-impl</include>
+									<include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
 									<include>com.bonitasoft.engine:bonita-delete-batch</include>
 									<include>com.bonitasoft.engine.work:bonita-work-parallel</include>
 									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-api-impl</include>
