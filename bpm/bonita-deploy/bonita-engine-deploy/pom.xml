@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bonita-deploy-sp</artifactId>
+		<artifactId>bonita-deploy</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bonita-engine-deploy-sp</artifactId>
+	<artifactId>bonita-engine-deploy</artifactId>
 	<packaging>pom</packaging>
 
 	<name>Bonita Engine Deploy</name>
@@ -15,29 +15,29 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-client-sp</artifactId>
+			<artifactId>bonita-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-server-sp</artifactId>
+			<artifactId>bonita-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home-sp</artifactId>
+			<artifactId>bonita-home</artifactId>
 			<version>${project.version}</version>
 			<type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-deploy-ear2-sp</artifactId>
+			<artifactId>bonita-deploy-ear2</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-deploy-ear3-sp</artifactId>
+			<artifactId>bonita-deploy-ear3</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
 		</dependency>

@@ -2,17 +2,17 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bpm-sp</artifactId>
+		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bonita-deploy-sp</artifactId>
+	<artifactId>bonita-deploy</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bonita-deploy-ear2-sp</module>
-		<module>bonita-deploy-ear3-sp</module>
+		<module>bonita-deploy-ear2</module>
+		<module>bonita-deploy-ear3</module>
 		<module>bonita-engine-deploy</module>
 	</modules>
 </project>

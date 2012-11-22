@@ -7,18 +7,20 @@
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bpm-sp</artifactId>
+	<artifactId>bpm</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>bonita-actor-privilege</module>
 		<module>bonita-common</module>
 		<module>bonita-client</module>
 		<module>bonita-server</module>
 		<module>bonita-core</module>
 		<module>bonita-deploy</module>
-		<module>bonita-home-sp</module>
-		<module>bonita-external-sp</module>
+		<module>bonita-home</module>
+		<module>bonita-external</module>
 	</modules>
+
 	<profiles>
 		<profile>
 			<id>tests</id>

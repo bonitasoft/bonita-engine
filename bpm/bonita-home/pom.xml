@@ -2,15 +2,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bpm-sp</artifactId>
+		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bonita-home-sp</artifactId>
+	<artifactId>bonita-home</artifactId>
 	<packaging>pom</packaging>
 
-	<name>Bonita Home SP</name>
+	<name>Bonita Home</name>
 
 	<build>
 		<plugins>

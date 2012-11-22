@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bpm</artifactId>
+		<groupId>com.bonitasoft.engine</groupId>
+		<version>6.0-Alpha</version>
+	</parent>
+
+	<groupId>com.bonitasoft.engine.external</groupId>
+	<artifactId>bonita-external</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita-SP External Features</name>
+	<description>Not Monitored by the Engine team :)</description>
+
+	<modules>
+		<module>bonita-web-commands</module>
+	</modules>
+</project>

@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bpm</artifactId>
+		<groupId>com.bonitasoft.engine</groupId>
+		<version>6.0-Alpha</version>
+	</parent>
+
+	<groupId>com.bonitasoft.engine.actor.privilege</groupId>
+	<artifactId>bonita-actor-privilege</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Actor Privilege</name>
+
+	<modules>
+		<module>bonita-actor-privilege-model-impl-mybatis</module>
+	</modules>
+</project>

@@ -2,13 +2,26 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bpm-sp</artifactId>
+		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
 	<groupId>com.bonitasoft.engine.core</groupId>
-	<artifactId>bonita-core-sp</artifactId>
+	<artifactId>bonita-core</artifactId>
 	<packaging>pom</packaging>
+
+    <name>Bonita Engine Core Services</name>
+
+	<modules>
+		<module>bonita-actor-mapping</module>
+		<module>bonita-category</module>
+		<module>bonita-instance-migration</module>
+		<module>bonita-process-comment</module>
+		<module>bonita-process-definition</module>
+		<module>bonita-process-document-mapping</module>
+		<module>bonita-process-instance</module>
+		<module>bonita-supervisor-mapping</module>
+	</modules>
 
 </project>

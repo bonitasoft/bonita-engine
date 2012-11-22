@@ -2,18 +2,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bonita-instance-migration</artifactId>
+		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bonita-instance-migration-impl-mybatis</artifactId>
+	<groupId>com.bonitasoft.engine.core.actor.mapping</groupId>
+	<artifactId>bonita-actor-mapping</artifactId>
+	<packaging>pom</packaging>
 
-	<dependencies>
-		<dependency>
-			<artifactId>bonita-instance-migration-impl</artifactId>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+	<name>Bonita Actor Mapping</name>
+
+	<modules>
+		<module>bonita-actor-mapping-impl-mybatis</module>
+	</modules>
 </project>

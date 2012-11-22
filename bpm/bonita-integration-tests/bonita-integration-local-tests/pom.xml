@@ -3,11 +3,11 @@
 
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
-		<artifactId>bonita-integration-tests-sp</artifactId>
+		<artifactId>bonita-integration-tests</artifactId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bonita-integration-local-tests-sp</artifactId>
+	<artifactId>bonita-integration-local-tests</artifactId>
 
 	<properties>
 		<bonita.home>${project.build.directory}/home</bonita.home>
@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-integration-client-tests-sp</artifactId>
+			<artifactId>bonita-integration-client-tests</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -26,7 +26,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-server-sp</artifactId>
+			<artifactId>bonita-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -81,7 +81,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bonita-home-sp</artifactId>
+									<artifactId>bonita-home</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
 								</artifactItem>

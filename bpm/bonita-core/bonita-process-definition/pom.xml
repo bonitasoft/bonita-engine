@@ -2,18 +2,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bonita-instance-migration</artifactId>
+		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
-	<artifactId>bonita-instance-migration-impl-mybatis</artifactId>
+	<groupId>com.bonitasoft.engine.core.process.definition</groupId>
+	<artifactId>bonita-process-definition</artifactId>
+	<packaging>pom</packaging>
 
-	<dependencies>
-		<dependency>
-			<artifactId>bonita-instance-migration-impl</artifactId>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+	<name>Bonita Process Definition</name>
+
+	<modules>
+		<module>bonita-process-definition-model-impl-mybatis</module>
+	</modules>
 </project>
