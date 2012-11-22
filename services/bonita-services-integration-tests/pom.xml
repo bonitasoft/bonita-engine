@@ -1,25 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <artifactId>services</artifactId>
-    <groupId>com.bonitasoft.engine</groupId>
-    <version>6.0-Alpha</version>
-  </parent>
-  
-  <artifactId>bonita-services-integration-tests-sp</artifactId>
-  
-  <dependencies>
-  
-  		<!-- Class loader -->
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>services</artifactId>
+		<groupId>com.bonitasoft.engine</groupId>
+		<version>6.0-Alpha</version>
+	</parent>
+
+	<artifactId>bonita-services-integration-tests</artifactId>
+
+	<dependencies>
+
+		<!-- Class loader -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.classloader</groupId>
 			<artifactId>bonita-classloader-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Delete -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
@@ -41,7 +41,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<groupId>com.bonitasoft.engine.dependency</groupId>
 			<artifactId>bonita-dependency-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -53,7 +53,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<groupId>com.bonitasoft.engine.dependency</groupId>
 			<artifactId>bonita-dependency-platform-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -105,7 +105,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
+			<groupId>com.bonitasoft.engine.identity</groupId>
 			<artifactId>bonita-identity-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -131,7 +131,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
+			<groupId>com.bonitasoft.engine.log</groupId>
 			<artifactId>bonita-log-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -169,13 +169,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<groupId>com.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<groupId>com.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-mybatis-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -195,7 +195,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
+			<groupId>com.bonitasoft.engine.platform</groupId>
 			<artifactId>bonita-platform-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -241,7 +241,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
+			<groupId>com.bonitasoft.engine.scheduler</groupId>
 			<artifactId>bonita-scheduler-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -353,7 +353,7 @@
 			<systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
 		</dependency>
 		<dependency>
-			<groupId>com.microsoft.jdbc</groupId> 
+			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
 			<version>3.0</version>
 			<scope>system</scope>
@@ -382,6 +382,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<systemPropertyVariables>
+						<bonita.test.persistence>bonita-persistence-mybatis</bonita.test.persistence>
+					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/test/AllTestsSP.java</include>
 					</includes>
@@ -389,5 +392,5 @@
 			</plugin>
 		</plugins>
 	</build>
-  
+
 </project>

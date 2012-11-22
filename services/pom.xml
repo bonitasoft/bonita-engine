@@ -36,7 +36,7 @@
 		<profile>
 			<id>tests</id>
 			<modules>
-				<module>bonita-services-integration-tests-sp</module>
+				<module>bonita-services-integration-tests</module>
 			</modules>
 			<build>
 				<plugins>
