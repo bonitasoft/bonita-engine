@@ -9,18 +9,9 @@
 
 	<artifactId>bonita-client</artifactId>
 
+	<name>Bonita Client</name>
+
 	<dependencies>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-client</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine</groupId>
-					<artifactId>bonita-common</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common</artifactId>
@@ -35,6 +26,42 @@
 					<artifactId>bonita-common-api-ejb2</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-client</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bonita-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+					<artifactId>bonita-client-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+					<artifactId>bonita-client-api-local</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+					<artifactId>bonita-client-api-ejb2</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+					<artifactId>bonita-client-api-ejb3</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+					<artifactId>bonita-client-api-http</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

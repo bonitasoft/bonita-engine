@@ -5,7 +5,6 @@ import org.bonitasoft.engine.bpm.ActorPrivilegeServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.CategoryServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.GatewayInstanceServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.OperationServiceIntegrationTest;
-import org.bonitasoft.engine.bpm.ParameterAndDataExpressionIntegrationTest;
 import org.bonitasoft.engine.bpm.ProcessDefinitionServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.ProcessDocumentServiceTest;
 import org.bonitasoft.engine.bpm.ProcessInstanceServiceIntegrationTest;

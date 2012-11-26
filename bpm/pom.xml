@@ -12,13 +12,13 @@
 
 	<modules>
 		<module>bonita-actor-privilege</module>
+		<module>bonita-home</module>
+		<module>bonita-external</module>
+		<module>bonita-core</module>
 		<module>bonita-common</module>
 		<module>bonita-client</module>
 		<module>bonita-server</module>
-		<module>bonita-core</module>
 		<module>bonita-deploy</module>
-		<module>bonita-home</module>
-		<module>bonita-external</module>
 	</modules>
 
 	<profiles>

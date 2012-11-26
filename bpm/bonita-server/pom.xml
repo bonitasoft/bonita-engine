@@ -13,7 +13,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
+			<groupId>com.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-process-engine</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
@@ -63,6 +63,7 @@
 			<artifactId>bonita-actor-privilege-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<!-- Supervisor Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
@@ -459,7 +460,7 @@
 
 		<!-- Parameter -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.parameter</groupId>
+			<groupId>com.bonitasoft.engine.core.parameter</groupId>
 			<artifactId>bonita-parameter-propertyfile</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -544,18 +545,18 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<groupId>com.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-model</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>org.bonitasoft.engine</groupId>
+					<groupId>com.bonitasoft.engine</groupId>
 					<artifactId>bonita-common</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<groupId>com.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -721,7 +722,7 @@
 									<include>org.bonitasoft.engine.core:bonita-instance-migration-api</include>
 									<include>org.bonitasoft.engine.core:bonita-instance-migration-impl</include>
 									<include>com.bonitasoft.engine.core:bonita-instance-migration-impl-mybatis</include>
-									<include>org.bonitasoft.engine.core:bonita-process-engine</include>
+									<include>com.bonitasoft.engine.core:bonita-process-engine</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-api</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
@@ -738,8 +739,8 @@
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-api</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
-									<include>org.bonitasoft.engine.core.parameter:bonita-parameter-api</include>
-									<include>org.bonitasoft.engine.core.parameter:bonita-parameter-propertyfile</include>
+									<include>com.bonitasoft.engine.core.parameter:bonita-parameter-api</include>
+									<include>com.bonitasoft.engine.core.parameter:bonita-parameter-propertyfile</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
@@ -749,9 +750,9 @@
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-impl</include>
-									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
+									<include>com.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
 									<include>com.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-mybatis</include>
-									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
+									<include>com.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-api</include>
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-model-impl</include>

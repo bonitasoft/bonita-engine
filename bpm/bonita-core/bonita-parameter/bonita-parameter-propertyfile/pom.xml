@@ -3,7 +3,7 @@
 
 	<parent>
 		<artifactId>bonita-parameter</artifactId>
-		<groupId>org.bonitasoft.engine.core.parameter</groupId>
+		<groupId>com.bonitasoft.engine.core.parameter</groupId>
 		<version>6.0-Alpha</version>
 	</parent>
 
@@ -13,7 +13,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.parameter</groupId>
+			<groupId>com.bonitasoft.engine.core.parameter</groupId>
 			<artifactId>bonita-parameter-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>

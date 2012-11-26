@@ -11,6 +11,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-client-integration-tests</artifactId>
 			<version>${project.version}</version>
@@ -20,11 +25,6 @@
 					<artifactId>bonita-client</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-client</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>
