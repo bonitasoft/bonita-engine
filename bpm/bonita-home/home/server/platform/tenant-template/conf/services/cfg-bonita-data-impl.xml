@@ -14,7 +14,6 @@
 			</list>
 		</constructor-arg>
 		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="businessLoggerService" ref="syncBusinessLoggerService" />
 	</bean>
 
