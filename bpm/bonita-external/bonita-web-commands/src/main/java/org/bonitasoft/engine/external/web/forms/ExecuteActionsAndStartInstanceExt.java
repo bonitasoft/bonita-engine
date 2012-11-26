@@ -101,19 +101,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
                     e);
         }
-
     }
 
-    /**
-     * @param sProcessDefinitionID
-     * @param connectorsMap
-     * @param operationsMap
-     * @throws InvalidProcessDefinitionException
-     * @throws InvalidEvaluationConnectorCondition
-     * @throws ConnectorException
-     * @throws ClassLoaderException
-     * @throws InvalidSessionException
-     */
     private void executeConnectors(final long sProcessDefinitionID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap,
             final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException {
@@ -140,8 +129,9 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final ProcessInstanceStateManager processInstanceStateManager = tenantAccessor.getProcessInstanceStateManager();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-        if (userId == 0)
+        if (userId == 0) {
             userId = getUserIdFromSession();
+        }
         // Retrieval of the process definition:
         SProcessDefinition sDefinition;
         try {
@@ -218,4 +208,5 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             throw new InvalidEvaluationConnectorCondition(connectorInputParameters.size(), inputValues.size());
         }
     }
+
 }

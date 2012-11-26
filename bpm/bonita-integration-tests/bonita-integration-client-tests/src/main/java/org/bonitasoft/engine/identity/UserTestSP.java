@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.identity;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * @author Matthieu Chaffotte
  */
-public class UserTestSP extends CommonAPITest {
+public class UserTestSP extends CommonAPISPTest {
 
     @Test(expected = LoginException.class)
     public void loginFailsUsingWrongUser() throws BonitaException, BonitaHomeNotSetException {

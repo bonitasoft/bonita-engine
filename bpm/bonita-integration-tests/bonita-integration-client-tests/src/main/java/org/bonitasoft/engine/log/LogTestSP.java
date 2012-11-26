@@ -1,11 +1,10 @@
 package org.bonitasoft.engine.log;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupBuilder;
@@ -13,7 +12,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdateDescriptor;
 import org.junit.Test;
 
-public class LogTestSP extends CommonAPITest {
+public class LogTestSP extends CommonAPISPTest {
 
     @Test
     public void log() throws BonitaException {

@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,7 +36,6 @@ import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
-import org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -46,23 +44,19 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminateTask {
 
-    /*
-     * (non-Javadoc)ExecuteActionsAndTerminateTask
-     * @see org.bonitasoft.engine.command.Command#execute(java.util.Map, org.bonitasoft.engine.service.ServiceAccessor)
-     */
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         Map<Operation, Map<String, Serializable>> operationsMap = null;
         Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap = null;
         try {
-            operationsMap = (HashMap<Operation, Map<String, Serializable>>) parameters.get(OPERATIONS_MAP_KEY);
+            operationsMap = (Map<Operation, Map<String, Serializable>>) parameters.get(OPERATIONS_MAP_KEY);
         } catch (final Exception e) {
             throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_MAP_KEY + " is missing or not convertible to Map.", e);
         }
-        
+
         try {
-            connectorsMap =  (Map<ConnectorDefinition, Map<String, Map<String, Serializable>>>) parameters.get(CONNECTORS_MAP_KEY);
+            connectorsMap = (Map<ConnectorDefinition, Map<String, Map<String, Serializable>>>) parameters.get(CONNECTORS_MAP_KEY);
         } catch (final Exception e) {
             throw new SCommandParameterizationException("Mandatory parameter " + CONNECTORS_MAP_KEY + " is missing or not convertible to Map.", e);
         }
@@ -87,27 +81,19 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         return null;
     }
 
-    /**
-     * @param sActivityInstanceID
-     * @param connectorsMap
-     * @param operationsMap 
-     * @throws InvalidEvaluationConnectorCondition 
-     * @throws ConnectorException 
-     * @throws ClassLoaderException 
-     * @throws ProcessInstanceNotFoundException 
-     * @throws ActivityInstanceNotFoundException 
-     * @throws InvalidSessionException 
-     */
-    private void executeConnectors(long sActivityInstanceID, Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap, Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition {
-        Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator =  connectorsMap.entrySet().iterator();
-        while(iterator.hasNext()){
-            Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry =  iterator.next();
-            ConnectorDefinition connectorDefinition = entry.getKey();
-            Map<String, Map<String, Serializable>> contextMap = entry.getValue();
+    private void executeConnectors(final long sActivityInstanceID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap,
+            final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ActivityInstanceNotFoundException,
+            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition {
+        final Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator = connectorsMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry = iterator.next();
+            final ConnectorDefinition connectorDefinition = entry.getKey();
+            final Map<String, Map<String, Serializable>> contextMap = entry.getValue();
             Map<String, Serializable> resultMap = null;
-                resultMap = executeConnectorOnActivityInstance(connectorDefinition.getConnectorId(),connectorDefinition.getVersion(),connectorDefinition.getInputs(),contextMap ,sActivityInstanceID);
-            for(Operation operation : connectorDefinition.getOutputs()){
-                operationsMap.put(operation, resultMap); 
+            resultMap = executeConnectorOnActivityInstance(connectorDefinition.getConnectorId(), connectorDefinition.getVersion(),
+                    connectorDefinition.getInputs(), contextMap, sActivityInstanceID);
+            for (final Operation operation : connectorDefinition.getOutputs()) {
+                operationsMap.put(operation, resultMap);
             }
         }
     }
@@ -135,4 +121,5 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             throw new InvalidEvaluationConnectorCondition(connectorInputParameters.size(), inputValues.size());
         }
     }
+
 }

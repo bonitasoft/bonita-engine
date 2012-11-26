@@ -7,11 +7,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * @author Elias Ricken de Medeiros
- */
 @RunWith(Suite.class)
-@SuiteClasses({ BPMTestsSP.class, BPMLocalSuiteTests.class, BPMRemoteTests.class })
+@SuiteClasses({
+    BPMTestsSP.class,
+    BPMLocalSuiteTests.class,
+    BPMRemoteTests.class,
+    LocalLogTest.class,
+    APIMethodSPTest.class
+})
 public class LocalIntegrationTestsSP {
 
     @BeforeClass

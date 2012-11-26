@@ -21,7 +21,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.api.ParameterSorting;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -51,10 +51,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author Matthieu Chaffotte
- */
-public class ProcessParameterTest extends CommonAPITest {
+public class ProcessParameterTest extends CommonAPISPTest {
 
     private static final String PROCESS_VERSION = "1.0";
 
