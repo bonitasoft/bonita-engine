@@ -128,63 +128,25 @@
 
 	<select id="getNumberOfSAProcessInstanceInvolvingUser" resultType="long">
 		SELECT COUNT(DISTINCT ap.id)
-		FROM arch_process_instance ap
-		WHERE ap.tenantid = #{tenantid}
-		AND ap.archiveDate = (
-			SELECT MAX(api.archiveDate)
-			FROM arch_process_instance api
-			WHERE api.tenantid = ap.tenantid
-			AND api.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.id = (
-			SELECT MAX(api.id)
-			FROM arch_process_instance api
-			WHERE api.tenantid = ap.tenantid
-			AND api.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.stateId IN (6,7,3)
-		AND (
-			ap.startedBy = #{userId}
-			OR ap.id IN (
-				SELECT at.logicalGroup2
-				FROM arch_flownode_instance at
-				WHERE at.tenantid = ap.tenantid
-				AND at.assigneeId = #{userId}
-				AND at.kind IN ('user', 'manual')
-			)
-		)
+		FROM arch_process_instance ap,
+			arch_flownode_instance at
+		WHERE (ap.tenantid = #{tenantid}
+			AND (((at.logicalGroup2 = ap.sourceObjectId AND at.tenantid = ap.tenantid AND at.executedBy = #{userId} AND at.kind IN ('user', 'manual'))
+			OR ap.startedBy = #{userId})
+			AND ap.stateId IN (6,7,3)))
 		<if test="filter != null">
 			AND ${filter}
 		</if>
 	 </select>
 
 	 <select id="searchSAProcessInstanceInvolvingUser" resultMap="archivedProcessInstanceResultMap">
-		SELECT *
-		FROM arch_process_instance ap
-		WHERE ap.tenantid = #{tenantid}
-		AND ap.archiveDate = (
-			SELECT MAX(api.archiveDate)
-			FROM arch_process_instance api
-			WHERE api.tenantid = ap.tenantid
-			AND api.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.id = (
-			SELECT MAX(api.id)
-			FROM arch_process_instance api
-			WHERE api.tenantid = ap.tenantid
-			AND api.sourceObjectId = ap.sourceObjectId
-		)
-		AND ap.stateId IN (6,7,3)
-		AND (
-			ap.startedBy = #{userId}
-			OR ap.id IN (
-				SELECT at.logicalGroup2
-				FROM arch_flownode_instance at
-				WHERE at.tenantid = ap.tenantid
-				AND at.assigneeId = #{userId}
-				AND at.kind IN ('user', 'manual')
-			)
-		)
+		SELECT DISTINCT ap.*
+		FROM arch_process_instance ap,
+			arch_flownode_instance at
+		WHERE (ap.tenantid = #{tenantid}
+			AND (((at.logicalGroup2 = ap.sourceObjectId AND at.tenantid = ap.tenantid AND at.executedBy = #{userId} AND at.kind IN ('user', 'manual'))
+			OR ap.startedBy = #{userId})
+			AND ap.stateId IN (6,7,3)))
 		<if test="filter != null">
 			AND ${filter}
 		</if>

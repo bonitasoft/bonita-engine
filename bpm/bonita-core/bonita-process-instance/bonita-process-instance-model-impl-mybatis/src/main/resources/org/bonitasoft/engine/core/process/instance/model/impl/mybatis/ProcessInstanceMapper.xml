@@ -223,49 +223,10 @@
 	<select id="getNumberOfSProcessInstanceInvolvingUser" resultType="long">
 		SELECT COUNT(DISTINCT p.id)
 		FROM process_instance p,
-			 flownode_instance f,
 			 arch_flownode_instance af
 		WHERE p.tenantid = #{tenantid}
-		AND f.tenantid = p.tenantid
-		AND af.tenantid = p.tenantid
-		AND p.stateId != 6
-		AND (
-			(
-				f.logicalGroup2 = p.id
-			  	AND f.assigneeId = #{userId}
-			)
-			OR (
-				af.logicalGroup2 = p.id
-				AND af.assigneeId = #{userId}
-			)
-			OR (
-				f.logicalGroup2 = p.id
-				AND f.stateId = 4
-				AND f.actorId IN (
-					SELECT actor.id
-					FROM actor actor,
-						 actormember actormember
-					WHERE actor.tenantid = p.tenantid
-					AND actormember.tenantid = actor.tenantid
-					AND actor.id = actormember.actorId 
-					AND (
-						actormember.userId = #{userId}
-						OR actormember.id IN (
-							SELECT actormember.id
-							FROM actormember am,
-								 user_membership um
-							WHERE am.tenantid = p.tenantid
-							AND am.tenantid = um.tenantid
-							AND um.userId = #{userId}
-							AND (
-								(am.groupId = um.groupId AND am.roleId &lt;= 0)
-								OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
-								OR (am.groupId = um.groupId AND am.roleId = um.roleId)
-							)
-						)
-					)
-				)
-			)
+				AND ((af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
+				OR (p.startedBy = #{userId})
 		)
 		<if test="filter != null">
 			AND ${filter}
@@ -278,46 +239,8 @@
 			 flownode_instance f,
 			 arch_flownode_instance af
 		WHERE p.tenantid = #{tenantid}
-		AND f.tenantid = p.tenantid
-		AND af.tenantid = p.tenantid
-		AND p.stateId != 6
-		AND (
-			(
-				f.logicalGroup2 = p.id
-			  	AND f.assigneeId = #{userId}
-			)
-			OR (
-				af.logicalGroup2 = p.id
-				AND af.assigneeId = #{userId}
-			)
-			OR (
-				f.logicalGroup2 = p.id
-				AND f.stateId = 4
-				AND f.actorId IN (
-					SELECT actor.id
-					FROM actor actor,
-						 actormember actormember
-					WHERE actor.tenantid = p.tenantid
-					AND actormember.tenantid = actor.tenantid
-					AND actor.id = actormember.actorId 
-					AND (
-						actormember.userId = #{userId}
-						OR actormember.id IN (
-							SELECT actormember.id
-							FROM actormember am,
-								 user_membership um
-							WHERE am.tenantid = p.tenantid
-							AND am.tenantid = um.tenantid
-							AND um.userId = #{userId}
-							AND (
-								(am.groupId = um.groupId AND am.roleId &lt;= 0)
-								OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
-								OR (am.groupId = um.groupId AND am.roleId = um.roleId)
-							)
-						)
-					)
-				)
-			)
+				AND ((af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
+				OR (p.startedBy = #{userId})
 		)
 		<if test="filter != null">
 			AND ${filter}
