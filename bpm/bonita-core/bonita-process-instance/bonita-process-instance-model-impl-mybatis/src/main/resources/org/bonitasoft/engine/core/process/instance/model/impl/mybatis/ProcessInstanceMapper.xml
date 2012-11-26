@@ -4,16 +4,18 @@
 <mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl">
 
 	<insert id="insertSProcessInstanceImpl" parameterType="process_instance">
-		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, tokenCount, processDefinitionId, startDate, startedBy, endDate, stateId,
+		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, tokenCount, processDefinitionId, description, startDate, startedBy, endDate, stateId,
 			stateCategory, lastUpdate, migration_plan)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.tokenCount}, #{entity.processDefinitionId},
-			#{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId})
+			#{entity.description}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId})
 	</insert>
 
 	<update id="updateSProcessInstanceImpl"  parameterType="process_instance">
 		UPDATE process_instance
 	    <trim prefix="SET" suffixOverrides=",">
 	      <if test="processDefinitionId != null">processDefinitionId=#{processDefinitionId},</if>
+	      <if test="description == '___bonitanull___'">description=NULL,</if>
+	      <if test="description != null and description != '___bonitanull___'">description=#{description},</if>
 	      <if test="tokenCount != null">tokenCount=#{tokenCount},</if>
 	      <if test="stateId != null">stateId=#{stateId},</if>
 	      <if test="stateCategory != null and stringIndex1 != '___bonitanull___'">stateCategory=#{stateCategory},</if>
@@ -51,6 +53,7 @@
 		<result property="callerId" column="callerId" />
 		<result property="tokenCount" column="tokenCount" />
 		<result property="processDefintionId" column="processDefintionId" />
+		<result property="description" column="description" />
 		<result property="stateId" column="stateId" />
 		<result property="stateCategory" column="stateCategory" />
 		<result property="startDate" column="startDate" />
@@ -220,11 +223,50 @@
 	<select id="getNumberOfSProcessInstanceInvolvingUser" resultType="long">
 		SELECT COUNT(DISTINCT p.id)
 		FROM process_instance p,
+			 flownode_instance f,
 			 arch_flownode_instance af
 		WHERE p.tenantid = #{tenantid}
-				AND ((af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
-				OR (p.startedBy = #{userId})
+		AND f.tenantid = p.tenantid
+		AND af.tenantid = p.tenantid
+		AND p.stateId != 6
+		AND (
+			(
+				f.logicalGroup2 = p.id
+			  	AND f.assigneeId = #{userId}
+			)
+			OR (
+				af.logicalGroup2 = p.id
+				AND af.assigneeId = #{userId}
+			)
+			OR (
+				f.logicalGroup2 = p.id
+				AND f.stateId = 4
+				AND f.actorId IN (
+					SELECT actor.id
+					FROM actor actor,
+						 actormember actormember
+					WHERE actor.tenantid = p.tenantid
+					AND actormember.tenantid = actor.tenantid
+					AND actor.id = actormember.actorId 
+					AND (
+						actormember.userId = #{userId}
+						OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember am,
+								 user_membership um
+							WHERE am.tenantid = p.tenantid
+							AND am.tenantid = um.tenantid
+							AND um.userId = #{userId}
+							AND (
+								(am.groupId = um.groupId AND am.roleId &lt;= 0)
+								OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
+								OR (am.groupId = um.groupId AND am.roleId = um.roleId)
+							)
+						)
+					)
 				)
+			)
+		)
 		<if test="filter != null">
 			AND ${filter}
 		</if>
@@ -236,9 +278,47 @@
 			 flownode_instance f,
 			 arch_flownode_instance af
 		WHERE p.tenantid = #{tenantid}
-				AND ((af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
-				OR (p.startedBy = #{userId})
+		AND f.tenantid = p.tenantid
+		AND af.tenantid = p.tenantid
+		AND p.stateId != 6
+		AND (
+			(
+				f.logicalGroup2 = p.id
+			  	AND f.assigneeId = #{userId}
+			)
+			OR (
+				af.logicalGroup2 = p.id
+				AND af.assigneeId = #{userId}
+			)
+			OR (
+				f.logicalGroup2 = p.id
+				AND f.stateId = 4
+				AND f.actorId IN (
+					SELECT actor.id
+					FROM actor actor,
+						 actormember actormember
+					WHERE actor.tenantid = p.tenantid
+					AND actormember.tenantid = actor.tenantid
+					AND actor.id = actormember.actorId 
+					AND (
+						actormember.userId = #{userId}
+						OR actormember.id IN (
+							SELECT actormember.id
+							FROM actormember am,
+								 user_membership um
+							WHERE am.tenantid = p.tenantid
+							AND am.tenantid = um.tenantid
+							AND um.userId = #{userId}
+							AND (
+								(am.groupId = um.groupId AND am.roleId &lt;= 0)
+								OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
+								OR (am.groupId = um.groupId AND am.roleId = um.roleId)
+							)
+						)
+					)
 				)
+			)
+		)
 		<if test="filter != null">
 			AND ${filter}
 		</if>

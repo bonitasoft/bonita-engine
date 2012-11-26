@@ -4,9 +4,9 @@
 <mapper namespace="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl">
 
 	<insert id="insertSAProcessInstanceImpl" parameterType="arch_process_instance">
-		INSERT INTO arch_process_instance (tenantid, id, name, processDefinitionId, startDate, startedBy, endDate, archiveDate, stateId, lastUpdate,
+		INSERT INTO arch_process_instance (tenantid, id, name, processDefinitionId, description, startDate, startedBy, endDate, archiveDate, stateId, lastUpdate,
 			rootProcessInstanceId, callerId, sourceObjectId)
-		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.processDefinitionId}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate},
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.processDefinitionId}, #{entity.description}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate},
 			#{entity.archiveDate}, #{entity.stateId}, #{entity.lastUpdate}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.sourceObjectId})
 	</insert>
 
@@ -20,6 +20,7 @@
 		<result property="id" column="id" />
 		<result property="name" column="name" />
 		<result property="processDefintionId" column="processDefintionId" />
+		<result property="description" column="description" />
 		<result property="stateId" column="stateId" />
 		<result property="startDate" column="startDate" />
 		<result property="endDate" column="endDate" />
@@ -124,27 +125,66 @@
 			ORDER BY ${orderBy}
 		</if>
   	</select>
-  
+
 	<select id="getNumberOfSAProcessInstanceInvolvingUser" resultType="long">
 		SELECT COUNT(DISTINCT ap.id)
-		FROM arch_process_instance ap,
-			arch_flownode_instance at
-		WHERE (ap.tenantid = #{tenantid}
-			AND (((at.logicalGroup2 = ap.sourceObjectId AND at.tenantid = ap.tenantid AND at.executedBy = #{userId} AND at.kind IN ('user', 'manual'))
-			OR ap.startedBy = #{userId})
-			AND ap.stateId IN (6,7,3)))
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		AND (
+			ap.startedBy = #{userId}
+			OR ap.id IN (
+				SELECT at.logicalGroup2
+				FROM arch_flownode_instance at
+				WHERE at.tenantid = ap.tenantid
+				AND at.assigneeId = #{userId}
+				AND at.kind IN ('user', 'manual')
+			)
+		)
 		<if test="filter != null">
 			AND ${filter}
 		</if>
 	 </select>
+
 	 <select id="searchSAProcessInstanceInvolvingUser" resultMap="archivedProcessInstanceResultMap">
-		SELECT DISTINCT ap.*
-		FROM arch_process_instance ap,
-			arch_flownode_instance at
-		WHERE (ap.tenantid = #{tenantid}
-			AND (((at.logicalGroup2 = ap.sourceObjectId AND at.tenantid = ap.tenantid AND at.executedBy = #{userId} AND at.kind IN ('user', 'manual'))
-			OR ap.startedBy = #{userId})
-			AND ap.stateId IN (6,7,3)))
+		SELECT *
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.archiveDate = (
+			SELECT MAX(api.archiveDate)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.id = (
+			SELECT MAX(api.id)
+			FROM arch_process_instance api
+			WHERE api.tenantid = ap.tenantid
+			AND api.sourceObjectId = ap.sourceObjectId
+		)
+		AND ap.stateId IN (6,7,3)
+		AND (
+			ap.startedBy = #{userId}
+			OR ap.id IN (
+				SELECT at.logicalGroup2
+				FROM arch_flownode_instance at
+				WHERE at.tenantid = ap.tenantid
+				AND at.assigneeId = #{userId}
+				AND at.kind IN ('user', 'manual')
+			)
+		)
 		<if test="filter != null">
 			AND ${filter}
 		</if>
