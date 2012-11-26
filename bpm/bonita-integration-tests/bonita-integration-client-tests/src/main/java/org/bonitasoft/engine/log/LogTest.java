@@ -287,7 +287,6 @@ public class LogTest extends CommonAPISPTest {
      */
     @Test
     public void testDontLogJobExecutionEvent() throws Exception {
-        login();
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m1", "receiveMessageProcess",
                 "startEvent", null, null, null, null);
         final User user = createUser("john", "bpm");
@@ -312,7 +311,6 @@ public class LogTest extends CommonAPISPTest {
         disableAndDelete(receiveMessageProcess);
 
         deleteUser("john");
-        logout();
     }
 
     private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName, final String messageName, final String targetProcess,
@@ -414,8 +412,9 @@ public class LogTest extends CommonAPISPTest {
     @Test
     @SuppressWarnings("unchecked")
     public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutputUsingAPIAccessor() throws Exception {
-        final String delivery = "Delivery men";
         final String johnName = "john";
+        createUser(johnName, "bpm");
+        final String delivery = "Delivery men";
         final Expression dataDefaultValue = new ExpressionBuilder().createConstantLongExpression(0);
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
