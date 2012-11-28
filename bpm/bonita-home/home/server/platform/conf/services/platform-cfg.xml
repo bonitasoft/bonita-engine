@@ -4,7 +4,7 @@
 	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>${bonita.home}/server/platform/conf/db.properties</value>
+				<value>${bonita.home}/server/platform/conf/bonita-platform.xml</value>
 				<value>${bonita.home}/server/platform/conf/cmis.properties</value>
 			</list>
 		</property>
