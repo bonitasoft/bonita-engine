@@ -15,8 +15,9 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.definition.model.impl.SParameterDefinitionImpl;
 import org.bonitasoft.engine.xml.SXMLParseException;
+
+import com.bonitasoft.engine.core.process.definition.model.impl.SParameterDefinitionImpl;
 
 /**
  * @author Baptiste Mesta

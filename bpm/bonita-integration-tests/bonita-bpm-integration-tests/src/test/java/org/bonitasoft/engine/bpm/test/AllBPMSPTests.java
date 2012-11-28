@@ -19,7 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
     ProcessDefinitionServiceIntegrationTest.class,
-    ParameterAndDataExpressionIntegrationTest.class,
+//    ParameterAndDataExpressionIntegrationTest.class,
     ProcessInstanceServiceIntegrationTest.class,
     ActorMappingServiceTest.class,
     OperationServiceIntegrationTest.class,

@@ -225,8 +225,9 @@
 		FROM process_instance p,
 			 arch_flownode_instance af
 		WHERE p.tenantid = #{tenantid}
-				AND ((af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
-				OR (p.startedBy = #{userId})
+		AND (
+			(af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
+			OR (p.startedBy = #{userId})
 		)
 		<if test="filter != null">
 			AND ${filter}
@@ -239,8 +240,9 @@
 			 flownode_instance f,
 			 arch_flownode_instance af
 		WHERE p.tenantid = #{tenantid}
-				AND ((af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
-				OR (p.startedBy = #{userId})
+		AND (
+			(af.tenantid = #{tenantid} AND af.logicalGroup2 = p.id AND af.executedBy = #{userId})
+			OR (p.startedBy = #{userId})
 		)
 		<if test="filter != null">
 			AND ${filter}

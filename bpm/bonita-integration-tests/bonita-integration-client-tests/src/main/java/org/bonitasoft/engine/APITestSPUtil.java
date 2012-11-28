@@ -83,7 +83,6 @@ import org.bonitasoft.engine.identity.RoleBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserBuilder;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.log.Log;
 import org.bonitasoft.engine.process.TestStates;
 import org.bonitasoft.engine.process.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.search.FlowNodeInstanceSearchDescriptor;
@@ -94,6 +93,8 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.bonitasoft.engine.log.Log;
 
 /**
  * @author Emmanuel Duchastenier
@@ -229,7 +230,7 @@ public class APITestSPUtil {
     }
 
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
-        session = BPMTestUtil.loginTenant(userName, password, tenantId);
+        session = SPBPMTestUtil.loginTenant(userName, password, tenantId);
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         processAPI = TenantAPIAccessor.getProcessAPI(session);
         commandAPI = TenantAPIAccessor.getCommandAPI(session);
@@ -237,7 +238,7 @@ public class APITestSPUtil {
     }
 
     protected void loginWith(final String userName, final String password) throws BonitaException {
-        session = BPMTestUtil.loginOnDefaultTenant(userName, password);
+        session = SPBPMTestUtil.loginOnDefaultTenant(userName, password);
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         processAPI = TenantAPIAccessor.getProcessAPI(session);
         commandAPI = TenantAPIAccessor.getCommandAPI(session);
@@ -246,7 +247,7 @@ public class APITestSPUtil {
     }
 
     protected void loginWith(final User user) throws BonitaException {
-        session = BPMTestUtil.loginOnDefaultTenant(user.getUserName(), user.getPassword());
+        session = SPBPMTestUtil.loginOnDefaultTenant(user.getUserName(), user.getPassword());
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         processAPI = TenantAPIAccessor.getProcessAPI(session);
         commandAPI = TenantAPIAccessor.getCommandAPI(session);
@@ -255,7 +256,7 @@ public class APITestSPUtil {
     }
 
     protected void login() throws BonitaException {
-        session = BPMTestUtil.loginOnDefaultTenant();
+        session = SPBPMTestUtil.loginOnDefaultTenant();
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         processAPI = TenantAPIAccessor.getProcessAPI(session);
         commandAPI = TenantAPIAccessor.getCommandAPI(session);
@@ -264,7 +265,7 @@ public class APITestSPUtil {
     }
 
     protected void login(final long tenantId) throws BonitaException {
-        session = BPMTestUtil.loginTenant(tenantId);
+        session = SPBPMTestUtil.loginTenant(tenantId);
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         processAPI = TenantAPIAccessor.getProcessAPI(session);
         commandAPI = TenantAPIAccessor.getCommandAPI(session);
@@ -272,7 +273,7 @@ public class APITestSPUtil {
     }
 
     protected void logout() throws BonitaException {
-        BPMTestUtil.logoutTenant(session);
+        SPBPMTestUtil.logoutTenant(session);
         session = null;
         identityAPI = null;
         processAPI = null;

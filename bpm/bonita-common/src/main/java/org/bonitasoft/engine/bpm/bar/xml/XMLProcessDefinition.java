@@ -33,7 +33,6 @@ import org.bonitasoft.engine.bpm.model.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.model.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.model.ManualTaskDefinition;
 import org.bonitasoft.engine.bpm.model.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.model.ParameterDefinition;
 import org.bonitasoft.engine.bpm.model.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.model.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.model.TransitionDefinition;
@@ -64,6 +63,8 @@ import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.XMLNode;
+
+import com.bonitasoft.engine.bpm.model.ParameterDefinition;
 
 /**
  * @author Baptiste Mesta

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.BPMTestUtil;
 import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -36,7 +35,6 @@ import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.RoleCriterion;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCriterion;
-import org.bonitasoft.engine.platform.Tenant;
 import org.bonitasoft.engine.process.TestStates;
 import org.bonitasoft.engine.search.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.CommandSearchDescriptor;
@@ -53,6 +51,8 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.platform.Tenant;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -62,12 +62,12 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
 
     @BeforeClass
     public static void beforeClass() throws BonitaException {
-        BPMTestUtil.createEnvironmentWithDefaultTenant();
+        SPBPMTestUtil.createEnvironmentWithDefaultTenant();
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
-        BPMTestUtil.destroyPlatformAndTenants();
+        SPBPMTestUtil.destroyPlatformAndTenants();
     }
 
     @Rule
@@ -111,12 +111,12 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
      */
     private List<String> clean() throws BonitaException {
         final List<String> messages = new ArrayList<String>();
-        final PlatformSession platformSession = BPMTestUtil.loginPlatform();
+        final PlatformSession platformSession = SPBPMTestUtil.loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final List<Tenant> tenants = platformAPI.getTenants(0, 1000);
-        BPMTestUtil.logoutPlatform(platformSession);
+        SPBPMTestUtil.logoutPlatform(platformSession);
         for (final Tenant tenant : tenants) {
-            final APISession apiSession = BPMTestUtil.loginTenant(tenant.getId());
+            final APISession apiSession = SPBPMTestUtil.loginTenant(tenant.getId());
 
             final CommandAPI commandAPI = TenantAPIAccessor.getCommandAPI(apiSession);
             final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
@@ -213,7 +213,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             // messages.add(categoryBuilder.toString());
             // }
 
-            BPMTestUtil.logoutTenant(apiSession);
+            SPBPMTestUtil.logoutTenant(apiSession);
         }
         return messages;
     }

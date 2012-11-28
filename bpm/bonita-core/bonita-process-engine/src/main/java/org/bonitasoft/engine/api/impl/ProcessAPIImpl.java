@@ -1,16 +1,7 @@
-/**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+/*
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.api.impl;
 
 import java.io.ByteArrayInputStream;
@@ -52,12 +43,10 @@ import org.bonitasoft.engine.actor.privilege.model.SActorPrivilege;
 import org.bonitasoft.engine.api.ActorMemberSorting;
 import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.api.EventSorting;
-import org.bonitasoft.engine.api.ParameterSorting;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProcessInstanceCriterion;
 import org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver;
-import org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.*;
@@ -94,7 +83,6 @@ import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.Index;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.MemberType;
-import org.bonitasoft.engine.bpm.model.ParameterInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionStates;
@@ -117,7 +105,6 @@ import org.bonitasoft.engine.bpm.model.data.DataDefinition;
 import org.bonitasoft.engine.bpm.model.data.DataInstance;
 import org.bonitasoft.engine.bpm.model.document.Document;
 import org.bonitasoft.engine.bpm.model.event.EventInstance;
-import org.bonitasoft.engine.bpm.model.impl.ParameterImpl;
 import org.bonitasoft.engine.bpm.model.impl.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.model.privilege.ActorPrivilege;
 import org.bonitasoft.engine.bpm.model.privilege.LevelRight;
@@ -256,13 +243,11 @@ import org.bonitasoft.engine.exception.EventInstanceReadException;
 import org.bonitasoft.engine.exception.ExpressionEvaluationException;
 import org.bonitasoft.engine.exception.GroupNotFoundException;
 import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
-import org.bonitasoft.engine.exception.InvalidParameterValueException;
 import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NoSuchActivityDefinitionException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.ParameterNotFoundException;
 import org.bonitasoft.engine.exception.PrivilegeInsertException;
 import org.bonitasoft.engine.exception.PrivilegeNotFoundException;
 import org.bonitasoft.engine.exception.PrivilegeRemoveException;
@@ -380,6 +365,13 @@ import org.bonitasoft.engine.util.FileUtil;
 import org.bonitasoft.engine.util.IOUtil;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.XMLWriter;
+
+import com.bonitasoft.engine.api.ParameterSorting;
+import com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver;
+import com.bonitasoft.engine.bpm.model.ParameterInstance;
+import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
+import com.bonitasoft.engine.exception.InvalidParameterValueException;
+import com.bonitasoft.engine.exception.ParameterNotFoundException;
 
 /**
  * @author Matthieu Chaffotte

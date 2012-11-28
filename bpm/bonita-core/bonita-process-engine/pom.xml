@@ -13,6 +13,17 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-common</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bonita-common</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-process-engine</artifactId>
 			<version>${project.version}</version>
@@ -21,17 +32,6 @@
 					<groupId>org.bonitasoft.engine.core.process.definition</groupId>
 					<artifactId>bonita-process-definition-model</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.bonitasoft.engine</groupId>
-					<artifactId>bonita-common</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
 				<exclusion>
 					<groupId>org.bonitasoft.engine</groupId>
 					<artifactId>bonita-common</artifactId>

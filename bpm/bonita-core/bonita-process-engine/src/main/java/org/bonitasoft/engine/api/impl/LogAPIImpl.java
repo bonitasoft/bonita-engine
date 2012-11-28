@@ -1,16 +1,7 @@
-/**
- * Copyright (C) 2011 BonitaSoft S.A.
+/*
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.api.impl;
 
 import java.util.ArrayList;
@@ -31,13 +22,8 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.LogNotFoundException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.log.Log;
-import org.bonitasoft.engine.log.LogBuilder;
-import org.bonitasoft.engine.log.LogCriterion;
-import org.bonitasoft.engine.log.SeverityLevel;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.search.SearchLogs;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -46,6 +32,12 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.services.BusinessLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+
+import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.log.LogBuilder;
+import com.bonitasoft.engine.log.LogCriterion;
+import com.bonitasoft.engine.log.SeverityLevel;
+import com.bonitasoft.engine.search.SearchLogs;
 
 /**
  * @author Bole Zhang
@@ -78,8 +70,7 @@ public class LogAPIImpl implements LogAPI {
             if (sLog == null) {
                 throw new LogNotFoundException("log Not Found.");
             }
-            final LogBuilder logBuilder = new org.bonitasoft.engine.log.LogBuilder().createNewInstance(sLog.getRawMessage(), sLog.getUserId(),
-                    new Date(sLog.getTimeStamp()));
+            final LogBuilder logBuilder = new LogBuilder().createNewInstance(sLog.getRawMessage(), sLog.getUserId(), new Date(sLog.getTimeStamp()));
             logBuilder.setLogId(sLog.getId());
             logBuilder.setActionType(sLog.getActionType());
             logBuilder.setActionScope(sLog.getActionScope());
@@ -182,8 +173,7 @@ public class LogAPIImpl implements LogAPI {
         final List<Log> logs = new ArrayList<Log>();
         if (sLogs != null) {
             for (final SBusinessLog sLog : sLogs) {
-                final LogBuilder logBuilder = new org.bonitasoft.engine.log.LogBuilder().createNewInstance(sLog.getRawMessage(), sLog.getUserId(), new Date(
-                        sLog.getTimeStamp()));
+                final LogBuilder logBuilder = new LogBuilder().createNewInstance(sLog.getRawMessage(), sLog.getUserId(), new Date(sLog.getTimeStamp()));
                 logBuilder.setLogId(sLog.getId());
                 logBuilder.setActionType(sLog.getActionType());
                 logBuilder.setActionScope(sLog.getActionScope());

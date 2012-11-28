@@ -12,6 +12,10 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdateDescriptor;
 import org.junit.Test;
 
+import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.log.LogCriterion;
+import com.bonitasoft.engine.log.SeverityLevel;
+
 public class LogTestSP extends CommonAPISPTest {
 
     @Test

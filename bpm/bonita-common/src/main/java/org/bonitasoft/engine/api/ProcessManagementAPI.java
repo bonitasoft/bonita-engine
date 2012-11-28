@@ -29,14 +29,12 @@ import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ActorInstance;
 import org.bonitasoft.engine.bpm.model.ActorMember;
-import org.bonitasoft.engine.bpm.model.AttachmentDefinition;
 import org.bonitasoft.engine.bpm.model.Category;
 import org.bonitasoft.engine.bpm.model.CategoryCriterion;
 import org.bonitasoft.engine.bpm.model.Comment;
 import org.bonitasoft.engine.bpm.model.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.model.ParameterInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
@@ -80,12 +78,10 @@ import org.bonitasoft.engine.exception.ConnectorNotFoundException;
 import org.bonitasoft.engine.exception.DataNotFoundException;
 import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
 import org.bonitasoft.engine.exception.GroupNotFoundException;
-import org.bonitasoft.engine.exception.InvalidParameterValueException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NoSuchActivityDefinitionException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.ParameterNotFoundException;
 import org.bonitasoft.engine.exception.PrivilegeInsertException;
 import org.bonitasoft.engine.exception.PrivilegeNotFoundException;
 import org.bonitasoft.engine.exception.PrivilegeRemoveException;
@@ -107,6 +103,11 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UserNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+
+import com.bonitasoft.engine.api.ParameterSorting;
+import com.bonitasoft.engine.bpm.model.ParameterInstance;
+import com.bonitasoft.engine.exception.InvalidParameterValueException;
+import com.bonitasoft.engine.exception.ParameterNotFoundException;
 
 /**
  * @author Baptiste Mesta

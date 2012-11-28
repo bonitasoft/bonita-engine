@@ -11,43 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.model.impl;
+package com.bonitasoft.engine.exception;
 
-import org.bonitasoft.engine.bpm.model.ParameterInstance;
+import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ParameterImpl extends NamedElementImpl implements ParameterInstance {
+public class ParameterProcessNotFoundException extends BonitaException {
 
-    private static final long serialVersionUID = 4096607590317516470L;
+    private static final long serialVersionUID = -6743209754015668676L;
 
-    private final String description;
-
-    private final Object value;
-
-    private final String type;
-
-    public ParameterImpl(final String name, final String description, final Object value, final String type) {
-        super(name);
-        this.description = description;
-        this.value = value;
-        this.type = type;
+    public ParameterProcessNotFoundException(final String message) {
+        super(message);
     }
 
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public Object getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String getType() {
-        return this.type;
+    public ParameterProcessNotFoundException(final Throwable cause) {
+        super(cause);
     }
 
 }

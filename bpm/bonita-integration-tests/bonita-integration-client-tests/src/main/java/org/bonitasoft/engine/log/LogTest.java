@@ -56,6 +56,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.log.LogCriterion;
+
 /**
  * @author Bole Zhang
  * @author Elias Ricken de Medeiros

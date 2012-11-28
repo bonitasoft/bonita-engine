@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bpm.model.ActorDefinition;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ParameterDefinition;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -27,6 +26,9 @@ import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+
+import com.bonitasoft.engine.bpm.model.ParameterDefinition;
+import com.bonitasoft.engine.core.process.definition.model.impl.SParameterDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte

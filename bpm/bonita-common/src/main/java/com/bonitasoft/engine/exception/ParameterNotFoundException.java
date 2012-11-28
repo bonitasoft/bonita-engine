@@ -11,13 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api;
+package com.bonitasoft.engine.exception;
+
+import java.text.MessageFormat;
+
+import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public enum ParameterSorting {
+public class ParameterNotFoundException extends BonitaException {
 
-    NAME_ASC, NAME_DESC;
+    private static final long serialVersionUID = -5548436489951596184L;
+
+    public ParameterNotFoundException(final Throwable cause) {
+        super(cause);
+    }
+
+    public ParameterNotFoundException(final long processDefinitionId, final String parameterName) {
+        super(MessageFormat.format("the parameter with name {0} and process with id {1}", parameterName, processDefinitionId));
+    }
 
 }

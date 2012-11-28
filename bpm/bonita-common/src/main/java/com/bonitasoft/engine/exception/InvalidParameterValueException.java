@@ -11,13 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.model;
+package com.bonitasoft.engine.exception;
+
+import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface ParameterDefinition extends DescriptionElement {
+public class InvalidParameterValueException extends BonitaException {
 
-    String getType();
+    private static final long serialVersionUID = 7463213076180306458L;
+
+    public InvalidParameterValueException(final String message) {
+        super(message);
+    }
+
+    public InvalidParameterValueException(final Throwable e) {
+        super(e);
+    }
 
 }

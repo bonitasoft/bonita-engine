@@ -22,14 +22,12 @@ import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPISPTest;
-import org.bonitasoft.engine.api.ParameterSorting;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ParameterInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
@@ -39,9 +37,7 @@ import org.bonitasoft.engine.connectors.TestConnector2;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.InvalidParameterValueException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.ParameterNotFoundException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -50,6 +46,11 @@ import org.bonitasoft.engine.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.api.ParameterSorting;
+import com.bonitasoft.engine.bpm.model.ParameterInstance;
+import com.bonitasoft.engine.exception.InvalidParameterValueException;
+import com.bonitasoft.engine.exception.ParameterNotFoundException;
 
 public class ProcessParameterTest extends CommonAPISPTest {
 

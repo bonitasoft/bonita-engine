@@ -22,8 +22,9 @@ import org.bonitasoft.engine.api.LogAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.ConnectorValidationException;
-import org.bonitasoft.engine.log.LogCriterion;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+
+import com.bonitasoft.engine.log.LogCriterion;
 
 /**
  * @author Matthieu Chaffotte
