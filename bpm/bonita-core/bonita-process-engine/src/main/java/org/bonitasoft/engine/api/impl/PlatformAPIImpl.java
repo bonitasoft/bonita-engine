@@ -431,12 +431,12 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     // modify username and password
     private void modifyTechnicalUser(final long tenantId, final String username, final String password) throws IOException, BonitaHomeNotSetException {
-        final String tenantPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "technical-user.properties";
+        final String tenantPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "bonita-server.xml";
         final File file = new File(tenantPath);
         if (!file.exists()) {
             file.createNewFile();
         }
-        final Properties properties = PropertiesManager.getPropertiesFromFile(file);
+        final Properties properties = PropertiesManager.getPropertiesFromXmlFile(file);
         if (username != null) {
             properties.setProperty("userName", username);
         }
