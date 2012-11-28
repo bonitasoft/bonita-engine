@@ -81,12 +81,9 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.model.ActivityState;
 import org.bonitasoft.engine.bpm.model.ActivityStates;
 import org.bonitasoft.engine.bpm.model.ActorInstance;
 import org.bonitasoft.engine.bpm.model.ActorMember;
-import org.bonitasoft.engine.bpm.model.AttachmentDefinition;
-import org.bonitasoft.engine.bpm.model.AttachmentInstance;
 import org.bonitasoft.engine.bpm.model.Category;
 import org.bonitasoft.engine.bpm.model.CategoryCriterion;
 import org.bonitasoft.engine.bpm.model.Comment;
@@ -95,7 +92,6 @@ import org.bonitasoft.engine.bpm.model.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.Index;
-import org.bonitasoft.engine.bpm.model.InitialAttachment;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.MemberType;
 import org.bonitasoft.engine.bpm.model.ParameterInstance;
@@ -258,7 +254,6 @@ import org.bonitasoft.engine.exception.DocumentException;
 import org.bonitasoft.engine.exception.DocumentNotFoundException;
 import org.bonitasoft.engine.exception.EventInstanceReadException;
 import org.bonitasoft.engine.exception.ExpressionEvaluationException;
-import org.bonitasoft.engine.exception.ExpressionException;
 import org.bonitasoft.engine.exception.GroupNotFoundException;
 import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
 import org.bonitasoft.engine.exception.InvalidParameterValueException;
@@ -935,13 +930,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             log(tenantAccessor, sbe);
             throw new SProcessInstanceReadException(sbe);
         }
-    }
-
-    @Override
-    @Deprecated
-    public ArchivedProcessInstance getArchivedProcessInstance(final long processInstanceId) throws InvalidSessionException, ProcessInstanceNotFoundException,
-            ProcessInstanceReadException {
-        return getFinalArchivedProcessInstance(processInstanceId);
     }
 
     @Override
@@ -2491,239 +2479,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfAssignedTasksSupervisedBy(final long managerUserId) throws InvalidSessionException, UserNotFoundException {
-
         return 0;
-    }
-
-    @Override
-    @Deprecated
-    public AttachmentDefinition getAttachmentDefinition(final long processDefinitionId, final String attachmentName) throws InvalidSessionException,
-            ProcessDefinitionNotFoundException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Object evaluateGroovyExpressionInActivityInstance(final String expression, final long activityInstanceId, final Map<String, Object> context,
-            final boolean useActivityScope, final boolean propagate) throws InvalidSessionException, ProcessInstanceNotFoundException,
-            ActivityInstanceNotFoundException, ExpressionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Object evaluateGroovyExpressionInProcessInstance(final String expression, final long processInstanceId, final Map<String, Object> context,
-            final boolean useInitialVariableValues, final boolean propagate) throws InvalidSessionException, ProcessInstanceNotFoundException,
-            ExpressionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Object evaluateGroovyExpressionInProcessDefinition(final String expression, final long processDefinitionId, final Map<String, Object> context)
-            throws InvalidSessionException, ProcessDefinitionNotFoundException, ExpressionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Object evaluateGroovyExpressionsInActivityInstance(final Map<String, String> expressions, final long activityInstanceId,
-            final Map<String, Object> context, final boolean useActivityScope, final boolean propagate) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, ActivityInstanceNotFoundException, ExpressionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Object evaluateGroovyExpressionsInProcessInstance(final Map<String, String> expressions, final long processInstanceId,
-            final Map<String, Object> context, final boolean useInitialVariableValues, final boolean propagate) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, ExpressionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Object evaluateGroovyExpressionsInProcessDefinition(final Map<String, String> expressions, final long processDefinitionId,
-            final Map<String, Object> context) throws InvalidSessionException, ProcessInstanceNotFoundException, ExpressionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public void setActivityInstanceVariable(final long activityInstanceId, final String variableId, final Object variableValue) throws InvalidSessionException,
-            ActivityInstanceNotFoundException, DataNotFoundException {
-        // TODO Implement this !
-
-    }
-
-    @Override
-    @Deprecated
-    public void setProcessInstanceVariable(final long instanceId, final String variableId, final Object variableValue) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, DataNotFoundException {
-        // TODO Implement this !
-    }
-
-    @Override
-    @Deprecated
-    public void setVariable(final long activityInstanceId, final String variableId, final Object variableValue) throws InvalidSessionException,
-            ActivityInstanceNotFoundException, DataNotFoundException {
-        // TODO Implement this !
-
-    }
-
-    @Override
-    @Deprecated
-    public void addAttachment(final long processInstanceId, final String name, final String label, final String description, final String fileName,
-            final Map<String, String> metadata, final byte[] value) throws InvalidSessionException {
-        // TODO Implement this !
-    }
-
-    @Override
-    @Deprecated
-    public void addAttachment(final long processInstanceId, final String name, final String fileName, final byte[] value) throws InvalidSessionException {
-        // TODO Implement this !
-    }
-
-    @Override
-    @Deprecated
-    public Object getModifiedJavaObject(final long processDefinitionId, final String variableExpression, final Object variableValue, final Object attributeValue)
-            throws InvalidSessionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public boolean canExecuteTask(final long activityInstanceId) throws InvalidSessionException, ActivityInstanceNotFoundException {
-        // TODO Implement this !
-        return false;
-    }
-
-    @Override
-    @Deprecated
-    public long getOneTask(final ActivityState taskState) throws InvalidSessionException {
-        // TODO Implement this !
-        return 0;
-    }
-
-    @Override
-    @Deprecated
-    public long getOneTaskOfProcessInstance(final long processInstanceId, final ActivityState taskState) throws InvalidSessionException {
-        // TODO Implement this !
-        return 0;
-    }
-
-    @Override
-    @Deprecated
-    public long getOneTaskOfProcessDefinition(final long processDefinitionUUID, final ActivityState taskState) throws InvalidSessionException {
-        // TODO Implement this !
-        return 0;
-    }
-
-    @Override
-    @Deprecated
-    public AttachmentInstance getLastAttachment(final long processInstanceId, final String attachmentName) throws InvalidSessionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public AttachmentInstance getLastAttachment(final long processInstanceId, final String attachmentName, final Date date) throws InvalidSessionException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public AttachmentInstance getLastAttachment(final long processInstanceId, final String attachmentName, final long activityInstanceId)
-            throws InvalidSessionException, ActivityInstanceNotFoundException {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public long startProcess(final long processDefinitionId, final Map<String, Object> variables, final Collection<InitialAttachment> attachments)
-            throws InvalidSessionException, ProcessDefinitionNotFoundException, DataNotFoundException {
-        // TODO Implement this !
-        return 0;
-    }
-
-    @Override
-    @Deprecated
-    public void setProcessInstanceVariables(final long processInstanceId, final Map<String, Object> variables) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, DataNotFoundException {
-        // TODO Implement this !
-
-    }
-
-    @Override
-    @Deprecated
-    public void setActivityInstanceVariables(final long activityInstanceId, final Map<String, Object> variables) throws InvalidSessionException,
-            ActivityInstanceNotFoundException, DataNotFoundException {
-        // TODO Implement this !
-
-    }
-
-    @Override
-    @Deprecated
-    public void startTask(final long activityInstanceId, final boolean assignTask) throws InvalidSessionException, ActivityInstanceNotFoundException {
-        // TODO Implement this !
-
-    }
-
-    @Override
-    @Deprecated
-    public void finishTask(final long activityInstanceId, final boolean assignTask) throws InvalidSessionException, ActivityInstanceNotFoundException {
-        // TODO Implement this !
-
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> executeConnectorInProcessDefinition(final String connectorClassName, final Map<String, Object[]> parameters,
-            final long processDefinitionUUID, final Map<String, Object> context) throws InvalidSessionException, Exception {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> executeConnectorInProcessInstance(final String connectorClassName, final Map<String, Object[]> parameters,
-            final long processInstanceId, final Map<String, Object> context, final boolean useCurrentVariableValues) throws InvalidSessionException, Exception {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> executeConnectorInActivityInstance(final String connectorClassName, final Map<String, Object[]> parameters,
-            final long activityInstanceId, final Map<String, Object> context, final boolean useCurrentVariableValues) throws InvalidSessionException, Exception {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> executeConnectorAndGetVariablesToSet(final String connectorClassName, final Map<String, Object[]> parameters,
-            final long processDefinitionId, final Map<String, Object> context) throws InvalidSessionException, Exception {
-        // TODO Implement this !
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public void executeConnectorAndSetVariables(final String connectorClassName, final Map<String, Object[]> parameters,
-            final ActivityInstance activityInstance, final Map<String, Object> context) throws InvalidSessionException, Exception {
-        // TODO Implement this !
     }
 
     @Override
@@ -2843,20 +2599,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDefinitionNotFoundException(e);
         }
         return transactionContent.getResult();
-    }
-
-    @Deprecated
-    @Override
-    public Set<Long> getChildrenInstanceIdsOfProcessInstance(final long processInstanceId) throws ProcessInstanceNotFoundException, InvalidSessionException {
-        // TODO Implement this !
-        return Collections.emptySet();
-    }
-
-    @Deprecated
-    @Override
-    public Set<String> getInvolvedUsersOfProcessInstance(final long processInstanceId) throws ProcessInstanceNotFoundException, InvalidSessionException {
-        // TODO Implement this !
-        return Collections.emptySet();
     }
 
     @Override
@@ -3260,25 +3002,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
             }
         }
-    }
-
-    @Override
-    @Deprecated
-    public long getOneAssignedUserTaskInstance(final long userId) throws InvalidSessionException, UserNotFoundException, ActivityInstanceReadException {
-        final int assignedUserTaskInstanceNumber = (int) getNumberOfAssignedHumanTaskInstances(userId);
-        final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
-                ActivityInstanceCriterion.DEFAULT);
-        String stateName = null;
-        if (userTaskInstances.size() != 0) {
-            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
-                stateName = userTaskInstance.getState();
-                final long userTaskInstanceId = userTaskInstance.getId();
-                if (stateName.equals(ActivityStates.READY_STATE)) {
-                    return userTaskInstanceId;
-                }
-            }
-        }
-        return -1;
     }
 
     @Override

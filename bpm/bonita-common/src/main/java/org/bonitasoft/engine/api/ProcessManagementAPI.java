@@ -1123,21 +1123,6 @@ public interface ProcessManagementAPI {
     int getNumberOfProcessDataDefinitions(long processDefinitionId) throws InvalidSessionException, ProcessDefinitionNotFoundException;
 
     /**
-     * @param processDefinitionId
-     *            Identifier of the processDefinition
-     * @param attachmentName
-     *            The name of attachment
-     * @return An attachment definition object
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws ProcessDefinitionNotFoundException
-     *             Error thrown if no processDefinition have an id corresponding to the parameter.
-     */
-    @Deprecated
-    AttachmentDefinition getAttachmentDefinition(long processDefinitionId, String attachmentName) throws InvalidSessionException,
-            ProcessDefinitionNotFoundException;
-
-    /**
      * Get all process resources by process definition id
      * 
      * @param processDefinitionId

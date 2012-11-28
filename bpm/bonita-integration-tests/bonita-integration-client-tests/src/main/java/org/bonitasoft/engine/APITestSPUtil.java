@@ -378,7 +378,7 @@ public class APITestSPUtil {
     }
 
     protected UserMembership createUserMembership(final String userName, final String roleName, final String groupName) throws BonitaException {
-        return identityAPI.addUserMembership(identityAPI.getUserByUserName(userName).getId(), identityAPI.getGroupByName(groupName).getId(), identityAPI
+        return identityAPI.addUserMembership(identityAPI.getUserByUserName(userName).getId(), identityAPI.getGroupByPath(groupName).getId(), identityAPI
                 .getRoleByName(roleName).getId());
     }
 
