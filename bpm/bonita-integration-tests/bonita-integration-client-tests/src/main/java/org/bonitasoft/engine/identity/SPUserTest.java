@@ -17,8 +17,6 @@ import org.bonitasoft.engine.exception.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Test;
 
-import com.bonitasoft.engine.exception.TenantNotActivatedException;
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -40,7 +38,7 @@ public class SPUserTest extends CommonAPISPTest {
         loginAPI.login(1, userName, password);
     }
 
-    @Test(expected = TenantNotActivatedException.class)
+    @Test(expected = LoginException.class)
     public void loginFailsDueToTenantDeactivation() throws BonitaException {
         final long tenantId = SPBPMTestUtil.constructTenant("suomi", "iconName", "iconPath", "hannu", "malminkartano");
         SPBPMTestUtil.deactivateTenant(tenantId);
@@ -54,7 +52,7 @@ public class SPUserTest extends CommonAPISPTest {
         }
     }
 
-    @Test(expected = TenantNotActivatedException.class)
+    @Test(expected = LoginException.class)
     public void loginFailsWithDeactivatedDefaultTenant() throws BonitaException {
         SPBPMTestUtil.deactivateDefaultTenant();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
