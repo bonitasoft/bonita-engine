@@ -36,7 +36,7 @@
 		<result property="state" column="state" />
 	</resultMap>
 
-	<select id="getConnectorInstanceById" parameterType="long" resultMap="connectorInstanceResultMap">
+	<select id="getConnectorInstance" parameterType="long" resultMap="connectorInstanceResultMap">
 		SELECT *
 		FROM connector_instance c
 		WHERE c.tenantid = #{tenantid}
@@ -53,6 +53,7 @@
 		AND c.containerId = #{containerId}
 		AND c.containerType = #{containerType}
 		AND c.activationEvent = #{activationEvent}
+		AND c.state = #{state}
 	</select>
 
 </mapper>

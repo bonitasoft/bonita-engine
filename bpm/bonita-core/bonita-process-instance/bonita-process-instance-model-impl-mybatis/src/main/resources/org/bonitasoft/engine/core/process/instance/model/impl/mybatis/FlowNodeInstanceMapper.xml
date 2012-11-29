@@ -64,6 +64,7 @@
 			<if test="tokenCount != null">tokenCount=#{tokenCount},</if>
 			<if test="executedBy != null">executedBy=#{executedBy},</if>
 	      	<if test="deleted != null">deleted=#{deleted},</if>
+	      	<if test="stateExecuting != null">state_executing=#{stateExecuting},</if>
 		</trim>
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}
@@ -99,6 +100,7 @@
 		<result property="loopCounter" column="loop_counter" />
 		<result property="executedBy" column="executedBy" />
 		<result property="deleted" column="deleted" />
+		<result property="stateExecuting" column="state_executing" />
 		<discriminator javaType="string" column="kind">
 			<case value="auto" resultType="automatic_task_instance">
 			</case>
@@ -194,6 +196,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.rootContainerId = #{rootContainerId}
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
@@ -219,6 +222,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.assigneeId = 0
@@ -253,6 +257,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.assigneeId = 0
@@ -280,6 +285,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.assigneeId = #{assigneeId}
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
@@ -293,6 +299,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.rootContainerId = #{rootContainerId}
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
@@ -303,6 +310,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.assigneeId = 0
@@ -324,6 +332,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.assigneeId = #{assigneeId}
@@ -596,6 +605,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.assigneeId IN
@@ -610,6 +620,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.assigneeId = 0
@@ -664,6 +675,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.assigneeId = 0
@@ -721,6 +733,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND (
@@ -779,6 +792,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND (
@@ -840,6 +854,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stateId = 4
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
@@ -902,6 +917,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.stateId = 4
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
@@ -1256,6 +1272,7 @@
 		FROM flownode_instance f, hidden_activity h
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.kind IN ('manual', 'user')
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
@@ -1310,6 +1327,7 @@
 		FROM flownode_instance f, hidden_activity h
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
+		AND f.state_executing = FALSE
 		AND f.kind IN ('manual', 'user')
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
