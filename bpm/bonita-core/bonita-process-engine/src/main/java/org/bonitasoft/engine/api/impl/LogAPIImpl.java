@@ -10,9 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.api.LogAPI;
-import org.bonitasoft.engine.api.impl.transaction.GetLogInstance;
-import org.bonitasoft.engine.api.impl.transaction.GetLogsWithOrder;
-import org.bonitasoft.engine.api.impl.transaction.GetNumberOfLogInstance;
 import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
 import org.bonitasoft.engine.businesslogger.model.builder.SIndexedLogBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -32,6 +29,9 @@ import org.bonitasoft.engine.services.BusinessLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
+import com.bonitasoft.engine.api.impl.transaction.GetLogInstance;
+import com.bonitasoft.engine.api.impl.transaction.GetLogsWithOrder;
+import com.bonitasoft.engine.api.impl.transaction.GetNumberOfLogInstance;
 import com.bonitasoft.engine.exception.LogNotFoundException;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogBuilder;
