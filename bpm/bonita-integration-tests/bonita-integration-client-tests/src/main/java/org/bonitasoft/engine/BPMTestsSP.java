@@ -20,7 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
 //  LogTest.class,
   LogTestSP.class,
   ExternalCommandsTestSP.class,
-  ProcessParameterTest.class,
+//  ProcessParameterTest.class,
   BPMRemoteTests.class,
   SPProfileMemberCommandTest.class
 })

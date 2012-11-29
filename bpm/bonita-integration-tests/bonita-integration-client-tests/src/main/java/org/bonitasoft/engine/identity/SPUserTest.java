@@ -14,9 +14,10 @@ import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.LoginException;
-import org.bonitasoft.engine.exception.TenantNotActivatedException;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Test;
+
+import com.bonitasoft.engine.exception.TenantNotActivatedException;
 
 /**
  * @author Matthieu Chaffotte

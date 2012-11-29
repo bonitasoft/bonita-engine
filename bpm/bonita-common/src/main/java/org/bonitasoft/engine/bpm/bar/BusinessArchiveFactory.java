@@ -1,0 +1,129 @@
+/*
+ * Copyright (C) 2011 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ */
+package org.bonitasoft.engine.bpm.bar;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipOutputStream;
+
+import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormat;
+import org.bonitasoft.engine.util.FileUtil;
+
+/**
+ * @author Baptiste Mesta
+ */
+public class BusinessArchiveFactory {
+
+    private static final List<BusinessArchiveContribution> contributions;
+
+    static {
+        contributions = new ArrayList<BusinessArchiveContribution>();
+        contributions.add(new ProcessDefinitionBARContribution());
+        contributions.add(new ParameterContribution());
+        contributions.add(new ConnectorContribution());
+        contributions.add(new ExternalResourceContribution());
+        contributions.add(new ActorMappingContribution());
+        contributions.add(new UserFilterContribution());
+        contributions.add(new DocumentsResourcesContribution());
+        contributions.add(new ClasspathContribution());
+    }
+
+    public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormat {
+        final File barFolder = File.createTempFile("tempBusinessArchive", "tmp");
+        barFolder.delete();
+        barFolder.mkdir();
+        FileUtil.unzipToFolder(inputStream, barFolder);
+
+        final BusinessArchive businessArchive = new BusinessArchive();
+        for (final BusinessArchiveContribution contribution : contributions) {
+            if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
+                throw new InvalidBusinessArchiveFormat("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
+            }
+        }
+        FileUtil.deleteDir(barFolder);
+        return businessArchive;
+    }
+
+    /**
+     * Create a business archive from a valid file or folder
+     * 
+     * @param barOrFolder
+     * @return
+     * @throws IOException
+     * @throws InvalidBusinessArchiveFormat
+     */
+    public static BusinessArchive readBusinessArchive(final File barOrFolder) throws InvalidBusinessArchiveFormat, IOException {
+        if (!barOrFolder.exists()) {
+            throw new FileNotFoundException("the file does not exists: " + barOrFolder.getAbsolutePath());
+        }
+        if (barOrFolder.isDirectory()) {
+            final BusinessArchive businessArchive = new BusinessArchive();
+            for (final BusinessArchiveContribution contribution : contributions) {
+                if (!contribution.readFromBarFolder(businessArchive, barOrFolder) && contribution.isMandatory()) {
+                    throw new InvalidBusinessArchiveFormat("Invalid format, can't read " + contribution.getName() + " from the BAR file");
+                }
+            }
+            return businessArchive;
+        } else {
+            final FileInputStream inputStream = new FileInputStream(barOrFolder);
+            try {
+                return readBusinessArchive(inputStream);
+            } finally {
+                inputStream.close();
+            }
+        }
+    }
+
+    public static void writeBusinessArchiveToFolder(final BusinessArchive businessArchive, final File folderPath) throws IOException {
+        if (folderPath.exists()) {
+            if (!folderPath.isDirectory()) {
+                throw new IOException("unable to create Business archive on a file " + folderPath);
+                // } else {
+                // if (folderPath.listFiles().length > 0) {
+                // throw new IOException("unable to create Business archive on a non empty folder " + folderPath);
+                // }
+            }
+        } else {
+            folderPath.mkdir();
+        }
+        for (final BusinessArchiveContribution contribution : contributions) {
+            contribution.saveToBarFolder(businessArchive, folderPath);
+        }
+    }
+
+    public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {
+        final File tempFile = File.createTempFile("businessArchiveFolder", "tmp");// FIXME put it in tmp folder of the bonita home
+        tempFile.delete();
+        tempFile.mkdir();
+        writeBusinessArchiveToFolder(businessArchive, tempFile);
+        zipBarFolder(businessArchiveFile, tempFile);
+        FileUtil.deleteDir(tempFile);
+    }
+
+    public static String businessArchiveFolderToFile(final File destFile, final String folderPath) throws IOException {
+        zipBarFolder(destFile, new File(folderPath));
+        return destFile.getAbsolutePath();
+    }
+
+    private static void zipBarFolder(final File businessArchiveFile, final File folder) throws FileNotFoundException, IOException {
+        // create a ZipOutputStream to zip the data to
+        if (businessArchiveFile.exists()) {
+            throw new IOException("The destination file already exists " + businessArchiveFile.getAbsolutePath());
+        }
+        final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(businessArchiveFile));
+        try {
+            FileUtil.zipDir(folder.getAbsolutePath(), zos, folder.getAbsolutePath());
+        } finally {
+            zos.close();
+        }
+    }
+
+}

@@ -7,11 +7,11 @@ package org.bonitasoft.engine.api;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.InvalidSessionException;
-import org.bonitasoft.engine.exception.LogNotFoundException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
+import com.bonitasoft.engine.exception.LogNotFoundException;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogCriterion;
 
