@@ -635,6 +635,19 @@
 			<artifactId>bonita-platform-session-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Platform command -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-model-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 
 		<!-- Persistence -->
 		<dependency>

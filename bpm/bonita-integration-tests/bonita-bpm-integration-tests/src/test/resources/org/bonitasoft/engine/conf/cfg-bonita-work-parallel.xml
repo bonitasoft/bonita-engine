@@ -1,0 +1,17 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	
+	<bean id="workService" class="org.bonitasoft.engine.work.ThreadPoolWorkService">
+		<constructor-arg name="transactionService" ref="transactionService"></constructor-arg>
+		<constructor-arg name="workSynchronizationFactory" >
+			<bean class="com.bonitasoft.engine.work.ParalellWorkSynchronizationFactory"></bean>
+		</constructor-arg>
+		<constructor-arg name="corePoolSize" value="5"></constructor-arg>
+		<constructor-arg name="maximumPoolSize" value="100"></constructor-arg>
+		<constructor-arg name="keepAliveTimeSeconds" value="600"></constructor-arg>
+		<constructor-arg name="queueCapacity" value="1000"></constructor-arg>
+		<constructor-arg name="loggerService" ref="technicalLoggerService"></constructor-arg>
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor"></constructor-arg>
+		<constructor-arg name="sessionService" ref="sessionService"></constructor-arg>
+	</bean>
+</beans>

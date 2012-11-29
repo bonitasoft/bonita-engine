@@ -1,0 +1,115 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformMybatisPersistenceService" depends-on="dbProperties">
+		<constructor-arg name="name" value="platform" />
+		<constructor-arg name="dbIdentifier" value="${db.vendor}" />
+		<constructor-arg ref="transactionService" />
+		<constructor-arg name="cacheEnabled" value="true" />
+		<constructor-arg ref="mybatisJournalSqlSessionFactoryProvider" />
+		<constructor-arg ref="platformMyBatisConfigurations" />
+		<constructor-arg name="rangeSize" value="100" />
+		<constructor-arg ref="dbConfigurationsProvider" />
+		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
+		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
+	</bean>
+
+	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantMybatisPersistenceService" depends-on="dbProperties">
+		<constructor-arg name="name" value="journal" />
+		<constructor-arg name="dbIdentifier" value="${db.vendor}" />
+		<constructor-arg ref="transactionService" />
+		<constructor-arg ref="sessionAccessor" />
+		<constructor-arg name="cacheEnabled" value="true" />
+		<constructor-arg ref="mybatisJournalSqlSessionFactoryProvider" />
+		<constructor-arg ref="myBatisConfigurations" />
+		<constructor-arg name="rangeSize" value="100" />
+		<constructor-arg ref="dbConfigurationsProvider" />
+		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
+		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
+	</bean>
+
+	<bean id="mybatisJournalSqlSessionFactoryProvider" class="org.bonitasoft.engine.persistence.MybatisSqlSessionFactoryProvider">
+		<constructor-arg name="configuration" value="/org/bonitasoft/engine/persistence/mybatis/mybatis.config.xml" />
+		<constructor-arg>
+			<list>
+				<ref bean="myBatisConfigurations" />
+				<ref bean="platformMyBatisConfigurations" />
+			</list>
+		</constructor-arg>
+		<constructor-arg name="properties">
+			<props>
+				<prop key="database.connection.driver_class">${database.journal.connection.driver_class}</prop>
+				<prop key="database.connection.url">${database.journal.connection.url}</prop>
+				<prop key="database.connection.username">${database.journal.connection.username}</prop>
+				<prop key="database.connection.password">${database.journal.connection.password}</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+
+	<bean id="myBatisConfigurations" class="org.bonitasoft.engine.persistence.MyBatisConfigurationsProvider" autowire="byType" />
+
+	<bean id="platformMyBatisConfigurations" class="org.bonitasoft.engine.persistence.PlatformMyBatisConfigurationsProvider" autowire="byType" />
+
+	<bean name="SequenceFiles" class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+		<constructor-arg name="typeAliases">
+			<map>
+				<entry key="sequence" value="org.bonitasoft.engine.persistence.model.TenantSequence" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="mappers">
+			<list>
+				<value>org/bonitasoft/engine/persistence/mybatis/TenantSequenceMapper.xml</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="sequencesMappings">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="statementMapping">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="dbStatementsMapping">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="entityMappings">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="classAliasMappings">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="classFieldAliasMappings">
+			<null />
+		</constructor-arg>
+	</bean>
+
+	<bean name="PlatformSequenceFiles" class="org.bonitasoft.engine.persistence.PlatformMyBatisConfiguration">
+		<constructor-arg name="typeAliases">
+			<map>
+				<entry key="platformSequence" value="org.bonitasoft.engine.persistence.model.PlatformSequence" />
+			</map>
+		</constructor-arg>
+		<constructor-arg name="mappers">
+			<list>
+				<value>org/bonitasoft/engine/persistence/mybatis/PlatformSequenceMapper.xml</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="sequencesMappings">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="statementMapping">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="dbStatementsMapping">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="entityMappings">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="classAliasMappings">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="classFieldAliasMappings">
+			<null />
+		</constructor-arg>
+	</bean>
+
+</beans>

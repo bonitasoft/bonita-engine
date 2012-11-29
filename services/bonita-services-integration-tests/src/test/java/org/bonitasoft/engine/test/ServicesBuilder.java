@@ -36,12 +36,22 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class ServicesBuilder extends BaseServicesBuilder {
 
+    private static final String BONITA_TEST_PERSISTENCE_TEST = "bonita.test.persistence.test";
+
     public static final String BONITA_EVENT_IMPL_SP = "bos-events-api-impl";
+
+    public static final String BONITA_ARCHIVE_TEST = "bonita-archive-test-model";
 
     @Override
     protected List<String> getResourceList() {
         System.setProperty(BaseServicesBuilder.BONITA_TEST_EVENT_SERVICE, BONITA_EVENT_IMPL_SP);
         final List<String> resourceList = super.getResourceList();
+        final String property = System.getProperty(BONITA_TEST_PERSISTENCE, getDefaultPersistenceType());
+        final String persistenceType = property.substring(BONITA_PERSISTENCE.length());
+        resourceList.add(getServiceImplementationConfigurationFile("org/bonitasoft/engine/conf", BONITA_TEST_PERSISTENCE_TEST, "bonita-persistence-"
+                + persistenceType + "-test"));
+        resourceList.add(getPersistenceServiceConfigurationFileForModule("org/bonitasoft/engine/conf", BONITA_ARCHIVE_TEST, BONITA_ARCHIVE_TEST,
+                persistenceType));
         return resourceList;
     }
 
