@@ -4,14 +4,14 @@
  */
 package com.bonitasoft.engine.exception;
 
-import java.text.MessageFormat;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
 
-import org.bonitasoft.engine.exception.BonitaException;
+import java.text.MessageFormat;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ParameterNotFoundException extends BonitaException {
+public class ParameterNotFoundException extends ObjectNotFoundException {
 
     private static final long serialVersionUID = -5548436489951596184L;
 

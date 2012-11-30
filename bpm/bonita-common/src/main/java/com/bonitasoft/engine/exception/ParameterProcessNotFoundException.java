@@ -4,12 +4,12 @@
  */
 package com.bonitasoft.engine.exception;
 
-import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ParameterProcessNotFoundException extends BonitaException {
+public class ParameterProcessNotFoundException extends ObjectNotFoundException {
 
     private static final long serialVersionUID = -6743209754015668676L;
 
