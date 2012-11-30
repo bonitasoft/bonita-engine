@@ -17,6 +17,13 @@
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
+		<property name="sqlTransformers">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl">
+					<bean class="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImplSQLTransformer" />
+				</entry>
+			</map>
+		</property>
 	</bean>
 
 </beans>

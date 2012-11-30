@@ -17,6 +17,41 @@
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/archive/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
+		<property name="sqlTransformers">
+			<map>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
+				<!--  -->
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImplSQLTransformer" />
+				</entry>
+			</map>
+		</property>
 	</bean>
 
 </beans>

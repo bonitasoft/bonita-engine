@@ -109,33 +109,33 @@
 		<result property="containerType" column="containerType" />
 		<result property="sourceObjectId" column="sourceObjectId" />
 		<discriminator javaType="string" column="discriminant">
-			<case value="SIntegerDataInstanceImpl" resultType="ArchIntegerDataInstance">
+			<case value="SAIntegerDataInstanceImpl" resultType="ArchIntegerDataInstance">
 				<result property="value" javaType="int" column="intValue" />
 			</case>
-			<case value="SLongDataInstanceImpl" resultType="ArchLongDataInstance">
+			<case value="SALongDataInstanceImpl" resultType="ArchLongDataInstance">
 				<result property="value" javaType="long" column="longValue" />
 			</case>
-			<case value="SDoubleDataInstanceImpl" resultType="ArchDoubleDataInstance">
+			<case value="SADoubleDataInstanceImpl" resultType="ArchDoubleDataInstance">
 				<result property="value" javaType="double" column="doubleValue" />
 			</case>
-			<case value="SShortTextDataInstanceImpl" resultType="ArchShortTextDataInstance">
+			<case value="SAShortTextDataInstanceImpl" resultType="ArchShortTextDataInstance">
 				<result property="value" javaType="string" column="shortTextValue" />
 			</case>
-			<case value="SBooleanDataInstanceImpl" resultType="ArchBooleanDataInstance">
+			<case value="SABooleanDataInstanceImpl" resultType="ArchBooleanDataInstance">
 				<result property="value" javaType="boolean" jdbcType="BOOLEAN" column="booleanValue" />
 			</case>
-			<case value="SLongTextDataInstanceImpl" resultType="ArchLongTextDataInstance">
+			<case value="SALongTextDataInstanceImpl" resultType="ArchLongTextDataInstance">
 				<result property="value" javaType="string" jdbcType="CLOB" column="clobValue" />
 			</case>
-			<case value="SXMLDataInstanceImpl" resultType="ArchXMLDataInstance">
+			<case value="SAXMLDataInstanceImpl" resultType="ArchXMLDataInstance">
 				<result property="value" javaType="string" jdbcType="CLOB" column="clobValue" />
 				<result property="namespace" column="namespace" />
 				<result property="element" column="element" />
 			</case>
-			<case value="SBlobDataInstanceImpl" resultType="ArchBlobDataInstance">
+			<case value="SABlobDataInstanceImpl" resultType="ArchBlobDataInstance">
 				<result property="value" typeHandler="org.bonitasoft.engine.persistence.SerializableTypeHandler" jdbcType="BLOB" column="blobValue" />
 			</case>
-			<case value="SDateDataInstanceImpl" resultType="ArchDateDataInstance">
+			<case value="SADateDataInstanceImpl" resultType="ArchDateDataInstance">
 				<result property="value" javaType="long" column="longValue" />
 			</case>
 		</discriminator>

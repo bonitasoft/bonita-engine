@@ -69,6 +69,25 @@
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/archive/test/model/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/archive/test/model/db/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="filter" value="journal" />
+		<property name="sqlTransformers">
+			<map>
+				<entry key="org.bonitasoft.engine.archive.test.model.Laptop">
+					<bean class="org.bonitasoft.engine.archive.test.model.LaptopSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.test.model.Employee">
+					<bean class="org.bonitasoft.engine.archive.test.model.EmployeeSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.test.model.EmployeeProjectMapping">
+					<bean class="org.bonitasoft.engine.archive.test.model.EmployeeProjectMappingSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.test.model.Address">
+					<bean class="org.bonitasoft.engine.archive.test.model.AddressSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.test.model.Project">
+					<bean class="org.bonitasoft.engine.archive.test.model.ProjectSQLTransformer" />
+				</entry>
+			</map>
+		</property>
 	</bean>
 
 </beans>
