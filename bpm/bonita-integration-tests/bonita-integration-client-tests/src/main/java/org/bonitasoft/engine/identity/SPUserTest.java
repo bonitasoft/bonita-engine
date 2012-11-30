@@ -23,6 +23,14 @@ import org.junit.Test;
 public class SPUserTest extends CommonAPISPTest {
 
     @Test(expected = LoginException.class)
+    public void loginFailsUsingWrongTenant() throws BonitaException {
+        final String userName = "technical_user_username";
+        final String password = "technical_user_password";
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        loginTenant.login(2, userName, password);
+    }
+
+    @Test(expected = LoginException.class)
     public void loginFailsUsingWrongUser() throws BonitaException, BonitaHomeNotSetException {
         final String userName = "hannu";
         final String password = "technical_user_password";
