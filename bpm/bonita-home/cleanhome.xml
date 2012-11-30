@@ -1,10 +1,20 @@
 <project default="cleanhome">
-
-    <target name="cleanhome">
-        <delete dir="${basedir}/target/home"/>
-      	<copy todir="${basedir}/target/home">
-        	<fileset dir="${basedir}/home"  excludes="**/.svn"/>
-       	</copy>
-    </target>
-
+  <target name="cleanhome">
+    <delete dir="${basedir}/target/home" />
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/base" excludes="**/.svn" />
+    </copy>
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/mybatis" excludes="**/.svn" />
+    </copy>
+  </target>
+  <target name="hibernate">
+    <delete dir="${basedir}/target/home" />
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/base" excludes="**/.svn" />
+    </copy>
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/target/base-hibernate/home" excludes="**/.svn" />
+    </copy>
+  </target>
 </project>

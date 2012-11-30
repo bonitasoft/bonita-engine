@@ -12,8 +12,46 @@
 
 	<name>Bonita Home</name>
 
+	<dependencies>
+		<dependency>
+			<artifactId>bonita-home</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<version>${project.version}</version>
+			<type>zip</type>
+			<classifier>base-hibernate</classifier>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<artifactId>bonita-home</artifactId>
+									<groupId>org.bonitasoft.engine</groupId>
+									<version>${project.version}</version>
+									<type>zip</type>
+									<classifier>base-hibernate</classifier>
+								</artifactItem>
+							</artifactItems>
+							<includes>home/**</includes>
+							<outputDirectory>${project.build.directory}/base-hibernate</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -27,6 +65,8 @@
 						<configuration>
 							<descriptors>
 								<descriptor>assembly.xml</descriptor>
+								<descriptor>assembly-base-mybatis.xml</descriptor>
+								<descriptor>assembly-hibernate.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
