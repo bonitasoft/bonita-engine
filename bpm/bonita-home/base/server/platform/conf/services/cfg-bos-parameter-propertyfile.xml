@@ -1,11 +1,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
-		<constructor-arg name="authenticationService" ref="authenticationService" />
-		<constructor-arg name="sessionService" ref="sessionService" />
+	<bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="identityService" ref="identityService" />
+	</bean>
+	
+	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.parameter.ParameterExpressionExecutorStrategy">
+		<constructor-arg name="parameterService" ref="parameterService" />
 	</bean>
 
 </beans>

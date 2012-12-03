@@ -15,38 +15,38 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="businessLogSessionProvider" class="org.bonitasoft.engine.services.impl.BusinessLogSessionProviderImpl">
-		<constructor-arg name="sessionService" ref="sessionService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
-	</bean>
+    <bean id="businessLogSessionProvider" class="org.bonitasoft.engine.services.impl.BusinessLogSessionProviderImpl">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
+    </bean>
 
-	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="eventService" ref="eventService" />
+    <bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="deleteService" ref="deleteService" />
-	</bean>
+    </bean>
 
-	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="eventService" ref="eventService" />
+    <bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="deleteService" ref="deleteService" />
-	</bean>
+    </bean>
 
-	<bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
-		<constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-	</bean>
+    <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
+        <constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
+        <constructor-arg name="logger" ref="technicalLoggerService" />
+    </bean>
 
-	<bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
+    <bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
 
-	<bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
+    <bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
 
-	<bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
-		<constructor-arg name="validator" ref="xmlValidator" />
-	</bean>
+    <bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
+        <constructor-arg name="validator" ref="xmlValidator" />
+    </bean>
 
 	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor">
 		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />

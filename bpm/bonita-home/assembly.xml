@@ -14,5 +14,9 @@
 			<outputDirectory>home</outputDirectory>
 			<directory>mybatis</directory>
 		</fileSet>
+		<fileSet>
+			<outputDirectory>home</outputDirectory>
+			<directory>target/common/home</directory>
+		</fileSet>
 	</fileSets>
 </assembly>

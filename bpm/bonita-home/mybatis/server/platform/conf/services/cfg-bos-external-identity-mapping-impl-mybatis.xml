@@ -2,14 +2,6 @@
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/external/identity/mapping/db/${db.vendor}-createTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/external/identity/mapping/db/${db.vendor}-initTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/external/identity/mapping/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="journal" />
-		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/external/identity/mapping/db/${db.vendor}-deleteTenantObjects.sql" />
-	</bean>
-	
 	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
 			<map>

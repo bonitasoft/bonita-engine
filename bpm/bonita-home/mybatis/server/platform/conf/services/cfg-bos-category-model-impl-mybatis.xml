@@ -43,7 +43,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+	<bean id="db-bos-category-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-dropTables.sql" />

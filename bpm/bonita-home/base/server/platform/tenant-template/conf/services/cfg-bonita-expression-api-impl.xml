@@ -7,7 +7,20 @@
 		<constructor-arg name="checkExpressionReturnType" value="true" />
 	</bean>
 
-	<bean id="expressionExecutorStrategyProvider" class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider" autowire="byType" />
+	<bean id="expressionExecutorStrategyProvider" class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider">
+		<property name="expressionExecutors">
+			<list>
+				<ref bean="ConstantExpressionExecutorStrategy" />
+				<ref bean="GroovyScriptExpressionExecutorStrategy" />
+				<ref bean="InputExpressionExecutorStrategy" />
+				<ref bean="dataExpressionExecutorStrategy" />
+				<ref bean="patternExpressionExecutorStrategy" />
+				<ref bean="documentReferenceExpressionExecutorStrategy" />
+				<ref bean="EngineConstantExpressionExecutorStrategy" />
+				<ref bean="listExpressionExecutorStrategy" />
+			</list>
+		</property>
+	</bean>
 
 	<bean id="ConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
 
@@ -17,7 +30,7 @@
 	</bean>
 
 	<bean id="InputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
-	
+
 	<bean id="patternExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.PatternExpressionExecutorStrategy" />
 
 	<bean id="EngineConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" >
