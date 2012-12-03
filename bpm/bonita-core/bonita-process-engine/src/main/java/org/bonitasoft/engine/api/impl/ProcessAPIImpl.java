@@ -149,6 +149,8 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
@@ -268,6 +270,7 @@ import org.bonitasoft.engine.exception.ProcessResourceException;
 import org.bonitasoft.engine.exception.RetryTaskException;
 import org.bonitasoft.engine.exception.RoleNotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.SendEventException;
 import org.bonitasoft.engine.exception.TaskReleaseException;
 import org.bonitasoft.engine.exception.UnreleasableTaskException;
 import org.bonitasoft.engine.exception.UserNotFoundException;
@@ -361,6 +364,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.util.FileUtil;
 import org.bonitasoft.engine.util.IOUtil;
 import org.bonitasoft.engine.xml.Parser;
@@ -5681,5 +5685,29 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchResult<Document> searchResult = searchDocuments(searchOptionsBuilder.done());
 
         return searchResult.getCount();
+    }
+    
+    @Override
+    public void sendSignal(final String signalName) throws InvalidSessionException, SendEventException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
+        final SThrowSignalEventTriggerDefinitionBuilder signalEventTriggerDefinitionBuilder = tenantAccessor.getBPMDefinitionBuilders()
+                .getSThrowSignalEventTriggerDefinitionBuilder();
+        final SThrowSignalEventTriggerDefinition signalEventTriggerDefinition = signalEventTriggerDefinitionBuilder.createNewInstance(signalName).done();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                eventsHandler.handleThrowEvent(signalEventTriggerDefinition);
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new SendEventException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+
+        } catch (final STransactionException e) {
+            throw new SendEventException(e);
+        }
     }
 }
