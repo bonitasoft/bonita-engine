@@ -16,8 +16,8 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="employeeHandler" class="org.bonitasoft.engine.archive.test.model.SEmployeeHandlerImpl" />
+	<bean id="employeeHandler" class="org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl" />
 
-	<bean id="userPasswordHandler" class="org.bonitasoft.engine.identity.test.TestUserPasswordUpdateEventHandler" />
+	<bean id="userPasswordHandler" class="org.bonitasoft.engine.identity.TestUserPasswordUpdateEventHandler" />
 
 </beans>

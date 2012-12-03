@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.archive.model.SAEmployee">
+
+	<select id="getSAEmployeesByArchivedDate" parameterType="long" resultMap="saemployeeResultMap">		
+		SELECT saemployee.*
+		FROM saemployee
+		WHERE tenantid = #{tenantid}
+		<if test="time != null">
+			AND archiveDate &lt; #{time}
+		</if>
+	</select>
+
+	<select id="getAllSAEmployees" parameterType="long" resultMap="saemployeeResultMap">		
+		SELECT saemployee.*
+		FROM saemployee
+		WHERE tenantid = #{tenantid}
+	</select>
+
+	<select id="getSAEmployeeById" parameterType="long" resultMap="saemployeeResultMap">		
+		SELECT saemployee.*
+		FROM saemployee
+		WHERE id = #{id}
+		AND tenantid = #{tenantid}
+	</select>
+	
+	<insert id="insertSAEmployee" parameterType="saemployee">
+		INSERT INTO saemployee (TENANTID, ID, EMPLOYEEID,archiveDate)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.employeeId},#{entity.archiveDate})
+	</insert>
+
+	<delete id="deleteSAEmployee" parameterType="saemployee">
+		DELETE FROM saemployee
+		WHERE tenantid = #{tenantid}
+      AND id = #{id} 
+	</delete>
+	
+	<resultMap id="saemployeeResultMap" type="saemployee">
+		<id property="id" column="ID" />
+		<result property="employeeId" column="EMPLOYEEID" />
+		<result property="archiveDate" column="ARCHIVEDATE" />
+	</resultMap>
+
+</mapper>

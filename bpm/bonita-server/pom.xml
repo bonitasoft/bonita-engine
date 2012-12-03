@@ -7,7 +7,7 @@
 		<version>6.0.Beta.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-server</artifactId>
+	<artifactId>bonita-server-sp</artifactId>
 
 	<name>Bonita Server SP</name>
 
@@ -25,7 +25,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
+			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>

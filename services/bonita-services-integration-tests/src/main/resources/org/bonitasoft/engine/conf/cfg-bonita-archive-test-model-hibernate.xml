@@ -1,58 +1,57 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="hbm-bonita-archive-test" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
 		<property name="resources">
 			<set>
-				<value>org/bonitasoft/engine/archive/test/model/hibernate/archive.hbm.xml</value>
-				<value>org/bonitasoft/engine/archive/test/model/hibernate/archive.queries.hbm.xml</value>
+				<value>org/bonitasoft/engine/archive/model/hibernate/archive.hbm.xml</value>
+				<value>org/bonitasoft/engine/archive/model/hibernate/archive.queries.hbm.xml</value>
 			</set>
 		</property>
 		<property name="sequencesMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.archive.test.model.Employee" value="60" />
-				<entry key="org.bonitasoft.engine.archive.test.model.Laptop" value="61" />
-				<entry key="org.bonitasoft.engine.archive.test.model.Address" value="62" />
-				<entry key="org.bonitasoft.engine.archive.test.model.Project" value="63" />
-				<entry key="org.bonitasoft.engine.archive.test.model.EmployeeProjectMapping" value="64" />
-				<entry key="org.bonitasoft.engine.archive.test.model.SAEmployee" value="65" />
+				<entry key="org.bonitasoft.engine.archive.model.Employee" value="60" />
+				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="61" />
+				<entry key="org.bonitasoft.engine.archive.model.Address" value="62" />
+				<entry key="org.bonitasoft.engine.archive.model.Project" value="63" />
+				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="64" />
+				<entry key="org.bonitasoft.engine.archive.model.SAEmployee" value="65" />
 			</map>
 		</property>
 		<property name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.archive.test.model.Employee" value="employee" />
-				<entry key="org.bonitasoft.engine.archive.test.model.Laptop" value="laptop" />
-				<entry key="org.bonitasoft.engine.archive.test.model.Address" value="address" />
-				<entry key="org.bonitasoft.engine.archive.test.model.Project" value="project" />
-				<entry key="org.bonitasoft.engine.archive.test.model.EmployeeProjectMapping" value="employeeprojectmapping" />
-				<entry key="org.bonitasoft.engine.archive.test.model.SAEmployee" value="saemployee" />
+				<entry key="org.bonitasoft.engine.archive.model.Employee" value="employee" />
+				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="laptop" />
+				<entry key="org.bonitasoft.engine.archive.model.Address" value="address" />
+				<entry key="org.bonitasoft.engine.archive.model.Project" value="project" />
+				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="employeeprojectmapping" />
+				<entry key="org.bonitasoft.engine.archive.model.SAEmployee" value="saemployee" />
 			</map>
 		</property>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/archive/test/model/db/${db.vendor}-createTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/archive/test/model/db/${db.vendor}-initTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/archive/test/model/db/${db.vendor}-dropTables.sql" />
-    	<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/archive/test/model/db/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="filter" value="journal"/>
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-deleteTenantObjects.sql" />
+		<constructor-arg name="filter" value="journal" />
 		<property name="sqlTransformers">
 			<map>
-				<entry key="org.bonitasoft.engine.archive.test.model.Laptop">
-					<bean class="org.bonitasoft.engine.archive.test.model.LaptopSQLTransformer" />
+				<entry key="org.bonitasoft.engine.archive.model.Laptop">
+					<bean class="org.bonitasoft.engine.archive.model.LaptopSQLTransformer" />
 				</entry>
-				<entry key="org.bonitasoft.engine.archive.test.model.Employee">
-					<bean class="org.bonitasoft.engine.archive.test.model.EmployeeSQLTransformer" />
+				<entry key="org.bonitasoft.engine.archive.model.Employee">
+					<bean class="org.bonitasoft.engine.archive.model.EmployeeSQLTransformer" />
 				</entry>
-				<entry key="org.bonitasoft.engine.archive.test.model.EmployeeProjectMapping">
-					<bean class="org.bonitasoft.engine.archive.test.model.EmployeeProjectMappingSQLTransformer" />
+				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping">
+					<bean class="org.bonitasoft.engine.archive.model.EmployeeProjectMappingSQLTransformer" />
 				</entry>
-				<entry key="org.bonitasoft.engine.archive.test.model.Address">
-					<bean class="org.bonitasoft.engine.archive.test.model.AddressSQLTransformer" />
+				<entry key="org.bonitasoft.engine.archive.model.Address">
+					<bean class="org.bonitasoft.engine.archive.model.AddressSQLTransformer" />
 				</entry>
-				<entry key="org.bonitasoft.engine.archive.test.model.Project">
-					<bean class="org.bonitasoft.engine.archive.test.model.ProjectSQLTransformer" />
+				<entry key="org.bonitasoft.engine.archive.model.Project">
+					<bean class="org.bonitasoft.engine.archive.model.ProjectSQLTransformer" />
 				</entry>
 			</map>
 		</property>

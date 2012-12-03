@@ -7,14 +7,14 @@
 		<version>6.0.Beta.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-client</artifactId>
+	<artifactId>bonita-client-sp</artifactId>
 
 	<name>Bonita Client</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
+			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>

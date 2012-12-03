@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
+			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>

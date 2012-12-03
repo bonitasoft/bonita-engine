@@ -18,8 +18,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.archive.test.model.Employee;
-import org.bonitasoft.engine.archive.test.model.SEmployeeHandlerImpl;
+import org.bonitasoft.engine.archive.model.Employee;
+import org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;

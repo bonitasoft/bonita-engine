@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.archive.model.Project">
+
+	<select id="getProjectById" parameterType="long" resultMap="projectResultMap">
+		SELECT project.*
+		FROM project
+		WHERE id = #{id}
+		AND tenantid = #{tenantid}
+	</select>
+
+	<insert id="insertProject" parameterType="project">
+		INSERT INTO project (TENANTID, ID, name,archivedate)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name},#{entity.archiveDate})
+	</insert>
+
+	<delete id="deleteProject" parameterType="project">
+		DELETE FROM project
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<resultMap id="projectResultMap" type="project">
+		<id property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="archiveDate" column="ARCHIVEDATE" />
+	</resultMap>
+
+</mapper>

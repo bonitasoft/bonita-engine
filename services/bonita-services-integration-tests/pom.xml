@@ -11,7 +11,14 @@
 	<artifactId>bonita-services-integration-tests</artifactId>
 
 	<dependencies>
-	
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-integration-tests</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Archive -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.archive</groupId>
@@ -19,7 +26,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Authentication -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.authentication</groupId>
@@ -27,13 +34,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.authentication</groupId>
-			<artifactId>bonita-authentication-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-	
+
 		<!-- Cache -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>
@@ -49,7 +50,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Command -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.command</groupId>
@@ -75,7 +76,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Connector executor -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.connector</groupId>
@@ -83,7 +84,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Data -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data</groupId>
@@ -109,20 +110,8 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
+
 		<!-- Data Instance -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
 			<artifactId>bonita-data-instance-model-impl-hibernate</artifactId>
@@ -159,7 +148,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 
 		<!-- Delete -->
 		<dependency>
@@ -168,7 +157,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Document -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.document</groupId>
@@ -200,7 +189,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Dependency -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
@@ -270,7 +259,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Exception -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.exceptions</groupId>
@@ -278,7 +267,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Expression -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
@@ -292,14 +281,8 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		
+
+
 		<!-- External identity mapping -->
 
 		<dependency>
@@ -320,7 +303,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 
 		<!-- Identity -->
 		<dependency>
@@ -347,12 +330,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Logs -->
 		<dependency>
@@ -373,13 +350,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
+
 		<!-- Monitoring -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.monitoring</groupId>
@@ -451,7 +422,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Platform authentication -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.authentication</groupId>
@@ -459,13 +430,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.authentication</groupId>
-			<artifactId>bonita-platform-authentication-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
+
 		<!-- platform-command -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>
@@ -491,7 +456,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Platform Session -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.session</groupId>
@@ -505,13 +470,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
+
 		<!-- Profile -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.profile</groupId>
@@ -531,21 +490,15 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Privilege -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.privilege</groupId>
 			<artifactId>bonita-privilege-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.bonitasoft.engine.privilege</groupId>
 			<artifactId>bonita-privilege-model-impl</artifactId>
@@ -569,12 +522,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
 			<artifactId>bonita-recorder-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.recorder</groupId>
-			<artifactId>bonita-recorder-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -605,12 +552,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
 			<artifactId>bonita-scheduler-test</artifactId>
 			<version>${project.version}</version>
@@ -627,12 +568,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.session</groupId>
 			<artifactId>bonita-session-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.session</groupId>
-			<artifactId>bonita-session-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -660,7 +595,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Work -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.work</groupId>

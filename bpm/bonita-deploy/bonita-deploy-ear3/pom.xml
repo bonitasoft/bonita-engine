@@ -7,7 +7,7 @@
 		<version>6.0.Beta.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-deploy-ear3</artifactId>
+	<artifactId>bonita-deploy-ear3-sp</artifactId>
 	<packaging>ear</packaging>
 
 	<name>Bonita Deploy: EAR-EJB3</name>
@@ -21,12 +21,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
+			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-server</artifactId>
+			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -65,11 +65,11 @@
 						</ejbModule>
 						<jarModule>
 							<groupId>com.bonitasoft.engine</groupId>
-							<artifactId>bonita-common</artifactId>
+							<artifactId>bonita-common-sp</artifactId>
 						</jarModule>
 						<jarModule>
 							<groupId>com.bonitasoft.engine</groupId>
-							<artifactId>bonita-server</artifactId>
+							<artifactId>bonita-server-sp</artifactId>
 						</jarModule>
 						<jarModule>
 							<groupId>ch.qos.logback</groupId>

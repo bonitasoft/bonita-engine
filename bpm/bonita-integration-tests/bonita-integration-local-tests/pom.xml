@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-server</artifactId>
+			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -137,7 +137,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bonita-home</artifactId>
+									<artifactId>bonita-home-sp</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
 								</artifactItem>

@@ -15,29 +15,29 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-client</artifactId>
+			<artifactId>bonita-client-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-server</artifactId>
+			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home</artifactId>
+			<artifactId>bonita-home-sp</artifactId>
 			<version>${project.version}</version>
 			<type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-deploy-ear2</artifactId>
+			<artifactId>bonita-deploy-ear2-sp</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-deploy-ear3</artifactId>
+			<artifactId>bonita-deploy-ear3-sp</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
 		</dependency>

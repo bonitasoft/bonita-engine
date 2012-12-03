@@ -10,8 +10,8 @@
 		<dependencySet>
 			<outputDirectory>lib/client</outputDirectory>
 			<includes>
-				<include>com.bonitasoft.engine:bonita-client</include>
-				<include>com.bonitasoft.engine:bonita-common</include>
+				<include>com.bonitasoft.engine:bonita-client-sp</include>
+				<include>com.bonitasoft.engine:bonita-common-sp</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveFiltering>false</useTransitiveFiltering>
@@ -19,8 +19,8 @@
 		<dependencySet>
 			<outputDirectory>lib/server</outputDirectory>
 			<includes>
-				<include>com.bonitasoft.engine:bonita-server</include>
-				<include>com.bonitasoft.engine:bonita-common</include>
+				<include>com.bonitasoft.engine:bonita-server-sp</include>
+				<include>com.bonitasoft.engine:bonita-common-sp</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
@@ -28,7 +28,7 @@
 		<dependencySet>
 			<outputDirectory>ear/ejb2</outputDirectory>
 			<includes>
-				<include>com.bonitasoft.engine:bonita-deploy-ear2</include>
+				<include>com.bonitasoft.engine:bonita-deploy-ear2-sp</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
@@ -36,7 +36,7 @@
 		<dependencySet>
 			<outputDirectory>ear/ejb3</outputDirectory>
 			<includes>
-				<include>com.bonitasoft.engine:bonita-deploy-ear3</include>
+				<include>com.bonitasoft.engine:bonita-deploy-ear3-sp</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
@@ -44,7 +44,7 @@
 		<dependencySet>
 			<outputDirectory>resources</outputDirectory>
 			<includes>
-				<include>com.bonitasoft.engine:bonita-home</include>
+				<include>com.bonitasoft.engine:bonita-home-sp</include>
 			</includes>
 			<unpack>true</unpack>
 		</dependencySet>

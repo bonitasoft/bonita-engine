@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.bonitasoft.engine.archive.model.Employee">
+
+	<select id="getEmployeeById" parameterType="long" resultMap="employeeResultMap">
+		SELECT employee.*
+		FROM employee
+		WHERE id = #{id}
+		AND tenantid = #{tenantid}
+	</select>
+
+	<select id="getEmployeeByAge" parameterType="long" resultMap="employeeResultMap">
+		SELECT employee.*
+		FROM employee
+		WHERE tenantid = #{tenantid}
+		AND age = #{age}
+	</select>
+
+	<insert id="insertEmployee" parameterType="employee">
+		INSERT INTO employee (TENANTID, ID, name, age, laptopId, archivedate)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.age}, #{entity.laptopId}, #{entity.archiveDate})
+	</insert>
+
+	<delete id="deleteEmployee" parameterType="employee">
+		DELETE FROM employee
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</delete>
+
+	<update id="updateEmployee" parameterType="employee">
+		UPDATE employee
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name == '___bonitanull___'">name=NULL,</if>
+			<if test="name != null and name != '___bonitanull___'">name=#{name},</if>
+			<if test="age != null">age=#{age},</if>
+			<if test="laptopId != null">laptopId=#{laptopId},</if>
+			<if test="archiveDate != null">archivedate=#{archiveDate},</if>
+		</trim>
+		WHERE TENANTID = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<resultMap id="employeeResultMap" type="employee">
+		<id property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="age" column="AGE" />
+		<result property="laptopId" column="LAPTOPID" />
+		<result property="archiveDate" column="ARCHIVEDATE" />
+	</resultMap>
+
+</mapper>
