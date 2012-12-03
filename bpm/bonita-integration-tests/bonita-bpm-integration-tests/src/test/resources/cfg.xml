@@ -83,8 +83,6 @@
         <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
 
-    <bean id="testLogBuilder" class="org.bonitasoft.engine.archive.test.model.TestLogBuilder" />
-
     <bean id="sessionAccessor" class="org.bonitasoft.engine.sessionaccessor.ThreadLocalSessionAccessor" />
 
     <bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">

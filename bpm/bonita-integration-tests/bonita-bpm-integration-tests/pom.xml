@@ -25,7 +25,7 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-bpm-services-integration-tests</artifactId>
 			<version>${project.version}</version>
-			<type>test-jar</type>
+<!-- 			<type>test-jar</type> -->
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -266,12 +266,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.archive</groupId>
-			<artifactId>bonita-archive-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Authentication -->
 		<dependency>
@@ -313,12 +307,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.classloader</groupId>
 			<artifactId>bonita-classloader-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.classloader</groupId>
-			<artifactId>bonita-classloader-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -402,20 +390,8 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Data Instance -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
 			<artifactId>bonita-data-instance-model-impl-hibernate</artifactId>
@@ -465,12 +441,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
 			<artifactId>bonita-dependency-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -591,12 +561,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Expression Resolver -->
 		<dependency>
@@ -630,12 +594,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
 			<artifactId>bonita-identity-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
