@@ -19,12 +19,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.archive</groupId>
-			<artifactId>bonita-archive-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 		
 		<!-- Authentication -->
 		<dependency>
