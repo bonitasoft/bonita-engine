@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.test;
+package com.bonitasoft.services;
 
 import java.util.List;
 

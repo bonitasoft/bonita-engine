@@ -14,12 +14,12 @@
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-				<value>org/bonitasoft/engine/archive/model/mybatis/EmployeeMapper.xml</value>
-				<value>org/bonitasoft/engine/archive/model/mybatis/LaptopMapper.xml</value>
-				<value>org/bonitasoft/engine/archive/model/mybatis/AddressMapper.xml</value>
-				<value>org/bonitasoft/engine/archive/model/mybatis/ProjectMapper.xml</value>
-				<value>org/bonitasoft/engine/archive/model/mybatis/EmployeeProjectMappingMapper.xml</value>
-				<value>org/bonitasoft/engine/archive/model/mybatis/SAEmployeeMapper.xml</value>
+				<value>com/bonitasoft/services/archive/model/mybatis/EmployeeMapper.xml</value>
+				<value>com/bonitasoft/services/archive/model/mybatis/LaptopMapper.xml</value>
+				<value>com/bonitasoft/services/archive/model/mybatis/AddressMapper.xml</value>
+				<value>com/bonitasoft/services/archive/model/mybatis/ProjectMapper.xml</value>
+				<value>com/bonitasoft/services/archive/model/mybatis/EmployeeProjectMappingMapper.xml</value>
+				<value>com/bonitasoft/services/archive/model/mybatis/SAEmployeeMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">

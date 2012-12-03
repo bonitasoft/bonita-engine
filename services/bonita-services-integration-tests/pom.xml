@@ -687,7 +687,7 @@
 						<bonita.test.persistence>bonita-persistence-mybatis</bonita.test.persistence>
 					</systemPropertyVariables>
 					<includes>
-						<include>org/bonitasoft/engine/test/AllTestsSP.java</include>
+						<include>com/bonitasoft/services/AllTestsSP.java</include>
 					</includes>
 				</configuration>
 			</plugin>
