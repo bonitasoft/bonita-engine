@@ -26,6 +26,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -240,6 +241,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private EventsHandler eventsHandler;
 
     private EventService eventService;
+
+    private ConnectorExecutor connectorExecutor;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -851,6 +854,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public void initializeServiceAccessor(final ClassLoader classLoader) {
         beanAccessor.initializeContext(classLoader);
+    }
+
+    @Override
+    public ConnectorExecutor getConnectorExecutor() {
+        if (connectorExecutor == null) {
+            connectorExecutor = beanAccessor.getService(ConnectorExecutor.class);
+        }
+        return connectorExecutor;
     }
 
 }

@@ -33,6 +33,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -803,6 +804,11 @@ public class SPBPMServicesBuilder extends BaseServicesBuilder implements Platfor
     @Override
     public ParameterService getParameterService() {
         return this.getInstanceOf(ParameterService.class);
+    }
+
+    @Override
+    public ConnectorExecutor getConnectorExecutor() {
+        return this.getInstanceOf(ConnectorExecutor.class);
     }
 
 }
