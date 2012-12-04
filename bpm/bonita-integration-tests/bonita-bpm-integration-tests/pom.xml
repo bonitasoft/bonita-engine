@@ -25,7 +25,7 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-bpm-services-integration-tests</artifactId>
 			<version>${project.version}</version>
-<!-- 			<type>test-jar</type> -->
+			<!-- <type>test-jar</type> -->
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -926,6 +926,11 @@
 			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons-test</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
