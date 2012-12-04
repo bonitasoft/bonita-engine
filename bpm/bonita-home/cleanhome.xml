@@ -7,6 +7,9 @@
     <copy todir="${basedir}/target/home">
       <fileset dir="${basedir}/mybatis" excludes="**/.svn" />
     </copy>
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/target/common/home" excludes="**/.svn" />
+    </copy>
   </target>
   <target name="hibernate">
     <delete dir="${basedir}/target/home" />
