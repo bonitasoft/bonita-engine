@@ -149,7 +149,9 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
@@ -192,6 +194,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstan
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -5693,7 +5696,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final SThrowSignalEventTriggerDefinitionBuilder signalEventTriggerDefinitionBuilder = tenantAccessor.getBPMDefinitionBuilders()
-                .getSThrowSignalEventTriggerDefinitionBuilder();
+                .getThrowSignalEventTriggerDefinitionBuilder();
         final SThrowSignalEventTriggerDefinition signalEventTriggerDefinition = signalEventTriggerDefinitionBuilder.createNewInstance(signalName).done();
         try {
             transactionExecutor.openTransaction();
@@ -5709,5 +5712,77 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final STransactionException e) {
             throw new SendEventException(e);
         }
+    }
+    
+    @Override
+    public void sendMessage(final String messageName, final Expression targetProcess, final Expression targetFlowNode,
+            final Map<Expression, Expression> messageContent) throws InvalidSessionException, SendEventException {
+        sendMessage(messageName, targetProcess, targetFlowNode, messageContent, null);
+    }
+
+    @Override
+    public void sendMessage(final String messageName, final Expression targetProcess, final Expression targetFlowNode,
+            final Map<Expression, Expression> messageContent, final Map<Expression, Expression> correlations) throws InvalidSessionException,
+            SendEventException {
+        if (correlations != null && correlations.size() > 5) {
+            throw new SendEventException("Too many correlations: a message can not have more than 5 correlations.");
+        }
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
+        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final SDataDefinitionBuilders sDataDefinitionBuilders = tenantAccessor.getSDataDefinitionBuilders();
+        final ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
+
+        final SThrowMessageEventTriggerDefinitionBuilder messageEventTriggerDefinitionBuilder = tenantAccessor.getBPMDefinitionBuilders()
+                .getThrowMessageEventTriggerDefinitionBuilder();
+        final SExpression targetProcessNameExp = ServerModelConvertor.convertExpression(sExpressionBuilders, targetProcess);
+        final SExpression targetFlowNodeNameExp = ServerModelConvertor.convertExpression(sExpressionBuilders, targetFlowNode);
+        messageEventTriggerDefinitionBuilder.createNewInstance(messageName, targetProcessNameExp, targetFlowNodeNameExp);
+        if (correlations != null && !correlations.isEmpty()) {
+            addMessageCorrelations(messageEventTriggerDefinitionBuilder, sExpressionBuilders, correlations);
+        }
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                if (messageContent != null && !messageContent.isEmpty()) {
+                    addMessageContent(messageEventTriggerDefinitionBuilder, sExpressionBuilders, sDataDefinitionBuilders, expressionResolverService,
+                            messageContent);
+                }
+                final SThrowMessageEventTriggerDefinition messageEventTriggerDefinition = messageEventTriggerDefinitionBuilder.done();
+                eventsHandler.handleThrowEvent(messageEventTriggerDefinition);
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new SendEventException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+
+        } catch (final STransactionException e) {
+            throw new SendEventException(e);
+        }
+
+    }
+
+    private void addMessageContent(final SThrowMessageEventTriggerDefinitionBuilder messageEventTriggerDefinitionBuilder,
+            final SExpressionBuilders sExpressionBuilders, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final ExpressionResolverService expressionResolverService, final Map<Expression, Expression> messageContent) throws SBonitaException {
+        for (final Entry<Expression, Expression> entry : messageContent.entrySet()) {
+            expressionResolverService.evaluate(ServerModelConvertor.convertExpression(sExpressionBuilders, entry.getKey()));
+            final SDataDefinitionBuilder dataDefinitionBuilder = sDataDefinitionBuilders.getDataDefinitionBuilder().createNewInstance(
+                    entry.getKey().getContent(), entry.getValue().getReturnType());
+            dataDefinitionBuilder.setDefaultValue(ServerModelConvertor.convertExpression(sExpressionBuilders, entry.getValue()));
+            messageEventTriggerDefinitionBuilder.addData(dataDefinitionBuilder.done());
+        }
+
+    }
+
+    private void addMessageCorrelations(final SThrowMessageEventTriggerDefinitionBuilder messageEventTriggerDefinitionBuilder,
+            final SExpressionBuilders sExpressionBuilders, final Map<Expression, Expression> messageCorrelations) {
+        for (final Entry<Expression, Expression> entry : messageCorrelations.entrySet()) {
+            messageEventTriggerDefinitionBuilder.addCorrelation(ServerModelConvertor.convertExpression(sExpressionBuilders, entry.getKey()),
+                    ServerModelConvertor.convertExpression(sExpressionBuilders, entry.getValue()));
+        }
+
     }
 }
