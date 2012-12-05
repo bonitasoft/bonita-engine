@@ -22,8 +22,7 @@
 			<if test="iconName != null and iconName != '___bonitanull___'">iconName=#{iconName},</if>
 			<if test="iconPath == '___bonitanull___'">iconPath=NULL,</if>
 			<if test="iconPath != null and iconPath != '___bonitanull___'">iconPath=#{iconPath},</if>
-			<if test="createdBy == '___bonitanull___'">createdBy=NULL,</if>
-			<if test="createdBy != null and createdBy != '___bonitanull___'">createdBy=#{createdBy},</if>
+			<if test="createdBy != null">createdBy=#{createdBy},</if>
 			<if test="creationDate != null">creationDate=#{creationDate},</if>
 			<if test="lastUpdate != null">lastUpdate=#{lastUpdate},</if>
 		</trim>
