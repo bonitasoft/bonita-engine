@@ -165,6 +165,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -179,6 +180,7 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
@@ -955,6 +957,32 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public ArchivedProcessInstance getArchivedProcessInstance(final long id) throws InvalidSessionException, ProcessInstanceNotFoundException,
+            ProcessInstanceReadException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ProcessInstanceStateManager processInstanceStateManager = tenantAccessor.getProcessInstanceStateManager();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SAProcessInstance archivedProcessInstance = processInstanceService.getArchivedProcessInstance(id, persistenceService);
+                return ModelConvertor.toArchivedProcessInstance(archivedProcessInstance, processInstanceStateManager);
+            } catch (final SProcessInstanceNotFoundException e) {
+                throw new ProcessInstanceNotFoundException(e);
+            } catch (final SBonitaException e) {
+                throw new ProcessInstanceReadException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e1) {
+            throw new ProcessInstanceReadException(e1);
+        }
+    }
+
+    @Override
     public ArchivedProcessInstance getFinalArchivedProcessInstance(final long processInstanceId) throws InvalidSessionException,
             ProcessInstanceNotFoundException, ProcessInstanceReadException {
         final ArchiveService archiveService = getTenantAccessor().getArchiveService();
@@ -1557,6 +1585,34 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ActivityInstanceReadException(e.getMessage());
         }
         return ModelConvertor.toArchivedActivityInstance(getActivityInstance.getResult(), flowNodeStateManager);
+    }
+
+    @Override
+    public ArchivedFlowNodeInstance getArchivedFlowNodeInstance(final long archivedFlowNodeInstanceId) throws InvalidSessionException,
+            ActivityInstanceNotFoundException, ActivityInstanceReadException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SAFlowNodeInstance archivedFlowNodeInstance = activityInstanceService.getArchivedFlowNodeInstance(archivedFlowNodeInstanceId,
+                        persistenceService);
+                return ModelConvertor.toArchivedFlowNodeInstance(archivedFlowNodeInstance, flowNodeStateManager);
+            } catch (final SFlowNodeNotFoundException e) {
+                throw new ActivityInstanceNotFoundException(archivedFlowNodeInstanceId);
+            } catch (final SFlowNodeReadException e) {
+                throw new ActivityInstanceReadException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e1) {
+            throw new ActivityInstanceReadException(e1);
+        }
     }
 
     @Override

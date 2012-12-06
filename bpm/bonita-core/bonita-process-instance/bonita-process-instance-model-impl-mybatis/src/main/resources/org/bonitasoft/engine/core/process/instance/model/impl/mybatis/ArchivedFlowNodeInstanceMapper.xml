@@ -76,14 +76,18 @@
 		</discriminator>
 	</resultMap>
 
+	<select id="getArchivedFlowNodeInstanceById" parameterType="long" resultMap="archivedFlownodeInstanceResultMap">
+		SELECT *
+		FROM arch_flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.id = #{id}
+	</select>
+	
 	<select id="getAActivityInstanceById" parameterType="long" resultMap="archivedFlownodeInstanceResultMap">
 	    SELECT *
 	    FROM arch_flownode_instance af
 	    WHERE af.tenantid = #{tenantid}
 	    AND af.id = #{id}
-	    <if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
 	</select>
 
 	<select id="getAActivityInstanceByActivityInstanceId" parameterType="long" resultMap="archivedFlownodeInstanceResultMap">

@@ -72,6 +72,13 @@
 		LIMIT 1
 	</select>
 
+	<select id="getArchivedProcessInstance" parameterType="long" resultMap="archivedProcessInstanceResultMap">
+		SELECT *
+		FROM arch_process_instance ap
+		WHERE ap.tenantid = #{tenantid}
+		AND ap.id = #{id}
+	</select>
+
 	<select id="getNumberOfArchivedProcessInstances" parameterType="long" resultType="long">
 		SELECT COUNT(DISTINCT ap.sourceObjectId)
 		FROM arch_process_instance ap
