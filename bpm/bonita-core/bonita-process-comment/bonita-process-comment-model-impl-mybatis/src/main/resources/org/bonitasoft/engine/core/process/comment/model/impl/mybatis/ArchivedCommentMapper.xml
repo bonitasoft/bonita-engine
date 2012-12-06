@@ -30,6 +30,13 @@
 		</if>
 	</select>
 
+	<select id="getArchivedCommentById" parameterType="long" resultMap="archivedCommentResultMap">
+		SELECT *
+		FROM arch_process_comment AS arch_process_comment
+		WHERE arch_process_comment.tenantid = #{tenantid}
+		AND arch_process_comment.id = #{id} 
+	</select>
+
 	<select id="getNumberOfSAComment" parameterType="long" resultType="long">
 		SELECT COUNT(id)
 		FROM arch_process_comment AS arch_process_comment

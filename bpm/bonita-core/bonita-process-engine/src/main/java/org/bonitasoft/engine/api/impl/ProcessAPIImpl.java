@@ -134,8 +134,10 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
+import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
@@ -154,6 +156,7 @@ import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -204,6 +207,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
+import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.exception.ActivityCreationException;
 import org.bonitasoft.engine.exception.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
@@ -253,6 +257,7 @@ import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
 import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NoSuchActivityDefinitionException;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.PrivilegeInsertException;
@@ -5431,7 +5436,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ArchivedDocument getArchivedProcessDocument(final long sourceObjectId) throws InvalidSessionException, ArchivedDocumentNotFoundException {
+    public ArchivedDocument getArchivedVersionOfProcessDocument(final long sourceObjectId) throws InvalidSessionException, ArchivedDocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
@@ -5444,6 +5449,28 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ArchivedDocumentNotFoundException(e);
         }
         return ModelConvertor.toArchivedDocument(getArchivedDocument.getResult());
+    }
+
+    @Override
+    public ArchivedDocument getArchivedProcessDocument(final long archivedProcessDocumentId) throws InvalidSessionException, ArchivedDocumentNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SAProcessDocument archivedDocument = processDocumentService.getArchivedDocument(archivedProcessDocumentId, persistenceService);
+                return ModelConvertor.toArchivedDocument(archivedDocument);
+            } catch (final SDocumentNotFoundException e) {
+                throw new ArchivedDocumentNotFoundException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e1) {
+            throw new ArchivedDocumentNotFoundException(e1);
+        }
     }
 
     @Override
@@ -5462,6 +5489,30 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(e);
         }
         return searchArchivedComments.getResult();
+    }
+
+    @Override
+    public ArchivedComment getArchivedComment(final long archivedCommentId) throws InvalidSessionException, CommentReadException, ObjectNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final SCommentService sCommentService = tenantAccessor.getCommentService();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SAComment archivedComment = sCommentService.getArchivedComment(archivedCommentId, persistenceService);
+                return ModelConvertor.toArchivedComment(archivedComment);
+            } catch (final SCommentNotFoundException e) {
+                throw new ObjectNotFoundException(e);
+            } catch (final SBonitaException e) {
+                throw new CommentReadException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e1) {
+            throw new CommentReadException(e1);
+        }
     }
 
     @Override

@@ -51,14 +51,18 @@
 		</if>		
 	</select>
 
-	<select id="getArchivedDocumentById" parameterType="long" resultMap="archivedDocumentMappingResultMap">
+	<select id="getArchivedVersionOfDocument" parameterType="long" resultMap="archivedDocumentMappingResultMap">
 		SELECT *
 		FROM arch_document_mapping archived_document_mapping
 		WHERE archived_document_mapping.sourceObjectId = #{sourceObjectId}
 		AND archived_document_mapping.tenantid = #{tenantid}
-		<if test="filter != null">
-			AND ${filter}
-		</if>		
+	</select>
+
+	<select id="getArchivedDocumentById" parameterType="long" resultMap="archivedDocumentMappingResultMap">
+		SELECT *
+		FROM arch_document_mapping archived_document_mapping
+		WHERE archived_document_mapping.id = #{id}
+		AND archived_document_mapping.tenantid = #{tenantid}
 	</select>
 			
 	<select id="searchSADocumentMapping" parameterType="map" resultMap="archivedDocumentMappingResultMap">
