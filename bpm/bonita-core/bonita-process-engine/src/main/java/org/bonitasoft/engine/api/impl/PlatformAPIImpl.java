@@ -34,6 +34,7 @@ import org.bonitasoft.engine.api.impl.transaction.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.RemovePrivilege;
 import org.bonitasoft.engine.bpm.model.privilege.Privilege;
 import org.bonitasoft.engine.command.CommandService;
+import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -86,7 +87,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.util.IOUtil;
 
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenants;
@@ -177,7 +177,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public void startPlatform() throws InvalidSessionException, PlatformStartingException {
+    public void startNode() throws InvalidSessionException, PlatformStartingException {
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
@@ -230,7 +230,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public void stopPlatform() throws InvalidSessionException, PlatformStoppingException {
+    public void stopNode() throws InvalidSessionException, PlatformStoppingException {
         try {
             final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();

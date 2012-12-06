@@ -4,9 +4,9 @@
  */
 package com.bonitasoft.engine.exception;
 
-import org.bonitasoft.engine.exception.ObjectNotFoundException;
-
 import java.text.MessageFormat;
+
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
 
 /**
  * @author Matthieu Chaffotte

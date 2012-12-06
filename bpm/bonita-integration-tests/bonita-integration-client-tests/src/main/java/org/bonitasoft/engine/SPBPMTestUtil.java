@@ -54,7 +54,7 @@ public class SPBPMTestUtil {
             destroyPlatformAndTenants();
         }
         platformAPI.createPlatform();
-        platformAPI.startPlatform();
+        platformAPI.startNode();
         defaultTenantId = platformAPI.getDefaultTenant().getId();
         logoutPlatform(session);
     }
@@ -66,7 +66,7 @@ public class SPBPMTestUtil {
         try {
             tenants = platformAPI.getTenants(0, 1000);
         } catch (final PlatformNotStartedException pnse) {
-            platformAPI.startPlatform();
+            platformAPI.startNode();
             tenants = platformAPI.getTenants(0, 1000);
         }
         for (final Tenant tenant : tenants) {
@@ -81,7 +81,7 @@ public class SPBPMTestUtil {
                 platformAPI.deleteTenant(tenant.getId());
             }
         }
-        platformAPI.stopPlatform();
+        platformAPI.stopNode();
         platformAPI.deletePlaftorm();
         logoutPlatform(session);
     }
@@ -90,14 +90,14 @@ public class SPBPMTestUtil {
         final PlatformSession session = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.createPlatform();
-        platformAPI.startPlatform();
+        platformAPI.startNode();
         logoutPlatform(session);
     }
 
     public static void destroyEnvironmentWithoutTenant() throws BonitaException {
         final PlatformSession session = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.stopPlatform();
+        platformAPI.stopNode();
         platformAPI.deletePlaftorm();
         logoutPlatform(session);
     }

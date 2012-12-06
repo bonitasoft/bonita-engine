@@ -44,7 +44,7 @@ public class TenantTest {
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.createPlatform();
-        platformAPI.startPlatform();
+        platformAPI.startNode();
         defaultTenantId = platformAPI.createTenant(DEFAULT_TENANT, "default", "testIconName", "testIconPath", "default_tenant_name", "default_tenant_password");
         platformAPI.activateTenant(defaultTenantId);
         defaultTenantId = platformAPI.getTenantByName(DEFAULT_TENANT).getId();
@@ -58,7 +58,7 @@ public class TenantTest {
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.deactiveTenant(defaultTenantId);
         platformAPI.deleteTenant(defaultTenantId);
-        platformAPI.stopPlatform();
+        platformAPI.stopNode();
         platformAPI.deletePlaftorm();
         platformLoginAPI.logout(session);
     }

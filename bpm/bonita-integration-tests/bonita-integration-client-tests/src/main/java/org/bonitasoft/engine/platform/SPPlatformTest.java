@@ -64,7 +64,7 @@ public class SPPlatformTest {
         platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         logAsPlatformAdmin();
         platformAPI.createPlatform();
-        platformAPI.startPlatform();
+        platformAPI.startNode();
     }
 
     private static void logAsPlatformAdmin() throws PlatformLoginException, InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
@@ -76,7 +76,7 @@ public class SPPlatformTest {
     @AfterClass
     public static void afterClass() throws BonitaException {
         if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
-            platformAPI.stopPlatform();
+            platformAPI.stopNode();
         }
         platformAPI.deletePlaftorm();
         platformLoginAPI.logout(session);
@@ -665,14 +665,14 @@ public class SPPlatformTest {
             platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
             logAsPlatformAdmin();
             platformAPI.createPlatform();
-            platformAPI.startPlatform();
+            platformAPI.startNode();
         }
     }
 
     @Test
     public void methodsThatNeedPlatformToBeStarted() throws BonitaException {
         try {
-            platformAPI.stopPlatform();
+            platformAPI.stopNode();
             try {
                 platformAPI.getTenants(0, 1000);
                 fail();
@@ -689,7 +689,7 @@ public class SPPlatformTest {
             } catch (final PlatformNotStartedException e) {
             }
         } finally {
-            platformAPI.startPlatform();
+            platformAPI.startNode();
         }
     }
 
@@ -718,10 +718,10 @@ public class SPPlatformTest {
     @Test(expected = PlatformNotStartedException.class)
     public void platformStoppedCreateTenant() throws BonitaException {
         try {
-            platformAPI.stopPlatform();
+            platformAPI.stopNode();
             createATenant("TENANT_1");
         } finally {
-            platformAPI.startPlatform();
+            platformAPI.startNode();
         }
     }
 
@@ -729,10 +729,10 @@ public class SPPlatformTest {
     public void platformStoppedGetTenant() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
         try {
-            platformAPI.stopPlatform();
+            platformAPI.stopNode();
             platformAPI.getTenantByName(DEFAULT_TENANT_NAME);
         } finally {
-            platformAPI.startPlatform();
+            platformAPI.startNode();
             platformAPI.deleteTenant(tenantId);
         }
     }
@@ -741,10 +741,10 @@ public class SPPlatformTest {
     public void platformStoppedDeleteTenant() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
         try {
-            platformAPI.stopPlatform();
+            platformAPI.stopNode();
             platformAPI.deleteTenant(tenantId);
         } finally {
-            platformAPI.startPlatform();
+            platformAPI.startNode();
             platformAPI.deleteTenant(tenantId);
         }
     }
@@ -753,10 +753,10 @@ public class SPPlatformTest {
     public void platformStoppedActivatedTenant() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
         try {
-            platformAPI.stopPlatform();
+            platformAPI.stopNode();
             platformAPI.activateTenant(tenantId);
         } finally {
-            platformAPI.startPlatform();
+            platformAPI.startNode();
             platformAPI.deleteTenant(tenantId);
         }
     }
@@ -765,10 +765,10 @@ public class SPPlatformTest {
     public void platformStoppedDeactivatedTenant() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
         try {
-            platformAPI.stopPlatform();
+            platformAPI.stopNode();
             platformAPI.deactiveTenant(tenantId);
         } finally {
-            platformAPI.startPlatform();
+            platformAPI.startNode();
             platformAPI.deleteTenant(tenantId);
         }
     }
@@ -779,7 +779,7 @@ public class SPPlatformTest {
         PlatformState state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STARTED, state);
         // test stopped state
-        platformAPI.stopPlatform();
+        platformAPI.stopNode();
         state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STOPPED, state);
         // test exception:PlatformNotExistException
@@ -791,7 +791,7 @@ public class SPPlatformTest {
             platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
             logAsPlatformAdmin();
             platformAPI.createPlatform();
-            platformAPI.startPlatform();
+            platformAPI.startNode();
         }
     }
 
@@ -847,7 +847,7 @@ public class SPPlatformTest {
                 "username", "123");
         platformAPI.getTenantById(tenantId);
         // stop platform
-        platformAPI.stopPlatform();
+        platformAPI.stopNode();
         // update tenant
         final TenantUpdateDescriptor udpateDescriptor = new TenantUpdateDescriptor();
         udpateDescriptor.updateName("updatedTenantName");
@@ -856,7 +856,7 @@ public class SPPlatformTest {
             platformAPI.updateTenant(tenantId, udpateDescriptor);
         } finally {
             // clear-up
-            platformAPI.startPlatform();
+            platformAPI.startNode();
             platformAPI.deleteTenant(tenantId);
         }
     }
