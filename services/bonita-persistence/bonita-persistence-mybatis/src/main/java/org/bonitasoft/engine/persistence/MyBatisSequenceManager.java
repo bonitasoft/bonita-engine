@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.persistence.model.Sequence;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
@@ -23,14 +25,14 @@ import org.bonitasoft.engine.transaction.TechnicalTransaction;
  */
 public class MyBatisSequenceManager<T extends Sequence> extends SequenceManager<T, AbstractMybatisPersistenceService> {
 
-    public MyBatisSequenceManager(final AbstractMybatisPersistenceService persistenceService, final Integer rangeSize, final Class<T> sequenceClass,
-            final String getSequenceQueryName, final boolean useTenant) {
-        super(persistenceService, rangeSize, sequenceClass, getSequenceQueryName, useTenant);
+    public MyBatisSequenceManager(final AbstractMybatisPersistenceService persistenceService, final Integer rangeSize, final Map<String, Integer> rangeSizes,
+            final Class<T> sequenceClass, final String getSequenceQueryName, final boolean useTenant, final Map<String, Long> sequencesMappings) {
+        super(persistenceService, rangeSizes, rangeSize, sequenceClass, getSequenceQueryName, useTenant, sequencesMappings);
     }
 
     @Override
     protected Object selectById(final TechnicalTransaction tx, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
-    	final MybatisSession session = ((MybatisTechnicalTransaction)tx).getSession();
+        final MybatisSession session = ((MybatisTechnicalTransaction) tx).getSession();
         final Object r = getPersistenceService().selectById(session, selectDescriptor);
         return r;
     }
@@ -42,7 +44,7 @@ public class MyBatisSequenceManager<T extends Sequence> extends SequenceManager<
 
     @Override
     protected void updateSequence(final TechnicalTransaction tx, final Sequence sequence, final long nextSequenceId) throws SPersistenceException {
-    	final MybatisSession session = ((MybatisTechnicalTransaction)tx).getSession();
+        final MybatisSession session = ((MybatisTechnicalTransaction) tx).getSession();
         getPersistenceService().update(session, UpdateDescriptor.buildSetField(sequence, "nextId", nextSequenceId));
     }
 

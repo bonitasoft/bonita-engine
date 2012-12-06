@@ -66,7 +66,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private final Map<String, StatementMapping> statementMappings;
 
-    private final Map<String, Long> sequencesMappings;
+    protected final Map<String, Long> sequencesMappings;
 
     private final Map<String, String> classAliasMappings;
 
@@ -80,6 +80,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private final TechnicalLoggerPrintWriter errorWriter;
 
+    private final Integer rangeSize;
+
     public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final AbstractMyBatisConfigurationsProvider configurations,
             final int rangeSize, final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter,
@@ -89,6 +91,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         this.txService = txService;
         this.cacheEnabled = cacheEnabled;
         this.mybatisSqlSessionFactoryProvider = mybatisSqlSessionFactoryProvider;
+        this.rangeSize = rangeSize;
 
         statementMappings = new HashMap<String, StatementMapping>();
         sequencesMappings = new HashMap<String, Long>();
@@ -116,12 +119,9 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         entityMappings.putAll(myBatisConfiguration.getEntityMappings());
     }
 
-    /**
-     * @return
-     * @throws TenantIdNotSetException
-     *             in case of getting sequences for tenants
-     */
-    protected abstract MyBatisSequenceManager<?> getSequenceManager() throws TenantIdNotSetException;
+    public Integer getRangeSize(final PersistentObject entity) {
+        return rangeSize;
+    }
 
     private MybatisTechnicalTransaction getTechnicalTx() {
         return technicalTxs.get();
@@ -298,11 +298,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         }
         if (id == null || id == -1 || id == 0) {
             try {
-                final Long sequenceId = sequencesMappings.get(entity.getClass().getName());
-                if (sequenceId == null) {
-                    throw new SPersistenceException("No sequence id found for entity with class " + entity.getClass().getName());
-                }
-                id = getSequenceManager().getNextId(sequenceId);
+                id = getSequenceManager(entity).getNextId(entity.getClass().getName());
                 ClassReflector.invokeSetter(entity, "setId", long.class, id);
             } catch (final Exception e) {
                 throw new SPersistenceException("Problem while saving entity: " + entity + " with id: " + id, e);
@@ -740,4 +736,11 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         }
 
     }
+
+    /**
+     * @return
+     * @throws TenantIdNotSetException
+     *             in case of getting sequences for tenants
+     */
+    protected abstract MyBatisSequenceManager<?> getSequenceManager(final PersistentObject entity) throws TenantIdNotSetException;
 }

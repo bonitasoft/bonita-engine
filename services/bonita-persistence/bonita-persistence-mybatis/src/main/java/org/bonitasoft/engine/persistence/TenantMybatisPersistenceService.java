@@ -37,15 +37,19 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
 
     private final ReadSessionAccessor sessionAccessor;
 
+    private final Map<String, Integer> rangeSizes;
+
     private final int rangeSize;
 
     public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final ReadSessionAccessor sessionAccessor, final boolean cacheEnabled, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
-            final MyBatisConfigurationsProvider configurations, final int rangeSize, final DBConfigurationsProvider dbConfigurationsProvider,
-            final String statementDelimiter, final TechnicalLoggerService technicalLoggerService) throws SPersistenceException {
+            final MyBatisConfigurationsProvider configurations, final int rangeSize, final Map<String, Integer> rangeSizes,
+            final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final TechnicalLoggerService technicalLoggerService)
+            throws SPersistenceException {
         super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, rangeSize, dbConfigurationsProvider,
                 statementDelimiter, technicalLoggerService);
         this.rangeSize = rangeSize;
+        this.rangeSizes = rangeSizes;
         this.sessionAccessor = sessionAccessor;
         sequenceManagers = new HashMap<Long, MyBatisSequenceManager<TenantSequence>>();
     }
@@ -65,14 +69,14 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
     }
 
     @Override
-    protected MyBatisSequenceManager<TenantSequence> getSequenceManager() throws TenantIdNotSetException {
+    protected MyBatisSequenceManager<TenantSequence> getSequenceManager(final PersistentObject entity) throws TenantIdNotSetException {
         final Long tenantId = sessionAccessor.getTenantId();
         if (!sequenceManagers.containsKey(tenantId)) {
             synchronized (this) {
                 // double check mandatory as the whole method is not synchronized
                 if (!sequenceManagers.containsKey(tenantId)) {
-                    final MyBatisSequenceManager<TenantSequence> sequenceManager = new MyBatisSequenceManager<TenantSequence>(this, rangeSize,
-                            TenantSequence.class, "getSequence", true);
+                    final MyBatisSequenceManager<TenantSequence> sequenceManager = new MyBatisSequenceManager<TenantSequence>(this, rangeSize, rangeSizes,
+                            TenantSequence.class, "getSequence", true, sequencesMappings);
                     sequenceManagers.put(tenantId, sequenceManager);
                 }
             }
