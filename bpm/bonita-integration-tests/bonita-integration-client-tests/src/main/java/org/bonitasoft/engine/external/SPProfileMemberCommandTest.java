@@ -122,7 +122,7 @@ public class SPProfileMemberCommandTest extends CommonAPISPTest {
             throws BonitaException, BonitaHomeNotSetException {
         final UserBuilder userBuilder = new UserBuilder().createNewInstance(userName, password);
         userBuilder.setFirstName(firstName).setLastName(lastName);
-        return getIdentityAPI().createUser(userBuilder.done());
+        return getIdentityAPI().createUser(userBuilder.done(), null, null);
     }
 
     private void deleteProfileMember(final Map<String, Serializable> addProfileMemberResult) throws InvalidSessionException, CommandNotFoundException,

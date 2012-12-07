@@ -119,7 +119,7 @@ public class LoginAPIImpl implements LoginAPI {
                 final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
                 final long lastConnection = System.currentTimeMillis();
                 final EntityUpdateDescriptor updateDescriptor = userUpdateBuilder.updateLastConnection(lastConnection).done();
-                final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor);
+                final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null, null);
                 transactionExecutor.execute(updateUser);
             } catch (final SBonitaException sbe) {
                 // XXX check if we have currently the technical user, else throw exception

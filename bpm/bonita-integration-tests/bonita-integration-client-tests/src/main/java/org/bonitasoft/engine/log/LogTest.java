@@ -112,7 +112,7 @@ public class LogTest extends CommonAPISPTest {
         final UserUpdateDescriptor updateDescriptor = new UserUpdateDescriptor();
         updateDescriptor.updateUserName("new");
         updateDescriptor.updatePassword("newPassword");
-        getIdentityAPI().updateUser(userOld.getId(), updateDescriptor);
+        getIdentityAPI().updateUser(userOld.getId(), updateDescriptor, null, null);
 
         actual = getLogAPI().getNumberOfLogs();
         assertEquals(before + 2, actual);

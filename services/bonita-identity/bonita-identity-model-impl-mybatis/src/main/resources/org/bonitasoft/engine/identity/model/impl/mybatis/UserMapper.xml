@@ -5,17 +5,16 @@
     <cache/>
 	<insert id="insertSUserImpl" parameterType="user">
 		INSERT INTO user_ (tenantid, id, firstName, lastName, password, userName, managerUserId, delegeeUserName, title, jobTitle, iconName, iconPath,
-			createdBy, creationDate, lastUpdate, lastConnection, PERSOEMAIL, PERSOPHONE, PERSOMOBILE, PERSOFAX, PERSOBUILDING, PERSOROOM, PERSOADDRESS,
-			PERSOZIPCODE, PERSOCITY, PERSOSTATE, PERSOCOUNTRY, PERSOWEBSITE, PROEMAIL, PROPHONE, PROMOBILE, PROFAX, PROBUILDING, PROROOM, PROADDRESS,
-			PROZIPCODE, PROCITY, PROSTATE, PROCOUNTRY, PROWEBSITE)
+			createdBy, creationDate, lastUpdate, lastConnection)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.firstName}, #{entity.lastName}, #{entity.password}, #{entity.userName}, #{entity.managerUserId},
 			#{entity.delegeeUserName}, #{entity.title}, #{entity.jobTitle}, #{entity.iconName}, #{entity.iconPath}, #{entity.createdBy},
-			#{entity.creationDate}, #{entity.lastUpdate}, #{entity.lastConnection}, #{entity.personalEmail}, #{entity.personalPhoneNumber},
-			#{entity.personalMobileNumber}, #{entity.personalFaxNumber}, #{entity.personalBuilding}, #{entity.personalRoom}, #{entity.personalAddress},
-			#{entity.personalZipCode}, #{entity.personalCity}, #{entity.personalState}, #{entity.personalCountry}, #{entity.personalWebsite},
-			#{entity.professionalEmail}, #{entity.professionalPhoneNumber}, #{entity.professionalMobileNumber}, #{entity.professionalFaxNumber},
-			#{entity.professionalBuilding}, #{entity.professionalRoom}, #{entity.professionalAddress}, #{entity.professionalZipCode},
-			#{entity.professionalCity}, #{entity.professionalState}, #{entity.professionalCountry}, #{entity.professionalWebsite})
+			#{entity.creationDate}, #{entity.lastUpdate}, #{entity.lastConnection})
+	</insert>
+	
+	<insert id="insertSContactInfoImpl" parameterType="user_contactinfo">
+		INSERT INTO user_contactinfo (tenantid, id, EMAIL, PHONE, MOBILE, FAX, BUILDING, ROOM, ADDRESS, ZIPCODE, CITY, STATE, COUNTRY, WEBSITE, userId, personal)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.email}, #{entity.phoneNumber}, #{entity.mobileNumber}, #{entity.faxNumber}, #{entity.building}, #{entity.room},
+			#{entity.address}, #{entity.zipCode}, #{entity.city}, #{entity.state}, #{entity.country}, #{entity.website}, #{entity.userId}, #{entity.personal})
 	</insert>
 
 	<update id="updateSUserImpl" parameterType="user">
@@ -44,54 +43,40 @@
 			<if test="creationDate != null">creationDate=#{creationDate},</if>
 			<if test="lastUpdate != null">lastUpdate=#{lastUpdate},</if>
 			<if test="lastConnection != null">lastConnection=#{lastConnection},</if>
-			<if test="personalEmail == '___bonitanull___'">PERSOEMAIL=NULL,</if>
-			<if test="personalEmail != null and personalEmail != '___bonitanull___'">PERSOEMAIL=#{personalEmail},</if>
-			<if test="personalPhoneNumber == '___bonitanull___'">PERSOPHONE=NULL,</if>
-			<if test="personalPhoneNumber != null and personalPhoneNumber != '___bonitanull___'">PERSOPHONE=#{personalPhoneNumber},</if>
-			<if test="personalMobileNumber == '___bonitanull___'">PERSOMOBILE=NULL,</if>
-			<if test="personalMobileNumber != null and personalMobileNumber != '___bonitanull___'">PERSOMOBILE=#{personalMobileNumber},</if>
-			<if test="personalFaxNumber == '___bonitanull___'">PERSOFAX=NULL,</if>
-			<if test="personalFaxNumber != null and personalFaxNumber != '___bonitanull___'">PERSOFAX=#{personalFaxNumber},</if>
-			<if test="personalBuilding == '___bonitanull___'">PERSOBUILDING=NULL,</if>
-			<if test="personalBuilding != null and personalBuilding != '___bonitanull___'">PERSOBUILDING=#{personalBuilding},</if>
-			<if test="personalRoom == '___bonitanull___'">PERSOROOM=NULL,</if>
-			<if test="personalRoom != null and personalRoom != '___bonitanull___'">PERSOROOM=#{personalRoom},</if>
-			<if test="personalAddress == '___bonitanull___'">PERSOADDRESS=NULL,</if>
-			<if test="personalAddress != null and personalAddress != '___bonitanull___'">PERSOADDRESS=#{personalAddress},</if>
-			<if test="personalZipCode == '___bonitanull___'">PERSOZIPCODE=NULL,</if>
-			<if test="personalZipCode != null and personalZipCode != '___bonitanull___'">PERSOZIPCODE=#{personalZipCode},</if>
-			<if test="personalCity == '___bonitanull___'">PERSOCITY=NULL,</if>
-			<if test="personalCity != null and personalCity != '___bonitanull___'">PERSOCITY=#{personalCity},</if>
-			<if test="personalState == '___bonitanull___'">PERSOSTATE=NULL,</if>
-			<if test="personalState != null and personalState != '___bonitanull___'">PERSOSTATE=#{personalState},</if>
-			<if test="personalCountry == '___bonitanull___'">PERSOCOUNTRY=NULL,</if>
-			<if test="personalCountry != null and personalCountry != '___bonitanull___'">PERSOCOUNTRY=#{personalCountry},</if>
-			<if test="personalWebsite == '___bonitanull___'">PERSOWEBSITE=NULL,</if>
-			<if test="personalWebsite != null and personalWebsite != '___bonitanull___'">PERSOWEBSITE=#{personalWebsite},</if>
-			<if test="professionalEmail == '___bonitanull___'">PROEMAIL=NULL,</if>
-			<if test="professionalEmail != null and professionalEmail != '___bonitanull___'">PROEMAIL=#{professionalEmail},</if>
-			<if test="professionalPhoneNumber == '___bonitanull___'">PROPHONE=NULL,</if>
-			<if test="professionalPhoneNumber != null and professionalPhoneNumber != '___bonitanull___'">PROPHONE=#{professionalPhoneNumber},</if>
-			<if test="professionalMobileNumber == '___bonitanull___'">PROMOBILE=NULL,</if>
-			<if test="professionalMobileNumber != null and professionalMobileNumber != '___bonitanull___'">PROMOBILE=#{professionalMobileNumber},</if>
-			<if test="professionalFaxNumber == '___bonitanull___'">PROFAX=NULL,</if>
-			<if test="professionalFaxNumber != null and professionalFaxNumber != '___bonitanull___'">PROFAX=#{professionalFaxNumber},</if>
-			<if test="professionalBuilding == '___bonitanull___'">PROBUILDING=NULL,</if>
-			<if test="professionalBuilding != null and professionalBuilding != '___bonitanull___'">PROBUILDING=#{professionalBuilding},</if>
-			<if test="professionalRoom == '___bonitanull___'">PROROOM=NULL,</if>
-			<if test="professionalRoom != null and professionalRoom != '___bonitanull___'">PROROOM=#{professionalRoom},</if>
-			<if test="professionalAddress == '___bonitanull___'">PROADDRESS=NULL,</if>
-			<if test="professionalAddress != null and professionalAddress != '___bonitanull___'">PROADDRESS=#{professionalAddress},</if>
-			<if test="professionalZipCode == '___bonitanull___'">PROZIPCODE=NULL,</if>
-			<if test="professionalZipCode != null and professionalZipCode != '___bonitanull___'">PROZIPCODE=#{professionalZipCode},</if>
-			<if test="professionalCity == '___bonitanull___'">PROCITY=NULL,</if>
-			<if test="professionalCity != null and professionalCity != '___bonitanull___'">PROCITY=#{professionalCity},</if>
-			<if test="professionalState == '___bonitanull___'">PROSTATE=NULL,</if>
-			<if test="professionalState != null and professionalState != '___bonitanull___'">PROSTATE=#{professionalState},</if>
-			<if test="professionalCountry == '___bonitanull___'">PROCOUNTRY=NULL,</if>
-			<if test="professionalCountry != null and professionalCountry != '___bonitanull___'">PROCOUNTRY=#{professionalCountry},</if>
-			<if test="professionalWebsite == '___bonitanull___'">PROWEBSITE=NULL,</if>
-			<if test="professionalWebsite != null and professionalWebsite != '___bonitanull___'">PROWEBSITE=#{professionalWebsite},</if>
+		</trim>
+		WHERE tenantid = #{tenantid}
+		AND id = #{id}
+	</update>
+
+	<update id="updateSContactInfoImpl" parameterType="user_contactinfo">
+		UPDATE user_contactinfo
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="email == '___bonitanull___'">EMAIL=NULL,</if>
+			<if test="email != null and email != '___bonitanull___'">EMAIL=#{email},</if>
+			<if test="phoneNumber == '___bonitanull___'">PHONE=NULL,</if>
+			<if test="phoneNumber != null and phoneNumber != '___bonitanull___'">PHONE=#{phoneNumber},</if>
+			<if test="mobileNumber == '___bonitanull___'">MOBILE=NULL,</if>
+			<if test="mobileNumber != null and mobileNumber != '___bonitanull___'">MOBILE=#{mobileNumber},</if>
+			<if test="baxNumber == '___bonitanull___'">FAX=NULL,</if>
+			<if test="faxNumber != null and faxNumber != '___bonitanull___'">FAX=#{faxNumber},</if>
+			<if test="building == '___bonitanull___'">BUILDING=NULL,</if>
+			<if test="building != null and building != '___bonitanull___'">BUILDING=#{building},</if>
+			<if test="room == '___bonitanull___'">ROOM=NULL,</if>
+			<if test="room != null and room != '___bonitanull___'">ROOM=#{room},</if>
+			<if test="address == '___bonitanull___'">ADDRESS=NULL,</if>
+			<if test="address != null and address != '___bonitanull___'">ADDRESS=#{address},</if>
+			<if test="zipCode == '___bonitanull___'">ZIPCODE=NULL,</if>
+			<if test="zipCode != null and zipCode != '___bonitanull___'">ZIPCODE=#{zipCode},</if>
+			<if test="city == '___bonitanull___'">CITY=NULL,</if>
+			<if test="city != null and city != '___bonitanull___'">CITY=#{city},</if>
+			<if test="state == '___bonitanull___'">STATE=NULL,</if>
+			<if test="state != null and state != '___bonitanull___'">STATE=#{state},</if>
+			<if test="country == '___bonitanull___'">COUNTRY=NULL,</if>
+			<if test="country != null and country != '___bonitanull___'">COUNTRY=#{country},</if>
+			<if test="website == '___bonitanull___'">WEBSITE=NULL,</if>
+			<if test="website != null and website != '___bonitanull___'">WEBSITE=#{website},</if>
+<!-- 			<if test="userId != null">userId=#{userId},</if> -->
+<!-- 			<if test="personal != null">personal=#{personal},</if> -->
 		</trim>
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}
@@ -119,30 +104,23 @@
 		<result property="creationDate" column="creationDate" />
 		<result property="lastUpdate" column="lastUpdate" />
 		<result property="lastConnection" column="lastConnection" />
-		<result property="personalEmail" column="PERSOEMAIL" />
-		<result property="personalPhoneNumber" column="PERSOPHONE" />
-		<result property="personalMobileNumber" column="PERSOMOBILE" />
-		<result property="personalFaxNumber" column="PERSOFAX" />
-		<result property="personalBuilding" column="PERSOBUILDING" />
-		<result property="personalRoom" column="PERSOROOM" />
-		<result property="personalAddress" column="PERSOADDRESS" />
-		<result property="personalZipCode" column="PERSOZIPCODE" />
-		<result property="personalCity" column="PERSOCITY" />
-		<result property="personalState" column="PERSOSTATE" />
-		<result property="personalCountry" column="PERSOCOUNTRY" />
-		<result property="personalWebsite" column="PERSOWEBSITE" />
-		<result property="professionalEmail" column="PROEMAIL" />
-		<result property="professionalPhoneNumber" column="PROPHONE" />
-		<result property="professionalMobileNumber" column="PROMOBILE" />
-		<result property="professionalFaxNumber" column="PROFAX" />
-		<result property="professionalBuilding" column="PROBUILDING" />
-		<result property="professionalRoom" column="PROROOM" />
-		<result property="professionalAddress" column="PROADDRESS" />
-		<result property="professionalZipCode" column="PROZIPCODE" />
-		<result property="professionalCity" column="PROCITY" />
-		<result property="professionalState" column="PROSTATE" />
-		<result property="professionalCountry" column="PROCOUNTRY" />
-		<result property="professionalWebsite" column="PROWEBSITE" />
+	</resultMap>
+
+	<resultMap id="userContactInfoResultMap" type="user_contactinfo">
+		<result property="email" column="EMAIL" />
+		<result property="phoneNumber" column="PHONE" />
+		<result property="mobileNumber" column="MOBILE" />
+		<result property="faxNumber" column="FAX" />
+		<result property="building" column="BUILDING" />
+		<result property="room" column="ROOM" />
+		<result property="address" column="ADDRESS" />
+		<result property="zipCode" column="ZIPCODE" />
+		<result property="city" column="CITY" />
+		<result property="state" column="STATE" />
+		<result property="country" column="COUNTRY" />
+		<result property="website" column="WEBSITE" />
+		<result property="userId" column="USERID" />
+		<result property="personal" column="PERSONAL" />
 	</resultMap>
 
 	<select id="getUserById" parameterType="long" resultMap="userResultMap">
@@ -251,6 +229,15 @@
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
+	</select>
+	
+	<!-- parameterType="string" -->
+	<select id="getUserContactInfo" resultMap="userContactInfoResultMap">
+		SELECT *
+		FROM user_contactinfo
+		WHERE tenantid = #{tenantid}
+		AND userId = #{userId}
+		AND personal = #{personal}
 	</select>
 
 	<select id="getUsersByRole" parameterType="string" resultMap="userResultMap">

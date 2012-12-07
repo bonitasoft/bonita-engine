@@ -340,7 +340,7 @@ public class APITestSPUtil {
     protected User createUser(final String userName, final String password) throws InvalidSessionException, UserAlreadyExistException, UserCreationException {
         final UserBuilder userBuilder = new UserBuilder();
         userBuilder.createNewInstance(userName, password);
-        return identityAPI.createUser(userBuilder.done());
+        return identityAPI.createUser(userBuilder.done(), null, null);
     }
 
     protected User createUserAndLogin(final String userName, final String password) throws BonitaException {
@@ -384,13 +384,13 @@ public class APITestSPUtil {
     }
 
     protected User createUser(final User user) throws BonitaException {
-        return identityAPI.createUser(user);
+        return identityAPI.createUser(user, null, null);
     }
 
     protected User createUserWithManager(final String userName, final long managerId) throws BonitaException {
         final UserBuilder userBuilder = new UserBuilder();
         userBuilder.createNewInstance(userName, "bpm").setManagerUserId(managerId);
-        return identityAPI.createUser(userBuilder.done());
+        return identityAPI.createUser(userBuilder.done(), null, null);
     }
 
     public ProcessAPI getProcessAPI() {
@@ -898,7 +898,7 @@ public class APITestSPUtil {
         final UserBuilder userBuilder = new UserBuilder();
         userBuilder.createNewInstance(username, password);
         userBuilder.setFirstName(firstName).setLastName(lastName);
-        return identityAPI.createUser(userBuilder.done());
+        return identityAPI.createUser(userBuilder.done(), null, null);
     }
 
     protected Group createGroup(final String groupName) throws InvalidSessionException, GroupAlreadyExistException, GroupCreationException {
