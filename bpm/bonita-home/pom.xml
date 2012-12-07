@@ -12,16 +12,6 @@
 
 	<name>Bonita Home</name>
 
-	<dependencies>
-		<dependency>
-			<artifactId>bonita-home</artifactId>
-			<groupId>org.bonitasoft.engine</groupId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<classifier>base-hibernate</classifier>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

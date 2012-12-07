@@ -68,6 +68,7 @@
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-deleteTenantObjects.sql" />
+		<constructor-arg name="deleteTenantObjectsPriority" value="51" />
 		<constructor-arg name="filter" value="journal" />
 		<property name="sqlTransformers">
 			<map>

@@ -52,6 +52,7 @@
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/migration/model/impl/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/migration/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
+		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="24"/>
 	</bean>
 	
 </beans>

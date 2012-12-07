@@ -7,6 +7,7 @@
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-deleteTenantObjects.sql" />
+		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="23"/>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">

@@ -46,5 +46,6 @@
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-deleteTenantObjects.sql" />
+		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="5"/>
 	</bean>
 </beans>

@@ -27,6 +27,7 @@ import org.bonitasoft.engine.api.impl.transaction.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeletePlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.DeletePlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.DeleteTenant;
+import org.bonitasoft.engine.api.impl.transaction.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.GetIsPlatformCreated;
 import org.bonitasoft.engine.api.impl.transaction.GetPlatformContent;
@@ -456,6 +457,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
+            // delete tenant objects in database
+            final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
+            transactionExecutor.execute(transactionContentForTenantObjects);
 
             // delete tenant in database
             final TransactionContent transactionContent = new DeleteTenant(tenantId, platformService);
@@ -944,6 +949,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
+            // delete tenant objects in database
+            final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
+            transactionExecutor.execute(transactionContentForTenantObjects);
 
             // delete tenant in database
             final TransactionContent transactionContent = new DeleteTenant(tenantId, platformService);
