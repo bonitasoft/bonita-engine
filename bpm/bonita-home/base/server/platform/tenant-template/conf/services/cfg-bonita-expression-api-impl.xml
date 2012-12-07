@@ -18,6 +18,7 @@
 				<ref bean="documentReferenceExpressionExecutorStrategy" />
 				<ref bean="EngineConstantExpressionExecutorStrategy" />
 				<ref bean="listExpressionExecutorStrategy" />
+				<ref bean="conditionExpressionExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
@@ -39,5 +40,7 @@
 	</bean>
 
 	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
+	
+	<bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy" />
 
 </beans>
