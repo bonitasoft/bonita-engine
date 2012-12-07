@@ -257,7 +257,11 @@ import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
 import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NoSuchActivityDefinitionException;
+import org.bonitasoft.engine.exception.ObjectAlreadyExistsException;
+import org.bonitasoft.engine.exception.ObjectCreationException;
+import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.PrivilegeInsertException;
@@ -305,8 +309,13 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SGroupNotFoundException;
+import org.bonitasoft.engine.identity.SRoleNotFoundException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -318,9 +327,11 @@ import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.privilege.api.PrivilegeService;
 import org.bonitasoft.engine.privilege.model.SPrivilege;
 import org.bonitasoft.engine.privilege.model.buidler.PrivilegeBuilder;
+import org.bonitasoft.engine.process.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -344,6 +355,7 @@ import org.bonitasoft.engine.search.SearchCommentsManagedBy;
 import org.bonitasoft.engine.search.SearchDocuments;
 import org.bonitasoft.engine.search.SearchDocumentsSupervisedBy;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.SearchHumanTaskInstances;
 import org.bonitasoft.engine.search.SearchOpenProcessInstancesInvolvingUser;
 import org.bonitasoft.engine.search.SearchOpenProcessInstancesSupervisedBy;
@@ -368,12 +380,28 @@ import org.bonitasoft.engine.search.humantask.SearchPendingTasksForUser;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
+import org.bonitasoft.engine.search.supervisor.SearchArchivedTasksSupervisedByTransaction;
+import org.bonitasoft.engine.search.supervisor.SearchAssignedTasksSupervisedByTransaction;
+import org.bonitasoft.engine.search.supervisor.SearchProcessDefinitionsSupervised;
+import org.bonitasoft.engine.search.supervisor.SearchProcessSupervisorGroupDescriptor;
+import org.bonitasoft.engine.search.supervisor.SearchProcessSupervisorRoleAndGroupDescriptor;
+import org.bonitasoft.engine.search.supervisor.SearchProcessSupervisorRoleDescriptor;
+import org.bonitasoft.engine.search.supervisor.SearchProcessSupervisorUserDescriptor;
+import org.bonitasoft.engine.search.supervisor.SearchSupervisorsTransaction;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorAlreadyExistsException;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorCreationException;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorDeletionException;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorNotFoundException;
+import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
+import org.bonitasoft.engine.supervisor.mapping.model.SSupervisor;
+import org.bonitasoft.engine.supervisor.mapping.model.SSupervisorBuilder;
+import org.bonitasoft.engine.supervisor.mapping.model.SSupervisorBuilders;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.util.FileUtil;
 import org.bonitasoft.engine.util.IOUtil;
@@ -4001,6 +4029,289 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
         return transactionSearch.getResult();
 
+    }
+
+    @Override
+    public SearchResult<ProcessDeploymentInfo> searchProcessDefinitionsSupervisedBy(final long userId, final SearchOptions searchOptions)
+            throws InvalidSessionException, SearchException, PageOutOfRangeException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
+        final SearchProcessDefinitionsSupervised searcher = new SearchProcessDefinitionsSupervised(processDefinitionService, searchDescriptor, searchOptions,
+                userId);
+        try {
+            transactionExecutor.execute(searcher);
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+        final SearchResult<ProcessDeploymentInfo> proceDefs = searcher.getResult();
+        return proceDefs;
+
+    }
+
+    @Override
+    public SearchResult<HumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final SearchOptions searchOptions)
+            throws InvalidSessionException, SearchException, PageOutOfRangeException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final SearchAssignedTasksSupervisedByTransaction searchedTasksTransaction = new SearchAssignedTasksSupervisedByTransaction(supervisorId,
+                activityInstanceService, flowNodeStateManager, searchEntitiesDescriptor.getHumanTaskInstanceDescriptor(), searchOptions);
+        try {
+            transactionExecutor.execute(searchedTasksTransaction);
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+        return searchedTasksTransaction.getResult();
+
+    }
+
+    @Override
+    public SearchResult<ArchivedHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final SearchOptions searchOptions)
+            throws InvalidSessionException, SearchException, PageOutOfRangeException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
+        final SearchArchivedTasksSupervisedByTransaction searchedTasksTransaction = new SearchArchivedTasksSupervisedByTransaction(supervisorId,
+                activityInstanceService, flowNodeStateManager, searchEntitiesDescriptor.getArchivedHumanTaskInstanceDescriptor(), searchOptions);
+
+        try {
+            transactionExecutor.execute(searchedTasksTransaction);
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+
+        return searchedTasksTransaction.getResult();
+
+    }
+
+    @Override
+    public SearchResult<ProcessSupervisor> searchProcessSupervisors(final MemberType memberType, final SearchOptions searchOptions)
+            throws InvalidSessionException, SearchException, PageOutOfRangeException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        final SSupervisorBuilders supervisorBuilders = serviceAccessor.getSSupervisorBuilders();
+        final IdentityModelBuilder identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
+        SearchEntityDescriptor searchDescriptor = null;
+        String suffix = null;
+        switch (memberType) {
+            case USER:
+                searchDescriptor = new SearchProcessSupervisorUserDescriptor(supervisorBuilders, identityModelBuilder);
+                suffix = "ForUser";
+                break;
+
+            case GROUP:
+                searchDescriptor = new SearchProcessSupervisorGroupDescriptor(supervisorBuilders, identityModelBuilder);
+                suffix = "ForGroup";
+                break;
+
+            case ROLE:
+                searchDescriptor = new SearchProcessSupervisorRoleDescriptor(supervisorBuilders, identityModelBuilder);
+                suffix = "ForRole";
+                break;
+
+            case MEMBERSHIP:
+                searchDescriptor = new SearchProcessSupervisorRoleAndGroupDescriptor(supervisorBuilders, identityModelBuilder);
+                suffix = "ForRoleAndGroup";
+                break;
+
+        }
+        final SearchSupervisorsTransaction searchSupervisorsTransaction = new SearchSupervisorsTransaction(supervisorService, searchDescriptor, searchOptions,
+                suffix);
+        try {
+            transactionExecutor.execute(searchSupervisorsTransaction);
+            return searchSupervisorsTransaction.getResult();
+        } catch (final SBonitaException e) {
+            throw new SearchException(e);
+        }
+    }
+
+    @Override
+    public ProcessSupervisor getSupervisor(final long supervisorId, final MemberType memberType) throws InvalidSessionException, ObjectReadException,
+            ObjectNotFoundException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+
+                final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+                SSupervisor supervisor = null;
+                switch (memberType) {
+                    case USER:
+                        supervisor = supervisorService.getSupervisorForUser(supervisorId);
+                        break;
+
+                    case GROUP:
+                        supervisor = supervisorService.getSupervisorForGroup(supervisorId);
+                        break;
+
+                    case ROLE:
+                        supervisor = supervisorService.getSupervisorForRole(supervisorId);
+                        break;
+
+                    case MEMBERSHIP:
+                        supervisor = supervisorService.getSupervisorForRoleAndGroup(supervisorId);// this method should throw a read exception
+                        break;
+                }
+                return ModelConvertor.toProcessSupervisor(supervisor);
+            } catch (final SSupervisorNotFoundException e) {
+                throw new ObjectNotFoundException("supervisor with type " + memberType + " and supervisor id " + supervisorId + " not found");
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+    }
+
+    @Override
+    public boolean isUserProcessSupervisor(final long processDefinitionId, final long userId) throws InvalidSessionException, ObjectReadException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                return supervisorService.isProcessSupervisor(processDefinitionId, userId);
+            } catch (final SBonitaReadException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectReadException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+    }
+
+    @Override
+    public void deleteSupervisor(final long id) throws InvalidSessionException, ObjectNotFoundException, ObjectDeletionException {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                supervisorService.deleteSupervisor(id);
+            } catch (final SSupervisorNotFoundException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectNotFoundException("supervisor not found with id " + id);
+            } catch (final SSupervisorDeletionException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectDeletionException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectDeletionException(e);
+        }
+    }
+
+    @Override
+    public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId) throws InvalidSessionException,
+            ObjectCreationException, ObjectNotFoundException {
+        return createSupervisor(processDefinitionId, userId, null, null, MemberType.USER);
+    }
+
+    @Override
+    public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId) throws InvalidSessionException,
+            ObjectCreationException, ObjectNotFoundException {
+        return createSupervisor(processDefinitionId, null, null, roleId, MemberType.ROLE);
+    }
+
+    @Override
+    public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws InvalidSessionException,
+            ObjectCreationException, ObjectNotFoundException {
+        return createSupervisor(processDefinitionId, null, groupId, null, MemberType.GROUP);
+    }
+
+    @Override
+    public ProcessSupervisor createProcessSupervisorForMembership(final long processDefinitionId, final long groupId, final long roleId)
+            throws InvalidSessionException, ObjectCreationException, ObjectNotFoundException {
+        return createSupervisor(processDefinitionId, null, groupId, roleId, MemberType.MEMBERSHIP);
+    }
+
+    private ProcessSupervisor createSupervisor(final long processDefinitionId, final Long userId, final Long groupId, final Long roleId,
+            final MemberType memberType) throws InvalidSessionException, ObjectCreationException, ObjectNotFoundException {
+        SSupervisor supervisor = null;
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+        final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
+        final IdentityService identityService = serviceAccessor.getIdentityService();
+        final SSupervisorBuilder supervisorBuilder = serviceAccessor.getSSupervisorBuilders().getSSupervisorBuilder();
+        try {
+            try {
+                transactionExecutor.openTransaction();
+                supervisorBuilder.createNewInstance(processDefinitionId);
+                switch (memberType) {
+                    case USER:
+                        final SUser user = identityService.getUser(userId);
+                        supervisorBuilder.setUserId(userId);
+                        supervisorBuilder.setDisplayNamePart1(user.getFirstName());
+                        supervisorBuilder.setDisplayNamePart2(user.getLastName());
+                        supervisorBuilder.setDisplayNamePart3(user.getUserName());
+                        break;
+
+                    case GROUP:
+                        SGroup group = identityService.getGroup(groupId);
+                        supervisorBuilder.setGroupId(groupId);
+                        supervisorBuilder.setDisplayNamePart1(group.getName());
+                        supervisorBuilder.setDisplayNamePart2(group.getParentPath());
+                        supervisorBuilder.setDisplayNamePart3("");
+                        break;
+
+                    case ROLE:
+                        SRole role = identityService.getRole(roleId);
+                        supervisorBuilder.setRoleId(roleId);
+                        supervisorBuilder.setDisplayNamePart1(role.getName());
+                        supervisorBuilder.setDisplayNamePart2("");
+                        supervisorBuilder.setDisplayNamePart3("");
+                        break;
+
+                    case MEMBERSHIP:
+                        group = identityService.getGroup(groupId);
+                        role = identityService.getRole(roleId);
+                        supervisorBuilder.setGroupId(groupId);
+                        supervisorBuilder.setRoleId(roleId);
+                        supervisorBuilder.setDisplayNamePart1(role.getName());
+                        supervisorBuilder.setDisplayNamePart2(group.getName());
+                        supervisorBuilder.setDisplayNamePart3(group.getParentPath());
+                        break;
+
+                }
+
+                supervisor = supervisorBuilder.done();
+                supervisor = supervisorService.createSupervisor(supervisor);
+                return ModelConvertor.toProcessSupervisor(supervisor);
+            } catch (final SSupervisorAlreadyExistsException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectAlreadyExistsException(supervisor);
+            } catch (final SSupervisorCreationException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectCreationException(e);
+            } catch (final SGroupNotFoundException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectNotFoundException("group not found with id: " + groupId);
+            } catch (final SRoleNotFoundException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectNotFoundException("role not found with id: " + roleId);
+            } catch (final SUserNotFoundException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectNotFoundException("user not found with id: " + userId);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectCreationException(e);
+        }
     }
 
     @Override

@@ -35,6 +35,7 @@ import org.bonitasoft.engine.bpm.model.Comment;
 import org.bonitasoft.engine.bpm.model.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.model.MemberType;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
@@ -80,6 +81,10 @@ import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
 import org.bonitasoft.engine.exception.GroupNotFoundException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NoSuchActivityDefinitionException;
+import org.bonitasoft.engine.exception.ObjectCreationException;
+import org.bonitasoft.engine.exception.ObjectDeletionException;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.PrivilegeInsertException;
@@ -101,6 +106,7 @@ import org.bonitasoft.engine.exception.ProcessResourceException;
 import org.bonitasoft.engine.exception.RoleNotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UserNotFoundException;
+import org.bonitasoft.engine.process.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -2183,4 +2189,122 @@ public interface ProcessManagementAPI {
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchMyAvailableHumanTasks(long userId, SearchOptions searchOptions) throws InvalidSessionException, SearchException;
+
+    /**
+     * @param userId
+     * @param searchOptions
+     * @return
+     * @throws InvalidSessionException
+     * @throws ProcessDefinitionReadException
+     * @throws PageOutOfRangeException
+     * @throws SearchException
+     */
+    SearchResult<ProcessDeploymentInfo> searchProcessDefinitionsSupervisedBy(long userId, SearchOptions searchOptions) throws InvalidSessionException,
+            PageOutOfRangeException, SearchException;
+
+    /**
+     * @param supervisorId
+     * @param searchOptions
+     * @return
+     * @throws InvalidSessionException
+     * @throws SearchException
+     * @throws PageOutOfRangeException
+     */
+    SearchResult<HumanTaskInstance> searchAssignedTasksSupervisedBy(long supervisorId, SearchOptions searchOptions) throws InvalidSessionException,
+            SearchException, PageOutOfRangeException;
+
+    /**
+     * @param supervisorId
+     * @param searchOptions
+     * @return
+     * @throws InvalidSessionException
+     * @throws SearchException
+     * @throws PageOutOfRangeException
+     */
+    SearchResult<ArchivedHumanTaskInstance> searchArchivedTasksSupervisedBy(long supervisorId, SearchOptions searchOptions) throws InvalidSessionException,
+            SearchException, PageOutOfRangeException;
+
+    /**
+     * @param processDefinitionId
+     * @param userId
+     * @return
+     * @throws InvalidSessionException
+     * @throws ObjectCreationException
+     * @throws ObjectNotFoundException
+     */
+    ProcessSupervisor createProcessSupervisorForUser(long processDefinitionId, long userId) throws InvalidSessionException, ObjectCreationException,
+            ObjectNotFoundException;
+
+    /**
+     * @param processDefinitionId
+     * @param roleId
+     * @return
+     * @throws InvalidSessionException
+     * @throws ObjectCreationException
+     * @throws ObjectNotFoundException
+     */
+    ProcessSupervisor createProcessSupervisorForRole(long processDefinitionId, long roleId) throws InvalidSessionException, ObjectCreationException,
+            ObjectNotFoundException;
+
+    /**
+     * @param processDefinitionId
+     * @param groupId
+     * @return
+     * @throws InvalidSessionException
+     * @throws ObjectCreationException
+     * @throws ObjectNotFoundException
+     */
+    ProcessSupervisor createProcessSupervisorForGroup(long processDefinitionId, long groupId) throws InvalidSessionException, ObjectCreationException,
+            ObjectNotFoundException;
+
+    /**
+     * @param processDefinitionId
+     * @param groupId
+     * @param roleId
+     * @return
+     * @throws InvalidSessionException
+     * @throws ObjectCreationException
+     * @throws ObjectNotFoundException
+     */
+    ProcessSupervisor createProcessSupervisorForMembership(long processDefinitionId, long groupId, long roleId) throws InvalidSessionException,
+            ObjectCreationException, ObjectNotFoundException;
+
+    /**
+     * @param supervisorId
+     * @param memberType
+     * @return
+     * @throws InvalidSessionException
+     * @throws ObjectReadException
+     * @throws ObjectNotFoundException
+     */
+    ProcessSupervisor getSupervisor(long supervisorId, MemberType memberType) throws InvalidSessionException, ObjectReadException, ObjectNotFoundException;
+
+    /**
+     * @param processDefinitionId
+     * @param userId
+     * @return
+     * @throws InvalidSessionException
+     * @throws ObjectReadException
+     */
+    boolean isUserProcessSupervisor(long processDefinitionId, long userId) throws InvalidSessionException, ObjectReadException;
+
+    /**
+     * @param id
+     * @throws InvalidSessionException
+     * @throws ObjectNotFoundException
+     * @throws ObjectDeletionException
+     */
+    void deleteSupervisor(long id) throws InvalidSessionException, ObjectNotFoundException, ObjectDeletionException;
+
+    /**
+     * @param supervisorId
+     * @param memberType
+     * @param searchOptions
+     * @return
+     * @throws InvalidSessionException
+     * @throws SearchException
+     * @throws PageOutOfRangeException
+     */
+    SearchResult<ProcessSupervisor> searchProcessSupervisors(MemberType memberType, SearchOptions searchOptions) throws InvalidSessionException,
+            SearchException, PageOutOfRangeException;
 }
