@@ -1,11 +1,9 @@
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.api.impl.LogAPIImpl;
 import org.junit.Test;
 
-/**
- * @author Matthieu Chaffotte
- */
+import com.bonitasoft.engine.api.impl.LogAPIImpl;
+
 public class APIMethodSPTest extends APIMethodTest {
 
     @Test

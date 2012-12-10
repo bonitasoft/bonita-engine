@@ -40,9 +40,6 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
-/**
- * @author Zhao Na
- */
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
     private static final Map<Integer, Serializable> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Serializable> emptyMap();

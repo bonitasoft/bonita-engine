@@ -2,7 +2,7 @@
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.api;
+package com.bonitasoft.engine.api;
 
 import java.util.List;
 
@@ -17,13 +17,15 @@ import com.bonitasoft.engine.log.LogCriterion;
 
 /**
  * @author Bole Zhang
+ * @author Matthieu Chaffotte
  */
 public interface LogAPI {
 
     /**
-     * retrieving the log by logId
+     * Retrieves the log by giving its identifier
      * 
      * @param logId
+     *            the log identifier
      * @return the Log object meet the criteria
      * @throws LogNotFoundException
      * @throws InvalidSessionException
@@ -37,6 +39,7 @@ public interface LogAPI {
      * @throws InvalidSessionException
      * @Deprecated use {@link #searchLogs(SearchOptions)} instead.
      */
+    @Deprecated
     int getNumberOfLogs() throws InvalidSessionException;
 
     /**
@@ -53,6 +56,7 @@ public interface LogAPI {
      * @throws InvalidSessionException
      * @Deprecated use {@link #searchLogs(SearchOptions)} instead.
      */
+    @Deprecated
     List<Log> getLogs(int pageIndex, int numberPerPage, LogCriterion pagingCriterion) throws PageOutOfRangeException, InvalidSessionException;
 
     /**

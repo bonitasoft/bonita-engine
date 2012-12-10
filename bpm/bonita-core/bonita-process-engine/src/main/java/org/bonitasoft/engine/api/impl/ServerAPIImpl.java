@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.LogAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.MigrationAPI;
 import org.bonitasoft.engine.api.MonitoringAPI;
@@ -46,6 +45,9 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionService;
+
+import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.impl.LogAPIImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -213,4 +215,5 @@ public class ServerAPIImpl implements ServerAPI {
         apis.put(CommandAPI.class.getName(), new CommandAPIImpl());
         apis.put(PlatformCommandAPI.class.getName(), new PlatformCommandAPIImpl());
     }
+
 }

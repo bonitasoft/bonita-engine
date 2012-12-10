@@ -4,6 +4,8 @@
  */
 package org.bonitasoft.engine.api;
 
+import com.bonitasoft.engine.api.LogAPI;
+
 /**
  * @author Matthieu Chaffotte
  */

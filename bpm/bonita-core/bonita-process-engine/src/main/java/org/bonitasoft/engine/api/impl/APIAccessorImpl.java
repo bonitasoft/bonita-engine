@@ -9,9 +9,11 @@ import java.io.Serializable;
 import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.LogAPI;
 import org.bonitasoft.engine.api.MonitoringAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+
+import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.impl.LogAPIImpl;
 
 /**
  * @author Matthieu Chaffotte
