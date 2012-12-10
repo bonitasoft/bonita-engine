@@ -22,9 +22,9 @@ import org.bonitasoft.engine.exception.PlatformCreationException;
 import org.bonitasoft.engine.exception.PlatformDeletionException;
 import org.bonitasoft.engine.exception.PlatformNotExistException;
 import org.bonitasoft.engine.exception.PlatformNotStartedException;
-import org.bonitasoft.engine.exception.PlatformStartingException;
-import org.bonitasoft.engine.exception.PlatformStoppingException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.StartNodeException;
+import org.bonitasoft.engine.exception.StopNodeException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -59,24 +59,24 @@ public interface PlatformAPI {
     void createPlatform() throws InvalidSessionException, PlatformCreationException;
 
     /**
-     * Start a platform.
+     * Starts the node.
      * 
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformStartingException
-     *             occurs when an exception is thrown during starting a platform
+     *             occurs if API Session is invalid, e.g session has expired.
+     * @throws StartNodeException
+     *             occurs when an exception is thrown during the activation of the node
      */
-    void startNode() throws InvalidSessionException, PlatformStartingException;
+    void startNode() throws InvalidSessionException, StartNodeException;
 
     /**
-     * Stop a platform.
+     * Stops the node.
      * 
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformStoppingException
-     *             occurs when an exception is thrown during platform stopping
+     *             occurs if API Session is invalid, e.g session has expired.
+     * @throws StopNodeException
+     *             occurs when an exception is thrown during the stop of the node
      */
-    void stopNode() throws InvalidSessionException, PlatformStoppingException;
+    void stopNode() throws InvalidSessionException, StopNodeException;
 
     /**
      * Delete a platform.

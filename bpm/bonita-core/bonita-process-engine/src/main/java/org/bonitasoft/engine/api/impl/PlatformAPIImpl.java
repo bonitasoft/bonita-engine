@@ -53,9 +53,9 @@ import org.bonitasoft.engine.exception.PlatformCreationException;
 import org.bonitasoft.engine.exception.PlatformDeletionException;
 import org.bonitasoft.engine.exception.PlatformNotExistException;
 import org.bonitasoft.engine.exception.PlatformNotStartedException;
-import org.bonitasoft.engine.exception.PlatformStartingException;
-import org.bonitasoft.engine.exception.PlatformStoppingException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.StartNodeException;
+import org.bonitasoft.engine.exception.StopNodeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -178,12 +178,12 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public void startNode() throws InvalidSessionException, PlatformStartingException {
+    public void startNode() throws InvalidSessionException, StartNodeException {
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         } catch (final Exception e) {
-            throw new PlatformStartingException(e);
+            throw new StartNodeException(e);
         }
         try {
             final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
@@ -216,22 +216,22 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             }
         } catch (final SBonitaException e) {
-            throw new PlatformStartingException("Platform starting failed.", e);
+            throw new StartNodeException("Platform starting failed.", e);
         } catch (final SecurityException e) {
-            throw new PlatformStartingException("Platform starting failed.", e);
+            throw new StartNodeException("Platform starting failed.", e);
         } catch (final IllegalArgumentException e) {
-            throw new PlatformStartingException("Platform starting failed.", e);
+            throw new StartNodeException("Platform starting failed.", e);
         } catch (final PlatformNotStartedException e) {
-            throw new PlatformStartingException("Platform starting failed.", e);
+            throw new StartNodeException("Platform starting failed.", e);
         } catch (final TenantNotFoundException e) {
-            throw new PlatformStartingException("Platform starting failed.", e);
+            throw new StartNodeException("Platform starting failed.", e);
         } catch (final TenantActivationException e) {
-            throw new PlatformStartingException("Platform starting failed.", e);
+            throw new StartNodeException("Platform starting failed.", e);
         }
     }
 
     @Override
-    public void stopNode() throws InvalidSessionException, PlatformStoppingException {
+    public void stopNode() throws InvalidSessionException, StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
@@ -241,25 +241,25 @@ public class PlatformAPIImpl implements PlatformAPI {
                 schedulerService.shutdown();
             }
         } catch (final SBonitaException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final BonitaHomeNotSetException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final InstantiationException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final IllegalAccessException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final ClassNotFoundException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final IOException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final BonitaHomeConfigurationException e) {
-            throw new PlatformStoppingException(e.getMessage());
+            throw new StopNodeException(e.getMessage());
         } catch (final PlatformNotStartedException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final TenantNotFoundException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         } catch (final TenantDeactivationException e) {
-            throw new PlatformStoppingException(e);
+            throw new StopNodeException(e);
         }
     }
 
