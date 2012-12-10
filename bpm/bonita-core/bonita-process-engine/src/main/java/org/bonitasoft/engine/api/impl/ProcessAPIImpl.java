@@ -6107,7 +6107,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         return searchResult.getCount();
     }
-    
+
     @Override
     public void sendSignal(final String signalName) throws InvalidSessionException, SendEventException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -6131,7 +6131,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SendEventException(e);
         }
     }
-    
+
     @Override
     public void sendMessage(final String messageName, final Expression targetProcess, final Expression targetFlowNode,
             final Map<Expression, Expression> messageContent) throws InvalidSessionException, SendEventException {
