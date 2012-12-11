@@ -40,7 +40,6 @@
 		<constructor-arg name="sProfileBuilderAccessor" ref="sProfileBuilderAccessor" />
 		<constructor-arg name="commentBuilders" ref="commentBuilders" />
 		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
-		<constructor-arg name="sBusinessLogModelBuilder" ref="logModelBuilder" />
 		<constructor-arg name="sDocumentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
 		<constructor-arg name="sExternalIdentityMappingBuilders" ref="sExternalIdentityMappingBuilders" />
 		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
