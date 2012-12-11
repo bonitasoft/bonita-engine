@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -597,7 +598,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void importActorMapping(final long pDefinitionId, final byte[] actorMappingXML) throws InvalidSessionException, ActorMappingImportException {
         if (actorMappingXML != null) {
-            final String actorMapping = new String(actorMappingXML);
+            final String actorMapping = new String(actorMappingXML, Charset.forName("UTF-8"));
             importActorMapping(pDefinitionId, actorMapping);
         }
     }
@@ -1912,8 +1913,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         OrderByType order = null;
         switch (pagingCriterion) {
             case DEFAULT:
+            case NAME_DESC:
                 field = modelBuilder.getNameKey();
                 order = OrderByType.DESC;
+                break;
+            case NAME_ASC:
+                field = modelBuilder.getNameKey();
+                order = OrderByType.ASC;
                 break;
             case LAST_UPDATE_ASC:
                 field = modelBuilder.getLastUpdateKey();
@@ -1921,14 +1927,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 break;
             case LAST_UPDATE_DESC:
                 field = modelBuilder.getLastUpdateKey();
-                order = OrderByType.DESC;
-                break;
-            case NAME_ASC:
-                field = modelBuilder.getNameKey();
-                order = OrderByType.ASC;
-                break;
-            case NAME_DESC:
-                field = modelBuilder.getNameKey();
                 order = OrderByType.DESC;
                 break;
             case PRIORITY_ASC:
@@ -2502,7 +2500,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final int numberPerPage) throws InvalidSessionException, NoSuchActivityDefinitionException, DataNotFoundException,
             ProcessDefinitionNotFoundException {
         List<DataDefinition> subDataDefinitionList = Collections.emptyList();
-        List<DataDefinition> dataDefinitionList = Collections.emptyList();
         List<SDataDefinition> sdataDefinitionList = Collections.emptyList();
         final TenantServiceAccessor tenantAccessor;
         tenantAccessor = getTenantAccessor();
@@ -2519,10 +2516,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             boolean isHave = false;
             final SFlowElementContainerDefinition processContainer = sProcessDefinition.getProcessContainer();
             final Set<SActivityDefinition> activityDefList = processContainer.getActivities();
-            final Iterator<SActivityDefinition> it = activityDefList.iterator();
-            while (it.hasNext()) {
-                final SActivityDefinition sActivityDefinition = it.next();
-                if (sActivityDefinition != null && activityName.equals(sActivityDefinition.getName())) {
+            for (final SActivityDefinition sActivityDefinition : activityDefList) {
+                if (activityName.equals(sActivityDefinition.getName())) {
                     sdataDefinitionList = sActivityDefinition.getSDataDefinitions();
                     isHave = true;
                     break;
@@ -2531,7 +2526,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (!isHave) {
                 throw new NoSuchActivityDefinitionException(activityName);
             }
-            dataDefinitionList = ModelConvertor.toDataDefinitionList(sdataDefinitionList);
+            final List<DataDefinition> dataDefinitionList = ModelConvertor.toDataDefinitionList(sdataDefinitionList);
             final int toIndex = Math.min(dataDefinitionList.size(), (pageIndex + 1) * numberPerPage);
             subDataDefinitionList = new ArrayList<DataDefinition>(dataDefinitionList.subList(pageIndex * numberPerPage, toIndex));
         }
@@ -2542,8 +2537,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public List<DataDefinition> getProcessDataDefinitions(final long processDefinitionId, final int pageIndex, final int numberPerPage)
             throws InvalidSessionException, ProcessDefinitionNotFoundException, DataNotFoundException {
         List<DataDefinition> subDataDefinitionList = Collections.emptyList();
-        List<DataDefinition> dataDefinitionList = Collections.emptyList();
-        List<SDataDefinition> sdataDefinitionList = Collections.emptyList();
         final TenantServiceAccessor tenantAccessor;
         tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -2557,8 +2550,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SProcessDefinition sProcessDefinition = getProcessDefinition.getResult();
         if (sProcessDefinition != null) {
             final SFlowElementContainerDefinition processContainer = sProcessDefinition.getProcessContainer();
-            sdataDefinitionList = processContainer.getDataDefinitions();
-            dataDefinitionList = ModelConvertor.toDataDefinitionList(sdataDefinitionList);
+            final List<SDataDefinition> sdataDefinitionList = processContainer.getDataDefinitions();
+            final List<DataDefinition> dataDefinitionList = ModelConvertor.toDataDefinitionList(sdataDefinitionList);
             final int toIndex = Math.min(dataDefinitionList.size(), (pageIndex + 1) * numberPerPage);
             subDataDefinitionList = new ArrayList<DataDefinition>(dataDefinitionList.subList(pageIndex * numberPerPage, toIndex));
         }
@@ -2842,14 +2835,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         String field = null;
         OrderByType order = null;
         switch (criterion) {
-            case NAME_ASC:
-                field = modelBuilder.getNameKey();
-                order = OrderByType.ASC;
-                break;
-            case NAME_DESC:
-                field = modelBuilder.getNameKey();
-                order = OrderByType.DESC;
-                break;
             case CREATION_DATE_ASC: // creation date can be seen as start date
                 field = modelBuilder.getStartDateKey();
                 order = OrderByType.ASC;
@@ -2866,6 +2851,11 @@ public class ProcessAPIImpl implements ProcessAPI {
                 field = modelBuilder.getLastUpdateKey();
                 order = OrderByType.DESC;
                 break;
+            case NAME_ASC:
+                field = modelBuilder.getNameKey();
+                order = OrderByType.ASC;
+                break;
+            case NAME_DESC:
             case DEFAULT:
                 field = modelBuilder.getNameKey();
                 order = OrderByType.DESC;
@@ -3341,10 +3331,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             boolean isHave = false;
             final SFlowElementContainerDefinition processContainer = sProcessDefinition.getProcessContainer();
             final Set<SActivityDefinition> activityDefList = processContainer.getActivities();
-            final Iterator<SActivityDefinition> it = activityDefList.iterator();
-            while (it.hasNext()) {
-                final SActivityDefinition sActivityDefinition = it.next();
-                if (sActivityDefinition != null && activityName.equals(sActivityDefinition.getName())) {
+            for (final SActivityDefinition sActivityDefinition : activityDefList) {
+                if (activityName.equals(sActivityDefinition.getName())) {
                     sdataDefinitionList = sActivityDefinition.getSDataDefinitions();
                     isHave = true;
                     break;
@@ -3466,9 +3454,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             return Collections.emptyMap();
         }
         final Map<SOperation, Map<String, Serializable>> sOperations = new HashMap<SOperation, Map<String, Serializable>>();
-        for (final Operation operation : operations.keySet()) {
-            final SOperation sOperation = toSOperation(operation, sOperationBuilders, sExpressionBuilders);
-            sOperations.put(sOperation, operations.get(operation));
+        for (final Map.Entry<Operation, Map<String, Serializable>> entry : operations.entrySet()) {
+            final SOperation sOperation = toSOperation(entry.getKey(), sOperationBuilders, sExpressionBuilders);
+            sOperations.put(sOperation, entry.getValue());
         }
         return sOperations;
     }
@@ -5120,27 +5108,57 @@ public class ProcessAPIImpl implements ProcessAPI {
      * byte[] is a zip file exported from studio
      * clear: remove the old .impl file; put the new .impl file in the connector directory
      * reload the cache, connectorId and connectorVersion are used here.
+     * Warning filesystem operation are not rolledback
      */
     @Override
     public void setConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion,
             final byte[] connectorImplementationArchive) throws InvalidSessionException, ConnectorException {
 
-        try {
-            this.getProcessDefinition(processDefinitionId);
-        } catch (final ProcessDefinitionNotFoundException e) {
-            throw new ConnectorException(e);
-        } catch (final ProcessDefinitionReadException e) {
-            throw new ConnectorException(e);
-        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final TransactionContent transactionContent = new SetConnectorImplementation(processDefinitionId, connectorImplementationArchive, connectorId,
-                connectorVersion, processDefinitionService, connectorService, tenantAccessor.getTenantId());
+        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
+        final long tenantId = tenantAccessor.getTenantId();
         try {
-            transactionExecutor.execute(transactionContent);
-        } catch (final SBonitaException e) {
+            transactionExecutor.openTransaction();
+            try {
+                final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
+                // reload dependencies
+                dependencyService.deleteDependencies(processDefinitionId, "process");
+
+                transactionExecutor.completeTransaction();
+                // reopen a new transaction: avoid primary key unique constraint violation
+                transactionExecutor.openTransaction();
+
+                final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
+                final File file = new File(processFolder, "classpath");
+                if (file.exists() && file.isDirectory()) {
+                    final File[] listFiles = file.listFiles();
+                    for (final File jarFile : listFiles) {
+                        final String name = jarFile.getName();
+                        final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
+                        final AddSDependency addSDependency = new AddSDependency(dependencyService, dependencyBuilderAccessor,
+                                processDefinitionId + "_" + name, jarContent, processDefinitionId, "process");
+                        addSDependency.execute();
+                    }
+                }
+
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } catch (final IOException e) {
+                transactionExecutor.setTransactionRollback();
+            throw new ConnectorException(e);
+            } catch (final BonitaHomeNotSetException e) {
+                transactionExecutor.setTransactionRollback();
+            throw new ConnectorException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+        }
+        } catch (final STransactionException e) {
             throw new ConnectorException(e);
         }
     }
@@ -5556,9 +5574,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(e);
         }
         final List<Map<String, String>> sProcessDeploymentInfos = processDefinitions.getResult();
-        Map<Long, ProcessDeploymentInfo> mProcessDeploymentInfos = new HashMap<Long, ProcessDeploymentInfo>();
-        mProcessDeploymentInfos = getProcessDeploymentInfosFromMap(sProcessDeploymentInfos);
-        return mProcessDeploymentInfos;
+        return getProcessDeploymentInfosFromMap(sProcessDeploymentInfos);
 
     }
 
@@ -5584,54 +5600,40 @@ public class ProcessAPIImpl implements ProcessAPI {
         String iconPath = "";
         String displayDescription = "";
         for (final Map<String, String> m : sProcessDeploymentInfos) {
-            ProcessDeploymentInfoImpl PDInfoImpl = null;
-            final Iterator<String> keys = m.keySet().iterator();
-            while (keys.hasNext()) {
-                final String key = keys.next();
-                final Object value = m.get(key);
-                if (key.equals("processInstanceId")) {
+            for (final Entry<String, String> entry : m.entrySet()) {
+                final String key = entry.getKey();
+                final Object value = entry.getValue();
+                if ("processInstanceId".equals(key)) {
                     processInstanceId = Long.parseLong(value.toString());
-                }
-                if (key.equals("id")) {
+                } else if ("id".equals(key)) {
                     id = Long.parseLong(value.toString());
-                }
-                if (key.equals("processId")) {
+                } else if ("processId".equals(key)) {
                     processId = Long.parseLong(value.toString());
-                }
-                if (key.equals("name")) {
+                } else if ("name".equals(key)) {
                     name = m.get(key);
-                }
-                if (key.equals("version")) {
+                } else if ("version".equals(key)) {
                     version = m.get(key);
-                }
-                if (key.equals("description")) {
+                } else if ("description".equals(key)) {
                     description = String.valueOf(m.get(key));
-                }
-                if (key.equals("deploymentDate")) {
+                } else if ("deploymentDate".equals(key)) {
                     deploymentDate = Long.parseLong(value.toString());
-                }
-                if (key.equals("deployedBy")) {
+                } else if ("deployedBy".equals(key)) {
                     deployedBy = Long.parseLong(value.toString());
-                }
-                if (key.equals("state")) {
+                } else if ("state".equals(key)) {
                     state = m.get(key);
-                }
-                if (key.equals("displayName")) {
+                } else if ("displayName".equals(key)) {
                     displayName = m.get(key);
-                }
-                if (key.equals("lastUpdateDate")) {
+                } else if ("lastUpdateDate".equals(key)) {
                     lastUpdateDate = Long.parseLong(value.toString());
-                }
-                if (key.equals("iconPath")) {
+                } else if ("iconPath".equals(key)) {
                     iconPath = m.get(key);
-                }
-                if (key.equals("displayDescription")) {
+                } else if ("displayDescription".equals(key)) {
                     displayDescription = String.valueOf(m.get(key));
                 }
             }
-            PDInfoImpl = new ProcessDeploymentInfoImpl(id, processId, name, version, description, new Date(deploymentDate), deployedBy, state, displayName,
-                    new Date(lastUpdateDate), iconPath, displayDescription);
-            mProcessDeploymentInfos.put(processInstanceId, PDInfoImpl);
+            final ProcessDeploymentInfoImpl pDeplInfoImpl = new ProcessDeploymentInfoImpl(id, processId, name, version, description, new Date(deploymentDate),
+                    deployedBy, state, displayName, new Date(lastUpdateDate), iconPath, displayDescription);
+            mProcessDeploymentInfos.put(processInstanceId, pDeplInfoImpl);
         }
         return mProcessDeploymentInfos;
     }
@@ -5955,9 +5957,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (sProcessDeploymentInfos != null && !sProcessDeploymentInfos.isEmpty()) {
             final Map<Long, ProcessDeploymentInfo> processDeploymentInfos = new HashMap<Long, ProcessDeploymentInfo>();
             final Set<Entry<Long, SProcessDefinitionDeployInfo>> entries = sProcessDeploymentInfos.entrySet();
-            final Iterator<Entry<Long, SProcessDefinitionDeployInfo>> iterator = entries.iterator();
-            while (iterator.hasNext()) {
-                final Entry<Long, SProcessDefinitionDeployInfo> entry = iterator.next();
+            for (final Entry<Long, SProcessDefinitionDeployInfo> entry : entries) {
                 processDeploymentInfos.put(entry.getKey(), ModelConvertor.toProcessDeploymentInfo(entry.getValue()));
             }
             return processDeploymentInfos;
@@ -5991,7 +5991,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             transactionExecutor.execute(hideTasksTx);
         } catch (final SBonitaException e) {
-            throw new TaskHidingException("Error while trying to hide tasks: " + activityInstanceId + " from user with ID " + userId, e);
+            throw new TaskHidingException("Error while trying to hide tasks: " + Arrays.toString(activityInstanceId) + " from user with ID " + userId, e);
         }
     }
 
@@ -6003,7 +6003,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             transactionExecutor.execute(unhideTasksTx);
         } catch (final SBonitaException e) {
-            throw new TaskHidingException("Error while trying to un-hide tasks: " + activityInstanceId + " from user with ID " + userId, e);
+            throw new TaskHidingException("Error while trying to un-hide tasks: " + Arrays.toString(activityInstanceId) + " from user with ID " + userId, e);
         }
     }
 
