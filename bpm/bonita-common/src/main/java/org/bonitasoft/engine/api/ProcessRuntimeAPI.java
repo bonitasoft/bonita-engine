@@ -875,7 +875,7 @@ public interface ProcessRuntimeAPI {
      * @param connectorInputParameters
      *            all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *            all parameters values for expression need when evaluate the connector
      * @param processInstanceId
      *            Identifier of the process instance
      * @return a map with connector parameter name and parameter value object
@@ -888,7 +888,7 @@ public interface ProcessRuntimeAPI {
      *             error thrown when connect external application failed.
      * @throws InvalidEvaluationConnectorCondition
      */
-    Map<String, Serializable> executeConnectorAtProcessInstanciation(final String connectorDefinitionId, final String connectorDefinitionVersion,
+    Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
             throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorCondition;

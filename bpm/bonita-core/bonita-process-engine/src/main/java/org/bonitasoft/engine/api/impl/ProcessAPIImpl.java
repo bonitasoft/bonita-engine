@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -3815,7 +3814,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Serializable> executeConnectorAtProcessInstanciation(final String connectorDefinitionId, final String connectorDefinitionVersion,
+    public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
             throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorCondition {
@@ -5151,13 +5150,13 @@ public class ProcessAPIImpl implements ProcessAPI {
                 throw new ConnectorException(e);
             } catch (final IOException e) {
                 transactionExecutor.setTransactionRollback();
-            throw new ConnectorException(e);
+                throw new ConnectorException(e);
             } catch (final BonitaHomeNotSetException e) {
                 transactionExecutor.setTransactionRollback();
-            throw new ConnectorException(e);
+                throw new ConnectorException(e);
             } finally {
                 transactionExecutor.completeTransaction();
-        }
+            }
         } catch (final STransactionException e) {
             throw new ConnectorException(e);
         }
