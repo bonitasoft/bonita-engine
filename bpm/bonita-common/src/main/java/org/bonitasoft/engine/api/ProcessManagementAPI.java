@@ -23,6 +23,8 @@ import org.bonitasoft.engine.bpm.model.ActorMember;
 import org.bonitasoft.engine.bpm.model.Category;
 import org.bonitasoft.engine.bpm.model.CategoryCriterion;
 import org.bonitasoft.engine.bpm.model.Comment;
+import org.bonitasoft.engine.bpm.model.ConnectorInstance;
+import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
@@ -44,6 +46,7 @@ import org.bonitasoft.engine.bpm.model.privilege.LevelRight;
 import org.bonitasoft.engine.bpm.model.privilege.Privilege;
 import org.bonitasoft.engine.connector.ConnectorCriterion;
 import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
+import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.exception.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.ActivityInstanceReadException;
@@ -74,6 +77,7 @@ import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NoSuchActivityDefinitionException;
 import org.bonitasoft.engine.exception.ObjectCreationException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
+import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
@@ -139,6 +143,7 @@ public interface ProcessManagementAPI {
      * If process having the id is enabled, it will throw DeletingEnabledProcessException
      * 
      * @param processId
+     *            the id of the process
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws ProcessDefinitionNotFoundException
@@ -213,7 +218,6 @@ public interface ProcessManagementAPI {
      *             Generic exception thrown if this process definition has any exceptions
      * @throws ProcessDefinitionNotFoundException
      *             Error thrown if no processDefinition have an id corresponding to the value of processDefinitionId parameter.
-     * @throws ActorMappingImportException
      */
     ProcessDefinition deploy(BusinessArchive businessArchive) throws InvalidSessionException, ProcessDeployException, ProcessDefinitionNotFoundException;
 
@@ -354,8 +358,6 @@ public interface ProcessManagementAPI {
      * @return The ProcessInstance Objects
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws ProcessDefinitionNotFoundException
-     *             Error thrown if no processDefinition have an id corresponding to the parameter.
      * @throws ProcessDefinitionNotFoundException
      *             Error thrown if no processDefinition have an id corresponding to the parameter.
      * @throws ProcessInstanceCreationException
@@ -2117,6 +2119,7 @@ public interface ProcessManagementAPI {
      * Retrieve actorInstances corresponding the given a list of actor ids, they're stored in a map as a result
      * 
      * @param actorIds
+     *            the list of actor ids
      * @return a map of mapping with key actorId and value actorInstance
      * @throws InvalidSessionException
      * @throws BonitaReadException
@@ -2127,6 +2130,7 @@ public interface ProcessManagementAPI {
      * Retrieve actorPrivileges corresponding the given a list of actorPrivilege ids, they're stored in a map as a result
      * 
      * @param actorPrivilegeIds
+     *            the list of actor privilege ids
      * @return a map of mapping with key actorPrivilegeId and value actorPrivilege
      * @throws InvalidSessionException
      * @throws BonitaReadException
@@ -2298,4 +2302,47 @@ public interface ProcessManagementAPI {
      */
     SearchResult<ProcessSupervisor> searchProcessSupervisors(MemberType memberType, SearchOptions searchOptions) throws InvalidSessionException,
             SearchException, PageOutOfRangeException;
+    /**
+     * Retrieve the list of connector instances on an activity instance
+     * 
+     * @param activityInstanceId
+     *            the id of the element on which we want the connector instances
+     * @param pageNumber
+     * @param numberPerPage
+     * @param order
+     * @return
+     *         the list of connector instance on this element
+     * @throws PageOutOfRangeException
+     * @since 6.0
+     */
+    List<ConnectorInstance> getConnectorInstancesOfActivity(long activityInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
+            throws InvalidSessionException, ObjectReadException, PageOutOfRangeException;
+
+    /**
+     * Retrieve the list of connector instances on a process instance
+     * 
+     * @param processInstanceId
+     *            the id of the element on which we want the connector instances
+     * @param pageNumber
+     * @param numberPerPage
+     * @param order
+     * @return
+     *         the list of connector instance on this element
+     * @throws PageOutOfRangeException
+     * @since 6.0
+     */
+    List<ConnectorInstance> getConnectorInstancesOfProcess(long processInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
+            throws InvalidSessionException, ObjectReadException, PageOutOfRangeException;
+
+    /**
+     * set this instance of connector in the specified state
+     * 
+     * @param connectorInstanceId
+     *            the id of the connector to change
+     * @param state
+     *            the state to set on the connector
+     * @since 6.0
+     */
+    void setConnectorInstanceState(long connectorInstanceId, ConnectorState state) throws InvalidSessionException, ObjectReadException,
+            ObjectNotFoundException, ObjectModificationException;
 }

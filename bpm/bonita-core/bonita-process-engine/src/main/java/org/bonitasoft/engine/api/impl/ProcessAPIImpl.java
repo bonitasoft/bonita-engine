@@ -76,6 +76,8 @@ import org.bonitasoft.engine.bpm.model.ActorMember;
 import org.bonitasoft.engine.bpm.model.Category;
 import org.bonitasoft.engine.bpm.model.CategoryCriterion;
 import org.bonitasoft.engine.bpm.model.Comment;
+import org.bonitasoft.engine.bpm.model.ConnectorInstance;
+import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.FlowNodeType;
@@ -116,6 +118,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorCriterion;
 import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
+import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.category.exception.SCategoryAlreadyExistsException;
 import org.bonitasoft.engine.core.category.exception.SCategoryException;
@@ -124,6 +127,8 @@ import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilder;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
+import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -175,6 +180,7 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -193,6 +199,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserT
 import org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
@@ -260,6 +267,7 @@ import org.bonitasoft.engine.exception.NoSuchActivityDefinitionException;
 import org.bonitasoft.engine.exception.ObjectAlreadyExistsException;
 import org.bonitasoft.engine.exception.ObjectCreationException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
+import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
@@ -6202,4 +6210,132 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
 
     }
+
+    @Override
+    public List<ConnectorInstance> getConnectorInstancesOfActivity(final long activityInstanceId, final int pageNumber, final int numberPerPage,
+            final ConnectorInstanceCriterion order) throws InvalidSessionException, ObjectReadException, PageOutOfRangeException {
+        return getConnectorInstancesFor(activityInstanceId, pageNumber, numberPerPage, SConnectorInstance.FLOWNODE_TYPE, order);
+
+    }
+
+    private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int pageNumber, final int numberPerPage, final String flownodeType,
+            final ConnectorInstanceCriterion order) throws InvalidSessionException, PageOutOfRangeException, ObjectReadException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final SConnectorInstanceBuilder connectorInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSConnectorInstanceBuilder();
+        OrderByType orderByType;
+        String fieldName;
+        switch (order) {
+            case ACTIVATION_EVENT_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getActivationEventKey();
+                break;
+            case ACTIVATION_EVENT_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getActivationEventKey();
+                break;
+            case CONNECTOR_ID_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getConnectorIdKey();
+                break;
+            case CONNECTOR_ID__DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getConnectorIdKey();
+                break;
+            case CONTAINER_ID_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getContainerIdKey();
+                break;
+            case CONTAINER_ID__DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getContainerIdKey();
+                break;
+            case DEFAULT:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+            case NAME_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+            case NAME_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+            case STATE_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getStateKey();
+                break;
+            case STATE_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getStateKey();
+                break;
+            case VERSION_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getVersionKey();
+                break;
+            case VERSION_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getVersionKey();
+                break;
+            default:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+        }
+        try {
+            transactionExecutor.openTransaction();
+            long numberOfConnectorInstances;
+            try {
+                numberOfConnectorInstances = connectorService.getNumberOfConnectorInstances(instanceId, flownodeType);
+                PageIndexCheckingUtil.checkIfPageIsOutOfRange(numberOfConnectorInstances, pageNumber, numberPerPage);
+                final List<SConnectorInstance> connectorInstances = connectorService.getConnectorInstances(instanceId, flownodeType,
+                        pageNumber * numberPerPage, numberPerPage, fieldName, orderByType);
+                return ModelConvertor.toConnectorInstances(connectorInstances);
+            } catch (final SConnectorInstanceReadException e) {
+                throw new ObjectReadException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+    }
+
+    @Override
+    public List<ConnectorInstance> getConnectorInstancesOfProcess(final long processInstanceId, final int pageNumber, final int numberPerPage,
+            final ConnectorInstanceCriterion order) throws InvalidSessionException, ObjectReadException, PageOutOfRangeException {
+        return getConnectorInstancesFor(processInstanceId, pageNumber, numberPerPage, SConnectorInstance.PROCESS_TYPE, order);
+    }
+
+    @Override
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorState state) throws InvalidSessionException, ObjectReadException,
+            ObjectNotFoundException, ObjectModificationException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connectorInstanceId);
+                if (connectorInstance == null) {
+                    throw new ObjectNotFoundException("connector instance with id " + connectorInstanceId);
+                }
+                connectorService.setState(connectorInstance, state.name());
+            } catch (final SConnectorInstanceReadException e) {
+                throw new ObjectReadException(e);
+            } catch (final SConnectorInstanceModificationException e) {
+                throw new ObjectModificationException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+
+    }
+
 }

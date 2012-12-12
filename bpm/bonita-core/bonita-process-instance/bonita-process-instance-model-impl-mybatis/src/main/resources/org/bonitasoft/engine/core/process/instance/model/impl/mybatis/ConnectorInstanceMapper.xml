@@ -46,8 +46,26 @@
    		</if>
 	</select>
 
+	<select id="getConnectorInstancesWithState" resultMap="connectorInstanceResultMap">
+		SELECT *
+		FROM connector_instance c
+		WHERE c.tenantid = #{tenantid}
+		AND c.containerId = #{containerId}
+		AND c.containerType = #{containerType}
+		AND c.activationEvent = #{activationEvent}
+		AND c.state = #{state}
+	</select>
+
 	<select id="getConnectorInstances" resultMap="connectorInstanceResultMap">
 		SELECT *
+		FROM connector_instance c
+		WHERE c.tenantid = #{tenantid}
+		AND c.containerId = #{containerId}
+		AND c.containerType = #{containerType}
+	</select>
+
+	<select id="getNumberOfConnectorInstances" resultType="long">
+		SELECT count(c.id)
 		FROM connector_instance c
 		WHERE c.tenantid = #{tenantid}
 		AND c.containerId = #{containerId}
