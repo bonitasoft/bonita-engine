@@ -29,6 +29,7 @@ import org.bonitasoft.engine.bpm.model.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.MemberType;
+import org.bonitasoft.engine.bpm.model.Problem;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
@@ -220,6 +221,21 @@ public interface ProcessManagementAPI {
      *             Error thrown if no processDefinition have an id corresponding to the value of processDefinitionId parameter.
      */
     ProcessDefinition deploy(BusinessArchive businessArchive) throws InvalidSessionException, ProcessDeployException, ProcessDefinitionNotFoundException;
+
+    /**
+     * Returns a list of problems if the process is misconfigured.
+     * 
+     * @param processId
+     *            the process definition identifier
+     * @return a list of problems or an empty list
+     * @throws InvalidSessionException
+     *             occurs if the session is invalid, e.g session expiration
+     * @throws ProcessDefinitionNotFoundException
+     *             occurs if the given id does not refer to any process definition
+     * @throws ProcessResourceException
+     *             occurs if something wrong happens during method evaluation
+     */
+    List<Problem> getProcessResolutionProblems(long processId) throws InvalidSessionException, ProcessDefinitionNotFoundException, ProcessResourceException;
 
     /**
      * Disables the process by a given processId

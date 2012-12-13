@@ -85,6 +85,7 @@ import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.Index;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.MemberType;
+import org.bonitasoft.engine.bpm.model.Problem;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionStates;
@@ -6335,7 +6336,30 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final STransactionException e) {
             throw new ObjectReadException(e);
         }
+    }
 
+    @Override
+    public List<Problem> getProcessResolutionProblems(final long processId) throws InvalidSessionException, ProcessDefinitionNotFoundException,
+            ProcessResourceException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processId, processDefinitionService);
+        List<Problem> problems;
+        try {
+            transactionExecutor.execute(getProcessDefinition);
+            final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+            final CheckActorMappingList checkActorMapping = new CheckActorMappingList(actorMappingService, processId);
+            transactionExecutor.execute(checkActorMapping);
+            problems = checkActorMapping.getProblems();
+            // final ParameterService parameterService = tenantAccessor.getParameterService();
+            // final CheckParameterProblems checkParameterProblems = new CheckParameterProblems(parameterService, processId);
+            // transactionExecutor.execute(checkParameterProblems);
+            // problems.addAll(checkActorMapping.getProblems());
+            return problems;
+        } catch (final SBonitaException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        }
     }
 
 }
