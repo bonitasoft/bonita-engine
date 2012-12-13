@@ -325,7 +325,7 @@ public class ProcessManagementTest extends CommonAPITest {
             protected boolean check() throws Exception {
                 final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
                 builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
-                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.CANCELLED_STATE);
+                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.ABORTED_STATE);
                 return getProcessAPI().searchArchivedTasks(builder.done()).getCount() == 2;
             }
         }.waitUntil());

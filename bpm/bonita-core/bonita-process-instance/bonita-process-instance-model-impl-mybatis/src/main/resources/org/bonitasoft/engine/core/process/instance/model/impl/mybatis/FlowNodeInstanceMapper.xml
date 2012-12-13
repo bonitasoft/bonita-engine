@@ -7,11 +7,13 @@
 		INSERT INTO flownode_instance (tenantid, id, kind, rootContainerId, parentContainerId,
 		name, description, displayName, displayDescription, stateId, stateName, prev_state_id, terminal, stable, lastUpdateDate, reachedStateDate,
 		stateCategory, logicalGroup1, logicalGroup2, logicalGroup3, logicalGroup4, tokenCount, loop_counter
-		<if test="kind == 'user' or kind == 'manual'">, priority, expectedEndDate, claimedDate, actorId, assigneeId</if>
+		<if test="kind == 'user' or kind == 'manual'">, priority, expectedEndDate, claimedDate, actorId, assigneeId, abortedByBoundary</if>
 		<if test="kind == 'gate'">, gatewayType, hitBys</if>
-		<if test="kind == 'loop'">, loop_max</if>
+		<if test="kind == 'loop'">, loop_max, abortedByBoundary</if>
+		<if test="kind == 'auto'">, abortedByBoundary</if>
+		<if test="kind == 'call'">, abortedByBoundary</if>
 		<if test="kind == 'multi'">, sequential, loopDataInputRef, loopDataOutputRef, dataInputItemRef,
-		 dataOutputItemRef, loopCardinality, nbActiveInst, nbCompletedInst, nbTerminatedInst</if>
+		 dataOutputItemRef, loopCardinality, nbActiveInst, nbCompletedInst, nbTerminatedInst, abortedByBoundary</if>
 		<if test="kind == 'boundaryEvent'">, activityInstanceId</if>
 		)
 		VALUES
@@ -19,11 +21,15 @@
 		#{entity.displayName}, #{entity.displayDescription}, #{entity.stateId}, #{entity.stateName}, #{entity.previousStateId}, #{entity.terminal}, #{entity.stable},
 		#{entity.lastUpdateDate}, #{entity.reachedStateDate},  #{entity.stateCategory}, #{entity.logicalGroup1}, #{entity.logicalGroup2}, #{entity.logicalGroup3}, 
 		#{entity.logicalGroup4}, #{entity.tokenCount}, #{entity.loopCounter}
-		<if test="kind == 'user' or kind == 'manual'">, #{entity.priority, javaType=org.bonitasoft.engine.core.process.instance.model.STaskPriority, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{entity.expectedEndDate}, #{entity.claimedDate}, #{entity.actorId}, #{entity.assigneeId}</if>
+		<if test="kind == 'user' or kind == 'manual'">, #{entity.priority, javaType=org.bonitasoft.engine.core.process.instance.model.STaskPriority, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, 
+				#{entity.expectedEndDate}, #{entity.claimedDate}, #{entity.actorId}, #{entity.assigneeId}, #{entity.abortedByBoundary}</if>
 		<if test="kind == 'gate'">, #{entity.gatewayType}, #{entity.hitBys}</if>
-		<if test="kind == 'loop'">, #{entity.loopMax}</if>
+		<if test="kind == 'loop'">, #{entity.loopMax}, #{entity.abortedByBoundary}</if>
+		<if test="kind == 'auto'">, #{entity.abortedByBoundary}</if>
+		<if test="kind == 'call'">, #{entity.abortedByBoundary}</if>
 		<if test="kind == 'multi'">, #{entity.sequential}, #{entity.loopDataInputRef}, #{entity.loopDataOutputRef}
-		, #{entity.dataInputItemRef}, #{entity.dataOutputItemRef}, #{entity.loopCardinality}, #{entity.numberOfActiveInstances}, #{entity.numberOfCompletedInstances}, #{entity.numberOfTerminatedInstances}</if>
+				, #{entity.dataInputItemRef}, #{entity.dataOutputItemRef}, #{entity.loopCardinality}, #{entity.numberOfActiveInstances}, #{entity.numberOfCompletedInstances}, 
+				#{entity.numberOfTerminatedInstances}, #{entity.abortedByBoundary}</if>
 		<if test="kind == 'boundaryEvent'">, #{entity.activityInstanceId}</if>
 		)
 	</insert>
@@ -65,6 +71,7 @@
 			<if test="executedBy != null">executedBy=#{executedBy},</if>
 	      	<if test="deleted != null">deleted=#{deleted},</if>
 	      	<if test="stateExecuting != null">state_executing=#{stateExecuting},</if>
+	      	<if test="abortedByBoundary != null">abortedByBoundary=#{abortedByBoundary},</if>
 		</trim>
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}
@@ -75,6 +82,7 @@
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}
 	</delete>
+	
 	<resultMap id="flowNodeInstanceResultMap" type="flownode_instance">
 		<result property="id" column="id" />
 		<result property="name" column="name" />
@@ -103,18 +111,22 @@
 		<result property="stateExecuting" column="state_executing" />
 		<discriminator javaType="string" column="kind">
 			<case value="auto" resultType="automatic_task_instance">
+				<result property="abortedByBoundary" column="abortedByBoundary" />
 			</case>
 			<case value="call" resultType="call_activity_instance">
+				<result property="abortedByBoundary" column="abortedByBoundary" />
 			</case>
 			<case value="user" resultType="user_task_instance">
 				<result property="actorId" column="actorId" />
 				<result property="assigneeId" column="assigneeId" />
 				<result property="priority" column="priority" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+				<result property="abortedByBoundary" column="abortedByBoundary" />
 			</case>
 			<case value="manual" resultType="manual_task_instance">
 				<result property="actorId" column="actorId" />
 				<result property="assigneeId" column="assigneeId" />
 				<result property="priority" column="priority" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+				<result property="abortedByBoundary" column="abortedByBoundary" />
 			</case>
 			<case value="gate" resultType="gateway_instance">
 				<result property="gatewayType" column="gatewayType" />
@@ -122,6 +134,7 @@
 			</case>
 			<case value="loop" resultType="loop_instance">
 				<result property="loopMax" column="loop_max" />
+				<result property="abortedByBoundary" column="abortedByBoundary" />
 			</case>
 			<case value="multi" resultType="multi_instance">
 				<result property="sequential" column="sequential" />
@@ -133,6 +146,7 @@
 				<result property="numberOfActiveInstances" column="nbActiveInst" />
 				<result property="numberOfCompletedInstances" column="nbCompletedInst" />
 				<result property="numberOfTerminatedInstances" column="nbTerminatedInst" />
+				<result property="abortedByBoundary" column="abortedByBoundary" />
 			</case>
 			<case value="startEvent" resultType="start_event_instance" />
 			<case value="intermediateCatchEvent" resultType="intermediate_catch_event_instance" />
@@ -371,6 +385,15 @@
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
+	</select>
+	
+	<select id="getActivityBoundaryEventInstances" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.activityInstanceId = #{activityInstanceId}
+		AND f.deleted = FALSE
+		AND f.kind = 'boundaryEvent'
 	</select>
 
 	<select id="getEventInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">

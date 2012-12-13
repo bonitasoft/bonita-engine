@@ -82,12 +82,12 @@ public class MultiInstanceTest extends CommonAPITest {
         }
         Thread.sleep(200);
         assertTrue("There was still pending task but no more was expected", new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 0, john).waitUntil());
-        final int nbAbortedActivities = (numberOfTask - numberOfTaskToCompleteMI) * 3; // parent and 2 children
+        final int nbAbortedActivities = (numberOfTask - numberOfTaskToCompleteMI) * 3 + numberOfTaskToCompleteMI * 2; // parent and 2 children for non completed 
+                                                                                                                       // tasks + 2 children for completed one
         assertTrue("process was not finished", new WaitProcessToFinishAndBeArchived(50, 7000, false, processInstance, getProcessAPI()).waitUntil());
         final CheckNbOfArchivedActivities checkNbOfActivities = new CheckNbOfArchivedActivities(getProcessAPI(), 100, 5000, true, processInstance,
                 nbAbortedActivities, TestStates.getAbortedState());
         final boolean waitUntilAborted = checkNbOfActivities.waitUntil();
         assertTrue("Expected " + nbAbortedActivities + " in the aboterd state. But was " + checkNbOfActivities.getResult().size(), waitUntilAborted);
     }
-
 }
