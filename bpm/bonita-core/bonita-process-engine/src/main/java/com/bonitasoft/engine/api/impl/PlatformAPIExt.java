@@ -96,6 +96,7 @@ import com.bonitasoft.engine.service.SPModelConvertor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
@@ -106,7 +107,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         try {
             return schedulerService.isStarted();
         } catch (final SSchedulerException e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
         }
         return false;
     }
@@ -134,7 +135,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final TenantAlreadyExistException e) {
             throw e;
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantCreationException(e);
         }
     }
@@ -206,7 +207,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             transactionExecutor.execute(createDefaultPrivileges);
             return tenantId;
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         }
     }
@@ -268,13 +269,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final PlatformNotStartedException e) {
             throw e;
         } catch (final STenantNotFoundException e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantNotFoundException(tenantId);
         } catch (final SDeletingActivatedTenantException e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantDeletionException("Unable to delete an activated tenant " + tenantId);
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantDeletionException(tenantId);
         }
     }
@@ -306,10 +307,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final PlatformNotStartedException e) {
             throw e;
         } catch (final TenantNotFoundException e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantNotFoundException(tenantId);
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantActivationException("Tenant activation: failed.", e);
         }
     }
@@ -336,9 +337,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         return transaction.getResult();
     }
 
-    private void log(final PlatformServiceAccessor platformAccessor, final Exception e) {
+    private void log(final PlatformServiceAccessor platformAccessor, final Exception e, final TechnicalLogSeverity logSeverity) {
         if (platformAccessor != null) {
-            platformAccessor.getTechnicalLoggerService().log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            platformAccessor.getTechnicalLoggerService().log(this.getClass(), logSeverity, e);
         } else {
             e.printStackTrace();
         }
@@ -369,10 +370,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final PlatformNotStartedException e) {
             throw e;
         } catch (final TenantNotFoundException e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantNotFoundException(tenantId);
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantDeactivationException("Tenant deactivation failed.", e);
         }
     }
@@ -468,7 +469,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final PlatformNotStartedException e) {
             throw e;
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new BonitaException(e.getMessage());
         }
     }
@@ -488,11 +489,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             return SPModelConvertor.toTenant(transactionContent.getResult());
         } catch (final PlatformNotStartedException e) {
             throw e;
+        } catch (final STenantNotFoundException e) {
+            log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
+            throw new TenantNotFoundException("No tenant exists with name: " + tenantName);
         } catch (final SBonitaException e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
             throw new TenantNotFoundException("Unable to retreive the tenant with name " + tenantName);
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
             throw new TenantNotFoundException("Unable to retreive the tenant with name " + tenantName);
         }
     }
@@ -513,10 +517,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final PlatformNotStartedException e) {
             throw e;
         } catch (final SBonitaException e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantNotFoundException("Unable to retreive the defaultTenant");
         } catch (final Exception e) {
-            log(platformAccessor, e);
+            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantNotFoundException("Unable to retreive the defaultTenant");
         }
     }
@@ -536,12 +540,15 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             return SPModelConvertor.toTenant(transactionContent.getResult());
         } catch (final PlatformNotStartedException e) {
             throw e;
+        } catch (final STenantNotFoundException e) {
+            log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
+            throw new TenantNotFoundException("No tenant exists with id: " + tenantId);
         } catch (final SBonitaException e) {
-            log(platformAccessor, e);
-            throw new TenantNotFoundException("Unable to retreive the tenant with name " + tenantId);
+            log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
+            throw new TenantNotFoundException("Unable to retreive the tenant with id " + tenantId);
         } catch (final Exception e) {
-            log(platformAccessor, e);
-            throw new TenantNotFoundException("Unable to retreive the tenant with name " + tenantId);
+            log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
+            throw new TenantNotFoundException("Unable to retreive the tenant with id " + tenantId);
         }
     }
 

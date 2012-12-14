@@ -397,7 +397,12 @@ public class SPPlatformTest {
 
     @Test(expected = TenantNotFoundException.class)
     public void getTenantByNotExistName() throws BonitaException {
-        platformAPI.getTenantByName("test");
+        try {
+            platformAPI.getTenantByName("test");
+        } catch (TenantNotFoundException e) {
+            assertTrue(e.getMessage().startsWith("No tenant exists with name: test"));
+            throw e;
+        }
     }
 
     @Test
@@ -415,7 +420,12 @@ public class SPPlatformTest {
 
     @Test(expected = TenantNotFoundException.class)
     public void getTenantByNotExistId() throws BonitaException {
-        platformAPI.getTenantById(-3);
+        try {
+            platformAPI.getTenantById(-3);
+        } catch (TenantNotFoundException e) {
+            assertTrue(e.getMessage().startsWith("No tenant exists with id: -3"));
+            throw e;
+        }
     }
 
     @Test
