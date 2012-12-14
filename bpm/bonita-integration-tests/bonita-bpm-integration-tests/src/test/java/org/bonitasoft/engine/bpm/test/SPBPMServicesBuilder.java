@@ -104,6 +104,7 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SSupervisorBuilders;
 import org.bonitasoft.engine.test.util.BaseServicesBuilder;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.XMLWriter;
@@ -790,6 +791,11 @@ public class SPBPMServicesBuilder extends BaseServicesBuilder implements Platfor
     @Override
     public ConnectorExecutor getConnectorExecutor() {
         return this.getInstanceOf(ConnectorExecutor.class);
+    }
+
+    @Override
+    public WorkService getWorkService() {
+        return this.getInstanceOf(WorkService.class);
     }
 
 }

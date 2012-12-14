@@ -4,7 +4,7 @@
 	<bean id="workService" class="org.bonitasoft.engine.work.ThreadPoolWorkService">
 		<constructor-arg name="transactionService" ref="transactionService"></constructor-arg>
 		<constructor-arg name="workSynchronizationFactory" >
-			<bean class="com.bonitasoft.engine.work.ParalellWorkSynchronizationFactory"></bean>
+			<bean class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory"></bean>
 		</constructor-arg>
 		<constructor-arg name="corePoolSize" value="5"></constructor-arg>
 		<constructor-arg name="maximumPoolSize" value="100"></constructor-arg>

@@ -23,6 +23,7 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
 
@@ -74,5 +75,7 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     SearchPlatformEntitiesDescriptor getSearchPlatformEntitiesDescriptor();
 
     NodeConfiguration getPlaformConfiguration();
+
+    WorkService getWorkService();
 
 }

@@ -72,6 +72,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
@@ -295,10 +296,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
+            final WorkService workService = platformAccessor.getWorkService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             final long sessionId = createSession(tenantId, sessionService, transactionExecutor);
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
-                    platformAccessor.getTechnicalLoggerService());
+                    platformAccessor.getTechnicalLoggerService(), workService);
             transactionExecutor.execute(transactionContent);
             sessionService.deleteSession(sessionId);
         } catch (final PlatformNotStartedException e) {
@@ -358,9 +360,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
+            final WorkService workService = platformAccessor.getWorkService();
             final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final long sessionId = createSession(tenantId, sessionService, transactionExecutor);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
             transactionExecutor.execute(transactionContent);
             sessionService.deleteSession(sessionId);
         } catch (final PlatformNotStartedException e) {

@@ -26,6 +26,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
 
@@ -75,6 +76,8 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor;
 
     private NodeConfiguration platformConfguration;
+
+    private WorkService workService;
 
     @Override
     public TransactionService getTransactionService() {
@@ -246,6 +249,14 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             platformConfguration = SpringPlatformFileSystemBeanAccessor.getService(NodeConfiguration.class);
         }
         return platformConfguration;
+    }
+
+    @Override
+    public WorkService getWorkService() {
+        if (workService == null) {
+            workService = SpringPlatformFileSystemBeanAccessor.getService(WorkService.class);
+        }
+        return workService;
     }
 
 }
