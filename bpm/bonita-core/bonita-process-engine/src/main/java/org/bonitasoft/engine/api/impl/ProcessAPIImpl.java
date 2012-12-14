@@ -76,6 +76,7 @@ import org.bonitasoft.engine.bpm.model.ActorMember;
 import org.bonitasoft.engine.bpm.model.Category;
 import org.bonitasoft.engine.bpm.model.CategoryCriterion;
 import org.bonitasoft.engine.bpm.model.Comment;
+import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
@@ -172,7 +173,9 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -182,6 +185,7 @@ import org.bonitasoft.engine.core.process.instance.api.states.ProcessInstanceSta
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -301,6 +305,7 @@ import org.bonitasoft.engine.exception.UserTaskNotFoundException;
 import org.bonitasoft.engine.exception.UserTaskSetPriorityException;
 import org.bonitasoft.engine.exception.document.DocumentAttachmentException;
 import org.bonitasoft.engine.exception.flownode.TaskHidingException;
+import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
@@ -6314,6 +6319,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorState state) throws InvalidSessionException, ObjectReadException,
             ObjectNotFoundException, ObjectModificationException {
+        if (state.equals(ConnectorState.TO_BE_EXECUTED)) {
+            throw new ObjectModificationException("You can't put the connector as TO_BE_EXECUTED, use TO_RE_EXECUTE intead");
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
@@ -6359,6 +6367,62 @@ public class ProcessAPIImpl implements ProcessAPI {
             return problems;
         } catch (final SBonitaException e) {
             throw new ProcessDefinitionNotFoundException(e);
+        }
+    }
+
+    @Override
+    public void replayActivity(final long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException,
+            ObjectModificationException, ActivityExecutionFailedException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
+        String containerType;
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
+                List<SConnectorInstance> connectorInstances = connectorService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
+                        ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
+                if (!connectorInstances.isEmpty()) {
+                    throw new ActivityExecutionFailedException("There is at least on connector in failed on onEnter of the activity: "
+                            + connectorInstances.get(0).getName());
+                }
+                connectorInstances = connectorService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_FINISH, 0,
+                        1, ConnectorState.FAILED.name());
+                if (!connectorInstances.isEmpty()) {
+                    throw new ActivityExecutionFailedException("There is at least on connector in failed on onFinish of the activity: "
+                            + connectorInstances.get(0).getName());
+                }
+                // can change state and call execute
+                activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
+                activityInstanceService.setExecuting(activityInstance);
+                containerType = SFlowElementsContainerType.PROCESS.name();
+                if (activityInstance.getLogicalGroup(2) > 0) {
+                    containerType = SFlowElementsContainerType.FLOWNODE.name();
+                }
+            } catch (final SConnectorInstanceReadException e) {
+                throw new ObjectReadException(e);
+            } catch (final SActivityReadException e) {
+                throw new ObjectReadException(e);
+            } catch (final SActivityInstanceNotFoundException e) {
+                throw new ObjectNotFoundException(e);
+            } catch (final SFlowNodeModificationException e) {
+                throw new ObjectModificationException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+        try {
+            containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType);
+        } catch (final SActivityReadException e) {
+            throw new ObjectReadException(e);
+        } catch (final SBonitaException e) {
+            throw new ActivityExecutionFailedException(e);
         }
     }
 

@@ -49,6 +49,7 @@ import org.bonitasoft.engine.connector.ConnectorCriterion;
 import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.core.operation.Operation;
+import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.ActivityInstanceReadException;
 import org.bonitasoft.engine.exception.ActorMemberNotFoundException;
@@ -2361,4 +2362,24 @@ public interface ProcessManagementAPI {
      */
     void setConnectorInstanceState(long connectorInstanceId, ConnectorState state) throws InvalidSessionException, ObjectReadException,
             ObjectNotFoundException, ObjectModificationException;
+
+    /**
+     * Replay a task that was in failed state.
+     * The task can be replayed if no connector is in state failed.
+     * If that is the case change state of failed connectors first to SKIPPED of TO_BE_EXECUTED
+     * 
+     * @param activityInstanceId
+     *            the activity to replay
+     * @throws InvalidSessionException
+     * @throws ObjectNotFoundException
+     *             When the activity does not exists
+     * @throws ObjectReadException
+     *             When the activity or connectors couldn't be read
+     * @throws ObjectModificationException
+     *             When the activity can't be modified
+     * @throws ActivityExecutionFailedException
+     *             When the activity can't be replayed because it's not in a good state, i.e. connectors in fail are present
+     */
+    void replayActivity(long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException, ObjectModificationException,
+            ActivityExecutionFailedException;
 }
