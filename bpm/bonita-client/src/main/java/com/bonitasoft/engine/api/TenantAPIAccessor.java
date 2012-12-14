@@ -2,11 +2,20 @@
  * Copyright (C) 2011-2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.api;
+package com.bonitasoft.engine.api;
 
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.ApiAccessType;
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.EJB2ServerAPI;
+import org.bonitasoft.engine.api.EJB3ServerAPI;
+import org.bonitasoft.engine.api.EngineAPI;
+import org.bonitasoft.engine.api.HTTPServerAPI;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.MigrationAPI;
+import org.bonitasoft.engine.api.MonitoringAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
@@ -19,11 +28,8 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
-import com.bonitasoft.engine.api.LogAPI;
-
 /**
  * @author Matthieu Chaffotte
- * @author Elias Ricken de Medeiros
  */
 public final class TenantAPIAccessor {
 

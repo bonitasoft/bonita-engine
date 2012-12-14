@@ -2,22 +2,15 @@
  * Copyright (C) 2011-2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.api;
+package com.bonitasoft.engine.api;
 
 import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.PlatformCreationException;
-import org.bonitasoft.engine.exception.PlatformDeletionException;
-import org.bonitasoft.engine.exception.PlatformNotExistException;
 import org.bonitasoft.engine.exception.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.StartNodeException;
-import org.bonitasoft.engine.exception.StopNodeException;
-import org.bonitasoft.engine.platform.Platform;
-import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -33,74 +26,9 @@ import com.bonitasoft.engine.platform.TenantCriterion;
 import com.bonitasoft.engine.platform.TenantUpdateDescriptor;
 
 /**
- * @author Elias Ricken de Medeiros,
- * @author Lu Kai
- * @author Zhang Bole
+ * @author Matthieu Chaffotte
  */
-public interface PlatformAPI {
-
-    /**
-     * Create a platform.
-     * 
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformCreationException
-     *             occurs when an exception is thrown during platform creation
-     */
-    void createPlatform() throws InvalidSessionException, PlatformCreationException;
-
-    /**
-     * Starts the node.
-     * 
-     * @throws InvalidSessionException
-     *             occurs if API Session is invalid, e.g session has expired.
-     * @throws StartNodeException
-     *             occurs when an exception is thrown during the activation of the node
-     */
-    void startNode() throws InvalidSessionException, StartNodeException;
-
-    /**
-     * Stops the node.
-     * 
-     * @throws InvalidSessionException
-     *             occurs if API Session is invalid, e.g session has expired.
-     * @throws StopNodeException
-     *             occurs when an exception is thrown during the stop of the node
-     */
-    void stopNode() throws InvalidSessionException, StopNodeException;
-
-    /**
-     * Delete a platform.
-     * 
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformDeletionException
-     *             occurs when an exception is thrown during platform deletion
-     */
-    void deletePlaftorm() throws InvalidSessionException, PlatformDeletionException;
-
-    /**
-     * Get the platform.
-     * 
-     * @return the Platform object
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotExistException
-     *             occurs when the identifier does not refer to an existing platform
-     */
-    @Deprecated
-    Platform getPlatform() throws InvalidSessionException, PlatformNotExistException;
-
-    /**
-     * Check if the platform created or not.
-     * 
-     * @return true if the platform existed
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotExistException
-     *             occurs when the identifier does not refer to an existing platform
-     */
-    boolean isPlatformCreated() throws InvalidSessionException, PlatformNotExistException;
+public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
 
     /**
      * Create a tenant
@@ -271,17 +199,6 @@ public interface PlatformAPI {
      *             occurs when an exception is thrown if the platform is not started
      */
     int getNumberOfTenants() throws InvalidSessionException, PlatformNotStartedException;
-
-    /**
-     * Get this platform state.
-     * 
-     * @return PlatformState object
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotExistException
-     *             occurs when the identifier does not refer to an existing platform
-     */
-    PlatformState getPlatformState() throws InvalidSessionException, PlatformNotExistException;
 
     /**
      * Update a tenant with its tenantId and new content.

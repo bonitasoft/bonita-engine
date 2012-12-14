@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TaskOnDemandTest extends CommonAPITest {
+public class TaskOnDemandTest extends CommonAPISPTest {
 
     // FIXME add test that there is no pending task if the parent task is finished
 

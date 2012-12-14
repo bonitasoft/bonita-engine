@@ -44,7 +44,7 @@ import com.bonitasoft.engine.search.SearchLogs;
  * @author Bole Zhang
  * @author Matthieu Chaffotte
  */
-public class LogAPIImpl implements LogAPI {
+public class LogAPIExt implements LogAPI {
 
     private static TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
         SessionAccessor sessionAccessor = null;

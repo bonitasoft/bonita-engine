@@ -17,9 +17,7 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EventSorting;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.MigrationAPI;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProcessInstanceCriterion;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
@@ -81,6 +79,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.log.Log;
 
 public class APITestSPUtil {

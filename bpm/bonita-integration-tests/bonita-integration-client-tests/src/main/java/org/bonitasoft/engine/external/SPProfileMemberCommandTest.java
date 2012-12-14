@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPISPTest;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -25,6 +23,9 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
 public class SPProfileMemberCommandTest extends CommonAPISPTest {
 

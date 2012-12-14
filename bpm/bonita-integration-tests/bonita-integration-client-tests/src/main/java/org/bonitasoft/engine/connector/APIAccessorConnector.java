@@ -14,6 +14,7 @@ import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.ConnectorValidationException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 
+import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.log.LogCriterion;
 
@@ -35,7 +36,7 @@ public class APIAccessorConnector extends AbstractConnector {
 
             setOutputParameter("procInstId", getExecutionContext().getParentProcessInstanceId());
 
-            final LogAPI logAPI = getAPIAccessor().getLogAPI();
+            final LogAPI logAPI = ((APIAccessor) getAPIAccessor()).getLogAPI();
             final int numberOfLogs = logAPI.getNumberOfLogs();
             setOutputParameter("nbLogs", numberOfLogs);
             setOutputParameter("searchLogs", logAPI.searchLogs(new SearchOptionsBuilder(0, numberOfLogs).done()));

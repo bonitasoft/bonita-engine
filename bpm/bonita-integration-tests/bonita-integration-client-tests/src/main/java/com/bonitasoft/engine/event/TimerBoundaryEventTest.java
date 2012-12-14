@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
@@ -26,7 +26,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("Not yet implemented")
-public class TimerBoundaryEventTest extends CommonAPITest {
+public class TimerBoundaryEventTest extends CommonAPISPTest {
 
     private User donaBenta;
 

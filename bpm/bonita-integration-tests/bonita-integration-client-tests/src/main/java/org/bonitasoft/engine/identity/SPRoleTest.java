@@ -18,12 +18,13 @@ import static org.junit.Assert.assertEquals;
 import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.SPBPMTestUtil;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.api.TenantAPIAccessor;
 
 public class SPRoleTest extends CommonAPISPTest {
 

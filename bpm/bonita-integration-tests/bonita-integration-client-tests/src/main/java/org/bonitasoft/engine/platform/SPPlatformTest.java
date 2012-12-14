@@ -8,8 +8,6 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -38,6 +36,8 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.exception.TenantActivationException;
 import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;

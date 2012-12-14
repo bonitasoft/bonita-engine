@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
@@ -22,7 +22,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MultiInstanceTest extends CommonAPITest {
+public class MultiInstanceTest extends CommonAPISPTest {
 
     private static final String JOHN = "john";
 
@@ -82,8 +82,8 @@ public class MultiInstanceTest extends CommonAPITest {
         }
         Thread.sleep(200);
         assertTrue("There was still pending task but no more was expected", new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 0, john).waitUntil());
-        final int nbAbortedActivities = (numberOfTask - numberOfTaskToCompleteMI) * 3 + numberOfTaskToCompleteMI * 2; // parent and 2 children for non completed 
-                                                                                                                       // tasks + 2 children for completed one
+        final int nbAbortedActivities = (numberOfTask - numberOfTaskToCompleteMI) * 3 + numberOfTaskToCompleteMI * 2; // parent and 2 children for non completed
+                                                                                                                      // tasks + 2 children for completed one
         assertTrue("process was not finished", new WaitProcessToFinishAndBeArchived(50, 7000, false, processInstance, getProcessAPI()).waitUntil());
         final CheckNbOfArchivedActivities checkNbOfActivities = new CheckNbOfArchivedActivities(getProcessAPI(), 100, 5000, true, processInstance,
                 nbAbortedActivities, TestStates.getAbortedState());

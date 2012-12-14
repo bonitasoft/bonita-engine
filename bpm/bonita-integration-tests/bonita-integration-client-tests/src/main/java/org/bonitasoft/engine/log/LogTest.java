@@ -59,10 +59,6 @@ import com.bonitasoft.engine.exception.LogNotFoundException;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogCriterion;
 
-/**
- * @author Bole Zhang
- * @author Elias Ricken de Medeiros
- */
 public class LogTest extends CommonAPISPTest {
 
     @Before

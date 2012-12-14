@@ -6,11 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.List;
 
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.identity.User;
@@ -20,6 +16,11 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
 
 /**
  * @author Yanyan Liu

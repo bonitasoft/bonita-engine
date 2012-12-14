@@ -2,23 +2,26 @@
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.api.impl;
+package com.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.MonitoringAPI;
-import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.impl.APIAccessorImpl;
+import org.bonitasoft.engine.api.impl.CommandAPIImpl;
+import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
+import org.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 
+import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.impl.LogAPIImpl;
+import com.bonitasoft.engine.api.ProcessAPI;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class APIAccessorImpl implements APIAccessor, Serializable {
+public class APIAccessorExt extends APIAccessorImpl implements APIAccessor, Serializable {
 
     private static final long serialVersionUID = -7317110051980496939L;
 
@@ -29,7 +32,7 @@ public class APIAccessorImpl implements APIAccessor, Serializable {
 
     @Override
     public ProcessAPI getProcessAPI() {
-        return new ProcessAPIImpl();
+        return new ProcessAPIExt();
     }
 
     @Override
@@ -39,7 +42,7 @@ public class APIAccessorImpl implements APIAccessor, Serializable {
 
     @Override
     public LogAPI getLogAPI() {
-        return new LogAPIImpl();
+        return new LogAPIExt();
     }
 
     @Override

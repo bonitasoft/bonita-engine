@@ -47,7 +47,10 @@ import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionService;
 
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.impl.LogAPIImpl;
+import com.bonitasoft.engine.api.impl.LogAPIExt;
+import com.bonitasoft.engine.api.impl.LoginAPIExt;
+import com.bonitasoft.engine.api.impl.PlatformAPIExt;
+import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 
 /**
  * @author Matthieu Chaffotte
@@ -57,7 +60,8 @@ public class ServerAPIImpl implements ServerAPI {
 
     private static final long serialVersionUID = -241989293071026657L;
 
-    private static final List<String> NO_SESSION_APIS = Arrays.asList(PlatformLoginAPI.class.getName(), LoginAPI.class.getName());
+    private static final List<String> NO_SESSION_APIS = Arrays.asList(PlatformLoginAPI.class.getName(), LoginAPI.class.getName(),
+            com.bonitasoft.engine.api.LoginAPI.class.getName());
 
     private final Map<String, Object> apis = new HashMap<String, Object>(12);
 
@@ -203,15 +207,18 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private void initMap() {
-        apis.put(PlatformAPI.class.getName(), new PlatformAPIImpl());
+        apis.put(PlatformAPI.class.getName(), new PlatformAPIExt());
+        apis.put(com.bonitasoft.engine.api.PlatformAPI.class.getName(), new PlatformAPIExt());
         apis.put(PlatformLoginAPI.class.getName(), new PlatformLoginAPIImpl());
         apis.put(PlatformMonitoringAPI.class.getName(), new PlatformMonitoringAPIImpl());
-        apis.put(LoginAPI.class.getName(), new LoginAPIImpl());
+        apis.put(LoginAPI.class.getName(), new LoginAPIExt());
+        apis.put(com.bonitasoft.engine.api.LoginAPI.class.getName(), new LoginAPIExt());
         apis.put(IdentityAPI.class.getName(), new IdentityAPIImpl());
         apis.put(MonitoringAPI.class.getName(), new MonitoringAPIImpl());
-        apis.put(ProcessAPI.class.getName(), new ProcessAPIImpl());
+        apis.put(ProcessAPI.class.getName(), new ProcessAPIExt());
+        apis.put(com.bonitasoft.engine.api.ProcessAPI.class.getName(), new ProcessAPIExt());
         apis.put(MigrationAPI.class.getName(), new MigrationAPIImpl());
-        apis.put(LogAPI.class.getName(), new LogAPIImpl());
+        apis.put(LogAPI.class.getName(), new LogAPIExt());
         apis.put(CommandAPI.class.getName(), new CommandAPIImpl());
         apis.put(PlatformCommandAPI.class.getName(), new PlatformCommandAPIImpl());
     }

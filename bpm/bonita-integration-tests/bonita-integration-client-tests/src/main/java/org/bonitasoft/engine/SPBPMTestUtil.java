@@ -5,11 +5,7 @@ import static org.junit.Assert.assertNull;
 import java.util.List;
 
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.model.ActivityDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
@@ -25,6 +21,10 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 
+import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotActivatedException;
 import com.bonitasoft.engine.platform.Tenant;

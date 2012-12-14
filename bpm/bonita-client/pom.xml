@@ -16,47 +16,47 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-					<artifactId>bonita-common-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-					<artifactId>bonita-common-api-ejb2</artifactId>
-				</exclusion>
-			</exclusions>
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
+<!-- 					<artifactId>bonita-common-api</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
+<!-- 					<artifactId>bonita-common-api-ejb2</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-client</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine</groupId>
-					<artifactId>bonita-common</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-					<artifactId>bonita-client-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-					<artifactId>bonita-client-api-local</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-					<artifactId>bonita-client-api-ejb2</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-					<artifactId>bonita-client-api-ejb3</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-					<artifactId>bonita-client-api-http</artifactId>
-				</exclusion>
-			</exclusions>
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine</groupId> -->
+<!-- 					<artifactId>bonita-common</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
+<!-- 					<artifactId>bonita-client-api</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
+<!-- 					<artifactId>bonita-client-api-local</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
+<!-- 					<artifactId>bonita-client-api-ejb2</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
+<!-- 					<artifactId>bonita-client-api-ejb3</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
+<!-- 					<artifactId>bonita-client-api-http</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

@@ -8,11 +8,6 @@ import java.util.List;
 import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessManagementAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ActorInstance;
 import org.bonitasoft.engine.bpm.model.Category;
@@ -51,6 +46,11 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.ProcessManagementAPI;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.platform.Tenant;
 
 /**

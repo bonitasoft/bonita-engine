@@ -10,8 +10,6 @@ import java.util.List;
 import org.bonitasoft.engine.BPMTestUtil;
 import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.SPBPMTestUtil;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.Comment;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
@@ -34,6 +32,9 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
 public class SPProcessManagementTest extends CommonAPISPTest {
 

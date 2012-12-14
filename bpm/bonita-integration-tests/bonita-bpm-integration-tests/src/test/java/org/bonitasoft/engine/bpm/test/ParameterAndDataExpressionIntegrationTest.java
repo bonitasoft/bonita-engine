@@ -40,6 +40,8 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.bonitasoft.engine.api.impl.LoginAPIExt;
+
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
     private static final Map<Integer, Serializable> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Serializable> emptyMap();
@@ -54,7 +56,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         btx.begin();
         final long tenantId = PlatformUtil.getDefaultTenantId(getPlatformService());
         btx.complete();
-        sSession = new LoginAPIImpl().login(tenantId, TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
+        sSession = new LoginAPIExt().login(tenantId, TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         getSessionAccessor().setSessionInfo(sSession.getId(), sSession.getTenantId());
 
         new LoginAPIImpl().logout(sSession);

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.BPMTestUtil;
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HiddenTaskTest extends CommonAPITest {
+public class HiddenTaskTest extends CommonAPISPTest {
 
     private ProcessDefinition processDefinition;
 

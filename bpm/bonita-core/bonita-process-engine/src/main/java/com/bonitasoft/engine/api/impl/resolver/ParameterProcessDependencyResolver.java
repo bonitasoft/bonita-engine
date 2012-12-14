@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
@@ -25,7 +25,7 @@ import com.bonitasoft.engine.exception.ParameterProcessNotFoundException;
 public class ParameterProcessDependencyResolver extends ProcessDependencyResolver {
 
     @Override
-    public boolean resolve(final ProcessAPIImpl processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
+    public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
             final SProcessDefinition sDefinition) throws ParameterProcessNotFoundException {
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final Set<SParameterDefinition> parameters = sDefinition.getParameters();

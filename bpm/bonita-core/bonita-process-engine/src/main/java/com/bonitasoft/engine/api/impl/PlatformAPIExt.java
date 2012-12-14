@@ -2,7 +2,7 @@
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.api.impl;
+package com.bonitasoft.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,29 +14,24 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
+import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.CreateDefaultCommand;
 import org.bonitasoft.engine.api.impl.transaction.CreateDefaultDataSource;
 import org.bonitasoft.engine.api.impl.transaction.CreateDefaultPrivileges;
 import org.bonitasoft.engine.api.impl.transaction.CreateDefaultProfiles;
-import org.bonitasoft.engine.api.impl.transaction.CreatePlatformContent;
-import org.bonitasoft.engine.api.impl.transaction.CreatePlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.CreateTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeactivateTenant;
-import org.bonitasoft.engine.api.impl.transaction.DeletePlatformContent;
-import org.bonitasoft.engine.api.impl.transaction.DeletePlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.GetDefaultTenantInstance;
-import org.bonitasoft.engine.api.impl.transaction.GetIsPlatformCreated;
-import org.bonitasoft.engine.api.impl.transaction.GetPlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.RemovePrivilege;
 import org.bonitasoft.engine.bpm.model.privilege.Privilege;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.commons.IOUtil;
-import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -49,28 +44,17 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.PlatformCreationException;
-import org.bonitasoft.engine.exception.PlatformDeletionException;
-import org.bonitasoft.engine.exception.PlatformNotExistException;
 import org.bonitasoft.engine.exception.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.StartNodeException;
-import org.bonitasoft.engine.exception.StopNodeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.platform.Platform;
-import org.bonitasoft.engine.platform.PlatformImpl;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.STenantCreationException;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
-import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.privilege.api.PrivilegeService;
 import org.bonitasoft.engine.privilege.model.buidler.PrivilegeBuilders;
@@ -89,6 +73,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 
+import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
@@ -110,62 +95,10 @@ import com.bonitasoft.engine.service.SPModelConvertor;
 
 /**
  * @author Matthieu Chaffotte
- * @author Elias Ricken de Medeiros
- * @author Lu Kai
- * @author Zhang Bole
- * @author Yanyan Liu
  */
-public class PlatformAPIImpl implements PlatformAPI {
+public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private final static String STATUS_DEACTIVATED = "DEACTIVATED";
-
-    @Override
-    public void createPlatform() throws InvalidSessionException, PlatformCreationException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new PlatformCreationException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContent platformTableContent = new CreatePlatformTableContent(platformService);
-        final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
-        try {
-            transactionExecutor.execute(platformTableContent);
-        } catch (final SBonitaException e) {
-            if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-            }
-            throw new PlatformCreationException("Platform Creation failed.", e);
-        }
-
-        final SPlatform platform = constructPlatform(platformAccessor);
-        final TransactionContent platformContent = new CreatePlatformContent(platformService, platform);
-        try {
-            transactionExecutor.execute(platformContent);
-            createDefaultTenant();
-        } catch (final SBonitaException e) {
-            if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-            }
-            throw new PlatformCreationException("Platform Creation failed.", e);
-        }
-    }
-
-    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) {
-        // FIXME construct platform object from a configuration file
-        final String version = "BOS-6.0";
-        final String previousVersion = "";
-        final String initialVersion = "BOS-6.0";
-        // FIXME createdBy when PlatformSessionAccessor will exist
-        final String createdBy = "platformAdmin";
-        // FIXME do that in the builder
-        final long created = System.currentTimeMillis();
-        final SPlatformBuilder platformBuilder = platformAccessor.getSPlatformBuilder();
-        final SPlatform platform = platformBuilder.createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
-        return platform;
-    }
 
     private boolean isPlatformStarted(final PlatformServiceAccessor platformAccessor) {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
@@ -175,147 +108,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
         }
         return false;
-    }
-
-    @Override
-    public void startNode() throws InvalidSessionException, StartNodeException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new StartNodeException(e);
-        }
-        try {
-            final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
-            final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            if (!isPlatformStarted(platformAccessor)) {
-                if (platformConfiguration.shouldStartScheduler()) {
-                    schedulerService.start();
-                }
-                final Tenant defaultTenant = getDefaultTenant();
-                activateTenant(defaultTenant.getId());
-                if (platformConfiguration.shouldResumeElements()) {
-                    // final PlatformService platformService = platformAccessor.getPlatformService();
-                    // List<STenant> tenants = null;
-                    // do {
-                    // tenants = platformService.getTenants(0, BATCH_SIZE, null, null);
-                    // for (final STenant sTenant : tenants) {
-                    // final TenantServiceAccessor tenantServiceAccessor = ServiceAccessorFactory.getInstance().createTenantServiceAccessor(
-                    // sTenant.getId());
-                    // for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
-                    // restartHandler.handleRestart(tenantServiceAccessor);
-                    // }
-                    // }
-                    //
-                    // } while (tenants.size() == BATCH_SIZE);
-                }
-
-                for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
-                    restartHandler.execute();
-                }
-
-            }
-        } catch (final SBonitaException e) {
-            throw new StartNodeException("Platform starting failed.", e);
-        } catch (final SecurityException e) {
-            throw new StartNodeException("Platform starting failed.", e);
-        } catch (final IllegalArgumentException e) {
-            throw new StartNodeException("Platform starting failed.", e);
-        } catch (final PlatformNotStartedException e) {
-            throw new StartNodeException("Platform starting failed.", e);
-        } catch (final TenantNotFoundException e) {
-            throw new StartNodeException("Platform starting failed.", e);
-        } catch (final TenantActivationException e) {
-            throw new StartNodeException("Platform starting failed.", e);
-        }
-    }
-
-    @Override
-    public void stopNode() throws InvalidSessionException, StopNodeException {
-        try {
-            final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final STenant tenant = getDefaultSTenant();
-            deactiveTenant(tenant.getId());
-            if (isPlatformStarted(platformAccessor)) {
-                schedulerService.shutdown();
-            }
-        } catch (final SBonitaException e) {
-            throw new StopNodeException(e);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new StopNodeException(e);
-        } catch (final InstantiationException e) {
-            throw new StopNodeException(e);
-        } catch (final IllegalAccessException e) {
-            throw new StopNodeException(e);
-        } catch (final ClassNotFoundException e) {
-            throw new StopNodeException(e);
-        } catch (final IOException e) {
-            throw new StopNodeException(e);
-        } catch (final BonitaHomeConfigurationException e) {
-            throw new StopNodeException(e.getMessage());
-        } catch (final PlatformNotStartedException e) {
-            throw new StopNodeException(e);
-        } catch (final TenantNotFoundException e) {
-            throw new StopNodeException(e);
-        } catch (final TenantDeactivationException e) {
-            throw new StopNodeException(e);
-        }
-    }
-
-    @Override
-    public void deletePlaftorm() throws InvalidSessionException, PlatformDeletionException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new PlatformDeletionException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContent deletePlatformContent = new DeletePlatformContent(platformService);
-        try {
-            final STenant tenant = getDefaultSTenant();
-            deleteDefaultTenant(tenant.getId());
-            transactionExecutor.execute(deletePlatformContent);
-        } catch (final SBonitaException e) {
-            throw new PlatformDeletionException(e);
-        } catch (final PlatformNotStartedException e) {
-            throw new PlatformDeletionException(e);
-        } catch (final TenantNotFoundException e) {
-            throw new PlatformDeletionException(e);
-        } catch (final TenantDeletionException e) {
-            throw new PlatformDeletionException(e);
-        }
-        final TransactionContent deletePlatformTableContent = new DeletePlatformTableContent(platformService);
-        try {
-            transactionExecutor.execute(deletePlatformTableContent);
-        } catch (final SBonitaException e) {
-            throw new PlatformDeletionException(e.getMessage());
-        }
-    }
-
-    @Override
-    @Deprecated
-    public Platform getPlatform() throws InvalidSessionException, PlatformNotExistException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new PlatformNotExistException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final GetPlatformContent transactionContent = new GetPlatformContent(platformService);
-        try {
-            transactionExecutor.execute(transactionContent);
-        } catch (final SBonitaException e) {
-            throw new PlatformNotExistException(e);
-        }
-        final SPlatform sPlatform = transactionContent.getResult();
-        final Platform platform = new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(),
-                sPlatform.getCreatedBy(), sPlatform.getCreated());
-        return platform;
     }
 
     @Override
@@ -343,18 +135,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             log(platformAccessor, e);
             throw new TenantCreationException(e);
-        }
-    }
-
-    private void createDefaultTenant() throws InvalidSessionException, STenantCreationException {
-        final String tenantName = "default";
-        final String description = "Default tenant";
-        final String userName = "technical_user_username";
-        final String password = "technical_user_password";
-        try {
-            create(tenantName, description, null, null, userName, password, true);
-        } catch (final PlatformNotStartedException e) {
-            throw new STenantCreationException(e);
         }
     }
 
@@ -691,25 +471,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public boolean isPlatformCreated() throws InvalidSessionException, PlatformNotExistException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new PlatformNotExistException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContentWithResult<Boolean> transactionContent = new GetIsPlatformCreated(platformService);
-        try {
-            transactionExecutor.execute(transactionContent);
-            return transactionContent.getResult();
-        } catch (final SBonitaException e) {
-            return false;
-        }
-    }
-
-    @Override
     public Tenant getTenantByName(final String tenantName) throws InvalidSessionException, TenantNotFoundException, PlatformNotStartedException {
         PlatformServiceAccessor platformAccessor = null;
         try {
@@ -803,21 +564,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             return 0;
         }
-    }
-
-    @Override
-    public PlatformState getPlatformState() throws InvalidSessionException, PlatformNotExistException {
-        getPlatform();
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new InvalidSessionException(e);
-        }
-        if (!isPlatformStarted(platformAccessor)) {
-            return PlatformState.STOPPED;
-        }
-        return PlatformState.STARTED;
     }
 
     @Override
@@ -922,69 +668,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             return searchTenants.getResult();
         } catch (final SBonitaException sbe) {
             throw new BonitaRuntimeException(sbe);
-        }
-    }
-
-    private STenant getDefaultSTenant() throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException {
-        PlatformServiceAccessor platformAccessor = null;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            final GetDefaultTenantInstance transactionContent = new GetDefaultTenantInstance(platformService);
-            transactionExecutor.execute(transactionContent);
-            return transactionContent.getResult();
-        } catch (final SBonitaException e) {
-            log(platformAccessor, e);
-            throw new TenantNotFoundException("Unable to retreive the defaultTenant");
-        } catch (final Exception e) {
-            log(platformAccessor, e);
-            throw new TenantNotFoundException("Unable to retreive the defaultTenant");
-        }
-    }
-
-    private void deleteDefaultTenant(final long tenantId) throws InvalidSessionException, TenantNotFoundException, TenantDeletionException {
-        PlatformServiceAccessor platformAccessor = null;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-
-            // delete tenant objects in database
-            final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
-            transactionExecutor.execute(transactionContentForTenantObjects);
-
-            // delete tenant in database
-            final TransactionContent transactionContent = new DeleteTenant(tenantId, platformService);
-            transactionExecutor.execute(transactionContent);
-
-            // delete default privileges
-            final TenantServiceAccessor tenantAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final PrivilegeService privilegeService = tenantAccessor.getPrivilegeService();
-            final SearchPrivilegeDescriptor privilegeSearcher = tenantAccessor.getSearchEntitiesDescriptor().getPrivilegeDescriptor();
-            final SearchOptions searchOptions = new SearchOptionsImpl(0, 10);
-            final SearchPrivileges searchPrivileges = new SearchPrivileges(privilegeService, privilegeSearcher, searchOptions);
-            transactionExecutor.execute(searchPrivileges);
-            final SearchResult<Privilege> privilegesRes = searchPrivileges.getResult();
-            if (privilegesRes.getCount() > 0) {
-                for (final Privilege pri : privilegesRes.getResult()) {
-                    final RemovePrivilege removePrivilege = new RemovePrivilege(pri.getId(), privilegeService);
-                    transactionExecutor.execute(removePrivilege);
-                }
-            }
-
-            // delete tenant folder
-            final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;
-            IOUtil.deleteDir(new File(targetDir));
-        } catch (final STenantNotFoundException e) {
-            log(platformAccessor, e);
-            throw new TenantNotFoundException(tenantId);
-        } catch (final SDeletingActivatedTenantException e) {
-            log(platformAccessor, e);
-            throw new TenantDeletionException("Unable to delete an activated tenant " + tenantId);
-        } catch (final Exception e) {
-            log(platformAccessor, e);
-            throw new TenantDeletionException(tenantId);
         }
     }
 

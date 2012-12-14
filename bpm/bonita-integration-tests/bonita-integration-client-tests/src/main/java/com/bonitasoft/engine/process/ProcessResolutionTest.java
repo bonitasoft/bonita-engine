@@ -2,7 +2,7 @@ package com.bonitasoft.engine.process;
 
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ActorInstance;
@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.model.ParameterDefinition;
 
-public class ProcessResolutionTest extends CommonAPITest {
+public class ProcessResolutionTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws BonitaException {

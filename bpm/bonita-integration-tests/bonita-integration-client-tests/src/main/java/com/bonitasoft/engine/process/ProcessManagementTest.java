@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.WaitUntil;
 import org.bonitasoft.engine.bpm.model.ActivityStates;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
@@ -31,7 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProcessManagementTest extends CommonAPITest {
+public class ProcessManagementTest extends CommonAPISPTest {
 
     private static final String PROCESS_VERSION = "1.0";
 
