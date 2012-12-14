@@ -6,7 +6,14 @@ package com.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.model.ConnectorInstance;
+import org.bonitasoft.engine.bpm.model.ConnectorState;
+import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
+import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.ObjectModificationException;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 
@@ -106,5 +113,69 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Error thrown if is value in the parameter is invalid
      */
     void importParameters(long pDefinitionId, byte[] parametersXML) throws InvalidSessionException, InvalidParameterValueException;
+
+    /**
+     * Retrieve the list of connector instances on an activity instance
+     * 
+     * @param activityInstanceId
+     *            the id of the element on which we want the connector instances
+     * @param pageNumber
+     * @param numberPerPage
+     * @param order
+     * @return
+     *         the list of connector instance on this element
+     * @throws PageOutOfRangeException
+     * @since 6.0
+     */
+    List<ConnectorInstance> getConnectorInstancesOfActivity(long activityInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
+            throws InvalidSessionException, ObjectReadException, PageOutOfRangeException;
+
+    /**
+     * Retrieve the list of connector instances on a process instance
+     * 
+     * @param processInstanceId
+     *            the id of the element on which we want the connector instances
+     * @param pageNumber
+     * @param numberPerPage
+     * @param order
+     * @return
+     *         the list of connector instance on this element
+     * @throws PageOutOfRangeException
+     * @since 6.0
+     */
+    List<ConnectorInstance> getConnectorInstancesOfProcess(long processInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
+            throws InvalidSessionException, ObjectReadException, PageOutOfRangeException;
+
+    /**
+     * set this instance of connector in the specified state
+     * 
+     * @param connectorInstanceId
+     *            the id of the connector to change
+     * @param state
+     *            the state to set on the connector
+     * @since 6.0
+     */
+    void setConnectorInstanceState(long connectorInstanceId, ConnectorState state) throws InvalidSessionException, ObjectReadException,
+            ObjectNotFoundException, ObjectModificationException;
+
+    /**
+     * Replay a task that was in failed state.
+     * The task can be replayed if no connector is in state failed.
+     * If that is the case change state of failed connectors first to SKIPPED of TO_BE_EXECUTED
+     * 
+     * @param activityInstanceId
+     *            the activity to replay
+     * @throws InvalidSessionException
+     * @throws ObjectNotFoundException
+     *             When the activity does not exists
+     * @throws ObjectReadException
+     *             When the activity or connectors couldn't be read
+     * @throws ObjectModificationException
+     *             When the activity can't be modified
+     * @throws ActivityExecutionFailedException
+     *             When the activity can't be replayed because it's not in a good state, i.e. connectors in fail are present
+     */
+    void replayActivity(long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException, ObjectModificationException,
+            ActivityExecutionFailedException;
 
 }

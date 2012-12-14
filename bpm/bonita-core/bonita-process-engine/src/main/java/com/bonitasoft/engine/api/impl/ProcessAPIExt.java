@@ -38,6 +38,9 @@ import org.bonitasoft.engine.api.impl.transaction.ResolveProcessAndCreateDepende
 import org.bonitasoft.engine.api.impl.transaction.StoreProcess;
 import org.bonitasoft.engine.api.impl.transaction.UnzipBusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.model.ConnectorEvent;
+import org.bonitasoft.engine.bpm.model.ConnectorInstance;
+import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.Problem;
@@ -49,6 +52,10 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
+import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
+import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
@@ -61,15 +68,21 @@ import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinition
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.ActivityCreationException;
 import org.bonitasoft.engine.exception.ActivityExecutionErrorException;
+import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.ActivityInterruptedException;
 import org.bonitasoft.engine.exception.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -77,11 +90,15 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.ObjectModificationException;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.ProcessDeletionException;
 import org.bonitasoft.engine.exception.ProcessDeployException;
 import org.bonitasoft.engine.exception.ProcessResourceException;
+import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
@@ -94,6 +111,7 @@ import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SOutOfBoundException;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.search.SearchActorPrivileges;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -105,6 +123,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.util.FileUtil;
 
 import com.bonitasoft.engine.api.ParameterSorting;
@@ -582,6 +601,189 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             return problems;
         } catch (final SBonitaException e) {
             throw new ProcessDefinitionNotFoundException(e);
+        }
+    }
+
+    @Override
+    public List<ConnectorInstance> getConnectorInstancesOfActivity(final long activityInstanceId, final int pageNumber, final int numberPerPage,
+            final ConnectorInstanceCriterion order) throws InvalidSessionException, ObjectReadException, PageOutOfRangeException {
+        return getConnectorInstancesFor(activityInstanceId, pageNumber, numberPerPage, SConnectorInstance.FLOWNODE_TYPE, order);
+
+    }
+
+    private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int pageNumber, final int numberPerPage, final String flownodeType,
+            final ConnectorInstanceCriterion order) throws InvalidSessionException, PageOutOfRangeException, ObjectReadException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final SConnectorInstanceBuilder connectorInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSConnectorInstanceBuilder();
+        OrderByType orderByType;
+        String fieldName;
+        switch (order) {
+            case ACTIVATION_EVENT_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getActivationEventKey();
+                break;
+            case ACTIVATION_EVENT_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getActivationEventKey();
+                break;
+            case CONNECTOR_ID_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getConnectorIdKey();
+                break;
+            case CONNECTOR_ID__DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getConnectorIdKey();
+                break;
+            case CONTAINER_ID_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getContainerIdKey();
+                break;
+            case CONTAINER_ID__DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getContainerIdKey();
+                break;
+            case DEFAULT:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+            case NAME_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+            case NAME_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+            case STATE_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getStateKey();
+                break;
+            case STATE_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getStateKey();
+                break;
+            case VERSION_ASC:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getVersionKey();
+                break;
+            case VERSION_DESC:
+                orderByType = OrderByType.DESC;
+                fieldName = connectorInstanceBuilder.getVersionKey();
+                break;
+            default:
+                orderByType = OrderByType.ASC;
+                fieldName = connectorInstanceBuilder.getNameKey();
+                break;
+        }
+        try {
+            transactionExecutor.openTransaction();
+            long numberOfConnectorInstances;
+            try {
+                numberOfConnectorInstances = connectorService.getNumberOfConnectorInstances(instanceId, flownodeType);
+                PageIndexCheckingUtil.checkIfPageIsOutOfRange(numberOfConnectorInstances, pageNumber, numberPerPage);
+                final List<SConnectorInstance> connectorInstances = connectorService.getConnectorInstances(instanceId, flownodeType,
+                        pageNumber * numberPerPage, numberPerPage, fieldName, orderByType);
+                return ModelConvertor.toConnectorInstances(connectorInstances);
+            } catch (final SConnectorInstanceReadException e) {
+                throw new ObjectReadException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+    }
+
+    @Override
+    public List<ConnectorInstance> getConnectorInstancesOfProcess(final long processInstanceId, final int pageNumber, final int numberPerPage,
+            final ConnectorInstanceCriterion order) throws InvalidSessionException, ObjectReadException, PageOutOfRangeException {
+        return getConnectorInstancesFor(processInstanceId, pageNumber, numberPerPage, SConnectorInstance.PROCESS_TYPE, order);
+    }
+
+    @Override
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorState state) throws InvalidSessionException, ObjectReadException,
+            ObjectNotFoundException, ObjectModificationException {
+        if (ConnectorState.TO_BE_EXECUTED.equals(state)) {
+            throw new ObjectModificationException("You can't put the connector as TO_BE_EXECUTED, use TO_RE_EXECUTE intead");
+        }
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connectorInstanceId);
+                if (connectorInstance == null) {
+                    throw new ObjectNotFoundException("connector instance with id " + connectorInstanceId);
+                }
+                connectorService.setState(connectorInstance, state.name());
+            } catch (final SConnectorInstanceReadException e) {
+                throw new ObjectReadException(e);
+            } catch (final SConnectorInstanceModificationException e) {
+                throw new ObjectModificationException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+    }
+
+    @Override
+    public void replayActivity(final long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException,
+            ObjectModificationException, ActivityExecutionFailedException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
+        String containerType;
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
+                List<SConnectorInstance> connectorInstances = connectorService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
+                        ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
+                if (!connectorInstances.isEmpty()) {
+                    throw new ActivityExecutionFailedException("There is at least on connector in failed on onEnter of the activity: "
+                            + connectorInstances.get(0).getName());
+                }
+                connectorInstances = connectorService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_FINISH, 0,
+                        1, ConnectorState.FAILED.name());
+                if (!connectorInstances.isEmpty()) {
+                    throw new ActivityExecutionFailedException("There is at least on connector in failed on onFinish of the activity: "
+                            + connectorInstances.get(0).getName());
+                }
+                // can change state and call execute
+                activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
+                activityInstanceService.setExecuting(activityInstance);
+                containerType = SFlowElementsContainerType.PROCESS.name();
+                if (activityInstance.getLogicalGroup(2) > 0) {
+                    containerType = SFlowElementsContainerType.FLOWNODE.name();
+                }
+            } catch (final SConnectorInstanceReadException e) {
+                throw new ObjectReadException(e);
+            } catch (final SActivityReadException e) {
+                throw new ObjectReadException(e);
+            } catch (final SActivityInstanceNotFoundException e) {
+                throw new ObjectNotFoundException(e);
+            } catch (final SFlowNodeModificationException e) {
+                throw new ObjectModificationException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectReadException(e);
+        }
+        try {
+            containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType);
+        } catch (final SActivityReadException e) {
+            throw new ObjectReadException(e);
+        } catch (final SBonitaException e) {
+            throw new ActivityExecutionFailedException(e);
         }
     }
 
