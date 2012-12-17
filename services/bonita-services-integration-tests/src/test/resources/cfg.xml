@@ -4,6 +4,7 @@
 	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<array>
+                <value>classpath:/org/bonitasoft/engine/conf/bonita-platform.xml</value>
 				<value>classpath:/org/bonitasoft/engine/conf/${bonita.test.db.vendor:h2}.properties</value>
 				<value>classpath:/org/bonitasoft/engine/conf/quartz-${bonita.test.db.vendor:h2}.properties</value>
 			</array>

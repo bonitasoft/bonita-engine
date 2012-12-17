@@ -4,6 +4,7 @@
 	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<array>
+                <value>classpath:/org/bonitasoft/engine/conf/bonita-platform.xml</value>
 				<value>classpath:/org/bonitasoft/engine/conf/${bonita.test.db.vendor:h2}.properties</value>
 				<value>classpath:/org/bonitasoft/engine/conf/quartz-${bonita.test.db.vendor:h2}.properties</value>
 			</array>
@@ -213,11 +214,8 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="handlers">
 			<map>
-				<entry>
-					<key>
-						<value>PROCESSINSTANCE_STATE_UPDATED</value>
-					</key>
-					<bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
+				<entry key="PROCESSINSTANCE_STATE_UPDATED">
+                    <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
 						<constructor-arg name="archiveService" ref="archiveService" />
 						<constructor-arg name="instancesBuilders" ref="bpmInstanceBuilders" />
 						<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -243,7 +241,7 @@
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
         <property name="shouldStartScheduler" value="true" />
         <property name="shouldRestartElements" value="true" />
-        <property name="eventHandlingJobCron" value="${event.job.frequency:*/5 * * * * ?}" />
+        <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
         <property name="shouldStartEventHandlingJob" value="true" />
 	</bean>
     

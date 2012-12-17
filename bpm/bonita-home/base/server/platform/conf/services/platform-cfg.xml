@@ -5,7 +5,6 @@
 		<property name="locations">
 			<list>
 				<value>${bonita.home}/server/platform/conf/bonita-platform.xml</value>
-				<value>${bonita.home}/server/platform/conf/cmis.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -55,7 +54,7 @@
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
         <property name="shouldStartScheduler" value="true" />
         <property name="shouldRestartElements" value="true" />
-        <property name="eventHandlingJobCron" value="${event.job.frequency:0/5 * * * * ?}" />
+        <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
         <property name="shouldStartEventHandlingJob" value="true" />
 	</bean>
 

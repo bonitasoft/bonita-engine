@@ -701,7 +701,11 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+        <dependency>
+            <groupId>org.bonitasoft.engine.platform.command</groupId>
+            <artifactId>bonita-platform-command-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<!-- Persistence -->
 		<dependency>

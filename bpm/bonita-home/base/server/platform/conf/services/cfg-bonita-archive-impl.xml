@@ -10,14 +10,14 @@
 		<constructor-arg ref="transactionService" />
 	</bean>
 
-	<bean id="definitiveArchiveDescriptor" class="org.bonitasoft.engine.archive.impl.SArchiveDescriptorImpl">
-		<constructor-arg name="name" value="DEFINITIVE_0" />
-		<constructor-arg name="oldestTime" value="1230739200052" /> <!-- 01/01/2009 -->
-		<constructor-arg name="newestTime" value="9999999999999" /> <!-- ever -->
-	</bean>
+    <bean id="definitiveArchiveDescriptor" class="org.bonitasoft.engine.archive.impl.SArchiveDescriptorImpl">
+        <constructor-arg name="name" value="${org.bonitasoft.engine.archive.name}" />
+        <constructor-arg name="oldestTime" value="${org.bonitasoft.engine.archive.oldestTime}" />
+        <constructor-arg name="newestTime" value="${org.bonitasoft.engine.archive.newestTime}" />
+    </bean>
 
-	<bean id="archiveServiceConfigurator" class="org.bonitasoft.engine.archive.impl.ArchiveServiceConfiguratorImpl">
-		<constructor-arg name="regexp" value=".*" />
-	</bean>
+    <bean id="archiveServiceConfigurator" class="org.bonitasoft.engine.archive.impl.ArchiveServiceConfiguratorImpl">
+        <constructor-arg name="regexp" value="${org.bonitasoft.engine.archive.regexp}" />
+    </bean>
 
 </beans>

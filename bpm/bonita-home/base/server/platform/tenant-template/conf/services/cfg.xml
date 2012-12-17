@@ -151,11 +151,8 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="handlers">
 			<map>
-				<entry>
-					<key>
-						<value>PROCESSINSTANCE_STATE_UPDATED</value>
-					</key>
-					<bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
+				<entry key="PROCESSINSTANCE_STATE_UPDATED">
+                    <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
 						<constructor-arg name="archiveService" ref="archiveService" />
 						<constructor-arg name="instancesBuilders" ref="bpmInstanceBuilders" />
 						<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -166,11 +163,8 @@
 						<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
 					</bean>
 				</entry>
-				<entry>
-					<key>
-						<value>PROCESSINSTANCE_DELETED</value>
-					</key>
-					<bean class="org.bonitasoft.engine.execution.handler.ProcessInstancesDeletedHandler">
+				<entry key="PROCESSINSTANCE_DELETED">
+                    <bean class="org.bonitasoft.engine.execution.handler.ProcessInstancesDeletedHandler">
 						<constructor-arg name="commentService" ref="commentService" />
 					</bean>
 				</entry>
