@@ -133,6 +133,8 @@ import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 
 /**
  * @author Matthieu Chaffotte
@@ -184,7 +186,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     transactionExecutor.execute(removeActorPrivilegeById);
                 }
             }
-
         } catch (final SProcessDefinitionNotFoundException e) {
             log(tenantAccessor, e);
             throw new ProcessDefinitionNotFoundException(e);
@@ -406,8 +407,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SParameterDefinition parameterDefinition = sProcessDefinition.getParameter(name);
             final String description = parameterDefinition.getDescription();
             final String type = parameterDefinition.getType();
-            final ParameterInstance paramterInstance = new ParameterImpl(name, description, value, type);
-            return paramterInstance;
+            return new ParameterImpl(name, description, value, type);
         } catch (final SParameterProcessNotFoundException e) {
             throw new ParameterNotFoundException(processDefinitionId, parameterName);
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -518,6 +518,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public ManualTaskInstance addManualUserTask(final long humanTaskId, final String taskName, final String displayName, final long assignTo,
             final String description, final Date dueDate, final TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException,
             ActivityExecutionErrorException, ActivityCreationException, ActivityNotFoundException {
+        if (!Manager.isFeatureActive(Features.CREATE_MANUAL_TASK)) {
+            throw new IllegalStateException("The add of a manual task is not an active feature");
+        }
         TenantServiceAccessor tenantAccessor = null;
         final TaskPriority prio = priority != null ? priority : TaskPriority.NORMAL;
         try {
@@ -705,6 +708,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorState state) throws InvalidSessionException, ObjectReadException,
             ObjectNotFoundException, ObjectModificationException {
+        if (!Manager.isFeatureActive(Features.SET_CONNECTOR_STATE)) {
+            throw new IllegalStateException("Set a connector state is not an active feature");
+        }
         if (ConnectorState.TO_BE_EXECUTED.equals(state)) {
             throw new ObjectModificationException("You can't put the connector as TO_BE_EXECUTED, use TO_RE_EXECUTE intead");
         }
@@ -734,6 +740,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void replayActivity(final long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException,
             ObjectModificationException, ActivityExecutionFailedException {
+        if (!Manager.isFeatureActive("REPLAY_ACTIVITY")) {
+            throw new IllegalStateException("The replay an activity is not an active feature");
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();

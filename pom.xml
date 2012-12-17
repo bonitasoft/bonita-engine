@@ -13,6 +13,16 @@
 
 	<name>Bonita Engine SP</name>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.bonitasoft.manager</groupId>
+				<artifactId>manager</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<profiles>
 		<profile>
 			<id>developer</id>

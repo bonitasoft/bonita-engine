@@ -93,6 +93,8 @@ import com.bonitasoft.engine.platform.TenantUpdateDescriptor.TenantField;
 import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.search.SearchTenants;
 import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 
 /**
  * @author Matthieu Chaffotte
@@ -113,8 +115,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String username,
+    public final long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String username,
             final String password) throws InvalidSessionException, TenantCreationException, PlatformNotStartedException, TenantAlreadyExistException {
+        if (!Manager.isFeatureActive(Features.CREATE_TENANT)) {
+            throw new IllegalStateException("The tenant creation is not an active feature");
+        }
         PlatformServiceAccessor platformAccessor = null;
         TransactionExecutor transactionExecutor = null;
         PlatformService platformService = null;

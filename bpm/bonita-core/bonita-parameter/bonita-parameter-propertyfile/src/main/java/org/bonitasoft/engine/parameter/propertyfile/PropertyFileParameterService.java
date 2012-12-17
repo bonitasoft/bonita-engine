@@ -1,16 +1,7 @@
-/**
- * Copyright (C) 2011 BonitaSoft S.A.
+/*
+ * Copyright (C) 2011-2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.parameter.propertyfile;
 
 import java.io.File;
@@ -37,6 +28,9 @@ import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
+
 /**
  * @author Matthieu Chaffotte
  * @author Zhao Na
@@ -57,13 +51,13 @@ public class PropertyFileParameterService implements ParameterService {
     public void update(final long processDefinitionId, final String parameterName, final String parameterValue) throws SParameterProcessNotFoundException,
             SParameterNameNotFoundException {
         try {
-            final String filePath = this.getFilePath(processDefinitionId);
+            final String filePath = getFilePath(processDefinitionId);
             final Properties properties = PropertiesManager.getPropertiesFromFile(filePath);
             if (!properties.containsKey(parameterName)) {
                 throw new SParameterNameNotFoundException("The paramter name " + parameterName + " does not exist");
             }
             final String newValue = parameterValue == null ? NULL : parameterValue;
-            this.putProperty(filePath, parameterName, newValue);
+            putProperty(filePath, parameterName, newValue);
         } catch (final BonitaHomeNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
         } catch (final IOException e) {
@@ -75,8 +69,11 @@ public class PropertyFileParameterService implements ParameterService {
 
     @Override
     public void addAll(final long processDefinitionId, final Map<String, String> parameters) throws SParameterProcessNotFoundException {
+        if (Manager.isFeatureActive(Features.CREATE_PARAMETER)) {
+            throw new IllegalStateException("The parameter creation is not an active feature");
+        }
         try {
-            final String filePath = this.getFilePathWithoutChecking(processDefinitionId);
+            final String filePath = getFilePathWithoutChecking(processDefinitionId);
             final Properties properties = new Properties();
             if (parameters != null) {
                 for (final Entry<String, String> parameter : parameters.entrySet()) {
@@ -99,7 +96,7 @@ public class PropertyFileParameterService implements ParameterService {
     @Override
     public void deleteAll(final long processDefinitionId) throws SParameterProcessNotFoundException {
         try {
-            final String filePath = this.getFilePath(processDefinitionId);
+            final String filePath = getFilePath(processDefinitionId);
             final File file = new File(filePath);
             if (!file.exists()) {
                 final StringBuilder errorBuilder = new StringBuilder();
@@ -180,7 +177,7 @@ public class PropertyFileParameterService implements ParameterService {
     public boolean containsNullValues(final long processDefinitionId) throws SParameterProcessNotFoundException {
         String filePath;
         try {
-            filePath = this.getFilePath(processDefinitionId);
+            filePath = getFilePath(processDefinitionId);
             final Properties properties = PropertiesManager.getPropertiesFromFile(filePath);
             final Collection<Object> values = properties.values();
             final Iterator<Object> iterator = values.iterator();
@@ -205,7 +202,7 @@ public class PropertyFileParameterService implements ParameterService {
     public SParameter get(final long processDefinitionId, final String parameterName) throws SParameterProcessNotFoundException,
             SParameterProcessNotFoundException {
         try {
-            final String filePath = this.getFilePath(processDefinitionId);
+            final String filePath = getFilePath(processDefinitionId);
             final Properties properties = PropertiesManager.getPropertiesFromFile(filePath);
             final String property = properties.getProperty(parameterName);
             if (property == null) {
@@ -228,7 +225,7 @@ public class PropertyFileParameterService implements ParameterService {
     public List<SParameter> get(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order)
             throws SParameterProcessNotFoundException, SOutOfBoundException {
         try {
-            final String filePath = this.getFilePath(processDefinitionId);
+            final String filePath = getFilePath(processDefinitionId);
             final List<SParameter> orderedParameters = getOrderedParameters(filePath, order);
 
             final int numberOfParameters = orderedParameters.size();

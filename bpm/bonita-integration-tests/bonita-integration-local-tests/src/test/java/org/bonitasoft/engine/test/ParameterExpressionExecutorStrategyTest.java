@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.parameter;
+package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,6 +13,9 @@ import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
+import org.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.parameter.SParameter;
+import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;

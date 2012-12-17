@@ -1029,8 +1029,11 @@
 						<phase>process-test-resources</phase>
 						<configuration>
 							<target name="copy-bos-home">
-								<copy todir="${project.build.directory}/home">
+								<copy todir="${bonita.home}">
 									<fileset dir="${basedir}/home" excludes="**/.svn" />
+								</copy>
+								<copy todir="${bonita.home}/server/licenses" failonerror="true">
+									<fileset dir="${user.home}/lic" includes="*.lic" />
 								</copy>
 							</target>
 						</configuration>
