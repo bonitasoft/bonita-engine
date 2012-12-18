@@ -76,7 +76,17 @@
 			ORDER BY ${orderBy}
    		</if>
 	</select>
-
+	
+	<select id="getProcessInstancesInState" parameterType="long" resultMap="processInstanceResultMap">
+		SELECT p.*
+		FROM process_instance p
+		WHERE p.tenantid = #{tenantid}
+		AND p.stateId = #{state}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
+	
 	<select id="getProcessInstanceById" parameterType="long" resultMap="processInstanceResultMap">
 		SELECT p.*
 		FROM process_instance p

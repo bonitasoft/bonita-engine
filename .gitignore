@@ -187,6 +187,7 @@
 /bpm/bonita-home/target
 /bpm/bonita-home/.settings
 /bpm/bonita-home/.project
+/bpm/bonita-home/base/server/licenses/license.lic
 
 # /bpm/bonita-home/base/server/platform/conf/
 /bpm/bonita-home/base/server/platform/conf/bonita-platform.mysql.xml
