@@ -10,8 +10,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.bpm.model.ActivationState;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionStates;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
@@ -49,6 +49,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Ruiheng Fan
+ * @author Celine Souchet
  */
 public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
@@ -128,7 +129,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             final GetProcessDeploymentInfo transactionContentWithResult = new GetProcessDeploymentInfo(processDefinitionId, processDefinitionService);
             transactionExecutor.execute(transactionContentWithResult);
             final SProcessDefinitionDeployInfo deployInfo = transactionContentWithResult.getResult();
-            if (!ProcessDefinitionStates.ENABLED.equals(deployInfo.getState())) {
+            if (ActivationState.DISABLED.equals(deployInfo.getActivationState())) {
                 throw new ProcessDefinitionNotEnabledException(deployInfo.getName(), deployInfo.getVersion(), deployInfo.getProcessId());
             }
             sDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);

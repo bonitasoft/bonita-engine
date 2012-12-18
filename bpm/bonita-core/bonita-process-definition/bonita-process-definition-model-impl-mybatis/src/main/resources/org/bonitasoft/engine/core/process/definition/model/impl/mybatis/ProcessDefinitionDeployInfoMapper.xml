@@ -4,17 +4,18 @@
 <mapper namespace="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl">
     <cache/>
 	<insert id="insertSProcessDefinitionDeployInfoImpl" parameterType="process_definition">
-		INSERT INTO process_definition (tenantid, id, name, processId, version, description, deploymentDate, deployedBy, state,
-			migrationDate, displayName, displayDescription, lastUpdateDate, iconPath)
+		INSERT INTO process_definition (tenantid, id, name, processId, version, description, deploymentDate, deployedBy, activationState,
+			configurationState, migrationDate, displayName, displayDescription, lastUpdateDate, iconPath)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.processId}, #{entity.version}, #{entity.description},
-			#{entity.deploymentDate}, #{entity.deployedBy}, #{entity.state}, #{entity.migrationDate}, #{entity.displayName},
+			#{entity.deploymentDate}, #{entity.deployedBy}, #{entity.activationState}, #{entity.configurationState}, #{entity.migrationDate}, #{entity.displayName},
 			#{entity.displayDescription}, #{entity.lastUpdateDate}, #{entity.iconPath})
 	</insert>
 
 	<update id="updateSProcessDefinitionDeployInfoImpl" parameterType="map">
 		UPDATE process_definition
 		<trim prefix="SET" suffixOverrides=",">
-			<if test="state != null">state=#{state},</if>
+			<if test="activationState != null">activationState=#{activationState},</if>
+			<if test="configurationState != null">configurationState=#{configurationState},</if>
 			<if test="displayName != null">displayName=#{displayName},</if>
 			<if test="description != null">description=#{description},</if>
 			<if test="displayDescription == '___bonitanull___'">displayDescription=NULL,</if>
@@ -39,7 +40,8 @@
 		<result property="deployedBy" column="deployedBy" />
 		<result property="version" column="version" />
 		<result property="description" column="description" />
-		<result property="state" column="state" />
+		<result property="activationState" column="activationState" />
+		<result property="configurationState" column="configurationState" />
 		<result property="processId" column="processId" />
 		<result property="migrationDate" column="migrationDate" />
 		<result property="displayName" column="displayName" />
@@ -87,11 +89,11 @@
 		</if>
 	</select>
 
-	<select id="getNumberOfProcessDefinitionsInState" parameterType="string" resultType="long">
+	<select id="getNumberOfProcessDefinitionsInActivationState" parameterType="string" resultType="long">
 		SELECT COUNT(*)
 		FROM process_definition proc_def
 		WHERE proc_def.tenantid = #{tenantid}
-		AND proc_def.state = #{state}
+		AND proc_def.activationState = #{activationState}
 	</select>
 
 	<select id="getNumberOfProcessDefinitions" parameterType="long" resultType="long">
@@ -109,11 +111,11 @@
 		</if>
 	</select>
 
-	<select id="getProcessDefinitionsIdsInState" parameterType="map" resultType="long">
+	<select id="getProcessDefinitionsIdsInActivationState" parameterType="map" resultType="long">
 		SELECT proc_def.processId
 		FROM process_definition proc_def
 		WHERE proc_def.tenantid = #{tenantid}
-		AND proc_def.state = #{state}
+		AND proc_def.activationState = #{activationState}
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
@@ -136,7 +138,7 @@
 		SELECT COUNT(*)
 		FROM process_definition proc_def
 		WHERE proc_def.tenantid = #{tenantid}
-		AND proc_def.state = 'enabled'
+		AND proc_def.activationState = 'enabled'
 		AND (proc_def.processId IN (
 			SELECT p.processDefinitionId
 			 FROM process_instance p
@@ -159,7 +161,7 @@
 		SELECT *
 		FROM process_definition proc_def
 		WHERE proc_def.tenantid = #{tenantid}
-		AND proc_def.state = 'enabled'
+		AND proc_def.activationState = 'enabled'
 		AND (proc_def.processId IN (
 			SELECT p.processDefinitionId
 			 FROM process_instance p
@@ -318,7 +320,7 @@
 		SELECT COUNT(*)
 		FROM process_definition proc_def
 		WHERE proc_def.tenantid = #{tenantid} 
-		AND proc_def.state = 'enabled'
+		AND proc_def.activationState = 'enabled'
 		AND proc_def.processId IN (
 			SELECT a.scopeId
 			FROM actor a
@@ -358,7 +360,7 @@
 		SELECT *
 		FROM process_definition proc_def
 		WHERE proc_def.tenantid = #{tenantid} 
-		AND proc_def.state = 'enabled'
+		AND proc_def.activationState = 'enabled'
 		AND proc_def.processId IN (
 			SELECT a.scopeId
 			FROM actor a
@@ -420,7 +422,7 @@
 						)
 					)
 				)
-		WHERE proc_def.state = 'enabled'
+		WHERE proc_def.activationState = 'enabled'
 		AND NOT EXISTS (
 			SELECT pcm.id
 			FROM processcategorymapping pcm
@@ -455,7 +457,7 @@
 						)
 					)
 				)
-		WHERE proc_def.state = 'enabled'
+		WHERE proc_def.activationState = 'enabled'
 		AND NOT EXISTS (
 			SELECT pcm.id
 			FROM processcategorymapping pcm
@@ -476,7 +478,7 @@
 			 processcategorymapping pcm
 		WHERE proc_def.tenantid = #{tenantid}
 		AND pcm.tenantid = proc_def.tenantid
-		AND proc_def.state = 'enabled'
+		AND proc_def.activationState = 'enabled'
 		AND proc_def.processId = pcm.processId
 		AND proc_def.processId IN (
 			SELECT actor.scopeId
@@ -519,7 +521,7 @@
 			 processcategorymapping pcm
 		WHERE proc_def.tenantid = #{tenantid}
 		AND pcm.tenantid = proc_def.tenantid
-		AND proc_def.state = 'enabled'
+		AND proc_def.activationState = 'enabled'
 		AND proc_def.processId = pcm.processId
 		AND proc_def.processId IN (
 			SELECT actor.scopeId
@@ -729,7 +731,7 @@
 	<select id="getProcessDeploymentInfoFromProcessInstanceIds" parameterType="list" resultType="map">
 		SELECT proc_def.id AS "id", proc_def.processId AS "processId", proc_def.name AS "name", proc_def.version AS "version",
 			proc_def.description AS "description", proc_def.deploymentDate AS "deploymentDate", proc_def.deployedBy AS "deployedBy",
-			proc_def.state AS "state", proc_def.displayName AS "displayName", proc_def.lastUpdateDate AS "lastUpdateDate",
+			proc_def.activationState AS "activationState", proc_def.configurationState AS "configurationState", proc_def.displayName AS "displayName", proc_def.lastUpdateDate AS "lastUpdateDate",
 			proc_def.iconPath AS "iconPath", proc_def.displayDescription AS "displayDescription", process_instance.id AS "processInstanceId"
 		FROM process_definition proc_def,
 			 process_instance
@@ -745,7 +747,7 @@
 	<select id="getProcessDeploymentInfoFromArchivedProcessInstanceIds" parameterType="list" resultType="map">
 		SELECT proc_def.id AS "id", proc_def.processId AS "processId", proc_def.name AS "name", proc_def.version AS "version",
 			proc_def.description AS "description", proc_def.deploymentDate AS "deploymentDate", proc_def.deployedBy AS "deployedBy",
-			proc_def.state AS "state", proc_def.displayName AS "displayName", proc_def.lastUpdateDate AS "lastUpdateDate",
+			proc_def.activationState AS "activationState", proc_def.configurationState AS "configurationState", proc_def.displayName AS "displayName", proc_def.lastUpdateDate AS "lastUpdateDate",
 			proc_def.iconPath AS "iconPath", proc_def.displayDescription AS "displayDescription", arch_process_instance.id AS "archivedProcessInstanceId"
 		FROM process_definition proc_def,
 			 arch_process_instance

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.bpm.model.ActivationState;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ActorInstance;
 import org.bonitasoft.engine.bpm.model.CatchMessageEventTriggerDefinitionBuilder;
@@ -333,7 +334,7 @@ public class LogTest extends CommonAPISPTest {
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcess(designProcessDefinition);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(sendMessageProcess.getId());
-        assertEquals("enabled", processDeploymentInfo.getState());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         return sendMessageProcess;
     }
@@ -395,7 +396,7 @@ public class LogTest extends CommonAPISPTest {
         getProcessAPI().enableProcess(receiveMessageProcess.getId());
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(receiveMessageProcess.getId());
-        assertEquals("enabled", processDeploymentInfo.getState());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         return receiveMessageProcess;
     }

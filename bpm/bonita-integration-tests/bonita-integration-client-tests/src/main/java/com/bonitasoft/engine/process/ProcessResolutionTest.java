@@ -45,7 +45,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getState());
+        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
 
         final List<Problem> problems = getProcessAPI().getProcessResolutionProblems(definition.getId());
         Assert.assertEquals(1, problems.size());
@@ -67,7 +67,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getState());
+        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
 
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "param1", "value");
         final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());

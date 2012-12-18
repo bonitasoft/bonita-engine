@@ -138,7 +138,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
                 final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
                 for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
                     processBuilder.append(processDeploymentInfo.getId()).append(", ");
-                    if (TestStates.getProcessDepInfoEnabledState().equals(processDeploymentInfo.getState())) {
+                    if (TestStates.getProcessDepInfoEnabledState().equals(processDeploymentInfo.getActivationState())) {
                         processManagementAPI.disableProcess(processDeploymentInfo.getProcessId());
                     }
                     processManagementAPI.deleteProcess(processDeploymentInfo.getProcessId());

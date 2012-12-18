@@ -38,6 +38,7 @@ import org.bonitasoft.engine.api.impl.transaction.ResolveProcessAndCreateDepende
 import org.bonitasoft.engine.api.impl.transaction.StoreProcess;
 import org.bonitasoft.engine.api.impl.transaction.UnzipBusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.model.ConfigurationState;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
@@ -45,7 +46,6 @@ import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.Problem;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionStates;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.bpm.model.privilege.ActorPrivilege;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -504,7 +504,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final CheckActorMapping checkActorMapping = new CheckActorMapping(actorMappingService, definition.getId());
         transactionExecutor.execute(checkActorMapping);
         final Boolean actorMappingResolved = checkActorMapping.getResult();
-        if (!containsNullParameterValues && actorMappingResolved && ProcessDefinitionStates.UNRESOLVED.equals(processDefinitionDeployInfo.getState())) {
+        if (!containsNullParameterValues && actorMappingResolved && ConfigurationState.UNRESOLVED.equals(processDefinitionDeployInfo.getConfigurationState())) {
             try {
                 transactionExecutor.execute(new ResolveProcessAndCreateDependencies(processDefinitionService, definition.getId(), dependencyService,
                         dependencyBuilderAccessor, tenantAccessor.getTenantId()));
