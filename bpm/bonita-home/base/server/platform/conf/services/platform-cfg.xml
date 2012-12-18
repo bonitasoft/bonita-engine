@@ -56,6 +56,13 @@
         <property name="shouldRestartElements" value="true" />
         <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
         <property name="shouldStartEventHandlingJob" value="true" />
+        <property name="TenantRestartHandlers" >
+        	<list>
+        		<bean class="org.bonitasoft.engine.restart.RestartTransitionsHandler"/>
+        		<bean class="org.bonitasoft.engine.restart.RestartFlowsNodeHandler"/>
+        		<bean class="org.bonitasoft.engine.restart.RestartProcessHandler"/>
+        	</list>
+        </property>
 	</bean>
 
 </beans>

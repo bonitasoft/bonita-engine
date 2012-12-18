@@ -236,7 +236,7 @@
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
-		AND (f.stateExecuting = TRUE OR f.stable = FALSE)
+		AND (f.state_executing = TRUE OR f.stable = FALSE)
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
