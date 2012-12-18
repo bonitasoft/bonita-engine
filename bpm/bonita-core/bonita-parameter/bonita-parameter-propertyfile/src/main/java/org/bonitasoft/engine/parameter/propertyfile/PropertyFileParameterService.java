@@ -69,7 +69,7 @@ public class PropertyFileParameterService implements ParameterService {
 
     @Override
     public void addAll(final long processDefinitionId, final Map<String, String> parameters) throws SParameterProcessNotFoundException {
-        if (Manager.isFeatureActive(Features.CREATE_PARAMETER)) {
+        if (!Manager.isFeatureActive(Features.CREATE_PARAMETER)) {
             throw new IllegalStateException("The parameter creation is not an active feature");
         }
         try {
