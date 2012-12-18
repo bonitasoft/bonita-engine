@@ -11,8 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
     BPMTestsSP.class,
     BPMLocalSuiteTests.class,
     LocalLogTest.class,
-    APIMethodSPTest.class,
-    ParameterExpressionExecutorStrategyTest.class
+    APIMethodSPTest.class
 })
 public class LocalIntegrationTestsSP {
 
