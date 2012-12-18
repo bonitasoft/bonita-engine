@@ -6,7 +6,6 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +28,7 @@ import org.bonitasoft.engine.api.impl.transaction.RenewSSession;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
@@ -110,8 +110,7 @@ public class ServerAPIImpl implements ServerAPI {
             if (api == null) {
                 throw new APIImplementationNotFoundException("No API implementation was found for: " + apiInterfaceName);
             }
-            final Method method = api.getClass().getMethod(methodName, parameterTypes);
-            return method.invoke(api, parametersValues);
+            return ClassReflector.invokeMethod(api, methodName, parameterTypes, parametersValues);
         } catch (final InvocationTargetException ite) {
             throw new ServerWrappedException(ite.getCause());
         } catch (final IllegalArgumentException iae) {
