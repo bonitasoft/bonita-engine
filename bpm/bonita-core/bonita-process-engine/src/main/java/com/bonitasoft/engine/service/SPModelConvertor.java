@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.platform.model.STenant;
 
 import com.bonitasoft.engine.log.Log;
@@ -23,24 +23,24 @@ import com.bonitasoft.engine.platform.TenantImpl;
  */
 public final class SPModelConvertor {
 
-    public static List<Log> toLogs(final Collection<SBusinessLog> sBusinessLogs) {
+    public static List<Log> toLogs(final Collection<SQueriableLog> sQueriableLogs) {
         final List<Log> logs = new ArrayList<Log>();
-        for (final SBusinessLog sBusinessLog : sBusinessLogs) {
-            final Log log = toLog(sBusinessLog);
+        for (final SQueriableLog sQueriableLog : sQueriableLogs) {
+            final Log log = toLog(sQueriableLog);
             logs.add(log);
         }
         return logs;
     }
 
-    public static Log toLog(final SBusinessLog sBusinessLog) {
-        final LogBuilder logBuilder = new LogBuilder().createNewInstance(sBusinessLog.getRawMessage(), sBusinessLog.getUserId(),
-                new Date(sBusinessLog.getTimeStamp()));
-        logBuilder.setLogId(sBusinessLog.getId());
-        logBuilder.setActionType(sBusinessLog.getActionType());
-        logBuilder.setActionScope(sBusinessLog.getActionScope());
-        logBuilder.setCallerClassName(sBusinessLog.getCallerClassName());
-        logBuilder.setCallerMethodName(sBusinessLog.getCallerMethodName());
-        logBuilder.setSeverity(SeverityLevel.valueOf(sBusinessLog.getSeverity().name()));
+    public static Log toLog(final SQueriableLog sQueriableLog) {
+        final LogBuilder logBuilder = new LogBuilder().createNewInstance(sQueriableLog.getRawMessage(), sQueriableLog.getUserId(),
+                new Date(sQueriableLog.getTimeStamp()));
+        logBuilder.setLogId(sQueriableLog.getId());
+        logBuilder.setActionType(sQueriableLog.getActionType());
+        logBuilder.setActionScope(sQueriableLog.getActionScope());
+        logBuilder.setCallerClassName(sQueriableLog.getCallerClassName());
+        logBuilder.setCallerMethodName(sQueriableLog.getCallerMethodName());
+        logBuilder.setSeverity(SeverityLevel.valueOf(sQueriableLog.getSeverity().name()));
         return logBuilder.done();
     }
 

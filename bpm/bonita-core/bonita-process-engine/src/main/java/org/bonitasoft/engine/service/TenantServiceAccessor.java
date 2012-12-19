@@ -9,7 +9,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActorBuilders;
 import org.bonitasoft.engine.actor.privilege.api.ActorPrivilegeService;
 import org.bonitasoft.engine.actor.privilege.model.builder.ActorPrivilegeBuilders;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.businesslogger.model.builder.SBusinessLogModelBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
@@ -67,7 +67,7 @@ import org.bonitasoft.engine.privilege.model.buidler.PrivilegeBuilders;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfileBuilderAccessor;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.services.BusinessLoggerService;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SSupervisorBuilders;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -88,9 +88,9 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     LoginService getLoginService();
 
-    BusinessLoggerService getBusinessLoggerService();
+    QueriableLoggerService getQueriableLoggerService();
 
-    SBusinessLogModelBuilder getSBusinessLogModelBuilder();
+    SQueriableLogModelBuilder getSQueriableLogModelBuilder();
 
     TechnicalLoggerService getTechnicalLoggerService();
 

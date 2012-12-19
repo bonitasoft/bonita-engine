@@ -43,8 +43,8 @@
                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" value="100"/>

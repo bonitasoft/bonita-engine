@@ -5,7 +5,7 @@
 package org.bonitasoft.engine.search;
 
 import org.bonitasoft.engine.actor.privilege.model.builder.ActorPrivilegeBuilders;
-import org.bonitasoft.engine.businesslogger.model.builder.SBusinessLogModelBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
@@ -85,7 +85,7 @@ public final class SearchEntitiesDescriptor {
             final ActorPrivilegeBuilders actorPrivilegeBuilders, final BPMInstanceBuilders bpmInstanceBuilders,
             final FlowNodeStateManager flowNodeStateManager, final SSupervisorBuilders sSupervisorBuilders, final BPMDefinitionBuilders definitionBuilders,
             final SProfileBuilderAccessor sProfileBuilderAccessor, final SCommentBuilders commentBuilders,
-            final SCategoryBuilderAccessor categoryBuilderAccessor, final SBusinessLogModelBuilder sBusinessLogModelBuilder,
+            final SCategoryBuilderAccessor categoryBuilderAccessor, final SQueriableLogModelBuilder sQueriableLogModelBuilder,
             final SDocumentMappingBuilderAccessor sDocumentMappingBuilderAccessor, final SExternalIdentityMappingBuilders sExternalIdentityMappingBuilders,
             final SCommandBuilderAccessor commandBuilderAccessor) {
         userDescriptor = new SearchUserDescriptor(identityModelBuilder);
@@ -106,7 +106,7 @@ public final class SearchEntitiesDescriptor {
                 identityModelBuilder.getRoleBuilder());
         profileMemberRoleAndGroupDescriptor = new SearchProfileMemberRoleAndGroupDescriptor(sProfileBuilderAccessor.getSProfileMemberBuilder(),
                 identityModelBuilder);
-        logDescriptor = new SearchLogDescriptor(sBusinessLogModelBuilder.getBusinessLogBuilder());
+        logDescriptor = new SearchLogDescriptor(sQueriableLogModelBuilder.getQueriableLogBuilder());
         documentDescriptor = new SearchDocumentDescriptor(sDocumentMappingBuilderAccessor);
         entityMemberUserDescriptor = new SearchEntityMemberUserDescriptor(sExternalIdentityMappingBuilders, identityModelBuilder);
         archivedDocumentDescriptor = new SearchArchivedDocumentDescriptor(sDocumentMappingBuilderAccessor);

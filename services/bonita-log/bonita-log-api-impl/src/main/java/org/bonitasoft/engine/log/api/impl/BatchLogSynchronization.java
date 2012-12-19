@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.transaction.Synchronization;
 
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -14,7 +14,7 @@ public class BatchLogSynchronization implements Synchronization {
 
     private final PersistenceService persistenceService;
 
-    private final List<SBusinessLog> logs = new ArrayList<SBusinessLog>();
+    private final List<SQueriableLog> logs = new ArrayList<SQueriableLog>();
 
     private Exception exception;
 
@@ -45,9 +45,9 @@ public class BatchLogSynchronization implements Synchronization {
         return exception;
     }
 
-    public void addLog(final SBusinessLog sBusinessLog) {
+    public void addLog(final SQueriableLog sQueriableLog) {
         // no synchronized required as we are working on a threadLocal
-        logs.add(sBusinessLog);
+        logs.add(sQueriableLog);
     }
 
 }

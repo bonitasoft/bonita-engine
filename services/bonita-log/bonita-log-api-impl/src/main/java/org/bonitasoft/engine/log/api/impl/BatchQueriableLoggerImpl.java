@@ -15,21 +15,21 @@ package org.bonitasoft.engine.log.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
-import org.bonitasoft.engine.businesslogger.model.builder.SBusinessLogModelBuilder;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.services.BusinessLogSessionProvider;
-import org.bonitasoft.engine.services.BusinessLoggerServiceConfiguration;
+import org.bonitasoft.engine.services.QueriableLogSessionProvider;
+import org.bonitasoft.engine.services.QueriableLoggerServiceConfiguration;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.services.impl.AbstractBusinessLoggerImpl;
+import org.bonitasoft.engine.services.impl.AbstractQueriableLoggerImpl;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
  */
-public class BatchBusinessLoggerImpl extends AbstractBusinessLoggerImpl {
+public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
 
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<BatchLogSynchronization>();
 
@@ -45,9 +45,9 @@ public class BatchBusinessLoggerImpl extends AbstractBusinessLoggerImpl {
      * @param loggerConfiguration
      * @param sessionProvider
      */
-    public BatchBusinessLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
-            final SBusinessLogModelBuilder builder, final BusinessLoggerServiceConfiguration loggerConfiguration,
-            final BusinessLogSessionProvider sessionProvider, final TechnicalLoggerService logger) {
+    public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
+            final SQueriableLogModelBuilder builder, final QueriableLoggerServiceConfiguration loggerConfiguration,
+            final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger) {
         super(persistenceService, builder, loggerConfiguration, sessionProvider);
         this.persistenceService = persistenceService;
         this.transactionService = transactionService;
@@ -64,15 +64,15 @@ public class BatchBusinessLoggerImpl extends AbstractBusinessLoggerImpl {
     }
 
     @Override
-    protected void log(final List<SBusinessLog> loggableLogs) {
+    protected void log(final List<SQueriableLog> loggableLogs) {
         BatchLogSynchronization synchro;
         try {
             synchro = getBatchLogSynchronization();
-            for (final SBusinessLog sBusinessLog : loggableLogs) {
-                synchro.addLog(sBusinessLog);
+            for (final SQueriableLog sQueriableLog : loggableLogs) {
+                synchro.addLog(sQueriableLog);
             }
         } catch (final STransactionNotFoundException e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log business logs: transaction not found");
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
         }
     }
 

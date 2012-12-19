@@ -21,7 +21,7 @@ import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
 import org.bonitasoft.engine.actor.xml.UserNamesBinding;
 import org.bonitasoft.engine.api.impl.transaction.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.businesslogger.model.builder.SBusinessLogModelBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
@@ -89,7 +89,7 @@ import org.bonitasoft.engine.profile.xml.ProfileMembershipBinding;
 import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.services.BusinessLoggerService;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SSupervisorBuilders;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -112,9 +112,9 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private LoginService loginService;
 
-    private BusinessLoggerService businessLoggerService;
+    private QueriableLoggerService queriableLoggerService;
 
-    private SBusinessLogModelBuilder logModelBuilder;
+    private SQueriableLogModelBuilder logModelBuilder;
 
     private TechnicalLoggerService technicalLoggerService;
 
@@ -274,11 +274,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public BusinessLoggerService getBusinessLoggerService() {
-        if (businessLoggerService == null) {
-            businessLoggerService = beanAccessor.getService("syncBusinessLoggerService", BusinessLoggerService.class);
+    public QueriableLoggerService getQueriableLoggerService() {
+        if (queriableLoggerService == null) {
+            queriableLoggerService = beanAccessor.getService("syncQueriableLoggerService", QueriableLoggerService.class);
         }
-        return businessLoggerService;
+        return queriableLoggerService;
     }
 
     @Override
@@ -394,9 +394,9 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public SBusinessLogModelBuilder getSBusinessLogModelBuilder() {
+    public SQueriableLogModelBuilder getSQueriableLogModelBuilder() {
         if (logModelBuilder == null) {
-            logModelBuilder = beanAccessor.getService(SBusinessLogModelBuilder.class);
+            logModelBuilder = beanAccessor.getService(SQueriableLogModelBuilder.class);
         }
         return logModelBuilder;
     }

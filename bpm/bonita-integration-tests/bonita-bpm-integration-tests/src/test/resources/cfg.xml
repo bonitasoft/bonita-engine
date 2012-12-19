@@ -16,27 +16,27 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="businessLoggerServiceConfig" class="org.bonitasoft.engine.services.impl.BusinessLoggerServiceConfigurationImpl" />
+	<bean id="queriableLoggerServiceConfig" class="org.bonitasoft.engine.services.impl.QueriableLoggerServiceConfigurationImpl" />
 
-    <bean id="syncBusinessLoggerService" class="org.bonitasoft.engine.services.impl.SyncBusinessLoggerServiceImpl">
+    <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="builder" ref="logModelBuilder" />
-        <constructor-arg name="loggerConfiguration" ref="businessLoggerServiceConfig" />
-        <constructor-arg name="sessionProvider" ref="businessLogSessionProvider" />
+        <constructor-arg name="loggerConfiguration" ref="queriableLoggerServiceConfig" />
+        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
-    <bean id="asyncBusinessLoggerService" class="org.bonitasoft.engine.services.impl.AsyncBusinessLoggerServiceImpl">
+    <bean id="asyncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.AsyncQueriableLoggerServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="scheduler" ref="scheduler" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="builder" ref="logModelBuilder" />
-        <constructor-arg name="loggerConfiguration" ref="businessLoggerServiceConfig" />
-        <constructor-arg name="sessionProvider" ref="businessLogSessionProvider" />
+        <constructor-arg name="loggerConfiguration" ref="queriableLoggerServiceConfig" />
+        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
-	<bean id="businessLogSessionProvider" class="org.bonitasoft.engine.services.impl.BusinessLogSessionProviderImpl">
+	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
@@ -101,7 +101,7 @@
 		<constructor-arg name="sProfileBuilderAccessor" ref="sProfileBuilderAccessor" />
 		<constructor-arg name="commentBuilders" ref="commentBuilders" />
 		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
-		<constructor-arg name="sBusinessLogModelBuilder" ref="logModelBuilder" />
+		<constructor-arg name="sQueriableLogModelBuilder" ref="logModelBuilder" />
 		<constructor-arg name="sDocumentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
 		<constructor-arg name="sExternalIdentityMappingBuilders" ref="sExternalIdentityMappingBuilders" />
 		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />

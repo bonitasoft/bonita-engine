@@ -16,9 +16,9 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="businessLoggerServiceConfig" class="org.bonitasoft.engine.services.impl.BusinessLoggerServiceConfigurationImpl" />
+	<bean id="queriableLoggerServiceConfig" class="org.bonitasoft.engine.services.impl.QueriableLoggerServiceConfigurationImpl" />
 
-	<bean id="businessLogSessionProvider" class="org.bonitasoft.engine.services.impl.BusinessLogSessionProviderImpl">
+	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />

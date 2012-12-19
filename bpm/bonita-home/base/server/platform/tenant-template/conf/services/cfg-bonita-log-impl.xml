@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.BusinessLoggerServiceOptions">
+	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.QueriableLoggerServiceOptions">
 		<constructor-arg name="loggableLevels">
 			<list>
 				<value>IDENTITY_USER_CREATED:INTERNAL</value>
@@ -12,21 +12,21 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="syncBusinessLogService" class="org.bonitasoft.engine.log.api.impl.BatchBusinessLoggerImpl">
+	<bean id="syncQueriableLogService" class="org.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="builder" ref="logModelBuilder" />
 		<constructor-arg name="loggerConfiguration" ref="loggerServiceConfiguration" />
-		<constructor-arg name="sessionProvider" ref="businessLogSessionProvider" />
+		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="asyncBusinessLogService" class="org.bonitasoft.engine.log.api.impl.BatchBusinessLoggerImpl">
+	<bean id="asyncQueriableLogService" class="org.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="builder" ref="logModelBuilder" />
 		<constructor-arg name="loggerConfiguration" ref="loggerServiceConfiguration" />
-		<constructor-arg name="sessionProvider" ref="businessLogSessionProvider" />
+		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 

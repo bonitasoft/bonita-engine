@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
-import org.bonitasoft.engine.businesslogger.model.builder.SIndexedLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.search.FieldDescriptor;
 import org.bonitasoft.engine.search.LogSearchDescriptor;
@@ -27,11 +27,11 @@ public class SearchLogDescriptor extends SearchEntityDescriptor {
 
     public SearchLogDescriptor(final SIndexedLogBuilder sIndexedLogBuilder) {
         searchEntityKeys = new HashMap<String, FieldDescriptor>(3);
-        searchEntityKeys.put(LogSearchDescriptor.ACTION_SCOPE, new FieldDescriptor(SBusinessLog.class, sIndexedLogBuilder.getActionScopeKey()));
-        searchEntityKeys.put(LogSearchDescriptor.ACTION_TYPE, new FieldDescriptor(SBusinessLog.class, sIndexedLogBuilder.getActionTypeKey()));
-        searchEntityKeys.put(LogSearchDescriptor.CREATED_BY, new FieldDescriptor(SBusinessLog.class, sIndexedLogBuilder.getUserIdKey()));
-        searchEntityKeys.put(LogSearchDescriptor.MESSAGE, new FieldDescriptor(SBusinessLog.class, sIndexedLogBuilder.getRawMessageKey()));
-        searchEntityKeys.put(LogSearchDescriptor.SEVERITY, new FieldDescriptor(SBusinessLog.class, sIndexedLogBuilder.getSeverityKey()));
+        searchEntityKeys.put(LogSearchDescriptor.ACTION_SCOPE, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getActionScopeKey()));
+        searchEntityKeys.put(LogSearchDescriptor.ACTION_TYPE, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getActionTypeKey()));
+        searchEntityKeys.put(LogSearchDescriptor.CREATED_BY, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getUserIdKey()));
+        searchEntityKeys.put(LogSearchDescriptor.MESSAGE, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getRawMessageKey()));
+        searchEntityKeys.put(LogSearchDescriptor.SEVERITY, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getSeverityKey()));
 
         logAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(2);
         final Set<String> logFields = new HashSet<String>();
@@ -48,7 +48,7 @@ public class SearchLogDescriptor extends SearchEntityDescriptor {
         logFields.add(sIndexedLogBuilder.getCallerClassNameKey());
         logFields.add(sIndexedLogBuilder.getCallerMethodNameKey());
         logFields.add(sIndexedLogBuilder.getDayOfWeekKey());
-        logAllFields.put(SBusinessLog.class, logFields);
+        logAllFields.put(SQueriableLog.class, logFields);
     }
 
     @Override

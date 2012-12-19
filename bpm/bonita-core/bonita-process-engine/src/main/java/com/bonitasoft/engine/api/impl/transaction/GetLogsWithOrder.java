@@ -6,30 +6,30 @@ package com.bonitasoft.engine.api.impl.transaction;
 
 import java.util.List;
 
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.services.BusinessLoggerService;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Bole Zhang
  */
-public class GetLogsWithOrder implements TransactionContentWithResult<List<SBusinessLog>> {
+public class GetLogsWithOrder implements TransactionContentWithResult<List<SQueriableLog>> {
 
     private final int numberPerPage;
 
     private final OrderByType orderContent;
 
-    private final BusinessLoggerService loggerService;
+    private final QueriableLoggerService loggerService;
 
     private final String fieldContent;
 
     private final int pageIndex;
 
-    private List<SBusinessLog> sLogsList;
+    private List<SQueriableLog> sLogsList;
 
-    public GetLogsWithOrder(final int numberPerPage, final OrderByType orderContent, final BusinessLoggerService loggerService, final String fieldContent,
+    public GetLogsWithOrder(final int numberPerPage, final OrderByType orderContent, final QueriableLoggerService loggerService, final String fieldContent,
             final int pageIndex) {
         this.numberPerPage = numberPerPage;
         this.orderContent = orderContent;
@@ -44,7 +44,7 @@ public class GetLogsWithOrder implements TransactionContentWithResult<List<SBusi
     }
 
     @Override
-    public List<SBusinessLog> getResult() {
+    public List<SQueriableLog> getResult() {
         return sLogsList;
     }
 

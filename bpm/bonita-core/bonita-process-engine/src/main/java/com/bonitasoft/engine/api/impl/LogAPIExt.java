@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
-import org.bonitasoft.engine.businesslogger.model.builder.SIndexedLogBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -19,13 +17,15 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.services.BusinessLoggerService;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
@@ -64,11 +64,11 @@ public class LogAPIExt implements LogAPI {
     @Override
     public Log getLog(final long logId) throws InvalidSessionException, LogNotFoundException {
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
-        final BusinessLoggerService loggerService = getTenantAccessor().getBusinessLoggerService();
+        final QueriableLoggerService loggerService = getTenantAccessor().getQueriableLoggerService();
         try {
-            final TransactionContentWithResult<SBusinessLog> transactionContentWithResult = new GetLogInstance(logId, loggerService);
+            final TransactionContentWithResult<SQueriableLog> transactionContentWithResult = new GetLogInstance(logId, loggerService);
             transactionExecutor.execute(transactionContentWithResult);
-            final SBusinessLog sLog = transactionContentWithResult.getResult();
+            final SQueriableLog sLog = transactionContentWithResult.getResult();
             if (sLog == null) {
                 throw new LogNotFoundException("log Not Found.");
             }
@@ -89,7 +89,7 @@ public class LogAPIExt implements LogAPI {
     @Override
     public int getNumberOfLogs() throws InvalidSessionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final BusinessLoggerService loggerService = tenantAccessor.getBusinessLoggerService();
+        final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
             final TransactionContentWithResult<Integer> transactionContent = new GetNumberOfLogInstance("getNumberOfLogs", loggerService);
@@ -108,45 +108,45 @@ public class LogAPIExt implements LogAPI {
         PageIndexCheckingUtil.checkIfPageIsOutOfRange(totalNumber, pageIndex, numberPerPage);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final BusinessLoggerService loggerService = tenantAccessor.getBusinessLoggerService();
-        final SIndexedLogBuilder businessLogBuilder = tenantAccessor.getSBusinessLogModelBuilder().getBusinessLogBuilder();
+        final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
+        final SIndexedLogBuilder queriableLogBuilder = tenantAccessor.getSQueriableLogModelBuilder().getQueriableLogBuilder();
         String field = null;
         OrderByType order = null;
         switch (pagingCriterion) {
 
             case CREATED_BY_ASC:
-                field = businessLogBuilder.getUserIdKey();
+                field = queriableLogBuilder.getUserIdKey();
                 order = OrderByType.ASC;
                 break;
             case CREATED_BY_DESC:
-                field = businessLogBuilder.getUserIdKey();
+                field = queriableLogBuilder.getUserIdKey();
                 order = OrderByType.DESC;
                 break;
             case CREATION_DATE_ASC:
-                field = businessLogBuilder.getTimeStampKey();
+                field = queriableLogBuilder.getTimeStampKey();
                 order = OrderByType.ASC;
                 break;
             case CREATION_DATE_DESC:
-                field = businessLogBuilder.getTimeStampKey();
+                field = queriableLogBuilder.getTimeStampKey();
                 order = OrderByType.DESC;
                 break;
             case SEVERITY_LEVEL_ASC:
-                field = businessLogBuilder.getSeverityKey();
+                field = queriableLogBuilder.getSeverityKey();
                 order = OrderByType.ASC;
                 break;
             case SEVERITY_LEVEL_DESC:
-                field = businessLogBuilder.getSeverityKey();
+                field = queriableLogBuilder.getSeverityKey();
                 order = OrderByType.DESC;
                 break;
             case DEFAULT:
-                field = businessLogBuilder.getTimeStampKey();
+                field = queriableLogBuilder.getTimeStampKey();
                 order = OrderByType.DESC;
                 break;
         }
         try {
             final String fieldContent = field;
             final OrderByType orderContent = order;
-            final TransactionContentWithResult<List<SBusinessLog>> transactionContent = new GetLogsWithOrder(numberPerPage, orderContent, loggerService,
+            final TransactionContentWithResult<List<SQueriableLog>> transactionContent = new GetLogsWithOrder(numberPerPage, orderContent, loggerService,
                     fieldContent, pageIndex);
             transactionExecutor.execute(transactionContent);
             return getLogsFromSLogs(transactionContent.getResult());
@@ -159,7 +159,7 @@ public class LogAPIExt implements LogAPI {
     public SearchResult<Log> searchLogs(final SearchOptions searchOptions) throws InvalidSessionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final BusinessLoggerService loggerService = tenantAccessor.getBusinessLoggerService();
+        final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
         final SearchLogs searchLogs = new SearchLogs(loggerService, searchEntitiesDescriptor.getLogDescriptor(), searchOptions);
@@ -171,10 +171,10 @@ public class LogAPIExt implements LogAPI {
         }
     }
 
-    private List<Log> getLogsFromSLogs(final List<SBusinessLog> sLogs) {
+    private List<Log> getLogsFromSLogs(final List<SQueriableLog> sLogs) {
         final List<Log> logs = new ArrayList<Log>();
         if (sLogs != null) {
-            for (final SBusinessLog sLog : sLogs) {
+            for (final SQueriableLog sLog : sLogs) {
                 final LogBuilder logBuilder = new LogBuilder().createNewInstance(sLog.getRawMessage(), sLog.getUserId(), new Date(sLog.getTimeStamp()));
                 logBuilder.setLogId(sLog.getId());
                 logBuilder.setActionType(sLog.getActionType());

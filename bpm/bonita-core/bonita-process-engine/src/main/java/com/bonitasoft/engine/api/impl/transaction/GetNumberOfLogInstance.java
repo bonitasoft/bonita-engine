@@ -6,20 +6,20 @@ package com.bonitasoft.engine.api.impl.transaction;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.services.BusinessLoggerService;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Bole Zhang
  */
 public class GetNumberOfLogInstance implements TransactionContentWithResult<Integer> {
 
-    private final BusinessLoggerService loggerService;
+    private final QueriableLoggerService loggerService;
 
     private int number;
 
     private final String instanceName;
 
-    public GetNumberOfLogInstance(final String instanceName, final BusinessLoggerService loggerService) {
+    public GetNumberOfLogInstance(final String instanceName, final QueriableLoggerService loggerService) {
         this.instanceName = instanceName;
         this.loggerService = loggerService;
     }

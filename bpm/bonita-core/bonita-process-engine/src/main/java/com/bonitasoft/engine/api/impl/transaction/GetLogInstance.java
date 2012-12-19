@@ -4,23 +4,23 @@
  */
 package com.bonitasoft.engine.api.impl.transaction;
 
-import org.bonitasoft.engine.businesslogger.model.SBusinessLog;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.services.BusinessLoggerService;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Bole Zhang
  */
-public class GetLogInstance implements TransactionContentWithResult<SBusinessLog> {
+public class GetLogInstance implements TransactionContentWithResult<SQueriableLog> {
 
     private final long logId;
 
-    private final BusinessLoggerService loggerService;
+    private final QueriableLoggerService loggerService;
 
-    private SBusinessLog sLog;
+    private SQueriableLog sLog;
 
-    public GetLogInstance(final long logId, final BusinessLoggerService loggerService) {
+    public GetLogInstance(final long logId, final QueriableLoggerService loggerService) {
         this.logId = logId;
         this.loggerService = loggerService;
     }
@@ -31,7 +31,7 @@ public class GetLogInstance implements TransactionContentWithResult<SBusinessLog
     }
 
     @Override
-    public SBusinessLog getResult() {
+    public SQueriableLog getResult() {
         return sLog;
     }
 

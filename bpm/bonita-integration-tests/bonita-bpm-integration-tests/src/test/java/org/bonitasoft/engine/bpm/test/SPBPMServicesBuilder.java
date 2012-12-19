@@ -13,7 +13,7 @@ import org.bonitasoft.engine.actor.privilege.model.builder.ActorPrivilegeBuilder
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.AuthenticationService;
-import org.bonitasoft.engine.businesslogger.model.builder.SBusinessLogModelBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -96,7 +96,7 @@ import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
-import org.bonitasoft.engine.services.BusinessLoggerService;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -249,12 +249,12 @@ public class SPBPMServicesBuilder extends BaseServicesBuilder implements Platfor
         return resources;
     }
 
-    public BusinessLoggerService getBusinessLogger(final String name) {
-        return this.getInstanceOf(name, BusinessLoggerService.class);
+    public QueriableLoggerService getQueriableLogger(final String name) {
+        return this.getInstanceOf(name, QueriableLoggerService.class);
     }
 
-    public BusinessLoggerService getBusinessLogger() {
-        return this.getBusinessLogger("syncBusinessLoggerService"); // default is the sync one
+    public QueriableLoggerService getQueriableLogger() {
+        return this.getQueriableLogger("syncQueriableLoggerService"); // default is the sync one
     }
 
     @Override
@@ -362,8 +362,8 @@ public class SPBPMServicesBuilder extends BaseServicesBuilder implements Platfor
         return this.getInstanceOf("platformDependencyService", DependencyService.class);
     }
 
-    public SBusinessLogModelBuilder getBusinessLogModelBuilder() {
-        return this.getInstanceOf(SBusinessLogModelBuilder.class);
+    public SQueriableLogModelBuilder getQueriableLogModelBuilder() {
+        return this.getInstanceOf(SQueriableLogModelBuilder.class);
     }
 
     @Override
@@ -476,13 +476,13 @@ public class SPBPMServicesBuilder extends BaseServicesBuilder implements Platfor
     }
 
     @Override
-    public BusinessLoggerService getBusinessLoggerService() {
-        return this.getInstanceOf(BusinessLoggerService.class);
+    public QueriableLoggerService getQueriableLoggerService() {
+        return this.getInstanceOf(QueriableLoggerService.class);
     }
 
     @Override
-    public SBusinessLogModelBuilder getSBusinessLogModelBuilder() {
-        return this.getInstanceOf(SBusinessLogModelBuilder.class);
+    public SQueriableLogModelBuilder getSQueriableLogModelBuilder() {
+        return this.getInstanceOf(SQueriableLogModelBuilder.class);
     }
 
     @Override

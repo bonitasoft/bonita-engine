@@ -15,19 +15,19 @@ package org.bonitasoft.engine.log.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.businesslogger.model.SBusinessLogSeverity;
-import org.bonitasoft.engine.services.BusinessLoggerServiceConfiguration;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.services.QueriableLoggerServiceConfiguration;
 
-public class BusinessLoggerServiceOptions implements BusinessLoggerServiceConfiguration {
+public class QueriableLoggerServiceOptions implements QueriableLoggerServiceConfiguration {
 
     private final List<String> loggableLevels;
 
-    public BusinessLoggerServiceOptions(final List<String> loggableLevels) {
+    public QueriableLoggerServiceOptions(final List<String> loggableLevels) {
         this.loggableLevels = loggableLevels;
     }
 
     @Override
-    public boolean isLoggable(final String actionType, final SBusinessLogSeverity severity) {
+    public boolean isLoggable(final String actionType, final SQueriableLogSeverity severity) {
         if (System.getProperty("org.bonitasoft.engine.services.queryablelog.disable") != null) {
             return false;
         }

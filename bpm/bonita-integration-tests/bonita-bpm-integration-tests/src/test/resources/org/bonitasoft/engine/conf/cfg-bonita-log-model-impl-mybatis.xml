@@ -4,44 +4,44 @@
 	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
 			<map>
-				<entry key="log" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" />
-				<entry key="log_parameter" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" />
+				<entry key="log" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
+				<entry key="log_parameter" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-				<value>org/bonitasoft/engine/businesslogger/model/impl/mybatis/BusinessLogMapper.xml</value>
+				<value>org/bonitasoft/engine/queriablelogger/model/impl/mybatis/QueriableLogMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="sequencesMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" value="30" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" value="31" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="30" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="31" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog" value="bl" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" value="blp" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="bl" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="blp" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.applicationName" value="applicationName" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.productVersion" value="productVersion" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.clientApplicationName" value="clientApplicationName" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.callerClassName" value="callerClassName" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.callerMethodName" value="callerMethodName" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex1" value="numericIndex1" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex2" value="numericIndex2" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex3" value="numericIndex3" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex4" value="numericIndex4" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.numericIndex5" value="numericIndex5" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex1" value="textualIndex1" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex2" value="textualIndex2" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex3" value="textualIndex3" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex4" value="textualIndex4" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog.textualIndex5" value="textualIndex5" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.applicationName" value="applicationName" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.productVersion" value="productVersion" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.clientApplicationName" value="clientApplicationName" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.callerClassName" value="callerClassName" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.callerMethodName" value="callerMethodName" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex1" value="numericIndex1" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex2" value="numericIndex2" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex3" value="numericIndex3" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex4" value="numericIndex4" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex5" value="numericIndex5" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex1" value="textualIndex1" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex2" value="textualIndex2" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex3" value="textualIndex3" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex4" value="textualIndex4" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex5" value="textualIndex5" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="statementMapping">
@@ -52,8 +52,8 @@
 		</constructor-arg>
 		<constructor-arg name="entityMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLog" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogImpl" />
-				<entry key="org.bonitasoft.engine.businesslogger.model.SBusinessLogParameter" value="org.bonitasoft.engine.businesslogger.model.impl.SBusinessLogParameterImpl" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
+				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
