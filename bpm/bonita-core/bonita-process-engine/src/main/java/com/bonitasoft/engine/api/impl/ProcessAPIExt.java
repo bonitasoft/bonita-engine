@@ -159,9 +159,10 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
+            deleteProcessInstancesFromProcessDefinition(processDefinitionUUID, tenantAccessor);
             final SProcessDefinition serverProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionUUID, processDefinitionService);
             final DeleteProcess deleteProcess = new DeleteProcess(processDefinitionService, serverProcessDefinition, processInstanceService,
-                    tenantAccessor.getArchiveService(), tenantAccessor.getCommentService());
+                    tenantAccessor.getArchiveService(), tenantAccessor.getCommentService(), tenantAccessor.getBPMInstanceBuilders());
             transactionExecutor.execute(deleteProcess);
             final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
             final File file = new File(processesFolder);
