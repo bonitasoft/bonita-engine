@@ -25,7 +25,7 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-bpm-services-integration-tests</artifactId>
 			<version>${project.version}</version>
-			<!-- <type>test-jar</type> -->
+			<type>test-jar</type>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
