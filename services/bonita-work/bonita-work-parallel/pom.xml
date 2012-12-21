@@ -15,8 +15,8 @@
 
 	<dependencies>
 		<dependency>
-			<artifactId>bonita-work-impl</artifactId>
 			<groupId>org.bonitasoft.engine.work</groupId>
+			<artifactId>bonita-work-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

@@ -1,0 +1,90 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="quartzDbInitializer" class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
+		<property name="dataSource">
+			<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+				<property name="driverClassName" value="${database.journal.connection.driver_class}" />
+				<property name="url" value="${database.journal.connection.url}" />
+				<property name="username" value="${database.journal.connection.username}" />
+				<property name="password" value="${database.journal.connection.password}" />
+			</bean>
+		</property>
+		<property name="enabled" value="true" />
+		<property name="databasePopulator">
+			<bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+				<property name="continueOnError" value="false" />
+				<property name="ignoreFailedDrops" value="true" />
+				<property name="sqlScriptEncoding" value="UTF-8" />
+				<property name="scripts">
+					<array>
+						<value type="org.springframework.core.io.Resource">classpath:org/bonitasoft/engine/scheduler/${bonita.test.db.vendor:h2}-dropQuartzTables.sql</value>
+						<value type="org.springframework.core.io.Resource">classpath:org/bonitasoft/engine/scheduler/${bonita.test.db.vendor:h2}-createQuartzTables.sql</value>
+					</array>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
+		<constructor-arg name="props">
+			<props>
+				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.threadPool.threadCount">10</prop>
+				<prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreTX</prop>
+				<prop key="org.quartz.jobStore.driverDelegateClass">${quartz.connection.jobstoredriver:org.quartz.impl.jdbcjobstore.StdJDBCDelegate}
+				</prop>
+				<prop key="org.quartz.jobStore.dataSource">myds</prop>
+				<prop key="org.quartz.dataSource.myds.driver">${database.journal.connection.driver_class}</prop>
+				<prop key="org.quartz.dataSource.myds.URL">${database.journal.connection.url}</prop>
+				<prop key="org.quartz.dataSource.myds.user">${database.journal.connection.username}</prop>
+				<prop key="org.quartz.dataSource.myds.password">${database.journal.connection.password}</prop>
+				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<!-- <prop key="org.quartz.jobStore.misfireThreshold">200</prop>the time before a misfire job will be executed -->
+			</props>
+		</constructor-arg>
+	</bean>
+
+	<bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
+		<constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
+		<constructor-arg ref="sessionAccessor" />
+	</bean>
+
+	<bean id="schedulerBuilderAccessor" class="org.bonitasoft.engine.scheduler.builder.impl.SchedulerBuilderAccessorImpl" />
+
+	<bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerImpl">
+		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
+		<constructor-arg name="builderAccessor" ref="schedulerBuilderAccessor" />
+		<constructor-arg name="queriableLogService" ref="syncQueriableLoggerService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="readPersistenceService" ref="persistenceService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="sessionService" ref="sessionService" />
+		<constructor-arg name="jobTruster">
+			<bean class="org.bonitasoft.engine.scheduler.impl.JobTruster">
+				<constructor-arg name="trusted">
+					<list>
+						<value>org.bonitasoft.engine.log.asyncflush.QueriableLogRecordJob</value>
+					</list>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="initTablesFile">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="dropTablesFile">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="filter" value="platform" />
+	</bean>
+
+</beans>

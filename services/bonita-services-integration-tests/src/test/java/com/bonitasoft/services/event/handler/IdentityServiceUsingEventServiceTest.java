@@ -16,6 +16,7 @@ package com.bonitasoft.services.event.handler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.bonitasoft.engine.ServicesBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserUpdateEventHandler;
@@ -39,8 +40,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.bonitasoft.services.ServicesBuilder;
 
 /**
  * @author Elias Ricken de Medeiros

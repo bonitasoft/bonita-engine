@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+    <comment>Bonita platform core configuration</comment>
+    <entry key="platformClassName">org.bonitasoft.engine.service.impl.SpringPlatformServiceAccessor</entry>
+    <entry key="tenantClassName">org.bonitasoft.engine.service.impl.SpringTenantServiceAccessor</entry>
+    <entry key="sessionAccessor">org.bonitasoft.engine.service.impl.SpringSessionAccessor</entry>
+    <entry key="platformAdminUsername">platformAdmin</entry>
+    <entry key="platformAdminPassword">platform</entry>
+
+    <entry key="org.bonitasoft.engine.archive.name">DEFINITIVE_0</entry>
+    <entry key="org.bonitasoft.engine.archive.oldestTime">1230739200052</entry>
+    <entry key="org.bonitasoft.engine.archive.newestTime">9999999999999</entry>
+    <entry key="org.bonitasoft.engine.archive.regexp">.*</entry>
+    <entry key="org.bonitasoft.engine.cron">0/5 * * * * ?</entry>
+
+    <entry key="document.servlet.url">downloadDocument</entry>
+</properties>

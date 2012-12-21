@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.ServicesBuilder;
 import org.bonitasoft.engine.archive.model.Employee;
 import org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -44,8 +45,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.bonitasoft.services.ServicesBuilder;
 
 /**
  * @author Elias Ricken de Medeiros

@@ -528,7 +528,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
+			<groupId>com.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -801,6 +801,18 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Process Migration -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-instance-migration-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-instance-migration-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Recorder -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
@@ -895,6 +907,12 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.work</groupId>
 			<artifactId>bonita-work-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.work</groupId>
+			<artifactId>bonita-work-parallel</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -1053,6 +1071,7 @@
 				<configuration>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
+						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
 						<bonita.test.persistence>bonita-persistence-mybatis</bonita.test.persistence>
 					</systemPropertyVariables>
 					<includes>

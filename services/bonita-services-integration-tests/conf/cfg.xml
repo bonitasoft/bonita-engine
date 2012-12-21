@@ -1,0 +1,62 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<array>
+                <value>classpath:/org/bonitasoft/engine/conf/bonita-platform.xml</value>
+				<value>classpath:/org/bonitasoft/engine/conf/${bonita.test.db.vendor:h2}.properties</value>
+				<value>classpath:/org/bonitasoft/engine/conf/quartz-${bonita.test.db.vendor:h2}.properties</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="transactionService" class="org.bonitasoft.engine.transaction.TransactionServiceImpl" scope="singleton">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="eventService" ref="eventService" />
+	</bean>
+
+	<bean id="queriableLoggerServiceConfig" class="org.bonitasoft.engine.services.impl.QueriableLoggerServiceConfigurationImpl" />
+
+	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
+		<constructor-arg name="sessionService" ref="sessionService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
+	</bean>
+
+	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="deleteService" ref="deleteService" />
+	</bean>
+
+	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="deleteService" ref="deleteService" />
+	</bean>
+
+	<bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
+
+	<bean id="xmlParser" class="org.bonitasoft.engine.xml.parse.SAXParser">
+		<constructor-arg name="validator" ref="xmlValidator" />
+		<constructor-arg name="logger">
+			<null />
+		</constructor-arg>
+	</bean>
+
+	<bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
+		<constructor-arg name="platformDependencyService" ref="platformDependencyService" />
+		<constructor-arg name="dependencyService" ref="dependencyService" />
+		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+	</bean>
+
+	<bean id="testLogBuilder" class="org.bonitasoft.engine.archive.model.TestLogBuilder" />
+
+	<bean id="sessionAccessor" class="org.bonitasoft.engine.sessionaccessor.ThreadLocalSessionAccessor" />
+
+</beans>
