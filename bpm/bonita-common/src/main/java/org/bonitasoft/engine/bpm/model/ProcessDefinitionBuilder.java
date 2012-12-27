@@ -22,6 +22,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBuilder {
 
@@ -315,6 +316,12 @@ public final class ProcessDefinitionBuilder implements DescriptionBuilder, Conta
     @Override
     public DataDefinitionBuilder addDoubleData(final String name, final Expression defaultValue) {
         final String className = Double.class.getName();
+        return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+    }
+
+    @Override
+    public DataDefinitionBuilder addFloatData(final String name, final Expression defaultValue) {
+        final String className = Float.class.getName();
         return new DataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
     }
 

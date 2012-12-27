@@ -8,6 +8,7 @@
 				<entry key="IntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" />
 				<entry key="BooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" />
 				<entry key="DoubleDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" />
+				<entry key="FloatDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" />
 				<entry key="ShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" />
 				<entry key="LongDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" />
 				<entry key="BlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
@@ -29,6 +30,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" value="10020" />
+				<entry key="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="10020" />
@@ -44,6 +46,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" value="intDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" value="boolDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" value="doubleDataInst" />
+				<entry key="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" value="doubleDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" value="shortTextdaInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" value="longDataInst" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="blobDataInst" />
@@ -88,6 +91,10 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.insertSDoubleDataInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl.insertSFloatDataInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.insertSFloatDataInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl.insertSXMLDataInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.insertSXMLDataInstanceImpl" />
 				</bean>
@@ -111,6 +118,10 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDoubleInstanceImpl.getDataInstanceById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl.getDataInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.getDataInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl.getDataInstanceById" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.getDataInstanceById" />
 				</bean>
@@ -131,6 +142,10 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl.deleteSDoubleDataInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.deleteSDataInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl.deleteSFloatDataInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.deleteSDataInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -185,6 +200,12 @@
 					<constructor-arg name="parameterValue" value="SDoubleDataInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl.updateSFloatDataInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.updateSDataInstanceImpl" />
+					<constructor-arg name="parameterName" value="discriminant" />
+					<constructor-arg name="parameterValue" value="SFloatDataInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl.updateSShortTextDataInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl.updateSDataInstanceImpl" />
 					<constructor-arg name="parameterName" value="discriminant" />
@@ -220,6 +241,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.SIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SBooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SDoubleDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" />
+				<entry key="org.bonitasoft.engine.data.instance.model.SFloatDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SShortDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SLongDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
@@ -238,6 +260,7 @@
 				<entry key="ArchIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
 				<entry key="ArchBooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
 				<entry key="ArchDoubleDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" />
+				<entry key="ArchFloatDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl" />
 				<entry key="ArchShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" />
 				<entry key="ArchLongDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" />
 				<entry key="ArchBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
@@ -259,6 +282,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" value="20050" />
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="20050" />
@@ -309,6 +333,10 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.insertSADoubleDataInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl.insertSAFloatDataInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.insertSAFloatDataInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl.insertSAXMLDataInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.insertSAXMLDataInstanceImpl" />
 				</bean>
@@ -332,6 +360,10 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SDoubleInstanceImpl.getDataInstanceById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl.getDataInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.getDataInstanceById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl.getDataInstanceById" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.getDataInstanceById" />
 				</bean>
@@ -352,6 +384,10 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl.deleteSADoubleDataInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.deleteSADataInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl.deleteSAFloatDataInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.deleteSADataInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -407,6 +443,12 @@
 					<constructor-arg name="parameterValue" value="SADoubleDataInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl.updateSAFloatDataInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.updateSADataInstanceImpl" />
+					<constructor-arg name="parameterName" value="discriminant" />
+					<constructor-arg name="parameterValue" value="SAFloatDataInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl.updateSAShortTextDataInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl.updateSADataInstanceImpl" />
@@ -443,6 +485,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADoubleDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" />
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAFloatDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SShortDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SALongDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />

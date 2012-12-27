@@ -33,6 +33,9 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl">
 					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
 				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
+				</entry>
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl">
 					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
 				</entry>

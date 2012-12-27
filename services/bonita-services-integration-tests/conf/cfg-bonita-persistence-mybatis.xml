@@ -65,6 +65,7 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="100"/>

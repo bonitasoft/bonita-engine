@@ -5,59 +5,66 @@
     <cache/>
 	<insert id="insertSBooleanDataInstanceImpl" parameterType="BooleanDataInstance">
 		INSERT INTO data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, 'SBooleanDataInstanceImpl')
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, 'SBooleanDataInstanceImpl')
 	</insert>
 
 	<insert id="insertSIntegerDataInstanceImpl" parameterType="IntegerDataInstance">
 		INSERT INTO data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, NULL, 'SIntegerDataInstanceImpl')
+			#{entity.containerType}, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, NULL,NULL, 'SIntegerDataInstanceImpl')
 	</insert>
 
 	<insert id="insertSLongDataInstanceImpl" parameterType="LongDataInstance">
 		INSERT INTO data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, 'SLongDataInstanceImpl')
+			#{entity.containerType}, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, NULL, 'SLongDataInstanceImpl')
 	</insert>
 
 	<insert id="insertSShortTextDataInstanceImpl" parameterType="ShortTextDataInstance">
 		INSERT INTO data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, 'SShortTextDataInstanceImpl')
+			#{entity.containerType}, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, 'SShortTextDataInstanceImpl')
 	</insert>
 
 	<insert id="insertSDoubleDataInstanceImpl" parameterType="DoubleDataInstance">
 		INSERT INTO	data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, 	#{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, 'SDoubleDataInstanceImpl')
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, 'SDoubleDataInstanceImpl')
+	</insert>
+	
+	<insert id="insertSFloatDataInstanceImpl" parameterType="FloatDataInstance">
+		INSERT INTO	data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, 	#{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, 'SFloatDataInstanceImpl')
 	</insert>
 
 	<insert id="insertSBlobDataInstanceImpl" parameterType="BlobDataInstance">
 		INSERT INTO data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value, typeHandler=org.bonitasoft.engine.persistence.SerializableTypeHandler},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value, typeHandler=org.bonitasoft.engine.persistence.SerializableTypeHandler},
 			NULL, 'SBlobDataInstanceImpl')
 	</insert>
 
 	<insert id="insertSLongTextDataInstanceImpl" parameterType="LongTextDataInstance">
 		INSERT INTO data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SLongTextDataInstanceImpl')
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SLongTextDataInstanceImpl')
 	</insert>
 
 	<insert id="insertSXMLDataInstanceImpl" parameterType="XMLDataInstance">
 		INSERT INTO data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData},#{entity.className}, #{entity.containerId},
-			#{entity.containerType}, #{entity.namespace}, #{entity.element}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SXMLDataInstanceImpl')
+			#{entity.containerType}, #{entity.namespace}, #{entity.element}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SXMLDataInstanceImpl')
 	</insert>
 
 	<update id="updateSDataInstanceImpl" parameterType="DataInstance">
@@ -72,6 +79,7 @@
 			<if test="discriminant == 'SIntegerDataInstanceImpl' and value != null">intValue=#{value},</if>
 			<if test="discriminant == 'SLongDataInstanceImpl' and value != null">longValue=#{value},</if>
 			<if test="discriminant == 'SDoubleDataInstanceImpl' and value != null">doubleValue=#{value},</if>
+			<if test="discriminant == 'SFloatDataInstanceImpl' and value != null">floatValue=#{value},</if>
 			<if test="discriminant == 'SShortTextDataInstanceImpl' and value == '___bonitanull___'">shortTextValue=NULL,</if>
 			<if test="discriminant == 'SShortTextDataInstanceImpl' and value != null and value != '___bonitanull___'">shortTextValue=#{value},</if>
 			<if test="discriminant == 'SBooleanDataInstanceImpl' and value != null">booleanValue=#{value},</if>
@@ -109,6 +117,9 @@
 			</case>
 			<case value="SDoubleDataInstanceImpl" resultType="DoubleDataInstance">
 				<result property="value" javaType="double" column="doubleValue" />
+			</case>
+			<case value="SFloatDataInstanceImpl" resultType="FloatDataInstance">
+				<result property="value" javaType="float" column="floatValue" />
 			</case>
 			<case value="SShortTextDataInstanceImpl" resultType="ShortTextDataInstance">
 				<result property="value" javaType="string" column="shortTextValue" />

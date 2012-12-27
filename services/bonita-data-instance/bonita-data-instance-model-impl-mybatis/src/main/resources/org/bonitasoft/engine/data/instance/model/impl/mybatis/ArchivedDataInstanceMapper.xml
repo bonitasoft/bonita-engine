@@ -5,65 +5,73 @@
 
 	<insert id="insertSABooleanDataInstanceImpl" parameterType="ArchBooleanDataInstance">
 		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, 'SBooleanDataInstanceImpl', #{entity.archiveDate},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, 'SBooleanDataInstanceImpl', #{entity.archiveDate},
 			#{entity.sourceObjectId})
 	</insert>
 
 	<insert id="insertSAIntegerDataInstanceImpl" parameterType="ArchIntegerDataInstance">
 		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-		intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, NULL, 'SIntegerDataInstanceImpl', #{entity.archiveDate},
+			#{entity.containerType}, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'SIntegerDataInstanceImpl', #{entity.archiveDate},
 			#{entity.sourceObjectId})
 	</insert>
 
 	<insert id="insertSALongDataInstanceImpl" parameterType="ArchLongDataInstance">
 		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, 'SLongDataInstanceImpl', #{entity.archiveDate},
+			#{entity.containerType}, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, NULL, 'SLongDataInstanceImpl', #{entity.archiveDate},
 			#{entity.sourceObjectId})
 	</insert>
 
 	<insert id="insertSAShortTextDataInstanceImpl" parameterType="ArchShortTextDataInstance">
 		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, 'SShortTextDataInstanceImpl', #{entity.archiveDate},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, NULL, NULL, 'SShortTextDataInstanceImpl', #{entity.archiveDate},
 			#{entity.sourceObjectId})
 	</insert>
 
 	<insert id="insertSADoubleDataInstanceImpl" parameterType="ArchDoubleDataInstance">
 		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, 'SDoubleDataInstanceImpl', #{entity.archiveDate},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, NULL, 'SDoubleDataInstanceImpl', #{entity.archiveDate},
+			#{entity.sourceObjectId})
+	</insert>
+	
+	<insert id="insertSAFloatDataInstanceImpl" parameterType="ArchFloatDataInstance">
+		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, NULL, NULL, 'SFloatDataInstanceImpl', #{entity.archiveDate},
 			#{entity.sourceObjectId})
 	</insert>
 
 	<insert id="insertSABlobDataInstanceImpl" parameterType="ArchBlobDataInstance">
 		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value, typeHandler=org.bonitasoft.engine.persistence.SerializableTypeHandler},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value, typeHandler=org.bonitasoft.engine.persistence.SerializableTypeHandler},
 			NULL, 'SBlobDataInstanceImpl', #{entity.archiveDate}, #{entity.sourceObjectId})
 	</insert>
 
 	<insert id="insertSALongTextDataInstanceImpl" parameterType="ArchLongTextDataInstance">
 		INSERT INTO arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SLongTextDataInstanceImpl', #{entity.archiveDate},
+			#{entity.containerType}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SLongTextDataInstanceImpl', #{entity.archiveDate},
 			#{entity.sourceObjectId})
 	</insert>
 
 	<insert id="insertSAXMLDataInstanceImpl" parameterType="ArchXMLDataInstance">
 		INSERT INTO	arch_data_instance (tenantid, id, name, description, transientData, className, containerId, containerType, namespace, element,
-			intValue, longValue, shortTextValue, booleanValue, doubleValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
+			intValue, longValue, shortTextValue, booleanValue, doubleValue, floatValue, blobValue, clobValue, discriminant, archiveDate, sourceObjectId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.description}, #{entity.transientData}, #{entity.className}, #{entity.containerId},
-			#{entity.containerType}, #{entity.namespace}, #{entity.element}, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SXMLDataInstanceImpl',
+			#{entity.containerType}, #{entity.namespace}, #{entity.element}, NULL, NULL, NULL, NULL, NULL, NULL, NULL, #{entity.value}, 'SXMLDataInstanceImpl',
 			#{entity.archiveDate}, #{entity.sourceObjectId})
 	</insert>
 
@@ -79,6 +87,7 @@
 			<if test="discriminant == 'SIntegerDataInstanceImpl' and value != null">intValue=#{value},</if>
 			<if test="discriminant == 'SLongDataInstanceImpl' and value != null">longValue=#{value},</if>
 			<if test="discriminant == 'SDoubleDataInstanceImpl' and value != null">doubleValue=#{value},</if>
+			<if test="discriminant == 'SFloatDataInstanceImpl' and value != null">floatValue=#{value},</if>
 			<if test="discriminant == 'SShortTextDataInstanceImpl' and value == '___bonitanull___'">shortTextValue=NULL,</if>
 			<if test="discriminant == 'SShortTextDataInstanceImpl' and value != null and value != '___bonitanull___'">shortTextValue=#{value},</if>
 			<if test="discriminant == 'SBooleanDataInstanceImpl' and value != null">booleanValue=#{value},</if>
@@ -117,6 +126,9 @@
 			</case>
 			<case value="SADoubleDataInstanceImpl" resultType="ArchDoubleDataInstance">
 				<result property="value" javaType="double" column="doubleValue" />
+			</case>
+			<case value="SAFloatDataInstanceImpl" resultType="ArchFloatDataInstance">
+				<result property="value" javaType="float" column="floatValue" />
 			</case>
 			<case value="SAShortTextDataInstanceImpl" resultType="ArchShortTextDataInstance">
 				<result property="value" javaType="string" column="shortTextValue" />
