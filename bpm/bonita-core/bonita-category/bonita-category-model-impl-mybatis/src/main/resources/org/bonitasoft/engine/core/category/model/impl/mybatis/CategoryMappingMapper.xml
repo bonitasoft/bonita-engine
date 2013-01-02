@@ -36,6 +36,15 @@
 		WHERE tenantid = #{tenantid}
 		AND processId = #{processId}
 	</select>
+	
+	<select id="getNumberOfCategoriesUnrelatedToProcess" parameterType="long" resultType="long">
+		SELECT COUNT(category.*)
+		FROM  category
+		WHERE category.id NOT IN (
+			SELECT processcategorymapping.categoryId
+			FROM processcategorymapping
+			WHERE processcategorymapping.processId = #{processId})
+	</select>
 
 	<select id="getProcessCategoryMappingsOfCategory" parameterType="long" resultMap="categorymappingResultMap">
 		SELECT *
