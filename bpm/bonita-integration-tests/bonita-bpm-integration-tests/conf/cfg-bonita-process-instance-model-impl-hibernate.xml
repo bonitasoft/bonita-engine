@@ -1,0 +1,122 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="hbm-bonita-process-instance-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="sequencesMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="10010" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="10013" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="10014" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" value="10015" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" value="10015" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" value="10015" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" value="10015" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" value="10016" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" value="10016" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" value="10016" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" value="10017" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="10018" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="10019" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
+			</map>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="p" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance" value="t" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="f" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="g" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="c" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstanceImpl" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstanceImpl" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="t" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="t" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="t" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="t" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance" value="t" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="s" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="s" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="s" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="s" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="m" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="mapping" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="usertask" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="h" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- Archived objects -->
+	<bean  id="hbm-bonita-process-instance-model-arch" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="sequencesMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" value="20012" />
+			</map>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="ap" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="at" />
+			</map>
+		</property>
+	</bean>
+</beans>

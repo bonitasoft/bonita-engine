@@ -1072,7 +1072,7 @@
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
-						<bonita.test.persistence>bonita-persistence-mybatis</bonita.test.persistence>
+						<bonita.file.filter>com.bonitasoft.engine.bpm.util.MyBatisServicesFileFilter</bonita.file.filter>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/bpm/test/AllBPMSPTests.java</include>
