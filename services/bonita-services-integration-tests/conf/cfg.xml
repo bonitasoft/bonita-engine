@@ -4,9 +4,9 @@
 	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<array>
-                <value>classpath:/org/bonitasoft/engine/conf/bonita-platform.xml</value>
-				<value>classpath:/org/bonitasoft/engine/conf/${bonita.test.db.vendor:h2}.properties</value>
-				<value>classpath:/org/bonitasoft/engine/conf/quartz-${bonita.test.db.vendor:h2}.properties</value>
+                <value>file:${bonita.services.folder}/bonita-platform.xml</value>
+				<value>file:${bonita.services.folder}/${bonita.test.db.vendor:h2}.properties</value>
+				<value>file:${bonita.services.folder}/quartz-${bonita.test.db.vendor:h2}.properties</value>
 			</array>
 		</property>
 	</bean>
@@ -16,13 +16,9 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="queriableLoggerServiceConfig" class="org.bonitasoft.engine.services.impl.QueriableLoggerServiceConfigurationImpl" />
+	<bean id="queriableLoggerServiceConfig" class="org.bonitasoft.engine.MockQueriableLoggerServiceConfigurationImpl" />
 
-	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
-		<constructor-arg name="sessionService" ref="sessionService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
-	</bean>
+	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.MockQueriableLogSessionProviderImpl" />
 
 	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />

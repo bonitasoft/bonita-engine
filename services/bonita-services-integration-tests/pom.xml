@@ -149,43 +149,10 @@
 			<scope>test</scope>
 		</dependency>
 
-
 		<!-- Delete -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-delete-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Document -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-opencmis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -240,9 +207,41 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Document -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-opencmis</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.document</groupId>
+			<artifactId>bonita-document-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Event -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
+			<groupId>com.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -250,12 +249,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -284,7 +277,6 @@
 
 
 		<!-- External identity mapping -->
-
 		<dependency>
 			<groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
 			<artifactId>bonita-external-identity-mapping-impl</artifactId>
@@ -304,7 +296,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
@@ -321,12 +312,6 @@
 		<dependency>
 			<groupId>com.bonitasoft.engine.identity</groupId>
 			<artifactId>bonita-identity-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -498,7 +483,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.bonitasoft.engine.privilege</groupId>
 			<artifactId>bonita-privilege-model-impl</artifactId>
@@ -618,6 +602,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Test suite -->
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-integration-tests</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Misc -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -675,11 +667,6 @@
 			<artifactId>commons-pool</artifactId>
 			<version>1.5.5</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-integration-tests</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -690,7 +677,7 @@
 				<configuration>
 					<systemPropertyVariables>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
-						<bonita.test.persistence>bonita-persistence-mybatis</bonita.test.persistence>
+						<bonita.file.filter>com.bonitasoft.services.MyBatisServicesFileFilter</bonita.file.filter>
 					</systemPropertyVariables>
 					<includes>
 						<include>com/bonitasoft/services/AllTestsSP.java</include>
@@ -699,5 +686,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

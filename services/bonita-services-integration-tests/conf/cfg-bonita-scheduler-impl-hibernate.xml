@@ -1,46 +1,28 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
-		<constructor-arg name="typeAliases">
-			<map>
-				<entry key="job_descriptor" value="org.bonitasoft.engine.scheduler.impl.model.SJobDescriptorImpl" />
-				<entry key="job_parameter" value="org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl" />
-			</map>
-		</constructor-arg>
-		<constructor-arg name="mappers">
-			<list>
-				<value>org/bonitasoft/engine/scheduler/impl/mybatis/SJobDescriptorMapper.xml</value>
-				<value>org/bonitasoft/engine/scheduler/impl/mybatis/SJobParametersMapper.xml</value>
-			</list>
-		</constructor-arg>
-		<constructor-arg name="sequencesMappings">
+	<bean id="hbm-bonita-scheduler" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
+				<value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="sequencesMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobDescriptorImpl" value="70" />
 				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl" value="71" />
 			</map>
-		</constructor-arg>
-		<constructor-arg name="classAliasMappings">
+		</property>
+		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobDescriptorImpl" value="jd" />
 				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl" value="jp" />
 			</map>
-		</constructor-arg>
-		<constructor-arg name="classFieldAliasMappings">
-			<map />
-		</constructor-arg>
-		<constructor-arg name="statementMapping">
-			<set />
-		</constructor-arg>
-		<constructor-arg name="dbStatementsMapping">
-			<map />
-		</constructor-arg>
-		<constructor-arg name="entityMappings">
-			<map />
-		</constructor-arg>
+		</property>
 	</bean>
 
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+	<bean id="db-bonita-scheduler" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-initTables.sql" />
@@ -48,4 +30,5 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="5"/>
 	</bean>
+
 </beans>

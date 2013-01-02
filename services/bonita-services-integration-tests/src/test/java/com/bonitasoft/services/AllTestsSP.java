@@ -10,7 +10,7 @@ import com.bonitasoft.services.event.handler.RecorderAndEventServiceTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-//    AllTests.class,
+    AllTests.class,
     IdentityServiceUsingEventServiceTest.class,
     RecorderAndEventServiceTest.class
 })

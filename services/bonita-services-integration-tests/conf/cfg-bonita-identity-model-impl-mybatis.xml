@@ -64,7 +64,23 @@
 			</map>
 		</constructor-arg>
 		<constructor-arg name="statementMapping">
-			<set />
+			<set>
+				<!-- insert -->
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl.insertSContactInfoImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.identity.model.impl.SUserImpl.insertSContactInfoImpl" />
+				</bean>
+				<!-- update -->
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl.updateSContactInfoImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.identity.model.impl.SUserImpl.updateSContactInfoImpl" />
+				</bean>
+				<!-- Queries -->
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl.getUserContactInfo" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.identity.model.impl.SUserImpl.getUserContactInfo" />
+				</bean>
+			</set>
 		</constructor-arg>
 		<constructor-arg name="dbStatementsMapping">
 			<map />
