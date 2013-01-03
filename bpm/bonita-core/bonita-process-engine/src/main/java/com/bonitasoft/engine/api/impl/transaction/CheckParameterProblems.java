@@ -42,7 +42,7 @@ public class CheckParameterProblems implements TransactionContent {
             i += 100;
             for (final SParameter parameter : paramters) {
                 if (parameter.getValue() == null) {
-                    final Problem problem = new ProblemImpl(Level.ERROR, "parameter", "Parameter" + parameter.getName() + " is not set");
+                    final Problem problem = new ProblemImpl(Level.ERROR, null, "parameter", "Parameter" + parameter.getName() + " is not set");
                     problems.add(problem);
                 }
             }
