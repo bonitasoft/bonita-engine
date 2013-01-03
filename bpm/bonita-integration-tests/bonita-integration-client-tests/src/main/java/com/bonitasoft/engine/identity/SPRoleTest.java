@@ -11,19 +11,21 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.identity;
+package com.bonitasoft.engine.identity;
 
 import static org.junit.Assert.assertEquals;
 
-import org.bonitasoft.engine.CommonAPISPTest;
-import org.bonitasoft.engine.SPBPMTestUtil;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.identity.Role;
+import org.bonitasoft.engine.identity.RoleBuilder;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 
 public class SPRoleTest extends CommonAPISPTest {

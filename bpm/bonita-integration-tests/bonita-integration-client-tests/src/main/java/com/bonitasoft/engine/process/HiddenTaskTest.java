@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.BPMTestUtil;
-import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
@@ -22,6 +21,8 @@ import org.bonitasoft.engine.wait.CheckNbPendingTasksForUserUsingSearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.CommonAPISPTest;
 
 public class HiddenTaskTest extends CommonAPISPTest {
 

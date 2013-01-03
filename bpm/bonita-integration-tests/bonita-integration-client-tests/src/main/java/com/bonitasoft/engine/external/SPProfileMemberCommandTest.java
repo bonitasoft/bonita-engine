@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.external;
+package com.bonitasoft.engine.external;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -24,6 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 

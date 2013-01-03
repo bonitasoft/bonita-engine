@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.identity;
+package com.bonitasoft.engine.identity;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,7 +1,8 @@
-package org.bonitasoft.engine.process;
+package com.bonitasoft.engine.process;
 
-import org.bonitasoft.engine.SPBPMTestUtil;
 import org.bonitasoft.engine.session.APISession;
+
+import com.bonitasoft.engine.SPBPMTestUtil;
 
 /**
  * @author Baptiste Mesta

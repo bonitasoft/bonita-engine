@@ -2,13 +2,14 @@
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.connector;
+package com.bonitasoft.engine.connector;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.ConnectorValidationException;

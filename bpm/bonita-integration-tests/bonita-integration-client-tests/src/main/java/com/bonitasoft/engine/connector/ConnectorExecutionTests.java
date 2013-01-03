@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
@@ -26,6 +25,8 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
+
+import com.bonitasoft.engine.CommonAPISPTest;
 
 /**
  * @author Baptiste Mesta

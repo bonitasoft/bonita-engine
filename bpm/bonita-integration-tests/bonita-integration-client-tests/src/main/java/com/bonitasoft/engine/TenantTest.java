@@ -1,4 +1,4 @@
-package org.bonitasoft.engine;
+package com.bonitasoft.engine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

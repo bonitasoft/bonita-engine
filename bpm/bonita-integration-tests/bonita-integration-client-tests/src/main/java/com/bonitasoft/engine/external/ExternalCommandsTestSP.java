@@ -1,5 +1,6 @@
-package org.bonitasoft.engine.command.web;
+package com.bonitasoft.engine.external;
 
+import org.bonitasoft.engine.command.web.ActivityCommandExtTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;

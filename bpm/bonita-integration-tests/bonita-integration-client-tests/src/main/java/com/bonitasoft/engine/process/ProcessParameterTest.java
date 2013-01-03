@@ -21,7 +21,6 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -44,7 +43,6 @@ import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.process.ExecutionInSession;
 import org.bonitasoft.engine.process.ProcessManagementTest;
 import org.bonitasoft.engine.process.TestStates;
 import org.bonitasoft.engine.util.IOUtil;
@@ -52,6 +50,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;

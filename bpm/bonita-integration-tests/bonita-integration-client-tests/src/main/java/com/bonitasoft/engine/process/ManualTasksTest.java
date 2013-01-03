@@ -2,7 +2,6 @@ package com.bonitasoft.engine.process;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
@@ -22,6 +21,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
+
 public class ManualTasksTest extends CommonAPISPTest {
 
     private static final String JOHN = "john";
@@ -40,7 +41,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         login();
         john = createUser(JOHN, "bpm");
         logout();
-        loginWith(JOHN, "bpm");
+        loginWith(john);
     }
 
     private ProcessDefinition deployProcessWithUserTask(final User user1) throws BonitaException, InvalidSessionException, ProcessDefinitionNotFoundException,

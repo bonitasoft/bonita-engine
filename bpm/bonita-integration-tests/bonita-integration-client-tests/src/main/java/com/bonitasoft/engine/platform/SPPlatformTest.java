@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.platform;
+package com.bonitasoft.engine.platform;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,6 +21,8 @@ import org.bonitasoft.engine.exception.PlatformNotExistException;
 import org.bonitasoft.engine.exception.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.platform.Platform;
+import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -43,9 +45,6 @@ import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.exception.TenantUpdateException;
-import com.bonitasoft.engine.platform.Tenant;
-import com.bonitasoft.engine.platform.TenantCriterion;
-import com.bonitasoft.engine.platform.TenantUpdateDescriptor;
 
 public class SPPlatformTest {
 
@@ -399,7 +398,7 @@ public class SPPlatformTest {
     public void getTenantByNotExistName() throws BonitaException {
         try {
             platformAPI.getTenantByName("test");
-        } catch (TenantNotFoundException e) {
+        } catch (final TenantNotFoundException e) {
             assertTrue(e.getMessage().startsWith("No tenant exists with name: test"));
             throw e;
         }
@@ -422,7 +421,7 @@ public class SPPlatformTest {
     public void getTenantByNotExistId() throws BonitaException {
         try {
             platformAPI.getTenantById(-3);
-        } catch (TenantNotFoundException e) {
+        } catch (final TenantNotFoundException e) {
             assertTrue(e.getMessage().startsWith("No tenant exists with id: -3"));
             throw e;
         }

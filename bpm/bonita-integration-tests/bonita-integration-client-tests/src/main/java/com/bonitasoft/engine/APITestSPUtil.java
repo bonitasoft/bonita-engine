@@ -1,4 +1,4 @@
-package org.bonitasoft.engine;
+package com.bonitasoft.engine;
 
 import static org.junit.Assert.assertTrue;
 
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.WaitUntil;
 import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EventSorting;

@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.platform;
+package com.bonitasoft.engine.platform;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.BPMTestUtil;
-import org.bonitasoft.engine.CommonAPISPTest;
-import org.bonitasoft.engine.SPBPMTestUtil;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.Comment;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
@@ -33,6 +31,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 

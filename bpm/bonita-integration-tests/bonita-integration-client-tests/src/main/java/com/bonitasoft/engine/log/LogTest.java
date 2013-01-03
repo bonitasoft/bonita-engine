@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.log;
+package com.bonitasoft.engine.log;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.ThrowMessageEventTriggerBuilder;
-import org.bonitasoft.engine.connector.APIAccessorConnector;
 import org.bonitasoft.engine.core.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperatorType;
@@ -56,6 +54,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.connector.APIAccessorConnector;
 import com.bonitasoft.engine.exception.LogNotFoundException;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogCriterion;

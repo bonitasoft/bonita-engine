@@ -2,12 +2,13 @@ package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 
-import org.bonitasoft.engine.CommonAPISPTest;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.CommonAPISPTest;
 
 public class LocalLogTest extends CommonAPISPTest {
 

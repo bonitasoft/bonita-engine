@@ -1,10 +1,11 @@
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.BPMTestsSP;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+
+import com.bonitasoft.engine.BPMTestsSP;
 
 @RunWith(Suite.class)
 @SuiteClasses({
