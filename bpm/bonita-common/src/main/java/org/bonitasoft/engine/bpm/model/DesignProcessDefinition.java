@@ -27,4 +27,6 @@ public interface DesignProcessDefinition extends ProcessDefinition {
 
     long getActorInitiatorId();
 
+    String getStringIndexLabel(int index);
+
 }

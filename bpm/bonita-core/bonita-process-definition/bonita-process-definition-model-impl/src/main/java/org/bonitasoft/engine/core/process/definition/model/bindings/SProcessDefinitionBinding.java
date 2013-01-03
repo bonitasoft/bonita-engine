@@ -41,10 +41,25 @@ public class SProcessDefinitionBinding extends SNamedElementBinding {
 
     private SFlowElementContainerDefinitionImpl processContainer;
 
+    private String stringIndexLabel1;
+
+    private String stringIndexLabel2;
+
+    private String stringIndexLabel3;
+
+    private String stringIndexLabel4;
+
+    private String stringIndexLabel5;
+
     @Override
     public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
         super.setAttributes(attributes);
         version = attributes.get(XMLSProcessDefinition.VERSION);
+        stringIndexLabel1 = attributes.get(XMLSProcessDefinition.STRING_INDEX_LABEL + 1);
+        stringIndexLabel2 = attributes.get(XMLSProcessDefinition.STRING_INDEX_LABEL + 2);
+        stringIndexLabel3 = attributes.get(XMLSProcessDefinition.STRING_INDEX_LABEL + 3);
+        stringIndexLabel4 = attributes.get(XMLSProcessDefinition.STRING_INDEX_LABEL + 4);
+        stringIndexLabel5 = attributes.get(XMLSProcessDefinition.STRING_INDEX_LABEL + 5);
     }
 
     @Override
@@ -69,6 +84,11 @@ public class SProcessDefinitionBinding extends SNamedElementBinding {
         final SProcessDefinitionImpl processDefinitionImpl = new SProcessDefinitionImpl(name, version);
         processDefinitionImpl.setId(Long.valueOf(id));
         processDefinitionImpl.setDescription(description);
+        processDefinitionImpl.setStringIndexLabel(1, stringIndexLabel1);
+        processDefinitionImpl.setStringIndexLabel(2, stringIndexLabel2);
+        processDefinitionImpl.setStringIndexLabel(3, stringIndexLabel3);
+        processDefinitionImpl.setStringIndexLabel(4, stringIndexLabel4);
+        processDefinitionImpl.setStringIndexLabel(5, stringIndexLabel5);
 
         for (final SActorDefinition actor : actors) {
             processDefinitionImpl.addActor(actor);

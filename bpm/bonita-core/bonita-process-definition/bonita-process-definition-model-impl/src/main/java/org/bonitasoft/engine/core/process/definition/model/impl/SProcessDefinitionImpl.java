@@ -52,6 +52,16 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
 
     private SFlowElementContainerDefinition container;
 
+    private String stringIndexLabel1;
+
+    private String stringIndexLabel2;
+
+    private String stringIndexLabel3;
+
+    private String stringIndexLabel4;
+
+    private String stringIndexLabel5;
+
     public SProcessDefinitionImpl(final DesignProcessDefinition processDefinition, final SExpressionBuilders sExpressionBuilders,
             final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
 
@@ -59,6 +69,11 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         description = processDefinition.getDescription();
         version = processDefinition.getVersion();
         actors = new HashSet<SActorDefinition>();
+        stringIndexLabel1 = processDefinition.getStringIndexLabel(1);
+        stringIndexLabel2 = processDefinition.getStringIndexLabel(2);
+        stringIndexLabel3 = processDefinition.getStringIndexLabel(3);
+        stringIndexLabel4 = processDefinition.getStringIndexLabel(4);
+        stringIndexLabel5 = processDefinition.getStringIndexLabel(5);
         for (final ActorDefinition actor : processDefinition.getActors()) {
             actors.add(new SActorDefinitionImpl(actor));
         }
@@ -145,6 +160,46 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
 
     public void setProcessContainer(final SFlowElementContainerDefinition processContainer) {
         container = processContainer;
+    }
+
+    public void setStringIndexLabel(final int index, final String label) {
+        switch (index) {
+            case 1:
+                stringIndexLabel1 = label;
+                break;
+            case 2:
+                stringIndexLabel2 = label;
+                break;
+            case 3:
+                stringIndexLabel3 = label;
+                break;
+            case 4:
+                stringIndexLabel4 = label;
+                break;
+            case 5:
+                stringIndexLabel5 = label;
+                break;
+            default:
+                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+        }
+    }
+
+    @Override
+    public String getStringIndexLabel(final int index) {
+        switch (index) {
+            case 1:
+                return stringIndexLabel1;
+            case 2:
+                return stringIndexLabel2;
+            case 3:
+                return stringIndexLabel3;
+            case 4:
+                return stringIndexLabel4;
+            case 5:
+                return stringIndexLabel5;
+            default:
+                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+        }
     }
 
 }

@@ -170,6 +170,8 @@ public class XMLProcessDefinition {
 
     public static final String DISPLAY_DESCRIPTION = "displayDescription";
 
+    public static final String STRING_INDEX_LABEL = "stringIndexLabel";
+
     public static final String DISPLAY_DESCRIPTION_AFTER_COMPLETION = "displayDescriptionAfterCompletion";
 
     public static final String INCOMING_TRANSITION = "incomingTransition";
@@ -340,6 +342,9 @@ public class XMLProcessDefinition {
         rootNode.addAttribute(DESCRIPTION, processDefinition.getDescription());
         rootNode.addAttribute(DISPLAY_NAME, processDefinition.getDisplayName());
         rootNode.addAttribute(DISPLAY_DESCRIPTION, processDefinition.getDisplayDescription());
+        for (int i = 1; i <= 5; i++) {
+            rootNode.addAttribute(STRING_INDEX_LABEL + i, processDefinition.getStringIndexLabel(i));
+        }
         rootNode.addAttribute(VERSION, processDefinition.getVersion());
         rootNode.addAttribute(BOS_VERSION, BOS_CURRENT_VERSION);
         rootNode.addAttribute("xmlns", NAMESPACE);

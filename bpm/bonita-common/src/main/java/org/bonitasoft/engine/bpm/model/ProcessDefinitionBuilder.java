@@ -377,4 +377,17 @@ public final class ProcessDefinitionBuilder implements DescriptionBuilder, Conta
     public DesignProcessDefinition getProcess() throws InvalidProcessDefinitionException {
         return done();
     }
+
+    /**
+     * Set the label for the string index
+     * 
+     * @param index
+     *            between 1-5
+     * @param label
+     *            the label to set
+     */
+    public void setStringIndexLabel(final int index, final String label) {
+        process.setStringIndexLabel(index, label);
+    }
+
 }

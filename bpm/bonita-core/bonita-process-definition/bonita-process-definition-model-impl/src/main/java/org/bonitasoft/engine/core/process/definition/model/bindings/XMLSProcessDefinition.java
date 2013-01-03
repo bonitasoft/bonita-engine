@@ -165,6 +165,8 @@ public class XMLSProcessDefinition {
 
     public static final String DISPLAY_DESCRIPTION = "displayDescription";
 
+    public static final String STRING_INDEX_LABEL = "stringIndexLabel";
+
     public static final String DISPLAY_DESCRIPTION_AFTER_COMPLETION = "displayDescriptionAfterCompletion";
 
     public static final String INCOMING_TRANSITION = "incomingTransition";
@@ -336,6 +338,9 @@ public class XMLSProcessDefinition {
         rootNode.addAttribute(VERSION, definition.getVersion());
         rootNode.addAttribute(BOS_VERSION, BOS_CURRENT_VERSION);
         rootNode.addAttribute(DESCRIPTION, definition.getDescription());
+        for (int i = 1; i <= 5; i++) {
+            rootNode.addAttribute(STRING_INDEX_LABEL + i, definition.getStringIndexLabel(i));
+        }
         rootNode.addAttribute("xmlns", NAMESPACE);
 
         createAndFillFlowElements(rootNode, definition.getProcessContainer());

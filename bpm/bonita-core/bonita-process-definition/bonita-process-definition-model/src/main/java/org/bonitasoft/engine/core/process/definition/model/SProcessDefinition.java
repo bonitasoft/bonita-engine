@@ -29,6 +29,8 @@ public interface SProcessDefinition extends SNamedElement {
     SActorDefinition getActorInitiator();
 
     Set<SActorDefinition> getActors();
+    
+    String getStringIndexLabel(int index);
 
     Set<SParameterDefinition> getParameters();
 

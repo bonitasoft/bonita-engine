@@ -39,6 +39,16 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     private FlowElementContainerDefinition flowElementContainer;
 
+    private String stringIndexLabel1;
+
+    private String stringIndexLabel2;
+
+    private String stringIndexLabel3;
+
+    private String stringIndexLabel4;
+
+    private String stringIndexLabel5;
+
     public DesignProcessDefinitionImpl(final String name, final String version) {
         super(name, version);
         parameters = new HashSet<ParameterDefinition>();
@@ -217,6 +227,47 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
             return false;
         }
         return true;
+    }
+    
+
+    public void setStringIndexLabel(final int index, final String label) {
+        switch (index) {
+            case 1:
+                stringIndexLabel1 = label;
+                break;
+            case 2:
+                stringIndexLabel2 = label;
+                break;
+            case 3:
+                stringIndexLabel3 = label;
+                break;
+            case 4:
+                stringIndexLabel4 = label;
+                break;
+            case 5:
+                stringIndexLabel5 = label;
+                break;
+            default:
+                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+        }
+    }
+
+    @Override
+    public String getStringIndexLabel(final int index) {
+        switch (index) {
+            case 1:
+                return stringIndexLabel1;
+            case 2:
+                return stringIndexLabel2;
+            case 3:
+                return stringIndexLabel3;
+            case 4:
+                return stringIndexLabel4;
+            case 5:
+                return stringIndexLabel5;
+            default:
+                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+        }
     }
 
 }

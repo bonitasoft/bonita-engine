@@ -149,7 +149,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             log(tenantAccessor, e);
             throw new ProcessInstanceCreationException(e);
         }// FIXME in case process instance creation exception -> put it in failed
-        return ModelConvertor.toProcessInstance(startedInstance, processInstanceStateManager);
+        return ModelConvertor.toProcessInstance(sDefinition, startedInstance, processInstanceStateManager);
     }
 
     /**
