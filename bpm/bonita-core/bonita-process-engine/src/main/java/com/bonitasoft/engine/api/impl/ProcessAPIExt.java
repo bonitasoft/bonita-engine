@@ -26,7 +26,6 @@ import org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolve
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.CheckActorMapping;
-import org.bonitasoft.engine.api.impl.transaction.CheckActorMappingList;
 import org.bonitasoft.engine.api.impl.transaction.CreateManualUserTask;
 import org.bonitasoft.engine.api.impl.transaction.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.GetActivityInstance;
@@ -129,6 +128,7 @@ import org.bonitasoft.engine.util.FileUtil;
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver;
+import com.bonitasoft.engine.api.impl.transaction.CheckParameterProblems;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;
@@ -586,21 +586,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Problem> getProcessResolutionProblems(final long processId) throws InvalidSessionException, ProcessDefinitionNotFoundException,
             ProcessResourceException {
+        final List<Problem> problems = super.getProcessResolutionProblems(processId);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processId, processDefinitionService);
-        List<Problem> problems;
         try {
-            transactionExecutor.execute(getProcessDefinition);
-            final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-            final CheckActorMappingList checkActorMapping = new CheckActorMappingList(actorMappingService, processId);
-            transactionExecutor.execute(checkActorMapping);
-            problems = checkActorMapping.getProblems();
-            // final ParameterService parameterService = tenantAccessor.getParameterService();
-            // final CheckParameterProblems checkParameterProblems = new CheckParameterProblems(parameterService, processId);
-            // transactionExecutor.execute(checkParameterProblems);
-            // problems.addAll(checkActorMapping.getProblems());
+            final ParameterService parameterService = tenantAccessor.getParameterService();
+            final CheckParameterProblems checkParameterProblems = new CheckParameterProblems(parameterService, processId);
+            transactionExecutor.execute(checkParameterProblems);
+            problems.addAll(checkParameterProblems.getProblems());
             return problems;
         } catch (final SBonitaException e) {
             throw new ProcessDefinitionNotFoundException(e);

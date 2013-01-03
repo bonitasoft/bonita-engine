@@ -18,7 +18,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.model.ParameterDefinition;
@@ -37,7 +36,6 @@ public class ProcessResolutionTest extends CommonAPISPTest {
 
     @Cover(classes = { Problem.class, ProcessDefinition.class, ParameterDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
     @Test
-    @Ignore("ENGINE-454")
     public void parameterUnset() throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addAutomaticTask("step1");
@@ -59,10 +57,9 @@ public class ProcessResolutionTest extends CommonAPISPTest {
 
     @Cover(classes = { Problem.class, ProcessDefinition.class, ParameterDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
     @Test
-    @Ignore("ENGINE-454")
     public void resolveParameter() throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addAutomaticTask("step1");
+        builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
