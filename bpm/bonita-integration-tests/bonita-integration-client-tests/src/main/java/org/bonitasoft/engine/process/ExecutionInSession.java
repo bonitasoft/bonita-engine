@@ -50,7 +50,7 @@ public abstract class ExecutionInSession {
         this.session = session;
     }
 
-    void executeInSession() throws Exception {
+    public void executeInSession() throws Exception {
         final APISession session;
         if (username != null) {
             if (tenantId > 0) {

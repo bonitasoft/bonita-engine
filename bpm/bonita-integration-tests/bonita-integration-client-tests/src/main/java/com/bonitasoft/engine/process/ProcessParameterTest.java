@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.process;
+package com.bonitasoft.engine.process;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -44,6 +44,9 @@ import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.process.ExecutionInSession;
+import org.bonitasoft.engine.process.ProcessManagementTest;
+import org.bonitasoft.engine.process.TestStates;
 import org.bonitasoft.engine.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -280,8 +283,10 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        Assert.assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "sleepy");
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -599,7 +604,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ConnectorImplementationDescriptor connector = getProcessAPI().getConnectorImplementation(proDefId, connectorId, connectorVersion);
         assertEquals(TestConnector.class.getName(), connector.getImplementationClassName());
         assertEquals(connectorVersion, connector.getVersion());
-        assertEquals("enabled", getProcessAPI().getProcessDeploymentInfo(proDefId).getActivationState());
+        assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(proDefId).getActivationState());
 
         getProcessAPI().updateParameterInstanceValue(proDefId, paraName, "bcd");
         final String implSourchFile = "/org/bonitasoft/engine/connectors/TestConnector2.impl";
@@ -611,7 +616,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ConnectorImplementationDescriptor connectorUpdate = getProcessAPI().getConnectorImplementation(proDefId, connectorId, connectorVersion);
         assertEquals(TestConnector2.class.getName(), connectorUpdate.getImplementationClassName());
         assertEquals(connectorVersion, connectorUpdate.getVersion());
-        assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(proDefId).getActivationState());
+        assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(proDefId).getConfigurationState());
 
         final byte[] resbytes = getProcessAPI().exportBarProcessContentUnderHome(proDefId);
         final ByteArrayInputStream baiStream = new ByteArrayInputStream(resbytes);
@@ -629,7 +634,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
                 connectorVersion);
         assertEquals(TestConnector2.class.getName(), connectorRedeploy.getImplementationClassName());
         assertEquals(connectorVersion, connectorRedeploy.getVersion());
-        assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(processDefinitionId).getActivationState());
+        assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(processDefinitionId).getConfigurationState());
 
         disableAndDelete(processDef);
         deleteUser(user.getId());

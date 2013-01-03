@@ -11,6 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
     ManualTasksTest.class,
     ProcessManagementTest.class,
     TaskOnDemandTest.class,
+    ProcessParameterTest.class
 })
 public class ProcessTests {
 

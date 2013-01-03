@@ -17,12 +17,11 @@ import com.bonitasoft.engine.process.ProcessTests;
 @RunWith(Suite.class)
 @SuiteClasses({
   SPIdentityTests.class,
- // SPPlatformTest.class,
+//  SPPlatformTest.class,
   SPProcessManagementTest.class,
 //  LogTest.class,
   LogTestSP.class,
   ExternalCommandsTestSP.class,
-//  ProcessParameterTest.class,
   BPMRemoteTests.class,
   SPProfileMemberCommandTest.class,
   MultiInstanceTest.class,

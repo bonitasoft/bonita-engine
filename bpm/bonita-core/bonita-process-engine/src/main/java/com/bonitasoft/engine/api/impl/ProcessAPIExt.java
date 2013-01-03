@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
 package com.bonitasoft.engine.api.impl;
@@ -505,7 +505,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final CheckActorMapping checkActorMapping = new CheckActorMapping(actorMappingService, definition.getId());
         transactionExecutor.execute(checkActorMapping);
         final Boolean actorMappingResolved = checkActorMapping.getResult();
-        if (!containsNullParameterValues && actorMappingResolved && ConfigurationState.UNRESOLVED.equals(processDefinitionDeployInfo.getConfigurationState())) {
+        if (!containsNullParameterValues && actorMappingResolved
+                && ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
             try {
                 transactionExecutor.execute(new ResolveProcessAndCreateDependencies(processDefinitionService, definition.getId(), dependencyService,
                         dependencyBuilderAccessor, tenantAccessor.getTenantId()));
@@ -572,16 +573,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     private String getUserNameFromSession() throws InvalidSessionException {
         SessionAccessor sessionAccessor = null;
-        String userName;
         try {
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = sessionAccessor.getSessionId();
             final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            userName = platformServiceAccessor.getSessionService().getSession(sessionId).getUserName();
+            return platformServiceAccessor.getSessionService().getSession(sessionId).getUserName();
         } catch (final Exception e) {
             throw new InvalidSessionException(e);
         }
-        return userName;
     }
 
     @Override
@@ -612,7 +611,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public List<ConnectorInstance> getConnectorInstancesOfActivity(final long activityInstanceId, final int pageNumber, final int numberPerPage,
             final ConnectorInstanceCriterion order) throws InvalidSessionException, ObjectReadException, PageOutOfRangeException {
         return getConnectorInstancesFor(activityInstanceId, pageNumber, numberPerPage, SConnectorInstance.FLOWNODE_TYPE, order);
-
     }
 
     private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int pageNumber, final int numberPerPage, final String flownodeType,

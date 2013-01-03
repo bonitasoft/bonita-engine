@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
 package com.bonitasoft.engine.api.impl;
@@ -224,14 +224,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         if (!file.exists()) {
             file.createNewFile();
         }
-        final Properties properties = PropertiesManager.getPropertiesFromXmlFile(file);
+        final Properties properties = PropertiesManager.getPropertiesFromXML(file);
         if (username != null) {
             properties.setProperty("userName", username);
         }
         if (password != null) {
             properties.setProperty("userPassword", password);
         }
-        PropertiesManager.saveProperties(properties, file);
+        PropertiesManager.savePropertiesToXML(properties, file);
     }
 
     @Override

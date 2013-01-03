@@ -63,11 +63,9 @@
 		<constructor-arg name="lockService" ref="lockService" />
 	</bean>
 
-
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
 		<constructor-arg name="workService" ref="workService" />
 	</bean>
-
 
 	<bean id="bpmInstancesCreator" class="org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator">
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />

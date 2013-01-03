@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
 package org.bonitasoft.engine.bpm.bar;
@@ -28,7 +28,7 @@ public class ParameterContribution implements BusinessArchiveContribution {
         if (!file.exists()) {
             return false;
         }
-        final Properties properties = PropertiesManager.getPropertiesFromFile(file);
+        final Properties properties = PropertiesManager.getProperties(file);
         final Map<String, String> parameters = new HashMap<String, String>(properties.size());
         for (final Entry<Object, Object> property : properties.entrySet()) {
             parameters.put((String) property.getKey(), (String) (property.getValue() == NULL ? null : property.getValue()));
