@@ -110,6 +110,29 @@
 			ORDER BY ${orderBy}
 		</if>
 	</select>
+	
+	<select id="getNumberOfSProcessDefinitionDeployInfoUnrelatedToCategory" parameterType="long" resultType="long">
+		SELECT COUNT(proc_def.id)
+		FROM process_definition proc_def
+		WHERE proc_def.tenantid = #{tenantid}
+		AND proc_def.processId NOT IN (
+				SELECT cat.processId
+				FROM categorymapping cat
+				WHERE cat.categoryId =  #{categoryId})
+	</select>
+
+	<select id="searchSProcessDefinitionDeployInfoUnrelatedToCategory" parameterType="long" resultMap="processDefinitionDeployInfoResultMap">
+		SELECT proc_def.*
+		FROM process_definition proc_def
+		WHERE proc_def.tenantid = #{tenantid}
+		AND proc_def.processId NOT IN (
+				SELECT cat.processId
+				FROM categorymapping cat
+				WHERE cat.categoryId =  #{categoryId})
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
 
 	<select id="getProcessDefinitionsIdsInActivationState" parameterType="map" resultType="long">
 		SELECT proc_def.processId
