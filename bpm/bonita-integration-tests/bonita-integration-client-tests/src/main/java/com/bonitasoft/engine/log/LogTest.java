@@ -42,6 +42,8 @@ import org.bonitasoft.engine.exception.InvalidExpressionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.GroupBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdateDescriptor;
 import org.bonitasoft.engine.search.LogSearchDescriptor;
@@ -57,8 +59,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.connector.APIAccessorConnector;
 import com.bonitasoft.engine.exception.LogNotFoundException;
-import com.bonitasoft.engine.log.Log;
-import com.bonitasoft.engine.log.LogCriterion;
 
 public class LogTest extends CommonAPISPTest {
 
@@ -258,14 +258,12 @@ public class LogTest extends CommonAPISPTest {
         getIdentityAPI().deleteUser(user2.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
-        builder.searchTerm("with username user1SearchTerm");
+        builder.searchTerm("Adding a new user with username user1SearchTerm");
         builder.sort(LogSearchDescriptor.ACTION_TYPE, Order.ASC);
         final SearchResult<Log> searchLogs = getLogAPI().searchLogs(builder.done());
 
-        assertEquals(2, searchLogs.getCount());
+        assertEquals(1, searchLogs.getCount());
         assertEquals("IDENTITY_USER_CREATED", searchLogs.getResult().get(0).getActionType());
-        assertEquals("IDENTITY_USER_DELETED", searchLogs.getResult().get(1).getActionType());
-
     }
 
     @Test(expected = BonitaRuntimeException.class)
@@ -504,7 +502,7 @@ public class LogTest extends CommonAPISPTest {
 
     private List<BarResource> generateDefaultConnectorImplementations() throws IOException {
         final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, "/org/bonitasoft/engine/connector/APIAccessorConnector.impl", "APIAccessorConnector.impl");
+        addResource(resources, "/com/bonitasoft/engine/connector/APIAccessorConnector.impl", "APIAccessorConnector.impl");
         return resources;
     }
 
@@ -525,6 +523,42 @@ public class LogTest extends CommonAPISPTest {
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
         resources.add(new BarResource(name, byteArray));
+    }
+
+    @Test
+    public void log() throws BonitaException {
+        final Group group = getIdentityAPI().createGroup(new GroupBuilder().createNewInstance("group1").done());
+        getIdentityAPI().deleteGroup(group.getId());
+
+        assertEquals(0, getLogAPI().getNumberOfLogs());
+
+        final User userOld = getIdentityAPI().createUser("old", "oldPassword");
+        assertEquals(1, getLogAPI().getNumberOfLogs());
+
+        final UserUpdateDescriptor updateDescriptor = new UserUpdateDescriptor();
+        updateDescriptor.updateUserName("new");
+        updateDescriptor.updatePassword("newPassword");
+        getIdentityAPI().updateUser(userOld.getId(), updateDescriptor, null, null);
+        assertEquals(2, getLogAPI().getNumberOfLogs());
+
+        getIdentityAPI().deleteUser(userOld.getId());
+        assertEquals(3, getLogAPI().getNumberOfLogs());
+
+        final List<Log> logs = getLogAPI().getLogs(0, 3, LogCriterion.DEFAULT);
+        assertEquals("IDENTITY_USER_DELETED", logs.get(0).getActionType());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(0).getSeverity());
+        assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(0).getCallerClassName());
+        assertEquals("deleteUser", logs.get(0).getCallerMethodName());
+
+        assertEquals("IDENTITY_USER_UPDATED", logs.get(1).getActionType());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(1).getSeverity());
+        assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(1).getCallerClassName());
+        assertEquals("updateUser", logs.get(1).getCallerMethodName());
+
+        assertEquals("IDENTITY_USER_CREATED", logs.get(2).getActionType());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(2).getSeverity());
+        assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(2).getCallerClassName());
+        assertEquals("createUser", logs.get(2).getCallerMethodName());
     }
 
 }

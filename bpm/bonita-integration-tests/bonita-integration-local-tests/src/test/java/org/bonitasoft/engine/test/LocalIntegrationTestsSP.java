@@ -5,11 +5,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.BPMTestsSP;
+import com.bonitasoft.engine.BPMSPTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    BPMTestsSP.class,
+    BPMSPTests.class,
     BPMLocalSuiteTests.class,
     LocalLogTest.class,
     APIMethodSPTest.class

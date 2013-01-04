@@ -2,7 +2,7 @@
 
 	<definitionId>org.bonitasoft.connector.APIAccessorConnector</definitionId>
 	<definitionVersion>1.0</definitionVersion>
-	<implementationClassname>org.bonitasoft.engine.connectors.APIAccessorConnector</implementationClassname>
+	<implementationClassname>com.bonitasoft.engine.connector.APIAccessorConnector</implementationClassname>
 	<implementationId>APIAccessorConnector</implementationId>
 	<implementationVersion>1.0</implementationVersion>
 

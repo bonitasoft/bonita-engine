@@ -11,17 +11,16 @@ import com.bonitasoft.engine.event.TimerBoundaryEventTest;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
 import com.bonitasoft.engine.external.SPProfileMemberCommandTest;
 import com.bonitasoft.engine.identity.SPIdentityTests;
-import com.bonitasoft.engine.log.LogTestSP;
+import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 import com.bonitasoft.engine.process.ProcessTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({
   SPIdentityTests.class,
-//  SPPlatformTest.class,
+//  SPPlatformTest.class, JIRA-482
   SPProcessManagementTest.class,
-//  LogTest.class,
-  LogTestSP.class,
+  LogTest.class,
   ExternalCommandsTestSP.class,
   BPMRemoteTests.class,
   SPProfileMemberCommandTest.class,
@@ -30,6 +29,6 @@ import com.bonitasoft.engine.process.ProcessTests;
   TimerBoundaryEventTest.class,
   RemoteConnectorExecutionTestsSP.class
 })
-public class BPMTestsSP {
+public class BPMSPTests {
 
 }
