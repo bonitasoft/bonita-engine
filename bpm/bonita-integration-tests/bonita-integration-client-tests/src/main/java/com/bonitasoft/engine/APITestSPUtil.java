@@ -28,7 +28,6 @@ import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.StateCategory;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedActivityInstance;
@@ -82,6 +81,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import com.bonitasoft.engine.log.Log;
 
 public class APITestSPUtil {

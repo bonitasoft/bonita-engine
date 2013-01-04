@@ -34,7 +34,6 @@ import org.bonitasoft.engine.bpm.model.DocumentDefinition;
 import org.bonitasoft.engine.bpm.model.GatewayType;
 import org.bonitasoft.engine.bpm.model.IntermediateCatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.model.TransitionDefinition;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinition;
@@ -55,6 +54,8 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.util.FileUtil;
 import org.junit.Test;
+
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 /**
  * @author Baptiste Mesta

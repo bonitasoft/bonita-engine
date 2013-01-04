@@ -13,7 +13,6 @@ import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
@@ -25,6 +24,8 @@ import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.junit.Test;
+
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 /**
  * @author Baptiste Mesta

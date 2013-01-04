@@ -2,7 +2,7 @@
  * Copyright (C) 2011 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.bpm.bar;
+package com.bonitasoft.engine.bpm.bar;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
 
+import org.bonitasoft.engine.bpm.bar.ActorMappingContribution;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveContribution;
+import org.bonitasoft.engine.bpm.bar.ClasspathContribution;
+import org.bonitasoft.engine.bpm.bar.ConnectorContribution;
+import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
+import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
+import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.bar.UserFilterContribution;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormat;
 import org.bonitasoft.engine.util.FileUtil;
 

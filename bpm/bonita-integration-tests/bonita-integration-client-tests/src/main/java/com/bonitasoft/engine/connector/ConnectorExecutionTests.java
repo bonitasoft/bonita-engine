@@ -13,7 +13,6 @@ import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
@@ -27,6 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 /**
  * @author Baptiste Mesta

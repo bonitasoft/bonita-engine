@@ -30,7 +30,6 @@ import org.bonitasoft.engine.bpm.model.ConfigurationState;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.connectors.TestConnector;
@@ -53,6 +52,7 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
 

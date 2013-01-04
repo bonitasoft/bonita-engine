@@ -2,11 +2,10 @@
  * Copyright (C) 2011-2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
-package org.bonitasoft.engine.bpm.model;
+package com.bonitasoft.engine.bpm.model;
 
 import org.bonitasoft.engine.bpm.model.impl.DesignProcessDefinitionImpl;
-
-import com.bonitasoft.engine.bpm.model.impl.ParameterDefinitionImpl;
+import org.bonitasoft.engine.bpm.model.impl.ParameterDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte

@@ -6,9 +6,9 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ActorInstance;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.model.ParameterDefinition;
 import org.bonitasoft.engine.bpm.model.Problem;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.process.TestStates;
@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ParameterDefinition;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 public class ProcessResolutionTest extends CommonAPISPTest {
 

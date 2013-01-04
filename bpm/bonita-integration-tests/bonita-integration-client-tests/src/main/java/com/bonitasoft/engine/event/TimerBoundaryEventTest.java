@@ -7,7 +7,6 @@ import java.util.Date;
 
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
@@ -25,6 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 @Ignore("Not yet implemented")
 public class TimerBoundaryEventTest extends CommonAPISPTest {

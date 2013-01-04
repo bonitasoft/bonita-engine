@@ -14,7 +14,6 @@ import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.data.DataService;
@@ -41,6 +40,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
