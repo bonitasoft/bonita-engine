@@ -30,5 +30,8 @@
     <copy todir="${basedir}/target/home">
       <fileset dir="${basedir}/target/common/home" excludes="**/.svn" />
     </copy>
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/hibernate" excludes="**/.svn" />
+    </copy>
   </target>
 </project>

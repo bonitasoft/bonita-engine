@@ -535,7 +535,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<groupId>com.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>

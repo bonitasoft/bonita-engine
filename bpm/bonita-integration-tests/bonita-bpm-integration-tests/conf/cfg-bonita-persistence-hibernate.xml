@@ -109,7 +109,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="journalConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProvider">
+	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
 		<constructor-arg name="properties">
 			<props>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
@@ -214,21 +214,18 @@
                 <entry key="getSADataInstanceIdsFromMapping" value="true"/>
                 <entry key="getSADataInstanceVisibilityMappings" value="true"/>
                 <entry key="getSADataInstancesByDataInstanceIdAndArchiveDate" value="true"/>
-
             </map>
         </constructor-arg>
         <constructor-arg name="classesWithLoadByQuery">
-
             <list>
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl</value>
             </list>
-
         </constructor-arg>
 	</bean>
 
-	<bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProvider">
+	<bean id="hbmResourcesConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderExt">
 		<property name="hbmResources">
 			<list>
 				<ref bean="hbm-bonita-persistence-hibernate" />
