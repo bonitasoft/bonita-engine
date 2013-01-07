@@ -9,54 +9,18 @@
 
 	<artifactId>bonita-client-sp</artifactId>
 
-	<name>Bonita Client</name>
+	<name>Bonita Client SP</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-common-api</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-common-api-ejb2</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-client</artifactId>
 			<version>${project.version}</version>
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine</groupId> -->
-<!-- 					<artifactId>bonita-common</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-client-api</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-client-api-local</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-client-api-ejb2</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-client-api-ejb3</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-client-api-http</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -67,30 +31,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>org.bonitasoft.engine:bonita-client</include>
-								</includes>
-							</artifactSet>
-							<outputDirectory>${basedir}/target</outputDirectory>
-							<destFileName>${project.build.finalName}.jar</destFileName>
-							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-							<createDependencyReducedPom>true</createDependencyReducedPom>
-							<createSourcesJar>true</createSourcesJar>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
@@ -103,7 +43,6 @@
 						<configuration>
 							<includeDependencySources>true</includeDependencySources>
 							<dependencySourceIncludes>
-								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
 								<dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude>
 							</dependencySourceIncludes>
 						</configuration>

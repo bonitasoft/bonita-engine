@@ -14,45 +14,11 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-common</artifactId>
 			<version>${project.version}</version>
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-common-api</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine.api</groupId> -->
-<!-- 					<artifactId>bonita-common-api-ejb2</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>org.bonitasoft.engine:bonita-common</include>
-								</includes>
-							</artifactSet>
-							<outputDirectory>${basedir}/target</outputDirectory>
-							<destFileName>${project.build.finalName}.jar</destFileName>
-							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-							<createDependencyReducedPom>true</createDependencyReducedPom>
-							<createSourcesJar>true</createSourcesJar>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
@@ -65,7 +31,7 @@
 						<configuration>
 							<includeDependencySources>true</includeDependencySources>
 							<dependencySourceIncludes>
-								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
+								<dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude>
 							</dependencySourceIncludes>
 						</configuration>
 					</execution>

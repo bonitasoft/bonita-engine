@@ -14,7 +14,7 @@
 				<include>com.bonitasoft.engine:bonita-common-sp</include>
 			</includes>
 			<useProjectArtifact>false</useProjectArtifact>
-			<useTransitiveFiltering>false</useTransitiveFiltering>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
 		</dependencySet>
 		<dependencySet>
 			<outputDirectory>lib/server</outputDirectory>

@@ -21,12 +21,6 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
-			<!-- <exclusions> -->
-			<!-- <exclusion> -->
-			<!-- <groupId>org.bonitasoft.engine</groupId> -->
-			<!-- <artifactId>bonita-common</artifactId> -->
-			<!-- </exclusion> -->
-			<!-- </exclusions> -->
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.parameter</groupId>
@@ -34,24 +28,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-process-engine</artifactId>
 			<version>${project.version}</version>
-			<!-- <exclusions> -->
-			<!-- <exclusion> -->
-			<!-- <groupId>org.bonitasoft.engine.core.process.definition</groupId> -->
-			<!-- <artifactId>bonita-process-definition-model</artifactId> -->
-			<!-- </exclusion> -->
-			<!-- <exclusion> -->
-			<!-- <groupId>org.bonitasoft.engine</groupId> -->
-			<!-- <artifactId>bonita-common</artifactId> -->
-			<!-- </exclusion> -->
-			<!-- </exclusions> -->
 		</dependency>
 	</dependencies>
 
@@ -69,9 +48,7 @@
 						<configuration>
 							<artifactSet>
 								<includes>
-									<include>org.bonitasoft.engine.core:bonita-process-engine</include>
 									<include>com.bonitasoft.engine.core.parameter:bonita-parameter-api</include>
-									<include>com.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${basedir}/target</outputDirectory>
