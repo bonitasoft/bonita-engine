@@ -44,7 +44,7 @@
 
 	<bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy" />
 
-	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
+	<bean id="parameterExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
 		<constructor-arg name="parameterService" ref="parameterService" />
 	</bean>
 

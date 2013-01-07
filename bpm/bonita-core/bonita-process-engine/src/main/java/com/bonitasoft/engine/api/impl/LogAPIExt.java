@@ -19,10 +19,8 @@ import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
-import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
@@ -36,8 +34,10 @@ import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogBuilder;
 import com.bonitasoft.engine.log.LogCriterion;
 import com.bonitasoft.engine.log.SeverityLevel;
+import com.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.SearchLogs;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
