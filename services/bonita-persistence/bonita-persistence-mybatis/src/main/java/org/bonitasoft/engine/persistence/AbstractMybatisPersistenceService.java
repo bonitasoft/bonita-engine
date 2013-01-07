@@ -630,10 +630,17 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
             final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
             final Set<String> fields = new HashSet<String>();
             for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
-                final String alias = classAliasMappings.get(entry.getKey().getName());
-                for (final String field : entry.getValue()) {
+                final String className = entry.getKey().getName();
+                final String alias = classAliasMappings.get(className);
+                for (final String fieldName : entry.getValue()) {
                     final StringBuilder aliasBuilder = new StringBuilder(alias);
-                    aliasBuilder.append('.').append(field);
+                    aliasBuilder.append('.');
+                    final String fieldQualifiedName = className + "." + fieldName;
+                    if (classFieldAliasMappings.containsKey(fieldQualifiedName)) {
+                        aliasBuilder.append(classFieldAliasMappings.get(fieldQualifiedName));
+                    } else {
+                        aliasBuilder.append(fieldName);
+                    }
                     fields.add(aliasBuilder.toString());
                 }
             }

@@ -5,6 +5,7 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.zip.ZipOutputStream;
 
+import org.bonitasoft.engine.actor.ActorMappingExportException;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.privilege.api.ActorPrivilegeService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
@@ -35,7 +38,6 @@ import org.bonitasoft.engine.api.impl.transaction.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.RemoveActorPrivilegeById;
 import org.bonitasoft.engine.api.impl.transaction.ResolveProcessAndCreateDependencies;
 import org.bonitasoft.engine.api.impl.transaction.StoreProcess;
-import org.bonitasoft.engine.api.impl.transaction.UnzipBusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.model.ConfigurationState;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
@@ -48,7 +50,6 @@ import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.bpm.model.privilege.ActorPrivilege;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
@@ -126,6 +127,7 @@ import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver;
 import com.bonitasoft.engine.api.impl.transaction.CheckParameterProblems;
+import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;
@@ -332,11 +334,15 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             file.mkdirs();
         }
         final File processFolder = new File(file, String.valueOf(sDefinition.getId()));
-        final TransactionContent transactionContent = new UnzipBusinessArchive(businessArchive, processFolder);
         try {
-            transactionExecutor.execute(transactionContent);
-        } catch (final SBonitaException e) {
-            throw (IOException) e.getCause();
+            try {
+                transactionExecutor.openTransaction();
+                BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ProcessDeployException(e);
         }
     }
 
@@ -785,6 +791,56 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new ObjectReadException(e);
         } catch (final SBonitaException e) {
             throw new ActivityExecutionFailedException(e);
+        }
+    }
+
+    @Override
+    // TODO delete files after use/if an exception occurs
+    public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws BonitaRuntimeException, IOException, InvalidSessionException {
+        String processesFolder;
+        try {
+            final long tenantId = getTenantAccessor().getTenantId();
+            processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
+        } catch (final BonitaHomeNotSetException e) {
+            throw new BonitaRuntimeException(e);
+        }
+        final File file = new File(processesFolder);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        final File processFolder = new File(file, String.valueOf(processDefinitionId));
+
+        // copy current parameter to parameter file
+        final File currentParasF = new File(processFolder.getPath(), "current-parameters.properties");
+        if (currentParasF.exists()) {
+            final File parasF = new File(processFolder.getPath(), "parameters.properties");
+            if (!parasF.exists()) {
+                parasF.createNewFile();
+            }
+            final String content = FileUtil.read(currentParasF);
+            FileUtil.write(parasF, content);
+        }
+
+        // export actormapping
+        final File actormappF = new File(processFolder.getPath(), "actorMapping.xml");
+        if (!actormappF.exists()) {
+            actormappF.createNewFile();
+        }
+        String xmlcontent = "";
+        try {
+            xmlcontent = exportActorMapping(processDefinitionId);
+        } catch (final ActorMappingExportException e) {
+            throw new BonitaRuntimeException(e);
+        }
+        FileUtil.write(actormappF, xmlcontent);
+
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+        try {
+            FileUtil.zipDir(processFolder.getPath(), zos, processFolder.getPath());
+            return baos.toByteArray();
+        } finally {
+            zos.close();
         }
     }
 
