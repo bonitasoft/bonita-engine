@@ -27,21 +27,6 @@
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.applicationName" value="appName" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.productVersion" value="productVersion" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.clientApplicationName" value="clientAppName" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.callerClassName" value="callClassName" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.callerMethodName" value="callMethodName" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex1" value="numIdx1" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex2" value="numIdx2" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex3" value="numIdx3" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex4" value="numIdx4" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.numericIndex5" value="numIdx5" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex1" value="txtIdx1" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex2" value="txtIdx2" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex3" value="txtIdx3" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex4" value="txtIdx4" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog.textualIndex5" value="txtIdx5" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="statementMapping">
