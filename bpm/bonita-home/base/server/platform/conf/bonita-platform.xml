@@ -9,6 +9,7 @@
     <entry key="platformClassName">com.bonitasoft.engine.service.impl.SpringPlatformServiceAccessor</entry>
     <entry key="tenantClassName">com.bonitasoft.engine.service.impl.SpringTenantServiceAccessor</entry>
     <entry key="sessionAccessor">org.bonitasoft.engine.service.impl.SpringSessionAccessor</entry>
+    <entry key="apiAccessResolver">com.bonitasoft.engine.service.impl.APIAccessResolverImpl</entry>
     
     <!-- Platform administrator -->
     
