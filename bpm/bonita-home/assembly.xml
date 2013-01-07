@@ -16,14 +16,6 @@
 		</fileSet>
 		<fileSet>
 			<outputDirectory>home</outputDirectory>
-			<directory>hibernate</directory>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home</outputDirectory>
-			<directory>target/base-hibernate/home</directory>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home</outputDirectory>
 			<directory>target/common/home</directory>
 		</fileSet>
 	</fileSets>

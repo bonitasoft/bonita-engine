@@ -27,7 +27,7 @@ public class ParameterProcessDependencyResolver extends ProcessDependencyResolve
     @Override
     public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
             final SProcessDefinition sDefinition) throws ParameterProcessNotFoundException {
-        final ParameterService parameterService = tenantAccessor.getParameterService();
+        final ParameterService parameterService = ((com.bonitasoft.engine.service.TenantServiceAccessor) tenantAccessor).getParameterService();
         final Set<SParameterDefinition> parameters = sDefinition.getParameters();
         final Map<String, String> defaultParamterValues = businessArchive.getParameters();
 

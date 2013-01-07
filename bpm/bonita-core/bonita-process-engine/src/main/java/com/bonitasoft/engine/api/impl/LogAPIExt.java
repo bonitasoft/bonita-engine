@@ -22,8 +22,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -39,6 +37,8 @@ import com.bonitasoft.engine.log.LogBuilder;
 import com.bonitasoft.engine.log.LogCriterion;
 import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.search.SearchLogs;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
  * @author Bole Zhang

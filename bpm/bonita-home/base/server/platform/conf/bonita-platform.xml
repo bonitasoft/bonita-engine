@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+    <comment>Bonita platform core configuration</comment>
+    
+    <!-- Default service accessors -->
+    
+    <entry key="platformClassName">com.bonitasoft.engine.service.impl.SpringPlatformServiceAccessor</entry>
+    <entry key="tenantClassName">com.bonitasoft.engine.service.impl.SpringTenantServiceAccessor</entry>
+    <entry key="sessionAccessor">org.bonitasoft.engine.service.impl.SpringSessionAccessor</entry>
+    
+    <!-- Platform administrator -->
+    
+    <entry key="platformAdminUsername">platformAdmin</entry>
+    <entry key="platformAdminPassword">platform</entry>
+
+	<!-- H2 configuration -->
+
+    <entry key="db.vendor">h2</entry>
+    <entry key="db.version">notspecified"</entry>
+    <entry key="sql.delimiter">;</entry>
+    <entry key="hibernate.journal.dialect">org.hibernate.dialect.H2Dialect</entry>
+    <entry key="database.journal.connection.driver_class">org.h2.Driver</entry>
+    <entry key="database.journal.connection.url">jdbc:h2:file:${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</entry>
+    <entry key="database.journal.connection.username">sa</entry>
+    <entry key="database.journal.connection.password"/>
+    
+    <!-- MySQL configuration -->
+    
+<!--     <entry key="db.vendor">mysql</entry> -->
+<!--     <entry key="db.version">notspecified"</entry> -->
+<!--     <entry key="sql.delimiter">;</entry> -->
+<!--     <entry key="hibernate.journal.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</entry> -->
+<!--     <entry key="database.journal.connection.driver_class">com.mysql.jdbc.Driver</entry> -->
+<!--     <entry key="database.journal.connection.url">jdbc:mysql://localhost:3306/bonita</entry> -->
+<!--     <entry key="database.journal.connection.username">root</entry> -->
+<!--     <entry key="database.journal.connection.password"></entry> -->
+
+
+	<!-- Hibernate specific configurations -->
+    <entry key="hibernate.journal.show_sql">false</entry>
+    <entry key="hibernate.journal.format_sql">false</entry>
+    <entry key="hibernate.journal.use_sql_comments">false</entry>
+    
+    <!-- Quartz configuration -->
+    <entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</entry>
+
+    <entry key="org.bonitasoft.engine.archive.name">DEFINITIVE_0</entry>
+    <entry key="org.bonitasoft.engine.archive.oldestTime">1230739200052</entry>
+    <entry key="org.bonitasoft.engine.archive.newestTime">9999999999999</entry>
+    <entry key="org.bonitasoft.engine.archive.regexp">.*</entry>
+    <entry key="org.bonitasoft.engine.cron">0/5 * * * * ?</entry>
+
+    <entry key="document.servlet.url">downloadDocument</entry>
+</properties>
