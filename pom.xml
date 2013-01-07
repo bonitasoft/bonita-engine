@@ -13,6 +13,16 @@
 
 	<name>Bonita Engine SP</name>
 
+	<properties>
+		<jacoco.file>${user.home}/jacoco-engine.exec</jacoco.file>
+		<!-- Sonar -->
+		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. Then JaCoCo will add up information 
+			in the same report, so that, it will give the cross-module code coverage. -->
+		<sonar.jacoco.reportPath>${jacoco.file}</sonar.jacoco.reportPath>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -22,6 +32,18 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.6.0.201210061924</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 	<profiles>
 		<profile>
@@ -80,6 +102,36 @@
 							<execution>
 								<goals>
 									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>sonar</id>
+			<modules>
+				<module>services</module>
+				<module>bpm</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<configuration>
+							<includes>
+								<include>org.bonitasoft.engine.*</include>
+								<include>com.bonitasoft.engine.*</include>
+							</includes>
+ 							<destFile>${jacoco.file}</destFile>
+						</configuration>
+						<executions>
+							<execution>
+								<id>pre-test</id>
+								<goals>
+									<goal>prepare-agent</goal>
 								</goals>
 							</execution>
 						</executions>

@@ -54,6 +54,12 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>sonar</id>
+			<modules>
+				<module>bonita-services-integration-tests</module>
+			</modules>
+		</profile>
 	</profiles>
 
 </project>

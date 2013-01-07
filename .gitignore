@@ -461,6 +461,14 @@
 /services/bonita-persistence/.settings
 /services/bonita-persistence/.project
 
+# /services/bonita-persistence/bonita-persistence-hibernate/
+/services/bonita-persistence/bonita-persistence-hibernate/target
+/services/bonita-persistence/bonita-persistence-hibernate/.settings
+/services/bonita-persistence/bonita-persistence-hibernate/.classpath
+/services/bonita-persistence/bonita-persistence-hibernate/.project
+/services/bonita-persistence/bonita-persistence-hibernate/.springBeans
+/services/bonita-persistence/bonita-persistence-hibernate/build
+
 # /services/bonita-persistence/bonita-persistence-mybatis/
 /services/bonita-persistence/bonita-persistence-mybatis/target
 /services/bonita-persistence/bonita-persistence-mybatis/.settings
