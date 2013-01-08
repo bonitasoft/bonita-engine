@@ -12,7 +12,7 @@
 			,signalName
 		</if>
 		<if test="kind == 'error'">
-			,errorCode
+			,errorCode, relatedActivityInstanceId
 		</if>
 			, processName, flowNodeName, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, flowNodeInstanceId, active)
 		VALUES (#{tenantid}, #{entity.id}, #{kind}, #{entity.eventType}
@@ -23,7 +23,7 @@
 			, #{entity.signalName}
 		</if>
 		<if test="kind == 'error'">
-			, #{entity.errorCode}
+			, #{entity.errorCode}, #{entity.relatedActivityInstanceId}
 		</if>
 			, #{entity.processName}, #{entity.flowNodeName}, #{entity.processDefinitionId}, #{entity.rootProcessInstanceId}, #{entity.parentProcessInstanceId}, #{entity.flowNodeInstanceId},
 			#{entity.active})
@@ -70,6 +70,7 @@
 			</case>
 			<case value="error" resultType="waiting_error_event">
 				<result property="errorCode" column="errorCode" />
+				<result property="relatedActivityInstanceId" column="relatedActivityInstanceId" />
 			</case>
 		</discriminator>
 	</resultMap>
@@ -93,6 +94,14 @@
 		WHERE w.tenantid = #{tenantid}
 		AND w.id = #{id}
 		AND w.kind = 'message'
+	</select>
+	
+	<select id="getCaughtErrorByRelatedActivityAndErrorCode" parameterType="List" resultMap="WaitingEventResultMap">
+		SELECT w.*
+		FROM  waiting_event w
+		WHERE w.tenantid = #{tenantid}
+		AND w.relatedActivityInstanceId = #{relatedActivityInstanceId}
+		AND w.errorCode = #{errorCode}
 	</select>
 
 	<select id="getStartWaitingEvents" parameterType="List" resultMap="WaitingEventResultMap">

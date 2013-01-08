@@ -38,6 +38,7 @@ import org.bonitasoft.engine.bpm.model.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.model.TransitionDefinition;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.model.event.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.model.event.EndEventDefinition;
 import org.bonitasoft.engine.bpm.model.event.trigger.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.model.event.trigger.ThrowMessageEventTriggerDefinition;
@@ -761,6 +762,9 @@ public class BusinessArchiveTests {
         final ActivityDefinition resultActivity = result.getProcessContainer().getActivity("userTask");
         assertEquals(process.getProcessContainer().getActivity("userTask"), resultActivity);
         assertEquals(3, resultActivity.getBoundaryEventDefinitions().size());
+        for (final BoundaryEventDefinition boundary : resultActivity.getBoundaryEventDefinitions()) {
+            assertEquals(1, boundary.getEventTriggers().size());
+        }
 
         assertEquals(process.getProcessContainer().getEndEvents(), result.getProcessContainer().getEndEvents());
         assertEquals(1, result.getProcessContainer().getEndEvents().size());
@@ -1020,7 +1024,7 @@ public class BusinessArchiveTests {
                 .addUserTask("userTask1", null);
 
     }
-    
+
     @Test
     public void testGeneratingOutgoingDefaultTransitionShouldBeConformToProcessDefinitionXsd() throws Exception {
         final File barFile = File.createTempFile("businessArchive", ".bar");

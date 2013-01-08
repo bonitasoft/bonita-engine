@@ -4,9 +4,9 @@
 <mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl">
 
 	<insert id="insertSProcessInstanceImpl" parameterType="process_instance">
-		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, tokenCount, processDefinitionId, description, startDate, startedBy, endDate, stateId,
+		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, interruptingEventId, tokenCount, processDefinitionId, description, startDate, startedBy, endDate, stateId,
 			stateCategory, lastUpdate, migration_plan)
-		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.tokenCount}, #{entity.processDefinitionId},
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.interruptingEventId}, #{entity.tokenCount}, #{entity.processDefinitionId},
 			#{entity.description}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId})
 	</insert>
 
@@ -23,6 +23,7 @@
 	      <if test="endDate != null">endDate=#{endDate},</if>
 	      <if test="lastUpdate != null">lastUpdate=#{lastUpdate},</if>
 	      <if test="containerId != null">containerId=#{containerId},</if>
+	      <if test="interruptingEventId != null">interruptingEventId=#{interruptingEventId},</if>
 	      <if test="migrationPlanId != null">migration_plan=#{migrationPlanId},</if>
 	      <if test="stringIndex1 == '___bonitanull___'">stringIndex1=NULL,</if>
 	      <if test="stringIndex1 != null and stringIndex1 != '___bonitanull___'">stringIndex1=#{stringIndex1},</if>
@@ -51,6 +52,7 @@
 		<result property="containerId" column="containerId" />
 		<result property="rootProcessInstanceId" column="rootProcessInstanceId" />
 		<result property="callerId" column="callerId" />
+		<result property="interruptingEventId" column="interruptingEventId" />
 		<result property="tokenCount" column="tokenCount" />
 		<result property="processDefintionId" column="processDefintionId" />
 		<result property="description" column="description" />

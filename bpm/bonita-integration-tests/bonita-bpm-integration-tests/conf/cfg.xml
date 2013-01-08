@@ -126,6 +126,7 @@
 		<constructor-arg name="commentService" ref="commentService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
