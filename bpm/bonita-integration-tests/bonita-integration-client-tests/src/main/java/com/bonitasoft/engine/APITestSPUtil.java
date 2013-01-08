@@ -1053,7 +1053,7 @@ public class APITestSPUtil {
 
     protected Operation buildAssignOperation(final String dataInstanceName, final String expressionContent, final ExpressionType expressionType,
             final String returnType) throws InvalidExpressionException {
-        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setDataName(dataInstanceName).done();
+        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
         final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName).setContent(expressionContent)
                 .setExpressionType(expressionType.name()).setReturnType(returnType).done();
         final Operation operation;

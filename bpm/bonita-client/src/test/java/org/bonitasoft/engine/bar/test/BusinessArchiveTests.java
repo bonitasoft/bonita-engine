@@ -316,7 +316,7 @@ public class BusinessArchiveTests {
         // No Java operation, so empty string passed:
         processDefinitionBuilder
                 .addAutomaticTask("auto1")
-                .addOperation(new LeftOperandBuilder().createNewInstance().setDataName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
+                .addOperation(new LeftOperandBuilder().createNewInstance().setName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
                         trueExpression).addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
         processDefinitionBuilder
                 .addManualTask("manual1", "Truck Driver")
@@ -343,7 +343,7 @@ public class BusinessArchiveTests {
         processDefinitionBuilder
                 .addConnector("conn3", "connId3", "1.0.0", ConnectorEvent.ON_FINISH)
                 .addInput("input1", trueExpression)
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
                         trueExpression);
         processDefinitionBuilder.addParameter("myParam", String.class.getName()).addDescription("an important parameter");
         processDefinitionBuilder.addData("myData", "java.lang.Boolean", trueExpression).addDescription("My boolean data");
@@ -497,7 +497,7 @@ public class BusinessArchiveTests {
         final Expression displayNameExpression = new ExpressionBuilder().createConstantStringExpression("dataToSend");
 
         final LeftOperandBuilder leftOperandBuilder = new LeftOperandBuilder();
-        leftOperandBuilder.createNewInstance().setDataName("var1");
+        leftOperandBuilder.createNewInstance().setName("var1");
         final OperationBuilder opb = new OperationBuilder();
         opb.createNewInstance().setOperator(ASSIGN_OPERATOR).setRightOperand(trueExpression).setType(OperatorType.ASSIGNMENT)
                 .setVariableToSet(leftOperandBuilder.done());

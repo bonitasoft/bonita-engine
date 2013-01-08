@@ -112,7 +112,7 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", input1Expression)
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
 
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
@@ -160,7 +160,7 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", input1Expression)
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
 
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
@@ -328,7 +328,7 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", normal)
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
 
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();

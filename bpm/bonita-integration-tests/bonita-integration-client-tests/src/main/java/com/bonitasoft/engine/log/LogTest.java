@@ -433,17 +433,17 @@ public class LogTest extends CommonAPISPTest {
         designProcessDefinition
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", "org.bonitasoft.connector.APIAccessorConnector", "1.0", ConnectorEvent.ON_FINISH)
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("numberOfUsers", Long.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(procInstIdData).done(), OperatorType.ASSIGNMENT, "=", null,
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(procInstIdData).done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression("procInstId", Long.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(nbLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(nbLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression("nbLogs", Integer.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(searchLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(searchLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression("searchLogs", SearchResult.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(getLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(getLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression("getLogs", List.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setDataName(profileAttributeMapData).done(), OperatorType.ASSIGNMENT, "=", null,
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(profileAttributeMapData).done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression("profileAttributeMap", Map.class.getName()));
         designProcessDefinition.addUserTask("step2", delivery);
         designProcessDefinition.addTransition("step0", "step1");
