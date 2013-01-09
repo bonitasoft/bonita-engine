@@ -14,9 +14,6 @@
     <copy todir="${basedir}/target/home/server/licenses" failonerror="true">
       <fileset dir="${user.home}/lic" includes="*.lic" />
     </copy>
-    <copy todir="${basedir}/target/home/server/licenses" failonerror="true">
-      <fileset dir="${user.home}/lic" includes="*.lic" />
-    </copy>
   </target>
 
   <target name="hibernate">

@@ -71,7 +71,28 @@
 		AND proc_def.name = #{name}
 		ORDER BY proc_def.deploymentDate DESC
 	</select>
-	
+
+	<!-- Don't use cache for this query, as the flush does not seem to be called... -->
+	<select id="getProcessDeployInfosOnlyForUser" parameterType="long" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
+		SELECT DISTINCT proc_def.*
+		FROM process_definition proc_def,
+			 actor,
+			 actormember
+		WHERE proc_def.processId = actor.scopeId
+		AND actor.id = actormember.actorId
+		AND actormember.userId = #{userId}
+		AND proc_def.tenantid = #{tenantid}
+		AND actor.tenantid = #{tenantid}
+		AND actormember.tenantid = #{tenantid}
+		AND actormember.actorId NOT IN (
+			SELECT actorId
+			FROM actormember am2
+			WHERE am2.userId != actormember.userId
+			AND actormember.tenantid = am2.tenantid
+		)
+		ORDER BY proc_def.processId ASC
+	</select>
+		
 	<select id="getProcessDefinitionIdByNameAndVersion" parameterType="list" resultType="long">
 		SELECT proc_def.processId
 		FROM process_definition proc_def

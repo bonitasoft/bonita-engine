@@ -477,12 +477,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-opencmis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.bonitasoft.engine.document</groupId> -->
+<!-- 			<artifactId>bonita-document-opencmis</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.document</groupId>
 			<artifactId>bonita-document-model-impl-hibernate</artifactId>

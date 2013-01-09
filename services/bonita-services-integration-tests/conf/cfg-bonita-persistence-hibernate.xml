@@ -34,7 +34,9 @@
 		<constructor-arg name="rangeSize" value="100" />
         <constructor-arg name="rangeSizes">
             <map>
-                <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="10000"/>
+                <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="200000"/>
+                <!-- entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="100"/>
@@ -43,8 +45,6 @@
                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" value="100"/>
@@ -101,7 +101,7 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" value="100"/-->
             </map>
         </constructor-arg>
 		<constructor-arg ref="dbConfigurationsProvider" />
