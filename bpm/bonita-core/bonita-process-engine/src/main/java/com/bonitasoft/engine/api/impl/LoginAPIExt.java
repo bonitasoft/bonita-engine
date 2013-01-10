@@ -21,13 +21,13 @@ import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.UserUpdateBuilder;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.APISessionImpl;
 import org.bonitasoft.engine.session.model.SSession;
 
 import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
  * @author Matthieu Chaffotte
@@ -83,4 +83,8 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
         }
     }
 
+    @Override
+    protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
+        return TenantServiceSingleton.getInstance(tenantId);
+    }
 }

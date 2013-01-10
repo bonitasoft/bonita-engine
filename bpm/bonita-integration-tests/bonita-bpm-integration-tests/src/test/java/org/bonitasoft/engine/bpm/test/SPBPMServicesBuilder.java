@@ -34,4 +34,8 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
         return this.getInstanceOf(SearchEntitiesDescriptor.class);
     }
 
+    @Override
+    public TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
+        return this;
+    }
 }

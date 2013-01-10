@@ -15,4 +15,7 @@ public interface PlatformServiceAccessor extends org.bonitasoft.engine.service.P
 
     SearchPlatformEntitiesDescriptor getSearchPlatformEntitiesDescriptor();
 
+    @Override
+    TenantServiceAccessor getTenantServiceAccessor(long tenantId);
+
 }

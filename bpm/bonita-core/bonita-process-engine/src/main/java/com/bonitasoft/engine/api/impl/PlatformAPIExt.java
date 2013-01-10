@@ -7,6 +7,7 @@ package com.bonitasoft.engine.api.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,6 @@ import org.bonitasoft.engine.search.SearchPrivilegeDescriptor;
 import org.bonitasoft.engine.search.SearchPrivileges;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.work.WorkService;
@@ -92,6 +92,7 @@ import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.search.SearchTenants;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
@@ -103,6 +104,18 @@ import com.bonitasoft.manager.Manager;
 public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private final static String STATUS_DEACTIVATED = "DEACTIVATED";
+
+    @Override
+    protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+        return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+    }
+
+    @Override
+    protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
+            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
+    }
 
     private boolean isPlatformStarted(final PlatformServiceAccessor platformAccessor) {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();

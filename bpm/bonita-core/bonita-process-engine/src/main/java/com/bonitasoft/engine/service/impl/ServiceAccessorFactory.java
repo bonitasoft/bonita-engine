@@ -5,18 +5,11 @@
 package com.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
-import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -29,16 +22,10 @@ public final class ServiceAccessorFactory {
 
     private static ServiceAccessorFactory instance = new ServiceAccessorFactory();
 
-    private Properties properties = null;
-
-    private SessionAccessorAccessor sessionAccessorAccessor;
-
-    private PlatformServiceAccessor platformServiceAccessor;
-
-    private final Map<Long, TenantServiceAccessor> tenantServiceAccessor = new HashMap<Long, TenantServiceAccessor>();
+    private final org.bonitasoft.engine.service.impl.ServiceAccessorFactory bosServiceAccessorFactory;
 
     private ServiceAccessorFactory() {
-        super();
+        bosServiceAccessorFactory = org.bonitasoft.engine.service.impl.ServiceAccessorFactory.getInstance();
     }
 
     public static ServiceAccessorFactory getInstance() {
@@ -47,50 +34,18 @@ public final class ServiceAccessorFactory {
 
     public PlatformServiceAccessor createPlatformServiceAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        if (platformServiceAccessor == null) {
-            initPropertiesIfNeeded();
-            final String platformClassName = properties.getProperty("platformClassName");
-            if (platformClassName == null) {
-                throw new BonitaHomeConfigurationException("platformClassName not set in bonita-platform.xml");
-            }
-            platformServiceAccessor = (PlatformServiceAccessor) Class.forName(platformClassName).newInstance();
-        }
-        return platformServiceAccessor;
-    }
-
-    private void initPropertiesIfNeeded() throws BonitaHomeNotSetException, IOException {
-        if (properties == null) {
-            properties = BonitaHomeServer.getInstance().getPlatformProperties();
-        }
+        return (PlatformServiceAccessor) bosServiceAccessorFactory.createPlatformServiceAccessor();
     }
 
     public TenantServiceAccessor createTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException {
-        if (!tenantServiceAccessor.containsKey(tenantId)) {
-            initPropertiesIfNeeded();
-            final String tenantClassName = properties.getProperty("tenantClassName");
-            if (tenantClassName == null) {
-                throw new BonitaHomeConfigurationException("tenantClassName not set in bonita-platform.xml");
-            }
-            final Class<TenantServiceAccessor> tenantClass = ClassReflector.getClass(TenantServiceAccessor.class, tenantClassName);
-            final Constructor<TenantServiceAccessor> constructor = tenantClass.getConstructor(Long.class);
-            tenantServiceAccessor.put(tenantId, constructor.newInstance(tenantId));
-        }
-        return tenantServiceAccessor.get(tenantId);
+        return (TenantServiceAccessor) bosServiceAccessorFactory.createTenantServiceAccessor(tenantId);
     }
 
-    public SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException,
-            IOException, BonitaHomeConfigurationException {
-        if (sessionAccessorAccessor == null) {
-            initPropertiesIfNeeded();
-            final String sessionAccessorStr = properties.getProperty("sessionAccessor");
-            if (sessionAccessorStr == null) {
-                throw new BonitaHomeConfigurationException("sessionAccessor not set in bonita-platform.xml");
-            }
-            sessionAccessorAccessor = (SessionAccessorAccessor) Class.forName(sessionAccessorStr).newInstance();
-        }
-        return sessionAccessorAccessor.getSessionAccessor();
+    public SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException,
+            IllegalAccessException, ClassNotFoundException, IOException {
+        return bosServiceAccessorFactory.createSessionAccessor();
     }
 
 }
