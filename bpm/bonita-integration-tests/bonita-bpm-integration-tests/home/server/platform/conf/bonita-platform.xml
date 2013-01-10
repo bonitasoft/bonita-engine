@@ -3,9 +3,9 @@
 
 <properties>
     <comment>Bonita platform core configuration</comment>
-    <entry key="platformClassName">org.bonitasoft.engine.bpm.BPMServicesBuilder</entry>
-    <entry key="tenantClassName">org.bonitasoft.engine.bpm.BPMServicesBuilder</entry>
-    <entry key="sessionAccessor">org.bonitasoft.engine.bpm.BPMServicesBuilder</entry>
+    <entry key="platformClassName">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
+    <entry key="tenantClassName">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
+    <entry key="sessionAccessor">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
     <entry key="platformAdminUsername">platformAdmin</entry>
     <entry key="platformAdminPassword">platform</entry>
 
