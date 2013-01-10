@@ -365,8 +365,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.connector</groupId>
-			<artifactId>bonita-connector-executor-api-impl</artifactId>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-connector-executor-timedout</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
