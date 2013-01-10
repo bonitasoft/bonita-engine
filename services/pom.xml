@@ -30,6 +30,7 @@
 		<module>bonita-profile</module>
 		<module>bonita-scheduler</module>
 		<module>bonita-work</module>
+		<module>bonita-connector-executor-timedout</module>
 	</modules>
 
 	<profiles>

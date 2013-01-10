@@ -70,6 +70,14 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Connector -->
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-connector-executor-timedout</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+
 		<!-- Data -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.data</groupId>
@@ -83,7 +91,7 @@
 			<artifactId>bonita-data-instance-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Delete -->
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
@@ -250,8 +258,9 @@
 						<configuration>
 							<artifactSet>
 								<includes>
-									<include>com.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl-mybatis</include>
 									<include>com.bonitasoft.engine:bonita-delete-batch</include>
+									<include>com.bonitasoft.engine:bonita-connector-executor-timedout</include>
+									<include>com.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl-mybatis</include>
 									<include>com.bonitasoft.engine.command:bonita-command-model-impl-mybatis</include>
 									<include>com.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl-mybatis</include>
 									<include>com.bonitasoft.engine.core:bonita-instance-migration-impl-mybatis</include>

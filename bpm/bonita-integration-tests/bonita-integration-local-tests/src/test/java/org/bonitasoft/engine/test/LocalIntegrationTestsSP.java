@@ -12,7 +12,8 @@ import com.bonitasoft.engine.BPMSPTests;
     BPMSPTests.class,
     BPMLocalSuiteTests.class,
     LocalLogTest.class,
-    APIMethodSPTest.class
+    APIMethodSPTest.class,
+    ConnectorExecutionTimeOutTest.class
 })
 public class LocalIntegrationTestsSP {
 

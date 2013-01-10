@@ -252,6 +252,15 @@
 /services/bonita-command/bonita-command-model-impl-mybatis/.project
 /services/bonita-command/bonita-command-model-impl-mybatis/build
 
+
+# /services/bonita-connector-executor-timedout/
+/services/bonita-connector-executor-timedout/target
+/services/bonita-connector-executor-timedout/.settings
+/services/bonita-connector-executor-timedout/.classpath
+/services/bonita-connector-executor-timedout/.project
+/services/bonita-connector-executor-timedout/build
+
+
 # /services/bonita-data/
 /services/bonita-data/.settings
 /services/bonita-data/.project
