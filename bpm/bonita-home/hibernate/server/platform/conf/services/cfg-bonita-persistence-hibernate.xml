@@ -233,6 +233,7 @@
                 <entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="read-write"/>
             </map>
 		</constructor-arg>
 	</bean>
