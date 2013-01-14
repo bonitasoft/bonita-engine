@@ -37,13 +37,13 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final Map<String, Integer> rangeSizes;
+    private final Map<Long, Integer> rangeSizes;
 
     private final int rangeSize;
 
     public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final ReadSessionAccessor sessionAccessor, final boolean cacheEnabled, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
-            final MyBatisConfigurationsProvider configurations, final int rangeSize, final Map<String, Integer> rangeSizes,
+            final MyBatisConfigurationsProvider configurations, final int rangeSize, final Map<Long, Integer> rangeSizes,
             final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final TechnicalLoggerService technicalLoggerService)
             throws SPersistenceException {
         super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, rangeSize, dbConfigurationsProvider,

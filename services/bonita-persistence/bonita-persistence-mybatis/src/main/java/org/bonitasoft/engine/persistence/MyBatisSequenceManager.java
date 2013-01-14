@@ -25,7 +25,7 @@ import org.bonitasoft.engine.transaction.TechnicalTransaction;
  */
 public class MyBatisSequenceManager<T extends Sequence> extends SequenceManager<T, AbstractMybatisPersistenceService> {
 
-    public MyBatisSequenceManager(final AbstractMybatisPersistenceService persistenceService, final Integer rangeSize, final Map<String, Integer> rangeSizes,
+    public MyBatisSequenceManager(final AbstractMybatisPersistenceService persistenceService, final Integer rangeSize, final Map<Long, Integer> rangeSizes,
             final Class<T> sequenceClass, final String getSequenceQueryName, final boolean useTenant, final Map<String, Long> sequencesMappings) {
         super(persistenceService, rangeSizes, rangeSize, sequenceClass, getSequenceQueryName, useTenant, sequencesMappings);
     }

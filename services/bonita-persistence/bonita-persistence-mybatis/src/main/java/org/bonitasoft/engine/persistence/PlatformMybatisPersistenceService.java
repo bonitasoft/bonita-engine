@@ -32,8 +32,8 @@ public class PlatformMybatisPersistenceService extends AbstractMybatisPersistenc
 
     public PlatformMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final PlatformMyBatisConfigurationsProvider configurations,
-            final DBConfigurationsProvider dbConfigurationsProvider, final int rangeSize, final Map<String, Integer> rangeSizes,
-            final String statementDelimiter, final TechnicalLoggerService technicalLoggerService) throws SPersistenceException {
+            final DBConfigurationsProvider dbConfigurationsProvider, final int rangeSize, final Map<Long, Integer> rangeSizes, final String statementDelimiter,
+            final TechnicalLoggerService technicalLoggerService) throws SPersistenceException {
         super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, rangeSize, dbConfigurationsProvider,
                 statementDelimiter, technicalLoggerService);
         sequenceManager = new MyBatisSequenceManager<PlatformSequence>(this, rangeSize, rangeSizes, PlatformSequence.class, "getPlatformSequence", false,
