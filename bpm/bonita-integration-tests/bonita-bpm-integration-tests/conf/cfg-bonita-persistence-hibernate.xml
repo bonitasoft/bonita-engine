@@ -38,11 +38,21 @@
                 <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="10000"/>
                 <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="200000"/>
                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="1000"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" value="20000"/><!-- 20 step by process average -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" value="20000"/><!-- 20 step by process average -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" value="20000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" value="20000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" value="20000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" value="20000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" value="20000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" value="20000"/>
                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="20000"/><!-- same as activity instance -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="20000"/><!-- same as activity in average -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="3000"/> <!-- Process instance * nb state -->
-                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" value="80000"/> <!-- Activity instance * average nb state -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" value="80000"/> <!-- Activity instance * average nb state -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" value="80000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" value="80000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" value="80000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" value="80000"/>
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" value="40000"/><!-- transition instance * nb state -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" value="4000"/><!-- 1/5 of activity -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" value="4000"/>
@@ -76,7 +86,7 @@
                 <entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="20000"/>
                 <entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="20000"/>
                 <!-- less used objects -->
-                <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="100"/>
@@ -107,7 +117,7 @@
                 <entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl" value="100"/>
-			</map>
+            </map>
 	    </constructor-arg>
 		<constructor-arg ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
