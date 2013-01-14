@@ -160,6 +160,7 @@
 						<constructor-arg name="documentMappingService" ref="documentMappingService" />
 						<constructor-arg name="commentService" ref="commentService" />
 						<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
+						<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 					</bean>
 				</entry>
 				<entry key="PROCESSINSTANCE_DELETED">

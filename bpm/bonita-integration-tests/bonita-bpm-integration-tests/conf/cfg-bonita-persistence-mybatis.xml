@@ -29,9 +29,50 @@
 		<constructor-arg name="rangeSize" value="100" />
 		<constructor-arg name="rangeSizes">
             <map>
+            	<!-- Most used objects: range size depends on process design -->
                 <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="10000"/>
                 <entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="200000"/>
-                <!-- entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="1000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" value="20000"/><!-- 20 step by process average -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="20000"/><!-- same as activity instance -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="20000"/><!-- same as activity in average -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="3000"/> <!-- Process instance * nb state -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" value="80000"/> <!-- Activity instance * average nb state -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" value="40000"/><!-- transition instance * nb state -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" value="4000"/><!-- 1/5 of activity -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" value="4000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" value="4000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" value="4000"/>
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="4000"/><!-- 1/5 of activity -->
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="5000"/><!-- 5 data / process instance -->
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDATEDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstance" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="5000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" value="25000"/><!-- 5 change by data -->
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="25000"/>
+                <entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="20000"/>
+                <entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="20000"/>
+                <!-- less used objects -->
+                <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl" value="100"/>
+                <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="100"/>
@@ -50,53 +91,17 @@
                 <entry key="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SADataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDATEDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstance" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.document.model.impl.SDocumentImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl" value="100"/>
                 <entry key="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SADataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="100"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" value="100"/-->
             </map>
 		</constructor-arg>
 		<constructor-arg ref="dbConfigurationsProvider" />
