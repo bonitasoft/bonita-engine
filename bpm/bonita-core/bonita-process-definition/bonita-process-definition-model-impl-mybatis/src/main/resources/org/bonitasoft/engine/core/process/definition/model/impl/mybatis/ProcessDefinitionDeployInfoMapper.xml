@@ -73,7 +73,7 @@
 	</select>
 
 	<!-- Don't use cache for this query, as the flush does not seem to be called... -->
-	<select id="getProcessDeployInfosOnlyForUser" parameterType="long" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
+	<select id="getProcessesWithActorOnlyForUser" parameterType="long" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
 		SELECT DISTINCT proc_def.*
 		FROM process_definition proc_def,
 			 actor,
@@ -90,9 +90,148 @@
 			WHERE am2.userId != actormember.userId
 			AND actormember.tenantid = am2.tenantid
 		)
-		ORDER BY proc_def.processId ASC
+		ORDER BY proc_def.deploymentDate ASC
 	</select>
-		
+
+	<select id="getProcessesWithActorOnlyForUsers" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
+		SELECT DISTINCT proc_def.*
+		FROM process_definition proc_def,
+			 actor,
+			 actormember
+		WHERE proc_def.tenantid = #{tenantid}
+		AND actor.tenantid = proc_def.tenantid
+		AND actor.tenantid = actormember.tenantid
+		AND proc_def.processId = actor.scopeId
+		AND actor.id = actormember.actorId
+		AND actormember.userId IN
+		<foreach item="userId" index="index" collection="userIds" open="(" separator="," close=")">
+			#{userId}
+		</foreach>
+		AND actormember.actorId NOT IN (
+			SELECT actorId
+			FROM actormember am2
+			WHERE am2.userId NOT IN
+			<foreach item="userId" index="index" collection="userIds" open="(" separator="," close=")">
+				#{userId}
+			</foreach>
+		)
+		ORDER BY proc_def.deploymentDate ASC
+	</select>
+
+	<select id="getProcessesWithActorOnlyForRole" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
+		SELECT DISTINCT proc_def.*
+		FROM process_definition proc_def,
+			 actor,
+			 actormember
+		WHERE proc_def.tenantid = #{tenantid}
+		AND actor.tenantid = proc_def.tenantid
+		AND actor.tenantid = actormember.tenantid
+		AND actor.scopeId = proc_def.processId 
+		AND actor.id = actormember.actorId
+		AND actormember.roleId = #{roleId}
+		AND	actormember.actorId NOT IN (
+			SELECT am2.actorId
+			FROM actormember am2
+			WHERE am2.roleId != actormember.roleId
+		)
+		ORDER BY proc_def.deploymentDate ASC
+	</select>
+
+	<select id="getProcessesWithActorOnlyForRoles" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
+		SELECT DISTINCT proc_def.*
+		FROM process_definition proc_def,
+			 actor,
+			 actormember
+		WHERE proc_def.tenantid = #{tenantid}
+		AND actor.tenantid = proc_def.tenantid
+		AND actor.tenantid = actormember.tenantid
+		AND actor.scopeId = proc_def.processId 
+		AND actor.id = actormember.actorId
+		AND actormember.roleId IN
+		<foreach item="roleId" index="index" collection="roleIds" open="(" separator="," close=")">
+			#{roleId}
+		</foreach>
+		AND	actormember.actorId NOT IN (
+			SELECT am2.actorId
+			FROM actormember am2
+			WHERE am2.roleId NOT IN 
+			<foreach item="roleId" index="index" collection="roleIds" open="(" separator="," close=")">
+				#{roleId}
+			</foreach>
+		)
+		ORDER BY proc_def.deploymentDate ASC
+	</select>
+
+	<select id="getProcessesWithActorOnlyForGroup" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
+		SELECT DISTINCT proc_def.*
+		FROM process_definition proc_def,
+			 actor,
+			 actormember
+		WHERE proc_def.tenantid = #{tenantid}
+		AND actor.tenantid = proc_def.tenantid
+		AND actor.tenantid = actormember.tenantid
+		AND actor.scopeId = proc_def.processId 
+		AND actor.id = actormember.actorId
+		AND actormember.groupId IN (
+			SELECT groupe.id
+        	FROM group_ groupe,
+        		 group_ group0
+        	WHERE CONCAT(groupe.parentPath,CONCAT('/',CONCAT(groupe.name,'/'))) LIKE CONCAT(group0.parentPath,CONCAT('/',CONCAT(group0.name,'/%')))
+        	AND group0.id = #{groupId} 
+        )
+        AND actormember.actorId NOT IN (
+			SELECT am2.actorId
+			FROM actormember am2
+        	WHERE am2.groupId != actormember.groupId
+        	AND am2.groupId NOT IN (
+            	SELECT groupe.id
+                FROM group_ groupe,
+                	 group_ group0
+                WHERE CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE  CONCAT(group0.parentPath,'/',group0.name,'/','%')
+                AND group0.id = #{groupId} 
+			)
+		)
+		ORDER BY proc_def.deploymentDate ASC
+	</select>
+
+	<select id="getProcessesWithActorOnlyForGroups" resultMap="processDefinitionDeployInfoResultMap" useCache="false">
+		SELECT DISTINCT proc_def.*
+		FROM process_definition proc_def,
+			 actor,
+			 actormember
+		WHERE proc_def.tenantid = #{tenantid}
+		AND actor.tenantid = proc_def.tenantid
+		AND actor.tenantid = actormember.tenantid
+		AND actor.scopeId = proc_def.processId 
+		AND actor.id = actormember.actorId
+		AND actormember.groupId IN (
+			SELECT groupe.id
+        	FROM group_ groupe,
+        		 group_ AS group0
+        	WHERE CONCAT(groupe.parentPath,CONCAT('/',CONCAT(groupe.name,'/'))) LIKE CONCAT(group0.parentPath,CONCAT('/',CONCAT(group0.name,'/%')))
+        	AND group0.id IN 
+        	<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+				#{groupId}
+			</foreach>
+        )
+        AND actormember.actorId NOT IN (
+			SELECT am2.actorId
+			FROM actormember am2
+        	WHERE am2.groupId != actormember.groupId
+        	AND am2.groupId NOT IN (
+            	SELECT groupe.id
+            	FROM group_ groupe,
+                  	 group_ group0
+				WHERE CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE  CONCAT(group0.parentPath,'/',group0.name,'/','%')
+				AND group0.id IN 
+				<foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">
+					#{groupId}
+				</foreach>
+			)
+		)
+		ORDER BY proc_def.deploymentDate ASC
+	</select>
+
 	<select id="getProcessDefinitionIdByNameAndVersion" parameterType="list" resultType="long">
 		SELECT proc_def.processId
 		FROM process_definition proc_def
@@ -130,6 +269,38 @@
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
+	</select>
+
+	<select id="getProcessDefinitionsOnlyRole" parameterType="map" resultType="long">
+		SELECT DISTINCT proc_def
+		FROM actor,
+			 actormember,
+			 process_definition proc_def
+		WHERE proc_def.tenantid = #{tenantid}
+		AND actor.scopeId = process_definition.processId 
+		AND actor.id = actormember.actorId
+		AND actormember.roleId = #{roleId}
+		AND	actormember.actorId NOT IN (
+				SELECT am2.actorId
+				FROM actormember AS am2
+				WHERE am2.roleId != actormember.roleId
+				)
+	</select>
+	
+	<select id="getProcessDefinitionsOnlyRoleMulti" parameterType="list" resultType="map">
+		SELECT DISTINCT proc_def.id AS "PDDI", actormember.roleId AS "roleId"
+		FROM actor,
+			 actormember,
+			 process_definition proc_def
+		WHERE proc_def.tenantid = #{tenantid}
+		AND actor.scopeId = proc_def.processId 
+		AND actor.id = actormember.actorId
+		AND actormember.roleId IN :roleIds
+		AND	actormember.actorId NOT IN (
+				SELECT am2.actorId
+				FROM actormember AS am2
+				WHERE am2.roleId != actormember.roleId
+				)
 	</select>
 	
 	<select id="getNumberOfSProcessDefinitionDeployInfoUnrelatedToCategory" parameterType="long" resultType="long">
