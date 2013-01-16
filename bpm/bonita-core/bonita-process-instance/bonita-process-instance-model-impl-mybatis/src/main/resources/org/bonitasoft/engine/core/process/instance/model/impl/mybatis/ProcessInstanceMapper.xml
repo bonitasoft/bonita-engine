@@ -4,9 +4,9 @@
 <mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl">
 
 	<insert id="insertSProcessInstanceImpl" parameterType="process_instance">
-		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, interruptingEventId, tokenCount, processDefinitionId, description, startDate, startedBy, endDate, stateId,
+		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, callerType, interruptingEventId, tokenCount, processDefinitionId, description, startDate, startedBy, endDate, stateId,
 			stateCategory, lastUpdate, migration_plan)
-		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.interruptingEventId}, #{entity.tokenCount}, #{entity.processDefinitionId},
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.callerType}, #{entity.interruptingEventId}, #{entity.tokenCount}, #{entity.processDefinitionId},
 			#{entity.description}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId})
 	</insert>
 
@@ -58,6 +58,7 @@
 		<result property="description" column="description" />
 		<result property="stateId" column="stateId" />
 		<result property="stateCategory" column="stateCategory" />
+		<result property="callerType" column="callerType" />
 		<result property="startDate" column="startDate" />
 		<result property="endDate" column="endDate" />
 		<result property="startedBy" column="startedBy" />

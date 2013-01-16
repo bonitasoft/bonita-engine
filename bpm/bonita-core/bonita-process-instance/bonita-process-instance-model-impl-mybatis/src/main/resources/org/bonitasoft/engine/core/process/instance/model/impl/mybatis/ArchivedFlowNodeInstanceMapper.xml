@@ -8,6 +8,7 @@
 		 terminal, stable, lastUpdateDate, reachedStateDate, aborting, logicalGroup1, logicalGroup2, logicalGroup3, logicalGroup4, sourceObjectId, description, executedBy
 		<if test="kind == 'user' or kind == 'manual'">, priority, expectedEndDate, actorId, assigneeId</if>
 		<if test="kind == 'loop'">, loop_counter, loop_max</if>
+		<if test="kind == 'subProc'">, triggeredByEvent</if>
 		)
 		VALUES
 		(#{tenantid}, #{entity.id}, #{kind}, #{entity.rootContainerId}, #{entity.parentContainerId}, #{entity.name},
@@ -15,6 +16,7 @@
 		#{entity.reachedStateDate}, #{entity.aborting}, #{entity.logicalGroup1}, #{entity.logicalGroup2}, #{entity.logicalGroup3}, #{entity.logicalGroup4}, #{entity.sourceObjectId}, #{entity.description}, #{entity.executedBy}
 		<if test="kind == 'user' or kind == 'manual'">, #{entity.priority, javaType=org.bonitasoft.engine.core.process.instance.model.STaskPriority, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{entity.expectedEndDate}, #{entity.actorId}, #{entity.assigneeId}</if>
 		<if test="kind == 'loop'">, #{entity.loopCounter}, #{entity.loopMax}</if> 
+		<if test="kind == 'subProc'">, #{entity.triggeredByEvent}</if> 
 		)
 	</insert>
 
@@ -50,6 +52,9 @@
 			<case value="auto" resultType="arch_automatic_task_instance">
 			</case>
 			<case value="call" resultType="arch_call_activity_instance">
+			</case>
+			<case value="subProc" resultType="arch_sub_process_activity_instance">
+				<result property="triggeredByEvent" column="triggeredByEvent" />
 			</case>
 			<case value="user" resultType="arch_user_task_instance">
 				<result property="priority" column="priority" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />

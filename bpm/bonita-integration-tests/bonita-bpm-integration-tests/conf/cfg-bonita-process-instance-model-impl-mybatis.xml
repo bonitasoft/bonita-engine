@@ -14,6 +14,7 @@
 				<entry key="loop_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" />
 				<entry key="multi_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" />
 				<entry key="call_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" />
+				<entry key="sub_process_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" />
 				<entry key="flownode_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
 				<entry key="gateway_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
 				<entry key="transition_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
@@ -65,6 +66,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" value="10011" />
@@ -97,6 +99,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="f" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="f" />
@@ -170,6 +173,12 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="call" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl.insertSSubProcessActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.insertSFlowNodeInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="subProc" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.insertSGatewayInstanceImpl" />
@@ -290,6 +299,10 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl.updateSSubProcessActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.updateSGatewayInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.updateSFlowNodeInstanceImpl" />
 				</bean>
@@ -351,6 +364,10 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl.deleteSCallActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl.deleteSSubProcessActivityInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.deleteSFlowNodeInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -567,6 +584,11 @@
 					<constructor-arg name="sourceStatement"
 						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl.getWaitingMessageEventById" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getWaitingMessageEventById" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl.getCaughtErrorByRelatedActivityAndErrorCode" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl.getCaughtErrorByRelatedActivityAndErrorCode" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl.getListeningSignals" />
@@ -1184,6 +1206,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
@@ -1224,6 +1247,7 @@
 				<entry key="arch_manual_task_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" />
 				<entry key="arch_loop_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" />
 				<entry key="arch_call_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" />
+				<entry key="arch_sub_process_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl" />
 				<entry key="arch_flow_node_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
 				<entry key="arch_start_event_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
 				<entry key="arch_end_event_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
@@ -1247,6 +1271,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" value="20011" />
@@ -1264,6 +1289,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" value="af" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="af" />
@@ -1289,6 +1315,13 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.insertAActivityInstanceImpl" />
 					<constructor-arg name="parameterName" value="kind" />
 					<constructor-arg name="parameterValue" value="call" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement"
+						value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl.insertSASubProcessActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.insertAActivityInstanceImpl" />
+					<constructor-arg name="parameterName" value="kind" />
+					<constructor-arg name="parameterValue" value="subProc" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl.insertSAUserTaskInstanceImpl" />
@@ -1356,6 +1389,10 @@
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl.deleteSACallActivityInstanceImpl" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
+				</bean>
+				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl.deleteSASubProcessActivityInstanceImpl" />
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl.deleteAActivityInstanceImpl" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
@@ -1549,6 +1586,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />

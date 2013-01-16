@@ -15,6 +15,7 @@
 		<if test="kind == 'multi'">, sequential, loopDataInputRef, loopDataOutputRef, dataInputItemRef,
 		 dataOutputItemRef, loopCardinality, nbActiveInst, nbCompletedInst, nbTerminatedInst, abortedByBoundary</if>
 		<if test="kind == 'boundaryEvent'">, activityInstanceId</if>
+		<if test="kind == 'subProc'">, triggeredByEvent</if>
 		)
 		VALUES
 		(#{tenantid}, #{entity.id}, #{kind}, #{entity.rootContainerId}, #{entity.parentContainerId}, #{entity.name}, #{entity.description},
@@ -31,6 +32,7 @@
 				, #{entity.dataInputItemRef}, #{entity.dataOutputItemRef}, #{entity.loopCardinality}, #{entity.numberOfActiveInstances}, #{entity.numberOfCompletedInstances}, 
 				#{entity.numberOfTerminatedInstances}, #{entity.abortedByBoundary}</if>
 		<if test="kind == 'boundaryEvent'">, #{entity.activityInstanceId}</if>
+		<if test="kind == 'subProc'">, #{entity.triggeredByEvent}</if> 
 		)
 	</insert>
 
@@ -115,6 +117,9 @@
 			</case>
 			<case value="call" resultType="call_activity_instance">
 				<result property="abortedByBoundary" column="abortedByBoundary" />
+			</case>
+			<case value="subProc" resultType="sub_process_activity_instance">
+				<result property="triggeredByEvent" column="triggeredByEvent" />
 			</case>
 			<case value="user" resultType="user_task_instance">
 				<result property="actorId" column="actorId" />

@@ -190,6 +190,7 @@
 		<constructor-arg name="workService" ref="workService"/>
 		<constructor-arg name="processInstanceService" ref="processInstanceService"/>
 		<constructor-arg name="lockService" ref="lockService"/>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="processInstanceStateManager" class="org.bonitasoft.engine.execution.ProcessInstanceStateManagerImpl" />
