@@ -186,6 +186,20 @@
 			ORDER BY ${orderBy}
 		</if>
 	</select>
+	
+	<select id="getNumberOfActivitiesFromProcessInstance" parameterType="long" resultType="long">
+		SELECT COUNT(f.id)
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.rootContainerId = #{rootContainerId}
+		AND f.kind IN ('user', 'manual', 'auto', 'call', 'loop', 'multi')
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+
 
 	<select id="getFlowNodesFromProcessInstance" parameterType="long" resultMap="flowNodeInstanceResultMap">
 		SELECT *
