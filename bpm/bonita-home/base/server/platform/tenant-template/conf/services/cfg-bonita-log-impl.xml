@@ -1,33 +1,43 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.QueriableLoggerServiceOptions">
-		<constructor-arg name="loggableLevels">
-			<list>
-				<value>IDENTITY_USER_CREATED:INTERNAL</value>
-				<value>IDENTITY_USER_UPDATED:INTERNAL</value>
-				<value>IDENTITY_USER_DELETED:INTERNAL</value>
-				<value>execute_connector:BUSINESS</value>
-			</list>
-		</constructor-arg>
-	</bean>
+	<bean id="loggerServiceConfiguration" class="org.bonitasoft.engine.log.api.impl.QueriableLoggerServiceOptions" >
+        <constructor-arg name="loggableLevels">
+            <list>
+                <value>IDENTITY_USER_CREATED:INTERNAL</value>
+                <value>IDENTITY_USER_UPDATED:INTERNAL</value>
+                <value>IDENTITY_USER_DELETED:INTERNAL</value>
+                <value>execute_connector:BUSINESS</value>
+            </list>
+        </constructor-arg>
+    </bean>
 
-	<bean id="syncQueriableLogService" class="org.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
+	<bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="builder" ref="logModelBuilder" />
 		<constructor-arg name="loggerConfiguration" ref="loggerServiceConfiguration" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="delayable" value="false" />
 	</bean>
 
-	<bean id="asyncQueriableLogService" class="org.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
+	<bean id="asyncQueriableLoggerService" class="org.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="builder" ref="logModelBuilder" />
 		<constructor-arg name="loggerConfiguration" ref="loggerServiceConfiguration" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="delayable" value="false" />
+	</bean>
+
+	<bean id="deleteRegister" class="org.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="cronExpression" value="* * * * *" />
 	</bean>
 
 </beans>

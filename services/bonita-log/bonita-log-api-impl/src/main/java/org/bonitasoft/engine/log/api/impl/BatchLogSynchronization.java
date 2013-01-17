@@ -3,6 +3,7 @@ package org.bonitasoft.engine.log.api.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -18,26 +19,35 @@ public class BatchLogSynchronization implements Synchronization {
 
     private Exception exception;
 
-    public BatchLogSynchronization(final PersistenceService persistenceService) {
+    private final boolean delayable;
+
+    public BatchLogSynchronization(final PersistenceService persistenceService, final boolean delayable) {
         super();
         this.persistenceService = persistenceService;
+        this.delayable = delayable;
     }
 
     @Override
-    public void afterCompletion(final int arg0) {
-        // NOTHING
+    public void afterCompletion(final int transactionStatus) {
+        if (delayable && Status.STATUS_COMMITTED == transactionStatus) {
+            BatchLogBuffer.getInstance().addLogs(logs);
+            final InsertBatchLogsJobRegister register = InsertBatchLogsJobRegister.getInstance();
+            register.registerJobIfNotRegistered();
+        }
     }
 
     @Override
     public void beforeCompletion() {
-        if (logs != null && !logs.isEmpty()) {
-            try {
-                persistenceService.insertInBatch(new ArrayList<PersistentObject>(logs));
-            } catch (final SPersistenceException e) {
-                exception = e;
-                // FIXME what to do?
-            } finally {
-                logs.clear();
+        if (!delayable) {
+            if (logs != null && !logs.isEmpty()) {
+                try {
+                    persistenceService.insertInBatch(new ArrayList<PersistentObject>(logs));
+                } catch (final SPersistenceException e) {
+                    exception = e;
+                    // FIXME what to do?
+                } finally {
+                    logs.clear();
+                }
             }
         }
     }

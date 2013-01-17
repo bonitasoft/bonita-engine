@@ -34,19 +34,19 @@ public class CheckParameterProblems implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        List<SParameter> paramters;
+        List<SParameter> parameters;
         problems = new ArrayList<Problem>();
         int i = 0;
         do {
-            paramters = parameterService.get(processId, i, 100, OrderBy.NAME_ASC);
+            parameters = parameterService.getNullValues(processId, i, 100, OrderBy.NAME_ASC);
             i += 100;
-            for (final SParameter parameter : paramters) {
+            for (final SParameter parameter : parameters) {
                 if (parameter.getValue() == null) {
                     final Problem problem = new ProblemImpl(Level.ERROR, null, "parameter", "Parameter" + parameter.getName() + " is not set");
                     problems.add(problem);
                 }
             }
-        } while (paramters.size() == 100);
+        } while (parameters.size() == 100);
     }
 
     public List<Problem> getProblems() {

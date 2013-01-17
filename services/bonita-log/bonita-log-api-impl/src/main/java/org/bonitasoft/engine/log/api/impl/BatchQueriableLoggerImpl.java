@@ -15,13 +15,13 @@ package org.bonitasoft.engine.log.api.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerServiceConfiguration;
-import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.impl.AbstractQueriableLoggerImpl;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -39,25 +39,22 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
 
     private final TechnicalLoggerService logger;
 
-    /**
-     * @param persistenceService
-     * @param builder
-     * @param loggerConfiguration
-     * @param sessionProvider
-     */
+    private final boolean delayable;
+
     public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
             final SQueriableLogModelBuilder builder, final QueriableLoggerServiceConfiguration loggerConfiguration,
-            final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger) {
+            final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger, final Boolean delayable) {
         super(persistenceService, builder, loggerConfiguration, sessionProvider);
         this.persistenceService = persistenceService;
         this.transactionService = transactionService;
         this.logger = logger;
+        this.delayable = delayable;
     }
 
     private synchronized BatchLogSynchronization getBatchLogSynchronization() throws STransactionNotFoundException {
         BatchLogSynchronization synchro = synchronizations.get();
         if (synchro == null) {
-            synchro = new BatchLogSynchronization(persistenceService);
+            synchro = new BatchLogSynchronization(persistenceService, delayable);
             transactionService.getTransaction().registerSynchronization(synchro);
         }
         return synchro;

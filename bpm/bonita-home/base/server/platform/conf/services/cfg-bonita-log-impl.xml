@@ -19,6 +19,7 @@
 		<constructor-arg name="loggerConfiguration" ref="loggerServiceConfiguration" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="delayable" value="false" />
 	</bean>
 
 	<bean id="asyncQueriableLoggerService" class="org.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
@@ -28,6 +29,15 @@
 		<constructor-arg name="loggerConfiguration" ref="loggerServiceConfiguration" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="delayable" value="false" />
+	</bean>
+
+	<bean id="deleteRegister" class="org.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="cronExpression" value="* * * * *" />
 	</bean>
 
 </beans>

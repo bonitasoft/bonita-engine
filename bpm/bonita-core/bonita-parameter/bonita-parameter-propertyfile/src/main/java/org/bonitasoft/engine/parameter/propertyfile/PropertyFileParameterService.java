@@ -138,7 +138,7 @@ public class PropertyFileParameterService implements ParameterService {
         return pathBuilder.toString();
     }
 
-    private List<SParameter> getListProperties(final String fileName) throws IOException {
+    private List<SParameter> getListProperties(final String fileName, final boolean onlyNulls) throws IOException {
         final Properties properties = PropertiesManager.getProperties(fileName);
         final List<SParameter> paramters = new ArrayList<SParameter>();
         for (final Entry<Object, Object> property : properties.entrySet()) {
@@ -146,12 +146,16 @@ public class PropertyFileParameterService implements ParameterService {
             if (NULL.equals(value)) {
                 value = null;
             }
-            paramters.add(new SParameterImpl(property.getKey().toString(), value));
+            if (!onlyNulls) {
+                paramters.add(new SParameterImpl(property.getKey().toString(), value));
+            } else if (value == null) {
+                paramters.add(new SParameterImpl(property.getKey().toString(), value));
+            }
         }
         return paramters;
     }
 
-    private List<SParameter> getOrderedParameters(final String filePath, final OrderBy order) throws IOException {
+    private List<SParameter> getOrderedParameters(final String filePath, final OrderBy order, final boolean onlyNulls) throws IOException {
         final Comparator<SParameter> sorting;
         switch (order) {
             case NAME_DESC:
@@ -161,7 +165,7 @@ public class PropertyFileParameterService implements ParameterService {
                 sorting = new NameAscComparator(NULL);
                 break;
         }
-        final List<SParameter> parameters = getListProperties(filePath);
+        final List<SParameter> parameters = getListProperties(filePath, onlyNulls);
         final List<SParameter> sortedList = new ArrayList<SParameter>(parameters);
         Collections.sort(sortedList, sorting);
         return sortedList;
@@ -224,9 +228,20 @@ public class PropertyFileParameterService implements ParameterService {
     @Override
     public List<SParameter> get(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order)
             throws SParameterProcessNotFoundException, SOutOfBoundException {
+        return getParameters(processDefinitionId, fromIndex, numberOfResult, order, false);
+    }
+
+    @Override
+    public List<SParameter> getNullValues(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order)
+            throws SParameterProcessNotFoundException, SOutOfBoundException {
+        return getParameters(processDefinitionId, fromIndex, numberOfResult, order, true);
+    }
+
+    private List<SParameter> getParameters(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order,
+            final boolean onlyNulls) throws SParameterProcessNotFoundException, SOutOfBoundException {
         try {
             final String filePath = getFilePath(processDefinitionId);
-            final List<SParameter> orderedParameters = getOrderedParameters(filePath, order);
+            final List<SParameter> orderedParameters = getOrderedParameters(filePath, order, onlyNulls);
 
             final int numberOfParameters = orderedParameters.size();
             if (fromIndex != 0 && numberOfParameters <= fromIndex) {
@@ -246,13 +261,6 @@ public class PropertyFileParameterService implements ParameterService {
         } catch (final IOException e) {
             throw new SParameterProcessNotFoundException(e);
         }
-    }
-
-    @Override
-    public List<SParameter> getNullValues(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order)
-            throws SParameterProcessNotFoundException, SOutOfBoundException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }
