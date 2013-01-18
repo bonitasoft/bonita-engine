@@ -16,7 +16,7 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="queriableLoggerServiceConfig" class="org.bonitasoft.engine.MockQueriableLoggerServiceConfigurationImpl" />
+	<bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.MockQueriableLoggerStrategy" />
 
 	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.MockQueriableLogSessionProviderImpl" />
 

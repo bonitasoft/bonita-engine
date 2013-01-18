@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,16 +13,19 @@
  **/
 package org.bonitasoft.engine.log.api.impl;
 
-import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.services.QueriableLoggerServiceConfiguration;
+import org.bonitasoft.engine.services.QueriableLoggerStrategy;
 
-public class QueriableLoggerServiceOptions implements QueriableLoggerServiceConfiguration {
+/**
+ * @author Matthieu Chaffotte
+ */
+public class MapQueriableLoggerStrategy implements QueriableLoggerStrategy {
 
-    private final List<String> loggableLevels;
+    private final Map<String, Boolean> loggableLevels;
 
-    public QueriableLoggerServiceOptions(final List<String> loggableLevels) {
+    public MapQueriableLoggerStrategy(final Map<String, Boolean> loggableLevels) {
         this.loggableLevels = loggableLevels;
     }
 
@@ -31,10 +34,13 @@ public class QueriableLoggerServiceOptions implements QueriableLoggerServiceConf
         if (System.getProperty("org.bonitasoft.engine.services.queryablelog.disable") != null) {
             return false;
         }
-        if (loggableLevels == null || loggableLevels.isEmpty()) {
-            return false;
+
+        final String actionSeverity = actionType + ":" + severity;
+        final Boolean isLoggable = loggableLevels.get(actionSeverity);
+        if (isLoggable == null) {
+            throw new RuntimeException("The action type '" + actionType + "' with the severity '" + severity.name() + "' is not known as loggable.");
         }
-        return loggableLevels.contains(actionType + ":" + severity);
+        return isLoggable;
     }
 
 }

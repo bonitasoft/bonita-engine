@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,13 +21,14 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
-import org.bonitasoft.engine.services.QueriableLoggerServiceConfiguration;
+import org.bonitasoft.engine.services.QueriableLoggerStrategy;
 import org.bonitasoft.engine.services.impl.AbstractQueriableLoggerImpl;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
 
@@ -42,9 +43,9 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     private final boolean delayable;
 
     public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
-            final SQueriableLogModelBuilder builder, final QueriableLoggerServiceConfiguration loggerConfiguration,
-            final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger, final Boolean delayable) {
-        super(persistenceService, builder, loggerConfiguration, sessionProvider);
+            final SQueriableLogModelBuilder builder, final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
+            final TechnicalLoggerService logger, final Boolean delayable) {
+        super(persistenceService, builder, loggerStrategy, sessionProvider);
         this.persistenceService = persistenceService;
         this.transactionService = transactionService;
         this.logger = logger;
