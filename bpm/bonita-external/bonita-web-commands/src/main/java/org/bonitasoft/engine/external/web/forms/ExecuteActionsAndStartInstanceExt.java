@@ -134,11 +134,9 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             }
             sDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
         } catch (final SProcessDefinitionNotFoundException e) {
-            log(tenantAccessor, e);
-            throw new ProcessDefinitionNotFoundException(e.getMessage());
+            throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
-            throw new ProcessDefinitionReadException(e.getMessage());
+            throw new ProcessDefinitionReadException(e);
         }
 
         SProcessInstance startedInstance;

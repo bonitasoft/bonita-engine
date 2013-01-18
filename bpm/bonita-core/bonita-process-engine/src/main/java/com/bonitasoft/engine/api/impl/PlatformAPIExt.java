@@ -19,8 +19,6 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.ActivateTenant;
-import org.bonitasoft.engine.api.impl.transaction.CreateDefaultCommand;
-import org.bonitasoft.engine.api.impl.transaction.CreateDefaultDataSource;
 import org.bonitasoft.engine.api.impl.transaction.CreateDefaultPrivileges;
 import org.bonitasoft.engine.api.impl.transaction.CreateDefaultProfiles;
 import org.bonitasoft.engine.api.impl.transaction.CreateTenant;
@@ -145,21 +143,18 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final String message = "Tenant named \"" + tenantName + "\" already exists!";
             throw new TenantAlreadyExistException(message);
         } catch (final STenantNotFoundException e) {
-            try {
-                return create(tenantName, description, iconName, iconPath, username, password, false);
-            } catch (final STenantCreationException stce) {
-                throw new TenantCreationException(stce);
-            }
+            // ok
         } catch (final TenantAlreadyExistException e) {
             throw e;
         } catch (final Exception e) {
             log(platformAccessor, e, TechnicalLogSeverity.ERROR);
             throw new TenantCreationException(e);
         }
+        return create(tenantName, description, iconName, iconPath, username, password, false);
     }
 
     private long create(final String tenantName, final String description, final String iconName, final String iconPath, final String userName,
-            final String password, final boolean isDefault) throws STenantCreationException, PlatformNotStartedException {
+            final String password, final boolean isDefault) throws TenantCreationException, PlatformNotStartedException {
         PlatformServiceAccessor platformAccessor = null;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
@@ -206,27 +201,32 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final SDataSourceModelBuilder sDataSourceModelBuilder = platformAccessor.getTenantServiceAccessor(tenantId).getSDataSourceModelBuilder();
             final DataService dataService = platformAccessor.getTenantServiceAccessor(tenantId).getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final CreateDefaultDataSource createDefaultDataSource = new CreateDefaultDataSource(sDataSourceModelBuilder, dataService, sessionService, tenantId,
-                    userName);
-            transactionExecutor.execute(createDefaultDataSource);
             final CommandService commandService = platformAccessor.getTenantServiceAccessor(tenantId).getCommandService();
-            final CreateDefaultCommand createDefaultCommand = new CreateDefaultCommand(commandService, sessionService, tenantId, userName);
-            transactionExecutor.execute(createDefaultCommand);
-
-            // TODO put this transaction in a handler
             final ProfileService profileService = platformAccessor.getTenantServiceAccessor(tenantId).getProfileService();
-            final CreateDefaultProfiles createDefaultProfiles = new CreateDefaultProfiles(profileService, sessionService, tenantId, userName);
-            transactionExecutor.execute(createDefaultProfiles);
-
             final PrivilegeService privilegeService = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeService();
             final PrivilegeBuilders privilegeBuilders = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeBuilders();
-            final CreateDefaultPrivileges createDefaultPrivileges = new CreateDefaultPrivileges(privilegeService, privilegeBuilders, sessionService, tenantId,
-                    userName);
-            transactionExecutor.execute(createDefaultPrivileges);
-            return tenantId;
+            transactionExecutor.openTransaction();
+            try {
+
+                final SSession session = sessionService.createSession(tenantId, userName);
+
+                createDefaultDataSource(sessionService, sDataSourceModelBuilder, dataService, tenantId, userName);
+
+                commandService.createDefaultCommands();
+                final CreateDefaultProfiles createDefaultProfiles = new CreateDefaultProfiles(profileService);
+                createDefaultProfiles.execute();
+
+                final CreateDefaultPrivileges createDefaultPrivileges = new CreateDefaultPrivileges(privilegeService, privilegeBuilders);
+                createDefaultPrivileges.execute();
+
+                sessionService.deleteSession(session.getId());
+
+                return tenantId;
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
         } catch (final Exception e) {
-            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
-            throw new STenantCreationException("Unable to create tenant " + tenantName, e);
+            throw new TenantCreationException("Unable to create tenant " + tenantName, e);
         }
     }
 

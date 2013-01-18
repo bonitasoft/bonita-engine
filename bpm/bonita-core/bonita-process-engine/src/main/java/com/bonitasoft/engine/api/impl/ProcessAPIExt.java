@@ -37,7 +37,6 @@ import org.bonitasoft.engine.api.impl.transaction.GetProcessDeploymentInfo;
 import org.bonitasoft.engine.api.impl.transaction.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.RemoveActorPrivilegeById;
 import org.bonitasoft.engine.api.impl.transaction.ResolveProcessAndCreateDependencies;
-import org.bonitasoft.engine.api.impl.transaction.StoreProcess;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.model.ConfigurationState;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
@@ -221,22 +220,32 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
         final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
         // create the runtime process definition
-        final SProcessDefinition sDefinition = createDefinition(tenantAccessor, processDefinitionService, bpmDefinitionBuilders, transactionExecutor,
-                processDefinition, sExpressionBuilders, sDataDefinitionBuilders, sOperationBuilders);
+        final SProcessDefinition sDefinition = bpmDefinitionBuilders.getProcessDefinitionBuilder()
+                .createNewInstance(processDefinition, sExpressionBuilders, sDataDefinitionBuilders, sOperationBuilders).done();
         try {
-            unzipBar(businessArchive, sDefinition, transactionExecutor, tenantAccessor.getTenantId());// TODO first unzip in temp folder
-            final boolean isResolved = resolveDependencies(businessArchive, tenantAccessor, sDefinition);
-            if (isResolved) {
-                transactionExecutor.execute(new ResolveProcessAndCreateDependencies(processDefinitionService, sDefinition.getId(), dependencyService,
-                        dependencyBuilderAccessor, businessArchive));
+            transactionExecutor.openTransaction();
+            try {
+                processDefinitionService.store(sDefinition, processDefinition.getDisplayName(), processDefinition.getDisplayDescription());
+                unzipBar(businessArchive, sDefinition, transactionExecutor, tenantAccessor.getTenantId());// TODO first unzip in temp folder
+                // TODO refactor this to avoid using transaction executor inside
+                final boolean isResolved = resolveDependencies(businessArchive, tenantAccessor, sDefinition);
+                if (isResolved) {
+                    transactionExecutor.execute(new ResolveProcessAndCreateDependencies(processDefinitionService, sDefinition.getId(), dependencyService,
+                            dependencyBuilderAccessor, businessArchive));
+                }
+            } catch (final BonitaHomeNotSetException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ProcessDeployException(e);
+            } catch (final IOException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ProcessDeployException(e);
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ProcessDeployException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
             }
-        } catch (final BonitaHomeNotSetException e) {
-            log(tenantAccessor, e);
-            throw new ProcessDeployException(e.getMessage());
-        } catch (final IOException e) {
-            log(tenantAccessor, e);
-            throw new ProcessDeployException(e.getMessage());
-        } catch (final SBonitaException e) {
+        } catch (final STransactionException e) {
             throw new ProcessDeployException(e);
         }
         return ModelConvertor.toProcessDefinition(sDefinition);
@@ -334,33 +343,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             file.mkdirs();
         }
         final File processFolder = new File(file, String.valueOf(sDefinition.getId()));
-        try {
-            try {
-                transactionExecutor.openTransaction();
-                BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
-            } finally {
-                transactionExecutor.completeTransaction();
-            }
-        } catch (final STransactionException e) {
-            throw new ProcessDeployException(e);
-        }
-    }
-
-    private SProcessDefinition createDefinition(final TenantServiceAccessor tenantAccessor, final ProcessDefinitionService processDefinitionService,
-            final BPMDefinitionBuilders bpmDefinitionBuilders, final TransactionExecutor transactionExecutor, final DesignProcessDefinition processDefinition,
-            final SExpressionBuilders sExpressionBuilders, final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders)
-            throws ProcessDeployException {
-        final SProcessDefinition sDefinition = bpmDefinitionBuilders.getProcessDefinitionBuilder()
-                .createNewInstance(processDefinition, sExpressionBuilders, sDataDefinitionBuilders, sOperationBuilders).done();
-        try {
-            final StoreProcess storeProcess = new StoreProcess(processDefinitionService, sDefinition, processDefinition.getDisplayName(),
-                    processDefinition.getDisplayDescription());
-            transactionExecutor.execute(storeProcess);
-        } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
-            throw new ProcessDeployException(e.getMessage());
-        }
-        return sDefinition;
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
     }
 
     private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {

@@ -505,21 +505,6 @@
 		</if>
 	</select>
 	
-	<select id="getPreviousState" resultMap="archivedFlownodeInstanceResultMap">
-		SELECT af.*
-		FROM arch_flownode_instance af,flownode_instance f
-		WHERE af.tenantid = #{tenantid}
-		AND f.tenantid = #{tenantid} 
-		AND f.id = #{activityInstanceId}
-		AND f.id = af.sourceObjectId
-		AND af.archiveDate = (
-	    	SELECT MAX(aai.archiveDate) 
-	        FROM arch_flownode_instance AS aai
-	        WHERE f.id = aai.sourceObjectId
-	        AND aai.tenantid = f.tenantid
-	    )
-	</select>
-	
 	
 	<select id="getArchivedFlowNodesFromProcessInstance" parameterType="long" resultMap="archivedFlownodeInstanceResultMap">
 		SELECT af.*
