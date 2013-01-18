@@ -7,9 +7,9 @@
 			<bean class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory" />
 		</constructor-arg>
 		<constructor-arg name="corePoolSize" value="20" />
-		<constructor-arg name="maximumPoolSize" value="100" />
+		<constructor-arg name="maximumPoolSize" value="20" />
 		<constructor-arg name="keepAliveTimeSeconds" value="60" />
-		<constructor-arg name="queueCapacity" value="5" />
+		<constructor-arg name="queueCapacity" value="10000" />
 		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
