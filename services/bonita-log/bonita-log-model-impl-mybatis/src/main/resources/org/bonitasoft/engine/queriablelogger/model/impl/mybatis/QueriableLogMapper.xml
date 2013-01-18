@@ -5,16 +5,15 @@
 
 	<insert id="insertSQueriableLogImpl" parameterType="log">
 		INSERT INTO queriable_log (tenantid, id, timeStamp, year, month, day, hour, minute, second, millisecond, dayOfWeek, dayOfYear, weekOfYear, userId,
-			clientIP, threadNumber, clusterNode, applicationName, domain, productVersion, clientApplicationName, severity, actionType, actionScope,
+			threadNumber, clusterNode, productVersion, severity, actionType, actionScope,
 			actionStatus, rawMessage, callerClassName, callerMethodName, numericIndex1, numericIndex2, numericIndex3, numericIndex4, numericIndex5,
 			textualIndex1, textualIndex2, textualIndex3, textualIndex4, textualIndex5)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.timeStamp}, #{entity.year}, #{entity.month}, #{entity.day}, #{entity.hour}, #{entity.minute},
-			#{entity.second}, #{entity.millisecond}, #{entity.dayOfWeek}, #{entity.dayOfYear}, #{entity.weekOfYear}, #{entity.userId}, #{entity.clientIP},
-			#{entity.threadNumber}, #{entity.clusterNode}, #{entity.applicationName}, #{entity.domain}, #{entity.productVersion},
-			#{entity.clientApplicationName}, #{entity.severity}, #{entity.actionType}, #{entity.actionScope}, #{entity.actionStatus}, #{entity.rawMessage},
-			#{entity.callerClassName}, #{entity.callerMethodName}, #{entity.numericIndex1}, #{entity.numericIndex2}, #{entity.numericIndex3},
-			#{entity.numericIndex4}, #{entity.numericIndex5}, #{entity.textualIndex1}, #{entity.textualIndex2}, #{entity.textualIndex3},
-			#{entity.textualIndex4}, #{entity.textualIndex5})
+			#{entity.second}, #{entity.millisecond}, #{entity.dayOfWeek}, #{entity.dayOfYear}, #{entity.weekOfYear}, #{entity.userId}, #{entity.threadNumber},
+			#{entity.clusterNode}, #{entity.productVersion}, #{entity.severity}, #{entity.actionType}, #{entity.actionScope}, #{entity.actionStatus},
+			#{entity.rawMessage}, #{entity.callerClassName}, #{entity.callerMethodName}, #{entity.numericIndex1}, #{entity.numericIndex2}, #{entity.numericIndex3},
+			#{entity.numericIndex4}, #{entity.numericIndex5}, #{entity.textualIndex1}, #{entity.textualIndex2}, #{entity.textualIndex3}, #{entity.textualIndex4},
+			#{entity.textualIndex5})
 	</insert>
 
 	<delete id="deleteSQueriableLogImpl" parameterType="log">
@@ -42,13 +41,9 @@
 		<result property="dayOfYear" column="dayOfYear" />
 		<result property="weekOfYear" column="weekOfYear" />
 		<result property="userId" column="userId" />
-		<result property="clientIP" column="clientIP" />
 		<result property="threadNumber" column="threadNumber" />
 		<result property="clusterNode" column="clusterNode" />
-		<result property="applicationName" column="applicationName" />
-		<result property="domain" column="domain" />
 		<result property="productVersion" column="productVersion" />
-		<result property="clientApplicationName" column="clientApplicationName" />
 		<result property="severity" column="severity" />
 		<result property="actionType" column="actionType" />
 		<result property="actionScope" column="actionScope" />
