@@ -16,6 +16,62 @@
 		WHERE tenantid = #{tenantid}
 		AND actorId = #{actorId}
 	</select>
+	
+	<select id="getNumberOfUsersOfActor" parameterType="long" resultType="long">
+		SELECT COUNT(user_.*)
+		FROM user_, actormember
+		WHERE user_.tenantid = #{tenantid}
+		AND user_.tenantid = actormember.tenantid
+		AND actormember.actorId = #{actorId}
+		AND user_.id = actormember.userId
+	</select>
+	
+	<select id="getNumberOfRolesOfActor" parameterType="long" resultType="long">
+		SELECT COUNT(role.*)
+		FROM role, actormember
+		WHERE role.tenantid = #{tenantid}
+		AND role.tenantid = actormember.tenantid
+		AND actormember.actorId = #{actorId}
+		AND role.id = actormember.roleId
+	</select>
+		
+	<select id="getNumberOfGroupsOfActor" parameterType="long" resultType="long">
+		SELECT COUNT(group_.*)
+		FROM group_, actormember
+		WHERE group_.tenantid = #{tenantid}
+		AND group_.tenantid = actormember.tenantid
+		AND actormember.actorId = #{actorId}
+		AND group_.id = actormember.groupId
+	</select>
+	
+	<select id="getNumberOfUserMembershipsOfActor" parameterType="long" resultType="long">
+		SELECT COUNT(distinct(user_membership.id))
+		FROM user_membership, actormember
+		WHERE user_membership.tenantid = #{tenantid}
+		AND user_membership.tenantid = actormember.tenantid
+		AND  actormember.actorId = #{actorId}
+		AND user_membership.id in (
+			SELECT distinct(user_membership.id)
+			FROM user_membership, actormember
+			WHERE user_membership.tenantid = #{tenantid}
+			AND user_membership.tenantid = actormember.tenantid
+			AND  actormember.actorId = #{actorId}
+			AND user_membership.id in (
+				SELECT distinct(user_membership.id)
+				FROM user_membership, actormember
+				WHERE user_membership.tenantid = #{tenantid}
+				AND user_membership.tenantid = actormember.tenantid
+				AND  actormember.actorId = #{actorId}
+				AND actormember.roleId = user_membership.roleId 
+				AND (actormember.userId &lt;= 0 OR actormember.userId = user_membership.userId)
+				AND (actormember.groupId &lt;= 0 OR actormember.groupId = user_membership.groupId))
+			AND actormember.groupId = user_membership.groupId 
+			AND (actormember.userId &lt;= 0 OR actormember.userId = user_membership.userId)
+			AND (actormember.roleId &lt;= 0 OR actormember.roleId = user_membership.roleId))
+		AND actormember.userId = user_membership.userId 
+		AND (actormember.groupId &lt;= 0 OR actormember.groupId = user_membership.groupId)
+		AND (actormember.roleId &lt;= 0 OR actormember.roleId = user_membership.roleId)
+	</select>
 
 	<select id="getActorMembersOfActor" parameterType="long" resultMap="actorMemberResultMap">
 		SELECT *
