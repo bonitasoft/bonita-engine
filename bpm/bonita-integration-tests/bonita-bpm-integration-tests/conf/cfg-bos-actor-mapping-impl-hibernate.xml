@@ -8,12 +8,6 @@
 				<value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="10000" />
-				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="10001" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="actor" /> 

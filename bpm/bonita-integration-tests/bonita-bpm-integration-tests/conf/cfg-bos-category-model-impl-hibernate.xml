@@ -17,12 +17,6 @@
 				<value>org/bonitasoft/engine/core/category/model/impl/hibernate/category.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="10030" />
-				<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="10031" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.category.model.SCategory" value="category" />

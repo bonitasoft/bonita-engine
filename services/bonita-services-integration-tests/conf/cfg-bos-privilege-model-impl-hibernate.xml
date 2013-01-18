@@ -8,11 +8,6 @@
 				<value>org/bonitasoft/engine/privilege/model/impl/hibernate/privilege.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="1060" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.privilege.model.SPrivilege" value="privilege" />

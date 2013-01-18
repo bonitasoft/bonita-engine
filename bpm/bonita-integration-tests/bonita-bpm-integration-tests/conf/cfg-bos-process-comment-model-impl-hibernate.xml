@@ -8,12 +8,6 @@
 				<value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" value="10060" />
-				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" value="10060" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="comment" />
@@ -29,11 +23,6 @@
 				<value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.hbm.xml</value>
 				<value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
 			</set>
-		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
-			</map>
 		</property>
 		<property name="classAliasMappings">
 			<map>

@@ -8,12 +8,6 @@
 				<value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="10012" />
-				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SActorImpl" value="10013" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="process_definition" />

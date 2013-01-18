@@ -8,17 +8,6 @@
 				<value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="20" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="21" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="22" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="23" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl" value="24" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl" value="25" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" value="26" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />

@@ -22,9 +22,9 @@ import java.util.Set;
  */
 public class PlatformMyBatisConfiguration extends AbstractMyBatisConfiguration {
 
-    public PlatformMyBatisConfiguration(final Map<String, String> typeAliases, final List<String> mappers, final Map<String, Long> sequencesMappings,
-            final Map<String, String> classAliasMappings, final Map<String, String> classFieldAliasMappings, final Set<StatementMapping> statementMapping,
-            final Map<String, String> dbStatementsMapping, final Map<String, String> entityMappings) {
-        super(typeAliases, mappers, sequencesMappings, classAliasMappings, classFieldAliasMappings, statementMapping, dbStatementsMapping, entityMappings);
+    public PlatformMyBatisConfiguration(final Map<String, String> typeAliases, final List<String> mappers, final Map<String, String> classAliasMappings,
+            final Map<String, String> classFieldAliasMappings, final Set<StatementMapping> statementMapping, final Map<String, String> dbStatementsMapping,
+            final Map<String, String> entityMappings) {
+        super(typeAliases, mappers, classAliasMappings, classFieldAliasMappings, statementMapping, dbStatementsMapping, entityMappings);
     }
 }

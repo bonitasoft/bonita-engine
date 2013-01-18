@@ -8,12 +8,6 @@
 				<value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="10" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping" value="11" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="pdependency" />

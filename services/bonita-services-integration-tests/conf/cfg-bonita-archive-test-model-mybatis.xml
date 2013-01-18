@@ -22,16 +22,6 @@
 				<value>com/bonitasoft/services/archive/model/mybatis/SAEmployeeMapper.xml</value>
 			</list>
 		</constructor-arg>
-		<constructor-arg name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.archive.model.Employee" value="60" />
-				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="61" />
-				<entry key="org.bonitasoft.engine.archive.model.Address" value="62" />
-				<entry key="org.bonitasoft.engine.archive.model.Project" value="63" />
-				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="64" />
-				<entry key="org.bonitasoft.engine.archive.model.SAEmployee" value="65" />
-			</map>
-		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.archive.model.Employee" value="employee" />

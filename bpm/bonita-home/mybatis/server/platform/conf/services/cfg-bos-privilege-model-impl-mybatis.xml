@@ -12,11 +12,6 @@
 				<value>org/bonitasoft/engine/privilege/model/impl/mybatis/PrivilegeMapper.xml</value>
 			</list>
 		</constructor-arg>
-		<constructor-arg name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="1060" />
-			</map>
-		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.privilege.model.SPrivilege" value="priv" />

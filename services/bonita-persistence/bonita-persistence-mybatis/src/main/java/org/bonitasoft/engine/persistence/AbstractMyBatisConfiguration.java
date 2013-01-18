@@ -28,8 +28,6 @@ public class AbstractMyBatisConfiguration {
 
     private final List<String> mappers;
 
-    private final Map<String, Long> sequencesMappings;
-
     private final Map<String, String> classAliasMappings;
 
     private final Set<StatementMapping> statementMapping;
@@ -40,13 +38,12 @@ public class AbstractMyBatisConfiguration {
 
     private final Map<String, String> classFieldAliasMappings;
 
-    public AbstractMyBatisConfiguration(final Map<String, String> typeAliases, final List<String> mappers, final Map<String, Long> sequencesMappings,
-            final Map<String, String> classAliasMappings, final Map<String, String> classFieldAliasMappings, final Set<StatementMapping> statementMapping,
-            final Map<String, String> dbStatementsMapping, final Map<String, String> entityMappings) {
+    public AbstractMyBatisConfiguration(final Map<String, String> typeAliases, final List<String> mappers, final Map<String, String> classAliasMappings,
+            final Map<String, String> classFieldAliasMappings, final Set<StatementMapping> statementMapping, final Map<String, String> dbStatementsMapping,
+            final Map<String, String> entityMappings) {
         super();
         this.typeAliases = typeAliases;
         this.mappers = mappers;
-        this.sequencesMappings = sequencesMappings;
         this.classAliasMappings = classAliasMappings;
         this.classFieldAliasMappings = classFieldAliasMappings;
         this.statementMapping = statementMapping;
@@ -59,13 +56,6 @@ public class AbstractMyBatisConfiguration {
             return Collections.emptyMap();
         }
         return dbStatementsMapping;
-    }
-
-    public Map<String, Long> getSequencesMappings() {
-        if (sequencesMappings == null) {
-            return Collections.emptyMap();
-        }
-        return sequencesMappings;
     }
 
     public Map<String, String> getClassAliasMappings() {
@@ -127,7 +117,6 @@ public class AbstractMyBatisConfiguration {
         result = prime * result + (dbStatementsMapping == null ? 0 : dbStatementsMapping.hashCode());
         result = prime * result + (entityMappings == null ? 0 : entityMappings.hashCode());
         result = prime * result + (mappers == null ? 0 : mappers.hashCode());
-        result = prime * result + (sequencesMappings == null ? 0 : sequencesMappings.hashCode());
         result = prime * result + (statementMapping == null ? 0 : statementMapping.hashCode());
         result = prime * result + (typeAliases == null ? 0 : typeAliases.hashCode());
         return result;
@@ -178,13 +167,6 @@ public class AbstractMyBatisConfiguration {
                 return false;
             }
         } else if (!mappers.equals(other.mappers)) {
-            return false;
-        }
-        if (sequencesMappings == null) {
-            if (other.sequencesMappings != null) {
-                return false;
-            }
-        } else if (!sequencesMappings.equals(other.sequencesMappings)) {
             return false;
         }
         if (statementMapping == null) {

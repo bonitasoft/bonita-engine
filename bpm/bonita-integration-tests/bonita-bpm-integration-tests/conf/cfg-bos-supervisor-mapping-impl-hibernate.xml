@@ -8,11 +8,6 @@
 				<value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorImpl" value="10050" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.supervisor.mapping.model.SSupervisor" value="processsupervisor" />

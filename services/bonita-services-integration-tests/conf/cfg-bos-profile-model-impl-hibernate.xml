@@ -8,13 +8,6 @@
 				<value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="9990" />
-				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="9991" />
-				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="9992" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.profile.model.SProfile" value="profile" />

@@ -13,12 +13,6 @@
 				<value>org/bonitasoft/engine/queriablelogger/model/impl/mybatis/QueriableLogMapper.xml</value>
 			</list>
 		</constructor-arg>
-		<constructor-arg name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="30" />
-				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="31" />
-			</map>
-		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="bl" />

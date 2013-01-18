@@ -10,14 +10,6 @@
 				<value>org/bonitasoft/engine/persistence/hibernate/car.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.persistence.model.Human" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Child" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Parent" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Car" value="1001" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.persistence.model.Human" value="human" />

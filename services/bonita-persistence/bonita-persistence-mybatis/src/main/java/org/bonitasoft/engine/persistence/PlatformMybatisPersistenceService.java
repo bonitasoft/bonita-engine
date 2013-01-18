@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.model.PlatformSequence;
+import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -28,22 +27,12 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class PlatformMybatisPersistenceService extends AbstractMybatisPersistenceService {
 
-    private final MyBatisSequenceManager<PlatformSequence> sequenceManager;
-
     public PlatformMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final PlatformMyBatisConfigurationsProvider configurations,
-            final DBConfigurationsProvider dbConfigurationsProvider, final int rangeSize, final Map<Long, Integer> rangeSizes, final String statementDelimiter,
-            final TechnicalLoggerService technicalLoggerService) throws SPersistenceException {
-        super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, rangeSize, dbConfigurationsProvider,
-                statementDelimiter, technicalLoggerService);
-        sequenceManager = new MyBatisSequenceManager<PlatformSequence>(this, rangeSize, rangeSizes, PlatformSequence.class, "getPlatformSequence", false,
-                sequencesMappings);
-    }
-
-    @Override
-    public void deleteStructure() throws SPersistenceException, IOException {
-        super.deleteStructure();
-        sequenceManager.reset();
+            final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final TechnicalLoggerService technicalLoggerService,
+            final SequenceManager sequenceManager) throws SPersistenceException {
+        super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
+                technicalLoggerService, sequenceManager);
     }
 
     @Override
@@ -52,7 +41,8 @@ public class PlatformMybatisPersistenceService extends AbstractMybatisPersistenc
     }
 
     @Override
-    protected MyBatisSequenceManager<PlatformSequence> getSequenceManager(final PersistentObject entity) throws TenantIdNotSetException {
-        return sequenceManager;
+    protected long getTenantId() throws TenantIdNotSetException {
+        return -1;
     }
+
 }

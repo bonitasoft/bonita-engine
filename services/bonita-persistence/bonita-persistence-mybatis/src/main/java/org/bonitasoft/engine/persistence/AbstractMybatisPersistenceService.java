@@ -40,6 +40,7 @@ import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
+import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
@@ -66,8 +67,6 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private final Map<String, StatementMapping> statementMappings;
 
-    protected final Map<String, Long> sequencesMappings;
-
     private final Map<String, String> classAliasMappings;
 
     private final Map<String, String> classFieldAliasMappings;
@@ -80,21 +79,16 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private final TechnicalLoggerPrintWriter errorWriter;
 
-    private final Integer rangeSize;
-
     public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final AbstractMyBatisConfigurationsProvider configurations,
-            final int rangeSize, final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter,
-            final TechnicalLoggerService technicalLoggerService) throws SPersistenceException {
-        super(name, tenantConfigurationsProvider, statementDelimiter);
+            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final TechnicalLoggerService technicalLoggerService,
+            final SequenceManager sequenceManager) throws SPersistenceException {
+        super(name, tenantConfigurationsProvider, statementDelimiter, sequenceManager);
         this.dbIdentifier = dbIdentifier;
         this.txService = txService;
         this.cacheEnabled = cacheEnabled;
         this.mybatisSqlSessionFactoryProvider = mybatisSqlSessionFactoryProvider;
-        this.rangeSize = rangeSize;
-
         statementMappings = new HashMap<String, StatementMapping>();
-        sequencesMappings = new HashMap<String, Long>();
         classAliasMappings = new HashMap<String, String>();
         classFieldAliasMappings = new HashMap<String, String>();
         dbStatementsMapping = new HashMap<String, String>();
@@ -112,15 +106,10 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private void initMappings(final AbstractMyBatisConfiguration myBatisConfiguration) {
         statementMappings.putAll(myBatisConfiguration.getStatementMappings());
-        sequencesMappings.putAll(myBatisConfiguration.getSequencesMappings());
         classAliasMappings.putAll(myBatisConfiguration.getClassAliasMappings());
         classFieldAliasMappings.putAll(myBatisConfiguration.getClassFieldAliasMappings());
         dbStatementsMapping.putAll(myBatisConfiguration.getDbStatementsMapping());
         entityMappings.putAll(myBatisConfiguration.getEntityMappings());
-    }
-
-    public Integer getRangeSize(final PersistentObject entity) {
-        return rangeSize;
     }
 
     private MybatisTechnicalTransaction getTechnicalTx() {
@@ -283,27 +272,6 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
     @Override
     public TechnicalTransaction getTechnicalTransaction() {
         return technicalTxs.get();
-    }
-
-    private void setId(final PersistentObject entity) throws SPersistenceException {
-        if (entity == null) {
-            return;
-        }
-        // if this entity has no id, set it
-        Long id = null;
-        try {
-            id = entity.getId();
-        } catch (final Exception e) {
-            // this is a new object to save
-        }
-        if (id == null || id == -1 || id == 0) {
-            try {
-                id = getSequenceManager(entity).getNextId(entity.getClass().getName());
-                ClassReflector.invokeSetter(entity, "setId", long.class, id);
-            } catch (final Exception e) {
-                throw new SPersistenceException("Problem while saving entity: " + entity + " with id: " + id, e);
-            }
-        }
     }
 
     @Override
@@ -743,11 +711,4 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         }
 
     }
-
-    /**
-     * @return
-     * @throws TenantIdNotSetException
-     *             in case of getting sequences for tenants
-     */
-    protected abstract MyBatisSequenceManager<?> getSequenceManager(final PersistentObject entity) throws TenantIdNotSetException;
 }

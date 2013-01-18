@@ -27,7 +27,7 @@
 		<constructor-arg name="deleteService" ref="deleteService" />
     </bean>
 
-    <bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+    <bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl" >
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="eventService" ref="eventService" />
@@ -63,6 +63,11 @@
         		<bean class="org.bonitasoft.engine.restart.RestartProcessHandler" />
         	</list>
         </property>
+<!--         <property name="jobsToRegister" > -->
+<!--         	<list> -->
+<!--         		<ref bean="deleteRegister"></ref> -->
+<!--         	</list> -->
+<!--         </property> -->
 	</bean>
 
 </beans>

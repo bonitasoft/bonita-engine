@@ -8,11 +8,6 @@
 				<value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="90" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />

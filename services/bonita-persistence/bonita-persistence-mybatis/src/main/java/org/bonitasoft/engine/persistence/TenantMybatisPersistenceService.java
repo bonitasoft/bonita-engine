@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.model.TenantSequence;
+import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
@@ -30,34 +29,19 @@ import org.bonitasoft.engine.transaction.TransactionService;
 /**
  * @author Charles Souillard
  * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceService {
 
-    private final Map<Long, MyBatisSequenceManager<TenantSequence>> sequenceManagers;
-
     private final ReadSessionAccessor sessionAccessor;
-
-    private final Map<Long, Integer> rangeSizes;
-
-    private final int rangeSize;
 
     public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final ReadSessionAccessor sessionAccessor, final boolean cacheEnabled, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
-            final MyBatisConfigurationsProvider configurations, final int rangeSize, final Map<Long, Integer> rangeSizes,
-            final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final TechnicalLoggerService technicalLoggerService)
-            throws SPersistenceException {
-        super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, rangeSize, dbConfigurationsProvider,
-                statementDelimiter, technicalLoggerService);
-        this.rangeSize = rangeSize;
-        this.rangeSizes = rangeSizes;
+            final MyBatisConfigurationsProvider configurations, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
+            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager) throws SPersistenceException {
+        super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
+                technicalLoggerService, sequenceManager);
         this.sessionAccessor = sessionAccessor;
-        sequenceManagers = new HashMap<Long, MyBatisSequenceManager<TenantSequence>>();
-    }
-
-    @Override
-    public void deleteStructure() throws SPersistenceException, IOException {
-        super.deleteStructure();
-        sequenceManagers.clear();
     }
 
     @Override
@@ -66,32 +50,6 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
         final Long tenantId = sessionAccessor.getTenantId();
         parameters.put("tenantid", tenantId);
         return parameters;
-    }
-
-    @Override
-    protected MyBatisSequenceManager<TenantSequence> getSequenceManager(final PersistentObject entity) throws TenantIdNotSetException {
-        final Long tenantId = sessionAccessor.getTenantId();
-        if (!sequenceManagers.containsKey(tenantId)) {
-            synchronized (this) {
-                // double check mandatory as the whole method is not synchronized
-                if (!sequenceManagers.containsKey(tenantId)) {
-                    final MyBatisSequenceManager<TenantSequence> sequenceManager = new MyBatisSequenceManager<TenantSequence>(this, rangeSize, rangeSizes,
-                            TenantSequence.class, "getSequence", true, sequencesMappings);
-                    sequenceManagers.put(tenantId, sequenceManager);
-                }
-            }
-        }
-        return sequenceManagers.get(tenantId);
-    }
-
-    @Override
-    public void deleteTenant(final long tenantId) throws SPersistenceException, IOException {
-        final MyBatisSequenceManager<TenantSequence> myBatisSequenceManager = sequenceManagers.get(tenantId);
-        if (myBatisSequenceManager != null) {
-            myBatisSequenceManager.clear();
-            sequenceManagers.remove(tenantId);
-        }
-        super.deleteTenant(tenantId);
     }
 
     @Override
@@ -132,7 +90,8 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
         }
     }
 
-    private long getTenantId() throws TenantIdNotSetException {
+    @Override
+    protected long getTenantId() throws TenantIdNotSetException {
         return sessionAccessor.getTenantId();
     }
 

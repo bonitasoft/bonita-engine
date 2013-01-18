@@ -8,12 +8,6 @@
 				<value>org/bonitasoft/engine/data/model/impl/hibernate/data.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" value="10" />
-				<entry key="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" value="11" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.data.model.SDataSource" value="datasource" />

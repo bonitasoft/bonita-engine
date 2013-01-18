@@ -1,101 +1,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="hbm-bonita-persistence-hibernate" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-		<property name="resources">
-			<set>
-				<value>org/bonitasoft/engine/persistence/hibernate/sequence.hbm.xml
-				</value>
-				<value>org/bonitasoft/engine/persistence/hibernate/sequence.queries.hbm.xml
-				</value>
-			</set>
-		</property>
-	</bean>
 
 	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="platform" />
-		<constructor-arg ref="transactionService" />
-		<constructor-arg ref="journalConfigurationProvider" />
-		<constructor-arg name="rangeSize" value="100" />
-		<constructor-arg name="rangeSizes">
-            <map>
-            </map>
-		</constructor-arg>
-		<constructor-arg ref="dbConfigurationsProvider" />
+		<constructor-arg name="txService" ref="transactionService" />
+		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
-    </bean>
-
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sequenceManager" ref="sequenceManager" />
+	</bean>
 	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="journal" />
-		<constructor-arg ref="transactionService" />
-		<constructor-arg ref="sessionAccessor" />
-		<constructor-arg ref="journalConfigurationProvider" />
-		<constructor-arg name="rangeSize" value="100" />
-        <constructor-arg name="rangeSizes">
-			<map>
-				<!-- Most used objects: range size depends on process design -->
-				<entry key="30" value="10000" /><!-- queriable log -->
-				<entry key="31" value="200000" /><!-- queriable log parameter -->
-				<entry key="10010" value="1000" /><!-- ProcessInstance -->
-				<entry key="10011" value="20000" /><!-- ActivityInstance --><!-- 20 step by process average -->
-				<entry key="10013" value="20000" /><!-- TransitoinInstance --><!-- same as activity instance -->
-				<entry key="10014" value="20000" /><!-- ConnectorInstance --><!-- same as activity instance -->
-				<entry key="20010" value="3000" /><!-- archived ProcessInstance --><!-- Process instance * nb state -->
-				<entry key="20011" value="80000" /><!-- archived ActivityInstance --><!-- Activity instance * average nb state -->
-				<entry key="20012" value="40000" /><!-- archived TransitionInstance --><!-- transition instance * nb state -->
-				<entry key="10015" value="4000" /><!-- EventTriggerInstance --><!-- 1/5 of activity -->
-				<entry key="10016" value="4000" /><!-- WaitingEvent --><!-- 1/5 of activity -->
-				<entry key="10017" value="4000" /><!-- MessageInstance --><!-- 1/5 of activity -->
-				<entry key="10018" value="4000" /><!-- PendingActivityMapping --><!-- 1/5 of activity -->
-				<entry key="10020" value="5000" /><!-- data -->
-				<entry key="10021" value="5000" /><!-- DataInstanceVisibilityMapping -->
-				<entry key="20050" value="25000" /><!-- archived data --><!-- 5 change by data -->
-				<entry key="20051" value="25000" /><!-- SADataInstanceVisibilityMapping -->
-				<entry key="10060" value="20000" /><!-- comment -->
-				<entry key="10080" value="20000" /><!-- SAComment -->
-
-				<!-- less used objects -->
-				<entry key="10012" value="100" /><!-- ProcessDefinition -->
-				<entry key="20" value="100" /><!-- user -->
-				<entry key="21" value="100" /><!-- group -->
-				<entry key="22" value="100" /><!-- role -->
-				<entry key="23" value="100" /><!-- user_memebership -->
-				<entry key="24" value="100" /><!-- P-metadata_def -->
-				<entry key="25" value="100" /><!-- P-metadata_val -->
-				<entry key="26" value="100" /><!-- user_contactinfo -->
-				<entry key="40" value="100" /><!-- privilege -->
-				<entry key="41" value="100" /><!-- privilege_excep -->
-				<entry key="50" value="100" /><!-- dataSource -->
-				<entry key="51" value="100" /><!-- dataSourceParameter -->
-				<entry key="60" value="100" /><!-- employee -->
-				<entry key="61" value="100" /><!-- laptop -->
-				<entry key="62" value="100" /><!-- address -->
-				<entry key="63" value="100" /><!-- project -->
-				<entry key="64" value="100" /><!-- employeeprojectmapping -->
-				<entry key="65" value="100" /><!-- saemployee -->
-				<entry key="70" value="100" /><!-- jobDescriptor -->
-				<entry key="71" value="100" /><!-- jobParameter -->
-				<entry key="90" value="100" /><!-- command -->
-				<entry key="1060" value="100" /><!-- bos_privilege -->
-				<entry key="1070" value="100" /><!-- actor_privilege -->
-				<entry key="10000" value="100" /><!-- actor -->
-				<entry key="10001" value="100" /><!-- actorMapping -->
-				<entry key="10019" value="100" /><!-- Breakpoint -->
-				<entry key="10095" value="100" /><!-- HiddenTask -->
-				<entry key="10030" value="100" /><!-- category -->
-				<entry key="10040" value="100" /><!-- SDocumentMapping -->
-				<entry key="10050" value="100" /><!-- supervisor -->
-				<entry key="10070" value="100" /><!-- ExternalIdentityMapping -->
-				<entry key="10090" value="100" /><!-- document_content -->
-				<entry key="10100" value="100" /><!-- MigrationPlanDescriptor -->
-				<entry key="20040" value="100" /><!-- SADocumentMapping -->
-			</map>
-        </constructor-arg>
-		<constructor-arg ref="dbConfigurationsProvider" />
+		<constructor-arg name="txService" ref="transactionService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
-    </bean>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sequenceManager" ref="sequenceManager" />
+	</bean>
 
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
 		<constructor-arg name="properties">
@@ -124,93 +49,93 @@
 		<!-- Query cache -->
         <constructor-arg name="cacheQueries">
             <map>
-                <entry key="getDirectProfileMembersOfGroup" value="true"/>
-                <entry key="getDirectProfileMembersOfRole" value="true"/>
-                <entry key="getDirectProfileMembersOfUser" value="true"/>
-                <entry key="getEntriesOfProfile" value="true"/>
-                <entry key="getEntriesOfProfileByParentId" value="true"/>
-                <entry key="getNumberOfEntriesOfProfile" value="true"/>
-                <entry key="getNumberOfProfile" value="true"/>
-                <entry key="getNumberOfProfileMemberOfProfile" value="true"/>
-                <entry key="getNumberOfSProfileMemberForGroup" value="true"/>
-                <entry key="getNumberOfSProfileMemberForRole" value="true"/>
-                <entry key="getNumberOfSProfileMemberForRoleAndGroup" value="true"/>
-                <entry key="getNumberOfSProfileMemberForUser" value="true"/>
-                <entry key="getNumberOfSProfileMemberwithSGroupForGroup" value="true"/>
-                <entry key="getNumberOfSProfileMemberwithSGroupForRoleAndGroup" value="true"/>
-                <entry key="getNumberOfSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true"/>
-                <entry key="getNumberOfSProfileMemberwithSRoleForRole" value="true"/>
-                <entry key="getNumberOfSProfileMemberwithSRoleForRoleAndGroup" value="true"/>
-                <entry key="getNumberOfSProfileMemberwithSUserForUser" value="true"/>
-                <entry key="getProfileByName" value="true"/>
-                <entry key="getProfileMemberWithoutDisplayNameById" value="true"/>
-                <entry key="getProfileMembersFromProfileIds" value="true"/>
-                <entry key="getProfiles" value="true"/>
-                <entry key="getProfilesOfUser" value="true"/>
-                <entry key="getSProfileMembersWithoutDisplayName" value="true"/>
-                <entry key="searchSProfileMemberForGroup" value="true"/>
-                <entry key="searchSProfileMemberForRole" value="true"/>
-                <entry key="searchSProfileMemberForRoleAndGroup" value="true"/>
-                <entry key="searchSProfileMemberForUser" value="true"/>
-                <entry key="searchSProfileMemberwithSGroupForGroup" value="true"/>
-                <entry key="searchSProfileMemberwithSGroupForRoleAndGroup" value="true"/>
-                <entry key="searchSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true"/>
-                <entry key="searchSProfileMemberwithSRoleForRole" value="true"/>
-                <entry key="searchSProfileMemberwithSRoleForRoleAndGroup" value="true"/>
-                <entry key="searchSProfileMemberwithSUserForUser" value="true"/>
-                <entry key="getCategories" value="true"/>
-                <entry key="getCategoriesOfProcess" value="true"/>
-                <entry key="getCategorizedProcessIds" value="true"/>
-                <entry key="getCategoryByName" value="true"/>
-                <entry key="getNumberOfCategoriesOfProcess" value="true"/>
-                <entry key="getNumberOfCategorizedProcessIds" value="true"/>
-                <entry key="getNumberOfCategory" value="true"/>
-                <entry key="getProcessCategoryMappingsOfCategory" value="true"/>
-                <entry key="getProcessCategoryMappingsOfProcess" value="true"/>
-                <entry key="getProcessIdsOfCategory" value="true"/>
-                <entry key="getActorFromNameAndScopeId" value="true"/>
-                <entry key="getActorMembersOfActor" value="true"/>
-                <entry key="getActorMembersOfGroup" value="true"/>
-                <entry key="getActorMembersOfRole" value="true"/>
-                <entry key="getActorMembersOfUser" value="true"/>
-                <entry key="getActorPrivilegeByActorAndPrivilegeId" value="true"/>
-                <entry key="getActorPrivileges" value="true"/>
-                <entry key="getActorPrivilegesByActorId" value="true"/>
-                <entry key="getActorPrivilegesByIds" value="true"/>
-                <entry key="getActorsByIds" value="true"/>
-                <entry key="getActorsOfScope" value="true"/>
-                <entry key="getActorsOfScopes" value="true"/>
-                <entry key="getActorsOfUser" value="true"/>
-                <entry key="getActorsOfUserCanStartProcessDefinition" value="true"/>
-                <entry key="getNumberOfActorMembersOfActor" value="true"/>
-                <entry key="getNumberOfSActorPrivilege" value="true"/>
-                <entry key="searchSActorPrivilege" value="true"/>
-                <entry key="getDataInstanceByIds" value="true"/>
-                <entry key="getDataInstanceIdFromMapping" value="true"/>
-                <entry key="getDataInstanceIdsFromMapping" value="true"/>
-                <entry key="getDataInstanceVisibilityMappings" value="true"/>
-                <entry key="getDataInstancesByContainer" value="true"/>
-                <entry key="getDataInstancesByNameAndContainer" value="true"/>
-                <entry key="getDataSourceByNameAndVersion" value="true"/>
-                <entry key="getDataSourceParameterByNameAndDataSourceId" value="true"/>
-                <entry key="getDataSourceParametersByDataSourceId" value="true"/>
-                <entry key="getDataSources" value="true"/>
-                <entry key="getLastSADataInstanceByDataInstanceId" value="true"/>
-                <entry key="getNumberOfDataInstancesForContainer" value="true"/>
-                <entry key="getSADataInstanceByDataInstanceId" value="true"/>
-                <entry key="getSADataInstanceByDataInstanceIdAndArchiveDate" value="true"/>
-                <entry key="getSADataInstanceIdFromMapping" value="true"/>
-                <entry key="getSADataInstanceIdsFromMapping" value="true"/>
-                <entry key="getSADataInstanceVisibilityMappings" value="true"/>
-                <entry key="getSADataInstancesByDataInstanceIdAndArchiveDate" value="true"/>
-				<entry key="getPlatform" value="true" />
-				<entry key="getDeployInfoByProcessDefId" value="true" />
-				<entry key="getCommandByName" value="true" />
+<!--                 <entry key="getDirectProfileMembersOfGroup" value="true"/> -->
+<!--                 <entry key="getDirectProfileMembersOfRole" value="true"/> -->
+<!--                 <entry key="getDirectProfileMembersOfUser" value="true"/> -->
+<!--                 <entry key="getEntriesOfProfile" value="true"/> -->
+<!--                 <entry key="getEntriesOfProfileByParentId" value="true"/> -->
+<!--                 <entry key="getNumberOfEntriesOfProfile" value="true"/> -->
+<!--                 <entry key="getNumberOfProfile" value="true"/> -->
+<!--                 <entry key="getNumberOfProfileMemberOfProfile" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberForGroup" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberForRole" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberForUser" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberwithSGroupForGroup" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberwithSGroupForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberwithSRoleForRole" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberwithSRoleForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="getNumberOfSProfileMemberwithSUserForUser" value="true"/> -->
+<!--                 <entry key="getProfileByName" value="true"/> -->
+<!--                 <entry key="getProfileMemberWithoutDisplayNameById" value="true"/> -->
+<!--                 <entry key="getProfileMembersFromProfileIds" value="true"/> -->
+<!--                 <entry key="getProfiles" value="true"/> -->
+<!--                 <entry key="getProfilesOfUser" value="true"/> -->
+<!--                 <entry key="getSProfileMembersWithoutDisplayName" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberForGroup" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberForRole" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberForUser" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberwithSGroupForGroup" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberwithSGroupForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberwithSRoleForRole" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberwithSRoleForRoleAndGroup" value="true"/> -->
+<!--                 <entry key="searchSProfileMemberwithSUserForUser" value="true"/> -->
+<!--                 <entry key="getCategories" value="true"/> -->
+<!--                 <entry key="getCategoriesOfProcess" value="true"/> -->
+<!--                 <entry key="getCategorizedProcessIds" value="true"/> -->
+<!--                 <entry key="getCategoryByName" value="true"/> -->
+<!--                 <entry key="getNumberOfCategoriesOfProcess" value="true"/> -->
+<!--                 <entry key="getNumberOfCategorizedProcessIds" value="true"/> -->
+<!--                 <entry key="getNumberOfCategory" value="true"/> -->
+<!--                 <entry key="getProcessCategoryMappingsOfCategory" value="true"/> -->
+<!--                 <entry key="getProcessCategoryMappingsOfProcess" value="true"/> -->
+<!--                 <entry key="getProcessIdsOfCategory" value="true"/> -->
+<!--                 <entry key="getActorFromNameAndScopeId" value="true"/> -->
+<!--                 <entry key="getActorMembersOfActor" value="true"/> -->
+<!--                 <entry key="getActorMembersOfGroup" value="true"/> -->
+<!--                 <entry key="getActorMembersOfRole" value="true"/> -->
+<!--                 <entry key="getActorMembersOfUser" value="true"/> -->
+<!--                 <entry key="getActorPrivilegeByActorAndPrivilegeId" value="true"/> -->
+<!--                 <entry key="getActorPrivileges" value="true"/> -->
+<!--                 <entry key="getActorPrivilegesByActorId" value="true"/> -->
+<!--                 <entry key="getActorPrivilegesByIds" value="true"/> -->
+<!--                 <entry key="getActorsByIds" value="true"/> -->
+<!--                 <entry key="getActorsOfScope" value="true"/> -->
+<!--                 <entry key="getActorsOfScopes" value="true"/> -->
+<!--                 <entry key="getActorsOfUser" value="true"/> -->
+<!--                 <entry key="getActorsOfUserCanStartProcessDefinition" value="true"/> -->
+<!--                 <entry key="getNumberOfActorMembersOfActor" value="true"/> -->
+<!--                 <entry key="getNumberOfSActorPrivilege" value="true"/> -->
+<!--                 <entry key="searchSActorPrivilege" value="true"/> -->
+<!--                 <entry key="getDataInstanceByIds" value="true"/> -->
+<!--                 <entry key="getDataInstanceIdFromMapping" value="true"/> -->
+<!--                 <entry key="getDataInstanceIdsFromMapping" value="true"/> -->
+<!--                 <entry key="getDataInstanceVisibilityMappings" value="true"/> -->
+<!--                 <entry key="getDataInstancesByContainer" value="true"/> -->
+<!--                 <entry key="getDataInstancesByNameAndContainer" value="true"/> -->
+<!--                 <entry key="getDataSourceByNameAndVersion" value="true"/> -->
+<!--                 <entry key="getDataSourceParameterByNameAndDataSourceId" value="true"/> -->
+<!--                 <entry key="getDataSourceParametersByDataSourceId" value="true"/> -->
+<!--                 <entry key="getDataSources" value="true"/> -->
+<!--                 <entry key="getLastSADataInstanceByDataInstanceId" value="true"/> -->
+<!--                 <entry key="getNumberOfDataInstancesForContainer" value="true"/> -->
+<!--                 <entry key="getSADataInstanceByDataInstanceId" value="true"/> -->
+<!--                 <entry key="getSADataInstanceByDataInstanceIdAndArchiveDate" value="true"/> -->
+<!--                 <entry key="getSADataInstanceIdFromMapping" value="true"/> -->
+<!--                 <entry key="getSADataInstanceIdsFromMapping" value="true"/> -->
+<!--                 <entry key="getSADataInstanceVisibilityMappings" value="true"/> -->
+<!--                 <entry key="getSADataInstancesByDataInstanceIdAndArchiveDate" value="true"/> -->
+<!-- 				<entry key="getPlatform" value="true" /> -->
+<!-- 				<entry key="getDeployInfoByProcessDefId" value="true" /> -->
+<!-- 				<entry key="getCommandByName" value="true" /> -->
             </map>
         </constructor-arg>
         <constructor-arg name="classesWithLoadByQuery">
             <list>
-                <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
+<!--                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value> -->
             </list>
         </constructor-arg>
 	</bean>
@@ -218,7 +143,6 @@
 	<bean id="hbmResourcesConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderExt">
 		<property name="hbmResources">
 			<list>
-				<ref bean="hbm-bonita-persistence-hibernate" />
 				<ref bean="hbm-bonita-persistence-test" />
 				<ref bean="hbm-bonita-log-model" />
 				<ref bean="hbm-bonita-platform-model" />
@@ -240,42 +164,42 @@
 		<!-- L2 cache -->
 		<constructor-arg name="cacheConcurrencyStrategies">
 			<map>
-                <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="read-write"/>
-                <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping" value="read-write"/>
-                <entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="read-write"/>
+<!--                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependency" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="read-write"/> -->
             </map>
 		</constructor-arg>
 	</bean>

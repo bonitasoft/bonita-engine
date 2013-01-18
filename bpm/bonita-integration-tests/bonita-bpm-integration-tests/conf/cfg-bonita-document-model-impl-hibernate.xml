@@ -8,11 +8,6 @@
 				<value>org/bonitasoft/engine/document/model/impl/hibernate/documentContent.queries.hbm.xml</value>
 			</set>
 		</property>
-		<property name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="10090" />
-			</map>
-		</property>
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.document.model.SDocumentContent" value="docContent" />

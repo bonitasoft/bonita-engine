@@ -12,11 +12,6 @@
 				<value>org/bonitasoft/engine/actor/privilege/model/impl/mybatis/ActorPrivilegeMapper.xml</value>
 			</list>
 		</constructor-arg>
-		<constructor-arg name="sequencesMappings">
-			<map>
-				<entry key="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl" value="1070" />
-			</map>
-		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.actor.privilege.model.SActorPrivilege" value="actor_privilege" />
