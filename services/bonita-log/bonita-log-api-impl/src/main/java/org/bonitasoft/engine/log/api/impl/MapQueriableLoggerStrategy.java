@@ -23,6 +23,8 @@ import org.bonitasoft.engine.services.QueriableLoggerStrategy;
  */
 public class MapQueriableLoggerStrategy implements QueriableLoggerStrategy {
 
+    private final boolean disable = System.getProperty("org.bonitasoft.engine.services.queryablelog.disable") != null;
+
     private final Map<String, Boolean> loggableLevels;
 
     public MapQueriableLoggerStrategy(final Map<String, Boolean> loggableLevels) {
@@ -31,7 +33,7 @@ public class MapQueriableLoggerStrategy implements QueriableLoggerStrategy {
 
     @Override
     public boolean isLoggable(final String actionType, final SQueriableLogSeverity severity) {
-        if (System.getProperty("org.bonitasoft.engine.services.queryablelog.disable") != null) {
+        if (disable) {
             return false;
         }
 
