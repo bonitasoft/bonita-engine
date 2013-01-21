@@ -44,7 +44,7 @@ public class TenantTest {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.createPlatform();
+        platformAPI.createAndInitializePlatform();
         platformAPI.startNode();
         defaultTenantId = platformAPI.createTenant(DEFAULT_TENANT, "default", "testIconName", "testIconPath", "default_tenant_name", "default_tenant_password");
         platformAPI.activateTenant(defaultTenantId);

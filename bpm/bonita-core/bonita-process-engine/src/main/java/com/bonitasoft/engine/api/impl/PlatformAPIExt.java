@@ -230,16 +230,16 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    // modify username and password
-    private void modifyTechnicalUser(final long tenantId, final String username, final String password) throws IOException, BonitaHomeNotSetException {
+    // modify user name and password
+    private void modifyTechnicalUser(final long tenantId, final String userName, final String password) throws IOException, BonitaHomeNotSetException {
         final String tenantPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "bonita-server.xml";
         final File file = new File(tenantPath);
         if (!file.exists()) {
             file.createNewFile();
         }
         final Properties properties = PropertiesManager.getPropertiesFromXML(file);
-        if (username != null) {
-            properties.setProperty("userName", username);
+        if (userName != null) {
+            properties.setProperty("userName", userName);
         }
         if (password != null) {
             properties.setProperty("userPassword", password);
@@ -340,7 +340,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             @Override
             public void execute() throws SBonitaException {
-                // TODO Auto-generated method stub
                 final SSession session = sessionService.createSession(tenantId, "system"); // FIXME use technical user
                 sessionId = session.getId();
             }

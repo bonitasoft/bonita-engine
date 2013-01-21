@@ -62,7 +62,7 @@ public class SPPlatformTest {
     public static void beforeClass() throws BonitaException, BonitaHomeNotSetException {
         platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         logAsPlatformAdmin();
-        platformAPI.createPlatform();
+        platformAPI.createAndInitializePlatform();
         platformAPI.startNode();
     }
 
@@ -304,7 +304,7 @@ public class SPPlatformTest {
     @Test(expected = PlatformCreationException.class)
     public void createPlatformException() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
-        platformAPI.createPlatform();
+        platformAPI.createAndInitializePlatform();
     }
 
     @Test(expected = TenantActivationException.class)
@@ -673,7 +673,7 @@ public class SPPlatformTest {
         } finally {
             platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
             logAsPlatformAdmin();
-            platformAPI.createPlatform();
+            platformAPI.createAndInitializePlatform();
             platformAPI.startNode();
         }
     }
@@ -799,7 +799,7 @@ public class SPPlatformTest {
         } catch (final PlatformNotExistException e) {
             platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
             logAsPlatformAdmin();
-            platformAPI.createPlatform();
+            platformAPI.createAndInitializePlatform();
             platformAPI.startNode();
         }
     }
