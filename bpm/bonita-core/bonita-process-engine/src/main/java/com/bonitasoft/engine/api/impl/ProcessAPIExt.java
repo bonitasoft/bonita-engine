@@ -10,11 +10,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
@@ -170,7 +171,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (!file.exists()) {
                 file.mkdir();
             }
-            tenantAccessor.getParameterService().deleteAll(serverProcessDefinition.getId());
+            if (!serverProcessDefinition.getParameters().isEmpty()) {
+                tenantAccessor.getParameterService().deleteAll(serverProcessDefinition.getId());
+            }
             final File processeFolder = new File(file, String.valueOf(serverProcessDefinition.getId()));
             FileUtil.deleteDir(processeFolder);
 
@@ -306,17 +309,10 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final IOException e1) {
                 throw new InvalidParameterValueException(e1);
             }
-            final Enumeration<String> names = (Enumeration<String>) property.propertyNames();
-            while (names.hasMoreElements()) {
-                final String name = names.nextElement();
-                final String value = property.getProperty(name);
-                defaultParamterValues.put(name, value);
+
+            for (final Entry<Object, Object> entry : property.entrySet()) {
+                defaultParamterValues.put(entry.getKey().toString(), entry.getValue().toString());
             }
-            /*
-             * for(Entry entry : property.entrySet()){
-             * defaultParamterValues.put((String)entry.getKey(), (String)entry.getValue());
-             * }
-             */
         }
 
         final Map<String, String> storedParameters = new HashMap<String, String>();
@@ -428,6 +424,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
 
             final SProcessDefinition sProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
+            if (sProcessDefinition.getParameters().isEmpty()) {
+                return Collections.emptyList();
+            }
             final List<SParameter> parameters = parameterService.get(processDefinitionId, pageIndex * numberPerPage, numberPerPage, order);
             final List<ParameterInstance> paramterInstances = new ArrayList<ParameterInstance>();
             for (int i = 0; i < parameters.size(); i++) {
@@ -578,11 +577,18 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final List<Problem> problems = super.getProcessResolutionProblems(processId);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processId, processDefinitionService);
+
         try {
-            final ParameterService parameterService = tenantAccessor.getParameterService();
-            final CheckParameterProblems checkParameterProblems = new CheckParameterProblems(parameterService, processId);
-            transactionExecutor.execute(checkParameterProblems);
-            problems.addAll(checkParameterProblems.getProblems());
+            transactionExecutor.execute(getProcessDefinition);
+            final SProcessDefinition definition = getProcessDefinition.getResult();
+            if (!definition.getParameters().isEmpty()) {
+                final ParameterService parameterService = tenantAccessor.getParameterService();
+                final CheckParameterProblems checkParameterProblems = new CheckParameterProblems(parameterService, processId);
+                transactionExecutor.execute(checkParameterProblems);
+                problems.addAll(checkParameterProblems.getProblems());
+            }
             return problems;
         } catch (final SBonitaException e) {
             throw new ProcessDefinitionNotFoundException(e);

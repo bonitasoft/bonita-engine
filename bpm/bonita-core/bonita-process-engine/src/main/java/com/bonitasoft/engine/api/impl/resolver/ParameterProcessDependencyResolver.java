@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
 package com.bonitasoft.engine.api.impl.resolver;
@@ -21,18 +21,20 @@ import com.bonitasoft.engine.exception.ParameterProcessNotFoundException;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class ParameterProcessDependencyResolver extends ProcessDependencyResolver {
 
     @Override
     public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
             final SProcessDefinition sDefinition) throws ParameterProcessNotFoundException {
-        final ParameterService parameterService = ((com.bonitasoft.engine.service.TenantServiceAccessor) tenantAccessor).getParameterService();
         final Set<SParameterDefinition> parameters = sDefinition.getParameters();
-        final Map<String, String> defaultParamterValues = businessArchive.getParameters();
-
         boolean resolved = true;
-
+        if (parameters.isEmpty()) {
+            return resolved;
+        }
+        final ParameterService parameterService = ((com.bonitasoft.engine.service.TenantServiceAccessor) tenantAccessor).getParameterService();
+        final Map<String, String> defaultParamterValues = businessArchive.getParameters();
         final Map<String, String> storedParameters = new HashMap<String, String>();
         for (final SParameterDefinition sParameterDefinition : parameters) {
             final String name = sParameterDefinition.getName();
