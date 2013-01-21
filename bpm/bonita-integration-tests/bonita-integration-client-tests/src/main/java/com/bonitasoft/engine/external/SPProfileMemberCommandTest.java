@@ -16,6 +16,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserBuilder;
+import org.bonitasoft.engine.identity.UserBuilderImpl;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
@@ -121,7 +122,7 @@ public class SPProfileMemberCommandTest extends CommonAPISPTest {
 
     private User createUserByUsernameAndPassword(final String userName, final String firstName, final String lastName, final String password)
             throws BonitaException, BonitaHomeNotSetException {
-        final UserBuilder userBuilder = new UserBuilder().createNewInstance(userName, password);
+        final UserBuilder userBuilder = new UserBuilderImpl().createNewInstance(userName, password);
         userBuilder.setFirstName(firstName).setLastName(lastName);
         return getIdentityAPI().createUser(userBuilder.done(), null, null);
     }

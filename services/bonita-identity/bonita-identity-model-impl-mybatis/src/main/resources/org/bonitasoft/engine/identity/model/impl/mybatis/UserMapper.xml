@@ -5,10 +5,10 @@
     <cache/>
 	<insert id="insertSUserImpl" parameterType="user">
 		INSERT INTO user_ (tenantid, id, firstName, lastName, password, userName, managerUserId, delegeeUserName, title, jobTitle, iconName, iconPath,
-			createdBy, creationDate, lastUpdate, lastConnection)
+			createdBy, creationDate, lastUpdate, lastConnection, enabled)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.firstName}, #{entity.lastName}, #{entity.password}, #{entity.userName}, #{entity.managerUserId},
 			#{entity.delegeeUserName}, #{entity.title}, #{entity.jobTitle}, #{entity.iconName}, #{entity.iconPath}, #{entity.createdBy},
-			#{entity.creationDate}, #{entity.lastUpdate}, #{entity.lastConnection})
+			#{entity.creationDate}, #{entity.lastUpdate}, #{entity.lastConnection}, #{entity.enabled})
 	</insert>
 	
 	<insert id="insertSContactInfoImpl" parameterType="user_contactinfo">
@@ -43,6 +43,7 @@
 			<if test="creationDate != null">creationDate=#{creationDate},</if>
 			<if test="lastUpdate != null">lastUpdate=#{lastUpdate},</if>
 			<if test="lastConnection != null">lastConnection=#{lastConnection},</if>
+			<if test="enabled != null">enabled=#{enabled},</if>
 		</trim>
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}
@@ -104,6 +105,7 @@
 		<result property="creationDate" column="creationDate" />
 		<result property="lastUpdate" column="lastUpdate" />
 		<result property="lastConnection" column="lastConnection" />
+		<result property="enabled" column="enabled" />
 	</resultMap>
 
 	<resultMap id="userContactInfoResultMap" type="user_contactinfo">

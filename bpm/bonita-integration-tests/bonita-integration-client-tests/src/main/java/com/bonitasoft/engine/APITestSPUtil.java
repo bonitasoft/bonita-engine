@@ -66,6 +66,7 @@ import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.RoleBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserBuilder;
+import org.bonitasoft.engine.identity.UserBuilderImpl;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.process.TestStates;
 import org.bonitasoft.engine.process.supervisor.ProcessSupervisor;
@@ -322,7 +323,7 @@ public class APITestSPUtil {
     }
 
     protected User createUser(final String userName, final String password) throws InvalidSessionException, UserAlreadyExistException, UserCreationException {
-        final UserBuilder userBuilder = new UserBuilder();
+        final UserBuilder userBuilder = new UserBuilderImpl();
         userBuilder.createNewInstance(userName, password);
         return identityAPI.createUser(userBuilder.done(), null, null);
     }
@@ -372,7 +373,7 @@ public class APITestSPUtil {
     }
 
     protected User createUserWithManager(final String userName, final long managerId) throws BonitaException {
-        final UserBuilder userBuilder = new UserBuilder();
+        final UserBuilder userBuilder = new UserBuilderImpl();
         userBuilder.createNewInstance(userName, "bpm").setManagerUserId(managerId);
         return identityAPI.createUser(userBuilder.done(), null, null);
     }
@@ -879,7 +880,7 @@ public class APITestSPUtil {
     }
 
     protected User createUser(final String username, final String password, final String firstName, final String lastName) throws BonitaException {
-        final UserBuilder userBuilder = new UserBuilder();
+        final UserBuilder userBuilder = new UserBuilderImpl();
         userBuilder.createNewInstance(username, password);
         userBuilder.setFirstName(firstName).setLastName(lastName);
         return identityAPI.createUser(userBuilder.done(), null, null);
