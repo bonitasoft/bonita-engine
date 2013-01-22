@@ -16,26 +16,6 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="queriableLoggerServiceConfig" class="org.bonitasoft.engine.services.impl.QueriableLoggerServiceConfigurationImpl" />
-
-    <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="builder" ref="logModelBuilder" />
-        <constructor-arg name="loggerConfiguration" ref="queriableLoggerServiceConfig" />
-        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
-    </bean>
-
-    <bean id="asyncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.AsyncQueriableLoggerServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="scheduler" ref="scheduler" />
-        <constructor-arg name="transactionService" ref="transactionService" />
-        <constructor-arg name="builder" ref="logModelBuilder" />
-        <constructor-arg name="loggerConfiguration" ref="queriableLoggerServiceConfig" />
-        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-        <constructor-arg name="logger" ref="technicalLoggerService" />
-    </bean>
-
 	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
