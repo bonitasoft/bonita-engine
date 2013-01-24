@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.log.api.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -28,7 +29,7 @@ public class BatchLogBuffer {
     private final List<SQueriableLog> logs;
 
     private BatchLogBuffer() {
-        logs = new ArrayList<SQueriableLog>();
+        this.logs = new ArrayList<SQueriableLog>();
     }
 
     public static BatchLogBuffer getInstance() {
@@ -36,13 +37,16 @@ public class BatchLogBuffer {
     }
 
     public synchronized void addLogs(final List<SQueriableLog> logs) {
-        logs.addAll(logs);
+        this.logs.addAll(logs);
     }
 
     public synchronized List<SQueriableLog> clearLogs() {
-        final List<SQueriableLog> logsToWrite = new ArrayList<SQueriableLog>(logs);
-        logs.clear();
-        return logsToWrite;
+    	if (!this.logs.isEmpty()) {
+    		final List<SQueriableLog> logsToWrite = new ArrayList<SQueriableLog>(this.logs);
+    		this.logs.clear();
+    		return logsToWrite;
+    	}
+    	return Collections.emptyList();
     }
 
 }
