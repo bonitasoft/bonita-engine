@@ -181,7 +181,7 @@
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
 		AND f.rootContainerId = #{rootContainerId}
-		AND f.kind IN ('user', 'manual', 'auto', 'call', 'loop', 'multi')
+		AND f.kind IN ('user', 'manual', 'auto', 'call', 'subProc', 'loop', 'multi')
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
@@ -193,7 +193,7 @@
 		WHERE f.tenantid = #{tenantid}
 		AND f.deleted = FALSE
 		AND f.rootContainerId = #{rootContainerId}
-		AND f.kind IN ('user', 'manual', 'auto', 'call', 'loop', 'multi')
+		AND f.kind IN ('user', 'manual', 'auto', 'call', 'subProc', 'loop', 'multi')
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>

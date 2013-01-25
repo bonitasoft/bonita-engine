@@ -997,7 +997,7 @@ public class BusinessArchiveTests {
         final Expression createdExpression = new ExpressionBuilder().createConstantBooleanExpression(false);
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("process", "10.2").addSubProcess("subProcessActivity", true).setSubProcess().addStartEvent("start")
+        builder.createNewInstance("process", "10.2").addSubProcess("subProcessActivity", true).getSubProcessBuilder().addStartEvent("start")
                 .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(5000))
                 .addBooleanData("created", createdExpression).addAutomaticTask("auto");
 
