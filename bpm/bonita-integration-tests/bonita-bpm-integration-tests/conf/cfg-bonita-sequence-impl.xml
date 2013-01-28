@@ -24,6 +24,7 @@
 				<entry key="20051" value="25000" /><!-- SADataInstanceVisibilityMapping -->
 				<entry key="10060" value="20000" /><!-- comment -->
 				<entry key="10080" value="20000" /><!-- SAComment -->
+				<entry key="10110" value="20000" /><!-- TokenCount -->
 
 				<!-- less used objects -->
 				<entry key="10012" value="100" /><!-- ProcessDefinition -->
@@ -152,6 +153,7 @@
 				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 				<entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl" value="10100" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceTokenCountImpl" value="10110" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

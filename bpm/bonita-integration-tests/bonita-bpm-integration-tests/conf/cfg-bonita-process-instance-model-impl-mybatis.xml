@@ -6,6 +6,7 @@
 		<constructor-arg name="typeAliases">
 			<map>
 				<entry key="process_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+				<entry key="process_instance_token_count" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceTokenCountImpl" />
 				<entry key="activity_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
 				<entry key="automatic_task_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
 				<entry key="user_task_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
@@ -43,6 +44,7 @@
 		<constructor-arg name="mappers">
 			<list>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceTokenCountMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/FlowNodeInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/TransitionInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ConnectorInstanceMapper.xml</value>
@@ -58,6 +60,7 @@
 		<constructor-arg name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="p" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstanceTokenCount" value="pitc" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="f" />
@@ -1169,6 +1172,7 @@
 		<constructor-arg name="entityMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstanceTokenCount" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceTokenCountImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />

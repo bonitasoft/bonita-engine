@@ -26,6 +26,13 @@
         <constructor-arg name="transitionService" ref="transitionService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 	</bean>
+	
+	<bean id="tokenCountService" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceTokenCountServiceImpl">
+        <constructor-arg name="recorder" ref="recorderSync" />
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
+    </bean>
 
 	<bean id="gatewayInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
 		<constructor-arg name="recorder" ref="recorderSync" />

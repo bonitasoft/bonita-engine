@@ -4,9 +4,9 @@
 <mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl">
 
 	<insert id="insertSProcessInstanceImpl" parameterType="process_instance">
-		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, callerType, interruptingEventId, tokenCount, processDefinitionId, description, startDate, startedBy, endDate, stateId,
+		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, callerType, interruptingEventId, processDefinitionId, description, startDate, startedBy, endDate, stateId,
 			stateCategory, lastUpdate, migration_plan)
-		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.callerType}, #{entity.interruptingEventId}, #{entity.tokenCount}, #{entity.processDefinitionId},
+		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.callerType}, #{entity.interruptingEventId}, #{entity.processDefinitionId},
 			#{entity.description}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId})
 	</insert>
 
@@ -16,7 +16,6 @@
 	      <if test="processDefinitionId != null">processDefinitionId=#{processDefinitionId},</if>
 	      <if test="description == '___bonitanull___'">description=NULL,</if>
 	      <if test="description != null and description != '___bonitanull___'">description=#{description},</if>
-	      <if test="tokenCount != null">tokenCount=#{tokenCount},</if>
 	      <if test="stateId != null">stateId=#{stateId},</if>
 	      <if test="stateCategory != null and stringIndex1 != '___bonitanull___'">stateCategory=#{stateCategory},</if>
 	      <if test="startDate != null">startDate=#{startDate},</if>
@@ -53,7 +52,6 @@
 		<result property="rootProcessInstanceId" column="rootProcessInstanceId" />
 		<result property="callerId" column="callerId" />
 		<result property="interruptingEventId" column="interruptingEventId" />
-		<result property="tokenCount" column="tokenCount" />
 		<result property="processDefintionId" column="processDefintionId" />
 		<result property="description" column="description" />
 		<result property="stateId" column="stateId" />
