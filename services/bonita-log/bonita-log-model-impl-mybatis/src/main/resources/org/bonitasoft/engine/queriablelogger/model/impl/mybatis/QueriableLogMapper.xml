@@ -6,14 +6,12 @@
 	<insert id="insertSQueriableLogImpl" parameterType="log">
 		INSERT INTO queriable_log (tenantid, id, timeStamp, year, month, day, hour, minute, second, millisecond, dayOfWeek, dayOfYear, weekOfYear, userId,
 			threadNumber, clusterNode, productVersion, severity, actionType, actionScope,
-			actionStatus, rawMessage, callerClassName, callerMethodName, numericIndex1, numericIndex2, numericIndex3, numericIndex4, numericIndex5,
-			textualIndex1, textualIndex2, textualIndex3, textualIndex4, textualIndex5)
+			actionStatus, rawMessage, callerClassName, callerMethodName, numericIndex1, numericIndex2, numericIndex3, numericIndex4, numericIndex5)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.timeStamp}, #{entity.year}, #{entity.month}, #{entity.day}, #{entity.hour}, #{entity.minute},
 			#{entity.second}, #{entity.millisecond}, #{entity.dayOfWeek}, #{entity.dayOfYear}, #{entity.weekOfYear}, #{entity.userId}, #{entity.threadNumber},
 			#{entity.clusterNode}, #{entity.productVersion}, #{entity.severity}, #{entity.actionType}, #{entity.actionScope}, #{entity.actionStatus},
 			#{entity.rawMessage}, #{entity.callerClassName}, #{entity.callerMethodName}, #{entity.numericIndex1}, #{entity.numericIndex2}, #{entity.numericIndex3},
-			#{entity.numericIndex4}, #{entity.numericIndex5}, #{entity.textualIndex1}, #{entity.textualIndex2}, #{entity.textualIndex3}, #{entity.textualIndex4},
-			#{entity.textualIndex5})
+			#{entity.numericIndex4}, #{entity.numericIndex5})
 	</insert>
 
 	<delete id="deleteSQueriableLogImpl" parameterType="log">
@@ -56,11 +54,6 @@
 		<result property="numericIndex3" column="numericIndex3" />
 		<result property="numericIndex4" column="numericIndex4" />
 		<result property="numericIndex5" column="numericIndex5" />
-		<result property="textualIndex1" column="textualIndex1" />
-		<result property="textualIndex2" column="textualIndex2" />
-		<result property="textualIndex3" column="textualIndex3" />
-		<result property="textualIndex4" column="textualIndex4" />
-		<result property="textualIndex5" column="textualIndex5" />
 	</resultMap>
 
 	<select id="getLogsFromNumericIndex1" parameterType="long" resultMap="logResultMap">
@@ -108,56 +101,6 @@
 		FROM queriable_log bl
 		WHERE bl.tenantid = #{tenantid}
 		AND bl.numericIndex5 = #{numericIndex5}
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getLogsFromTextualIndex1" parameterType="string" resultMap="logResultMap">
-		SELECT *
-		FROM queriable_log bl
-		WHERE bl.tenantid = #{tenantid}
-		AND bl.textualIndex1 = #{textualIndex1}
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getLogsFromTextualIndex2" parameterType="string" resultMap="logResultMap">
-		SELECT *
-		FROM queriable_log bl
-		WHERE bl.tenantid = #{tenantid}
-		AND bl.textualIndex2 = #{textualIndex2}
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getLogsFromTextualIndex3" parameterType="string" resultMap="logResultMap">
-		SELECT *
-		FROM queriable_log bl
-		WHERE bl.tenantid = #{tenantid}
-		AND bl.textualIndex3 = #{textualIndex3}
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getLogsFromTextualIndex4" parameterType="string" resultMap="logResultMap">
-		SELECT *
-		FROM queriable_log bl
-		WHERE bl.tenantid = #{tenantid}
-		AND bl.textualIndex4 = #{textualIndex4}
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getLogsFromTextualIndex5" parameterType="string" resultMap="logResultMap">
-		SELECT *
-		FROM queriable_log bl
-		WHERE bl.tenantid = #{tenantid}
-		AND bl.textualIndex5 = #{textualIndex5}
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
