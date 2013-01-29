@@ -184,12 +184,4 @@
 		AND dataInst.containerType = #{containerType}
 	</select>
 
-	<select id="getNumberOfDataInstancesForContainer" resultType = "long">
-		SELECT count(*)
-		FROM data_instance dataInst
-		WHERE dataInst.tenantid = #{tenantid}
-		AND dataInst.containerId = #{containerId}
-		AND dataInst.containerType = #{containerType}
-	</select>
-
 </mapper>

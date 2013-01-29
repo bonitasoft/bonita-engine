@@ -60,4 +60,12 @@
 		</if>
 	</select>
 
+	<select id="getNumberOfDataInstancesForContainer" resultType="long">
+		SELECT count(*)
+		FROM data_mapping dataMapping
+		WHERE dataMapping.tenantid = #{tenantid}
+		AND dataMapping.containerId = #{containerId}
+		AND dataMapping.containerType = #{containerType}
+	</select>
+
 </mapper>
