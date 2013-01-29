@@ -4,11 +4,10 @@
 <mapper namespace="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl">
 
 	<insert id="insertSQueriableLogImpl" parameterType="log">
-		INSERT INTO queriable_log (tenantid, id, timeStamp, year, month, day, hour, minute, second, millisecond, dayOfWeek, dayOfYear, weekOfYear, userId,
+		INSERT INTO queriable_log (tenantid, id, timeStamp, year, month, dayOfYear, weekOfYear, userId,
 			threadNumber, clusterNode, productVersion, severity, actionType, actionScope,
 			actionStatus, rawMessage, callerClassName, callerMethodName, numericIndex1, numericIndex2, numericIndex3, numericIndex4, numericIndex5)
-		VALUES (#{tenantid}, #{entity.id}, #{entity.timeStamp}, #{entity.year}, #{entity.month}, #{entity.day}, #{entity.hour}, #{entity.minute},
-			#{entity.second}, #{entity.millisecond}, #{entity.dayOfWeek}, #{entity.dayOfYear}, #{entity.weekOfYear}, #{entity.userId}, #{entity.threadNumber},
+		VALUES (#{tenantid}, #{entity.id}, #{entity.timeStamp}, #{entity.year}, #{entity.month}, #{entity.dayOfYear}, #{entity.weekOfYear}, #{entity.userId}, #{entity.threadNumber},
 			#{entity.clusterNode}, #{entity.productVersion}, #{entity.severity}, #{entity.actionType}, #{entity.actionScope}, #{entity.actionStatus},
 			#{entity.rawMessage}, #{entity.callerClassName}, #{entity.callerMethodName}, #{entity.numericIndex1}, #{entity.numericIndex2}, #{entity.numericIndex3},
 			#{entity.numericIndex4}, #{entity.numericIndex5})
@@ -30,12 +29,6 @@
 		<result property="timeStamp" column="timeStamp" />
 		<result property="year" column="year" />
 		<result property="month" column="month" />
-		<result property="day" column="day" />
-		<result property="hour" column="hour" />
-		<result property="minute" column="minute" />
-		<result property="second" column="second" />
-		<result property="millisecond" column="millisecond" />
-		<result property="dayOfWeek" column="dayOfWeek" />
 		<result property="dayOfYear" column="dayOfYear" />
 		<result property="weekOfYear" column="weekOfYear" />
 		<result property="userId" column="userId" />

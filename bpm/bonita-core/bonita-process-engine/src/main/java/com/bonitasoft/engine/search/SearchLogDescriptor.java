@@ -34,8 +34,8 @@ public class SearchLogDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(LogSearchDescriptor.MESSAGE, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getRawMessageKey()));
         searchEntityKeys.put(LogSearchDescriptor.SEVERITY, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getSeverityKey()));
 
-        logAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(2);
-        final Set<String> logFields = new HashSet<String>();
+        logAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        final Set<String> logFields = new HashSet<String>(8);
         logFields.add(sIndexedLogBuilder.getUserIdKey());
         logFields.add(sIndexedLogBuilder.getClusterNodeKey());
         logFields.add(sIndexedLogBuilder.getProductVersionKey());
@@ -44,7 +44,6 @@ public class SearchLogDescriptor extends SearchEntityDescriptor {
         logFields.add(sIndexedLogBuilder.getRawMessageKey());
         logFields.add(sIndexedLogBuilder.getCallerClassNameKey());
         logFields.add(sIndexedLogBuilder.getCallerMethodNameKey());
-        logFields.add(sIndexedLogBuilder.getDayOfWeekKey());
         logAllFields.put(SQueriableLog.class, logFields);
     }
 
