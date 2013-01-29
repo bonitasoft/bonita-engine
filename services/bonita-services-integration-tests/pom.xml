@@ -674,6 +674,12 @@
 			<artifactId>commons-pool</artifactId>
 			<version>1.5.5</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons-test</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -682,6 +688,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
+						</property>
+					</properties>
 					<systemPropertyVariables>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
 						<bonita.file.filter>com.bonitasoft.services.MyBatisServicesFileFilter</bonita.file.filter>

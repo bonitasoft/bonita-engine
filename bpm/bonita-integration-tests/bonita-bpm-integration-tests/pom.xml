@@ -1082,6 +1082,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
+						</property>
+					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
