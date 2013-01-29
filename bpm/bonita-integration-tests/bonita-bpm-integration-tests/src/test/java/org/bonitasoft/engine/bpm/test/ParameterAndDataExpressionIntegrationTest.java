@@ -2,13 +2,14 @@ package org.bonitasoft.engine.bpm.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.api.impl.LoginAPIExt;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -39,12 +40,9 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.bonitasoft.engine.api.impl.LoginAPIExt;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
-
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
-    private static final Map<Integer, Serializable> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Serializable> emptyMap();
+    private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
 
     private static APISession sSession;
 
@@ -129,7 +127,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         return eb.done();
     }
 
-    private Serializable createAndEvaluateParameterExpression(final String nameParameter, final Long deployId, final String key) throws Exception {
+    private Object createAndEvaluateParameterExpression(final String nameParameter, final Long deployId, final String key) throws Exception {
         final SExpression strExpr = newExpression(nameParameter, SExpression.TYPE_PARAMETER, String.class.getName(), null, null);
         final Map<String, Object> dependencies = CollectionUtil.buildSimpleMap(key, deployId);
         return getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS);

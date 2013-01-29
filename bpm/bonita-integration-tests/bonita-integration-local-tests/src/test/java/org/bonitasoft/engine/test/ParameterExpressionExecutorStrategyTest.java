@@ -2,7 +2,6 @@ package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ public abstract class ParameterExpressionExecutorStrategyTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ParameterExpressionExecutorStrategyTest.class);
 
-    private static final Map<Integer, Serializable> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Serializable> emptyMap();
+    private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Object> emptyMap();
 
     protected abstract ExpressionService getExpressionService();
 
@@ -89,7 +88,7 @@ public abstract class ParameterExpressionExecutorStrategyTest {
 
         final SExpression strExpr = newExpression(nameParameter, SExpression.TYPE_PARAMETER, null, null, null);
         final Map<String, Object> dependencies = CollectionUtil.buildSimpleMap("processDefinitionId", processDefinitionId);
-        final Serializable expressionResult = getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS);
+        final Object expressionResult = getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS);
         final SParameter para = createParameter("name", "baptiste");
         assertEquals(para, expressionResult);
     }
@@ -104,7 +103,7 @@ public abstract class ParameterExpressionExecutorStrategyTest {
         final Map<String, Object> dependencies = CollectionUtil.buildSimpleMap("processDefinitionId", processDefinitionId);
         dependencies.put("processDefinitionId", processDefinitionId);
         final SExpression strExpr = newExpression(expressionContent, SExpression.TYPE_PARAMETER, null, null, null);
-        final Serializable expressionResult = getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS);
+        final Object expressionResult = getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS);
         final SParameter para = createParameter("address", "");
         assertEquals(para, expressionResult);
     }

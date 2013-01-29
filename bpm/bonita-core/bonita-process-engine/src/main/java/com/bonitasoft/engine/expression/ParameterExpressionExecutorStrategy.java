@@ -4,7 +4,6 @@
  */
 package com.bonitasoft.engine.expression;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +35,12 @@ public class ParameterExpressionExecutorStrategy implements ExpressionExecutorSt
     }
 
     @Override
-    public Serializable evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Serializable> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         long processDefinitionId;
         final String expressionContent = expression.getContent();
         try {
-            Serializable result = null;
+            Object result = null;
             if (dependencyValues != null && !dependencyValues.isEmpty()) {
                 if (dependencyValues.containsKey(PROCESS_DEFINITION_ID)) {
                     processDefinitionId = (Long) dependencyValues.get(PROCESS_DEFINITION_ID);
@@ -83,9 +82,9 @@ public class ParameterExpressionExecutorStrategy implements ExpressionExecutorSt
     }
 
     @Override
-    public List<Serializable> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
-            final Map<Integer, Serializable> resolvedExpressions) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        final List<Serializable> list = new ArrayList<Serializable>(expressions.size());
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
+            final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+        final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, dependencyValues, resolvedExpressions));
         }

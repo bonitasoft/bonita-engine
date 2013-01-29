@@ -54,7 +54,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     @Override
-    public Serializable evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Serializable> resolvedExpressions)
+    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         ExpressionConstants expressionConstant = ExpressionConstantsResolver.getExpressionConstantsFromName(expression.getContent());
         if (expressionConstant == null) {
@@ -203,9 +203,9 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     @Override
-    public List<Serializable> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
-            final Map<Integer, Serializable> resolvedExpressions) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        final List<Serializable> results = new ArrayList<Serializable>();
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
+            final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+        final List<Object> results = new ArrayList<Object>();
         for (final SExpression sExpression : expressions) {
             results.add(evaluate(sExpression, dependencyValues, resolvedExpressions));
         }
