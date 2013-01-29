@@ -6,6 +6,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -23,6 +24,7 @@ public class LocalLogTest extends CommonAPISPTest {
     }
 
     // run this test in local test suite only, otherwise it's necessary to use a command to set the system property on the server side
+    @Ignore("This test fails because Property 'org.bonitasoft.engine.services.queryablelog.disable' is only read at startup, so change is not taken into account")
     @Test
     public void testDisableLogs() throws Exception {
         final int initNumberOfLogs = getLogAPI().getNumberOfLogs();
