@@ -14,7 +14,11 @@ import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.exception.ObjectDeletionException;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.wait.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.wait.CheckNbPendingTaskOf;
 import org.junit.After;
@@ -122,6 +126,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         disableAndDelete(processDefinition);
     }
 
+    @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, keywords = { "add subtask" })
     @Test
     public void createUserTaskOnParent() throws Exception {
         final String password = "secretPassword";
@@ -133,9 +138,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         loginWith(john.getUserName(), password);
 
         getProcessAPI().startProcess(processDefinition.getId());
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 30, 3000, true, 1, john);
-        assertTrue("no new activity found", checkNbPendingTaskOf.waitUntil());
-        final List<HumanTaskInstance> pendingTasks = checkNbPendingTaskOf.getPendingHumanTaskInstances();
+        final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
         final HumanTaskInstance parentTask = pendingTasks.get(0);
         getProcessAPI().assignUserTask(parentTask.getId(), john.getId());
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
@@ -173,6 +176,64 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         final HumanTaskInstance userTaskInstance = checkNbAssignedTaskOfJack.getAssingnedHumanTaskInstances().get(0);
         assertEquals("newTask1", userTaskInstance.getName());
         disableAndDelete(processDefinition);
+    }
+
+    @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
+    @Test
+    public void deleteManualTask() throws Exception {
+        final String password = "secretPassword";
+        final String delivery = "Delivery men";
+
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess(delivery);
+
+        logout();
+        loginWith(john.getUserName(), password);
+
+        getProcessAPI().startProcess(processDefinition.getId());
+        final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
+        final HumanTaskInstance parentTask = pendingTasks.get(0);
+        getProcessAPI().assignUserTask(parentTask.getId(), john.getId());
+        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
+        assertEquals(1, toDoTasks.size());
+        assertEquals("userTask1", toDoTasks.get(0).getName());
+
+        final Date dueDate = new Date(System.currentTimeMillis());
+        final ManualTaskInstance subtask = getProcessAPI().addManualUserTask(parentTask.getId(), "newTask2", "newTask2", john.getId(),
+                "add new manual user task", dueDate, TaskPriority.NORMAL);
+        CheckNbAssignedTaskOf checkNbAssignedTaskOfJohn = new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, true, 2, john);
+        assertTrue("no new activity found", checkNbAssignedTaskOfJohn.waitUntil());
+        getProcessAPI().deleteManualUserTask(subtask.getId());
+        checkNbAssignedTaskOfJohn = new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, true, 1, john);
+        assertTrue("no new activity found", checkNbAssignedTaskOfJohn.waitUntil());
+        assertEquals("userTask1", checkNbAssignedTaskOfJohn.getAssingnedHumanTaskInstances().get(0).getName());
+        disableAndDelete(processDefinition);
+    }
+
+    @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
+    @Test(expected = ObjectDeletionException.class)
+    public void deleteNotManualTask() throws Exception {
+        final String password = "secretPassword";
+        final String delivery = "Delivery men";
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess(delivery);
+        logout();
+        loginWith(john.getUserName(), password);
+        getProcessAPI().startProcess(processDefinition.getId());
+        final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
+        final HumanTaskInstance parentTask = pendingTasks.get(0);
+        getProcessAPI().assignUserTask(parentTask.getId(), john.getId());
+        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
+        final HumanTaskInstance humanTaskInstance = toDoTasks.get(0);
+        try {
+            getProcessAPI().deleteManualUserTask(humanTaskInstance.getId());
+        } finally {
+            disableAndDelete(processDefinition);
+        }
+    }
+
+    @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
+    @Test(expected = ObjectNotFoundException.class)
+    public void deleteUnexistingManualTask() throws Exception {
+        getProcessAPI().deleteManualUserTask(123);
     }
 
     private ProcessDefinition deployAndEnableSimpleProcess(final String actorName) throws BonitaException, InvalidProcessDefinitionException {

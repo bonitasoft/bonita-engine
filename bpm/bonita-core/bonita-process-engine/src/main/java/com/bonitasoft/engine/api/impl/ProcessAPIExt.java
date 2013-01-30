@@ -90,6 +90,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
@@ -556,6 +557,37 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final Exception e) {
             log(tenantAccessor, e);
             throw new ActivityExecutionErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteManualUserTask(final long manualTaskId) throws InvalidSessionException, ObjectDeletionException, ObjectNotFoundException {
+        if (!Manager.isFeatureActive(Features.CREATE_MANUAL_TASK)) {
+            throw new IllegalStateException("The add of a manual task is not an active feature");
+        }
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        try {
+            transactionExecutor.openTransaction();
+            try {
+                final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(manualTaskId);
+                if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
+                    processInstanceService.deleteFlowNodeInstance(activityInstance, null);
+                } else {
+                    throw new ObjectDeletionException("Can't delete a task that is not a sub task");
+                }
+            } catch (final SActivityInstanceNotFoundException e) {
+                throw new ObjectNotFoundException("can't find activity with id " + manualTaskId, e);
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ObjectDeletionException(e);
+            } finally {
+                transactionExecutor.completeTransaction();
+            }
+        } catch (final STransactionException e) {
+            throw new ObjectDeletionException(e);
         }
     }
 

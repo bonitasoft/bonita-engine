@@ -14,6 +14,8 @@ import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.ActivityInterruptedException;
 import org.bonitasoft.engine.exception.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.ObjectDeletionException;
+import org.bonitasoft.engine.exception.ObjectNotFoundException;
 
 /**
  * @author Matthieu Chaffotte
@@ -51,5 +53,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     ManualTaskInstance addManualUserTask(long humanTaskId, String taskName, String displayName, long assignTo, String description, Date dueDate,
             TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException, ActivityExecutionErrorException, ActivityCreationException,
             ActivityNotFoundException;
+
+    void deleteManualUserTask(final long manualTaskId) throws InvalidSessionException, ObjectDeletionException, ObjectNotFoundException;
 
 }

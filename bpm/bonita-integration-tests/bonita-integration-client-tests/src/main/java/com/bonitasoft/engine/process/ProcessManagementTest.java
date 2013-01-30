@@ -173,8 +173,9 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals("userTask1", toDoTasks.get(0).getName());
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());
-        getProcessAPI().addManualUserTask(parentTask.getId(), "newTask1", "newTask1", jack.getId(), "add new manual user task", dueDate, TaskPriority.HIGHEST);
-        getProcessAPI().addManualUserTask(parentTask.getId(), "newTask2", "newTask2", john.getId(), "add new manual user task", dueDate, TaskPriority.LOWEST);
+        getProcessAPI()
+                .addManualUserTask(parentTask.getId(), "newTask'1", "newTask'1", jack.getId(), "add new manual user task", dueDate, TaskPriority.HIGHEST);
+        getProcessAPI().addManualUserTask(parentTask.getId(), "newTask'2", "newTask'2", john.getId(), "add new manual user task", dueDate, TaskPriority.LOWEST);
         assertTrue("no new activity found", new WaitUntil(20, 500) {
 
             @Override
@@ -198,10 +199,10 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals(2, searchResult.getCount());
         final List<HumanTaskInstance> subTasks = searchResult.getResult();
         final HumanTaskInstance subTask1 = subTasks.get(0);
-        assertEquals("newTask1", subTask1.getName());
+        assertEquals("newTask'1", subTask1.getName());
         assertEquals(TaskPriority.HIGHEST, subTask1.getPriority());
         final HumanTaskInstance subTask2 = subTasks.get(1);
-        assertEquals("newTask2", subTask2.getName());
+        assertEquals("newTask'2", subTask2.getName());
         assertEquals(TaskPriority.LOWEST, subTask2.getPriority());
         assertTrue(subTask1 instanceof ManualTaskInstance);
         disableAndDelete(processDefinition);
