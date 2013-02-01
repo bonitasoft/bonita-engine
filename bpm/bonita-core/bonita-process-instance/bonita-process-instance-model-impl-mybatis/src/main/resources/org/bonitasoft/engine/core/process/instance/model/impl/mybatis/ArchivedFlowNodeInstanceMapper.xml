@@ -100,7 +100,7 @@
 		FROM arch_flownode_instance af
 		WHERE af.tenantid = #{tenantid}
 	    AND af.sourceObjectId = #{activityInstanceId}
-		ORDER BY af.archiveDate DESC
+		ORDER BY af.archiveDate DESC, af.id DESC
 	</select>
 
 	<select id="getAActivityInstanceByActivityInstanceIdAndStateId" parameterType="long" resultMap="archivedFlownodeInstanceResultMap">
