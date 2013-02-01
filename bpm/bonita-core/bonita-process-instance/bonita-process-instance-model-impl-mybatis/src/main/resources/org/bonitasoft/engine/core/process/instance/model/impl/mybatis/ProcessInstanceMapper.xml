@@ -5,9 +5,10 @@
 
 	<insert id="insertSProcessInstanceImpl" parameterType="process_instance">
 		INSERT INTO process_instance (tenantid, id, name, containerId, rootProcessInstanceId, callerId, callerType, interruptingEventId, processDefinitionId, description, startDate, startedBy, endDate, stateId,
-			stateCategory, lastUpdate, migration_plan)
+			stateCategory, lastUpdate, migration_plan, stringIndex1, stringIndex2, stringIndex3, stringIndex4, stringIndex5)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.name}, #{entity.containerId}, #{entity.rootProcessInstanceId}, #{entity.callerId}, #{entity.callerType}, #{entity.interruptingEventId}, #{entity.processDefinitionId},
-			#{entity.description}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId})
+			#{entity.description}, #{entity.startDate}, #{entity.startedBy}, #{entity.endDate}, #{entity.stateId}, #{entity.stateCategory}, #{entity.lastUpdate}, #{entity.migrationPlanId},
+			#{entity.stringIndex1}, #{entity.stringIndex2}, #{entity.stringIndex3}, #{entity.stringIndex4}, #{entity.stringIndex5})
 	</insert>
 
 	<update id="updateSProcessInstanceImpl"  parameterType="process_instance">

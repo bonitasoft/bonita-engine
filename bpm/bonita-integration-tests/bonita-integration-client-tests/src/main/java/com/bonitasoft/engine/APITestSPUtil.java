@@ -1057,7 +1057,7 @@ public class APITestSPUtil {
         final Expression expression = new ExpressionBuilder().createNewInstance(dataInstanceName).setContent(expressionContent)
                 .setExpressionType(expressionType.name()).setReturnType(returnType).done();
         final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setVariableToSet(leftOperand).setType(OperatorType.ASSIGNMENT)
+        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
         return operation;
     }

@@ -442,7 +442,7 @@ public class BusinessArchiveTests {
         for (final ConnectorDefinition connector : result.getProcessContainer().getConnectors()) {
             final Operation operation = connector.getOutputs().get(0);
             if ("conn3".equals(connector.getName()) && trueExpression.equals(connector.getInputs().get("input1"))
-                    && "testData".equals(operation.getVariableToSet().getDataName()) && OperatorType.ASSIGNMENT.equals(operation.getType())
+                    && "testData".equals(operation.getLeftOperand().getName()) && OperatorType.ASSIGNMENT.equals(operation.getType())
                     && ASSIGN_OPERATOR.equals(operation.getOperator()) && trueExpression.equals(operation.getRightOperand())) {
                 connectorWithInputOutputOk = true;
                 break;
@@ -500,7 +500,7 @@ public class BusinessArchiveTests {
         leftOperandBuilder.createNewInstance().setName("var1");
         final OperationBuilder opb = new OperationBuilder();
         opb.createNewInstance().setOperator(ASSIGN_OPERATOR).setRightOperand(trueExpression).setType(OperatorType.ASSIGNMENT)
-                .setVariableToSet(leftOperandBuilder.done());
+                .setLeftOperand(leftOperandBuilder.done());
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addBooleanData("var1", null);
@@ -727,7 +727,7 @@ public class BusinessArchiveTests {
 
     private Operation getOperation(final Expression rightOperand, final LeftOperand leftOperand) {
         final OperationBuilder opb = new OperationBuilder().createNewInstance();
-        opb.setVariableToSet(leftOperand);
+        opb.setLeftOperand(leftOperand);
         opb.setOperator(ASSIGN_OPERATOR);
         opb.setRightOperand(rightOperand);
         opb.setType(OperatorType.ASSIGNMENT);

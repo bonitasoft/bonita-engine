@@ -3,6 +3,7 @@
 
 	<bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
 		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
+		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 	</bean>
 
 	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="byType" />
@@ -10,19 +11,16 @@
 	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
-		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 	</bean>
 
 	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
-		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 
 	</bean>
 
 	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService"></constructor-arg>
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders"></constructor-arg>
-		<constructor-arg name="expressionResolverService" ref="expressionResolverService"></constructor-arg>
 	</bean>
 </beans>
