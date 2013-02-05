@@ -4,14 +4,14 @@
 <mapper namespace="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl">
 
 	<insert id="insertAActivityInstanceImpl" parameterType="arch_activity_instance">
-		INSERT INTO arch_flownode_instance (tenantid, id, kind, rootContainerId, parentContainerId, name, displayName, displayDescription, stateId, stateName, archiveDate,
+		INSERT INTO arch_flownode_instance (tenantid, id, kind, flownodeDefinitionId, rootContainerId, parentContainerId, name, displayName, displayDescription, stateId, stateName, archiveDate,
 		 terminal, stable, lastUpdateDate, reachedStateDate, aborting, logicalGroup1, logicalGroup2, logicalGroup3, logicalGroup4, sourceObjectId, description, executedBy
 		<if test="kind == 'user' or kind == 'manual'">, priority, expectedEndDate, actorId, assigneeId</if>
 		<if test="kind == 'loop'">, loop_counter, loop_max</if>
 		<if test="kind == 'subProc'">, triggeredByEvent</if>
 		)
 		VALUES
-		(#{tenantid}, #{entity.id}, #{kind}, #{entity.rootContainerId}, #{entity.parentContainerId}, #{entity.name},
+		(#{tenantid}, #{entity.id}, #{kind}, #{entity.flownodeDefinitionId}, #{entity.rootContainerId}, #{entity.parentContainerId}, #{entity.name},
 		#{entity.displayName}, #{entity.displayDescription}, #{entity.stateId}, #{entity.stateName}, #{entity.archiveDate}, #{entity.terminal}, #{entity.stable}, #{entity.lastUpdateDate}, 
 		#{entity.reachedStateDate}, #{entity.aborting}, #{entity.logicalGroup1}, #{entity.logicalGroup2}, #{entity.logicalGroup3}, #{entity.logicalGroup4}, #{entity.sourceObjectId}, #{entity.description}, #{entity.executedBy}
 		<if test="kind == 'user' or kind == 'manual'">, #{entity.priority, javaType=org.bonitasoft.engine.core.process.instance.model.STaskPriority, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{entity.expectedEndDate}, #{entity.actorId}, #{entity.assigneeId}</if>
@@ -29,6 +29,7 @@
 	<resultMap id="archivedFlownodeInstanceResultMap" type="arch_flow_node_instance">
 		<result property="id" column="id" />
 		<result property="name" column="name" />
+		<result property="flownodeDefinitionId" column="flownodeDefinitionId" />
 		<result property="displayName" column="displayName" />
 		<result property="displayDescription" column="displayDescription" />
 		<result property="rootContainerId" column="rootContainerId" />

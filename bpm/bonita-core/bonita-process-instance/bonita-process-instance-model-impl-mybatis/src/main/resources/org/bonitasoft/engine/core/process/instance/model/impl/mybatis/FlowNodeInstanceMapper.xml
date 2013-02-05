@@ -4,8 +4,8 @@
 <mapper namespace="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl">
 
 	<insert id="insertSFlowNodeInstanceImpl" parameterType="activity_instance">
-		INSERT INTO flownode_instance (tenantid, id, kind, rootContainerId, parentContainerId,
-		name, description, displayName, displayDescription, stateId, stateName, prev_state_id, terminal, stable, lastUpdateDate, reachedStateDate,
+		INSERT INTO flownode_instance (tenantid, id, kind, flownodeDefinitionId, rootContainerId, parentContainerId, name, description, 
+		displayName, displayDescription, stateId, stateName, prev_state_id, terminal, stable, lastUpdateDate, reachedStateDate,
 		stateCategory, logicalGroup1, logicalGroup2, logicalGroup3, logicalGroup4, tokenCount, loop_counter
 		<if test="kind == 'user' or kind == 'manual'">, priority, expectedEndDate, claimedDate, actorId, assigneeId, abortedByBoundary</if>
 		<if test="kind == 'gate'">, gatewayType, hitBys</if>
@@ -18,7 +18,7 @@
 		<if test="kind == 'subProc'">, triggeredByEvent</if>
 		)
 		VALUES
-		(#{tenantid}, #{entity.id}, #{kind}, #{entity.rootContainerId}, #{entity.parentContainerId}, #{entity.name}, #{entity.description},
+		(#{tenantid}, #{entity.id}, #{kind}, #{entity.flownodeDefinitionId}, #{entity.rootContainerId}, #{entity.parentContainerId}, #{entity.name}, #{entity.description},
 		#{entity.displayName}, #{entity.displayDescription}, #{entity.stateId}, #{entity.stateName}, #{entity.previousStateId}, #{entity.terminal}, #{entity.stable},
 		#{entity.lastUpdateDate}, #{entity.reachedStateDate},  #{entity.stateCategory}, #{entity.logicalGroup1}, #{entity.logicalGroup2}, #{entity.logicalGroup3}, 
 		#{entity.logicalGroup4}, #{entity.tokenCount}, #{entity.loopCounter}
@@ -39,6 +39,7 @@
 	<update id="updateSFlowNodeInstanceImpl" parameterType="map">
 		UPDATE flownode_instance
 		<trim prefix="SET" suffixOverrides=",">
+			<if test="flownodeDefinitionId != null">flownodeDefinitionId=#{flownodeDefinitionId},</if>
 			<if test="stateId != null">stateId=#{stateId},</if>
 			<if test="previousStateId != null">prev_state_id=#{previousStateId},</if>
 			<if test="terminal != null">terminal=#{terminal},</if>
@@ -88,6 +89,7 @@
 	<resultMap id="flowNodeInstanceResultMap" type="flownode_instance">
 		<result property="id" column="id" />
 		<result property="name" column="name" />
+		<result property="flownodeDefinitionId" column="flownodeDefinitionId" />
 		<result property="displayName" column="displayName" />
 		<result property="displayDescription" column="displayDescription" />
 		<result property="rootContainerId" column="rootContainerId" />

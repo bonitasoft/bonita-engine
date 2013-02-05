@@ -534,7 +534,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (((SHumanTaskInstance) activityInstance).getAssigneeId() != userId) {
                 throw new ActivityCreationException("Unable to create a child task from this task, it's not assigned to you!");
             }
-            final TransactionContentWithResult<SManualTaskInstance> createManualUserTask = new CreateManualUserTask(activityInstanceService, taskName,
+            final TransactionContentWithResult<SManualTaskInstance> createManualUserTask = new CreateManualUserTask(activityInstanceService, taskName, -1,
                     displayName, humanTaskId, assignTo, description, dueDate, STaskPriority.valueOf(prio.name()));
             transactionExecutor.execute(createManualUserTask);
             final long id = createManualUserTask.getResult().getId();
