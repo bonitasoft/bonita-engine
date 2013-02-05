@@ -129,7 +129,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             final GetProcessDeploymentInfo transactionContentWithResult = new GetProcessDeploymentInfo(processDefinitionId, processDefinitionService);
             transactionExecutor.execute(transactionContentWithResult);
             final SProcessDefinitionDeployInfo deployInfo = transactionContentWithResult.getResult();
-            if (ActivationState.DISABLED.equals(deployInfo.getActivationState())) {
+            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
                 throw new ProcessDefinitionNotEnabledException(deployInfo.getName(), deployInfo.getVersion(), deployInfo.getProcessId());
             }
             sDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
