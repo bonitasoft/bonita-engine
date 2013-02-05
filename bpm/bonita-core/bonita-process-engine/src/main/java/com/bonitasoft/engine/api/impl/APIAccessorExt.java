@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
 package com.bonitasoft.engine.api.impl;
-
-import java.io.Serializable;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -21,7 +19,7 @@ import com.bonitasoft.engine.api.ProcessAPI;
 /**
  * @author Matthieu Chaffotte
  */
-public class APIAccessorExt extends APIAccessorImpl implements APIAccessor, Serializable {
+public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
 
     private static final long serialVersionUID = -7317110051980496939L;
 
