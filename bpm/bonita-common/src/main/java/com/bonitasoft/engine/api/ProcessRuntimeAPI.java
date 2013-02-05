@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
 package com.bonitasoft.engine.api;
@@ -10,7 +10,6 @@ import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.exception.ActivityCreationException;
 import org.bonitasoft.engine.exception.ActivityExecutionErrorException;
-import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.ActivityInterruptedException;
 import org.bonitasoft.engine.exception.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
@@ -42,8 +41,6 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws ActivityExecutionErrorException
      *             An unexpected error occurred while executing the user task
-     * @throws ActivityExecutionFailedException
-     *             The execution of the activity failed
      * @throws ActivityInterruptedException
      *             The activity was interrupted
      * @throws ActivityCreationException
