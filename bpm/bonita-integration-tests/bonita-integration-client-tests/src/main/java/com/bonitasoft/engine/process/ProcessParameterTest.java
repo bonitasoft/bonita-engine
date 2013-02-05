@@ -724,7 +724,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         try {
             stream = BPMRemoteTests.class.getResourceAsStream(implSourceFile);
             assertNotNull(stream);
-            final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf("/") + 1, implSourceFile.lastIndexOf("."));
+            final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf('/') + 1, implSourceFile.lastIndexOf('.'));
             final byte[] byteArray = IOUtils.toByteArray(stream);
             final byte[] data = IOUtil.generateJar(implClass);
             // read bytes of files to zip file byte array
