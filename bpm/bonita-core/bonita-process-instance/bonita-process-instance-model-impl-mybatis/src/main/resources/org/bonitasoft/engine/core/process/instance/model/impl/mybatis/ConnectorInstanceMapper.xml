@@ -83,5 +83,26 @@
 		AND c.activationEvent = #{activationEvent}
 		AND c.state = #{state}
 	</select>
+	
+		<select id="getNumberOfSConnectorInstance" parameterType="long" resultType="long">
+		SELECT COUNT(c.id)
+		FROM connector_instance c
+		WHERE c.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>		
+	</select>
+	
+	<select id="searchSConnectorInstance" resultMap="connectorInstanceResultMap">
+		SELECT c.*
+		FROM connector_instance c
+		WHERE c.tenantid = #{tenantid}
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>		
+	</select>	
 
 </mapper>
