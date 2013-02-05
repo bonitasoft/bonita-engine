@@ -65,10 +65,10 @@ public class SPProfileMemberCommandTest extends CommonAPISPTest {
 
         loginWith("default_tenant2", "default_password2", tenant2Id);
 
-        final User user_tenant2 = createUserByUsernameAndPassword("userName_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2", "UserPwd_tenant2");
+        final User userTenant2 = createUserByUsernameAndPassword("userName_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2", "UserPwd_tenant2");
         final Map<String, Serializable> addParameters = new HashMap<String, Serializable>();
         addParameters.put(PROFILE_ID, Long.valueOf(1));
-        addParameters.put(USER_ID, user_tenant2.getId());
+        addParameters.put(USER_ID, userTenant2.getId());
         final Map<String, Serializable> addProfileMemberResult = (Map<String, Serializable>) getCommandAPI().execute(ADD_PROFILE_MEMEBER, addParameters);
 
         logout();
@@ -109,7 +109,7 @@ public class SPProfileMemberCommandTest extends CommonAPISPTest {
 
         logout();
         loginWith("default_tenant2", "default_password2", tenant2Id);
-        getIdentityAPI().deleteUser(user_tenant2.getId());
+        getIdentityAPI().deleteUser(userTenant2.getId());
 
         platformSession = platformLoginAPI.login("platformAdmin", "platform");
         platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
