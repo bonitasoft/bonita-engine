@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  */
 package com.bonitasoft.engine.log;
@@ -10,27 +10,28 @@ import java.util.Date;
 /**
  * @author Lu Kai
  * @author Bole Zhang
+ * @author Matthieu Chaffotte
  */
 public interface Log extends Serializable {
 
-    public long getLogId();
+    long getLogId();
 
-    public String getMessage();
+    String getMessage();
 
-    public SeverityLevel getSeverityLevel();
+    SeverityLevel getSeverityLevel();
 
-    public String getCreatedBy();
+    String getCreatedBy();
 
-    public Date getCreationDate();
+    Date getCreationDate();
 
-    public String getActionType();
+    String getActionType();
 
-    public String getActionScope();
+    String getActionScope();
 
-    public SeverityLevel getSeverity();
+    SeverityLevel getSeverity();
 
-    public String getCallerClassName();
+    String getCallerClassName();
 
-    public String getCallerMethodName();
+    String getCallerMethodName();
 
 }
