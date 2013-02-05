@@ -61,12 +61,12 @@ public class MultiInstanceTest extends CommonAPISPTest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskWithChildrenInParallel(loopMax, 1, processDefinition, processInstance);
+        checkPendingTaskWithChildrenInParallel(loopMax, 1, processInstance);
         disableAndDelete(processDefinition);
     }
 
-    private void checkPendingTaskWithChildrenInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessDefinition processDefinition,
-            final ProcessInstance processInstance) throws Exception {
+    private void checkPendingTaskWithChildrenInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessInstance processInstance)
+            throws Exception {
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, numberOfTask, john);
         final boolean waitUntil = checkNbPendingTaskOf.waitUntil();
         assertTrue("expected " + numberOfTask + " pending task but was " + checkNbPendingTaskOf.getPendingHumanTaskInstances().size(), waitUntil);

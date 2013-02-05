@@ -230,7 +230,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             transactionExecutor.openTransaction();
             try {
                 processDefinitionService.store(sDefinition, processDefinition.getDisplayName(), processDefinition.getDisplayDescription());
-                unzipBar(businessArchive, sDefinition, transactionExecutor, tenantAccessor.getTenantId());// TODO first unzip in temp folder
+                unzipBar(businessArchive, sDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
                 // TODO refactor this to avoid using transaction executor inside
                 final boolean isResolved = resolveDependencies(businessArchive, tenantAccessor, sDefinition);
                 if (isResolved) {
@@ -332,8 +332,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sDefinition, final TransactionExecutor transactionExecutor,
-            final long tenantId) throws BonitaHomeNotSetException, InvalidSessionException, ProcessDeployException, IOException {
+    private void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sDefinition, final long tenantId) throws BonitaHomeNotSetException,
+            InvalidSessionException, ProcessDeployException, IOException {
         final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
         final File file = new File(processesFolder);
         if (!file.exists()) {
