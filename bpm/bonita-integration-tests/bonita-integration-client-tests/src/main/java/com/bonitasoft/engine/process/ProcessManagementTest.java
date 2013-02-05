@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.WaitUntil;
+import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ActivityStates;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
@@ -164,13 +165,13 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 return getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null).size() == 2;
             }
         }.waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
+        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         // make userTask1 as parentTask
         final HumanTaskInstance parentTask = pendingTasks.get(1);
         getProcessAPI().assignUserTask(parentTask.getId(), john.getId());
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, toDoTasks.size());
-        assertEquals("userTask1", toDoTasks.get(0).getName());
+        assertEquals(parentTask.getName(), toDoTasks.get(0).getName());
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());
         getProcessAPI()
