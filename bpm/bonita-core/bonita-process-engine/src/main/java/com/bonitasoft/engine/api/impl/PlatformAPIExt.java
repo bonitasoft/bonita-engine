@@ -20,7 +20,6 @@ import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.CreateDefaultPrivileges;
-import org.bonitasoft.engine.api.impl.transaction.CreateDefaultProfiles;
 import org.bonitasoft.engine.api.impl.transaction.CreateTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeleteTenant;
