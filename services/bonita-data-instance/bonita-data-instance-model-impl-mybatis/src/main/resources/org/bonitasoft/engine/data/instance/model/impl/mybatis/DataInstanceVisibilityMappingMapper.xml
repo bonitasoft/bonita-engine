@@ -52,12 +52,10 @@
   	<select id="getDataInstanceVisibilityMappings" parameterType="long" resultMap="dataInstanceVisibilityMappingResultMap">
 		SELECT *
 		FROM data_mapping dataMapping
-		WHERE dataMapping.tenantid = #{tenantid}
+		WHERE dataMapping.containerId = #{containerId}
 		AND dataMapping.containerType = #{containerType}
-		AND dataMapping.containerId = #{containerId}
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
+		AND dataMapping.tenantid = #{tenantid}
+		ORDER BY dataMapping.dataInstanceId
 	</select>
 
 	<select id="getNumberOfDataInstancesForContainer" resultType="long">
