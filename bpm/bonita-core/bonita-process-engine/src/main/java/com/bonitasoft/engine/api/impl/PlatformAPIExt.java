@@ -202,7 +202,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final DataService dataService = platformAccessor.getTenantServiceAccessor(tenantId).getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = platformAccessor.getTenantServiceAccessor(tenantId).getCommandService();
-            final ProfileService profileService = platformAccessor.getTenantServiceAccessor(tenantId).getProfileService();
             final PrivilegeService privilegeService = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeService();
             final PrivilegeBuilders privilegeBuilders = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeBuilders();
             transactionExecutor.openTransaction();
@@ -213,8 +212,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 createDefaultDataSource(sessionService, sDataSourceModelBuilder, dataService, tenantId, userName);
 
                 commandService.createDefaultCommands();
-                final CreateDefaultProfiles createDefaultProfiles = new CreateDefaultProfiles(profileService);
-                createDefaultProfiles.execute();
 
                 final CreateDefaultPrivileges createDefaultPrivileges = new CreateDefaultPrivileges(privilegeService, privilegeBuilders);
                 createDefaultPrivileges.execute();
