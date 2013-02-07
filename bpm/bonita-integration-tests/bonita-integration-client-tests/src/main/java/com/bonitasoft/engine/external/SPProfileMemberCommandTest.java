@@ -21,6 +21,7 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -51,6 +52,7 @@ public class SPProfileMemberCommandTest extends CommonAPISPTest {
         logout();
     }
 
+    @Ignore("Problem with assumption that default values pre-exist")
     @Test
     public void testMultitenancyOnSearchUserProfileMembers() throws BonitaException, IOException {
         logout();
