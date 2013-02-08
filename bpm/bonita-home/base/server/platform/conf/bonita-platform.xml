@@ -50,7 +50,6 @@
     <entry key="org.bonitasoft.engine.archive.name">DEFINITIVE_0</entry>
     <entry key="org.bonitasoft.engine.archive.oldestTime">1230739200052</entry>
     <entry key="org.bonitasoft.engine.archive.newestTime">9999999999999</entry>
-    <entry key="org.bonitasoft.engine.archive.regexp">.*</entry>
     <entry key="org.bonitasoft.engine.cron">0/5 * * * * ?</entry>
     <entry key="delete.job.frequency">0 0/5 * * * ?</entry>
 
