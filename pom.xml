@@ -14,7 +14,7 @@
 	<name>Bonita Engine SP</name>
 
 	<properties>
-		<jacoco.file>${user.home}/jacoco-engine-sp.exec</jacoco.file>
+		<jacoco.file>${user.home}/jacoco-engine.exec</jacoco.file>
 		<!-- Sonar -->
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
