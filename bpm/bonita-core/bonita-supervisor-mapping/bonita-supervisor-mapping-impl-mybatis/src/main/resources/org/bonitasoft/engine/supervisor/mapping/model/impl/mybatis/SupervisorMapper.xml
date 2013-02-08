@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorImpl">
+<mapper namespace="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl">
     <cache/>
-	<insert id="insertSSupervisorImpl" parameterType="processsupervisor">
+	<insert id="insertSProcessSupervisorImpl" parameterType="processsupervisor">
 		INSERT INTO processsupervisor (tenantid, id, processDefId, userId, groupId, roleId)
 		VALUES (#{tenantid}, #{entity.id}, #{entity.processDefId}, #{entity.userId}, #{entity.groupId}, #{entity.roleId})
 	</insert>
 
-	<delete id="deleteSSupervisorImpl" parameterType="processsupervisor">
+	<delete id="deleteSProcessSupervisorImpl" parameterType="processsupervisor">
 		DELETE FROM processsupervisor
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}
@@ -20,64 +20,212 @@
 		<result property="userId" column="userId" />
 		<result property="groupId" column="groupId" />
 		<result property="roleId" column="roleId" />
-		<result property="displayNamePart1" column="displayNamePart1" />
-		<result property="displayNamePart2" column="displayNamePart2" />
-		<result property="displayNamePart3" column="displayNamePart3" />
 	</resultMap>
+	
+	<select id="getNumberOfSProcessSupervisor" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor
+		WHERE supervisor.tenantid = #{tenantid}
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisor" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor
+		WHERE supervisor.tenantid = #{tenantid}
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSProcessSupervisorwithSUser" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor, user_ user
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.userId = user.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisorwithSUser" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor, user_ user
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.userId = user.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSProcessSupervisorwithSGroup" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor, group_ group
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.groupId = group.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisorwithSGroup" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor, group_ group
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.groupId = group.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSProcessSupervisorwithSRole" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor, role role
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.roleId = role.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisorwithSRole" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor, role role
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.roleId = role.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSProcessSupervisorwithSGroupSRole" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor, role role, group_ group
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.roleId = role.id
+		AND supervisor.groupId = group.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisorwithSGroupSRole" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor, role role, group_ group
+		WHERE supervisor.tenantid = #{tenantid}
+		AND supervisor.roleId = role.id
+		AND supervisor.groupId = group.id
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSProcessSupervisorwithSUserSRole" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor, user_ user, role role
+		WHERE supervisor.tenantid = #{tenantid}
+		AND ((supervisor.userId &lt;= 0 AND  supervisor.roleId = role.id)
+			OR (supervisor.userId = user.id AND supervisor.roleId &lt;= 0))
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisorwithSUserSRole" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor, user_ user, role role
+		WHERE supervisor.tenantid = #{tenantid}
+		AND ((supervisor.userId &lt;= 0 AND  supervisor.roleId = role.id)
+			OR (supervisor.userId = user.id AND supervisor.roleId &lt;= 0))
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getNumberOfSProcessSupervisorwithSUserSGroup" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor, user_ user, group_ group
+		WHERE supervisor.tenantid = #{tenantid}
+		AND ((supervisor.userId &lt;= 0 AND  supervisor.groupId = group.id)
+			OR (supervisor.userId = user.id AND supervisor.groupId &lt;= 0))
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisorwithSUserSGroup" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor, user_ user, group_ group
+		WHERE supervisor.tenantid = #{tenantid}
+		AND ((supervisor.userId &lt;= 0 AND  supervisor.groupId = group.id)
+			OR (supervisor.userId = user.id AND supervisor.groupId &lt;= 0))
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>
 
-	<select id="getSupervisorWithoutDisplayNameById" parameterType="long" resultMap="supervisorResultMap">
+	<select id="getNumberOfSProcessSupervisorwithSUserSGroupSRole" parameterType="long" resultType="long">
+		SELECT COUNT(supervisor.id)
+		FROM processsupervisor supervisor, user_ user, group_ group, role role
+		WHERE supervisor.tenantid = #{tenantid}
+		AND (((user.id = supervisor.userId AND supervisor.roleId &lt;= 0 AND supervisor.groupId &lt;= 0)
+			OR (supervisor.userId &lt;= 0 AND 
+				((supervisor.roleId = role.id AND supervisor.groupId = group.id)
+				OR (supervisor.roleId = role.id AND supervisor.groupId &lt;= 0)
+				OR (supervisor.roleId &lt;= 0 AND supervisor.groupId = group.id)))))
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessSupervisorwithSUserSGroupSRole" parameterType="long" resultMap="supervisorResultMap">
+		SELECT supervisor.*
+		FROM processsupervisor supervisor, user_ user, group_ group, role role
+		WHERE supervisor.tenantid = #{tenantid}
+		AND (((user.id = supervisor.userId AND supervisor.roleId &lt;= 0 AND supervisor.groupId &lt;= 0)
+			OR (supervisor.userId &lt;= 0 AND 
+				((supervisor.roleId = role.id AND supervisor.groupId = group.id)
+				OR (supervisor.roleId = role.id AND supervisor.groupId &lt;= 0)
+				OR (supervisor.roleId &lt;= 0 AND supervisor.groupId = group.id)))))
+		<if test="filter != null">
+		 	AND ${filter}
+		</if>
+		<if test="orderBy != null">
+		 	ORDER BY ${orderBy}
+		</if>
+	</select>	
+
+	<select id="getSupervisorById" parameterType="long" resultMap="supervisorResultMap">
 		SELECT supervisor.*
 		FROM processsupervisor supervisor
 		WHERE supervisor.tenantid = #{tenantid}
 		AND supervisor.id = #{id}
 	</select>
 
-	<select id="getSupervisorByIdForUser" parameterType="long" resultMap="supervisorResultMap">
-		SELECT supervisor.*, u.firstName AS displayNamePart1, u.lastName AS displayNamePart2, u.userName AS displayNamePart3
-		FROM processsupervisor supervisor, 
-			 user_ u
-		WHERE supervisor.tenantid = #{tenantid}
-		AND u.tenantid = supervisor.tenantid
-		AND supervisor.id = #{id}
-		AND u.id = supervisor.userId
-	</select>
-
-	<select id="getSupervisorByIdForGroup" parameterType="long" resultMap="supervisorResultMap">
-		SELECT supervisor.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, '' AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.id = #{id}
-		AND supervisor.groupId = g.id
-		AND supervisor.roleId &lt;= 0
-	</select>
-
-	<select id="getSupervisorByIdForRole" parameterType="long" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 role r
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND supervisor.id = #{id}
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId &lt;= 0
-	</select>
-
-	<select id="getSupervisorByIdForRoleAndGroup" parameterType="long" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 group_ g,
-			 role r
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.id = #{id}
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-	</select>
-
-	<select id="getSupervisorWithoutDisplayName" parameterType="list" resultMap="supervisorResultMap">
+	<select id="getSupervisor" parameterType="list" resultMap="supervisorResultMap">
 		SELECT supervisor.*
 		FROM processsupervisor supervisor
 		WHERE supervisor.tenantid = #{tenantid}
@@ -99,307 +247,4 @@
 			)
 		)
 	</select>
-
-	<select id="getNumberOfSSupervisorForUser" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 user_ u
-		WHERE supervisor.tenantid = #{tenantid}
-		AND u.tenantid = supervisor.tenantid
-		AND supervisor.userId = u.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-	
-	<select id="searchSSupervisorForUser" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, u.firstName AS displayNamePart1, u.lastName AS displayNamePart2, u.userName AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 user_ u
-		WHERE supervisor.tenantid = #{tenantid}
-		AND u.tenantid = supervisor.tenantid
-		AND supervisor.userId = u.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorwithSUserForUser" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 user_ u
-		WHERE supervisor.tenantid = #{tenantid}
-		AND u.tenantid = supervisor.tenantid
-		AND supervisor.userId = u.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorwithSUserForUser" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, u.firstName AS displayNamePart1, u.lastName AS displayNamePart2, u.userName AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 user_ u
-		WHERE supervisor.tenantid = #{tenantid}
-		AND u.tenantid = supervisor.tenantid
-		AND supervisor.userId = u.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorForGroup" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.groupId = g.id
-		AND supervisor.roleId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorForGroup" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, '' AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.groupId = g.id
-		AND supervisor.roleId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorwithSGroupForGroup" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.groupId = g.id
-		AND supervisor.roleId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorwithSGroupForGroup" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, '' AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.groupId = g.id
-		AND supervisor.roleId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorForRole" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 role r
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorForRole" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 role r
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorwithSRoleForRole" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 role r
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorwithSRoleForRole" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 role r
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId &lt;= 0
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorForRoleAndGroup" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorForRoleAndGroup" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorwithSGroupForRoleAndGroup" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorwithSGroupForRoleAndGroup" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
-		FROM processsupervisor AS supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = #{tenantid}
-		AND g.tenantid = #{tenantid}
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorwithSRoleForRoleAndGroup" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorwithSRoleForRoleAndGroup" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getNumberOfSSupervisorwithSGroupwithSRoleForRoleAndGroup" parameterType="map" resultType="long">
-		SELECT COUNT(supervisor.id)
-		FROM processsupervisor supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-	</select>
-
-	<select id="searchSSupervisorwithSGroupwithSRoleForRoleAndGroup" parameterType="map" resultMap="supervisorResultMap">
-		SELECT supervisor.*, r.name AS displayNamePart1, g.name AS displayNamePart2, g.parentPath AS displayNamePart3
-		FROM processsupervisor supervisor,
-			 role r,
-			 group_ g
-		WHERE supervisor.tenantid = #{tenantid}
-		AND r.tenantid = supervisor.tenantid
-		AND g.tenantid = supervisor.tenantid
-		AND supervisor.roleId = r.id
-		AND supervisor.groupId = g.id
-		<if test="filter != null">
-			AND ${filter}
-		</if>
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
 </mapper>

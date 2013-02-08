@@ -17,7 +17,7 @@ import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.privilege.model.buidler.PrivilegeBuilders;
 import org.bonitasoft.engine.profile.model.SProfileBuilderAccessor;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
-import org.bonitasoft.engine.supervisor.mapping.model.SSupervisorBuilders;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 
 /**
  * @author Emmanuel Duchastenier
@@ -28,7 +28,8 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
 
     public SearchEntitiesDescriptor(final IdentityModelBuilder identityModelBuilder, final PrivilegeBuilders privilegeBuilders,
             final ActorPrivilegeBuilders actorPrivilegeBuilders, final BPMInstanceBuilders bpmInstanceBuilders,
-            final FlowNodeStateManager flowNodeStateManager, final SSupervisorBuilders sSupervisorBuilders, final BPMDefinitionBuilders definitionBuilders,
+            final FlowNodeStateManager flowNodeStateManager, final SProcessSupervisorBuilders sSupervisorBuilders,
+            final BPMDefinitionBuilders definitionBuilders,
             final SProfileBuilderAccessor sProfileBuilderAccessor, final SCommentBuilders commentBuilders,
             final SCategoryBuilderAccessor categoryBuilderAccessor, final SQueriableLogModelBuilder sQueriableLogModelBuilder,
             final SDocumentMappingBuilderAccessor sDocumentMappingBuilderAccessor, final SExternalIdentityMappingBuilders sExternalIdentityMappingBuilders,
