@@ -25,8 +25,11 @@ import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
+import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 /**
@@ -138,6 +141,7 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
         deleteUser(JOHN);
     }
 
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state" })
     @Test
     public void testResetConnectorInstancesState() throws Exception {
         final String delivery = "Delivery men";
@@ -196,7 +200,7 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
     }
 
     @Test
-    public void testReplayActivityWithConnectorToTeExecuteAndThenSkipped() throws Exception {
+    public void testReplayActivityWithConnectorToReExecuteAndThenSkipped() throws Exception {
         final String delivery = "Delivery men";
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
@@ -227,6 +231,47 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail2.getId(), 0, 1, ConnectorInstanceCriterion.DEFAULT).get(0).getId(),
                 ConnectorStateReset.SKIPPED);
         getProcessAPI().replayActivity(waitForTaskToFail2.getId());
+
+        // should finish
+        waitForProcessToFinish(processInstance);
+        disableAndDelete(processDefinition);
+        deleteUser(JOHN);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
+    @Test
+    public void testReplayActivityWithResetConnectorStates() throws Exception {
+        final String delivery = "Delivery men";
+        final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
+        final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
+        final String connectorId = "testConnectorThatThrowException";
+        final String connectorVersion = "1.0";
+        final String dataName = "myVar";
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
+        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
+                .addInput("kind", normal);
+
+        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
+
+        List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10,
+                ConnectorInstanceCriterion.DEFAULT);
+        Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
+        connectorsToReset.put(connectorInstances.get(0).getId(), ConnectorStateReset.TO_RE_EXECUTE);
+        // put in TO_RE_EXECUTE and restart the task:
+        getProcessAPI().replayActivity(waitForTaskToFail.getId(), connectorsToReset);
+
+        final ActivityInstance waitForTaskToFail2 = waitForTaskToFail(processInstance);
+
+        connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
+        connectorsToReset.put(connectorInstances.get(0).getId(), ConnectorStateReset.SKIPPED);
+        // failed again, put in SKIPPED and restart the task:
+        getProcessAPI().replayActivity(waitForTaskToFail2.getId(), connectorsToReset);
 
         // should finish
         waitForProcessToFinish(processInstance);

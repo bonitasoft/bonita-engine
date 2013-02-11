@@ -773,25 +773,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException,
-            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException {
-        // .....
-
-        // final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        // final ConnectorService connectorService = tenantAccessor.getConnectorService();
-        // for (Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-        // final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connEntry.getKey());
-        // final ConnectorStateReset state = connEntry.getValue();
-        // connectorService.setState(connectorInstance, state.name());
-        // }
-
-        // ..... to put in method below (to be in same transaction):
+    public void replayActivity(final long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException,
+            ObjectModificationException, ActivityExecutionFailedException {
+        replayActivity(activityInstanceId, null);
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException,
-            ObjectModificationException, ActivityExecutionFailedException {
+    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException,
+            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException {
         if (!Manager.isFeatureActive("REPLAY_ACTIVITY")) {
             throw new IllegalStateException("The replay an activity is not an active feature");
         }
@@ -805,6 +794,16 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             transactionExecutor.openTransaction();
             try {
+                // Reset connectors first:
+                if (connectorsToReset != null) {
+                    for (Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
+                        final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connEntry.getKey());
+                        final ConnectorStateReset state = connEntry.getValue();
+                        connectorService.setState(connectorInstance, state.name());
+                    }
+                }
+
+                // Then replay activity:
                 final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
                 List<SConnectorInstance> connectorInstances = connectorService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
                         ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
@@ -832,6 +831,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final SActivityInstanceNotFoundException e) {
                 throw new ObjectNotFoundException(e);
             } catch (final SFlowNodeModificationException e) {
+                throw new ObjectModificationException(e);
+            } catch (SConnectorInstanceModificationException e) {
                 throw new ObjectModificationException(e);
             } finally {
                 transactionExecutor.completeTransaction();

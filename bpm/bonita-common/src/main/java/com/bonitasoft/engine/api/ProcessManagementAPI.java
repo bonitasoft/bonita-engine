@@ -5,17 +5,21 @@
 package com.bonitasoft.engine.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
+import org.bonitasoft.engine.exception.ActivityNotFoundException;
+import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.exception.RetryTaskException;
 
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;
@@ -157,6 +161,30 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      */
     void setConnectorInstanceState(long connectorInstanceId, ConnectorStateReset state) throws InvalidSessionException, ObjectReadException,
             ObjectNotFoundException, ObjectModificationException;
+
+    public void resetConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException;
+
+    /**
+     * set state of activity to its previous state and then execute.
+     * precondition: the activity is in state FAILED
+     * 
+     * @param activityInstanceId
+     *            Identifier of the activity instance
+     * @param connectorsToReset
+     *            Map of connectors to reset before retrying the task
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws ActivityNotFoundException
+     *             errors thrown if can't find corresponding activity
+     * @throws RetryTaskException
+     *             errors happened when one of the two step that re-set state of the task and execute it again failed.
+     * @throws ActivityExecutionFailedException
+     * @throws ObjectReadException
+     * @throws ObjectNotFoundException
+     * @throws ObjectModificationException
+     */
+    void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ActivityNotFoundException,
+            RetryTaskException, ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException;
 
     /**
      * Replay a task that was in failed state.
