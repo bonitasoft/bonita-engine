@@ -733,9 +733,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         if (!Manager.isFeatureActive(Features.SET_CONNECTOR_STATE)) {
             throw new IllegalStateException("Set a connector state is not an active feature");
         }
-        if (ConnectorState.TO_BE_EXECUTED.equals(state)) {
-            throw new ObjectModificationException("You can't put the connector as TO_BE_EXECUTED, use TO_RE_EXECUTE intead");
-        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
@@ -761,6 +758,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void resetConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException {
+        if (!Manager.isFeatureActive(Features.SET_CONNECTOR_STATE)) {
+            throw new IllegalStateException("Set a connector state is not an active feature");
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
