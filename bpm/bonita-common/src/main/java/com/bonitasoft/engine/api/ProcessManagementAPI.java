@@ -7,7 +7,7 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
-import org.bonitasoft.engine.bpm.model.ConnectorState;
+import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
@@ -155,7 +155,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            the state to set on the connector
      * @since 6.0
      */
-    void setConnectorInstanceState(long connectorInstanceId, ConnectorState state) throws InvalidSessionException, ObjectReadException,
+    void setConnectorInstanceState(long connectorInstanceId, ConnectorStateReset state) throws InvalidSessionException, ObjectReadException,
             ObjectNotFoundException, ObjectModificationException;
 
     /**

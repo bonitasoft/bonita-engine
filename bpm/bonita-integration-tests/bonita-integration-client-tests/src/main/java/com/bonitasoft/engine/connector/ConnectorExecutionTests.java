@@ -31,7 +31,8 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 /**
  * @author Baptiste Mesta
  */
-public class ConnectorExecutionTests extends CommonAPISPTest {
+public abstract class ConnectorExecutionTests extends CommonAPISPTest {
+
     protected static final String JOHN = "john";
 
     protected long johnUserId;
@@ -171,6 +172,5 @@ public class ConnectorExecutionTests extends CommonAPISPTest {
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
-
 
 }

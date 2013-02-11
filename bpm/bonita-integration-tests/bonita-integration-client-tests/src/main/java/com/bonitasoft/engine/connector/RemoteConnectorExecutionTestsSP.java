@@ -5,13 +5,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
+import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
@@ -19,7 +22,6 @@ import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.core.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
-import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -124,28 +126,20 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
                 ConnectorInstanceCriterion.DEFAULT);
         ConnectorInstance failedConnector = connectorInstances.get(0);
         assertEquals(ConnectorState.FAILED, failedConnector.getState());
-        getProcessAPI().setConnectorInstanceState(failedConnector.getId(), ConnectorState.TO_RE_EXECUTE);
+        getProcessAPI().setConnectorInstanceState(failedConnector.getId(), ConnectorStateReset.TO_RE_EXECUTE);
         connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT);
         failedConnector = connectorInstances.get(0);
         assertEquals(ConnectorState.TO_RE_EXECUTE, failedConnector.getState());
-        getProcessAPI().setConnectorInstanceState(failedConnector.getId(), ConnectorState.SKIPPED);
+        getProcessAPI().setConnectorInstanceState(failedConnector.getId(), ConnectorStateReset.SKIPPED);
         connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT);
         failedConnector = connectorInstances.get(0);
         assertEquals(ConnectorState.SKIPPED, failedConnector.getState());
-        getProcessAPI().setConnectorInstanceState(failedConnector.getId(), ConnectorState.DONE);
-        connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT);
-        failedConnector = connectorInstances.get(0);
-        assertEquals(ConnectorState.DONE, failedConnector.getState());
-        getProcessAPI().setConnectorInstanceState(failedConnector.getId(), ConnectorState.FAILED);
-        connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT);
-        failedConnector = connectorInstances.get(0);
-        assertEquals(ConnectorState.FAILED, failedConnector.getState());
         disableAndDelete(processDefinition);
         deleteUser(JOHN);
     }
 
-    @Test(expected = ObjectModificationException.class)
-    public void testSetConnectorStateToTOEXECUTEFail() throws Exception {
+    @Test
+    public void testResetConnectorInstancesState() throws Exception {
         final String delivery = "Delivery men";
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
@@ -156,24 +150,36 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addStringData(dataName, defaultValueExpression);
-        designProcessDefinition
-                .addAutomaticTask("step1")
-                .addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
+        final AutomaticTaskDefinitionBuilder autoTask = designProcessDefinition.addAutomaticTask("step1");
+        autoTask.addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", input1Expression)
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
+        autoTask.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind",
+                new ExpressionBuilder().createConstantStringExpression("invalidInputParam"));
 
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
         final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
         assertEquals("step1", waitForTaskToFail.getName());
-        final List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10,
+        List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10,
                 ConnectorInstanceCriterion.DEFAULT);
-        final ConnectorInstance failedConnector = connectorInstances.get(0);
-        assertEquals(ConnectorState.FAILED, failedConnector.getState());
+        // First connector must have failed:
+        assertEquals(ConnectorState.FAILED, connectorInstances.get(0).getState());
+        // Second connector must then not have been executed:
+        assertEquals(ConnectorState.TO_BE_EXECUTED, connectorInstances.get(1).getState());
+
+        Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(2);
+        connectorsToReset.put(connectorInstances.get(0).getId(), ConnectorStateReset.TO_RE_EXECUTE);
+        // TODO: can we reset the connector instance state if it has never be executed?:
+        connectorsToReset.put(connectorInstances.get(1).getId(), ConnectorStateReset.TO_RE_EXECUTE);
         try {
-            getProcessAPI().setConnectorInstanceState(failedConnector.getId(), ConnectorState.TO_BE_EXECUTED);
+            getProcessAPI().resetConnectorInstanceState(connectorsToReset);
+            connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT);
+            for (ConnectorInstance connectorInstance : connectorInstances) {
+                assertEquals(ConnectorState.TO_RE_EXECUTE, connectorInstance.getState());
+            }
         } finally {
             disableAndDelete(processDefinition);
             deleteUser(JOHN);
@@ -183,7 +189,7 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
     @Test(expected = ObjectNotFoundException.class)
     public void testSetConnectorStateOnUnkownConnector() throws Exception {
         try {
-            getProcessAPI().setConnectorInstanceState(-123456789l, ConnectorState.FAILED);
+            getProcessAPI().setConnectorInstanceState(-123456789l, ConnectorStateReset.SKIPPED);
         } finally {
             deleteUser(JOHN);
         }
@@ -212,14 +218,14 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
         // put in TO BE EXECUTED and restart the task
         getProcessAPI().setConnectorInstanceState(
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 1, ConnectorInstanceCriterion.DEFAULT).get(0).getId(),
-                ConnectorState.TO_RE_EXECUTE);
+                ConnectorStateReset.TO_RE_EXECUTE);
         getProcessAPI().replayActivity(waitForTaskToFail.getId());
         final ActivityInstance waitForTaskToFail2 = waitForTaskToFail(processInstance);
 
         // failed again, put in SKIPPED and restart the task
         getProcessAPI().setConnectorInstanceState(
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail2.getId(), 0, 1, ConnectorInstanceCriterion.DEFAULT).get(0).getId(),
-                ConnectorState.SKIPPED);
+                ConnectorStateReset.SKIPPED);
         getProcessAPI().replayActivity(waitForTaskToFail2.getId());
 
         // should finish
@@ -254,14 +260,14 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
         // put in TO BE EXECUTED and restart the task
         getProcessAPI().setConnectorInstanceState(
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 3, ConnectorInstanceCriterion.DEFAULT).get(1).getId(),
-                ConnectorState.TO_RE_EXECUTE);
+                ConnectorStateReset.TO_RE_EXECUTE);
         getProcessAPI().replayActivity(waitForTaskToFail.getId());
         final ActivityInstance waitForTaskToFail2 = waitForTaskToFail(processInstance);
 
         // failed again, put in SKIPPED and restart the task
         getProcessAPI().setConnectorInstanceState(
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail2.getId(), 0, 3, ConnectorInstanceCriterion.DEFAULT).get(1).getId(),
-                ConnectorState.SKIPPED);
+                ConnectorStateReset.SKIPPED);
         getProcessAPI().replayActivity(waitForTaskToFail2.getId());
 
         // should finish
@@ -296,14 +302,14 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
         // put in TO BE EXECUTED and restart the task
         getProcessAPI().setConnectorInstanceState(
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 3, ConnectorInstanceCriterion.DEFAULT).get(1).getId(),
-                ConnectorState.TO_RE_EXECUTE);
+                ConnectorStateReset.TO_RE_EXECUTE);
         getProcessAPI().replayActivity(waitForTaskToFail.getId());
         final ActivityInstance waitForTaskToFail2 = waitForTaskToFail(processInstance);
 
         // failed again, put in SKIPPED and restart the task
         getProcessAPI().setConnectorInstanceState(
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail2.getId(), 0, 3, ConnectorInstanceCriterion.DEFAULT).get(1).getId(),
-                ConnectorState.SKIPPED);
+                ConnectorStateReset.SKIPPED);
         getProcessAPI().replayActivity(waitForTaskToFail2.getId());
 
         // should finish

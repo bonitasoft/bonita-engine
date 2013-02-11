@@ -43,6 +43,7 @@ import org.bonitasoft.engine.bpm.model.ConfigurationState;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
+import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.Problem;
@@ -88,6 +89,7 @@ import org.bonitasoft.engine.exception.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
@@ -128,6 +130,7 @@ import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver;
 import com.bonitasoft.engine.api.impl.transaction.CheckParameterProblems;
+import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
@@ -725,7 +728,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorState state) throws InvalidSessionException, ObjectReadException,
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws InvalidSessionException, ObjectReadException,
             ObjectNotFoundException, ObjectModificationException {
         if (!Manager.isFeatureActive(Features.SET_CONNECTOR_STATE)) {
             throw new IllegalStateException("Set a connector state is not an active feature");
@@ -754,6 +757,36 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final STransactionException e) {
             throw new ObjectReadException(e);
         }
+    }
+
+    @Override
+    public void resetConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        SetConnectorInstancesState txContent = new SetConnectorInstancesState(connectorsToReset, connectorService);
+        try {
+            transactionExecutor.execute(txContent);
+        } catch (SBonitaException e) {
+            throw new ConnectorException("Error resetting connector instance state", e);
+        }
+    }
+
+    @Override
+    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException,
+            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException {
+        // .....
+
+        // final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        // final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        // final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        // for (Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
+        // final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connEntry.getKey());
+        // final ConnectorStateReset state = connEntry.getValue();
+        // connectorService.setState(connectorInstance, state.name());
+        // }
+
+        // ..... to put in method below (to be in same transaction):
     }
 
     @Override
