@@ -21,7 +21,6 @@
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 	</bean>
 
-
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
 		<constructor-arg name="properties">
 			<props>
@@ -136,6 +135,7 @@
         <constructor-arg name="classesWithLoadByQuery">
             <list>
                 <value>org.bonitasoft.engine.identity.model.SUserMembership</value>
+				<!-- Abstract instances. Cannot be fetched by Session.get -->
                 <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl</value>
                 <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl</value>
             </list>
@@ -200,7 +200,7 @@
                 <entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write"/>
+<!--                 <entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write"/> -->
                 <entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="read-write"/>

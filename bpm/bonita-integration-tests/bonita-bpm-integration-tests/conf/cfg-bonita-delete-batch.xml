@@ -1,0 +1,22 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="deleteRegister" class="com.bonitasoft.engine.persistence.DeleteBatchJobRegister">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="loggerService" ref="technicalLoggerService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="classesToPurge">
+			<list>
+				<value>org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl</value>
+				<value>org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="repeat" value="${delete.job.frequency:0 0 0/1 * * ?}" />
+	</bean>
+
+	<bean id="deleteService" class="com.bonitasoft.engine.persistence.DeleteServiceBatch">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+	</bean>
+
+</beans>

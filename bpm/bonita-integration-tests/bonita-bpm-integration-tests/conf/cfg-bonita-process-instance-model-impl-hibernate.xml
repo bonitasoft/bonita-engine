@@ -37,6 +37,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
@@ -63,6 +64,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="aa" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance" value="aa" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" value="aa" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance" value="aa" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance" value="aa" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="aa" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="aa" />

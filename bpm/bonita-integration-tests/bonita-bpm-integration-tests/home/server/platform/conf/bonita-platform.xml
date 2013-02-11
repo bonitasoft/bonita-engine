@@ -18,6 +18,12 @@
     <entry key="database.journal.connection.url">jdbc:h2:file:${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</entry>
     <entry key="database.journal.connection.username">sa</entry>
     <entry key="database.journal.connection.password"/>
+<!--     <entry key="hibernate.journal.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</entry> -->
+<!--     <entry key="database.journal.connection.driver_class">com.mysql.jdbc.Driver</entry> -->
+<!--     <entry key="database.journal.connection.url">jdbc:mysql://localhost:3306/bonita</entry> -->
+<!--     <entry key="database.journal.connection.username">root</entry> -->
+<!--     <entry key="database.journal.connection.password">root</entry> -->
+    
     <entry key="hibernate.journal.show_sql">false</entry>
     <entry key="hibernate.journal.format_sql">false</entry>
     <entry key="hibernate.journal.use_sql_comments">false</entry>

@@ -432,8 +432,8 @@
 
 		<!-- Delete -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-delete-impl</artifactId>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-delete-batch</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

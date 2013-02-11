@@ -42,6 +42,9 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl">
 					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
 				</entry>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl">
+					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
+				</entry>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl">
 					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
 				</entry>
