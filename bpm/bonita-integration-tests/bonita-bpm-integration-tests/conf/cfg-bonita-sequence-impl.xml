@@ -145,7 +145,7 @@
 				<entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="10030" />
 				<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="10031" />
 				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" value="10040" />
-				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SSupervisorImpl" value="10050" />
+				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" value="10050" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />

@@ -10,7 +10,7 @@
 		</property>
 		<property name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.supervisor.mapping.model.SSupervisor" value="processsupervisor" />
+				<entry key="org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor" value="processsupervisor" />
 			</map>
 		</property>
 	</bean>
