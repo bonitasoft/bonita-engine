@@ -264,4 +264,45 @@
 		</if>
 	</select>
 	
+	<select id="getNumberOfSProcessInstanceInvolvingUsersManagedBy" resultType="long">
+		SELECT COUNT(DISTINCT p.id)
+		FROM process_instance p, user_ u
+		WHERE p.tenantid = #{tenantid}
+		 AND (p.id IN 
+				(SELECT af.logicalGroup2
+				FROM arch_flownode_instance af
+				WHERE af.executedBy = u.id
+					AND u.managerUserId = #{managerUserId}
+				)
+			OR (p.startedBy = u.id
+				AND u.managerUserId = #{managerUserId}
+				)
+			)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSProcessInstanceInvolvingUsersManagedBy" resultMap="processInstanceResultMap">
+		SELECT DISTINCT p.*
+		FROM process_instance p, user_ u
+		WHERE p.tenantid = #{tenantid}
+		 AND (p.id IN 
+				(SELECT af.logicalGroup2
+				FROM arch_flownode_instance af
+				WHERE af.executedBy = u.id
+					AND u.managerUserId = #{managerUserId}
+				)
+			OR (p.startedBy = u.id
+				AND u.managerUserId = #{managerUserId}
+				)
+			)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
 </mapper>
