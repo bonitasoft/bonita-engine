@@ -363,8 +363,9 @@ public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
         deleteUser(JOHN);
     }
 
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
     @Test(expected = ActivityExecutionFailedException.class)
-    public void testReplayActivityWithConnectorFailed() throws Exception {
+    public void testReplayActivityWithUnresolvedFailedConnectors() throws Exception {
         final String delivery = "Delivery men";
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
