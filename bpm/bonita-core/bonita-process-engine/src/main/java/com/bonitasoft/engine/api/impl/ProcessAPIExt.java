@@ -39,6 +39,7 @@ import org.bonitasoft.engine.api.impl.transaction.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.RemoveActorPrivilegeById;
 import org.bonitasoft.engine.api.impl.transaction.ResolveProcessAndCreateDependencies;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ConfigurationState;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
@@ -92,6 +93,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.ObjectAlreadyExistsException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
@@ -215,7 +217,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition deploy(final BusinessArchive businessArchive) throws InvalidSessionException, ProcessDeployException,
-            ProcessDefinitionNotFoundException {
+            ProcessDefinitionNotFoundException, ObjectAlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final BPMDefinitionBuilders bpmDefinitionBuilders = tenantAccessor.getBPMDefinitionBuilders();
@@ -232,6 +234,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             transactionExecutor.openTransaction();
             try {
+                try {
+                    processDefinitionService.getProcessDefinitionId(processDefinition.getName(), processDefinition.getVersion());
+                    throw new ObjectAlreadyExistsException("A process with the same name and version already exists " + processDefinition.getName() + " "
+                            + processDefinition.getVersion(), ProcessDefinition.class);
+                } catch (final SProcessDefinitionReadException e) {
+                    // ok
+                }
                 processDefinitionService.store(sDefinition, processDefinition.getDisplayName(), processDefinition.getDisplayDescription());
                 unzipBar(businessArchive, sDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
                 // TODO refactor this to avoid using transaction executor inside
@@ -579,18 +588,18 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
                     processInstanceService.deleteFlowNodeInstance(activityInstance, null);
                 } else {
-                    throw new ObjectDeletionException("Can't delete a task that is not a sub task");
+                    throw new ObjectDeletionException("Can't delete a task that is not a sub task", ManualTaskInstance.class);
                 }
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new ObjectNotFoundException("can't find activity with id " + manualTaskId, e);
+                throw new ObjectNotFoundException("can't find activity with id " + manualTaskId, e, ManualTaskInstance.class);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
-                throw new ObjectDeletionException(e);
+                throw new ObjectDeletionException(e, ManualTaskInstance.class);
             } finally {
                 transactionExecutor.completeTransaction();
             }
         } catch (final STransactionException e) {
-            throw new ObjectDeletionException(e);
+            throw new ObjectDeletionException(e, ManualTaskInstance.class);
         }
     }
 
@@ -712,12 +721,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         pageNumber * numberPerPage, numberPerPage, fieldName, orderByType);
                 return ModelConvertor.toConnectorInstances(connectorInstances);
             } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e);
+                throw new ObjectReadException(e, ConnectorInstance.class);
             } finally {
                 transactionExecutor.completeTransaction();
             }
         } catch (final STransactionException e) {
-            throw new ObjectReadException(e);
+            throw new ObjectReadException(e, ConnectorInstance.class);
         }
     }
 
@@ -741,18 +750,18 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             try {
                 final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connectorInstanceId);
                 if (connectorInstance == null) {
-                    throw new ObjectNotFoundException("connector instance with id " + connectorInstanceId);
+                    throw new ObjectNotFoundException("connector instance with id " + connectorInstanceId, ConnectorInstance.class);
                 }
                 connectorService.setState(connectorInstance, state.name());
             } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e);
+                throw new ObjectReadException(e, ConnectorInstance.class);
             } catch (final SConnectorInstanceModificationException e) {
-                throw new ObjectModificationException(e);
+                throw new ObjectModificationException(e, ConnectorInstance.class);
             } finally {
                 transactionExecutor.completeTransaction();
             }
         } catch (final STransactionException e) {
-            throw new ObjectReadException(e);
+            throw new ObjectReadException(e, ConnectorInstance.class);
         }
     }
 
@@ -764,10 +773,10 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
-        SetConnectorInstancesState txContent = new SetConnectorInstancesState(connectorsToReset, connectorService);
+        final SetConnectorInstancesState txContent = new SetConnectorInstancesState(connectorsToReset, connectorService);
         try {
             transactionExecutor.execute(txContent);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new ConnectorException("Error resetting connector instance state", e);
         }
     }
@@ -796,7 +805,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             try {
                 // Reset connectors first:
                 if (connectorsToReset != null) {
-                    for (Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
+                    for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
                         final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connEntry.getKey());
                         final ConnectorStateReset state = connEntry.getValue();
                         connectorService.setState(connectorInstance, state.name());
@@ -825,25 +834,25 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     containerType = SFlowElementsContainerType.FLOWNODE.name();
                 }
             } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e);
+                throw new ObjectReadException(e, ConnectorInstance.class);
             } catch (final SActivityReadException e) {
-                throw new ObjectReadException(e);
+                throw new ObjectReadException(e, ActivityInstance.class);
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new ObjectNotFoundException(e);
+                throw new ObjectNotFoundException(e, ActivityInstance.class);
             } catch (final SFlowNodeModificationException e) {
-                throw new ObjectModificationException(e);
-            } catch (SConnectorInstanceModificationException e) {
-                throw new ObjectModificationException(e);
+                throw new ObjectModificationException(e, ActivityInstance.class);
+            } catch (final SConnectorInstanceModificationException e) {
+                throw new ObjectModificationException(e, ConnectorInstance.class);
             } finally {
                 transactionExecutor.completeTransaction();
             }
         } catch (final STransactionException e) {
-            throw new ObjectReadException(e);
+            throw new ObjectReadException(e, ActivityInstance.class);
         }
         try {
             containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType);
         } catch (final SActivityReadException e) {
-            throw new ObjectReadException(e);
+            throw new ObjectReadException(e, ActivityInstance.class);
         } catch (final SBonitaException e) {
             throw new ActivityExecutionFailedException(e);
         }

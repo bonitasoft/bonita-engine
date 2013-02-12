@@ -19,6 +19,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormat;
 import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.ObjectAlreadyExistsException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.ProcessDeployException;
 import org.bonitasoft.engine.identity.User;
@@ -166,7 +167,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,
-            InvalidSessionException, ProcessDeployException, ProcessDefinitionNotFoundException, InvalidBusinessArchiveFormat {
+            InvalidSessionException, ProcessDeployException, ProcessDefinitionNotFoundException, InvalidBusinessArchiveFormat, ObjectAlreadyExistsException {
         final List<Long> ids = new ArrayList<Long>();
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;
