@@ -8,6 +8,9 @@
 		<constructor-arg name="initTablesFile">
 			<null />
 		</constructor-arg>
+		<constructor-arg name="cleanTablesFile">
+			<null />
+		</constructor-arg>
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-deleteTenantObjects.sql" />

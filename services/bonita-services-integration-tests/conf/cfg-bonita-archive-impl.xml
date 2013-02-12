@@ -30,4 +30,33 @@
 		<constructor-arg name="newestTime" value="${org.bonitasoft.engine.archive.newestTime}" />
 	</bean>
 
+	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-createTables.sql" />
+		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-cleanTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/archive/model/db/${db.vendor}-deleteTenantObjects.sql" />
+		<constructor-arg name="deleteTenantObjectsPriority" value="51" />
+		<constructor-arg name="filter" value="journal" />
+		<property name="sqlTransformers">
+			<map>
+				<entry key="org.bonitasoft.engine.archive.model.Laptop">
+					<bean class="org.bonitasoft.engine.archive.model.LaptopSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.model.Employee">
+					<bean class="org.bonitasoft.engine.archive.model.EmployeeSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping">
+					<bean class="org.bonitasoft.engine.archive.model.EmployeeProjectMappingSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.model.Address">
+					<bean class="org.bonitasoft.engine.archive.model.AddressSQLTransformer" />
+				</entry>
+				<entry key="org.bonitasoft.engine.archive.model.Project">
+					<bean class="org.bonitasoft.engine.archive.model.ProjectSQLTransformer" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
 </beans>

@@ -4,7 +4,7 @@
 	<bean id="workService" class="org.bonitasoft.engine.work.ExecutorWorkService">
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="workSynchronizationFactory">
-			<bean class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory"></bean>
+			<bean class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory" />
 		</constructor-arg>
 		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -18,4 +18,5 @@
 		<constructor-arg name="keepAliveTimeSeconds" value="60" />
 		<constructor-arg name="queueCapacity" value="10000" />
 	</bean>
+
 </beans>

@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="workService" class="org.bonitasoft.engine.work.ExecutorWorkService">
-		<constructor-arg name="transactionService" ref="transactionService"/>
+		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="workSynchronizationFactory">
-			<bean class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory"></bean>
+			<bean class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
 		</constructor-arg>
 		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -18,4 +18,5 @@
 		<constructor-arg name="keepAliveTimeSeconds" value="60" />
 		<constructor-arg name="queueCapacity" value="10000" />
 	</bean>
+
 </beans>

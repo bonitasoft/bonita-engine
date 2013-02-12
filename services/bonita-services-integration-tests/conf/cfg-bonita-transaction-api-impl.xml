@@ -5,7 +5,7 @@
 		<constructor-arg name="logger">
 			<null />
 		</constructor-arg>
-		<constructor-arg ref="eventService"></constructor-arg>
+		<constructor-arg ref="eventService" />
 	</bean>
 
 </beans>

@@ -23,6 +23,7 @@
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration" depends-on="dbProperties">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-initTables.sql" />
+		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-cleanTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-deleteTenantObjects.sql" />
@@ -30,7 +31,7 @@
 		<property name="sqlTransformers">
 			<map>
 				<entry key="org.bonitasoft.engine.persistence.model.Human">
-					<bean class="org.bonitasoft.engine.persistence.model.HumanSQLTransformer"></bean>
+					<bean class="org.bonitasoft.engine.persistence.model.HumanSQLTransformer" />
 				</entry>
 			</map>
 		</property>

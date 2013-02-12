@@ -18,8 +18,7 @@
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
-			<map>
-			</map>
+			<map />
 		</constructor-arg>
 		<constructor-arg name="statementMapping">
 			<set />

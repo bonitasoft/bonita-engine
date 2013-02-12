@@ -50,5 +50,4 @@
 
 	<bean id="platformMyBatisConfigurations" class="org.bonitasoft.engine.persistence.PlatformMyBatisConfigurationsProvider" autowire="byType" />
 
-
 </beans>

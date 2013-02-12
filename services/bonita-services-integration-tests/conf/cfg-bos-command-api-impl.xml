@@ -7,7 +7,7 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
 		<constructor-arg name="defaultCommandProvider">
-			<bean class="org.bonitasoft.engine.command.api.impl.DefaultCommandProvider"/>
+			<bean class="org.bonitasoft.engine.command.api.impl.DefaultCommandProvider" />
 		</constructor-arg>
 		<constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
@@ -18,10 +18,11 @@
 	<bean id="db-bos-command-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-cleanTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="23"/>
+		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="23" />
 	</bean>
 
 </beans>

@@ -2,4 +2,5 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="technicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />
+
 </beans>

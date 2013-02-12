@@ -6,19 +6,21 @@
 	<bean id="db-bos-data-instance-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/${db.vendor}-cleanTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="6"/>
+		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="6" />
 	</bean>
 
 	<bean id="db-bos-data-instance-model-arch" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/archive/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/archive/${db.vendor}-initTables.sql" />
+		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/archive/${db.vendor}-cleanTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/archive/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/data/instance/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="7"/>
+		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="7" />
 		<property name="sqlTransformers">
 			<map>
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl">

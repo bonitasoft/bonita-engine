@@ -40,10 +40,11 @@
 	<bean id="db-bos-category-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-initTables.sql" />
+		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-cleanTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-dropTables.sql" />
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="19"/>
+		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="19" />
 	</bean>
 
 </beans>

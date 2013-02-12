@@ -10,6 +10,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 	</bean>
+
 	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="journal" />
 		<constructor-arg ref="transactionService" />
@@ -20,7 +21,6 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 	</bean>
-
 
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
 		<constructor-arg name="properties">

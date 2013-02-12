@@ -56,7 +56,6 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.privilege.api.PrivilegeService;
 import org.bonitasoft.engine.privilege.model.buidler.PrivilegeBuilders;
-import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -208,7 +207,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
                 final SSession session = sessionService.createSession(tenantId, userName);
 
-                createDefaultDataSource(sessionService, sDataSourceModelBuilder, dataService, tenantId, userName);
+                createDefaultDataSource(sDataSourceModelBuilder, dataService);
 
                 commandService.createDefaultCommands();
 
