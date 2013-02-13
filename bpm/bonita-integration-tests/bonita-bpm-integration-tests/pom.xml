@@ -1023,6 +1023,14 @@
 			<version>1.6.1</version>
 			<scope>test</scope>
 		</dependency>
+
+        <!-- Local JNDI implementation -->
+        <dependency>
+            <groupId>org.ow2.carol</groupId>
+            <artifactId>carol</artifactId>
+            <version>3.0.10</version>
+        </dependency>
+
 	</dependencies>
 
 	<build>
