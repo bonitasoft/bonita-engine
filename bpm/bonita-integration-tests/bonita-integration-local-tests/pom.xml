@@ -68,7 +68,7 @@
 										</artifactItem>
 									</artifactItems>
 									<includes>**/*.*</includes>
-									<outputDirectory>${project.build.directory}/hibernate</outputDirectory>
+									<outputDirectory>${project.build.directory}</outputDirectory>
 									<overWriteReleases>false</overWriteReleases>
 									<overWriteSnapshots>true</overWriteSnapshots>
 								</configuration>
@@ -80,7 +80,7 @@
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<bonita.home>${project.build.directory}/hibernate/home</bonita.home>
+								<bonita.home>${project.build.directory}/home</bonita.home>
 							</systemPropertyVariables>
 							<includes>
 								<include>org/bonitasoft/engine/test/LocalIntegrationTestsSP.java</include>
