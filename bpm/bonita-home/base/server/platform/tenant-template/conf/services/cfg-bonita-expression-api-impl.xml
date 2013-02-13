@@ -38,6 +38,8 @@
 	<bean id="engineConstantExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" >
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+		<constructor-arg name="sessionService" ref="sessionService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 	</bean>
 
 	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
