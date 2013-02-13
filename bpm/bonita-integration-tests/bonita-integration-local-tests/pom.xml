@@ -61,7 +61,7 @@
 									<artifactItems>
 										<artifactItem>
 											<groupId>com.bonitasoft.engine</groupId>
-											<artifactId>bonita-home</artifactId>
+											<artifactId>bonita-home-sp</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>hibernate</classifier>
