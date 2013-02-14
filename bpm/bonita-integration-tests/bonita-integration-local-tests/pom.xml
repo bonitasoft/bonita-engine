@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
 		<artifactId>bonita-integration-tests</artifactId>
-		<version>6.0.Beta.4-SNAPSHOT</version>
+		<version>6.0.Beta.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-local-tests-sp</artifactId>
@@ -69,14 +69,14 @@
 									<artifactItems>
 										<artifactItem>
 											<groupId>com.bonitasoft.engine</groupId>
-											<artifactId>bonita-home</artifactId>
+											<artifactId>bonita-home-sp</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>hibernate</classifier>
 										</artifactItem>
 									</artifactItems>
 									<includes>**/*.*</includes>
-									<outputDirectory>${project.build.directory}/hibernate</outputDirectory>
+									<outputDirectory>${project.build.directory}</outputDirectory>
 									<overWriteReleases>false</overWriteReleases>
 									<overWriteSnapshots>true</overWriteSnapshots>
 								</configuration>
@@ -88,7 +88,7 @@
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<bonita.home>${project.build.directory}/hibernate/home</bonita.home>
+								<bonita.home>${project.build.directory}/home</bonita.home>
 							</systemPropertyVariables>
 							<includes>
 								<include>org/bonitasoft/engine/test/LocalIntegrationTestsSP.java</include>

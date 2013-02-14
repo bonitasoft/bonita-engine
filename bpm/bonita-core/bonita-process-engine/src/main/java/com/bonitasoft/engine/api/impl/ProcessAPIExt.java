@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.actor.ActorMappingExportException;
-import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.privilege.api.ActorPrivilegeService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
@@ -29,26 +28,19 @@ import org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver;
-import org.bonitasoft.engine.api.impl.transaction.CheckActorMapping;
 import org.bonitasoft.engine.api.impl.transaction.CreateManualUserTask;
 import org.bonitasoft.engine.api.impl.transaction.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.GetProcessDefinition;
-import org.bonitasoft.engine.api.impl.transaction.GetProcessDeploymentInfo;
 import org.bonitasoft.engine.api.impl.transaction.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.RemoveActorPrivilegeById;
-import org.bonitasoft.engine.api.impl.transaction.ResolveProcessAndCreateDependencies;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
-import org.bonitasoft.engine.bpm.model.ConfigurationState;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
-import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
-import org.bonitasoft.engine.bpm.model.Problem;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.bpm.model.privilege.ActorPrivilege;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -58,15 +50,12 @@ import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
@@ -79,21 +68,16 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.ActivityCreationException;
 import org.bonitasoft.engine.exception.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.ActivityInterruptedException;
 import org.bonitasoft.engine.exception.ActivityNotFoundException;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
-import org.bonitasoft.engine.exception.ObjectAlreadyExistsException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
@@ -101,12 +85,9 @@ import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.ProcessDeletionException;
-import org.bonitasoft.engine.exception.ProcessDeployException;
-import org.bonitasoft.engine.exception.ProcessResourceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -131,7 +112,6 @@ import org.bonitasoft.engine.util.FileUtil;
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver;
-import com.bonitasoft.engine.api.impl.transaction.CheckParameterProblems;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
@@ -216,86 +196,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws InvalidSessionException, ProcessDeployException,
-            ProcessDefinitionNotFoundException, ObjectAlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final BPMDefinitionBuilders bpmDefinitionBuilders = tenantAccessor.getBPMDefinitionBuilders();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-        final SDataDefinitionBuilders sDataDefinitionBuilders = tenantAccessor.getSDataDefinitionBuilders();
-        final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
-        final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
-        final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
-        // create the runtime process definition
-        final SProcessDefinition sDefinition = bpmDefinitionBuilders.getProcessDefinitionBuilder()
-                .createNewInstance(processDefinition, sExpressionBuilders, sDataDefinitionBuilders, sOperationBuilders).done();
-        try {
-            transactionExecutor.openTransaction();
-            try {
-                try {
-                    processDefinitionService.getProcessDefinitionId(processDefinition.getName(), processDefinition.getVersion());
-                    throw new ObjectAlreadyExistsException("A process with the same name and version already exists " + processDefinition.getName() + " "
-                            + processDefinition.getVersion(), ProcessDefinition.class);
-                } catch (final SProcessDefinitionReadException e) {
-                    // ok
-                }
-                processDefinitionService.store(sDefinition, processDefinition.getDisplayName(), processDefinition.getDisplayDescription());
-                unzipBar(businessArchive, sDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
-                // TODO refactor this to avoid using transaction executor inside
-                final boolean isResolved = resolveDependencies(businessArchive, tenantAccessor, sDefinition);
-                if (isResolved) {
-                    transactionExecutor.execute(new ResolveProcessAndCreateDependencies(processDefinitionService, sDefinition.getId(), dependencyService,
-                            dependencyBuilderAccessor, businessArchive));
-                }
-            } catch (final BonitaHomeNotSetException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ProcessDeployException(e);
-            } catch (final IOException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ProcessDeployException(e);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ProcessDeployException(e);
-            } finally {
-                transactionExecutor.completeTransaction();
-            }
-        } catch (final STransactionException e) {
-            throw new ProcessDeployException(e);
-        }
-        return ModelConvertor.toProcessDefinition(sDefinition);
-    }
-
-    private boolean resolveDependencies(final BusinessArchive businessArchive, final TenantServiceAccessor tenantAccessor, final SProcessDefinition sDefinition)
-            throws InvalidSessionException, ProcessDeployException {
-        final List<ProcessDependencyResolver> resolvers = Arrays.asList(new ActorProcessDependencyResolver(), new ParameterProcessDependencyResolver(),
-                new ConnectorProcessDependencyResolver(), new UserFilterProcessDependencyResolver());
-        ProcessDeployException pde = null;
-        boolean resolved = true;
-        for (final ProcessDependencyResolver resolver : resolvers) {
-            try {
-                resolved &= resolver.resolve(this, tenantAccessor, businessArchive, sDefinition);
-            } catch (final BonitaException e) {
-                if (pde == null) {
-                    pde = new ProcessDeployException("Some dependencies are not resolved");
-                    pde.setProcessDefinitionId(sDefinition.getId());
-                }
-                resolved = false;
-                pde.addException(e);
-            }
-        }
-        if (pde != null) {
-            final TechnicalLoggerService technicalLoggerService = tenantAccessor.getTechnicalLoggerService();
-            for (final BonitaException e : pde.getExceptions()) {
-                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-            }
-            throw pde;
-        }
-        return resolved;
-    }
-
-    @Override
     public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws InvalidSessionException, InvalidParameterValueException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -344,8 +244,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sDefinition, final long tenantId) throws BonitaHomeNotSetException,
-            InvalidSessionException, ProcessDeployException, IOException {
+    @Override
+    protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sDefinition, final long tenantId) throws BonitaHomeNotSetException,
+            IOException {
         final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
         final File file = new File(processesFolder);
         if (!file.exists()) {
@@ -480,7 +381,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new ParameterNotFoundException(processDefinitionId, parameterName);
             }
             parameterService.update(processDefinitionId, parameterName, parameterValue);
-            resolvedDependencies(sProcessDefinition, tenantAccessor);
+            resolvedDependencies(processDefinitionId, tenantAccessor);
         } catch (final SParameterProcessNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -489,31 +390,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new ProcessDefinitionNotFoundException(e);
-        }
-    }
-
-    private void resolvedDependencies(final SProcessDefinition definition, final TenantServiceAccessor tenantAccessor) throws SBonitaException {
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ParameterService parameterService = tenantAccessor.getParameterService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
-        final GetProcessDeploymentInfo getProcessDeploymentInfo = new GetProcessDeploymentInfo(definition.getId(), processDefinitionService);
-        transactionExecutor.execute(getProcessDeploymentInfo);
-        final SProcessDefinitionDeployInfo processDefinitionDeployInfo = getProcessDeploymentInfo.getResult();
-        final boolean containsNullParameterValues = parameterService.containsNullValues(definition.getId());
-        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final CheckActorMapping checkActorMapping = new CheckActorMapping(actorMappingService, definition.getId());
-        transactionExecutor.execute(checkActorMapping);
-        final Boolean actorMappingResolved = checkActorMapping.getResult();
-        if (!containsNullParameterValues && actorMappingResolved
-                && ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-            try {
-                transactionExecutor.execute(new ResolveProcessAndCreateDependencies(processDefinitionService, definition.getId(), dependencyService,
-                        dependencyBuilderAccessor, tenantAccessor.getTenantId()));
-            } catch (final BonitaHomeNotSetException e) {
-                throw new BonitaRuntimeException(e);
-            }
         }
     }
 
@@ -616,27 +492,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<Problem> getProcessResolutionProblems(final long processId) throws InvalidSessionException, ProcessDefinitionNotFoundException,
-            ProcessResourceException {
-        final List<Problem> problems = super.getProcessResolutionProblems(processId);
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processId, processDefinitionService);
-
-        try {
-            transactionExecutor.execute(getProcessDefinition);
-            final SProcessDefinition definition = getProcessDefinition.getResult();
-            if (!definition.getParameters().isEmpty()) {
-                final ParameterService parameterService = tenantAccessor.getParameterService();
-                final CheckParameterProblems checkParameterProblems = new CheckParameterProblems(parameterService, processId);
-                transactionExecutor.execute(checkParameterProblems);
-                problems.addAll(checkParameterProblems.getProblems());
-            }
-            return problems;
-        } catch (final SBonitaException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        }
+    protected List<ProcessDependencyResolver> getResolvers() {
+        return Arrays.asList(new ActorProcessDependencyResolver(), new ConnectorProcessDependencyResolver(), new UserFilterProcessDependencyResolver(),
+                new ParameterProcessDependencyResolver());
     }
 
     @Override
