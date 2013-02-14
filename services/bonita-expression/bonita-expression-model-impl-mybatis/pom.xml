@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-expression</artifactId>
 		<groupId>com.bonitasoft.engine.expression</groupId>
-		<version>6.0.Beta.4-SNAPSHOT</version>
+		<version>6.0.Beta.4</version>
 	</parent>
 
 	<artifactId>bonita-expression-model-impl-mybatis</artifactId>
