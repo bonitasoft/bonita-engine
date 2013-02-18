@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-actor-mapping</artifactId>
 		<groupId>com.bonitasoft.engine.core.actor.mapping</groupId>
-		<version>6.0.Beta.5-SNAPSHOT</version>
+		<version>6.0.Beta.5</version>
 	</parent>
 
 	<artifactId>bonita-actor-mapping-impl-mybatis</artifactId>
