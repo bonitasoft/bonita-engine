@@ -411,11 +411,11 @@
 				<!-- get -->
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl.getUserTaskInstanceById" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getFlowNodeInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getSFlowNodeInstanceById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getHumanTaskInstanceById" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getFlowNodeInstanceById" />
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getSHumanTaskInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getSFlowNodeInstanceById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl.getNumberOfSHumanTaskInstance" />
@@ -484,12 +484,12 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getOpenActivitiesFromProcessInstance" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getActivityInstanceById" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getFlowNodeInstanceById" />
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl.getSActivityInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getSFlowNodeInstanceById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.getGatewayInstanceById" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getFlowNodeInstanceById" />
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.getSGatewayInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getSFlowNodeInstanceById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl.getActiveGatewayInstanceOfProcess" />
@@ -512,8 +512,8 @@
 					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getEventInstancesFromRootContainer" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
-					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance.getEventInstanceById" />
-					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getEventInstanceById" />
+					<constructor-arg name="sourceStatement" value="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance.getSEventInstanceById" />
+					<constructor-arg name="destinationStatement" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl.getSEventInstanceById" />
 				</bean>
 				<bean class="org.bonitasoft.engine.persistence.StatementMapping">
 					<constructor-arg name="sourceStatement"

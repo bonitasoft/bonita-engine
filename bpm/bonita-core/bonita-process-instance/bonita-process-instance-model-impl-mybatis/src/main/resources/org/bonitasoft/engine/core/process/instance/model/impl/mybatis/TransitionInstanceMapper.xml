@@ -47,7 +47,7 @@
 		<result property="deleted" column="deleted" />
 	</resultMap>
 
-	<select id="getTransitionInstanceById" parameterType="long" resultMap="transitionInstanceResultMap">
+	<select id="getSTransitionInstanceById" parameterType="long" resultMap="transitionInstanceResultMap">
 		SELECT t.*
 		FROM transition_instance t
 		WHERE t.tenantid = #{tenantid}

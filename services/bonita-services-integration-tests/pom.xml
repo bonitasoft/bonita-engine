@@ -682,6 +682,24 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>hibernate</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<bonita.file.filter>com.bonitasoft.services.HibernateServicesFileFilter</bonita.file.filter>
+			</properties>
+		</profile>
+		<profile>
+			<id>mybatis</id>
+			<properties>
+				<bonita.file.filter>com.bonitasoft.services.MyBatisServicesFileFilter</bonita.file.filter>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -696,7 +714,7 @@
 					</properties>
 					<systemPropertyVariables>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
-						<bonita.file.filter>com.bonitasoft.services.MyBatisServicesFileFilter</bonita.file.filter>
+						<bonita.file.filter>${bonita.file.filter}</bonita.file.filter>
 					</systemPropertyVariables>
 					<includes>
 						<include>com/bonitasoft/services/AllTestsSP.java</include>

@@ -1025,6 +1025,24 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>hibernate</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<bonita.file.filter>com.bonitasoft.engine.bpm.util.HibernateServicesFileFilter</bonita.file.filter>
+			</properties>
+		</profile>
+		<profile>
+			<id>mybatis</id>
+			<properties>
+				<bonita.file.filter>com.bonitasoft.engine.bpm.util.MyBatisServicesFileFilter</bonita.file.filter>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -1091,7 +1109,7 @@
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
-						<bonita.file.filter>com.bonitasoft.engine.bpm.util.MyBatisServicesFileFilter</bonita.file.filter>
+						<bonita.file.filter>${bonita.file.filter}</bonita.file.filter>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/bpm/test/AllBPMSPTests.java</include>

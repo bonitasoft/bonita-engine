@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -45,57 +46,26 @@
 	<profiles>
 		<profile>
 			<id>hibernate</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>unpack</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>com.bonitasoft.engine</groupId>
-											<artifactId>bonita-home-sp</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<classifier>hibernate</classifier>
-										</artifactItem>
-									</artifactItems>
-									<includes>**/*.*</includes>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-									<overWriteReleases>false</overWriteReleases>
-									<overWriteSnapshots>true</overWriteSnapshots>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<systemPropertyVariables>
-								<bonita.home>${project.build.directory}/home</bonita.home>
-							</systemPropertyVariables>
-							<includes>
-								<include>org/bonitasoft/engine/test/LocalIntegrationTestsSP.java</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<bonita.home.classifier>hibernate</bonita.home.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mybatis</id>
+			<properties>
+				<bonita.home.classifier></bonita.home.classifier>
+			</properties>
 		</profile>
 	</profiles>
 
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -125,6 +95,34 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.bonitasoft.engine</groupId>
+									<artifactId>bonita-home-sp</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+									<classifier>${bonita.home.classifier}</classifier>
+								</artifactItem>
+							</artifactItems>
+							<includes>**/*.*</includes>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
@@ -145,33 +143,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.bonitasoft.engine</groupId>
-									<artifactId>bonita-home-sp</artifactId>
-									<version>${project.version}</version>
-									<type>zip</type>
-								</artifactItem>
-							</artifactItems>
-							<includes>**/*.*</includes>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<properties>
@@ -184,7 +155,7 @@
 						<bonita.home>${bonita.home}</bonita.home>
 					</systemPropertyVariables>
 					<includes>
-						<include>org/bonitasoft/engine/test/LocalIntegrationTestsSP.java</include>
+						<include>org/bonitasoft/engine/test/TemporaryLocalIntegrationTestsSP.java</include>
 					</includes>
 				</configuration>
 			</plugin>
