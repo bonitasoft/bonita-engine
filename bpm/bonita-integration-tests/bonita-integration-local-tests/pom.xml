@@ -155,7 +155,7 @@
 						<bonita.home>${bonita.home}</bonita.home>
 					</systemPropertyVariables>
 					<includes>
-						<include>org/bonitasoft/engine/test/TemporaryLocalIntegrationTestsSP.java</include>
+						<include>org/bonitasoft/engine/test/LocalIntegrationTestsSP.java</include>
 					</includes>
 				</configuration>
 			</plugin>
