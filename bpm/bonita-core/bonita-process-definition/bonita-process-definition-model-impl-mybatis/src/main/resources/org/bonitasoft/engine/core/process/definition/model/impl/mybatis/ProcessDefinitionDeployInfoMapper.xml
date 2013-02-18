@@ -613,6 +613,105 @@
 			ORDER BY ${orderBy}
    		</if>
 	</select>
+	
+	<select id="getNumberOfSProcessDefinitionDeployInfoUsersManagedByCanStart" resultType="long">
+		SELECT COUNT(*)
+		FROM  process_definition proc_def
+		WHERE proc_def.tenantid = #{tenantid} 
+		AND activationState = 'enabled'
+		AND proc_def.processId IN (
+			SELECT a.scopeId
+			FROM actor a
+			WHERE a.tenantid = proc_def.tenantid
+			AND a.initiator = TRUE 
+			AND EXISTS (
+				SELECT a.id
+				FROM actormember
+				WHERE a.id = actormember.actorId 
+				AND ( 	
+					actormember.userId = #{managerUserId}
+					OR EXISTS (
+						SELECT actormember.userId
+						FROM  user
+						WHERE actormember.userId = user.id
+						AND user.managerUserId = #{managerUserId}
+					)
+					OR EXISTS (
+						SELECT actormember.id
+						FROM user_membership um
+						WHERE (
+							um.userId = #{managerUserId} 
+							OR EXISTS (
+								SELECT user.id
+								FROM  user
+								WHERE um.userId = user.id
+								AND user.managerUserId = #{managerUserId}
+							)
+						)
+						AND (
+							(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+							OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+							OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+	
+	<select id="searchSProcessDefinitionDeployInfoUsersManagedByCanStart" resultMap="processDefinitionDeployInfoResultMap">
+		SELECT process_definition
+				FROM  process_definition proc_def
+		WHERE proc_def.tenantid = #{tenantid} 
+		AND activationState = 'enabled'
+		AND proc_def.processId IN (
+			SELECT a.scopeId
+			FROM actor a
+			WHERE a.tenantid = proc_def.tenantid
+			AND a.initiator = TRUE 
+			AND EXISTS (
+				SELECT a.id
+				FROM actormember
+				WHERE a.id = actormember.actorId 
+				AND ( 	
+					actormember.userId = #{managerUserId}
+					OR EXISTS (
+						SELECT actormember.userId
+						FROM  user
+						WHERE actormember.userId = user.id
+						AND user.managerUserId = #{managerUserId}
+					)
+					OR EXISTS (
+						SELECT actormember.id
+						FROM user_membership um
+						WHERE (
+							um.userId = #{managerUserId} 
+							OR EXISTS (
+								SELECT user.id
+								FROM  user
+								WHERE um.userId = user.id
+								AND user.managerUserId = #{managerUserId}
+							)
+						)
+						AND (
+							(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+							OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+							OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+						)
+					)
+				)
+			)
+		)
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+   		</if>
+	</select>
 
 	<select id="getNumberOfSProcessDefinitionDeployInfoUncategorizedUserCanStart" resultType="long">
 		SELECT COUNT(*)
