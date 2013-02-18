@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-privilege</artifactId>
 		<groupId>com.bonitasoft.engine.privilege</groupId>
-		<version>6.0.Beta.5</version>
+		<version>6.0.Beta.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-privilege-model-impl-mybatis</artifactId>

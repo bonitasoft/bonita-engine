@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-integration-tests</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.0.Beta.5</version>
+		<version>6.0.Beta.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-client-tests-sp</artifactId>
