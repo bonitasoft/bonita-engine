@@ -22,6 +22,7 @@ import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -31,6 +32,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Ruiheng Fan
+ * @author Celine Souchet
  */
 public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminateTask {
 
@@ -73,7 +75,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
 
     private void executeConnectors(final long sActivityInstanceID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap,
             final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ActivityInstanceNotFoundException,
-            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition {
+            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException {
         final Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator = connectorsMap.entrySet().iterator();
         while (iterator.hasNext()) {
             final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry = iterator.next();
@@ -91,7 +93,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
     private Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
             throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorCondition {
+            InvalidEvaluationConnectorCondition, NotSerializableException {
         final String containerType = "ACTIVITY_INSTANCE";
         if (connectorInputParameters.size() == inputValues.size()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
