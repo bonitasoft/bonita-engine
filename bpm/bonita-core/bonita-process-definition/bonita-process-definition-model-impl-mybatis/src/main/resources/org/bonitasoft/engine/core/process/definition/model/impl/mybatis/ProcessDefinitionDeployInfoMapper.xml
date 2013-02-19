@@ -583,8 +583,7 @@
 			AND a.initiator = TRUE 
 			AND a.id IN (
 				SELECT actor.id
-				FROM actor,
-					 actormember
+				FROM actor, actormember
 				WHERE actor.tenantid = proc_def.tenantid
 				AND actormember.tenantid = actor.tenantid
 				AND actor.id = actormember.actorId 
@@ -632,7 +631,7 @@
 					actormember.userId = #{managerUserId}
 					OR EXISTS (
 						SELECT actormember.userId
-						FROM  user
+						FROM user_ user
 						WHERE actormember.userId = user.id
 						AND user.managerUserId = #{managerUserId}
 					)
@@ -643,7 +642,7 @@
 							um.userId = #{managerUserId} 
 							OR EXISTS (
 								SELECT user.id
-								FROM  user
+								FROM user_ user
 								WHERE um.userId = user.id
 								AND user.managerUserId = #{managerUserId}
 							)
@@ -663,8 +662,8 @@
 	</select>
 	
 	<select id="searchSProcessDefinitionDeployInfoUsersManagedByCanStart" resultMap="processDefinitionDeployInfoResultMap">
-		SELECT process_definition
-				FROM  process_definition proc_def
+		SELECT *
+		FROM  process_definition proc_def
 		WHERE proc_def.tenantid = #{tenantid} 
 		AND activationState = 'enabled'
 		AND proc_def.processId IN (
@@ -680,7 +679,7 @@
 					actormember.userId = #{managerUserId}
 					OR EXISTS (
 						SELECT actormember.userId
-						FROM  user
+						FROM user_ user
 						WHERE actormember.userId = user.id
 						AND user.managerUserId = #{managerUserId}
 					)
@@ -691,7 +690,7 @@
 							um.userId = #{managerUserId} 
 							OR EXISTS (
 								SELECT user.id
-								FROM  user
+								FROM user_ user
 								WHERE um.userId = user.id
 								AND user.managerUserId = #{managerUserId}
 							)
