@@ -1026,9 +1026,9 @@
 
         <!-- Local JNDI implementation -->
         <dependency>
-            <groupId>org.ow2.carol</groupId>
-            <artifactId>carol</artifactId>
-            <version>3.0.10</version>
+			<groupId>org.bonitasoft.engine.jndi</groupId>
+			<artifactId>bonita-jndi-carol</artifactId>
+			<version>${project.version}</version>
         </dependency>
 
 	</dependencies>
