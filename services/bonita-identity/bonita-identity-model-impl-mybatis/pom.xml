@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-identity</artifactId>
 		<groupId>com.bonitasoft.engine.identity</groupId>
-		<version>6.0.Beta.6</version>
+		<version>6.0.Beta.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-identity-model-impl-mybatis</artifactId>
