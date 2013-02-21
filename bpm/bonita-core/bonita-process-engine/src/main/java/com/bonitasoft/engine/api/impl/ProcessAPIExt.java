@@ -708,7 +708,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new ObjectReadException(e, ActivityInstance.class);
         }
         try {
-            containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType);
+            containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType, null);
         } catch (final SActivityReadException e) {
             throw new ObjectReadException(e, ActivityInstance.class);
         } catch (final SBonitaException e) {
