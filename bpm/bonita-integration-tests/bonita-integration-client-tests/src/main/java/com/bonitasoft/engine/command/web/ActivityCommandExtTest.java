@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -129,8 +128,8 @@ public class ActivityCommandExtTest extends CommonAPITest {
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
     public void testInstantiateProcessWithDataConversionOperation() throws Exception {
-        final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(new File(ActivityCommandExtTest.class.getResource(
-                "/com/bonitasoft/engine/command/web/Pool2--1.0.bar").toURI()));
+        final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(this.getClass().getResourceAsStream(
+                "Pool2--1.0.bar"));
         processDefinition = getProcessAPI().deploy(businessArchive);
         getProcessAPI().enableProcess(processDefinition.getId());
 
