@@ -11,7 +11,7 @@ import org.bonitasoft.engine.bpm.model.Problem;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.process.TestStates;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;

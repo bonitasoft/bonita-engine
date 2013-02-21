@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.WaitUntil;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ActivityStates;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
@@ -23,6 +22,7 @@ import org.bonitasoft.engine.search.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.wait.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.wait.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.wait.WaitForCompletedArchivedStep;

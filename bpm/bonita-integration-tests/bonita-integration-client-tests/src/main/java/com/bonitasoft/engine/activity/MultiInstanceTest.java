@@ -14,7 +14,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.process.TestStates;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.wait.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;

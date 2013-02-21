@@ -42,7 +42,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.process.ProcessManagementTest;
-import org.bonitasoft.engine.process.TestStates;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;

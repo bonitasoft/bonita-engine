@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.WaitUntil;
 import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EventSorting;
@@ -67,7 +66,6 @@ import org.bonitasoft.engine.identity.RoleBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserBuilder;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.process.TestStates;
 import org.bonitasoft.engine.process.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.search.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.HumanTaskInstanceSearchDescriptor;
@@ -75,6 +73,8 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.WaitUntil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
