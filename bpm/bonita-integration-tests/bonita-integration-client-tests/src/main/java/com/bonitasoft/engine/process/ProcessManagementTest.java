@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.WaitUntil;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ActivityStates;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
@@ -23,6 +22,7 @@ import org.bonitasoft.engine.search.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.wait.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.wait.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.wait.WaitForCompletedArchivedStep;
@@ -224,7 +224,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), actor, john);
 
         getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 200, 1000, true, 1, john);
+        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 20, 1000, true, 1, john);
         assertTrue("Expected activity not found", checkNbPendingTaskOf.waitUntil());
         final List<HumanTaskInstance> pendingTasks = checkNbPendingTaskOf.getPendingHumanTaskInstances();
         assertEquals(1, pendingTasks.size());
@@ -238,7 +238,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final Date dueDate = new Date(System.currentTimeMillis());
         final ManualTaskInstance manualUserTask1 = getProcessAPI().addManualUserTask(parentTask.getId(), subtask1, subtask1, john.getId(),
                 "add new manual user task", dueDate, TaskPriority.NORMAL);
-        final ManualTaskInstance manualUserTask2 = getProcessAPI().addManualUserTask(parentTask.getId(), subtask2, subtask1, john.getId(),
+        final ManualTaskInstance manualUserTask2 = getProcessAPI().addManualUserTask(parentTask.getId(), subtask2, subtask2, john.getId(),
                 "add new manual user task", dueDate, TaskPriority.ABOVE_NORMAL);
 
         CheckNbAssignedTaskOf checkNbAssignedTaskOf = new CheckNbAssignedTaskOf(getProcessAPI(), 50, 1000, true, 3, john);

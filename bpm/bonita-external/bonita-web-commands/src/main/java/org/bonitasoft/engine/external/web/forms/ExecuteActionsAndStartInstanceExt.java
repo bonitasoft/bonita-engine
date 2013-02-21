@@ -34,6 +34,7 @@ import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
 import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotEnabledException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
@@ -96,7 +97,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     private void executeConnectors(final long sProcessDefinitionID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap,
             final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException {
+            InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException, NotSerializableException {
         final Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator = connectorsMap.entrySet().iterator();
         while (iterator.hasNext()) {
             final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry = iterator.next();
@@ -179,7 +180,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     Map<String, Serializable> executeConnectorOnProcessDefinition(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processDefinitionId)
-            throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException {
+            throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException,
+            NotSerializableException {
         if (connectorInputParameters.size() == inputValues.size()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ClassLoader classLoader = getLocalClassLoader(tenantAccessor, processDefinitionId);

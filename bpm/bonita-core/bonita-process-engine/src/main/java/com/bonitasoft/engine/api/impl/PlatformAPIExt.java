@@ -506,10 +506,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new TenantNotFoundException("No tenant exists with name: " + tenantName);
         } catch (final SBonitaException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
-            throw new TenantNotFoundException("Unable to retreive the tenant with name " + tenantName);
+            throw new TenantNotFoundException("Unable to retrieve the tenant with name " + tenantName);
         } catch (final Exception e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
-            throw new TenantNotFoundException("Unable to retreive the tenant with name " + tenantName);
+            throw new TenantNotFoundException("Unable to retrieve the tenant with name " + tenantName);
         }
     }
 
@@ -530,10 +530,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw e;
         } catch (final SBonitaException e) {
             log(platformAccessor, e, TechnicalLogSeverity.ERROR);
-            throw new TenantNotFoundException("Unable to retreive the defaultTenant");
+            throw new TenantNotFoundException("Unable to retrieve the defaultTenant");
         } catch (final Exception e) {
             log(platformAccessor, e, TechnicalLogSeverity.ERROR);
-            throw new TenantNotFoundException("Unable to retreive the defaultTenant");
+            throw new TenantNotFoundException("Unable to retrieve the defaultTenant");
         }
     }
 
@@ -557,10 +557,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new TenantNotFoundException("No tenant exists with id: " + tenantId);
         } catch (final SBonitaException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
-            throw new TenantNotFoundException("Unable to retreive the tenant with id " + tenantId);
+            throw new TenantNotFoundException("Unable to retrieve the tenant with id " + tenantId);
         } catch (final Exception e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
-            throw new TenantNotFoundException("Unable to retreive the tenant with id " + tenantId);
+            throw new TenantNotFoundException("Unable to retrieve the tenant with id " + tenantId);
         }
     }
 

@@ -95,7 +95,7 @@ public class TenantTest {
             }
         }
         if (getUser.isFailed()) {
-            throw new Exception("failed to retreive user");
+            throw new Exception("failed to retrieve user");
         }
         final List<User> users = getUser.getUsers();
         assertNotNull(users);

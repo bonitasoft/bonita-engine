@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.BPMTestUtil;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
@@ -17,6 +16,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.wait.CheckNbPendingTasksForUserUsingSearch;
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class HiddenTaskTest extends CommonAPISPTest {
     public void beforeTest() throws BonitaException {
         login();
 
-        final DesignProcessDefinition designProcessDefinition = BPMTestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("ProcessContainingTasksToHide",
+        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("ProcessContainingTasksToHide",
                 "1.01beta", Arrays.asList("humanTask_1", "humanTask_2"), Arrays.asList(true, true), "actor", true, true);
         user = createUser("common_user", "abc");
         user2 = createUser("uncommon_user", "abc");

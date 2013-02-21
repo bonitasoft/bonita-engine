@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.BPMTestUtil;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.Comment;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
@@ -28,6 +27,7 @@ import org.bonitasoft.engine.search.SearchCommentsDescriptor;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
 
     private static final String USERNAME = "yanyanliu";
 
-    private static final String ACTOR_NAME = BPMTestUtil.ACTOR_NAME;
+    private static final String ACTOR_NAME = APITestUtil.ACTOR_NAME;
 
     @After
     public void afterTest() throws BonitaException {
@@ -74,12 +74,12 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         logout();
         final String tenantName = "myTestTenant";
 
-        PlatformSession platformSession = BPMTestUtil.loginPlatform();
+        PlatformSession platformSession = APITestUtil.loginPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final long tenantId = platformAPI.createTenant(tenantName, "default", "defaultIconName", "defaultIconPath", "default_tenant_name",
                 "default_tenant_password");
         platformAPI.activateTenant(tenantId);
-        BPMTestUtil.logoutPlatform(platformSession);
+        APITestUtil.logoutPlatform(platformSession);
 
         login();
 
@@ -116,11 +116,11 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         assertEquals(0, getProcessAPI().getNumberOfProcesses());
 
         logout();
-        platformSession = BPMTestUtil.loginPlatform();
+        platformSession = APITestUtil.loginPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         platformAPI.deactiveTenant(tenantId);
         platformAPI.deleteTenant(tenantId);
-        BPMTestUtil.logoutPlatform(platformSession);
+        APITestUtil.logoutPlatform(platformSession);
 
         login();
     }
@@ -130,7 +130,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         final User user = createUser(USERNAME, PASSWORD);
         loginWith(USERNAME, PASSWORD);
         DesignProcessDefinition designProcessDefinition;
-        designProcessDefinition = BPMTestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+        designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final String commentContent1 = "commentContent1";
         final String commentContent2 = "commentContent2";
@@ -174,7 +174,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
             if (i >= 0 && i < 10) {
                 processName += "0";
             }
-            final DesignProcessDefinition processDefinition = BPMTestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION
+            final DesignProcessDefinition processDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION
                     + i, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
             ids.add(getProcessAPI().deploy(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done()).getId());
         }

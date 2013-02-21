@@ -241,7 +241,7 @@
 		</if>
 	</select>
 
-	<select id="getFlowNodeInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+	<select id="getSFlowNodeInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
 		SELECT *
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}
@@ -428,7 +428,7 @@
 		AND f.kind = 'boundaryEvent'
 	</select>
 
-	<select id="getEventInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+	<select id="getSEventInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
 		SELECT *
 		FROM flownode_instance f
 		WHERE f.tenantid = #{tenantid}

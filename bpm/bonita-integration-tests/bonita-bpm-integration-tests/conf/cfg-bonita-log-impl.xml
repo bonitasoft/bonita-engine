@@ -31,6 +31,7 @@
         		<entry key="DEPENDENCY_MAPPING_CREATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_MAPPING_DELETED:INTERNAL" value="true" />
         		<entry key="DOCUMENTMAPPING_CREATED:INTERNAL" value="true" />
+        		<entry key="DOCUMENTMAPPING_DELETED:INTERNAL" value="true" />
         		<entry key="DOCUMENTMAPPING_UPDATED:INTERNAL" value="true" />
         		<entry key="EVENT_INSTANCE_TRIGGER_CREATED:INTERNAL" value="true" />
         		<entry key="EVENT_INSTANCE_TRIGGER_DELETED:INTERNAL" value="true" />
