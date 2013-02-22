@@ -116,18 +116,21 @@ public class IdentityServiceUsingEventServiceTest {
         BusinessTransaction tx = txService.createTransaction();
         tx.begin();
         final String userName = "Zhang";
-        final SUser user = builder.getUserBuilder().createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole")
-                .setLastName("zhang").done();
+        SUser user = builder.getUserBuilder().createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang")
+                .done();
         identityService.createUser(user);
         tx.complete();
 
         tx = txService.createTransaction();
         tx.begin();
+        user = identityService.getUser(user.getId());
+
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
         final EntityUpdateDescriptor changeDescriptor = builder.getUserUpdateBuilder().updatePassword("newpassword").done();
         identityService.updateUser(user, changeDescriptor);
 
+        user = identityService.getUser(user.getId());
         assertEquals(user.getPassword(), userUpdateEventHandler.getPassword(userName));
 
         identityService.deleteUser(user);
@@ -140,8 +143,8 @@ public class IdentityServiceUsingEventServiceTest {
         tx.begin();
 
         final String userName = "Zhang";
-        final SUser user = builder.getUserBuilder().createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole")
-                .setLastName("zhang").done();
+        SUser user = builder.getUserBuilder().createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang")
+                .done();
         identityService.createUser(user);
         tx.complete();
 
@@ -149,6 +152,7 @@ public class IdentityServiceUsingEventServiceTest {
         tx.begin();
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
+        user = identityService.getUser(user.getId());
         final EntityUpdateDescriptor changeDescriptor = builder.getUserUpdateBuilder().updatePassword("oldpassword").done();
         identityService.updateUser(user, changeDescriptor);
 
@@ -162,13 +166,14 @@ public class IdentityServiceUsingEventServiceTest {
         BusinessTransaction tx = txService.createTransaction();
         tx.begin();
 
-        final SUser user = builder.getUserBuilder().createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update")
-                .setLastName("User").done();
+        SUser user = builder.getUserBuilder().createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User")
+                .done();
         identityService.createUser(user);
         tx.complete();
 
         tx = txService.createTransaction();
         tx.begin();
+        user = identityService.getUser(user.getId());
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
         final EntityUpdateDescriptor changeDescriptor = builder.getUserUpdateBuilder().updateUserName("testUpdateUser2").updateFirstName("updated")

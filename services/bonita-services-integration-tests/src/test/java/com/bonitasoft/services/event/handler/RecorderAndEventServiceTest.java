@@ -24,6 +24,7 @@ import org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
@@ -127,14 +128,15 @@ public class RecorderAndEventServiceTest {
         // Add an Employee using persistence service
         BusinessTransaction btx = txService.createTransaction();
         btx.begin();
-        final Employee employee = new Employee("John", 15);
+        Employee employee = new Employee("John", 15);
         persistenceService.insert(employee);
         btx.complete();
 
         // Update an Employee using recorder
         btx = txService.createTransaction();
         btx.begin();
-
+        final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>("getEmployeeById", Employee.class, employee.getId());
+        employee = persistenceService.selectById(selectByIdDescriptor);
         // Make UpdateRecord parameter
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("name", "Alice");
@@ -160,7 +162,7 @@ public class RecorderAndEventServiceTest {
         // Add an Employee using persistence service
         BusinessTransaction btx = txService.createTransaction();
         btx.begin();
-        final Employee employee = new Employee("John", 15);
+        Employee employee = new Employee("John", 15);
         persistenceService.insert(employee);
         btx.complete();
 
@@ -168,6 +170,8 @@ public class RecorderAndEventServiceTest {
         btx = txService.createTransaction();
         btx.begin();
 
+        final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>("getEmployeeById", Employee.class, employee.getId());
+        employee = persistenceService.selectById(selectByIdDescriptor);
         // Make UpdateRecord parameter
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("age", 20);
