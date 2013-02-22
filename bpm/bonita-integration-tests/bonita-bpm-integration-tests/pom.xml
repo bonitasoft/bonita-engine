@@ -729,7 +729,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-persistence-hibernate</artifactId>
+			<artifactId>bonita-persistence-hibernate-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
