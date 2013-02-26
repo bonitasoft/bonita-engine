@@ -50,10 +50,7 @@ public class SPBPMTestUtil {
     public static void createEnvironmentWithDefaultTenant() throws BonitaException {
         final PlatformSession session = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        if (platformAPI.isPlatformCreated()) {
-            destroyPlatformAndTenants();
-        }
-        platformAPI.createAndInitializePlatform();
+        platformAPI.initializePlatform();
         platformAPI.startNode();
         defaultTenantId = platformAPI.getDefaultTenant().getId();
         logoutPlatform(session);
@@ -82,7 +79,7 @@ public class SPBPMTestUtil {
             }
         }
         platformAPI.stopNode();
-        platformAPI.deletePlaftorm();
+        platformAPI.cleanPlatform();
         logoutPlatform(session);
     }
 
