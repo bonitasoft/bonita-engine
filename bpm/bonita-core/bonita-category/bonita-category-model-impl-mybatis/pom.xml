@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-category</artifactId>
 		<groupId>com.bonitasoft.engine.core.category</groupId>
-		<version>6.0.0-beta-007</version>
+		<version>6.0.0-beta-008-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-category-model-impl-mybatis</artifactId>
