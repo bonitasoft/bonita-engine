@@ -154,6 +154,7 @@
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
 		<constructor-arg name="identityService" ref="identityService" />
 		<constructor-arg name="workService" ref="workService"/>
+		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
@@ -173,8 +174,6 @@
 		<constructor-arg name="lockService" ref="lockService"/>
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
-
-	<bean id="processInstanceStateManager" class="org.bonitasoft.engine.execution.ProcessInstanceStateManagerImpl" />
 
 	<bean id="processExecutor" class="org.bonitasoft.engine.execution.ProcessExecutorImpl">
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
@@ -221,6 +220,7 @@
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
+		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
 	</bean>
 	
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
