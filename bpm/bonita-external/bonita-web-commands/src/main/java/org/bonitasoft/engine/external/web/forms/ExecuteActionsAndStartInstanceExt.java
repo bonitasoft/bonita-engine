@@ -41,7 +41,6 @@ import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.ProcessDefinitionReadException;
 import org.bonitasoft.engine.exception.ProcessInstanceCreationException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.state.ProcessInstanceStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
@@ -118,7 +117,6 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final ProcessInstanceStateManager processInstanceStateManager = tenantAccessor.getProcessInstanceStateManager();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         if (userId == 0) {
@@ -148,7 +146,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             log(tenantAccessor, e);
             throw new ProcessInstanceCreationException(e);
         }// FIXME in case process instance creation exception -> put it in failed
-        return ModelConvertor.toProcessInstance(sDefinition, startedInstance, processInstanceStateManager);
+        return ModelConvertor.toProcessInstance(sDefinition, startedInstance);
     }
 
     /**
