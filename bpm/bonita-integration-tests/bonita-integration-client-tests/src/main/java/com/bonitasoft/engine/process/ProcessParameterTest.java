@@ -30,11 +30,10 @@ import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
-import org.bonitasoft.engine.connectors.TestConnector;
-import org.bonitasoft.engine.connectors.TestConnector2;
+import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
-import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
@@ -580,7 +579,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final String valueOfInput = "valueOfInput";
         final String inputName = "input1";
-        final String connectorId = "org.bonitasoft.connector.testConnector";
+        final String connectorId = "org.bonitasoft.connector.testConnectorWithOutput";
         final String connectorVersion = "1.0";
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression(valueOfInput);
         final String paraName = "Para1";
@@ -593,7 +592,8 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(delivery, userId, designProcessDefinition, paraMap);
         final long proDefId = processDefinition.getId();
-        startProcessAndWaitForTask(proDefId, "step2");
+        ProcessInstance processInstance = getProcessAPI().startProcess(proDefId);
+        assertNotNull(waitForUserTask(100, 10000, "step2", processInstance));
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(proDefId);
         assertNotNull(processDeploymentInfo);
@@ -601,19 +601,20 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         assertEquals("abc", getProcessAPI().getParameterInstance(proDefId, paraName).getValue());
         final ConnectorImplementationDescriptor connector = getProcessAPI().getConnectorImplementation(proDefId, connectorId, connectorVersion);
-        assertEquals(TestConnector.class.getName(), connector.getImplementationClassName());
+        assertEquals(TestConnectorWithOutput.class.getName(), connector.getImplementationClassName());
         assertEquals(connectorVersion, connector.getVersion());
         assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(proDefId).getActivationState());
 
         getProcessAPI().updateParameterInstanceValue(proDefId, paraName, "bcd");
-        final String implSourchFile = "/org/bonitasoft/engine/connectors/TestConnector2.impl";
-        final Class<TestConnector2> implClass = TestConnector2.class;
+        assertEquals("bcd", getProcessAPI().getParameterInstance(proDefId, paraName).getValue());
+
+        final String implSourchFile = "/org/bonitasoft/engine/connectors/TestConnectorWithModifiedOutput.impl";
+        final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;
         final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
         getProcessAPI().setConnectorImplementation(proDefId, connectorId, connectorVersion, connectorImplementationArchive);
 
-        assertEquals("bcd", getProcessAPI().getParameterInstance(proDefId, paraName).getValue());
         final ConnectorImplementationDescriptor connectorUpdate = getProcessAPI().getConnectorImplementation(proDefId, connectorId, connectorVersion);
-        assertEquals(TestConnector2.class.getName(), connectorUpdate.getImplementationClassName());
+        assertEquals(TestConnectorWithModifiedOutput.class.getName(), connectorUpdate.getImplementationClassName());
         assertEquals(connectorVersion, connectorUpdate.getVersion());
         assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(proDefId).getConfigurationState());
 
@@ -626,12 +627,13 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ProcessDefinition processDef = getProcessAPI().deploy(businessArchive);
         final long processDefinitionId = processDef.getId();
         getProcessAPI().enableProcess(processDefinitionId);
-        startProcessAndWaitForTask(processDefinitionId, "step2");
+        processInstance = getProcessAPI().startProcess(processDefinitionId);
+        assertNotNull(waitForUserTask(100, 10000, "step2", processInstance));
 
         assertEquals("bcd", getProcessAPI().getParameterInstance(processDefinitionId, paraName).getValue());
         final ConnectorImplementationDescriptor connectorRedeploy = getProcessAPI().getConnectorImplementation(processDefinitionId, connectorId,
                 connectorVersion);
-        assertEquals(TestConnector2.class.getName(), connectorRedeploy.getImplementationClassName());
+        assertEquals(TestConnectorWithModifiedOutput.class.getName(), connectorRedeploy.getImplementationClassName());
         assertEquals(connectorVersion, connectorRedeploy.getVersion());
         assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(processDefinitionId).getConfigurationState());
 
@@ -755,19 +757,14 @@ public class ProcessParameterTest extends CommonAPISPTest {
     }
 
     private List<BarResource> generateConnectorImplementations() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(2);
-        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnector.impl", "TestConnector.impl");
-        // addResource(resources, "/org/bonitasoft/engine/connectors/TestConnector2.impl", "TestConnector2.impl");
+        final List<BarResource> resources = new ArrayList<BarResource>(1);
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl", "TestConnectorWithOutput.impl");
         return resources;
     }
 
     private List<BarResource> generateConnectorDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(2);
-        addResource(resources, TestConnector.class, "TestConnector.jar");
-        // addResource(resources, TestConnector2.class, "TestConnector2.jar");
+        final List<BarResource> resources = new ArrayList<BarResource>(1);
         addResource(resources, TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
-        addResource(resources, VariableStorage.class, "VariableStorage.jar");
         return resources;
     }
 
