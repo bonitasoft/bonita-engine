@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
+	<bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl" depends-on="bonitaSequenceManagerDS">
 		<constructor-arg name="rangeSizes">
 			<map>
 				<!-- Most used objects: range size depends on process design -->
@@ -188,10 +188,7 @@
 				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl" value="20040" />
 			</map>
 		</constructor-arg>
-		<constructor-arg name="url" value="${database.journal.connection.url}" />
-		<constructor-arg name="driver" value="${database.journal.connection.driver_class}" />
-		<constructor-arg name="user" value="${database.journal.connection.username}" />
-		<constructor-arg name="password" value="${database.journal.connection.password}" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDS" />
 		<constructor-arg name="retries" value="5" />
 		<constructor-arg name="delay" value="5" />
 		<constructor-arg name="delayFactor" value="2" />
