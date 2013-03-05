@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -62,10 +63,22 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
 
         try {
             executeActivity(sActivityInstanceID);
-            executeConnectors(sActivityInstanceID, connectorsMap, operationsMap);
-            updateActivityInstanceVariables(operationsMap, sActivityInstanceID);
+            final ClassLoader processClassloader = getProcessClassLoader(serviceAccessor, sActivityInstanceID);
+            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(processClassloader);
+                updateActivityInstanceVariables(operationsMap, sActivityInstanceID);
+                executeConnectors(sActivityInstanceID, connectorsMap, operationsMap);
+                updateActivityInstanceVariables(operationsMap, sActivityInstanceID);
+            } finally {
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
+            }
             executeActivity(sActivityInstanceID);
         } catch (final BonitaException e) {
+            throw new SCommandExecutionException(
+                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminate(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
+                    e);
+        } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminate(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
                     e);
