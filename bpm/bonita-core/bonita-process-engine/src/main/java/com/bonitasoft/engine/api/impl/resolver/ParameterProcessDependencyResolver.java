@@ -65,7 +65,7 @@ public class ParameterProcessDependencyResolver extends ProcessDependencyResolve
     }
 
     @Override
-    public List<Problem> checkResolution(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition) {
+    public List<Problem> checkResolution(final TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition) {
 
         if (processDefinition.getParameters().isEmpty()) {
             return Collections.emptyList();
