@@ -305,8 +305,10 @@ public class BusinessArchiveTests {
 
         final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addDocumentDefinition("testDoc", "testFile.txt").addFile("testFile.txt").addDescription("desc").addMimeType("text/plain");
-        processDefinitionBuilder.addDocumentDefinition("testDocUrl", "testFile.txt").addUrl("http://test.com/testFile.txt").addDescription("desc");
+        processDefinitionBuilder.addDocumentDefinition("testDoc").addContentFileName("testFile.txt").addFile("testFile.txt").addDescription("desc")
+                .addMimeType("text/plain");
+        processDefinitionBuilder.addDocumentDefinition("testDocUrl").addContentFileName("testFile.txt").addUrl("http://test.com/testFile.txt")
+                .addDescription("desc");
         processDefinitionBuilder.addDescription("a very good description");
         processDefinitionBuilder.addDisplayDescription("A very good and clean description that will be displayed in user xp");
         processDefinitionBuilder.addDisplayName("Truck Handling Process");
@@ -978,15 +980,16 @@ public class BusinessArchiveTests {
     @Test(expected = InvalidProcessDefinitionException.class)
     public void createProcessWithADocumentHavingBothUrlAndFile() throws InvalidProcessDefinitionException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithExternalDocuments", "1.0");
-        builder.addDocumentDefinition("myDoc", "testFile.txt").addDescription("a cool pdf document").addMimeType("application/pdf").addFile("myPdf.pdf")
-                .addUrl("http://plop");
+        builder.addDocumentDefinition("myDoc").addContentFileName("testFile.txt").addDescription("a cool pdf document").addMimeType("application/pdf")
+                .addFile("myPdf.pdf").addUrl("http://plop");
         builder.done();
     }
 
     @Test(expected = InvalidBusinessArchiveFormat.class)
     public void createProcessWithAInBarDocumentMissingFile() throws InvalidProcessDefinitionException, InvalidBusinessArchiveFormat {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithExternalDocuments", "1.0");
-        builder.addDocumentDefinition("myDoc", "testFile.txt").addDescription("a cool pdf document").addMimeType("application/pdf").addFile("myPdf.pdf");
+        builder.addDocumentDefinition("myDoc").addContentFileName("testFile.txt").addDescription("a cool pdf document").addMimeType("application/pdf")
+                .addFile("myPdf.pdf");
         final DesignProcessDefinition processDefinition = builder.done();
         new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition)
                 .addDocumentResource(new BarResource("testFile.txt", new byte[] { 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })).done();
