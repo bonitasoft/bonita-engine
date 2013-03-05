@@ -70,6 +70,7 @@
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
 	
 </beans>
