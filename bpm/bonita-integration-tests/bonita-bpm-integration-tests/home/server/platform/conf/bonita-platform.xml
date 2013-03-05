@@ -10,7 +10,7 @@
     <entry key="platformAdminPassword">platform</entry>
 
     <entry key="db.vendor">h2</entry>
-    <entry key="db.version">notspecified"</entry>
+    <entry key="db.version">notspecified</entry>
     <entry key="sql.delimiter">;</entry>
 
     <entry key="hibernate.journal.dialect">org.hibernate.dialect.H2Dialect</entry>
