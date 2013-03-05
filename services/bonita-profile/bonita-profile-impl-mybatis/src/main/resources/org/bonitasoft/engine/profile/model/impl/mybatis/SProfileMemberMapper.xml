@@ -41,6 +41,14 @@
 			ORDER BY ${orderBy}
 		</if>
 	</select>
+	<select id="getProfileMembers" parameterType="long" resultMap="profileMemberResultMap">
+		SELECT pm.*
+		FROM profilemember pm
+		WHERE pm.tenantId = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
 
 	<select id="getDirectProfileMembersOfGroup" parameterType="long" resultMap="profileMemberResultMap">
 		SELECT pm.*
