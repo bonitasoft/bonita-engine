@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,10 +23,6 @@ import org.bonitasoft.engine.actor.ActorMappingExportException;
 import org.bonitasoft.engine.actor.privilege.api.ActorPrivilegeService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
-import org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver;
-import org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver;
-import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
-import org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.CreateManualUserTask;
 import org.bonitasoft.engine.api.impl.transaction.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.GetActivityInstance;
@@ -111,7 +106,6 @@ import org.bonitasoft.engine.util.FileUtil;
 
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
@@ -381,7 +375,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new ParameterNotFoundException(processDefinitionId, parameterName);
             }
             parameterService.update(processDefinitionId, parameterName, parameterValue);
-            resolvedDependencies(processDefinitionId, tenantAccessor);
+            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         } catch (final SParameterProcessNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -489,12 +483,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final Exception e) {
             throw new InvalidSessionException(e);
         }
-    }
-
-    @Override
-    protected List<ProcessDependencyResolver> getResolvers() {
-        return Arrays.asList(new ActorProcessDependencyResolver(), new ConnectorProcessDependencyResolver(), new UserFilterProcessDependencyResolver(),
-                new ParameterProcessDependencyResolver());
     }
 
     @Override

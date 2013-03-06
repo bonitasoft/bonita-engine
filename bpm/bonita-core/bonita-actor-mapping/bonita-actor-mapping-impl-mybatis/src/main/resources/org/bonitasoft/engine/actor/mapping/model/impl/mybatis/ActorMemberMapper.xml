@@ -82,6 +82,14 @@
 			ORDER BY ${orderBy}
 		</if>
 	</select>
+	<select id="getActorMembers" parameterType="long" resultMap="actorMemberResultMap">
+		SELECT *
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
 
 	<select id="getActorMembersOfUser" parameterType="long" resultMap="actorMemberResultMap">
 		SELECT *

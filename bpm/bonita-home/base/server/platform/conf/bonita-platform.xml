@@ -19,7 +19,7 @@
 	<!-- H2 configuration -->
 
 	<entry key="db.vendor">h2</entry>
-	<entry key="db.version">notspecified"</entry>
+	<entry key="db.version">notspecified</entry>
 	<entry key="sql.delimiter">;</entry>
 	<entry key="hibernate.journal.dialect">org.bonitasoft.engine.MyH2Dialect</entry>
 	<!-- this datasource name is used by the engine to get connected to the database -->
@@ -33,7 +33,7 @@
 	<!-- MySQL configuration -->
 
 	<!-- <entry key="db.vendor">mysql</entry> -->
-	<!-- <entry key="db.version">notspecified"</entry> -->
+	<!-- <entry key="db.version">notspecified</entry> -->
 	<!-- <entry key="sql.delimiter">;</entry> -->
 	<!-- <entry key="hibernate.journal.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</entry> -->
 	<!-- this datasource name is used by the engine to get connected to the database -->

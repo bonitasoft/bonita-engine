@@ -229,6 +229,16 @@
         <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
         <property name="shouldStartEventHandlingJob" value="true" />
 	</bean>
+	
+	<bean id="dependencyResolver" class="org.bonitasoft.engine.api.impl.resolver.DependencyResolver">
+		<constructor-arg name="dependencyResolvers">
+			<list>
+				<bean class="org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver" />
+				<bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver" />
+				<bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver" />
+				<bean class="com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver" />
+			</list>
+		</constructor-arg>
+	</bean>
     
-
 </beans>

@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-data-instance</artifactId>
 		<groupId>com.bonitasoft.engine.data.instance</groupId>
-		<version>6.0.0-beta-008-SNAPSHOT</version>
+		<version>6.0.0-beta-009-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-data-instance-model-impl-mybatis</artifactId>

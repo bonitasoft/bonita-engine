@@ -1,61 +1,47 @@
-package org.bonitasoft.engine.bar.test;
+package com.bonitasoft.engine.bar.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.ActorMappingContribution;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.model.ActivityDefinition;
-import org.bonitasoft.engine.bpm.model.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.DocumentDefinition;
 import org.bonitasoft.engine.bpm.model.GatewayType;
 import org.bonitasoft.engine.bpm.model.IntermediateCatchMessageEventTriggerDefinitionBuilder;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.model.TransitionDefinition;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.bpm.model.event.BoundaryEventDefinition;
-import org.bonitasoft.engine.bpm.model.event.EndEventDefinition;
 import org.bonitasoft.engine.bpm.model.event.trigger.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.model.event.trigger.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.model.event.trigger.TimerType;
-import org.bonitasoft.engine.core.operation.LeftOperand;
 import org.bonitasoft.engine.core.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormat;
-import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.util.FileUtil;
 import org.junit.Test;
 
+import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 /**
@@ -64,186 +50,6 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 public class BusinessArchiveTests {
 
     private static final String ASSIGN_OPERATOR = "=";
-
-    @Test
-    public void createBusinessArchiveFolder() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
-        assertTrue(tempFile.exists());
-        assertTrue(tempFile.isDirectory());
-        final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        assertTrue(file.exists());
-        assertFalse(file.isDirectory());
-        deleteDir(tempFile);
-    }
-
-    @Test
-    public void createBusinessArchiveFileFromFolder() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
-
-        BusinessArchiveFactory.businessArchiveFolderToFile(barFile, tempFile.getAbsolutePath());
-        assertTrue(barFile.exists());
-
-        final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final ProcessDefinition result = businessArchive2.getProcessDefinition();
-
-        assertEquals(process, result);
-        barFile.delete();
-        deleteDir(tempFile);
-    }
-
-    @Test
-    public void createBusinessArchiveFromFile() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
-
-        BusinessArchiveFactory.businessArchiveFolderToFile(barFile, tempFile.getAbsolutePath());
-        assertTrue(barFile.exists());
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(barFile);
-        final ProcessDefinition result = businessArchive2.getProcessDefinition();
-
-        assertEquals(process, result);
-        barFile.delete();
-        deleteDir(tempFile);
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormat.class)
-    public void readInvalidBusinessArchive() throws Exception {
-        final File tempFile = File.createTempFile("businessArchive", "folder");
-        tempFile.delete();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
-        final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        file.delete();
-        file.createNewFile();
-        final FileWriter fileWriter = new FileWriter(file);
-        fileWriter.write("test");
-        fileWriter.flush();
-        fileWriter.close();
-        try {
-            BusinessArchiveFactory.readBusinessArchive(tempFile);
-        } finally {
-            barFile.delete();
-            deleteDir(tempFile);
-
-        }
-    }
-
-    @Test(expected = IOException.class)
-    public void createBusinessArchiveFolderWithInvalidPath() throws Exception {
-        BusinessArchiveFactory.readBusinessArchive(new File("$$$an invalidPath@//\\ùù%%%"));
-    }
-
-    @Test
-    public void createBusinessArchiveWithProcessDefinition() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        final ProcessDefinition result = businessArchive.getProcessDefinition();
-
-        assertEquals(process, result);
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormat.class)
-    public void createEmptyBusinessArchive() throws Exception {
-        new BusinessArchiveBuilder().createNewBusinessArchive().done();
-    }
-
-    @Test
-    public void exportBusinessArchiveAsFile() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-        assertTrue(barFile.exists());
-        assertFalse(barFile.isDirectory());
-        barFile.delete();
-    }
-
-    @Test(expected = IOException.class)
-    public void exportBusinessArchiveAsFileOnExistingFile() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-    }
-
-    @Test
-    public void readBusinessArchive() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-
-        final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final ProcessDefinition result = businessArchive2.getProcessDefinition();
-
-        assertEquals(process, result);
-        barFile.delete();
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormat.class)
-    public void importOldBusinessArchiveFail() throws Exception {
-        final InputStream resourceAsStream = this.getClass().getResourceAsStream("MyProcess--1.0.bar");
-        BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormat.class)
-    public void importOldBusinessArchiveFileFail() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-        final InputStream inputStream = this.getClass().getResourceAsStream("MyProcess--1.0.bar");
-        final OutputStream out = new FileOutputStream(barFile);
-        final byte buf[] = new byte[1024];
-        int len;
-        while ((len = inputStream.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
-        out.close();
-        inputStream.close();
-        try {
-            BusinessArchiveFactory.readBusinessArchive(barFile);
-        } finally {
-            barFile.delete();
-        }
-    }
 
     private static boolean deleteDir(final File dir) {
         if (dir.isDirectory()) {
@@ -259,54 +65,16 @@ public class BusinessArchiveTests {
     }
 
     @Test
-    public void manageBusinessArchiveResources() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                .addExternalResource(new BarResource("dummy.txt", new byte[] { 'a', 'b', 'c', 'd' })).done();
-
-        // Add a resource to the biz archive:
-        final File tempFile = File.createTempFile("testbar", ".bar");
-        tempFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
-
-        // read from the file
-        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
-        // final ProcessDefinition processDefinition = processAPI.deploy(readBusinessArchive);
-        assertTrue("Added resource not found in BusinessArchive", readBusinessArchive.getResources().containsKey("resources/dummy.txt"));
-        tempFile.delete();
-    }
-
-    @Test
-    public void putActorMappingInBar() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProductionPlanning", "3.1");
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        // Add a resource to the biz archive:
-        final byte[] xmlBytes = "<toto>text</toto>".getBytes();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                .setActorMapping(xmlBytes).done();
-
-        final File tempFile = File.createTempFile("testbar", ".bar");
-        tempFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
-
-        // read from the file
-        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
-        // final ProcessDefinition processDefinition = processAPI.deploy(readBusinessArchive);
-        assertTrue("Actor Mapping not found in BusinessArchive",
-                Arrays.equals(xmlBytes, readBusinessArchive.getResource(ActorMappingContribution.ACTOR_MAPPING_FILE)));
-        tempFile.delete();
-    }
-
-    @Test
     public void readProcessFromBusinessArchive() throws Exception {
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
         final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addDocumentDefinition("testDoc", "testFile.txt").addFile("testFile.txt").addDescription("desc").addMimeType("text/plain");
-        processDefinitionBuilder.addDocumentDefinition("testDocUrl", "testFile.txt").addUrl("http://test.com/testFile.txt").addDescription("desc");
+        processDefinitionBuilder.addDocumentDefinition("testDoc").addContentFileName("testFile.txt").addFile("testFile.txt").addDescription("desc")
+                .addMimeType("text/plain");
+        processDefinitionBuilder.addDocumentDefinition("testDocUrl").addContentFileName("testFile.txt").addUrl("http://test.com/testFile.txt")
+                .addDescription("desc");
         processDefinitionBuilder.addDescription("a very good description");
         processDefinitionBuilder.addDisplayDescription("A very good and clean description that will be displayed in user xp");
         processDefinitionBuilder.addDisplayName("Truck Handling Process");
@@ -430,8 +198,9 @@ public class BusinessArchiveTests {
         assertEquals(process.getProcessContainer().getGateways().iterator().next(), result.getProcessContainer().getGateways().iterator().next());
         assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
         boolean trWithConditionOk = false;
+        final long startId = result.getProcessContainer().getFlowNode("start1").getId();
         for (final TransitionDefinition transition : result.getProcessContainer().getTransitions()) {
-            if ("start1".equals(transition.getSource()) && trueExpression.equals(transition.getCondition())) {
+            if (startId == transition.getSource() && trueExpression.equals(transition.getCondition())) {
                 trWithConditionOk = true;
                 break;
             }
@@ -474,10 +243,10 @@ public class BusinessArchiveTests {
         initialParameters.put("myKey2", "myValue2");
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process)
                 .setParameters(initialParameters).setActorMapping(null).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
+        com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
+        final BusinessArchive businessArchive2 = com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.readBusinessArchive(inputStream);
         inputStream.close();
         final Map<String, String> result = businessArchive2.getParameters();
 
@@ -539,237 +308,6 @@ public class BusinessArchiveTests {
         barFile.delete();
     }
 
-    @Test(expected = InvalidProcessDefinitionException.class)
-    public void tooMuchCorrelationOnCatchMessage() throws Exception {
-        final Expression conditionKey = new ExpressionBuilder().createConstantStringExpression("coditionKey");
-        final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
-        final Expression displayNameExpression = new ExpressionBuilder().createConstantStringExpression("dataToSend");
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addStartEvent("start1").addMessageEventTrigger("m1");
-        processDefinitionBuilder.addAutomaticTask("auto1");
-        final IntermediateCatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processDefinitionBuilder
-                .addIntermediateCatchEvent("waitForMessage").addMessageEventTrigger("m2");
-        catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
-        catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
-        catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
-        catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
-        catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
-        catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
-        // create expression for target process/flowNode
-        Expression targetProcess = new ExpressionBuilder().createDataExpression("p3", String.class.getName());
-        final Expression receiveMessage = new ExpressionBuilder().createDataExpression("receiveMessage", String.class.getName());
-        processDefinitionBuilder.addIntermediateThrowEvent("sendMessage").addMessageEventTrigger("m4", targetProcess, receiveMessage);
-        targetProcess = new ExpressionBuilder().createConstantStringExpression("p2");
-        final Expression waitMessage = new ExpressionBuilder().createConstantStringExpression("waitMessage");
-        final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder = processDefinitionBuilder.addEndEvent("end1").addMessageEventTrigger("m2",
-                targetProcess, waitMessage);
-        throwMessageEventTriggerBuilder.addCorrelation(conditionKey, trueExpression);
-        throwMessageEventTriggerBuilder.addMessageContentExpression(displayNameExpression, trueExpression);
-        processDefinitionBuilder.addTransition("start1", "auto1", trueExpression);
-        processDefinitionBuilder.addTransition("auto1", "waitForMessage");
-        processDefinitionBuilder.addTransition("waitForMessage", "sendMessage");
-        processDefinitionBuilder.addTransition("sendMessage", "end1");
-        processDefinitionBuilder.done();
-    }
-
-    @Test(expected = InvalidProcessDefinitionException.class)
-    public void tooMuchCorrelationOnThrowMessage() throws Exception {
-        final Expression conditionKey = new ExpressionBuilder().createConstantStringExpression("coditionKey");
-        final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
-        final Expression displayNameExpression = new ExpressionBuilder().createConstantStringExpression("dataToSend");
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addStartEvent("start1").addMessageEventTrigger("m1");
-        processDefinitionBuilder.addAutomaticTask("auto1");
-        final IntermediateCatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processDefinitionBuilder
-                .addIntermediateCatchEvent("waitForMessage").addMessageEventTrigger("m2");
-        catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
-        // create expression for target process/flowNode
-        Expression targetProcess = new ExpressionBuilder().createDataExpression("p3", String.class.getName());
-        final Expression receiveMessage = new ExpressionBuilder().createDataExpression("receiveMessage", String.class.getName());
-        processDefinitionBuilder.addIntermediateThrowEvent("sendMessage").addMessageEventTrigger("m4", targetProcess, receiveMessage);
-        targetProcess = new ExpressionBuilder().createConstantStringExpression("p2");
-        final Expression waitMessage = new ExpressionBuilder().createConstantStringExpression("waitMessage");
-        final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder = processDefinitionBuilder.addEndEvent("end1").addMessageEventTrigger("m2",
-                targetProcess, waitMessage);
-        throwMessageEventTriggerBuilder.addCorrelation(conditionKey, trueExpression);
-        throwMessageEventTriggerBuilder.addCorrelation(conditionKey, trueExpression);
-        throwMessageEventTriggerBuilder.addCorrelation(conditionKey, trueExpression);
-        throwMessageEventTriggerBuilder.addCorrelation(conditionKey, trueExpression);
-        throwMessageEventTriggerBuilder.addCorrelation(conditionKey, trueExpression);
-        throwMessageEventTriggerBuilder.addCorrelation(conditionKey, trueExpression);
-        throwMessageEventTriggerBuilder.addMessageContentExpression(displayNameExpression, trueExpression);
-        processDefinitionBuilder.addTransition("start1", "auto1", trueExpression);
-        processDefinitionBuilder.addTransition("auto1", "waitForMessage");
-        processDefinitionBuilder.addTransition("waitForMessage", "sendMessage");
-        processDefinitionBuilder.addTransition("sendMessage", "end1");
-        processDefinitionBuilder.done();
-    }
-
-    @Test
-    public void readProcessWithCallActivityFromBusinessArchive() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final Expression fromCallerData = new ExpressionBuilder().createDataExpression("var1", Boolean.class.getName());
-        final LeftOperand dataInputLeftOp = new LeftOperandBuilder().createNewInstance("data1").done();
-        final Operation dataInputOperation = getOperation(fromCallerData, dataInputLeftOp);
-
-        final Expression fromCallableElementData = new ExpressionBuilder().createDataExpression("data2", Integer.class.getName());
-        final LeftOperand dataOutputOp = new LeftOperandBuilder().createNewInstance("var2").done();
-        final Operation dataOutputOperation = getOperation(fromCallableElementData, dataOutputOp);
-
-        final Expression targetProcess = new ExpressionBuilder().createConstantStringExpression("MyProcess2");
-        final Expression processVersion = new ExpressionBuilder().createConstantStringExpression("1.0");
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addBooleanData("var1", null);
-        processDefinitionBuilder.addIntegerData("var2", null);
-        processDefinitionBuilder.addStartEvent("start1");
-        final CallActivityBuilder callActivityBuilder = processDefinitionBuilder.addCallActivity("callActivity", targetProcess, processVersion);
-        callActivityBuilder.addDataInputOperation(dataInputOperation);
-        callActivityBuilder.addDataOutputOperation(dataOutputOperation);
-        processDefinitionBuilder.addEndEvent("end1");
-        processDefinitionBuilder.addTransition("start1", "callActivity");
-        processDefinitionBuilder.addTransition("callActivity", "end1");
-
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-
-        final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
-
-        checkProcessForCallActivity(process, result);
-
-        barFile.delete();
-    }
-
-    @Test
-    public void readProcessWithBoundaryEventsFromBusinessArchive() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1000);
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addStartEvent("start1");
-        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("userTask", "delivery");
-        userTaskDefinitionBuilder.addBoundaryEvent("b1").addTimerEventTriggerDefinition(TimerType.DURATION, timerExpression);
-        userTaskDefinitionBuilder.addBoundaryEvent("b2").addMessageEventTrigger("m1");
-        userTaskDefinitionBuilder.addBoundaryEvent("b3").addErrorEventTrigger("e1");
-        processDefinitionBuilder.addAutomaticTask("exceptionFlowB1");
-        processDefinitionBuilder.addAutomaticTask("exceptionFlowB2");
-        processDefinitionBuilder.addAutomaticTask("exceptionFlowB3");
-        processDefinitionBuilder.addEndEvent("end1");
-        processDefinitionBuilder.addTransition("start1", "userTask");
-        processDefinitionBuilder.addTransition("userTask", "end1");
-        processDefinitionBuilder.addTransition("b1", "exceptionFlowB1");
-        processDefinitionBuilder.addTransition("b2", "exceptionFlowB2");
-        processDefinitionBuilder.addTransition("b3", "exceptionFlowB3");
-
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-
-        final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
-
-        checkProcessForBoundaryEvents(process, result);
-
-        barFile.delete();
-    }
-
-    @Test
-    public void readProcessWithThowErrorEventFromBusinessArchive() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addStartEvent("start1");
-        processDefinitionBuilder.addAutomaticTask("a1");
-        processDefinitionBuilder.addEndEvent("end1").addErrorEventTrigger("e1");
-        processDefinitionBuilder.addTransition("start1", "a1");
-        processDefinitionBuilder.addTransition("a1", "end1");
-
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-
-        final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
-
-        assertEquals(process.getName(), result.getName());
-        assertEquals(process.getVersion(), result.getVersion());
-
-        assertEquals(process.getProcessContainer().getStartEvents(), result.getProcessContainer().getStartEvents());
-        assertEquals(1, result.getProcessContainer().getStartEvents().size());
-
-        assertEquals(1, process.getProcessContainer().getActivities().size());
-        assertEquals(1, result.getProcessContainer().getActivities().size());
-
-        final List<EndEventDefinition> resultEndEvents = result.getProcessContainer().getEndEvents();
-        assertEquals(process.getProcessContainer().getEndEvents(), resultEndEvents);
-        assertEquals(1, result.getProcessContainer().getEndEvents().size());
-        final EndEventDefinition endEventDefinition = resultEndEvents.get(0);
-        assertEquals(1, endEventDefinition.getEventTriggers().size());
-        assertEquals(1, endEventDefinition.getErrorEventTriggerDefinitions().size());
-
-        barFile.delete();
-    }
-
-    private Operation getOperation(final Expression rightOperand, final LeftOperand leftOperand) {
-        final OperationBuilder opb = new OperationBuilder().createNewInstance();
-        opb.setLeftOperand(leftOperand);
-        opb.setOperator(ASSIGN_OPERATOR);
-        opb.setRightOperand(rightOperand);
-        opb.setType(OperatorType.ASSIGNMENT);
-        final Operation op = opb.done();
-        return op;
-    }
-
-    private void checkProcessForCallActivity(final DesignProcessDefinition process, final DesignProcessDefinition result) {
-        assertEquals(process.getName(), result.getName());
-        assertEquals(process.getVersion(), result.getVersion());
-
-        assertEquals(process.getProcessContainer().getStartEvents(), result.getProcessContainer().getStartEvents());
-        assertEquals(1, result.getProcessContainer().getStartEvents().size());
-
-        assertEquals(1, result.getProcessContainer().getActivities().size());
-        assertEquals(1, process.getProcessContainer().getActivities().size());
-        assertEquals(process.getProcessContainer().getActivities().iterator().next(), result.getProcessContainer().getActivities().iterator().next());
-
-        assertEquals(process.getProcessContainer().getEndEvents(), result.getProcessContainer().getEndEvents());
-        assertEquals(1, result.getProcessContainer().getEndEvents().size());
-    }
-
-    private void checkProcessForBoundaryEvents(final DesignProcessDefinition process, final DesignProcessDefinition result) {
-        assertEquals(process.getName(), result.getName());
-        assertEquals(process.getVersion(), result.getVersion());
-
-        assertEquals(process.getProcessContainer().getStartEvents(), result.getProcessContainer().getStartEvents());
-        assertEquals(1, result.getProcessContainer().getStartEvents().size());
-
-        assertEquals(4, process.getProcessContainer().getActivities().size());
-        assertEquals(4, result.getProcessContainer().getActivities().size());
-        final ActivityDefinition resultActivity = result.getProcessContainer().getActivity("userTask");
-        assertEquals(process.getProcessContainer().getActivity("userTask"), resultActivity);
-        assertEquals(3, resultActivity.getBoundaryEventDefinitions().size());
-        for (final BoundaryEventDefinition boundary : resultActivity.getBoundaryEventDefinitions()) {
-            assertEquals(1, boundary.getEventTriggers().size());
-        }
-
-        assertEquals(process.getProcessContainer().getEndEvents(), result.getProcessContainer().getEndEvents());
-        assertEquals(1, result.getProcessContainer().getEndEvents().size());
-    }
-
     private void checkProcessForMessagesEvents(final DesignProcessDefinition process, final DesignProcessDefinition result) {
         assertEquals(process.getName(), result.getName());
         assertEquals(process.getVersion(), result.getVersion());
@@ -821,19 +359,6 @@ public class BusinessArchiveTests {
         assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
         assertEquals(process.getParameters().size(), result.getParameters().size());
         assertEquals(process.getProcessContainer().getDataDefinitions().size(), result.getProcessContainer().getDataDefinitions().size());
-    }
-
-    @Test
-    public void checkErrorMessageOnInvalidTransition() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addTransition("unknown1", "unknown2");
-        try {
-            processDefinitionBuilder.done();
-            fail("should have thrown an " + InvalidProcessDefinitionException.class.getSimpleName());
-        } catch (final InvalidProcessDefinitionException e) {
-            assertTrue(e.getMessage().contains("unknown1"));
-            assertTrue(e.getMessage().contains("unknown2"));
-        }
     }
 
     @Test
@@ -975,48 +500,6 @@ public class BusinessArchiveTests {
         barFile.delete();
     }
 
-    @Test(expected = InvalidProcessDefinitionException.class)
-    public void createProcessWithADocumentHavingBothUrlAndFile() throws InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithExternalDocuments", "1.0");
-        builder.addDocumentDefinition("myDoc", "testFile.txt").addDescription("a cool pdf document").addMimeType("application/pdf").addFile("myPdf.pdf")
-                .addUrl("http://plop");
-        builder.done();
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormat.class)
-    public void createProcessWithAInBarDocumentMissingFile() throws InvalidProcessDefinitionException, InvalidBusinessArchiveFormat {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithExternalDocuments", "1.0");
-        builder.addDocumentDefinition("myDoc", "testFile.txt").addDescription("a cool pdf document").addMimeType("application/pdf").addFile("myPdf.pdf");
-        final DesignProcessDefinition processDefinition = builder.done();
-        new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition)
-                .addDocumentResource(new BarResource("testFile.txt", new byte[] { 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })).done();
-    }
-
-    @Test
-    public void testSubProcess() throws BonitaException, IOException {
-        final Expression createdExpression = new ExpressionBuilder().createConstantBooleanExpression(false);
-
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("process", "10.2").addSubProcess("subProcessActivity", true).getSubProcessBuilder().addStartEvent("start")
-                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(5000))
-                .addBooleanData("created", createdExpression).addAutomaticTask("auto");
-
-        final DesignProcessDefinition process = builder.getProcess();
-        assertEquals(1, process.getProcessContainer().getActivities().size());
-
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-
-        final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
-        assertEquals(1, result.getProcessContainer().getActivities().size());
-        barFile.delete();
-    }
-
     @Test
     public void testParameters() {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
@@ -1025,27 +508,4 @@ public class BusinessArchiveTests {
 
     }
 
-    @Test
-    public void testGeneratingOutgoingDefaultTransitionShouldBeConformToProcessDefinitionXsd() throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
-        processDefinitionBuilder.addStartEvent("start1");
-        processDefinitionBuilder.addGateway("Gateway1", GatewayType.EXCLUSIVE);
-        processDefinitionBuilder.addEndEvent("end1");
-        processDefinitionBuilder.addEndEvent("end2");
-        processDefinitionBuilder.addEndEvent("end3");
-        processDefinitionBuilder.addTransition("start1", "Gateway1");
-        processDefinitionBuilder.addTransition("Gateway1", "end1");
-        processDefinitionBuilder.addTransition("Gateway1", "end2");
-        processDefinitionBuilder.addDefaultTransition("Gateway1", "end3");
-
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-
-        BusinessArchiveFactory.readBusinessArchive(barFile);
-    }
 }
