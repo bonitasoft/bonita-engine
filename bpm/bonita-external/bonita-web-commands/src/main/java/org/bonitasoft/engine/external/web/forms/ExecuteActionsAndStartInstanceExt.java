@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.bpm.model.ActivationState;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -85,9 +86,28 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         }
 
         try {
-            executeConnectors(sProcessDefinitionID, connectorsInputValues, operationsMap);
-            return startProcess(userId, sProcessDefinitionID, operationsMap).getId();
+            final ClassLoader processClassloader;
+            final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
+            final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(processClassloader);
+                executeConnectors(sProcessDefinitionID, connectorsInputValues, operationsMap);
+                return startProcess(userId, sProcessDefinitionID, operationsMap).getId();
+            } finally {
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
+            }
         } catch (final BonitaException e) {
+            throw new SCommandExecutionException(
+                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
+                    e);
+        } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
                     e);
