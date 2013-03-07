@@ -452,7 +452,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
-            transactionExecutor.openTransaction();
+            boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(manualTaskId);
                 if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
@@ -466,7 +466,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 transactionExecutor.setTransactionRollback();
                 throw new ObjectDeletionException(e, ManualTaskInstance.class);
             } finally {
-                transactionExecutor.completeTransaction();
+                transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
             throw new ObjectDeletionException(e, ManualTaskInstance.class);
@@ -558,7 +558,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 break;
         }
         try {
-            transactionExecutor.openTransaction();
+            boolean txOpened = transactionExecutor.openTransaction();
             long numberOfConnectorInstances;
             try {
                 numberOfConnectorInstances = connectorService.getNumberOfConnectorInstances(instanceId, flownodeType);
@@ -569,7 +569,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final SConnectorInstanceReadException e) {
                 throw new ObjectReadException(e, ConnectorInstance.class);
             } finally {
-                transactionExecutor.completeTransaction();
+                transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
             throw new ObjectReadException(e, ConnectorInstance.class);
@@ -592,7 +592,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         try {
-            transactionExecutor.openTransaction();
+            boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connectorInstanceId);
                 if (connectorInstance == null) {
@@ -604,7 +604,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final SConnectorInstanceModificationException e) {
                 throw new ObjectModificationException(e, ConnectorInstance.class);
             } finally {
-                transactionExecutor.completeTransaction();
+                transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
             throw new ObjectReadException(e, ConnectorInstance.class);
@@ -647,7 +647,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
         String containerType;
         try {
-            transactionExecutor.openTransaction();
+            boolean txOpened = transactionExecutor.openTransaction();
             try {
                 // Reset connectors first:
                 if (connectorsToReset != null) {
@@ -690,7 +690,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final SConnectorInstanceModificationException e) {
                 throw new ObjectModificationException(e, ConnectorInstance.class);
             } finally {
-                transactionExecutor.completeTransaction();
+                transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
             throw new ObjectReadException(e, ActivityInstance.class);

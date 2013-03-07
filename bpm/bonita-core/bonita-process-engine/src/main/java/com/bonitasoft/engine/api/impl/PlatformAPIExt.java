@@ -202,7 +202,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final CommandService commandService = platformAccessor.getTenantServiceAccessor(tenantId).getCommandService();
             final PrivilegeService privilegeService = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeService();
             final PrivilegeBuilders privilegeBuilders = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeBuilders();
-            transactionExecutor.openTransaction();
+            boolean txOpened = transactionExecutor.openTransaction();
             try {
 
                 final SSession session = sessionService.createSession(tenantId, userName);
@@ -218,7 +218,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
                 return tenantId;
             } finally {
-                transactionExecutor.completeTransaction();
+                transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final Exception e) {
             throw new TenantCreationException("Unable to create tenant " + tenantName, e);
