@@ -24,11 +24,7 @@
 	<entry key="hibernate.journal.dialect">org.bonitasoft.engine.MyH2Dialect</entry>
 	<!-- this datasource name is used by the engine to get connected to the database -->
 	<entry key="database.journal.datasource.name">bonitaDS</entry>
-	<!-- these jdbc connection parameters are used by the sequence manager which needs a direct jdbc connection -->
-	<entry key="database.journal.connection.driver_class">org.h2.Driver</entry>
-	<entry key="database.journal.connection.url">jdbc:h2:file:${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</entry>
-	<entry key="database.journal.connection.username">sa</entry>
-	<entry key="database.journal.connection.password" />
+	<entry key="database.sequence.manager.datasource.name">bonitaSequenceManagerDS</entry> 
 
 	<!-- MySQL configuration -->
 
@@ -40,9 +36,9 @@
 	<!-- <entry key="database.journal.datasource.name">bonitaDS</entry> -->
 	<!-- these jdbc connection parameters are used by the sequence manager which needs a direct jdbc connection -->
 	<!-- <entry key="database.journal.connection.driver_class">com.mysql.jdbc.Driver</entry> -->
-	<!-- <entry key="database.journal.connection.url">jdbc:mysql://localhost:3306/bonita</entry> -->
+	<!-- <entry key="database.journal.connection.url">jdbc:mysql://localhost:3306/bonita?useUnicode=true&amp;characterEncoding=UTF-8</entry> -->
 	<!-- <entry key="database.journal.connection.username">root</entry> -->
-	<!-- <entry key="database.journal.connection.password">root</entry> -->
+	<!-- <entry key="database.journal.connection.password"></entry> -->
 
 
     <!-- PostgreSQL configuration -->

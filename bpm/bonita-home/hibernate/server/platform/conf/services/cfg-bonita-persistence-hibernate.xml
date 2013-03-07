@@ -26,11 +26,7 @@
 		<constructor-arg name="properties">
 			<props>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
-				<prop key="hibernate.connection.driver_class">${database.journal.connection.driver_class}</prop>
-				<prop key="hibernate.connection.url">${database.journal.connection.url}</prop>
-				<prop key="hibernate.connection.username">${database.journal.connection.username}</prop>
-				<prop key="hibernate.connection.password">${database.journal.connection.password}</prop>
-				<prop key="hibernate.connection.pool_size">${hibernate.connection.pool_size:20}</prop>
+				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>
 				<prop key="hibernate.cache.use_query_cache">true</prop>
 				<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>

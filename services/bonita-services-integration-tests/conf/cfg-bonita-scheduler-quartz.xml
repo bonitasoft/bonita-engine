@@ -26,7 +26,7 @@
 		</property>
 	</bean>
 
-	<bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
+	<bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory" depends-on="carolJNDI">
 		<constructor-arg name="props">
 			<props>
 				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
@@ -35,10 +35,7 @@
 				<prop key="org.quartz.jobStore.driverDelegateClass">${quartz.connection.jobstoredriver:org.quartz.impl.jdbcjobstore.StdJDBCDelegate}
 				</prop>
 				<prop key="org.quartz.jobStore.dataSource">myds</prop>
-				<prop key="org.quartz.dataSource.myds.driver">${database.journal.connection.driver_class}</prop>
-				<prop key="org.quartz.dataSource.myds.URL">${database.journal.connection.url}</prop>
-				<prop key="org.quartz.dataSource.myds.user">${database.journal.connection.username}</prop>
-				<prop key="org.quartz.dataSource.myds.password">${database.journal.connection.password}</prop>
+				<prop key="org.quartz.dataSource.myds.jndiURL">${database.journal.datasource.name}</prop>
 				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
 				<!-- <prop key="org.quartz.jobStore.misfireThreshold">200</prop>the time before a misfire job will be executed -->
 			</props>
@@ -101,3 +98,4 @@
 	</bean>
 
 </beans>
+

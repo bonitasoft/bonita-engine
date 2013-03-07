@@ -1023,6 +1023,14 @@
 			<version>1.6.1</version>
 			<scope>test</scope>
 		</dependency>
+
+        <!-- Local JNDI implementation -->
+        <dependency>
+			<groupId>org.bonitasoft.engine.jndi</groupId>
+			<artifactId>bonita-jndi-carol</artifactId>
+			<version>${project.version}</version>
+        </dependency>
+
 	</dependencies>
 
 	<profiles>

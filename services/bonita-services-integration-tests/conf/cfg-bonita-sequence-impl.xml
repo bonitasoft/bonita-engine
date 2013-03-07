@@ -188,10 +188,7 @@
 				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl" value="20040" />
 			</map>
 		</constructor-arg>
-		<constructor-arg name="url" value="${database.journal.connection.url}" />
-		<constructor-arg name="driver" value="${database.journal.connection.driver_class}" />
-		<constructor-arg name="user" value="${database.journal.connection.username}" />
-		<constructor-arg name="password" value="${database.journal.connection.password}" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 		<constructor-arg name="retries" value="5" />
 		<constructor-arg name="delay" value="5" />
 		<constructor-arg name="delayFactor" value="2" />
