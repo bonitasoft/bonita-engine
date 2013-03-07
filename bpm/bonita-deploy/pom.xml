@@ -13,6 +13,7 @@
 	<modules>
 		<module>bonita-deploy-ear2</module>
 		<module>bonita-deploy-ear3</module>
+		<module>bonita-deploy-war</module>
 		<module>bonita-engine-deploy</module>
 	</modules>
 </project>

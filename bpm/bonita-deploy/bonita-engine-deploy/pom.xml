@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -32,6 +33,14 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-home-sp</artifactId>
 			<version>${project.version}</version>
+			<classifier></classifier>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-home-sp</artifactId>
+			<version>${project.version}</version>
+			<classifier>hibernate</classifier>
 			<type>zip</type>
 		</dependency>
 		<dependency>
@@ -45,6 +54,12 @@
 			<artifactId>bonita-deploy-ear3-sp</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-deploy-war-sp</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
 		</dependency>
 	</dependencies>
 
@@ -63,6 +78,7 @@
 						<configuration>
 							<descriptors>
 								<descriptor>assembly.xml</descriptor>
+								<descriptor>assembly-hibernate.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
