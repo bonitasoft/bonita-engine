@@ -25,11 +25,6 @@
 	<!-- this datasource name is used by the engine to get connected to the database -->
 	<entry key="database.journal.datasource.name">bonitaDS</entry>
 	<entry key="database.sequence.manager.datasource.name">bonitaSequenceManagerDS</entry> 
-	<!-- these jdbc connection parameters are used by the sequence manager which needs a direct jdbc connection -->
-	<entry key="database.journal.connection.driver_class">org.h2.Driver</entry>
-	<entry key="database.journal.connection.url">jdbc:h2:tcp://localhost/tmp/bonita6_journal.db;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</entry>
-	<entry key="database.journal.connection.username">sa</entry>
-	<entry key="database.journal.connection.password"></entry>
 
 	<!-- MySQL configuration -->
 

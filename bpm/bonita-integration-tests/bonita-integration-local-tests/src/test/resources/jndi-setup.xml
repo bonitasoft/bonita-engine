@@ -3,17 +3,21 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<!-- Create the datasource -->
+	<!-- We need 2 datasources that target the same DB : -->
+	<!-- First datasource (bonitaDataSource) for the whole Bonita platform -->
+	<!-- Second datasource (bonitaSequenceManagerDataSource) for the SequenceManager implementation in order not to be stuck when we need some new ids -->
+
+	<!-- TODO : factorize the driverClass, jdbcUrl, user, password -->
+
 	<bean id="bonitaDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 
 <!-- 		<property name="driverClass" value="com.mysql.jdbc.Driver" /> -->
 <!-- 		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/bonita?useUnicode=true&amp;characterEncoding=UTF-8" /> -->
 <!-- 		<property name="user" value="root" /> -->
 <!-- 		<property name="password" value="" /> -->
-		
-		
+
 		<property name="driverClass" value="org.h2.Driver" />
-		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/tmp/bonita6_journal.db;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
+		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/target/h2/bonita6_journal.db;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
 		<property name="user" value="sa" />
 		<property name="password" value="" />
 
@@ -60,7 +64,7 @@
 		
 		
 		<property name="driverClass" value="org.h2.Driver" />
-		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/tmp/bonita6_journal.db;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
+		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/target/h2/bonita6_journal.db;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
 		<property name="user" value="sa" />
 		<property name="password" value="" />
 
