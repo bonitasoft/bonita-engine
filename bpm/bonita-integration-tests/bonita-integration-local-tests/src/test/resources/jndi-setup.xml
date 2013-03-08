@@ -3,9 +3,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-<!-- 	Load system properties in sprint context -->
+	<!-- Load system properties in Spring context -->
 	<bean id="systemPropResolver" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 	</bean>
+
 	<!-- We need 2 datasources that target the same DB : -->
 	<!-- First datasource (bonitaDataSource) for the whole Bonita platform -->
 	<!-- Second datasource (bonitaSequenceManagerDataSource) for the SequenceManager implementation in order not to be stuck when we need some new ids -->
