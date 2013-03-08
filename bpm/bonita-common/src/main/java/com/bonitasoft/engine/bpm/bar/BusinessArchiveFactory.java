@@ -52,13 +52,20 @@ public class BusinessArchiveFactory {
         FileUtil.unzipToFolder(inputStream, barFolder);
 
         final BusinessArchive businessArchive = new BusinessArchive();
-        for (final BusinessArchiveContribution contribution : contributions) {
-            if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
-                throw new InvalidBusinessArchiveFormat("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
+        try {
+            for (final BusinessArchiveContribution contribution : contributions) {
+                if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
+                    throw new InvalidBusinessArchiveFormat("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
+                }
             }
+            return businessArchive;
+        } catch (InvalidBusinessArchiveFormat e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InvalidBusinessArchiveFormat("Invalid format, can't read the BAR file", e);
+        } finally {
+            FileUtil.deleteDir(barFolder);
         }
-        FileUtil.deleteDir(barFolder);
-        return businessArchive;
     }
 
     /**

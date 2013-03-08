@@ -37,6 +37,7 @@
 				<prop key="org.quartz.jobStore.dataSource">myds</prop>
 				<prop key="org.quartz.dataSource.myds.jndiURL">${database.journal.datasource.name}</prop>
 				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.scheduler.skipUpdateCheck">${org.quartz.scheduler.skipUpdateCheck}</prop>
 				<!-- <prop key="org.quartz.jobStore.misfireThreshold">200</prop>the time before a misfire job will be executed -->
 			</props>
 		</constructor-arg>

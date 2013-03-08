@@ -59,6 +59,7 @@
 
 	<!-- Quartz configuration -->
 	<entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</entry>
+	<entry key="org.quartz.scheduler.skipUpdateCheck">true</entry>
 	<!-- Quartz/PostgreSQL configuration -->
 <!--     <entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.PostgreSQLDelegate</entry> -->
 
