@@ -173,6 +173,9 @@
 /bpm/bonita-deploy/bonita-engine-deploy/.project
 /bpm/bonita-deploy/bonita-engine-deploy/.settings
 
+# bpm/bonita-deploy/bonita-deploy-war/
+bpm/bonita-deploy/bonita-deploy-war/target
+
 # /bpm/bonita-external/
 /bpm/bonita-external/.settings
 /bpm/bonita-external/.project
