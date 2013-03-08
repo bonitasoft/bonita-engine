@@ -34,6 +34,9 @@
 		<copy todir="${basedir}/target/home" overwrite="true">
 			<fileset dir="${basedir}/hibernate" excludes="**/.svn" />
 		</copy>
+		<copy todir="${basedir}/target/home/server/licenses" failonerror="true">
+			<fileset dir="${user.home}/lic" includes="*.lic" />
+		</copy>
 	</target>
 	
 </project>
