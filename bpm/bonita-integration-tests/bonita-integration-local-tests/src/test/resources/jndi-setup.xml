@@ -3,6 +3,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+<!-- 	Load system properties in sprint context -->
+	<bean id="systemPropResolver" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	</bean>
 	<!-- We need 2 datasources that target the same DB : -->
 	<!-- First datasource (bonitaDataSource) for the whole Bonita platform -->
 	<!-- Second datasource (bonitaSequenceManagerDataSource) for the SequenceManager implementation in order not to be stuck when we need some new ids -->
@@ -17,7 +20,7 @@
 <!-- 		<property name="password" value="" /> -->
 
 		<property name="driverClass" value="org.h2.Driver" />
-		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/target/h2/bonita6_journal.db;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
+		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
 		<property name="user" value="sa" />
 		<property name="password" value="" />
 
@@ -64,7 +67,7 @@
 		
 		
 		<property name="driverClass" value="org.h2.Driver" />
-		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/target/h2/bonita6_journal.db;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
+		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
 		<property name="user" value="sa" />
 		<property name="password" value="" />
 
