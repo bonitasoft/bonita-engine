@@ -33,14 +33,6 @@
 	<!-- <entry key="db.version">notspecified</entry> -->
 	<!-- <entry key="sql.delimiter">;</entry> -->
 	<!-- <entry key="hibernate.journal.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</entry> -->
-	<!-- this datasource name is used by the engine to get connected to the database -->
-	<!-- <entry key="database.journal.datasource.name">bonitaDS</entry> -->
-	<!-- these jdbc connection parameters are used by the sequence manager which needs a direct jdbc connection -->
-	<!-- <entry key="database.journal.connection.driver_class">com.mysql.jdbc.Driver</entry> -->
-	<!-- <entry key="database.journal.connection.url">jdbc:mysql://localhost:3306/bonita?useUnicode=true&amp;characterEncoding=UTF-8</entry> -->
-	<!-- <entry key="database.journal.connection.username">root</entry> -->
-	<!-- <entry key="database.journal.connection.password"></entry> -->
-
 
     <!-- PostgreSQL configuration -->
     
@@ -48,10 +40,13 @@
 <!--     <entry key="db.version">notspecified</entry> -->
 <!--     <entry key="sql.delimiter">;</entry> -->
 <!--     <entry key="hibernate.journal.dialect">org.hibernate.dialect.PostgreSQLDialect</entry> -->
-<!--     <entry key="database.journal.connection.driver_class">org.postgresql.Driver</entry> -->
-<!--     <entry key="database.journal.connection.url">jdbc:postgresql://localhost:5432/bonita</entry> -->
-<!--     <entry key="database.journal.connection.username">bonita</entry> -->
-<!--     <entry key="database.journal.connection.password">bonita</entry> -->
+
+    <!-- Oracle configuration -->
+
+<!--     <entry key="db.vendor">oracle</entry> -->
+<!--     <entry key="db.version">notspecified</entry> -->
+<!--     <entry key="sql.delimiter">;</entry> -->
+<!--     <entry key="hibernate.journal.dialect">org.hibernate.dialect.Oracle10gDialect</entry> -->
 
 	<!-- Hibernate specific configurations -->
 	<entry key="hibernate.journal.show_sql">false</entry>
@@ -59,8 +54,8 @@
 	<entry key="hibernate.journal.use_sql_comments">false</entry>
 
 	<!-- Quartz configuration -->
-	<entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</entry>
 	<entry key="org.quartz.scheduler.skipUpdateCheck">true</entry>
+	<entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</entry>
 	<!-- Quartz/PostgreSQL configuration -->
 <!--     <entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.PostgreSQLDelegate</entry> -->
 
