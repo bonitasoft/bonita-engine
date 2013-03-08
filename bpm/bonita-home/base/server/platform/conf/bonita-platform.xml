@@ -16,15 +16,16 @@
 	<entry key="platformAdminUsername">platformAdmin</entry>
 	<entry key="platformAdminPassword">platform</entry>
 
+	<!-- this datasource name is used by the engine to get connected to the database -->
+	<entry key="database.journal.datasource.name">java:comp/env/bonitaDS</entry>
+	<entry key="database.sequence.manager.datasource.name">java:comp/env/bonitaSequenceManagerDS</entry> 
+
 	<!-- H2 configuration -->
 
 	<entry key="db.vendor">h2</entry>
 	<entry key="db.version">notspecified</entry>
 	<entry key="sql.delimiter">;</entry>
 	<entry key="hibernate.journal.dialect">org.bonitasoft.engine.MyH2Dialect</entry>
-	<!-- this datasource name is used by the engine to get connected to the database -->
-	<entry key="database.journal.datasource.name">bonitaDS</entry>
-	<entry key="database.sequence.manager.datasource.name">bonitaSequenceManagerDS</entry> 
 
 	<!-- MySQL configuration -->
 

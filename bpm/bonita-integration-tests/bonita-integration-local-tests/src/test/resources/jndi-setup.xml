@@ -110,20 +110,14 @@
 		<property name="targetMapClass" value="java.util.LinkedHashMap" />
 		<property name="sourceMap">
 			<map>
-				<entry key="bonitaDS" value-ref="bonitaDataSource" />
-				<entry key="bonitaSequenceManagerDS" value-ref="bonitaSequenceManagerDataSource" />
+				<entry key="java:comp/env/bonitaDS" value-ref="bonitaDataSource" />
+				<entry key="java:comp/env/bonitaSequenceManagerDS" value-ref="bonitaSequenceManagerDataSource" />
 			</map>
 		</property>
 	</bean>
 
 	<!-- This is the base class that will allow to lookup the JNDI tree -->
 	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
-		<property name="environment">
-			<props>
-				<prop key="java.naming.factory.initial">org.ow2.carol.jndi.spi.URLInitialContextFactory</prop>
-				<prop key="java.naming.provider.url">rmi://localhost:1099</prop>
-			</props>
-		</property>
 	</bean>
 
 	<!-- Bind the mapping into Carol -->
