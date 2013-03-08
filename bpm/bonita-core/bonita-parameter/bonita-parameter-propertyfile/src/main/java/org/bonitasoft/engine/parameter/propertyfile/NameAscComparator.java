@@ -29,7 +29,7 @@ public class NameAscComparator implements Comparator<SParameter> {
         if (nullValue.equals(name2)) {
             return -1;
         }
-        return name2.compareTo(name1);
+        return name1.compareTo(name2);
     }
 
 }
