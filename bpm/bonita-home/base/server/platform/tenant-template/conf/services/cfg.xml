@@ -117,6 +117,7 @@
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders"/>
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders"/>
+		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService"/>
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
