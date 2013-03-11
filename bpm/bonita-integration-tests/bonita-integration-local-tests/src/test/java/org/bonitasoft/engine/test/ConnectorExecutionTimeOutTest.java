@@ -16,7 +16,7 @@ import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.connector.Connector;
-import org.bonitasoft.engine.connectors.ConnectorExecutionTests;
+import org.bonitasoft.engine.connectors.ConnectorExecutionTest;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -32,7 +32,7 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 /**
  * @author Baptiste Mesta
  */
-public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTests {
+public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
 
     protected TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
         try {

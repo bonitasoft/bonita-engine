@@ -39,7 +39,7 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 /**
  * @author Baptiste Mesta
  */
-public abstract class ConnectorExecutionTests extends CommonAPISPTest {
+public abstract class ConnectorExecutionTest extends CommonAPISPTest {
 
     protected static final String JOHN = "john";
 

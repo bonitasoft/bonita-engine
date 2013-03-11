@@ -43,7 +43,7 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 /**
  * @author Baptiste Mesta
  */
-public class RemoteConnectorExecutionTestsSP extends ConnectorExecutionTests {
+public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
     @Test
     public void testGetConnectorInstancesOnActivity() throws Exception {

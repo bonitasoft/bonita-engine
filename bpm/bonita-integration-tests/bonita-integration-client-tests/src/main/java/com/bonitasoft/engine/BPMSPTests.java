@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.MultiInstanceTest;
-import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestsSP;
+import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
 import com.bonitasoft.engine.event.TimerBoundaryEventTest;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
 import com.bonitasoft.engine.external.SPProfileMemberCommandTest;
@@ -35,7 +35,7 @@ import com.bonitasoft.engine.process.ProcessTests;
   MultiInstanceTest.class,
   ProcessTests.class,
   TimerBoundaryEventTest.class,
-  RemoteConnectorExecutionTestsSP.class
+  RemoteConnectorExecutionTestSP.class
 })
 public class BPMSPTests {
 
