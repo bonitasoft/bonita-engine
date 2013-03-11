@@ -3,6 +3,6 @@
 
 <properties>
     <comment>Bonita platform core configuration</comment>
-    <entry key="userName">${platformAdminUsername}</entry>
-    <entry key="userPassword">${platformAdminPassword}</entry>
+    <entry key="userName">install</entry>
+    <entry key="userPassword">install</entry>
 </properties>
