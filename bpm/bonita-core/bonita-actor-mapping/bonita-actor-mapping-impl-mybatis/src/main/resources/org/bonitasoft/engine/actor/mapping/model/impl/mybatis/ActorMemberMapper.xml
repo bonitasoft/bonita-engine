@@ -3,6 +3,7 @@
 
 <mapper namespace="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl">
     <cache/>
+
 	<select id="getActorMemberById" parameterType="long" resultMap="actorMemberResultMap">
 		SELECT *
 		FROM actormember
@@ -43,34 +44,15 @@
 		AND actormember.actorId = #{actorId}
 		AND group_.id = actormember.groupId
 	</select>
-	
-	<select id="getNumberOfUserMembershipsOfActor" parameterType="long" resultType="long">
-		SELECT COUNT(distinct(user_membership.id))
-		FROM user_membership, actormember
-		WHERE user_membership.tenantid = #{tenantid}
-		AND user_membership.tenantid = actormember.tenantid
-		AND  actormember.actorId = #{actorId}
-		AND user_membership.id in (
-			SELECT distinct(user_membership.id)
-			FROM user_membership, actormember
-			WHERE user_membership.tenantid = #{tenantid}
-			AND user_membership.tenantid = actormember.tenantid
-			AND  actormember.actorId = #{actorId}
-			AND user_membership.id in (
-				SELECT distinct(user_membership.id)
-				FROM user_membership, actormember
-				WHERE user_membership.tenantid = #{tenantid}
-				AND user_membership.tenantid = actormember.tenantid
-				AND  actormember.actorId = #{actorId}
-				AND actormember.roleId = user_membership.roleId 
-				AND (actormember.userId &lt;= 0 OR actormember.userId = user_membership.userId)
-				AND (actormember.groupId &lt;= 0 OR actormember.groupId = user_membership.groupId))
-			AND actormember.groupId = user_membership.groupId 
-			AND (actormember.userId &lt;= 0 OR actormember.userId = user_membership.userId)
-			AND (actormember.roleId &lt;= 0 OR actormember.roleId = user_membership.roleId))
-		AND actormember.userId = user_membership.userId 
-		AND (actormember.groupId &lt;= 0 OR actormember.groupId = user_membership.groupId)
-		AND (actormember.roleId &lt;= 0 OR actormember.roleId = user_membership.roleId)
+
+	<select id="getNumberOfMembershipsOfActor" parameterType="long" resultType="long">
+		SELECT COUNT(*)
+		FROM actormember
+		WHERE tenantid = #{tenantid}
+		AND actorId = #{actorId}
+		AND userId = -1
+		AND groupId &gt; -1
+		AND roleId &gt; -1
 	</select>
 
 	<select id="getActorMembersOfActor" parameterType="long" resultMap="actorMemberResultMap">
@@ -82,6 +64,7 @@
 			ORDER BY ${orderBy}
 		</if>
 	</select>
+
 	<select id="getActorMembers" parameterType="long" resultMap="actorMemberResultMap">
 		SELECT *
 		FROM actormember
