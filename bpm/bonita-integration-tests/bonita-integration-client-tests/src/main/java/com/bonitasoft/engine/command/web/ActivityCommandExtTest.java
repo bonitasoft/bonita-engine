@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,13 +25,16 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
+import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
+import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
@@ -130,8 +134,7 @@ public class ActivityCommandExtTest extends CommonAPITest {
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
     public void testInstantiateProcessWithDataConversionOperation() throws Exception {
-        final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(this.getClass().getResourceAsStream(
-                "Pool2--1.0.bar"));
+        final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(this.getClass().getResourceAsStream("Pool2--1.0.bar"));
         processDefinition = getProcessAPI().deploy(businessArchive);
         getProcessAPI().enableProcess(processDefinition.getId());
 
@@ -450,5 +453,49 @@ public class ActivityCommandExtTest extends CommonAPITest {
             final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
         bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
         bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
+    }
+
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Action" }, story = "Execute actions and terminate with custom jar.", jira = "ENGINE-928")
+    @Test
+    public void testExecuteActionsAndTerminateWithCustomJarInOperation() throws Exception {
+        // process is deployed here with a custom jar
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+        final String content = "Word";
+        processBuilder.addData("Application", String.class.getName(), expressionBuilder.createConstantStringExpression(content));
+        processBuilder.addActor("myActor");
+        processBuilder.addUserTask("Request", "myActor");
+        processBuilder.addUserTask("Approval", "myActor");
+        processBuilder.addTransition("Request", "Approval");
+        final DesignProcessDefinition designProcessDefinition = processBuilder.done();
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
+        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
+        assertNotNull(stream);
+        final byte[] byteArray = IOUtils.toByteArray(stream);
+        builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
+        final BusinessArchive businessArchive = builder.done();
+        processDefinition = getProcessAPI().deploy(businessArchive);
+        addMappingOfActorsForUser("myActor", businessUser.getId(), processDefinition);
+        getProcessAPI().enableProcess(processDefinition.getId());
+        final long processInstanceID = getProcessAPI().startProcess(processDefinition.getId()).getId();
+        // wait for first task and assign it
+        final ActivityInstance userTaskInstance = waitForUserTask("Request", processInstanceID);
+        final long taskId = userTaskInstance.getId();
+        getProcessAPI().assignUserTask(taskId, getSession().getUserId());
+
+        // execute it with operation using the command
+        final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
+        // the operation execute a groovy script that depend in a class in the jar
+        final Expression rightOperand = new ExpressionBuilder().createGroovyScriptExpression("myScript",
+                "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName());
+        final Operation operation = createOperation("Application", OperatorType.ASSIGNMENT, "=", rightOperand);
+        final Map<Operation, Map<String, Serializable>> operationsMap = new HashMap<Operation, Map<String, Serializable>>();
+        operationsMap.put(operation, fieldValues);
+        final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("ACTIVITY_INSTANCE_ID_KEY", taskId);
+        parameters.put("OPERATIONS_MAP_KEY", (Serializable) operationsMap);
+
+        // just check the operation is executed normally
+        getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
     }
 }
