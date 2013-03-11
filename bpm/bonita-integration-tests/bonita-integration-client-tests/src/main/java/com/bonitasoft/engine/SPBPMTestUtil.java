@@ -126,7 +126,7 @@ public class SPBPMTestUtil {
     }
 
     public static APISession loginDefaultTenant() throws BonitaException {
-        return loginTenant("technical_user_username", "technical_user_password", defaultTenantId);
+        return loginTenant("install", "install", defaultTenantId);
     }
 
     public static APISession loginDefaultTenant(final String userName, final String password) throws BonitaException {
@@ -218,11 +218,11 @@ public class SPBPMTestUtil {
     }
 
     public static APISession loginTenant(final long tenantId) throws BonitaException {
-        return loginTenant("technical_user_username", "technical_user_password", tenantId);
+        return loginTenant("install", "install", tenantId);
     }
 
     public static APISession loginOnDefaultTenant() throws BonitaException {
-        return loginOnDefaultTenant("technical_user_username", "technical_user_password");
+        return loginOnDefaultTenant("install", "install");
     }
 
     public static APISession loginOnDefaultTenant(final String userName, final String password) throws BonitaException {

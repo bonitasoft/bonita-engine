@@ -246,7 +246,7 @@ public class LogTest extends CommonAPISPTest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
         builder.filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(user1.getId()));
         builder.filter(LogSearchDescriptor.ACTION_TYPE, "IDENTITY_USER_DELETED");
-        builder.filter(LogSearchDescriptor.CREATED_BY, "technical_user_username");
+        builder.filter(LogSearchDescriptor.CREATED_BY, "install");
         builder.filter(LogSearchDescriptor.MESSAGE, "Deleting user with username user1WithAllAvailableFilters");
         builder.filter(LogSearchDescriptor.SEVERITY, "INTERNAL");
 

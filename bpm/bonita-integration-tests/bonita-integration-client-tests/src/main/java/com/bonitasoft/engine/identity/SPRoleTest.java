@@ -40,7 +40,7 @@ public class SPRoleTest extends CommonAPISPTest {
     @Test
     public void aSameRoleNameCanBeUseInTwoTenants() throws BonitaException {
         final String role = "role";
-        final long tenantId1 = SPBPMTestUtil.constructTenant("tenant1", "iconName", "iconPath", "technical_user_username", "technical_user_password");
+        final long tenantId1 = SPBPMTestUtil.constructTenant("tenant1", "iconName", "iconPath", "install", "install");
         final APISession session1 = SPBPMTestUtil.loginTenant(tenantId1);
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
         final RoleBuilder roleBuilder1 = new RoleBuilder().createNewInstance(role);

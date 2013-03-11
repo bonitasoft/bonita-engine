@@ -34,8 +34,8 @@ public class SPUserTest extends CommonAPISPTest {
 
     @Test(expected = LoginException.class)
     public void loginFailsUsingWrongTenant() throws BonitaException {
-        final String userName = "technical_user_username";
-        final String password = "technical_user_password";
+        final String userName = "install";
+        final String password = "install";
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
         loginTenant.login(2, userName, password);
     }
@@ -43,14 +43,14 @@ public class SPUserTest extends CommonAPISPTest {
     @Test(expected = LoginException.class)
     public void loginFailsUsingWrongUser() throws BonitaException, BonitaHomeNotSetException {
         final String userName = "hannu";
-        final String password = "technical_user_password";
+        final String password = "install";
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         loginAPI.login(1, userName, password);
     }
 
     @Test(expected = LoginException.class)
     public void loginFailsUsingWrongPassword() throws BonitaException, BonitaHomeNotSetException {
-        final String userName = "technical_user_username";
+        final String userName = "install";
         final String password = "suomi";
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         loginAPI.login(1, userName, password);
@@ -106,8 +106,8 @@ public class SPUserTest extends CommonAPISPTest {
 
     @Test
     public void aSameUserNameCanBeUseInTwoTenants() throws BonitaException {
-        final String userName = "technical_user_username";
-        final long tenantId1 = SPBPMTestUtil.constructTenant("tenant1", "iconName", "iconPath", userName, "technical_user_password");
+        final String userName = "install";
+        final long tenantId1 = SPBPMTestUtil.constructTenant("tenant1", "iconName", "iconPath", userName, "install");
         final APISession session1 = SPBPMTestUtil.loginTenant(tenantId1);
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
         final User user1 = identityAPI1.createUser(userName, "bpm");
