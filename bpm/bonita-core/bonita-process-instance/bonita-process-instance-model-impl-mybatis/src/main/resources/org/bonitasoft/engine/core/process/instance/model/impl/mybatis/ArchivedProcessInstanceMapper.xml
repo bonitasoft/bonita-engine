@@ -102,6 +102,7 @@
 			WHERE api.tenantid = api.tenantid
 			AND api.sourceObjectId = ap.sourceObjectId
 		)
+		AND ap.callerId = -1
 		AND ap.stateId IN (6,7,3)
 		<if test="filter != null">
 			AND ${filter}
@@ -124,6 +125,7 @@
 			WHERE api.tenantid = api.tenantid
 			AND api.sourceObjectId = ap.sourceObjectId
 		)
+		AND ap.callerId = -1
 		AND ap.stateId IN (6,7,3)
 		<if test="filter != null">
 			AND ${filter}
