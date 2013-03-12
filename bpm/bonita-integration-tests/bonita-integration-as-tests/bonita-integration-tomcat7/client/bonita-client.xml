@@ -3,6 +3,6 @@
 <properties>
   <entry key="org.bonitasoft.engine.api-type">HTTP</entry>
   <entry key="org.bonitasoft.engine.api-type.parameters">server.url,application.name</entry>
-  <entry key="server.url">http://localhost:8080</entry>
+  <entry key="server.url">http://localhost:8123</entry>
   <entry key="application.name">bonita</entry>
 </properties>
