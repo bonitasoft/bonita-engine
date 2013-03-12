@@ -4,15 +4,18 @@
 	<bean id="connectorService" class="org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl">
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="connectorExecutor" ref="connectorExecutor" />
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
-		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="parserFactory" ref="parserFactory" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="operationService" ref="operationService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
+	
+	<bean id="connectorInstanceService" class="org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
 
 </beans>

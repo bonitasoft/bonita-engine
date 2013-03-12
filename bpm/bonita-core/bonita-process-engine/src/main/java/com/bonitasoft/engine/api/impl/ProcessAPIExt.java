@@ -46,7 +46,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
-import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -496,7 +496,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final ConnectorInstanceCriterion order) throws InvalidSessionException, PageOutOfRangeException, ObjectReadException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final SConnectorInstanceBuilder connectorInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSConnectorInstanceBuilder();
         OrderByType orderByType;
         String fieldName;
@@ -562,10 +562,10 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final boolean txOpened = transactionExecutor.openTransaction();
             long numberOfConnectorInstances;
             try {
-                numberOfConnectorInstances = connectorService.getNumberOfConnectorInstances(instanceId, flownodeType);
+                numberOfConnectorInstances = connectorInstanceService.getNumberOfConnectorInstances(instanceId, flownodeType);
                 PageIndexCheckingUtil.checkIfPageIsOutOfRange(numberOfConnectorInstances, pageNumber, numberPerPage);
-                final List<SConnectorInstance> connectorInstances = connectorService.getConnectorInstances(instanceId, flownodeType,
-                        pageNumber * numberPerPage, numberPerPage, fieldName, orderByType);
+                final List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(instanceId, flownodeType, pageNumber
+                        * numberPerPage, numberPerPage, fieldName, orderByType);
                 return ModelConvertor.toConnectorInstances(connectorInstances);
             } catch (final SConnectorInstanceReadException e) {
                 throw new ObjectReadException(e, ConnectorInstance.class);
@@ -591,15 +591,15 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connectorInstanceId);
+                final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
                 if (connectorInstance == null) {
                     throw new ObjectNotFoundException("connector instance with id " + connectorInstanceId, ConnectorInstance.class);
                 }
-                connectorService.setState(connectorInstance, state.name());
+                connectorInstanceService.setState(connectorInstance, state.name());
             } catch (final SConnectorInstanceReadException e) {
                 throw new ObjectReadException(e, ConnectorInstance.class);
             } catch (final SConnectorInstanceModificationException e) {
@@ -619,8 +619,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
-        final SetConnectorInstancesState txContent = new SetConnectorInstancesState(connectorsToReset, connectorService);
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
+        final SetConnectorInstancesState txContent = new SetConnectorInstancesState(connectorsToReset, connectorInstanceService);
         try {
             transactionExecutor.execute(txContent);
         } catch (final SBonitaException e) {
@@ -642,7 +642,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
@@ -653,22 +653,22 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 // Reset connectors first:
                 if (connectorsToReset != null) {
                     for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-                        final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connEntry.getKey());
+                        final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connEntry.getKey());
                         final ConnectorStateReset state = connEntry.getValue();
-                        connectorService.setState(connectorInstance, state.name());
+                        connectorInstanceService.setState(connectorInstance, state.name());
                     }
                 }
 
                 // Then replay activity:
                 final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-                List<SConnectorInstance> connectorInstances = connectorService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
-                        ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
+                List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId,
+                        SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
                 if (!connectorInstances.isEmpty()) {
                     throw new ActivityExecutionFailedException("There is at least on connector in failed on onEnter of the activity: "
                             + connectorInstances.get(0).getName());
                 }
-                connectorInstances = connectorService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_FINISH, 0,
-                        1, ConnectorState.FAILED.name());
+                connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
+                        ConnectorEvent.ON_FINISH, 0, 1, ConnectorState.FAILED.name());
                 if (!connectorInstances.isEmpty()) {
                     throw new ActivityExecutionFailedException("There is at least on connector in failed on onFinish of the activity: "
                             + connectorInstances.get(0).getName());

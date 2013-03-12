@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 
 /**
@@ -24,19 +24,19 @@ public class SetConnectorInstancesState implements TransactionContent {
 
     private final Map<Long, ConnectorStateReset> connectorsToReset;
 
-    private final ConnectorService connectorService;
+    private final ConnectorInstanceService connectorInstanceService;
 
-    public SetConnectorInstancesState(final Map<Long, ConnectorStateReset> connectorsToReset, final ConnectorService connectorService) {
+    public SetConnectorInstancesState(final Map<Long, ConnectorStateReset> connectorsToReset, final ConnectorInstanceService connectorInstanceService) {
         this.connectorsToReset = connectorsToReset;
-        this.connectorService = connectorService;
+        this.connectorInstanceService = connectorInstanceService;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        for (Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-            final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connEntry.getKey());
+        for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
+            final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connEntry.getKey());
             final ConnectorStateReset state = connEntry.getValue();
-            connectorService.setState(connectorInstance, state.name());
+            connectorInstanceService.setState(connectorInstance, state.name());
         }
     }
 

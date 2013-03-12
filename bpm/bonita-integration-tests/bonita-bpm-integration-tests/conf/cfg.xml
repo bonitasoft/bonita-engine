@@ -120,7 +120,7 @@
 		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
-		<constructor-arg name="connectorService" ref="connectorService" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
@@ -129,6 +129,7 @@
 	<bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="connectorService" ref="connectorService" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
@@ -192,6 +193,7 @@
 		<constructor-arg name="transitionService" ref="transitionService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="connectorService" ref="connectorService" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="operationService" ref="operationService" />
 		<constructor-arg name="expressionBuilders" ref="sExpressionBuilders" />
