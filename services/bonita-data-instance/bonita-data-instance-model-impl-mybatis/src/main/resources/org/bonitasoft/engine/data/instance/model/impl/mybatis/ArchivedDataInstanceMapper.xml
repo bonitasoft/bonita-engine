@@ -195,8 +195,8 @@
 		FROM arch_data_instance dataInst
 		WHERE tenantid = #{tenantid}
 		AND sourceObjectId = #{dataInstanceId}
-		AND archiveDate >= #{time}
-		ORDER BY archiveDate ASC
+		AND #{time} >= archiveDate
+		ORDER BY archiveDate DESC
 		LIMIT 1
 	</select>
 	<select id="getSADataInstancesByDataInstanceIdAndArchiveDate" resultMap="archDataInstanceResultMap">
@@ -204,13 +204,13 @@
 		FROM arch_data_instance dataInst
 		WHERE tenantid = #{tenantid}
 		AND dataInst.id IN ( 
-			SELECT min(sadi.id)
+			SELECT max(sadi.id)
 			FROM arch_data_instance sadi
 			WHERE sadi.sourceObjectId IN 
 			<foreach item="dataInstanceId" index="index" collection="dataInstanceIds" open="(" separator="," close=")">
 					#{dataInstanceId}
 			</foreach>
-			AND sadi.archiveDate >= #{time}
+			AND #{time} >= sadi.archiveDate
 			GROUP BY sadi.sourceObjectId)
 	</select>
 	
