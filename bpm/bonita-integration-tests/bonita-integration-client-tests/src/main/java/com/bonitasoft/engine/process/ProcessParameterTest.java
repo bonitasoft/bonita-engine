@@ -60,7 +60,6 @@ import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
-import com.bonitasoft.engine.exception.InvalidParameterValueException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
 
 public class ProcessParameterTest extends CommonAPISPTest {
@@ -505,8 +504,8 @@ public class ProcessParameterTest extends CommonAPISPTest {
         getProcessAPI().deleteProcess(definition.getId());
     }
 
-    @Test(expected = InvalidParameterValueException.class)
-    public void cannotUpdateAParameterWithNullValue() throws BonitaException {
+    @Test
+    public void updateAParameterWithNullValueAndTheProcessIsUnresolved() throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -518,11 +517,11 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        try {
-            getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", null);
-        } finally {
-            getProcessAPI().deleteProcess(definition.getId());
-        }
+        getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", null);
+
+        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
+        getProcessAPI().deleteProcess(definition.getId());
     }
 
     @Test

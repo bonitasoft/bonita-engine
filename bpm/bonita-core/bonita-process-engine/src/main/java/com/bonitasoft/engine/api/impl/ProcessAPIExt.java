@@ -365,9 +365,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void updateParameterInstanceValue(final long processDefinitionId, final String parameterName, final String parameterValue)
             throws InvalidSessionException, ProcessDefinitionNotFoundException, ParameterNotFoundException, InvalidParameterValueException {
-        if (parameterValue == null) {
-            throw new InvalidParameterValueException("The parameter value cannot be null");
-        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -456,7 +453,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
+            final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(manualTaskId);
                 if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
@@ -562,7 +559,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 break;
         }
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
+            final boolean txOpened = transactionExecutor.openTransaction();
             long numberOfConnectorInstances;
             try {
                 numberOfConnectorInstances = connectorService.getNumberOfConnectorInstances(instanceId, flownodeType);
@@ -596,7 +593,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
+            final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SConnectorInstance connectorInstance = connectorService.getConnectorInstance(connectorInstanceId);
                 if (connectorInstance == null) {
@@ -651,7 +648,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
         String containerType;
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
+            final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 // Reset connectors first:
                 if (connectorsToReset != null) {
