@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.actor.ActorMappingExportException;
+import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.privilege.api.ActorPrivilegeService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
@@ -147,8 +148,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             deleteProcessInstancesFromProcessDefinition(processDefinitionUUID, tenantAccessor);
             final SProcessDefinition serverProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionUUID, processDefinitionService);
+            final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final DeleteProcess deleteProcess = new DeleteProcess(processDefinitionService, serverProcessDefinition, processInstanceService,
-                    tenantAccessor.getArchiveService(), tenantAccessor.getCommentService(), tenantAccessor.getBPMInstanceBuilders());
+                    tenantAccessor.getArchiveService(), tenantAccessor.getCommentService(), tenantAccessor.getBPMInstanceBuilders(), actorMappingService);
             transactionExecutor.execute(deleteProcess);
             final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
             final File file = new File(processesFolder);
