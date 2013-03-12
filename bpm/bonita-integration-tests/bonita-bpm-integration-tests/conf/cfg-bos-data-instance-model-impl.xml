@@ -53,6 +53,9 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl">
 					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImplSQLTransformer" />
 				</entry>
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl">
+					<bean class="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImplSQLTransformer" />
+				</entry>
 			</map>
 		</property>
 	</bean>
