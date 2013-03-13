@@ -1,19 +1,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+    </bean>
+
     <bean id="carolJNDI" class="org.bonitasoft.engine.local.CarolJNDISetup" scope="singleton" init-method="init" destroy-method="clean">
       <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
       <constructor-arg name="jndiMapping" ref="jndiEnvproperties"/>
       <constructor-arg name="carolProperties" value="carol-perf.properties"/>
-    </bean>
-
-    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
-        <property name="environment">
-            <props>
-                <prop key="java.naming.factory.initial">org.ow2.carol.jndi.spi.URLInitialContextFactory</prop>
-                <prop key="java.naming.provider.url">rmi://localhost:1099</prop>
-            </props>
-        </property>
     </bean>
 
     <bean id="jndiEnvproperties" class="org.springframework.beans.factory.config.MapFactoryBean">

@@ -8,12 +8,6 @@
     </bean>
 
     <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
-        <property name="environment">
-            <props>
-                <prop key="java.naming.factory.initial">org.ow2.carol.jndi.spi.URLInitialContextFactory</prop>
-                <prop key="java.naming.provider.url">rmi://localhost:1099</prop>
-            </props>
-        </property>
     </bean>
 
     <bean id="jndiEnvproperties" class="org.springframework.beans.factory.config.MapFactoryBean">
