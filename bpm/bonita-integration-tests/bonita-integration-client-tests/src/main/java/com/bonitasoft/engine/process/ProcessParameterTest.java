@@ -514,13 +514,21 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setProcessDefinition(processDefinition);
         final Map<String, String> params = new HashMap<String, String>();
         params.put("bee", "busy");
+        params.put("bear", "bos");
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", null);
+        ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ConfigurationState.RESOLVED, deploymentInfo.getConfigurationState());
 
-        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", null);
+        deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
+
+        getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "honey");
+        deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ConfigurationState.RESOLVED, deploymentInfo.getConfigurationState());
+
         getProcessAPI().deleteProcess(definition.getId());
     }
 
