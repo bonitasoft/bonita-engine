@@ -26,7 +26,6 @@
 		<constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="archivingStrategy" ref="archivingStrategy" />
-		<constructor-arg name="deleteService" ref="deleteService" />
 		<constructor-arg ref="transactionService" />
 	</bean>
 

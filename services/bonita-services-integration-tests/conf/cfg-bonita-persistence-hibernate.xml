@@ -11,7 +11,7 @@
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 	</bean>
 
-	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="carolJNDI,dbProperties">
+	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="carolJNDI,dbProperties">
 		<constructor-arg name="name" value="journal" />
 		<constructor-arg name="txService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />

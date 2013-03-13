@@ -22,6 +22,12 @@
 			<artifactId>bonita-persistence-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+      <groupId>com.bonitasoft.engine</groupId>
+      <artifactId>bonita-delete-batch</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     </dependencies>
 </project>
 	
