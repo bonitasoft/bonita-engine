@@ -54,6 +54,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
     @After
     public void afterTest() throws BonitaException {
         VariableStorage.clearAll();
+        deleteUser(JOHN);
         logout();
     }
 

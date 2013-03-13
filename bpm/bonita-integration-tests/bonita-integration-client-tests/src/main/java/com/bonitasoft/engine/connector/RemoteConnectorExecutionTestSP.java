@@ -65,8 +65,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         addUserTask.addConnector("myConnector5", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", input1Expression);
         addUserTask.addConnector("myConnector6", connectorId, connectorVersion, ConnectorEvent.ON_FINISH).addInput("kind", input1Expression);
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         final ActivityInstance step2 = waitForUserTask("step2", processInstance);
@@ -75,7 +74,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertThat(connectorInstances, nameAre("myConnector1", "myConnector2", "myConnector3", "myConnector4", "myConnector5", "myConnector6"));
         assertTrue(getProcessAPI().getConnectorInstancesOfActivity(step2.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT).isEmpty());
         disableAndDelete(processDefinition);
-        deleteUser(JOHN);
     }
 
     @Test
@@ -98,15 +96,13 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addConnector("myConnector5", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", input1Expression);
         designProcessDefinition.addConnector("myConnector6", connectorId, connectorVersion, ConnectorEvent.ON_FINISH).addInput("kind", input1Expression);
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step1", processInstance);
         final List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfProcess(processInstance.getId(), 0, 10,
                 ConnectorInstanceCriterion.DEFAULT);
         assertThat(connectorInstances, nameAre("myConnector1", "myConnector2", "myConnector3", "myConnector4", "myConnector5", "myConnector6"));
         disableAndDelete(processDefinition);
-        deleteUser(JOHN);
     }
 
     @Test
@@ -128,8 +124,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
         assertEquals("step1", waitForTaskToFail.getName());
@@ -146,7 +141,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         failedConnector = connectorInstances.get(0);
         assertEquals(ConnectorState.SKIPPED, failedConnector.getState());
         disableAndDelete(processDefinition);
-        deleteUser(JOHN);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state" })
@@ -170,8 +164,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         autoTask.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind",
                 new ExpressionBuilder().createConstantStringExpression("invalidInputParam"));
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
         assertEquals("step1", waitForTaskToFail.getName());
@@ -194,17 +187,12 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             }
         } finally {
             disableAndDelete(processDefinition);
-            deleteUser(JOHN);
         }
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testSetConnectorStateOnUnkownConnector() throws Exception {
-        try {
-            getProcessAPI().setConnectorInstanceState(-123456789l, ConnectorStateReset.SKIPPED);
-        } finally {
-            deleteUser(JOHN);
-        }
+        getProcessAPI().setConnectorInstanceState(-123456789l, ConnectorStateReset.SKIPPED);
     }
 
     @Test
@@ -222,8 +210,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", normal);
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
 
@@ -243,7 +230,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // should finish
         waitForProcessToFinish(processInstance);
         disableAndDelete(processDefinition);
-        deleteUser(JOHN);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
@@ -262,8 +248,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", normal);
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
 
@@ -284,7 +269,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // should finish
         waitForProcessToFinish(processInstance);
         disableAndDelete(processDefinition);
-        deleteUser(JOHN);
     }
 
     @Test
@@ -305,8 +289,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         addAutomaticTask.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", normal);
         addAutomaticTask.addConnector("myConnector3", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", none);
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
 
@@ -326,7 +309,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // should finish
         waitForProcessToFinish(processInstance);
         disableAndDelete(processDefinition);
-        deleteUser(JOHN);
     }
 
     @Test
@@ -347,8 +329,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         addAutomaticTask.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_FINISH).addInput("kind", normal);
         addAutomaticTask.addConnector("myConnector3", connectorId, connectorVersion, ConnectorEvent.ON_FINISH).addInput("kind", none);
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
 
@@ -368,7 +349,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // should finish
         waitForProcessToFinish(processInstance);
         disableAndDelete(processDefinition);
-        deleteUser(JOHN);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
@@ -391,8 +371,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
         // just restart, should not work
@@ -400,16 +379,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             getProcessAPI().replayActivity(waitForTaskToFail.getId());
         } finally {
             disableAndDelete(processDefinition);
-            deleteUser(JOHN);
         }
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testReplayUnknownActivity() throws Exception {
-        try {
-            getProcessAPI().replayActivity(-123456789l);
-        } finally {
-            deleteUser(JOHN);
-        }
+        getProcessAPI().replayActivity(-123456789l);
     }
 }
