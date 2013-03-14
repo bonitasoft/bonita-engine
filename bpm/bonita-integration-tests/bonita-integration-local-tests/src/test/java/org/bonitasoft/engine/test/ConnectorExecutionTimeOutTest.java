@@ -53,8 +53,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
                 .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(350));
 
-        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, userId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorExecutorTimedOut connectorExecutor = (ConnectorExecutorTimedOut) tenantAccessor.getConnectorExecutor();
         final long oldTimeout = connectorExecutor.getTimeout();
@@ -67,7 +66,6 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
             connectorExecutor.setTimeout(oldTimeout);
             final ProcessInstance process2 = getProcessAPI().startProcess(processDefinition.getId());
             waitForProcessToFinish(process2);
-            deleteUser(JOHN);
             disableAndDelete(processDefinition);
         } finally {
             connectorExecutor.setTimeout(oldTimeout);
