@@ -60,6 +60,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant creation
      * @throws TenantAlreadyExistException
      *             occurs when the tenant has already been taken
+     * since 6.0
      */
     long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String userName,
             final String password) throws InvalidSessionException, PlatformNotStartedException, TenantCreationException, TenantAlreadyExistException;
@@ -77,6 +78,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      * @throws TenantDeletionException
      *             occurs when an exception is thrown during tenant deletion
+     * since 6.0
      */
     void deleteTenant(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException, TenantDeletionException;
 
@@ -93,6 +95,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      * @throws TenantActivationException
      *             occurs when an exception is thrown during tenant activation
+     * since 6.0
      */
     void activateTenant(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException, TenantActivationException;
 
@@ -109,6 +112,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      * @throws TenantDeactivationException
      *             occurs when an exception is thrown during tenant deactivation
+     * since 6.0
      */
     void deactiveTenant(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException, TenantDeactivationException;
 
@@ -125,6 +129,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotStartedException
      *             occurs when an exception is thrown if the platform is not started
+     * since 6.0
      */
     List<Tenant> getTenants(final int pageIndex, final int numberPerPage) throws InvalidSessionException, PlatformNotStartedException;
 
@@ -145,6 +150,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @throws PageOutOfRangeException
      *             when the pageIndex is 0 and other out of range scenarios
      * @throws BonitaException
+     * since 6.0
      */
     List<Tenant> getTenants(int pageIndex, int numberPerPage, TenantCriterion pagingCriterion) throws InvalidSessionException, PlatformNotStartedException,
             PageOutOfRangeException, BonitaException;
@@ -161,6 +167,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
+     * since 6.0
      */
     Tenant getTenantByName(String tenantName) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException;
 
@@ -174,6 +181,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
+     * since 6.0
      */
     Tenant getDefaultTenant() throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException;
 
@@ -189,6 +197,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
+     * since 6.0
      */
     Tenant getTenantById(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException;
 
@@ -201,6 +210,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotStartedException
      *             occurs when an exception is thrown if the platform is not started
+     * since 6.0
      */
     int getNumberOfTenants() throws InvalidSessionException, PlatformNotStartedException;
 
@@ -218,6 +228,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown if the platform is not started
      * @throws TenantUpdateException
      *             occurs when an exception is thrown during tenant updated
+     * since 6.0
      */
     Tenant updateTenant(long tenantId, TenantUpdateDescriptor udpateDescriptor) throws InvalidSessionException, PlatformNotStartedException,
             TenantUpdateException;
@@ -230,6 +241,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *         The criterion used to search tenants
      * @throws InvalidSessionException
      * @throws SearchException
+     * since 6.0
      */
     SearchResult<Tenant> searchTenants(SearchOptions searchOptions) throws InvalidSessionException, SearchException;
 

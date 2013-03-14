@@ -50,6 +50,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @throws ActivityCreationException
      * @throws ActivityNotFoundException
      *             errors thrown if can't find corresponding activity
+     * since 6.0
      */
     ManualTaskInstance addManualUserTask(long humanTaskId, String taskName, String displayName, long assignTo, String description, Date dueDate,
             TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException, ActivityExecutionErrorException, ActivityCreationException,

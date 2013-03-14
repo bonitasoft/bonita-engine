@@ -33,6 +33,7 @@ public interface LogAPI {
      * @return the Log object meet the criteria
      * @throws LogNotFoundException
      * @throws InvalidSessionException
+     * since 6.0
      */
     Log getLog(long logId) throws LogNotFoundException, InvalidSessionException;
 
@@ -42,6 +43,7 @@ public interface LogAPI {
      * @return the total number of logs
      * @throws InvalidSessionException
      * @Deprecated use {@link #searchLogs(SearchOptions)} instead.
+     * since 6.0
      */
     @Deprecated
     int getNumberOfLogs() throws InvalidSessionException;
@@ -59,6 +61,7 @@ public interface LogAPI {
      * @return the list of Log objects
      * @throws InvalidSessionException
      * @Deprecated use {@link #searchLogs(SearchOptions)} instead.
+     * since 6.0
      */
     @Deprecated
     List<Log> getLogs(int pageIndex, int numberPerPage, LogCriterion pagingCriterion) throws PageOutOfRangeException, InvalidSessionException;
@@ -70,6 +73,7 @@ public interface LogAPI {
      *            searchOptions
      * @return the SearchResult<Log>
      * @throws InvalidSessionException
+     * since 6.0
      */
     SearchResult<Log> searchLogs(SearchOptions searchOptions) throws InvalidSessionException;
 
