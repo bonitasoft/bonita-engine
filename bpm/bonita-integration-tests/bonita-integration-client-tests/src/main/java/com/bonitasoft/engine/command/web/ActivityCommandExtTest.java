@@ -122,9 +122,9 @@ public class ActivityCommandExtTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultExpression);
         designProcessDefinition.addBooleanData(dataName2, new ExpressionBuilder().createConstantBooleanExpression(false));
-        designProcessDefinition.addStringData(dataName3, defaultExpression);
+        designProcessDefinition.addShortTextData(dataName3, defaultExpression);
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
         designProcessDefinition.addTransition("step1", "step2");

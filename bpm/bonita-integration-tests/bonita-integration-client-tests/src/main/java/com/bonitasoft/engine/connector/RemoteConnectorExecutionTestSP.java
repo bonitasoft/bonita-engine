@@ -56,7 +56,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression).addUserTask("step2", delivery);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression).addUserTask("step2", delivery);
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step1", delivery);
         addUserTask.addConnector("myConnector1", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", input1Expression);
         addUserTask.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_FINISH).addInput("kind", input1Expression);
@@ -87,7 +87,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addConnector("myConnector1", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", input1Expression);
         designProcessDefinition.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_FINISH).addInput("kind", input1Expression);
@@ -116,7 +116,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
@@ -155,7 +155,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         final AutomaticTaskDefinitionBuilder autoTask = designProcessDefinition.addAutomaticTask("step1");
         autoTask.addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", input1Expression)
@@ -206,7 +206,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", normal);
 
@@ -244,7 +244,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput("kind", normal);
 
@@ -283,7 +283,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step1");
         addAutomaticTask.addConnector("myConnector1", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", none);
         addAutomaticTask.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", normal);
@@ -323,7 +323,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step1");
         addAutomaticTask.addConnector("myConnector1", connectorId, connectorVersion, ConnectorEvent.ON_ENTER).addInput("kind", none);
         addAutomaticTask.addConnector("myConnector2", connectorId, connectorVersion, ConnectorEvent.ON_FINISH).addInput("kind", normal);
@@ -363,7 +363,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addStringData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
