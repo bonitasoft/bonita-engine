@@ -15,15 +15,30 @@
 
 	<bean id="bonitaDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 
+<!-- MySQL -->
+
 <!-- 		<property name="driverClass" value="com.mysql.jdbc.Driver" /> -->
 <!-- 		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/bonita?useUnicode=true&amp;characterEncoding=UTF-8" /> -->
 <!-- 		<property name="user" value="root" /> -->
 <!-- 		<property name="password" value="" /> -->
 
-		<property name="driverClass" value="org.h2.Driver" />
-		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
-		<property name="user" value="sa" />
-		<property name="password" value="" />
+<!-- H2 -->
+			<property name="driverClass" value="org.h2.Driver" />
+			<property name="jdbcUrl" value="jdbc:h2:${bonita.home}/server/platform/work/bonita6_journal;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${h2.port:9090};" />
+			<property name="user" value="sa" />
+			<property name="password" value="" />
+					
+<!-- Postgres -->
+<!-- 		<property name="driverClass" value="org.postgresql.Driver" /> -->
+<!-- 		<property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/bonita" /> -->
+<!-- 		<property name="user" value="bonita" /> -->
+<!-- 		<property name="password" value="bonita" /> -->
+		
+<!-- Oracle -->
+<!-- 		<property name="driverClass" value="oracle.jdbc.OracleDriver" /> -->
+<!-- 		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE<" /> -->
+<!-- 		<property name="user" value="bonita" /> -->
+<!-- 		<property name="password" value="bonita" /> -->
 
 		<!--property name="acquireIncrement" value="toBeDefined" / --><!-- default:3 -->
 		<!--property name="acquireRetryAttempts" value="toBeDefined" / --><!-- default:30 -->
@@ -61,16 +76,30 @@
 	<!-- Create the datasource -->
 	<bean id="bonitaSequenceManagerDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 
+<!-- MySQL -->
+
 <!-- 		<property name="driverClass" value="com.mysql.jdbc.Driver" /> -->
 <!-- 		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/bonita?useUnicode=true&amp;characterEncoding=UTF-8" /> -->
 <!-- 		<property name="user" value="root" /> -->
 <!-- 		<property name="password" value="" /> -->
+
+<!-- H2 -->
+			<property name="driverClass" value="org.h2.Driver" />
+			<property name="jdbcUrl" value="jdbc:h2:${bonita.home}/server/platform/work/bonita6_journal;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${h2.port:9090};" />
+			<property name="user" value="sa" />
+			<property name="password" value="" />
+					
+<!-- Postgres -->
+<!-- 		<property name="driverClass" value="org.postgresql.Driver" /> -->
+<!-- 		<property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/bonita" /> -->
+<!-- 		<property name="user" value="bonita" /> -->
+<!-- 		<property name="password" value="bonita" /> -->
 		
-		
-		<property name="driverClass" value="org.h2.Driver" />
-		<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE" />
-		<property name="user" value="sa" />
-		<property name="password" value="" />
+<!-- Oracle -->
+<!-- 		<property name="driverClass" value="oracle.jdbc.OracleDriver" /> -->
+<!-- 		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE<" /> -->
+<!-- 		<property name="user" value="bonita" /> -->
+<!-- 		<property name="password" value="bonita" /> -->
 
 		<!--property name="acquireIncrement" value="toBeDefined" / --><!-- default:3 -->
 		<!--property name="acquireRetryAttempts" value="toBeDefined" / --><!-- default:30 -->
