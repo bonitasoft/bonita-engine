@@ -84,7 +84,7 @@ public class LocalIntegrationTestsSP {
     
     private static void setupJNDI() {
         System.setProperty("java.naming.factory.initial", "org.ow2.carol.jndi.spi.URLInitialContextFactory");
-        System.setProperty("java.naming.provider.url", "rmi://localhost:" + System.getProperty("carol.jndi.rmi.port", "1099"));
+        System.setProperty("java.naming.provider.url", "rmi://localhost:" + System.getProperty("jndi.carol.port", "1099"));
         contextJNDI = new ClassPathXmlApplicationContext("jndi-setup.xml");
     }
 
