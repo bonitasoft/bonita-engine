@@ -6,7 +6,7 @@
 	</bean>
 
 	<bean id="bonitaSequenceManagerDSJNDI" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="${database.journal.datasource.name}" />
+		<property name="jndiName" value="${database.sequence.manager.datasource.name}" />
 	</bean>
 
 

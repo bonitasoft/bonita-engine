@@ -24,6 +24,7 @@
 				<entry key="20051" value="25000" /><!-- SADataInstanceVisibilityMapping -->
 				<entry key="10060" value="20000" /><!-- comment -->
 				<entry key="10080" value="20000" /><!-- SAComment -->
+				<entry key="10110" value="20000" /><!-- TokenCount -->
 
 				<!-- less used objects -->
 				<entry key="10012" value="100" /><!-- ProcessDefinition -->
@@ -65,16 +66,16 @@
 		<constructor-arg name="defaultRangeSize" value="100"></constructor-arg>
 		<constructor-arg name="sequencesMappings">
 			<map>
+				<entry key="org.bonitasoft.engine.persistence.model.Human" value="1000" />
+				<entry key="org.bonitasoft.engine.persistence.model.Child" value="1000" />
+				<entry key="org.bonitasoft.engine.persistence.model.Parent" value="1000" />
+				<entry key="org.bonitasoft.engine.persistence.model.Car" value="1001" />
 				<entry key="org.bonitasoft.engine.archive.model.Employee" value="60" />
 				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="61" />
 				<entry key="org.bonitasoft.engine.archive.model.Address" value="62" />
 				<entry key="org.bonitasoft.engine.archive.model.Project" value="63" />
 				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="64" />
 				<entry key="org.bonitasoft.engine.archive.model.SAEmployee" value="65" />
-				<entry key="org.bonitasoft.engine.persistence.model.Human" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Child" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Parent" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Car" value="1001" />
 			<!-- platform -->
 				<entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="0" />
 				<entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="1" />
@@ -158,6 +159,7 @@
 				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 				<entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl" value="10100" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceTokenCountImpl" value="10110" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />
@@ -193,6 +195,5 @@
 		<constructor-arg name="delay" value="5" />
 		<constructor-arg name="delayFactor" value="2" />
 	</bean>
-
 
 </beans>

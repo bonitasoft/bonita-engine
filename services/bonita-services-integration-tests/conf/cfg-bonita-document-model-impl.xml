@@ -7,13 +7,13 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="documentBuilders" ref="documentBuilders" />
 	</bean> -->
-	
+
 	<bean class="org.bonitasoft.engine.document.impl.FileSystemDocumentServiceImpl" id="documentService">
 		<constructor-arg name="storePath" value="${java.io.tmpdir}/documents" />
 	</bean>
-	
+
 	<bean id="documentBuilder" class="org.bonitasoft.engine.document.model.impl.SDocumentBuilderImpl" />
-	
+
 	<bean name="documentBuilders" class="org.bonitasoft.engine.document.model.impl.SDocumentBuildersImpl" />
 
 	<bean id="db-bonita-document-model" class="org.bonitasoft.engine.persistence.DBConfiguration">

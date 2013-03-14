@@ -5,17 +5,18 @@
     </bean>
 
     <bean id="carolJNDI" class="org.bonitasoft.engine.local.CarolJNDISetup" scope="singleton" init-method="init" destroy-method="clean">
-      <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
-      <constructor-arg name="jndiMapping" ref="jndiEnvproperties"/>
-      <constructor-arg name="port" value="${jndi.carol.port:1099}" />
+        <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
+        <constructor-arg name="jndiMapping" ref="jndiEnvproperties"/>
+        <constructor-arg name="port" value="${jndi.carol.port:1099}"/>
     </bean>
 
     <bean id="jndiEnvproperties" class="org.springframework.beans.factory.config.MapFactoryBean">
-      <property name="targetMapClass" value="java.util.LinkedHashMap" />
-      <property name="sourceMap">
-          <map>
-              <entry key="${database.journal.datasource.name}" value-ref="bonitaDS" />
-          </map>
+        <property name="targetMapClass" value="java.util.LinkedHashMap" />
+        <property name="sourceMap">
+            <map>
+                <entry key="${database.journal.datasource.name}" value-ref="bonitaDS" />
+                <entry key="${database.sequence.manager.datasource.name}" value-ref="bonitaSequenceManagerDS" />
+            </map>
       </property>
     </bean>
 
