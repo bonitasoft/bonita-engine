@@ -125,7 +125,7 @@
 		scope="singleton" init-method="init" destroy-method="clean">
 		<constructor-arg name="jndiTemplate" ref="jndiTemplate" />
 		<constructor-arg name="jndiMapping" ref="jndiEnvproperties" />
-		<constructor-arg name="carolProperties" value="carol-perf.properties" />
+		<constructor-arg name="port" value="${jndi.carol.port:1099}" />
 	</bean>
 
 </beans>
