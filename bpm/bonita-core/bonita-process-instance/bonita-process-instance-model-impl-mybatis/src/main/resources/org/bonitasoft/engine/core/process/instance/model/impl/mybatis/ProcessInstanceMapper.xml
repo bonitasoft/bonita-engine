@@ -141,6 +141,7 @@
 		FROM process_instance p
 		WHERE p.stateId != 6
 		AND p.tenantid = #{tenantid}
+        AND (p.callerType is null OR p.callerType not in ('CALL_ACTIVITY'))
 		<if test="filter != null">
 			AND ${filter}
 		</if>
@@ -151,6 +152,7 @@
 		FROM process_instance p
 		WHERE p.tenantid = #{tenantid}
 		AND p.stateId != 6
+        AND (p.callerType is null OR p.callerType not in ('CALL_ACTIVITY'))
 		<if test="filter != null">
 			AND ${filter}
 		</if>
