@@ -9,6 +9,8 @@
 
 	<artifactId>bonita-common-sp</artifactId>
 
+	<name>Bonita Common SP</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>

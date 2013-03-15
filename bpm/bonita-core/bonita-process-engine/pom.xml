@@ -77,30 +77,6 @@
 					</includes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>com.bonitasoft.engine.core.parameter:bonita-parameter-api</include>
-								</includes>
-							</artifactSet>
-							<outputDirectory>${basedir}/target</outputDirectory>
-							<destFileName>${project.build.finalName}.jar</destFileName>
-							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-							<createDependencyReducedPom>true</createDependencyReducedPom>
-							<createSourcesJar>true</createSourcesJar>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 
