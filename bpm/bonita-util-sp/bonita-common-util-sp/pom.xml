@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-util-sp</artifactId>
 		<groupId>com.bonitasoft.engine.util</groupId>
-		<version>6.0.0-beta-013</version>
+		<version>6.0.0-beta-014-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	
