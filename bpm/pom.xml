@@ -19,6 +19,7 @@
 		<module>bonita-client</module>
 		<module>bonita-server</module>
 		<module>bonita-deploy</module>
+		<module>bonita-util-sp</module>
 	</modules>
 
 	<profiles>

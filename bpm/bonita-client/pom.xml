@@ -13,13 +13,55 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common-sp</artifactId>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-client-api</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bonita-common</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-client-api-local</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-client</artifactId>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-client-api-ejb2</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine</groupId>
+					<artifactId>bonita-common</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-client-api-ejb3</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-client-api-http</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.util</groupId>
+			<artifactId>bonita-client-util</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.util</groupId>
+			<artifactId>bonita-client-util-sp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -27,26 +69,10 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-client</artifactId>
-			<version>${project.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>com/bonitasoft/engine/bar/test/BusinessArchiveTestSuite.java</include>
-					</includes>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
@@ -61,6 +87,35 @@
 							<dependencySourceIncludes>
 								<dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude>
 							</dependencySourceIncludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>org.bonitasoft.engine.api:bonita-client-api</include>
+									<include>org.bonitasoft.engine.api:bonita-client-api-local</include>
+									<include>org.bonitasoft.engine.api:bonita-client-api-ejb2</include>
+									<include>org.bonitasoft.engine.api:bonita-client-api-ejb3</include>
+									<include>org.bonitasoft.engine.api:bonita-client-api-http</include>
+									<include>org.bonitasoft.engine.util:bonita-client-util</include>
+									<include>com.bonitasoft.engine.util:bonita-client-util-sp</include>
+								</includes>
+							</artifactSet>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+							<createDependencyReducedPom>true</createDependencyReducedPom>
+							<createSourcesJar>true</createSourcesJar>
 						</configuration>
 					</execution>
 				</executions>

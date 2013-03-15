@@ -13,8 +13,23 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api-ejb2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.util</groupId>
+			<artifactId>bonita-common-util</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.util</groupId>
+			<artifactId>bonita-common-util-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -35,6 +50,33 @@
 							<dependencySourceIncludes>
 								<dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude>
 							</dependencySourceIncludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>org.bonitasoft.engine.api:bonita-common-api</include>
+									<include>org.bonitasoft.engine.api:bonita-common-api-ejb2</include>
+									<include>org.bonitasoft.engine.util:bonita-common-util</include>
+									<include>com.bonitasoft.engine.util:bonita-common-util-sp</include>
+								</includes>
+							</artifactSet>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+							<createDependencyReducedPom>true</createDependencyReducedPom>
+							<keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
+							<createSourcesJar>true</createSourcesJar>
 						</configuration>
 					</execution>
 				</executions>
