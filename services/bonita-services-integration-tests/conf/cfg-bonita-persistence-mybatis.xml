@@ -38,10 +38,11 @@
 		</constructor-arg>
 		<constructor-arg name="properties">
 			<props>
-				<prop key="database.connection.driver_class">${database.journal.connection.driver_class}</prop>
+				<prop key="database.connection.datasource">${database.journal.datasource.name}</prop>
+				<!-- <prop key="database.connection.driver_class">${database.journal.connection.driver_class}</prop>
 				<prop key="database.connection.url">${database.journal.connection.url}</prop>
 				<prop key="database.connection.username">${database.journal.connection.username}</prop>
-				<prop key="database.connection.password">${database.journal.connection.password}</prop>
+				<prop key="database.connection.password">${database.journal.connection.password}</prop> -->
 			</props>
 		</constructor-arg>
 	</bean>

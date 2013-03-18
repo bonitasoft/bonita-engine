@@ -28,7 +28,7 @@
 	</select>
 
 	<select id="getExternalIdentityMappingByIdForGroup" parameterType="long" resultMap="externalIdentityResultMap">
-		SELECT ext_ident_mapping.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, '' AS displayNamePart3
+		SELECT ext_ident_mapping.*, g.name AS displayNamePart1, g.parentPath AS displayNamePart2, NULL AS displayNamePart3
 		FROM external_identity_mapping AS ext_ident_mapping,
 			group_ g
 		WHERE ext_ident_mapping.tenantid = #{tenantid}
@@ -39,7 +39,7 @@
 	</select>
 
 	<select id="getExternalIdentityMappingByIdForRole" parameterType="long" resultMap="externalIdentityResultMap">
-		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3
+		SELECT ext_ident_mapping.*, r.name AS displayNamePart1, NULL AS displayNamePart2, NULL AS displayNamePart3
 		FROM external_identity_mapping AS ext_ident_mapping,
 			role r
 		WHERE ext_ident_mapping.tenantid = #{tenantid}

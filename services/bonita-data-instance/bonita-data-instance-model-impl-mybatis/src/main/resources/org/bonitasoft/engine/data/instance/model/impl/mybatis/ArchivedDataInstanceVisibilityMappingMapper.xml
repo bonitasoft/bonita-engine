@@ -8,7 +8,7 @@
 		VALUES (#{tenantid}, #{entity.id}, #{entity.containerId}, #{entity.containerType}, #{entity.dataName}, #{entity.dataInstanceId}, #{entity.archiveDate}, #{entity.sourceObjectId})
 	</insert>
 
-	<delete id="deleteSADataInstanceImpl" parameterType="ArchDataInstanceVisibilityMapping">
+	<delete id="deleteSADataInstanceVisibilityMappingImpl" parameterType="ArchDataInstanceVisibilityMapping">
 		DELETE FROM arch_data_mapping
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}

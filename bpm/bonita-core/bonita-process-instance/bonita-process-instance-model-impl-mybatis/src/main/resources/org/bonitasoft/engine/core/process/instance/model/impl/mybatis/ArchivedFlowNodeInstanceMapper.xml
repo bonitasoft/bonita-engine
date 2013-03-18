@@ -82,7 +82,7 @@
 		</discriminator>
 	</resultMap>
 
-	<select id="getArchivedFlowNodeInstanceById" parameterType="long" resultMap="archivedFlownodeInstanceResultMap">
+	<select id="getSArchivedFlowNodeInstanceById" parameterType="long" resultMap="archivedFlownodeInstanceResultMap">
 		SELECT *
 		FROM arch_flownode_instance f
 		WHERE f.tenantid = #{tenantid}

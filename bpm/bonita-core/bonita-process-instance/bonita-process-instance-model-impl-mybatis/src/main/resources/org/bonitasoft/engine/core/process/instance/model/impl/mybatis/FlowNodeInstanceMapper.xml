@@ -165,6 +165,53 @@
 		</discriminator>
 	</resultMap>
 
+	<select id="getSFlowNodeInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.id = #{id}
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
+	<select id="getSActivityInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.id = #{id}
+		AND f.kind IN ('call', 'loop', 'subProc', 'manual', 'user') 
+	</select>
+
+	<select id="getSHumanTaskInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.id = #{id}
+		AND f.kind IN ('manual', 'user') 
+	</select>
+	
+	<select id="getSEventInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.id = #{id}
+		AND f.kind IN ('startEvent', 'intermediateCatchEvent', 'intermediateThrowEvent', 'endEvent', 'boundaryEvent') 
+	</select>
+	
+	<select id="getSGatewayInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
+		SELECT *
+		FROM flownode_instance f
+		WHERE f.tenantid = #{tenantid}
+		AND f.deleted = FALSE
+		AND f.id = #{id}
+		AND f.kind IN ('gate') 
+	</select>
+
 	<select id="getChildrenOfAnActivity" parameterType="long" resultMap="flowNodeInstanceResultMap">
 		SELECT *
 		FROM flownode_instance f
@@ -200,8 +247,6 @@
 			ORDER BY ${orderBy}
 		</if>
 	</select>
-	
-
 
 	<select id="getFlowNodesFromProcessInstance" parameterType="long" resultMap="flowNodeInstanceResultMap">
 		SELECT *
@@ -236,17 +281,6 @@
 		AND f.stable = TRUE
 		AND f.terminal = FALSE
 		AND f.kind IN ('manual', 'user') 
-		<if test="orderBy != null">
-			ORDER BY ${orderBy}
-		</if>
-	</select>
-
-	<select id="getSFlowNodeInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
-		SELECT *
-		FROM flownode_instance f
-		WHERE f.tenantid = #{tenantid}
-		AND f.deleted = FALSE
-		AND f.id = #{id}
 		<if test="orderBy != null">
 			ORDER BY ${orderBy}
 		</if>
@@ -426,14 +460,6 @@
 		AND f.activityInstanceId = #{activityInstanceId}
 		AND f.deleted = FALSE
 		AND f.kind = 'boundaryEvent'
-	</select>
-
-	<select id="getSEventInstanceById" parameterType="long" resultMap="flowNodeInstanceResultMap">
-		SELECT *
-		FROM flownode_instance f
-		WHERE f.tenantid = #{tenantid}
-		AND f.deleted = FALSE
-		AND f.id = #{id}
 	</select>
 
 	<!-- External Service Queries -->

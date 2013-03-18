@@ -8,7 +8,7 @@
 		VALUES (#{tenantid}, #{entity.id}, #{entity.containerId}, #{entity.containerType}, #{entity.dataName}, #{entity.dataInstanceId})
 	</insert>
 
-	<delete id="deleteSDataInstanceImpl" parameterType="DataInstanceVisibilityMapping">
+	<delete id="deleteSDataInstanceVisibilityMappingImpl" parameterType="DataInstanceVisibilityMapping">
 		DELETE FROM data_mapping
 		WHERE tenantid = #{tenantid}
 		AND id = #{id}
