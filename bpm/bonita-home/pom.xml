@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.0.0-beta-014</version>
+		<version>6.0.0-beta-015-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-home-sp</artifactId>
