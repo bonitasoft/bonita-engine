@@ -534,25 +534,26 @@ public class LogTest extends CommonAPISPTest {
     }
 
     @Test
-    public void log() throws BonitaException {
+    public void log() throws BonitaException, InterruptedException {
         final Group group = getIdentityAPI().createGroup(new GroupBuilder().createNewInstance("group1").done());
         getIdentityAPI().deleteGroup(group.getId());
 
-        assertEquals(0, getLogAPI().getNumberOfLogs());
+        final int initialNumberOfLogs = getLogAPI().getNumberOfLogs();
 
         final User userOld = getIdentityAPI().createUser("old", "oldPassword");
-        assertEquals(1, getLogAPI().getNumberOfLogs());
-
+        assertEquals(initialNumberOfLogs + 1, getLogAPI().getNumberOfLogs());
+        Thread.sleep(10);
         final UserUpdateDescriptor updateDescriptor = new UserUpdateDescriptor();
         updateDescriptor.updateUserName("new");
         updateDescriptor.updatePassword("newPassword");
         getIdentityAPI().updateUser(userOld.getId(), updateDescriptor, null, null);
-        assertEquals(2, getLogAPI().getNumberOfLogs());
+        assertEquals(initialNumberOfLogs + 2, getLogAPI().getNumberOfLogs());
 
+        Thread.sleep(10);
         getIdentityAPI().deleteUser(userOld.getId());
-        assertEquals(3, getLogAPI().getNumberOfLogs());
+        assertEquals(initialNumberOfLogs + 3, getLogAPI().getNumberOfLogs());
 
-        final List<Log> logs = getLogAPI().getLogs(0, 3, LogCriterion.DEFAULT);
+        final List<Log> logs = getLogAPI().getLogs(0, 3, LogCriterion.CREATION_DATE_DESC);
         assertEquals("IDENTITY_USER_DELETED", logs.get(0).getActionType());
         assertEquals(SeverityLevel.INTERNAL, logs.get(0).getSeverity());
         assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(0).getCallerClassName());

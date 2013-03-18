@@ -219,6 +219,9 @@ bpm/bonita-deploy/bonita-deploy-war/target
 /bpm/bonita-integration-tests/bonita-integration-local-tests/.settings
 /bpm/bonita-integration-tests/bonita-integration-local-tests/.classpath
 /bpm/bonita-integration-tests/bonita-integration-local-tests/.project
+/bpm/bonita-integration-tests/bonita-integration-local-tests/FILEPATH.h2.db
+/bpm/bonita-integration-tests/bonita-integration-local-tests/FILEPATH.trace.db
+
 
 # /bpm/bonita-integration-tests/bonita-integration-local-tests/src/main/resources/org/
 
@@ -566,3 +569,8 @@ bpm/bonita-deploy/bonita-deploy-war/target
 /services/bonita-work/bonita-work-parallel/target
 /services/bonita-work/bonita-work-parallel/.settings
 /services/bonita-work/bonita-work-parallel/build
+
+
+bpm/bonita-util-sp/bonita-common-util-sp/target
+bpm/bonita-util-sp/bonita-client-util-sp/target
+

@@ -60,6 +60,7 @@
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -165,6 +166,7 @@
 						<constructor-arg name="commentService" ref="commentService" />
 						<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
 						<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+						<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 					</bean>
 				</entry>
 				<entry key="PROCESSINSTANCE_DELETED">

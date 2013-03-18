@@ -66,6 +66,9 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl">
 					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImplSQLTransformer" />
 				</entry>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl">
+					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImplSQLTransformer" />
+				</entry>
 			</map>
 		</property>
 	</bean>

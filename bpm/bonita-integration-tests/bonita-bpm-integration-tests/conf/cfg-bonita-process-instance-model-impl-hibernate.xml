@@ -70,6 +70,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="aa" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="aa" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="at" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="ac" />
 			</map>
 		</property>
 	</bean>

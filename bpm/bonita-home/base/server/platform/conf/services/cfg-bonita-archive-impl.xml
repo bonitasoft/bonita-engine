@@ -15,6 +15,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="true" />
+        		<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="true" />
         		<entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="true" />
         		<entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="true" />
 			</map>
