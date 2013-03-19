@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl;
 import org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProvider;
 import org.bonitasoft.engine.services.SPersistenceException;
-import org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl;
 
 /**
  * @author Celine Souchet
@@ -25,14 +25,16 @@ public class HibernateConfigurationProviderExt extends HibernateConfigurationPro
 
     public HibernateConfigurationProviderExt(final Properties properties,
             final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider,
-            final Map<String, String> cacheQueries, final List<String> classesWithLoadByQuery)
+            final Map<String, String> interfaceToClassMapping,
+            final List<String> mappingExclusions,
+            final Map<String, String> cacheQueries)
             throws SPersistenceException {
-        super(properties, hibernateResourcesConfigurationProvider, classesWithLoadByQuery);
+        super(properties, hibernateResourcesConfigurationProvider, interfaceToClassMapping, mappingExclusions);
         this.cacheQueries = cacheQueries;
     }
 
     @Override
     public Map<String, String> getCacheQueries() {
-        return cacheQueries;
+        return this.cacheQueries;
     }
 }

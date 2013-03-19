@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.persistence;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.DBConfigurationsProvider;
 import org.bonitasoft.engine.persistence.HibernateConfigurationProvider;
