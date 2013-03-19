@@ -199,27 +199,20 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 throw new STenantCreationException("Modify File Exception!");
             }
             final Long tenantId = transactionContent.getResult();
-
             final SDataSourceModelBuilder sDataSourceModelBuilder = platformAccessor.getTenantServiceAccessor(tenantId).getSDataSourceModelBuilder();
             final DataService dataService = platformAccessor.getTenantServiceAccessor(tenantId).getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = platformAccessor.getTenantServiceAccessor(tenantId).getCommandService();
             final PrivilegeService privilegeService = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeService();
             final PrivilegeBuilders privilegeBuilders = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeBuilders();
-            boolean txOpened = transactionExecutor.openTransaction();
+            final boolean txOpened = transactionExecutor.openTransaction();
             try {
-
-                final SSession session = sessionService.createSession(tenantId, userName);
-
+                final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
                 createDefaultDataSource(sDataSourceModelBuilder, dataService);
-
                 commandService.createDefaultCommands();
-
                 final CreateDefaultPrivileges createDefaultPrivileges = new CreateDefaultPrivileges(privilegeService, privilegeBuilders);
                 createDefaultPrivileges.execute();
-
                 sessionService.deleteSession(session.getId());
-
                 return tenantId;
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
