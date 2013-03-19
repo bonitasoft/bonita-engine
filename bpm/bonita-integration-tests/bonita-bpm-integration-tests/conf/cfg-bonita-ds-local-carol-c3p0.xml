@@ -15,6 +15,7 @@
       <property name="sourceMap">
           <map>
               <entry key="${database.journal.datasource.name}" value-ref="bonitaDS" />
+              <entry key="${database.sequence.manager.datasource.name}" value-ref="bonitaSequenceManagerDS" />
           </map>
       </property>
     </bean>
