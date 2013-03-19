@@ -1225,6 +1225,7 @@
 				<entry key="arch_end_event_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
 				<entry key="arch_gateway_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
 				<entry key="arch_transition_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
+				<entry key="arch_connector_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappers">
@@ -1232,6 +1233,7 @@
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedProcessInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedFlowNodeInstanceMapper.xml</value>
 				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedTransitionInstanceMapper.xml</value>
+				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedConnectorInstanceMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -1250,6 +1252,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="af" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="at" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="ac" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="classFieldAliasMappings">
@@ -1547,6 +1550,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
 			</map>
 		</constructor-arg>
 	</bean>
