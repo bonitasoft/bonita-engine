@@ -56,7 +56,7 @@ import com.bonitasoft.engine.exception.TenantUpdateException;
 
 public class SPPlatformTest {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SPPlatformTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SPPlatformTest.class);
 
     private static final String DEFAULT_TENANT_NAME = "lukai";
 

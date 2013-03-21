@@ -103,7 +103,7 @@ import com.bonitasoft.manager.Manager;
  */
 public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
-    private final static String STATUS_DEACTIVATED = "DEACTIVATED";
+    private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
     @Override
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,

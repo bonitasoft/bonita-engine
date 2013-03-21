@@ -66,7 +66,7 @@ import com.bonitasoft.engine.platform.Tenant;
  */
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(CommonAPISPTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPTest.class);
 
     @BeforeClass
     public static void beforeClass() throws BonitaException {

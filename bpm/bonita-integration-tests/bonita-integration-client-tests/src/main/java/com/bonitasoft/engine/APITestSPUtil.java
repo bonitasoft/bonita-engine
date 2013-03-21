@@ -94,7 +94,7 @@ import com.bonitasoft.engine.log.Log;
 
 public class APITestSPUtil {
 
-    protected final static Logger LOGGER = LoggerFactory.getLogger(APITestSPUtil.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(APITestSPUtil.class);
 
     protected static final String SUPERVISOR_ID_KEY = "supervisorId";
 
