@@ -129,7 +129,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
                 builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
                 builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.SKIPPED_STATE);
-                return getProcessAPI().searchArchivedTasks(builder.done()).getCount() == 2;
+                return getProcessAPI().searchArchivedHumanTasks(builder.done()).getCount() == 2;
             }
         }.waitUntil());
 
@@ -137,7 +137,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final SearchOptionsBuilder searchhBuilder = new SearchOptionsBuilder(0, 10);
         searchhBuilder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, parentTask.getId());
         searchhBuilder.sort(ArchivedHumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
-        final SearchResult<ArchivedHumanTaskInstance> searchResult = getProcessAPI().searchArchivedTasks(searchhBuilder.done());
+        final SearchResult<ArchivedHumanTaskInstance> searchResult = getProcessAPI().searchArchivedHumanTasks(searchhBuilder.done());
         assertEquals(2, searchResult.getCount());
         final List<ArchivedHumanTaskInstance> subTasks = searchResult.getResult();
         final ArchivedHumanTaskInstance aTask1 = subTasks.get(0);
@@ -326,7 +326,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
                 builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
                 builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.COMPLETED_STATE);
-                return getProcessAPI().searchArchivedTasks(builder.done()).getCount() == 1;
+                return getProcessAPI().searchArchivedHumanTasks(builder.done()).getCount() == 1;
             }
         }.waitUntil());
 
@@ -337,7 +337,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
                 builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
                 builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.ABORTED_STATE);
-                return getProcessAPI().searchArchivedTasks(builder.done()).getCount() == 2;
+                return getProcessAPI().searchArchivedHumanTasks(builder.done()).getCount() == 2;
             }
         }.waitUntil());
 
