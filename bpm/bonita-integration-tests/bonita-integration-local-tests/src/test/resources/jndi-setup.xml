@@ -36,7 +36,7 @@
 		
 <!-- Oracle -->
 <!-- 		<property name="driverClass" value="oracle.jdbc.OracleDriver" /> -->
-<!-- 		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE<" /> -->
+<!-- 		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE" /> -->
 <!-- 		<property name="user" value="bonita" /> -->
 <!-- 		<property name="password" value="bonita" /> -->
 
@@ -97,7 +97,7 @@
 		
 <!-- Oracle -->
 <!-- 		<property name="driverClass" value="oracle.jdbc.OracleDriver" /> -->
-<!-- 		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE<" /> -->
+<!-- 		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE" /> -->
 <!-- 		<property name="user" value="bonita" /> -->
 <!-- 		<property name="password" value="bonita" /> -->
 
