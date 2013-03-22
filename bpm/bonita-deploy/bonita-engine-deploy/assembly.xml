@@ -42,6 +42,14 @@
 			<useTransitiveFiltering>true</useTransitiveFiltering>
 		</dependencySet>
 		<dependencySet>
+			<outputDirectory>war</outputDirectory>
+			<includes>
+				<include>com.bonitasoft.engine:bonita-deploy-war-sp</include>
+			</includes>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+		</dependencySet>
+		<dependencySet>
 			<outputDirectory>resources</outputDirectory>
 			<includes>
 				<include>com.bonitasoft.engine:bonita-home-sp</include>
