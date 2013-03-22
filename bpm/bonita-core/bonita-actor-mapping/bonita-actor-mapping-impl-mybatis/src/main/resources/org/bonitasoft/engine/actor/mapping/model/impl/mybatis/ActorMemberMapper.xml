@@ -45,6 +45,16 @@
 		AND group_.id = actormember.groupId
 	</select>
 
+	<select id="getNumberOfActorMembersOfGroupWithActor" parameterType="long" resultType="long">
+		SELECT count(actormember.id)
+		FROM actormember
+		WHERE actormember.actorId = #{actorId}
+		AND actormember.groupId = #{groupId}
+		AND actormember.roleId = -1
+		AND actormember.userId = -1
+	</select>
+
+
 	<select id="getNumberOfMembershipsOfActor" parameterType="long" resultType="long">
 		SELECT COUNT(*)
 		FROM actormember
