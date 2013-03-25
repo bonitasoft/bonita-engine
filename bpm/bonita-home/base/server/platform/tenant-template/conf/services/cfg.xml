@@ -61,6 +61,7 @@
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
