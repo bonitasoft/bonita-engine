@@ -14,6 +14,7 @@
     <entry key="org.bonitasoft.engine.archive.newestTime">9999999999999</entry>
     <entry key="org.bonitasoft.engine.archive.regexp">.*</entry>
     <entry key="org.bonitasoft.engine.cron">0/5 * * * * ?</entry>
+    <entry key="org.bonitasoft.engine.clean.invalid.sessions.cron">0 0 */2 * * ?</entry>
 
     <entry key="document.servlet.url">downloadDocument</entry>
 </properties>

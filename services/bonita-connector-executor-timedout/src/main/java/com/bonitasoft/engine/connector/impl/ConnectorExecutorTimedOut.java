@@ -140,11 +140,13 @@ public class ConnectorExecutorTimedOut implements ConnectorExecutor {
             sConnector.setInputParameters(inputParameters);
             try {
                 sConnector.validate();
+                sConnector.connect();
+                return sConnector.execute();
             } catch (final SConnectorValidationException e) {
                 throw new SConnectorException(e);
+            } finally {
+                sessionAccessor.deleteSessionId();
             }
-            sConnector.connect();
-            return sConnector.execute();
         }
     }
 

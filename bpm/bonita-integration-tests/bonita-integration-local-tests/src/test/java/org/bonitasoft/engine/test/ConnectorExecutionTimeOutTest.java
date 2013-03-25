@@ -54,6 +54,8 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
                 .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(350));
 
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition);
+        final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+        sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorExecutorTimedOut connectorExecutor = (ConnectorExecutorTimedOut) tenantAccessor.getConnectorExecutor();
         final long oldTimeout = connectorExecutor.getTimeout();
@@ -63,12 +65,15 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
             final ActivityInstance failedTask = waitForTaskToFail(process);
             assertEquals("step1", failedTask.getName());
             System.out.println("second start");
+            sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info cleaned by api call
             connectorExecutor.setTimeout(oldTimeout);
             final ProcessInstance process2 = getProcessAPI().startProcess(processDefinition.getId());
             waitForProcessToFinish(process2);
             disableAndDelete(processDefinition);
         } finally {
+            sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info cleaned by api call
             connectorExecutor.setTimeout(oldTimeout);
+            sessionAccessor.deleteSessionId();
         }
     }
 

@@ -3,7 +3,6 @@
 
 	<bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
 		<constructor-arg name="sessionModelBuilder" ref="sessionModelBuilder" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="platformService" ref="platformService" />
 		<constructor-arg name="applicationName" value="BPM" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
