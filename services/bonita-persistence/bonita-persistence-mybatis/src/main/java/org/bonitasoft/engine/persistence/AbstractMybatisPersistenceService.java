@@ -608,18 +608,24 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
                 }
             }
             fields.removeAll(specificFilters);
-            final Iterator<String> iterator = fields.iterator();
-            if (iterator.hasNext()) {
+            final Iterator<String> fieldIterator = fields.iterator();
+            final List<String> terms = multipleFilter.getTerms();
+            if (!fields.isEmpty()) {
                 if (!specificFilters.isEmpty()) {
                     builder.append(" AND (");
                 } else {
                     builder.append(" (");
                 }
-                final String field = iterator.next();
-                builder.append(field).append(" LIKE '").append(multipleFilter.getTerm()).append('\'');
-                while (iterator.hasNext()) {
-                    final String next = iterator.next();
-                    builder.append(" OR ").append(next).append(" LIKE '").append(multipleFilter.getTerm()).append('\'');
+                while (fieldIterator.hasNext()) {
+                    final Iterator<String> termIterator = terms.iterator();
+                    final String currentField = fieldIterator.next();
+                    while (termIterator.hasNext()) {
+                        final String currentTerm = termIterator.next();
+                        builder.append(currentField).append(" LIKE '").append(currentTerm).append('\'');
+                        if (termIterator.hasNext() || fieldIterator.hasNext()) {
+                            builder.append(" OR ");
+                        }
+                    }
                 }
                 builder.append(")");
             }
