@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-external-identity-mapping</artifactId>
 		<groupId>com.bonitasoft.engine.external.identity.mapping</groupId>
-		<version>6.0.0-beta-015</version>
+		<version>6.0.0-beta-016-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-external-identity-mapping-impl-mybatis</artifactId>
