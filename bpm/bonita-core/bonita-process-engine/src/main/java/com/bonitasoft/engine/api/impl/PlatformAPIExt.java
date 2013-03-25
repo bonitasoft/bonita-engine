@@ -33,6 +33,8 @@ import org.bonitasoft.engine.api.impl.transaction.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.RemovePrivilege;
 import org.bonitasoft.engine.bpm.model.privilege.Privilege;
 import org.bonitasoft.engine.command.CommandService;
+import org.bonitasoft.engine.command.DefaultCommandProvider;
+import org.bonitasoft.engine.command.model.SCommandBuilder;
 import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -199,17 +201,20 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 throw new STenantCreationException("Modify File Exception!");
             }
             final Long tenantId = transactionContent.getResult();
-            final SDataSourceModelBuilder sDataSourceModelBuilder = platformAccessor.getTenantServiceAccessor(tenantId).getSDataSourceModelBuilder();
-            final DataService dataService = platformAccessor.getTenantServiceAccessor(tenantId).getDataService();
+            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            final SDataSourceModelBuilder sDataSourceModelBuilder = tenantServiceAccessor.getSDataSourceModelBuilder();
+            final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final CommandService commandService = platformAccessor.getTenantServiceAccessor(tenantId).getCommandService();
-            final PrivilegeService privilegeService = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeService();
-            final PrivilegeBuilders privilegeBuilders = platformAccessor.getTenantServiceAccessor(tenantId).getPrivilegeBuilders();
+            final CommandService commandService = tenantServiceAccessor.getCommandService();
+            final PrivilegeService privilegeService = tenantServiceAccessor.getPrivilegeService();
+            final PrivilegeBuilders privilegeBuilders = tenantServiceAccessor.getPrivilegeBuilders();
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
                 createDefaultDataSource(sDataSourceModelBuilder, dataService);
-                commandService.createDefaultCommands();
+                final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
+                final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
+                createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
                 final CreateDefaultPrivileges createDefaultPrivileges = new CreateDefaultPrivileges(privilegeService, privilegeBuilders);
                 createDefaultPrivileges.execute();
                 sessionService.deleteSession(session.getId());

@@ -6,9 +6,6 @@
 		<constructor-arg name="persistence" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
-		<constructor-arg name="defaultCommandProvider">
-			<bean class="org.bonitasoft.engine.command.api.impl.DefaultCommandProvider"/>
-		</constructor-arg>
 		<constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
@@ -24,5 +21,7 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="23" />
 	</bean>
+
+	<bean class="org.bonitasoft.engine.command.DefaultCommandProvider"/>
 
 </beans>
