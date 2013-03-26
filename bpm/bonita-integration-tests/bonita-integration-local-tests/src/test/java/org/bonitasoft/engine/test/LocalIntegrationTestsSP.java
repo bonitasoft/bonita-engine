@@ -10,6 +10,8 @@ package org.bonitasoft.engine.test;
 
 import java.sql.SQLException;
 
+import javax.naming.Context;
+
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.PlatformSession;
@@ -36,15 +38,13 @@ import com.bonitasoft.engine.api.PlatformAPIAccessor;
 })
 public class LocalIntegrationTestsSP {
 
-    static ConfigurableApplicationContext contextJNDI;
-    static Server server;
+    static ConfigurableApplicationContext springContext;
 
     @BeforeClass
     public static void beforeClass() throws BonitaException {
         System.err.println("=================== LocalIntegrationTestsSP.beforeClass()");
 
-        setupH2();
-        setupJNDI();
+        setupSpringContext();
 
         PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
@@ -64,31 +64,17 @@ public class LocalIntegrationTestsSP {
         platformAPI.deletePlaftorm();
         platformLoginAPI.logout(session);
 
-        shutdownJNDI();
-        shutdownH2();
+        closeSpringContext();
     }
 
-    private static void setupH2() throws BonitaException {
-        // start the TCP Server
-        try {
-            server = Server.createTcpServer(new String[] { "-tcpAllowOthers" }).start();
-        } catch (SQLException e) {
-            throw new BonitaException(e);
-        }
-    }
-    
-    private static void shutdownH2() {
-        server.stop();
-    }
-    
-    
-    private static void setupJNDI() {
-        System.setProperty("java.naming.factory.initial", "org.ow2.carol.jndi.spi.URLInitialContextFactory");
-        System.setProperty("java.naming.provider.url", "rmi://localhost:" + System.getProperty("jndi.carol.port", "1099"));
-        contextJNDI = new ClassPathXmlApplicationContext("jndi-setup.xml");
+    private static void setupSpringContext() {
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
+
+        springContext = new ClassPathXmlApplicationContext("datasource-c3p0.xml", "jndi-setup.xml");
     }
 
-    private static void shutdownJNDI() {
-        contextJNDI.close();
+    private static void closeSpringContext() {
+        springContext.close();
     }
 }

@@ -1,0 +1,98 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+">
+
+	<import resource="classpath:datasource-dependency-${sysprop.bonita.db.vendor}.xml" />
+
+	<context:property-placeholder location="classpath:jdbc-${sysprop.bonita.db.vendor}.properties" />
+
+	<!-- We need 2 datasources that target the same DB : -->
+	<!-- First datasource (bonitaDataSource) for the whole Bonita platform -->
+	<!-- Second datasource (bonitaSequenceManagerDataSource) for the SequenceManager implementation in order not to be stuck when we need some new ids -->
+
+	<bean id="bonitaDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close" depends-on="dataSourceDependency">
+
+		<property name="driverClass" value="${jdbc.driverClass}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.password}" />
+
+		<!--property name="acquireIncrement" value="toBeDefined" / --><!-- default:3 -->
+		<!--property name="acquireRetryAttempts" value="toBeDefined" / --><!-- default:30 -->
+		<property name="acquireRetryDelay" value="50" /><!-- default:1000 -->
+		<!--property name="autoCommitOnClose" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="automaticTestTable" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="breakAfterAcquireFailure" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="checkoutTimeout" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="connectionCustomizerClassName" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="connectionTesterClassName" value="toBeDefined" / --><!-- com.mchange.v2.c3p0.impl.DefaultConnectionTester -->
+		<!--property name="dataSourceName" value="toBeDefined" / --><!-- default:if configured with a named config, the config name, otherwise the pool's "identity token" -->
+		<!--property name="debugUnreturnedConnectionStackTraces" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="forceIgnoreUnresolvedTransactions" value="toBeDefined" / --><!-- default:false -->
+		<property name="idleConnectionTestPeriod" value="300" /><!-- default:0 -->
+		<!--property name="initialPoolSize" value="toBeDefined" / --><!-- default:3 -->
+		<!--property name="maxAdministrativeTaskTime" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="maxConnectionAge" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="maxIdleTime" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="maxIdleTimeExcessConnections" value="toBeDefined" / --><!-- default:0 -->
+		<property name="maxPoolSize" value="50" /><!-- default:15 -->
+		<!--property name="maxStatements" value="toBeDefined" / --><!-- default:0 -->
+		<property name="maxStatementsPerConnection" value="500" /><!-- default:0 -->
+		<property name="minPoolSize" value="3" /><!-- default:3 -->
+		<property name="numHelperThreads" value="20" /><!-- default:3 -->
+		<!--property name="overrideDefaultPassword" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="overrideDefaultUser" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="preferredTestQuery" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="propertyCycle" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="statementCacheNumDeferredCloseThreads" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="testConnectionOnCheckin" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="testConnectionOnCheckout" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="unreturnedConnectionTimeout" value="toBeDefined" / --><!-- default:0 -->
+	</bean>	
+
+	<!-- Create the datasource -->
+	<bean id="bonitaSequenceManagerDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" depends-on="dataSourceDependency">
+
+		<property name="driverClass" value="${jdbc.driverClass}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.password}" />
+
+		<!--property name="acquireIncrement" value="toBeDefined" / --><!-- default:3 -->
+		<!--property name="acquireRetryAttempts" value="toBeDefined" / --><!-- default:30 -->
+		<property name="acquireRetryDelay" value="50" /><!-- default:1000 -->
+		<!--property name="autoCommitOnClose" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="automaticTestTable" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="breakAfterAcquireFailure" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="checkoutTimeout" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="connectionCustomizerClassName" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="connectionTesterClassName" value="toBeDefined" / --><!-- com.mchange.v2.c3p0.impl.DefaultConnectionTester -->
+		<!--property name="dataSourceName" value="toBeDefined" / --><!-- default:if configured with a named config, the config name, otherwise the pool's "identity token" -->
+		<!--property name="debugUnreturnedConnectionStackTraces" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="forceIgnoreUnresolvedTransactions" value="toBeDefined" / --><!-- default:false -->
+		<property name="idleConnectionTestPeriod" value="300" /><!-- default:0 -->
+		<!--property name="initialPoolSize" value="toBeDefined" / --><!-- default:3 -->
+		<!--property name="maxAdministrativeTaskTime" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="maxConnectionAge" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="maxIdleTime" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="maxIdleTimeExcessConnections" value="toBeDefined" / --><!-- default:0 -->
+		<property name="maxPoolSize" value="3" /><!-- default:15 -->
+		<!--property name="maxStatements" value="toBeDefined" / --><!-- default:0 -->
+		<property name="maxStatementsPerConnection" value="500" /><!-- default:0 -->
+		<property name="minPoolSize" value="1" /><!-- default:3 -->
+		<property name="numHelperThreads" value="3" /><!-- default:3 -->
+		<!--property name="overrideDefaultPassword" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="overrideDefaultUser" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="preferredTestQuery" value="toBeDefined" / --><!-- default:null -->
+		<!--property name="propertyCycle" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="statementCacheNumDeferredCloseThreads" value="toBeDefined" / --><!-- default:0 -->
+		<!--property name="testConnectionOnCheckin" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="testConnectionOnCheckout" value="toBeDefined" / --><!-- default:false -->
+		<!--property name="unreturnedConnectionTimeout" value="toBeDefined" / --><!-- default:0 -->
+	</bean>
+
+</beans>

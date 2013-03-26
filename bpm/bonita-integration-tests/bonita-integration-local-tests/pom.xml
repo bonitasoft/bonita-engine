@@ -44,6 +44,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.18</version>
+            <scope>runtime</scope>
 		</dependency>
 		<dependency>
             <groupId>com.oracle</groupId>
@@ -56,12 +57,13 @@
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901.jdbc3</version>
+            <scope>runtime</scope>
 		</dependency>
 
 		<!-- Local JNDI implementation -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.jndi</groupId>
-			<artifactId>bonita-jndi-carol</artifactId>
+			<artifactId>bonita-jndi-memory</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

@@ -18,46 +18,15 @@
 
 	<!-- this datasource name is used by the engine to get connected to the database -->
 	<entry key="database.journal.datasource.name">java:comp/env/bonitaDS</entry>
-	<entry key="database.sequence.manager.datasource.name">java:comp/env/bonitaSequenceManagerDS</entry> 
+	<entry key="database.sequence.manager.datasource.name">java:comp/env/bonitaSequenceManagerDS</entry>
 
-	<!-- H2 configuration -->
-
-	<entry key="db.vendor">h2</entry>
-	<entry key="db.version">notspecified</entry>
-	<entry key="sql.delimiter">;</entry>
-	<entry key="hibernate.journal.dialect">org.bonitasoft.engine.persistence.dialect.MyH2Dialect</entry>
-
-	<!-- MySQL configuration -->
-
-	<!-- <entry key="db.vendor">mysql</entry> -->
-	<!-- <entry key="db.version">notspecified</entry> -->
-	<!-- <entry key="sql.delimiter">;</entry> -->
-	<!-- <entry key="hibernate.journal.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</entry> -->
-
-    <!-- PostgreSQL configuration -->
-    
-<!--     <entry key="db.vendor">postgres</entry> -->
-<!--     <entry key="db.version">notspecified</entry> -->
-<!--     <entry key="sql.delimiter">;</entry> -->
-<!--     <entry key="hibernate.journal.dialect">org.hibernate.dialect.PostgreSQLDialect</entry> -->
-
-    <!-- Oracle configuration -->
-
-<!--     <entry key="db.vendor">oracle</entry> -->
-<!--     <entry key="db.version">notspecified</entry> -->
-<!--     <entry key="sql.delimiter">;</entry> -->
-<!--     <entry key="hibernate.journal.dialect">org.hibernate.dialect.Oracle10gDialect</entry> -->
+	<!-- Try to inherit the property from the System properties -->
+	<entry key="db.vendor">${sysprop.bonita.db.vendor:h2}</entry>
 
 	<!-- Hibernate specific configurations -->
 	<entry key="hibernate.journal.show_sql">false</entry>
 	<entry key="hibernate.journal.format_sql">false</entry>
 	<entry key="hibernate.journal.use_sql_comments">false</entry>
-
-	<!-- Quartz configuration -->
-	<entry key="org.quartz.scheduler.skipUpdateCheck">true</entry>
-	<entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</entry>
-	<!-- Quartz/PostgreSQL configuration -->
-<!--     <entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.PostgreSQLDelegate</entry> -->
 
 	<entry key="org.bonitasoft.engine.archive.name">DEFINITIVE_0</entry>
 	<entry key="org.bonitasoft.engine.archive.oldestTime">1230739200052</entry>
