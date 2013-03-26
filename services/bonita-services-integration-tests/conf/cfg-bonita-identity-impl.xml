@@ -8,6 +8,9 @@
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="encrypter">
+        	<bean class="org.bonitasoft.engine.identity.impl.MD5CredentialsEncrypter" />
+        </constructor-arg>
 	</bean>
 
 </beans>

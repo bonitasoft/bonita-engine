@@ -17,6 +17,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserUpdateEventHandler;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
@@ -111,9 +112,9 @@ public class IdentityServiceUsingEventServiceTest {
         BusinessTransaction tx = txService.createTransaction();
         tx.begin();
         final String userName = "Zhang";
-        SUser user = builder.getUserBuilder().createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang")
-                .done();
-        identityService.createUser(user);
+        final SUserBuilder userBuilder = builder.getUserBuilder();
+        userBuilder.createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
+        SUser user = identityService.createUser(userBuilder.done());
         tx.complete();
 
         tx = txService.createTransaction();
@@ -138,9 +139,9 @@ public class IdentityServiceUsingEventServiceTest {
         tx.begin();
 
         final String userName = "Zhang";
-        SUser user = builder.getUserBuilder().createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang")
-                .done();
-        identityService.createUser(user);
+        final SUserBuilder userBuilder = builder.getUserBuilder();
+        userBuilder.createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
+        SUser user = identityService.createUser(userBuilder.done());
         tx.complete();
 
         tx = txService.createTransaction();
@@ -160,10 +161,9 @@ public class IdentityServiceUsingEventServiceTest {
     public void testUpdateUserWithoutPasswordChange() throws Exception {
         BusinessTransaction tx = txService.createTransaction();
         tx.begin();
-
-        SUser user = builder.getUserBuilder().createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User")
-                .done();
-        identityService.createUser(user);
+        final SUserBuilder userBuilder = builder.getUserBuilder();
+        userBuilder.createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User");
+        SUser user = identityService.createUser(userBuilder.done());
         tx.complete();
 
         tx = txService.createTransaction();

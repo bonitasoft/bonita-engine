@@ -35,8 +35,6 @@ public class ManualTasksTest extends CommonAPISPTest {
 
     private static final String JOHN = "john";
 
-    private User john;
-
     @After
     public void afterTest() throws BonitaException {
         deleteUser(JOHN);
@@ -47,9 +45,9 @@ public class ManualTasksTest extends CommonAPISPTest {
     @Before
     public void beforeTest() throws BonitaException {
         login();
-        john = createUser(JOHN, "bpm");
+        createUser(JOHN, "bpm");
         logout();
-        loginWith(john);
+        loginWith(JOHN, "bpm");
     }
 
     private ProcessDefinition deployProcessWithUserTask(final User user1) throws BonitaException, InvalidSessionException, ProcessDefinitionNotFoundException,
@@ -68,7 +66,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         final ActivityInstance task = waitForUserTask("Request", startProcess);
         final long taskId = task.getId();
         login();
-        loginWith(user);
+        loginWith("login1", "password");
         getProcessAPI().assignUserTask(taskId, user.getId());
 
         final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskId, "subtask", "MySubTask", user.getId(), "desk", new Date(),

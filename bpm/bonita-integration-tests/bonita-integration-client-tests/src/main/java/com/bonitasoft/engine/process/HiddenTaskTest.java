@@ -92,7 +92,7 @@ public class HiddenTaskTest extends CommonAPISPTest {
     private void logoutLogin(final User user) throws BonitaException {
         logout();
         if (user != null) {
-            loginWith(user.getUserName(), user.getPassword());
+            loginWith(user.getUserName(), "abc");
             checkNbOPendingTasks = new CheckNbPendingTasksForUserUsingSearch(getProcessAPI(), 50, 3000, true, 2, user.getId(),
                     new SearchOptionsBuilder(0, 100).done());
         } else {

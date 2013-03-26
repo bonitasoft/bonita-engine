@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.identity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -98,7 +99,7 @@ public class SPUserTest extends CommonAPISPTest {
         identityAPI.deleteUser(userName);
 
         assertEquals(userName, user.getUserName());
-        assertEquals(password, user.getPassword());
+        assertNotSame(password, user.getPassword());
         assertTrue(now.before(user.getLastConnection()));
 
         SPBPMTestUtil.destroyTenant(tenantId);

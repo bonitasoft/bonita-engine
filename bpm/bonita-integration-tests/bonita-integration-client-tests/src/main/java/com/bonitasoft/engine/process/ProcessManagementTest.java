@@ -272,7 +272,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
     @Test
     public void testExecuteTaskShouldCancelSubtasks() throws Exception {
         final String actor = "acting";
-        loginWith(john);
+        loginWith(JOHN_USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("testArchiveTaskShouldArchiveSubtasks", "1.0");
         final String userTaskName = "userTask";

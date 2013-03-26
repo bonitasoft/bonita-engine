@@ -238,15 +238,6 @@ public class APITestSPUtil {
         migrationAPI = TenantAPIAccessor.getMigrationAPI(session);
     }
 
-    protected void loginWith(final User user) throws BonitaException {
-        session = SPBPMTestUtil.loginOnDefaultTenant(user.getUserName(), user.getPassword());
-        identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-        processAPI = TenantAPIAccessor.getProcessAPI(session);
-        commandAPI = TenantAPIAccessor.getCommandAPI(session);
-        logAPI = TenantAPIAccessor.getLogAPI(session);
-        migrationAPI = TenantAPIAccessor.getMigrationAPI(session);
-    }
-
     protected void login() throws BonitaException {
         session = SPBPMTestUtil.loginOnDefaultTenant();
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
@@ -338,7 +329,7 @@ public class APITestSPUtil {
     protected User createUserAndLogin(final String userName, final String password) throws BonitaException {
         final User user = identityAPI.createUser(userName, password);
         logout();
-        loginWith(user);
+        loginWith(userName, password);
         return user;
     }
 
