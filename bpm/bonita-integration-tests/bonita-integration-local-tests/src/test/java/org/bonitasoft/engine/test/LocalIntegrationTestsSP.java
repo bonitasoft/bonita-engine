@@ -68,13 +68,20 @@ public class LocalIntegrationTestsSP {
     }
 
     private static void setupSpringContext() {
+        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+
+        // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
 
-        springContext = new ClassPathXmlApplicationContext("datasource-c3p0.xml", "jndi-setup.xml");
+        springContext = new ClassPathXmlApplicationContext("datasource.xml", "jndi-setup.xml");
     }
 
     private static void closeSpringContext() {
         springContext.close();
+    }
+
+    private static void setSystemPropertyIfNotSet(String property, String value) {
+        System.setProperty(property, System.getProperty(property, value));
     }
 }
