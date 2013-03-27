@@ -55,7 +55,6 @@ public class APIAccessorConnector extends AbstractConnector {
             setOutputParameter("profileAttributeMap", profileAttributeMap);
 
             getAPIAccessor().getProcessAPI().getNumberOfCategories();
-            getAPIAccessor().getMonitoringAPI().getNumberOfExecutingProcesses();
 
         } catch (final BonitaException e) {
             throw new ConnectorException(e);

@@ -10,7 +10,6 @@ package com.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.MonitoringAPI;
 
 /**
  * @author Matthieu Chaffotte
@@ -23,7 +22,6 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
     @Override
     ProcessAPI getProcessAPI();
 
-    @Override
     MonitoringAPI getMonitoringAPI();
 
     LogAPI getLogAPI();

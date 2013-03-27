@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -34,6 +35,7 @@ import org.bonitasoft.engine.api.impl.transaction.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.GetProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.RemoveActorPrivilegeById;
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
@@ -43,13 +45,19 @@ import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.bpm.model.privilege.ActorPrivilege;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.connector.ConnectorResult;
+import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
@@ -61,23 +69,34 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.exception.ActivityCreationException;
 import org.bonitasoft.engine.exception.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
+import org.bonitasoft.engine.exception.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.ActivityInterruptedException;
 import org.bonitasoft.engine.exception.ActivityNotFoundException;
+import org.bonitasoft.engine.exception.ArchivedActivityInstanceNotFoundException;
+import org.bonitasoft.engine.exception.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.DeletingEnabledProcessException;
+import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
@@ -85,9 +104,13 @@ import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.ProcessDeletionException;
+import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -98,6 +121,7 @@ import org.bonitasoft.engine.parameter.SOutOfBoundException;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.search.SearchActorPrivileges;
 import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -754,6 +778,378 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             return baos.toByteArray();
         } finally {
             zos.close();
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
+            throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, null, processInstanceId);
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
+            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws InvalidSessionException,
+            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, operations, processInstanceId);
+    }
+
+    private Map<String, Serializable> executeConnectorAtProcessInstantiationWithOtWithoutOperations(final String connectorDefinitionId,
+            final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
+            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
+            throws InvalidEvaluationConnectorCondition, InvalidSessionException, ConnectorException, ArchivedProcessInstanceNotFoundException,
+            ClassLoaderException, NotSerializableException {
+        checkConnectorParameters(connectorInputParameters, inputValues);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final SAProcessInstanceBuilder saProcessInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSAProcessInstanceBuilder();
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                SAProcessInstance saprocessInstance;
+    
+                saprocessInstance = processInstanceService.getArchivedProcessInstanceList(processInstanceId, persistenceService, 0, 1,
+                        saProcessInstanceBuilder.getIdKey(), OrderByType.ASC).get(0);
+                final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
+                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+    
+                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+                final SExpressionContext expcontext = new SExpressionContext();
+                expcontext.setContainerId(processInstanceId);
+                expcontext.setContainerType("PROCESS_INSTANCE");
+                expcontext.setProcessDefinitionId(processDefinitionId);
+                expcontext.setTime(saprocessInstance.getArchiveDate());
+                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+                if (operations != null) {
+                    // execute operations
+                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                } else {
+                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+                }
+            } catch (final SConnectorException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } catch (final SProcessInstanceReadException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ArchivedProcessInstanceNotFoundException(e);
+            } catch (final org.bonitasoft.engine.classloader.ClassLoaderException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ClassLoaderException(e);
+            } catch (final NotSerializableException e) {
+                transactionExecutor.setTransactionRollback();
+                throw e;
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new ConnectorException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
+            throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, null, activityInstanceId);
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
+            final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId) throws InvalidSessionException, ConnectorException,
+            NotSerializableException, ClassLoaderException, InvalidEvaluationConnectorCondition {
+        return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, operations, activityInstanceId);
+    }
+
+    /**
+     * execute the connector and return connector output if there is no operation or operation output if there is operation
+     */
+    private Map<String, Serializable> executeConnectorOnActivityInstanceWithOrWithoutOperations(final String connectorDefinitionId,
+            final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
+            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId)
+            throws InvalidSessionException, ConnectorException, NotSerializableException, ClassLoaderException, InvalidEvaluationConnectorCondition {
+        checkConnectorParameters(connectorInputParameters, inputValues);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
+                final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getRootContainerId());
+                final long processDefinitionId = processInstance.getProcessDefinitionId();
+                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+                final SExpressionContext expcontext = new SExpressionContext();
+                expcontext.setContainerId(activityInstanceId);
+                expcontext.setContainerType("ACTIVITY_INSTANCE");
+                expcontext.setProcessDefinitionId(processDefinitionId);
+                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+                if (operations != null) {
+                    // execute operations
+                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                } else {
+                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+                }
+            } catch (final SConnectorException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } catch (final NotSerializableException e) {
+                transactionExecutor.setTransactionRollback();
+                throw e;
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ClassLoaderException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new ConnectorException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
+            throws InvalidSessionException, ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException,
+            ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, null, activityInstanceId);
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
+            final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId) throws InvalidSessionException,
+            ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, operations, activityInstanceId);
+    }
+
+    private Map<String, Serializable> executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(final String connectorDefinitionId,
+            final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
+            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId)
+            throws InvalidEvaluationConnectorCondition, InvalidSessionException, ArchivedActivityInstanceNotFoundException, ClassLoaderException,
+            NotSerializableException, ConnectorException {
+        checkConnectorParameters(connectorInputParameters, inputValues);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                final SAActivityInstance aactivityInstance = activityInstanceService.getArchivedActivityInstance(activityInstanceId, persistenceService);
+                final long processInstanceId = aactivityInstance.getRootContainerId();
+                final SAProcessInstance processInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId, persistenceService);
+                final long processDefinitionId = processInstance.getProcessDefinitionId();
+                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+    
+                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+                final SExpressionContext expcontext = new SExpressionContext();
+                expcontext.setContainerId(activityInstanceId);
+                expcontext.setContainerType("ACTIVITY_INSTANCE");
+                expcontext.setProcessDefinitionId(processDefinitionId);
+                expcontext.setTime(aactivityInstance.getArchiveDate() + 500);
+                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+                if (operations != null) {
+                    // execute operations
+                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                } else {
+                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+                }
+            } catch (final SProcessInstanceReadException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ArchivedActivityInstanceNotFoundException(e);
+            } catch (final org.bonitasoft.engine.classloader.ClassLoaderException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ClassLoaderException(e);
+            } catch (final NotSerializableException e) {
+                transactionExecutor.setTransactionRollback();
+                throw e;
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new ConnectorException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
+            throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, null, processInstanceId);
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
+            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws InvalidSessionException,
+            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, operations, processInstanceId);
+    }
+
+    private Map<String, Serializable> executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(final String connectorDefinitionId,
+            final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
+            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
+            throws InvalidEvaluationConnectorCondition, InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException,
+            NotSerializableException, ConnectorException {
+        checkConnectorParameters(connectorInputParameters, inputValues);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                SAProcessInstance saprocessInstance;
+                saprocessInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId, persistenceService);
+                final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
+                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+    
+                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+                final SExpressionContext expcontext = new SExpressionContext();
+                expcontext.setContainerId(processInstanceId);
+                expcontext.setContainerType("PROCESS_INSTANCE");
+                expcontext.setProcessDefinitionId(processDefinitionId);
+                expcontext.setTime(saprocessInstance.getArchiveDate() + 500);
+                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+                if (operations != null) {
+                    // execute operations
+                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                } else {
+                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+                }
+            } catch (final SProcessInstanceReadException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ArchivedProcessInstanceNotFoundException(e);
+            } catch (final org.bonitasoft.engine.classloader.ClassLoaderException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ClassLoaderException(e);
+            } catch (final NotSerializableException e) {
+                transactionExecutor.setTransactionRollback();
+                throw e;
+            } catch (final SConnectorException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ClassLoaderException(e);
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new ConnectorException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
+            throws ClassLoaderException, InvalidSessionException, ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorCondition,
+            NotSerializableException {
+        return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, null, processInstanceId);
+    }
+
+    @Override
+    public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
+            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws ClassLoaderException, InvalidSessionException,
+            ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException {
+        return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                inputValues, operations, processInstanceId);
+    }
+
+    /**
+     * execute the connector and return connector output if there is no operation or operation output if there is operation
+     */
+    private Map<String, Serializable> executeConnectorOnProcessInstanceWithOrWithoutOperations(final String connectorDefinitionId,
+            final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
+            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
+            throws InvalidEvaluationConnectorCondition, InvalidSessionException, NotSerializableException, ClassLoaderException, ConnectorException {
+        checkConnectorParameters(connectorInputParameters, inputValues);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+                final long processDefinitionId = processInstance.getProcessDefinitionId();
+                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+                final SExpressionContext expcontext = new SExpressionContext();
+                expcontext.setContainerId(processInstanceId);
+                expcontext.setContainerType("PROCESS_INSTANCE");
+                expcontext.setProcessDefinitionId(processDefinitionId);
+                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+                if (operations != null) {
+                    // execute operations
+                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                } else {
+                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
+                }
+            } catch (final SConnectorException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } catch (final NotSerializableException e) {
+                transactionExecutor.setTransactionRollback();
+                throw e;
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ClassLoaderException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new ConnectorException(e);
         }
     }
 

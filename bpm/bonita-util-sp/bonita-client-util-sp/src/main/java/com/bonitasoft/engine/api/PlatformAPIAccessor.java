@@ -18,7 +18,6 @@ import org.bonitasoft.engine.api.EngineAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.api.PlatformMonitoringAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;

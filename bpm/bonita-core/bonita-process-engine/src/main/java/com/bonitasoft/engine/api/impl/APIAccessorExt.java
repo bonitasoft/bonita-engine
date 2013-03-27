@@ -10,14 +10,13 @@ package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.MonitoringAPI;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
-import org.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 
 /**

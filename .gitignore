@@ -574,3 +574,12 @@ bpm/bonita-deploy/bonita-deploy-war/target
 bpm/bonita-util-sp/bonita-common-util-sp/target
 bpm/bonita-util-sp/bonita-client-util-sp/target
 
+bpm/bonita-util-sp/bonita-client-util-sp/.classpath
+bpm/bonita-util-sp/bonita-client-util-sp/.project
+bpm/bonita-util-sp/bonita-client-util-sp/.settings
+bpm/bonita-util-sp/bonita-common-util-sp/.classpath
+bpm/bonita-util-sp/bonita-common-util-sp/.project
+bpm/bonita-util-sp/bonita-common-util-sp/.settings
+bpm/bonita-util-sp/.project
+bpm/bonita-util-sp/.settings
+

@@ -226,58 +226,12 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
         return messages;
     }
 
-    protected StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
-        final ActivityInstance task = waitForUserTask(taskName, processInstance);
-        return new StartProcessUntilStep(processInstance, task);
-    }
-
-    protected void waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception {
-        assignAndExecuteStep(waitForUserTask(taskName, processInstance), userId);
-    }
-
-    protected ActivityInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws Exception {
-        return waitForUserTask(50, 5000, taskName, processInstance);
-    }
-
-    @Override
-    protected ActivityInstance waitForUserTask(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance)
-            throws Exception {
-        final WaitForStep waitForStep1 = new WaitForStep(repeatEach, timeout, taskName, processInstance.getId(), TestStates.getReadyState(null));
-        assertTrue(waitForStep1.waitUntil());
-        return waitForStep1.getResult();
-    }
-
     protected ActivityInstance waitForTaskToFail(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
         final CheckNbOfActivities waitForStep1 = new CheckNbOfActivities(getProcessAPI(), repeatEach, timeout, false, processInstance, 1,
                 TestStates.getFailedState());
         assertTrue(waitForStep1.waitUntil());
         final ActivityInstance next = waitForStep1.getResult().iterator().next();
         return next;
-    }
-
-    protected ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception {
-        final CheckNbOfActivities waitForStep1 = new CheckNbOfActivities(getProcessAPI(), DEFAULT_REPEAT, DEFAULT_TIMEOUT, false, processInstance, 1,
-                TestStates.getFailedState());
-        assertTrue(waitForStep1.waitUntil());
-        final ActivityInstance next = waitForStep1.getResult().iterator().next();
-        return next;
-    }
-
-    protected void waitForProcessToFinish(final ProcessInstance processInstance) throws Exception {
-        final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(50, 5000, false, processInstance,
-                getProcessAPI());
-        assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
-    }
-
-    protected void waitForProcessToFinish(final ProcessInstance processInstance, final String state) throws Exception {
-        waitForProcessToFinish(50, 10000, processInstance, state);
-    }
-
-    protected void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
-        final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
-                processInstance, getProcessAPI(), state);
-        assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
     }
 
     protected void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws InvalidSessionException, SearchException {

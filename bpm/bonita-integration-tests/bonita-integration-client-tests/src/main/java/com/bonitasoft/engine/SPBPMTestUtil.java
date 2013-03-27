@@ -27,6 +27,7 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.ClientEventUtil;
 
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.PlatformAPI;
@@ -62,9 +63,15 @@ public class SPBPMTestUtil {
         platformAPI.startNode();
         defaultTenantId = platformAPI.getDefaultTenant().getId();
         logoutPlatform(session);
+        final APISession loginDefaultTenant = loginDefaultTenant();
+        ClientEventUtil.deployCommand(loginDefaultTenant);
+        logoutTenant(loginDefaultTenant);
     }
 
     public static void destroyPlatformAndTenants() throws BonitaException {
+        final APISession loginDefaultTenant = loginDefaultTenant();
+        ClientEventUtil.undeployCommand(loginDefaultTenant);
+        logoutTenant(loginDefaultTenant);
         final PlatformSession session = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         List<Tenant> tenants = null;

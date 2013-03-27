@@ -20,6 +20,9 @@ import com.bonitasoft.engine.external.ExternalCommandsTestSP;
 import com.bonitasoft.engine.external.SPProfileMemberCommandTest;
 import com.bonitasoft.engine.identity.SPIdentityTests;
 import com.bonitasoft.engine.log.LogTest;
+import com.bonitasoft.engine.migration.MigrationTest;
+import com.bonitasoft.engine.monitoring.MonitoringAPITest;
+import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 import com.bonitasoft.engine.process.ProcessTests;
 
@@ -35,7 +38,10 @@ import com.bonitasoft.engine.process.ProcessTests;
   MultiInstanceTest.class,
   ProcessTests.class,
   TimerBoundaryEventTest.class,
-  RemoteConnectorExecutionTestSP.class
+  RemoteConnectorExecutionTestSP.class,
+  PlatformMonitoringAPITest.class,
+  MonitoringAPITest.class,
+  MigrationTest.class
 })
 public class BPMSPTests {
 

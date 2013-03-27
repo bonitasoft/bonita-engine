@@ -10,20 +10,33 @@ package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.connector.Connector;
-import org.bonitasoft.engine.connectors.ConnectorExecutionTest;
+import org.bonitasoft.engine.core.operation.Operation;
+import org.bonitasoft.engine.core.operation.OperationBuilder;
+import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.connector.ConnectorExecutionTest;
 import com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -75,6 +88,57 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
             connectorExecutor.setTimeout(oldTimeout);
             sessionAccessor.deleteSessionId();
         }
+    }
+
+    @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-865")
+    @Test
+    public void testExecuteConnectorWithCustomOutputTypeWithCommands() throws Exception {
+        final String delivery = "Delivery men";
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
+        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addShortTextData("value", null);
+        designProcessDefinition.addUserTask("step1", delivery);
+        final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
+        final List<BarResource> resources = new ArrayList<BarResource>();
+        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithCustomType.impl", "TestConnectorWithCustomType.impl");
+        addResource(resources, "/org/bonitasoft/engine/connectors/connector-with-custom-type.bak", "connector-with-custom-type.jar");
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+        businessArchiveBuilder.addConnectorImplementation(resources.get(0));
+        businessArchiveBuilder.addClasspathResource(resources.get(1));
+        businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
+        addMappingOfActorsForUser(delivery, userId, processDefinition);
+        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance step1 = this.waitForUserTask("step1", process);
+        final Map<String, Expression> params = Collections.emptyMap();
+        final Map<String, Map<String, Serializable>> input = Collections.emptyMap();
+        final Map<String, Serializable> results = getProcessAPI().executeConnectorOnActivityInstance("connectorWithCustomType", "1.0.0", params, input,
+                step1.getId());
+
+        // execute command:
+        final String commandName = "getUpdatedVariableValuesForActivityInstance";
+        final HashMap<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>(1);
+        operations.put(
+                new OperationBuilder()
+                        .createNewInstance()
+                        .setLeftOperand("value", true)
+                        .setType(OperatorType.ASSIGNMENT)
+                        .setRightOperand(
+                                new ExpressionBuilder().createGroovyScriptExpression("script", "output.getValue()", String.class.getName(),
+                                        new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType"))).done(), results);
+        final HashMap<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+        commandParameters.put("OPERATIONS_WITH_CONTEXT_MAP_KEY", operations);
+        final HashMap<String, Serializable> currentvalues = new HashMap<String, Serializable>();
+        currentvalues.put("value", "test");
+        commandParameters.put("CURRENT_VARIABLE_VALUES_MAP_KEY", currentvalues);
+        commandParameters.put("ACTIVITY_INSTANCE_ID_KEY", step1.getId());
+        @SuppressWarnings("unchecked")
+        final Map<String, Serializable> updatedVariable = (Map<String, Serializable>) getCommandAPI().execute(commandName, commandParameters);
+        assertEquals("value", updatedVariable.get("value"));
+        designProcessDefinition.addUserTask("step1", delivery);
+
+        disableAndDelete(processDefinition);
     }
 
 }

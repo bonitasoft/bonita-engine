@@ -18,8 +18,6 @@ import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.EngineAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.MigrationAPI;
-import org.bonitasoft.engine.api.MonitoringAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
