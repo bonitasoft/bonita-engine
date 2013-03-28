@@ -118,8 +118,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = PlatformLoginException.class)
-    public void testWrongLogin() throws PlatformLogoutException, PlatformLoginException, InvalidSessionException, BonitaHomeNotSetException,
-            ServerAPIException, UnknownAPITypeException {
+    public void testWrongLogin() throws Exception {
         try {
             platformLoginAPI.logout(session);
             platformLoginAPI.login("titi", "toto");
@@ -130,8 +129,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = InvalidSessionException.class)
-    public void useAnAPIWithInvalidSession() throws PlatformLogoutException, PlatformLoginException, InvalidSessionException, PlatformNotStartedException,
-            BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public void useAnAPIWithInvalidSession() throws Exception {
         try {
             platformLoginAPI.logout(session);
             platformAPI.getTenants(0, 1000);
@@ -142,8 +140,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = PlatformLogoutException.class)
-    public void testLogoutWithWrongSession() throws PlatformLogoutException, PlatformLoginException, InvalidSessionException, BonitaHomeNotSetException,
-            ServerAPIException, UnknownAPITypeException {
+    public void testLogoutWithWrongSession() throws Exception {
         try {
             platformLoginAPI.logout(new PlatformSessionImpl(123l, null, -1l, null, -1l));
         } finally {
