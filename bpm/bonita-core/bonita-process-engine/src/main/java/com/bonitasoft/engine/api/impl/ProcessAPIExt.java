@@ -690,13 +690,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId,
                         SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
                 if (!connectorInstances.isEmpty()) {
-                    throw new ActivityExecutionFailedException("There is at least on connector in failed on onEnter of the activity: "
+                    throw new ActivityExecutionFailedException("There is at least one connector in failed on ON_ENTER of the activity: "
                             + connectorInstances.get(0).getName());
                 }
                 connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
                         ConnectorEvent.ON_FINISH, 0, 1, ConnectorState.FAILED.name());
                 if (!connectorInstances.isEmpty()) {
-                    throw new ActivityExecutionFailedException("There is at least on connector in failed on onFinish of the activity: "
+                    throw new ActivityExecutionFailedException("There is at least one connector in failed on ON_FINISH of the activity: "
                             + connectorInstances.get(0).getName());
                 }
                 // can change state and call execute
