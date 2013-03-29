@@ -29,7 +29,6 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
@@ -134,15 +133,17 @@ public class ActivityCommandExtTest extends CommonAPITest {
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
     public void testInstantiateProcessWithDataConversionOperation() throws Exception {
-        final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(this.getClass().getResourceAsStream("Pool2--1.0.bar"));
-        processDefinition = getProcessAPI().deploy(businessArchive);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final String myDdataName = "mon_entier_1";
+        final String actorName = "Employee";
+        final String userTaskName = "Étape1";
+        final ProcessDefinitionBuilder builder = deployProcessWithIntegerData(myDdataName, actorName, userTaskName);
+
+        processDefinition = deployAndEnableWithActor(builder.done(), actorName, businessUser);
 
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         // final Map<String, Map<String, Serializable>> inputValues = new HashMap<String, Map<String, Serializable>>();
         final HashMap<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>();
         final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        final String myDdataName = "mon_entier_1";
         final String fieldName = "field_entier";
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(myDdataName).done();
         final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("int_conversion_script", "Integer.parseInt(" + fieldName + ")",
@@ -161,7 +162,18 @@ public class ActivityCommandExtTest extends CommonAPITest {
         assertTrue("processInstanceId should be > 0", processInstanceId > 0);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(myDdataName, processInstanceId);
         assertEquals(Integer.parseInt(enteredValue), ((Integer) dataInstance.getValue()).intValue());
-        waitForUserTask("Étape1", getProcessAPI().getProcessInstance(processInstanceId));
+        waitForUserTask(userTaskName, getProcessAPI().getProcessInstance(processInstanceId));
+    }
+
+    private ProcessDefinitionBuilder deployProcessWithIntegerData(final String myDdataName, final String actorName, final String userTaskName) {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Pool2", "1.0");
+        builder.addIntegerData(myDdataName, null);
+        builder.addActor(actorName, true);
+        builder.addStartEvent("Début1");
+        builder.addUserTask(userTaskName, actorName);
+        builder.addEndEvent("Fin1");
+        builder.addTransition("Début1", userTaskName);
+        return builder;
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
