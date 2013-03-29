@@ -11,6 +11,7 @@ package com.bonitasoft.engine.process;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
@@ -24,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
@@ -49,7 +48,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.process.ProcessManagementTest;
-import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -88,7 +86,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final int numberOfParamters = getProcessAPI().getNumberOfParameterInstances(definition.getId());
-        Assert.assertEquals(0, numberOfParamters);
+        assertEquals(0, numberOfParamters);
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -104,7 +102,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final int numberOfParamters = getProcessAPI().getNumberOfParameterInstances(definition.getId());
-        Assert.assertEquals(4, numberOfParamters);
+        assertEquals(4, numberOfParamters);
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -124,7 +122,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_DESC);
-        Assert.assertEquals(0, parameters.size());
+        assertEquals(0, parameters.size());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -145,13 +143,13 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_ASC);
-        Assert.assertEquals(2, parameters.size());
+        assertEquals(2, parameters.size());
         final ParameterInstance firstParameter = parameters.get(0);
-        Assert.assertEquals("key.2", firstParameter.getName());
-        Assert.assertEquals("bos", firstParameter.getValue());
+        assertEquals("key.2", firstParameter.getName());
+        assertEquals("bos", firstParameter.getValue());
         final ParameterInstance secondParameter = parameters.get(1);
-        Assert.assertEquals("key1", secondParameter.getName());
-        Assert.assertEquals("engine", secondParameter.getValue());
+        assertEquals("key1", secondParameter.getName());
+        assertEquals("engine", secondParameter.getValue());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -174,9 +172,9 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final ParameterInstance parameter = getProcessAPI().getParameterInstance(definition.getId(), parameterName);
-        Assert.assertEquals(parameterName, parameter.getName());
-        Assert.assertEquals(parameterValue, parameter.getValue());
-        Assert.assertEquals("Parameter description", parameter.getDescription());
+        assertEquals(parameterName, parameter.getName());
+        assertEquals(parameterValue, parameter.getValue());
+        assertEquals("Parameter description", parameter.getDescription());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -247,10 +245,10 @@ public class ProcessParameterTest extends CommonAPISPTest {
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "key.2", "bee");
 
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_ASC);
-        Assert.assertEquals(2, parameters.size());
+        assertEquals(2, parameters.size());
         final ParameterInstance firstParameter = parameters.get(0);
-        Assert.assertEquals("key.2", firstParameter.getName());
-        Assert.assertEquals("bee", firstParameter.getValue());
+        assertEquals("key.2", firstParameter.getName());
+        assertEquals("bee", firstParameter.getValue());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -289,10 +287,10 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "sleepy");
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().deleteProcess(definition.getId());
     }
 
@@ -308,7 +306,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "sleepy");
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().deleteProcess(definition.getId());
     }
 
@@ -335,11 +333,11 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_ASC);
-        Assert.assertEquals(4, parameters.size());
-        Assert.assertEquals("bear", parameters.get(0).getName());
-        Assert.assertEquals("bee", parameters.get(1).getName());
-        Assert.assertEquals("donkey", parameters.get(2).getName());
-        Assert.assertEquals("squirrel", parameters.get(3).getName());
+        assertEquals(4, parameters.size());
+        assertEquals("bear", parameters.get(0).getName());
+        assertEquals("bee", parameters.get(1).getName());
+        assertEquals("donkey", parameters.get(2).getName());
+        assertEquals("squirrel", parameters.get(3).getName());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -362,11 +360,11 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_DESC);
-        Assert.assertEquals(4, parameters.size());
-        Assert.assertEquals("squirrel", parameters.get(0).getName());
-        Assert.assertEquals("donkey", parameters.get(1).getName());
-        Assert.assertEquals("bee", parameters.get(2).getName());
-        Assert.assertEquals("bear", parameters.get(3).getName());
+        assertEquals(4, parameters.size());
+        assertEquals("squirrel", parameters.get(0).getName());
+        assertEquals("donkey", parameters.get(1).getName());
+        assertEquals("bee", parameters.get(2).getName());
+        assertEquals("bear", parameters.get(3).getName());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -389,9 +387,9 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 2, ParameterSorting.NAME_DESC);
-        Assert.assertEquals(2, parameters.size());
-        Assert.assertEquals("squirrel", parameters.get(0).getName());
-        Assert.assertEquals("donkey", parameters.get(1).getName());
+        assertEquals(2, parameters.size());
+        assertEquals("squirrel", parameters.get(0).getName());
+        assertEquals("donkey", parameters.get(1).getName());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -414,9 +412,9 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 1, 2, ParameterSorting.NAME_DESC);
-        Assert.assertEquals(2, parameters.size());
-        Assert.assertEquals("bee", parameters.get(0).getName());
-        Assert.assertEquals("bear", parameters.get(1).getName());
+        assertEquals(2, parameters.size());
+        assertEquals("bee", parameters.get(0).getName());
+        assertEquals("bear", parameters.get(1).getName());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -447,14 +445,14 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void unresolvedDependencies() throws Exception {
-        final long processId = createProcessWithUnresolvedParametersAnhdDeployIt();
+        final long processId = createProcessWithUnresolvedParametersAndDeployIt();
         new ExecutionInSession() {
 
             @Override
             public void run() throws Exception {
                 try {
                     final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processId);
-                    Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), processDeploymentInfo.getConfigurationState());
+                    assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
                 } finally {
                     getProcessAPI().deleteProcess(processId);
                 }
@@ -463,7 +461,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     }
 
-    private long createProcessWithUnresolvedParametersAnhdDeployIt() throws BonitaException {
+    private long createProcessWithUnresolvedParametersAndDeployIt() throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
@@ -479,6 +477,24 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         return definition.getId();
+    }
+
+    @Test
+    public void emptyParameterIsAValidValue() throws BonitaException {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("emptyParameterIsAValidValue", "1.7");
+        processBuilder.addParameter("Astronaut", String.class.getCanonicalName()).addUserTask("userTask1", null);
+        final DesignProcessDefinition processDefinition = processBuilder.done();
+        final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
+        businessArchive.setProcessDefinition(processDefinition);
+        final Map<String, String> params = new HashMap<String, String>(1);
+        params.put("Astronaut", "");
+        businessArchive.setParameters(params);
+
+        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
+
+        getProcessAPI().deleteProcess(definition.getId());
     }
 
     @Test
@@ -499,7 +515,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -547,17 +563,17 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_DESC);
-        Assert.assertEquals(2, parameters.size());
+        assertEquals(2, parameters.size());
         final ParameterInstance parameter1 = parameters.get(0);
-        Assert.assertEquals("bee", parameter1.getName());
-        Assert.assertEquals("busy", parameter1.getValue());
-        Assert.assertEquals("description", parameter1.getDescription());
-        Assert.assertEquals(String.class.getCanonicalName(), parameter1.getType());
+        assertEquals("bee", parameter1.getName());
+        assertEquals("busy", parameter1.getValue());
+        assertEquals("description", parameter1.getDescription());
+        assertEquals(String.class.getCanonicalName(), parameter1.getType());
         final ParameterInstance parameter2 = parameters.get(1);
-        Assert.assertEquals("bear", parameter2.getName());
-        Assert.assertNull(parameter2.getValue());
-        Assert.assertNull(parameter2.getDescription());
-        Assert.assertEquals(String.class.getCanonicalName(), parameter2.getType());
+        assertEquals("bear", parameter2.getName());
+        assertNull(parameter2.getValue());
+        assertNull(parameter2.getDescription());
+        assertEquals(String.class.getCanonicalName(), parameter2.getType());
         getProcessAPI().deleteProcess(definition.getId());
     }
 
