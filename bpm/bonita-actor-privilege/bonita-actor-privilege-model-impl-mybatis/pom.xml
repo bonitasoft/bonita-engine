@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-actor-privilege</artifactId>
 		<groupId>com.bonitasoft.engine.actor.privilege</groupId>
-		<version>6.0.0-beta-016-SNAPSHOT</version>
+		<version>6.0.0-beta-016</version>
 	</parent>
 
 	<artifactId>bonita-actor-privilege-model-impl-mybatis</artifactId>
