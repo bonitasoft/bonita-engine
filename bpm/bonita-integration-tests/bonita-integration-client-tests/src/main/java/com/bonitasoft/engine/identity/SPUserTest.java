@@ -50,14 +50,6 @@ public class SPUserTest extends CommonAPISPTest {
     }
 
     @Test(expected = LoginException.class)
-    public void loginFailsUsingWrongPassword() throws BonitaException, BonitaHomeNotSetException {
-        final String userName = "install";
-        final String password = "suomi";
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        loginAPI.login(1, userName, password);
-    }
-
-    @Test(expected = LoginException.class)
     public void loginFailsDueToTenantDeactivation() throws BonitaException {
         final long tenantId = SPBPMTestUtil.constructTenant("suomi", "iconName", "iconPath", "hannu", "malminkartano");
         SPBPMTestUtil.deactivateTenant(tenantId);
