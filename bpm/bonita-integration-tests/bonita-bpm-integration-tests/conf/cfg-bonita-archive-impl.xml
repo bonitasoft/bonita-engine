@@ -12,6 +12,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="true" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="true" />

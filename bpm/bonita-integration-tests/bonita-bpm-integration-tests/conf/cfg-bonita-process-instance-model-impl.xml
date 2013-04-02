@@ -56,6 +56,9 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl">
 					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
 				</entry>
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl">
+					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
+				</entry>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl">
 					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
 				</entry>

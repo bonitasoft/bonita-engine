@@ -156,6 +156,7 @@
         <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" />
+        <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
