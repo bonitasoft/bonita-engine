@@ -15,6 +15,7 @@ import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 
 /**
@@ -34,7 +35,11 @@ public class SetConnectorInstancesState implements TransactionContent {
     @Override
     public void execute() throws SBonitaException {
         for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-            final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connEntry.getKey());
+            final Long connectorInstanceId = connEntry.getKey();
+            final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
+            if (connectorInstance == null) {
+                throw new SConnectorException("Connector instance not found with id " + connectorInstanceId);
+            }
             final ConnectorStateReset state = connEntry.getValue();
             connectorInstanceService.setState(connectorInstance, state.name());
         }

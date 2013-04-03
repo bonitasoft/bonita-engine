@@ -20,6 +20,7 @@
 				<ref bean="listExpressionExecutorStrategy" />
 				<ref bean="conditionExpressionExecutorStrategy" />
 				<ref bean="parameterExpressionExecutorStrategy" />
+				<ref bean="xPathReadExpressionExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
@@ -34,6 +35,8 @@
 	<bean id="inputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
 
 	<bean id="patternExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.PatternExpressionExecutorStrategy" />
+
+	<bean id="xPathReadExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.XPathReadExpressionExecutorStrategy" />
 
 	<bean id="engineConstantExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" >
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />

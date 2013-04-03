@@ -18,6 +18,8 @@
 
 	<bean id="patternExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.PatternExpressionExecutorStrategy" />
 
+	<bean id="xPathReadExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.XPathReadExpressionExecutorStrategy" />
+
 	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
 
 	<bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy" />

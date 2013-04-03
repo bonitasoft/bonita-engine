@@ -163,15 +163,15 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteProcess(final long processDefinitionUUID) throws InvalidSessionException, ProcessDefinitionNotFoundException, ProcessDeletionException,
+    public void deleteProcess(final long processDefinitionId) throws InvalidSessionException, ProcessDefinitionNotFoundException, ProcessDeletionException,
             DeletingEnabledProcessException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            deleteProcessInstancesFromProcessDefinition(processDefinitionUUID, tenantAccessor);
-            final SProcessDefinition serverProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionUUID, processDefinitionService);
+            deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
+            final SProcessDefinition serverProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final DeleteProcess deleteProcess = new DeleteProcess(processDefinitionService, serverProcessDefinition, processInstanceService,
                     tenantAccessor.getArchiveService(), tenantAccessor.getCommentService(), tenantAccessor.getBPMInstanceBuilders(), actorMappingService);
@@ -610,36 +610,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws InvalidSessionException, ObjectReadException,
-            ObjectNotFoundException, ObjectModificationException {
-        if (!Manager.isFeatureActive(Features.SET_CONNECTOR_STATE)) {
-            throw new IllegalStateException("Set a connector state is not an active feature");
-        }
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
-                if (connectorInstance == null) {
-                    throw new ObjectNotFoundException("connector instance with id " + connectorInstanceId, ConnectorInstance.class);
-                }
-                connectorInstanceService.setState(connectorInstance, state.name());
-            } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e, ConnectorInstance.class);
-            } catch (final SConnectorInstanceModificationException e) {
-                throw new ObjectModificationException(e, ConnectorInstance.class);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
-            throw new ObjectReadException(e, ConnectorInstance.class);
-        }
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws InvalidSessionException, ConnectorException {
+        Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
+        connectorsToReset.put(connectorInstanceId, state);
+        setConnectorInstanceState(connectorsToReset);
     }
 
     @Override
-    public void resetConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException {
+    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException {
         if (!Manager.isFeatureActive(Features.SET_CONNECTOR_STATE)) {
             throw new IllegalStateException("Set a connector state is not an active feature");
         }
@@ -818,12 +796,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 SAProcessInstance saprocessInstance;
-    
+
                 saprocessInstance = processInstanceService.getArchivedProcessInstanceList(processInstanceId, persistenceService, 0, 1,
                         saProcessInstanceBuilder.getIdKey(), OrderByType.ASC).get(0);
                 final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
                 final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
-    
+
                 final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
                 final SExpressionContext expcontext = new SExpressionContext();
                 expcontext.setContainerId(processInstanceId);
@@ -973,7 +951,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 final SAProcessInstance processInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId, persistenceService);
                 final long processDefinitionId = processInstance.getProcessDefinitionId();
                 final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
-    
+
                 final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
                 final SExpressionContext expcontext = new SExpressionContext();
                 expcontext.setContainerId(activityInstanceId);
@@ -1047,7 +1025,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 saprocessInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId, persistenceService);
                 final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
                 final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
-    
+
                 final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
                 final SExpressionContext expcontext = new SExpressionContext();
                 expcontext.setContainerId(processInstanceId);

@@ -259,20 +259,19 @@ public class LogTest extends CommonAPISPTest {
 
     @Test
     public void testSearchLogsWithAllSearchTerm() throws Exception {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
+        builder.searchTerm("Adding");
+        builder.sort(LogSearchDescriptor.ACTION_TYPE, Order.ASC);
+        SearchResult<Log> searchLogs = getLogAPI().searchLogs(builder.done());
+        final long initialCount = searchLogs.getCount();
 
         final User user1 = getIdentityAPI().createUser("user1SearchTerm", "bpm");
         getIdentityAPI().deleteUser(user1.getId());
         final User user2 = getIdentityAPI().createUser("user2SearchTerm", "bpm");
         getIdentityAPI().deleteUser(user2.getId());
 
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
-        builder.searchTerm("Adding");
-
-        builder.sort(LogSearchDescriptor.ACTION_TYPE, Order.ASC);
-        final SearchResult<Log> searchLogs = getLogAPI().searchLogs(builder.done());
-
-        assertTrue(searchLogs.getCount() > 0);
-        assertEquals("IDENTITY_USER_CREATED", searchLogs.getResult().get(0).getActionType());
+        searchLogs = getLogAPI().searchLogs(builder.done());
+        assertEquals(initialCount + 2, searchLogs.getCount());
     }
 
     @Test(expected = BonitaRuntimeException.class)
