@@ -89,7 +89,6 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
-                updateActivityInstanceVariables(operationsMap, sActivityInstanceID, processDefinitionID);
                 executeConnectors(sActivityInstanceID, connectorsMap, operationsMap);
                 updateActivityInstanceVariables(operationsMap, sActivityInstanceID, processDefinitionID);
             } finally {

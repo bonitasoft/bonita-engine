@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,8 +67,13 @@ import com.bonitasoft.engine.api.ProcessAPI;
 /**
  * @author Ruiheng Fan
  * @author Celine Souchet
+ * @author Elias Ricken de Medeiros
  */
 public class ActivityCommandExtTest extends CommonAPITest {
+
+    private static final String OPERATIONS_MAP_KEY = "OPERATIONS_MAP_KEY";
+
+    private static final String ACTIVITY_INSTANCE_ID_KEY = "ACTIVITY_INSTANCE_ID_KEY";
 
     private final String COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT = "executeActionsAndTerminateExt";
 
@@ -81,15 +87,17 @@ public class ActivityCommandExtTest extends CommonAPITest {
 
     protected User businessUser;
 
-    final String dataName = "var1";
+    private final String dataName = "var1";
 
-    final String dataName2 = "var2";
+    private final String dataName2 = "var2";
 
-    final String dataName3 = "var3";
+    private final String dataName3 = "var3";
 
-    final String inputName = "input1";
+    private final String intDataName = "intVar";
 
-    final String delivery = "Delivery men";
+    private final String inputName = "input1";
+
+    private final String delivery = "Delivery men";
 
     @Before
     public void before() throws Exception {
@@ -124,6 +132,7 @@ public class ActivityCommandExtTest extends CommonAPITest {
         designProcessDefinition.addShortTextData(dataName, defaultExpression);
         designProcessDefinition.addBooleanData(dataName2, new ExpressionBuilder().createConstantBooleanExpression(false));
         designProcessDefinition.addShortTextData(dataName3, defaultExpression);
+        designProcessDefinition.addIntegerData(intDataName, new ExpressionBuilder().createConstantIntegerExpression(0));
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
         designProcessDefinition.addTransition("step1", "step2");
@@ -156,7 +165,7 @@ public class ActivityCommandExtTest extends CommonAPITest {
         operations.put(operation, contexts);
         parameters.put("CONNECTORS_MAP_KEY", new HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>>(0));
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDefinition.getId());
-        parameters.put("OPERATIONS_MAP_KEY", operations);
+        parameters.put(OPERATIONS_MAP_KEY, operations);
         parameters.put("USER_ID_KEY", businessUser.getId());
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
         assertTrue("processInstanceId should be > 0", processInstanceId > 0);
@@ -225,7 +234,7 @@ public class ActivityCommandExtTest extends CommonAPITest {
         operations.put(integerOperation, contexts);
         parameters.put("CONNECTORS_MAP_KEY", connectors);
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDefinition.getId());
-        parameters.put("OPERATIONS_MAP_KEY", operations);
+        parameters.put(OPERATIONS_MAP_KEY, operations);
         parameters.put("USER_ID_KEY", firstUser.getId());
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
 
@@ -304,8 +313,8 @@ public class ActivityCommandExtTest extends CommonAPITest {
         final HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectors = new HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>>();
         connectors.put(connectDefinition, inputValues);
         parameters.put("CONNECTORS_MAP_KEY", connectors);
-        parameters.put("ACTIVITY_INSTANCE_ID_KEY", taskId);
-        parameters.put("OPERATIONS_MAP_KEY", (Serializable) operationsMap);
+        parameters.put(ACTIVITY_INSTANCE_ID_KEY, taskId);
+        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
         assertTrue("no pending user task instances are found", new WaitUntil(50, 1000) {
@@ -325,6 +334,39 @@ public class ActivityCommandExtTest extends CommonAPITest {
         assertTrue(Boolean.valueOf(dataInstance2.getValue().toString()));
         final DataInstance dataInstance3 = getProcessAPI().getProcessDataInstance(dataName3, processInstanceId);
         assertEquals(resContent, dataInstance3.getValue().toString());
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndTerminateTaskExt" }, jira = "ENGINE-1053")
+    @Test
+    public void testExecuteActionsAndTerminateDataExpression() throws Exception {
+        // deploy and start a process containing a integer data
+        createAndDeployProcess2();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        // wait for the user task and assign it
+        final ActivityInstance userTask = waitForUserTask("step1", processInstance.getId());
+        getProcessAPI().assignUserTask(userTask.getId(), getSession().getUserId());
+
+        // create operation to increment the variable
+        final Expression dataExpression = new ExpressionBuilder().createDataExpression(intDataName, Integer.class.getName());
+        final Expression rightOperand = new ExpressionBuilder().createGroovyScriptExpression("increment", intDataName + " + 1;", Integer.class.getName(),
+                Collections.singletonList(dataExpression));
+
+        final Operation operation = createOperation(intDataName, OperatorType.ASSIGNMENT, "=", rightOperand);
+        final Map<Operation, Map<String, Serializable>> operationsMap = new HashMap<Operation, Map<String, Serializable>>();
+        operationsMap.put(operation, Collections.<String, Serializable> emptyMap());
+
+        // execute the command
+        final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(ACTIVITY_INSTANCE_ID_KEY, userTask.getId());
+        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
+
+        getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
+
+        // check that the variable was incremented
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(intDataName, processInstance.getId());
+        assertEquals(1, dataInstance.getValue());
+
     }
 
     // Connector in Form: for Input parameter, try type_input for ExpressionType.TYPE_INPUT
@@ -368,8 +410,8 @@ public class ActivityCommandExtTest extends CommonAPITest {
         final HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectors = new HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>>();
         connectors.put(connectDefinition, inputValues);
         parameters.put("CONNECTORS_MAP_KEY", connectors);
-        parameters.put("ACTIVITY_INSTANCE_ID_KEY", taskId);
-        parameters.put("OPERATIONS_MAP_KEY", (Serializable) operationsMap);
+        parameters.put(ACTIVITY_INSTANCE_ID_KEY, taskId);
+        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
         assertTrue("no pending user task instances are found", new WaitUntil(50, 1000) {
@@ -504,8 +546,8 @@ public class ActivityCommandExtTest extends CommonAPITest {
         final Map<Operation, Map<String, Serializable>> operationsMap = new HashMap<Operation, Map<String, Serializable>>();
         operationsMap.put(operation, fieldValues);
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("ACTIVITY_INSTANCE_ID_KEY", taskId);
-        parameters.put("OPERATIONS_MAP_KEY", (Serializable) operationsMap);
+        parameters.put(ACTIVITY_INSTANCE_ID_KEY, taskId);
+        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
 
         // just check the operation is executed normally
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
