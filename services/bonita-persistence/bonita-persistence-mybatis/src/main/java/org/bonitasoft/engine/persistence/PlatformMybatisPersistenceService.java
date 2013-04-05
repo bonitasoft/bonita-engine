@@ -24,9 +24,11 @@ public class PlatformMybatisPersistenceService extends AbstractMybatisPersistenc
 
     public PlatformMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final PlatformMyBatisConfigurationsProvider configurations,
-            final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final TechnicalLoggerService technicalLoggerService,
+            final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
+            final TechnicalLoggerService technicalLoggerService,
             final SequenceManager sequenceManager) throws SPersistenceException {
         super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
+                likeEscapeCharacter,
                 technicalLoggerService, sequenceManager);
     }
 

@@ -33,8 +33,10 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
     public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final ReadSessionAccessor sessionAccessor, final boolean cacheEnabled, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
             final MyBatisConfigurationsProvider configurations, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
+            final String likeEscapeCharacter,
             final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager) throws SPersistenceException {
         super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
+                likeEscapeCharacter,
                 technicalLoggerService, sequenceManager);
         this.sessionAccessor = sessionAccessor;
     }

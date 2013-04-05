@@ -10,6 +10,7 @@
 		<constructor-arg name="configurations" ref="platformMyBatisConfigurations" />
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
+		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 	</bean>
@@ -24,6 +25,7 @@
 		<constructor-arg name="configurations" ref="myBatisConfigurations" />
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
+		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 	</bean>

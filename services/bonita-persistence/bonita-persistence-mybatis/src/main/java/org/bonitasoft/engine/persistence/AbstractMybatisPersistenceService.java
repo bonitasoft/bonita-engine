@@ -76,9 +76,10 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final AbstractMyBatisConfigurationsProvider configurations,
-            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final TechnicalLoggerService technicalLoggerService,
+            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
+            final TechnicalLoggerService technicalLoggerService,
             final SequenceManager sequenceManager) throws SPersistenceException {
-        super(name, tenantConfigurationsProvider, statementDelimiter, sequenceManager);
+        super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager);
         this.dbIdentifier = dbIdentifier;
         this.txService = txService;
         this.cacheEnabled = cacheEnabled;
@@ -621,7 +622,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
                     final String currentField = fieldIterator.next();
                     while (termIterator.hasNext()) {
                         final String currentTerm = termIterator.next();
-                        builder.append(currentField).append(" LIKE '").append(currentTerm).append('\'');
+                        builder.append(currentField).append(getLikeEscapeClause(currentTerm));
                         if (termIterator.hasNext() || fieldIterator.hasNext()) {
                             builder.append(" OR ");
                         }
