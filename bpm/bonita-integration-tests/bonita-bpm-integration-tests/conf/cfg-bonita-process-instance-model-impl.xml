@@ -14,10 +14,10 @@
 		<property name="sqlTransformers">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceSQLTransformer"></bean>
+					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceSQLTransformer" />
 				</entry>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceSQLTransformer"></bean>
+					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceSQLTransformer" />
 				</entry>
 			</map>
 		</property>

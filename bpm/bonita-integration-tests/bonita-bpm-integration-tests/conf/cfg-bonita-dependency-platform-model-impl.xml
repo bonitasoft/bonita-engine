@@ -8,7 +8,7 @@
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/dependency-platform/model/impl/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/dependency-platform/model/impl/db/${db.vendor}-cleanTables.sql" />
 		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/dependency-platform/model/impl/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="platform"/>
+		<constructor-arg name="filter" value="platform" />
 	</bean>
 
 </beans>

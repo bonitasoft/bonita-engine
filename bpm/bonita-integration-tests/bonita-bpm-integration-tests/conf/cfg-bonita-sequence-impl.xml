@@ -63,7 +63,7 @@
 				<entry key="20040" value="100" /><!-- SADocumentMapping -->
 			</map>
 		</constructor-arg>
-		<constructor-arg name="defaultRangeSize" value="100"></constructor-arg>
+		<constructor-arg name="defaultRangeSize" value="100" />
 		<constructor-arg name="sequencesMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.persistence.model.Human" value="1000" />
@@ -190,6 +190,5 @@
 		<constructor-arg name="delay" value="5" />
 		<constructor-arg name="delayFactor" value="2" />
 	</bean>
-
 
 </beans>

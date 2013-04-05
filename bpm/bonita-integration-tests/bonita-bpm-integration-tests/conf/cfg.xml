@@ -5,16 +5,9 @@
 		<property name="locations">
 			<array>
 				<value>file:${bonita.services.folder}/bonita-platform.xml</value>
-				<value>file:${bonita.services.folder}/db-common.properties</value>
-				<value>file:${bonita.services.folder}/${bonita.test.db.vendor:h2}.properties</value>
-				<value>file:${bonita.services.folder}/quartz-${bonita.test.db.vendor:h2}.properties</value>
+				<value>file:${bonita.services.folder}/jdbc-${bonita.test.db.vendor}.xml</value>
 			</array>
 		</property>
-	</bean>
-
-	<bean id="transactionService" class="org.bonitasoft.engine.transaction.TransactionServiceImpl" scope="singleton">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
 	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
@@ -25,14 +18,14 @@
 
 	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
@@ -247,5 +240,5 @@
 			</list>
 		</constructor-arg>
 	</bean>
-    
+
 </beans>

@@ -15,7 +15,6 @@
 		</property>
 	</bean>
 
-
 	<bean id="db-bonita-instance-migration-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/migration/model/impl/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/migration/model/impl/db/${db.vendor}-initTables.sql" />
@@ -25,4 +24,5 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/migration/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="24"/>
 	</bean>
+
 </beans>

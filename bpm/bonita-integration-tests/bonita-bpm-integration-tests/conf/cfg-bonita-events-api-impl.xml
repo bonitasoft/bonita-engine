@@ -3,7 +3,7 @@
 
 	<bean id="eventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
 		<constructor-arg name="eventBuilders" ref="eventBuilders" />
-		<constructor-arg name="logger" ref="technicalLoggerService"/>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 </beans>

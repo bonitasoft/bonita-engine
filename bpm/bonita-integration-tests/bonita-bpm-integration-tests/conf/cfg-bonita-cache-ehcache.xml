@@ -14,10 +14,10 @@
 	</bean>
 	
 	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-		<constructor-arg name="timeToLiveSeconds" value="3600"/>
-		<constructor-arg name="maxElementsInMemory" value="10000"/>
-		<constructor-arg name="maxElementsOnDisk" value="20000"/>
-		<constructor-arg name="inMemoryOnly" value="true"/>
+		<constructor-arg name="timeToLiveSeconds" value="3600" />
+		<constructor-arg name="maxElementsInMemory" value="10000" />
+		<constructor-arg name="maxElementsOnDisk" value="20000" />
+		<constructor-arg name="inMemoryOnly" value="true" />
 	</bean>
 
 </beans>

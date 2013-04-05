@@ -1,43 +1,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="quartzDbInitializer" class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
-		<property name="dataSource">
-			<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-				<property name="driverClassName" value="${database.journal.connection.driver_class}" />
-				<property name="url" value="${database.journal.connection.url}" />
-				<property name="username" value="${database.journal.connection.username}" />
-				<property name="password" value="${database.journal.connection.password}" />
-			</bean>
-		</property>
-		<property name="enabled" value="true" />
-		<property name="databasePopulator">
-			<bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
-				<property name="continueOnError" value="false" />
-				<property name="ignoreFailedDrops" value="true" />
-				<property name="sqlScriptEncoding" value="UTF-8" />
-				<property name="scripts">
-					<array>
-						<value type="org.springframework.core.io.Resource">classpath:org/bonitasoft/engine/scheduler/${bonita.test.db.vendor:h2}-dropQuartzTables.sql</value>
-						<value type="org.springframework.core.io.Resource">classpath:org/bonitasoft/engine/scheduler/${bonita.test.db.vendor:h2}-createQuartzTables.sql</value>
-					</array>
-				</property>
-			</bean>
-		</property>
-	</bean>
-
-	<bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory" depends-on="carolJNDI">
+	<bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
 		<constructor-arg name="props">
 			<props>
 				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
 				<prop key="org.quartz.threadPool.threadCount">10</prop>
 				<prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreTX</prop>
-				<prop key="org.quartz.jobStore.driverDelegateClass">${quartz.connection.jobstoredriver:org.quartz.impl.jdbcjobstore.StdJDBCDelegate}
-				</prop>
+				<prop key="org.quartz.jobStore.driverDelegateClass">${quartz.connection.jobstoredriver:org.quartz.impl.jdbcjobstore.StdJDBCDelegate}</prop>
 				<prop key="org.quartz.jobStore.dataSource">myds</prop>
 				<prop key="org.quartz.dataSource.myds.jndiURL">${database.journal.datasource.name}</prop>
-				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-				<prop key="org.quartz.scheduler.skipUpdateCheck">${org.quartz.scheduler.skipUpdateCheck}</prop>
+				<prop key="org.quartz.scheduler.skipUpdateCheck">${org.quartz.scheduler.skipUpdateCheck:true}</prop>
 				<!-- <prop key="org.quartz.jobStore.misfireThreshold">200</prop>the time before a misfire job will be executed -->
 			</props>
 		</constructor-arg>
