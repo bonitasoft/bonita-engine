@@ -683,7 +683,7 @@
         <!-- Local JNDI implementation -->
         <dependency>
 			<groupId>org.bonitasoft.engine.jndi</groupId>
-			<artifactId>bonita-jndi-carol</artifactId>
+			<artifactId>bonita-jndi-memory</artifactId>
 			<version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -724,7 +724,7 @@
 						<bonita.file.filter>${bonita.file.filter}</bonita.file.filter>
 					</systemPropertyVariables>
 					<includes>
-						<include>com/bonitasoft/services/AllTestsSP.java</include>
+						<include>com/bonitasoft/services/AllTestsSPWithJNDI.java</include>
 					</includes>
 				</configuration>
 			</plugin>

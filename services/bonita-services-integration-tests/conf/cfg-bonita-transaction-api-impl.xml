@@ -2,9 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="transactionService" class="org.bonitasoft.engine.transaction.TransactionServiceImpl">
-		<constructor-arg name="logger">
-			<null />
-		</constructor-arg>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg ref="eventService" />
 	</bean>
 
