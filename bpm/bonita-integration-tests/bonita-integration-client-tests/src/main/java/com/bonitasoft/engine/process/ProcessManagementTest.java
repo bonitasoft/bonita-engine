@@ -66,7 +66,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
     }
 
     private void skipTask(final long activityId) throws Exception {
-        getProcessAPI().setStateByStateName(activityId, ActivityStates.SKIPPED_STATE);
+        getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
     }
 
     @Test
