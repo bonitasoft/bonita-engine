@@ -409,6 +409,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Platform login -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.platform.login</groupId>
+			<artifactId>bonita-platform-login-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- platform-command -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>

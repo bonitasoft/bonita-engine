@@ -1,4 +1,4 @@
-<project default="cleantarget">
+<project name="services-sp" default="cleantarget">
 
     <target name="cleantarget">
         <delete dir="${basedir}/target" includes="*.db"/>

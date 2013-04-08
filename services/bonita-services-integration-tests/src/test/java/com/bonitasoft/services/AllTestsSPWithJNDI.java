@@ -8,16 +8,18 @@
  *******************************************************************************/
 package com.bonitasoft.services;
 
-import javax.naming.Context;                                                                                                      
-
 import org.bonitasoft.engine.AllTests;
+import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.ServicesBuilder;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
+import org.bonitasoft.engine.test.util.TestUtil;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.bonitasoft.services.event.handler.IdentityServiceUsingEventServiceTest;
 import com.bonitasoft.services.event.handler.RecorderAndEventServiceTest;
@@ -29,38 +31,35 @@ import com.bonitasoft.services.event.handler.RecorderAndEventServiceTest;
     RecorderAndEventServiceTest.class
 })
 public class AllTestsSPWithJNDI {
+    
+    private static ServicesBuilder servicesBuilder;
 
-    static ConfigurableApplicationContext springContext;
+    private static TransactionService transactionService;
+
+    private static PlatformService platformService;
+
+    private static SPlatformBuilder platformBuilder;
+
+    static {
+        CommonServiceTest.setupSpringContextIfNeeded();
+        servicesBuilder = new ServicesBuilder();
+        transactionService = servicesBuilder.buildTransactionService();
+        platformService = servicesBuilder.buildPlatformService();
+        platformBuilder = servicesBuilder.buildPlatformBuilder();
+    }
 
     @BeforeClass
-    public static void beforeClass() {
-        System.err.println("=================== AllTestsSP.beforeClass()");
-        setupSpringContext();
+    public static void beforeClass() throws Exception {
+        System.err.println("=================== AllTestsSPWithJNDI.beforeClass()");
+        CommonServiceTest.setupSpringContextIfNeeded();
+        TestUtil.createPlatform(transactionService, platformService, platformBuilder);
     }
 
     @AfterClass
-    public static void afterClass() {
-        System.err.println("=================== AllTestsSP.afterClass()");
-
-        closeSpringContext();
-    }
-
-    private static void setupSpringContext() {
-        setSystemPropertyIfNotSet("bonita.test.db.vendor", "h2");
-
-        // Force these system properties
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
-
-        springContext = new ClassPathXmlApplicationContext("datasource.xml", "jndi-setup.xml");
-    }
-
-    private static void closeSpringContext() {
-        springContext.close();
-    }
-
-    private static void setSystemPropertyIfNotSet(final String property, final String value) {
-        System.setProperty(property, System.getProperty(property, value));
+    public static void afterClass() throws Exception {
+        System.err.println("=================== AllTestsSPWithJNDI.afterClass()");
+        TestUtil.deletePlatForm(transactionService, platformService);
+        CommonServiceTest.closeSpringContext();
     }
 
 }

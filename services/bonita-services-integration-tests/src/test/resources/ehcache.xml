@@ -10,6 +10,8 @@
     timeToLiveSeconds="120"
     overflowToDisk="false"
     memoryStoreEvictionPolicy="LRU"
+    copyOnRead="true"
+	copyOnWrite="true"
   />
 
   <cache
@@ -18,5 +20,23 @@
     eternal="true"
     overflowToDisk="true"
   />
+  
+  <cache
+	maxElementsInMemory="10000"
+	overflowToDisk="true"
+	eternal="false"
+	name="1_test1"
+	copyOnRead="true"
+	copyOnWrite="true">
+  </cache>
+	
+  <cache
+	maxElementsInMemory="100000"
+	overflowToDisk="true"
+	eternal="false"
+	name="1_test2"
+	copyOnRead="false"
+	copyOnWrite="false">
+ </cache>
 
 </ehcache>

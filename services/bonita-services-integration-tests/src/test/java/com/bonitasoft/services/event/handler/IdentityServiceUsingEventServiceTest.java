@@ -11,105 +11,37 @@ package com.bonitasoft.services.event.handler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.bonitasoft.engine.ServicesBuilder;
+import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserUpdateEventHandler;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.BusinessTransaction;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class IdentityServiceUsingEventServiceTest {
+public class IdentityServiceUsingEventServiceTest extends CommonServiceTest {
 
     private static IdentityService identityService;
 
     private static IdentityModelBuilder builder;
 
-    private static TransactionService txService;
-
-    private static ServicesBuilder servicesBuilder;
-
-    private static PlatformService platformService;
-
-    private static SPlatformBuilder platformBuilder;
-
-    private static STenantBuilder tenantBuilder;
-
-    private static SessionAccessor sessionAccessor;
-
     private static EventService eventService;
 
-    private static SessionService sessionService;
-
     static {
-        servicesBuilder = new ServicesBuilder();
-        txService = servicesBuilder.buildTransactionService();
-        identityService = servicesBuilder.buildIdentityService();
-        builder = servicesBuilder.buildIdentityModelBuilder();
-        platformService = servicesBuilder.buildPlatformService();
-        platformBuilder = servicesBuilder.buildPlatformBuilder();
-        tenantBuilder = servicesBuilder.buildTenantBuilder();
-        sessionAccessor = servicesBuilder.buildSessionAccessor();
-        eventService = servicesBuilder.buildEventService();
-        sessionService = servicesBuilder.buildSessionService();
-    }
-
-    @Rule
-    public TestRule testWatcher = new TestWatcher() {
-
-        private final Logger LOGGER = LoggerFactory.getLogger(RecorderAndEventServiceTest.class);
-
-        @Override
-        public void starting(final Description d) {
-            LOGGER.error("Starting test: " + this.getClass().getName() + "." + d.getMethodName());
-        }
-
-        @Override
-        public void failed(final Throwable cause, final Description d) {
-            LOGGER.error("Failed test: " + this.getClass().getName() + "." + d.getMethodName());
-        }
-
-        @Override
-        public void succeeded(final Description d) {
-            LOGGER.error("Succeeded test: " + this.getClass().getName() + "." + d.getMethodName());
-        }
-    };
-
-    @BeforeClass
-    public static void setUpPersistence() throws Exception {
-        TestUtil.createPlatformAndDefaultTenant(txService, platformService, sessionAccessor, platformBuilder, tenantBuilder, sessionService);
-    }
-
-    @AfterClass
-    public static void tearDownPersistence() throws Exception {
-        TestUtil.closeTransactionIfOpen(txService);
-        TestUtil.deleteDefaultTenantAndPlatForm(txService, platformService, sessionAccessor, sessionService);
+        identityService = getServicesBuilder().buildIdentityService();
+        builder = getServicesBuilder().buildIdentityModelBuilder();
+        eventService = getServicesBuilder().buildEventService();
     }
 
     @Test
     public void testUserPasswordUpdate() throws Exception {
-        BusinessTransaction tx = txService.createTransaction();
+        BusinessTransaction tx = getTransactionService().createTransaction();
         tx.begin();
         final String userName = "Zhang";
         final SUserBuilder userBuilder = builder.getUserBuilder();
@@ -117,7 +49,7 @@ public class IdentityServiceUsingEventServiceTest {
         SUser user = identityService.createUser(userBuilder.done());
         tx.complete();
 
-        tx = txService.createTransaction();
+        tx = getTransactionService().createTransaction();
         tx.begin();
         user = identityService.getUser(user.getId());
 
@@ -135,7 +67,7 @@ public class IdentityServiceUsingEventServiceTest {
 
     @Test
     public void testUserPasswordNotUpdate() throws Exception {
-        BusinessTransaction tx = txService.createTransaction();
+        BusinessTransaction tx = getTransactionService().createTransaction();
         tx.begin();
 
         final String userName = "Zhang";
@@ -144,7 +76,7 @@ public class IdentityServiceUsingEventServiceTest {
         SUser user = identityService.createUser(userBuilder.done());
         tx.complete();
 
-        tx = txService.createTransaction();
+        tx = getTransactionService().createTransaction();
         tx.begin();
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
@@ -159,14 +91,14 @@ public class IdentityServiceUsingEventServiceTest {
 
     @Test
     public void testUpdateUserWithoutPasswordChange() throws Exception {
-        BusinessTransaction tx = txService.createTransaction();
+        BusinessTransaction tx = getTransactionService().createTransaction();
         tx.begin();
         final SUserBuilder userBuilder = builder.getUserBuilder();
         userBuilder.createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User");
         SUser user = identityService.createUser(userBuilder.done());
         tx.complete();
 
-        tx = txService.createTransaction();
+        tx = getTransactionService().createTransaction();
         tx.begin();
         user = identityService.getUser(user.getId());
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
