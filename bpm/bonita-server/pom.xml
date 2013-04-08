@@ -425,7 +425,7 @@
 		<!-- Migration -->
 		<dependency>
 			<artifactId>bonita-instance-migration-impl</artifactId>
-			<groupId>org.bonitasoft.engine.core</groupId>
+			<groupId>com.bonitasoft.engine.core</groupId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -671,12 +671,12 @@
 		
 		<!-- Process Instance -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -686,7 +686,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>

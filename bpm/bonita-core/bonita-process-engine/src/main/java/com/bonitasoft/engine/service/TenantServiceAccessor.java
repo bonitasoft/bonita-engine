@@ -10,6 +10,8 @@ package com.bonitasoft.engine.service;
 
 import org.bonitasoft.engine.parameter.ParameterService;
 
+import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
+import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.search.SearchEntitiesDescriptor;
 
 /**
@@ -19,7 +21,12 @@ public interface TenantServiceAccessor extends org.bonitasoft.engine.service.Ten
 
     ParameterService getParameterService();
 
+    BreakpointService getBreakpointService();
+
     @Override
     SearchEntitiesDescriptor getSearchEntitiesDescriptor();
+
+    @Override
+    BPMInstanceBuilders getBPMInstanceBuilders();
 
 }

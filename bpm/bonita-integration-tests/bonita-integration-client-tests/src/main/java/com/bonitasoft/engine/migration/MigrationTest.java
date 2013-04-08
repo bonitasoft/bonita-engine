@@ -13,8 +13,6 @@ import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
-import org.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
-import org.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -30,6 +28,7 @@ import org.bonitasoft.engine.migration.MigrationPlanCriterion;
 import org.bonitasoft.engine.migration.MigrationPlanDescriptor;
 import org.bonitasoft.engine.migration.OperationWithEnablement;
 import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.bonitasoft.engine.util.IOUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -37,6 +36,8 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
+import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 
 /**
  * @author Frédéric Bouquet
@@ -231,7 +232,8 @@ public class MigrationTest extends CommonAPISPTest {
 
         getMigrationAPI().prepareProcessesForMigration(Arrays.asList(pInstance1.getId()), migrationPlanId);
         assignAndExecuteStep(step1, john.getId());
-        final WaitForStep waitForStep2 = new WaitForStep(50, 1000, "step2", pInstance1.getId(), TestStates.getReadyState(null));
+        final WaitForStep waitForStep2 = new WaitForStep(50, 1000, "step2", pInstance1.getId(), TestStates.getReadyState(null), getProcessAPI());
+
         // should never reach step2
         assertFalse(waitForStep2.waitUntil());
 

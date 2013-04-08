@@ -133,7 +133,7 @@
         <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
-        <entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="org.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
+        <entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
         
         <entry key="org.bonitasoft.engine.core.category.model.SCategory" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
         <entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />
@@ -275,6 +275,7 @@
 				<ref bean="hbm-bonita-identity-model" />
 				<ref bean="hbm-bonita-process-definition-model" />
 				<ref bean="hbm-bonita-process-instance-model" />
+				<ref bean="hbm-bonita-process-instance-model-ext" />
 				<ref bean="hbm-bonita-process-instance-model-arch" />
 				<ref bean="hbm-bonita-scheduler" />
 				<ref bean="hbm-bonita-document-model" />

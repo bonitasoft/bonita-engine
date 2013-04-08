@@ -25,7 +25,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.wait.CheckNbPendingTasksForUserUsingSearch;
+import org.bonitasoft.engine.test.check.CheckNbPendingTasksForUserUsingSearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,0 +1,55 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="dbConfigurationsProvider" class="org.bonitasoft.engine.persistence.DBConfigurationsProvider">
+		<property name="tenantConfigurations">
+			<list>
+				<ref bean="db-bonita-persistence-db"/>
+				<ref bean="db-bonita-platform-model"/>
+				<ref bean="db-bonita-data-model"/>
+				<ref bean="db-bonita-document-model"/>
+				<ref bean="db-bonita-dependency-model"/>
+				<ref bean="db-bonita-dependency-platform-model"/>
+				<ref bean="db-bonita-identity-model"/>
+				<ref bean="db-bonita-log"/>
+				<ref bean="db-bonita-process-definition-model"/>
+				<ref bean="db-bonita-process-instance-model"/>
+				<ref bean="db-bonita-process-instance-model-arch"/>
+				<ref bean="db-bonita-process-instance-model-ext"/>
+				<ref bean="db-bonita-scheduler"/>
+				<ref bean="db-bonita-scheduler-quartz"/>
+				<ref bean="db-bos-actor-mapping"/>
+				<ref bean="db-bos-actor-privilege-model"/>
+				<ref bean="db-bos-category-model"/>
+				<ref bean="db-bos-command-model"/>
+				<ref bean="db-bos-data-instance-model"/>
+				<ref bean="db-bos-data-instance-model-arch"/>
+				<ref bean="db-bos-platform-command-model"/>
+				<ref bean="db-bos-privilege-model"/>
+				<ref bean="db-bos-process-comment-model"/>
+				<ref bean="db-bos-process-comment-model-arch"/>
+				<ref bean="db-bos-process-document-mapping-model"/>
+				<ref bean="db-bos-process-document-mapping-model-arch"/>
+				<ref bean="db-bos-profile-model"/>
+				<ref bean="db-bos-supervisor-mapping"/>
+				<ref bean="db-bos-external-identity-mapping"/>
+				<ref bean="db-bonita-instance-migration-model"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="db-bonita-persistence-db" name="sequencecripts" class="org.bonitasoft.engine.persistence.DBConfiguration"><!-- sequence not used in archive because objects keep their ids -->
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-createTables.sql" />
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-dropTables.sql" />
+		<constructor-arg name="initTablesFile">
+			<null />
+		</constructor-arg>
+		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-cleanTables.sql" />
+		<constructor-arg name="filter" value="journal" />
+		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-deleteTenantObjects.sql" />
+		<constructor-arg name="deleteTenantObjectsPriority" value="0" />
+		<constructor-arg name="postCreateStructureFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-postCreateStructure.sql" />
+		<constructor-arg name="preDropStructureFile" value="/org/bonitasoft/engine/persistence/db/${db.vendor}-preDropStructure.sql" />
+	</bean>
+
+</beans>

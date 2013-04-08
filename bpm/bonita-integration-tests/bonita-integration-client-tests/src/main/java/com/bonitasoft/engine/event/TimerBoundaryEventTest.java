@@ -26,6 +26,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -84,8 +85,8 @@ public class TimerBoundaryEventTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent(timerDuration);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForStep waitForStep1 = new WaitForStep(50, 1000, "step1", processInstance.getId());
-        assertTrue(waitForStep1.waitUntil());
+        final WaitForStep waitForStep1 = waitForStep("step1", processInstance);
+
         ManualTaskInstance manualUserTask = null;
         if (addChild) {
             getProcessAPI().assignUserTask(waitForStep1.getStepId(), donaBenta.getId());
@@ -95,8 +96,8 @@ public class TimerBoundaryEventTest extends CommonAPISPTest {
 
         Thread.sleep(timerDuration); // wait timer trigger
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 500, "exceptionStep", processInstance.getId(), TestStates.getReadyState(null));
-        assertTrue(waitForExceptionStep.waitUntil());
+        final WaitForStep waitForExceptionStep = waitForStep(50, 500, "exceptionStep", processInstance, TestStates.getReadyState(null));
+
         ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
         assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
 

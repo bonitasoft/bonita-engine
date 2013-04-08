@@ -57,8 +57,9 @@ import org.bonitasoft.engine.search.LogSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
+import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.bonitasoft.engine.util.IOUtil;
-import org.bonitasoft.engine.wait.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -462,14 +463,12 @@ public class LogTest extends CommonAPISPTest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final long procInstanceId = startProcess.getId();
         assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
-        final WaitForStep waitForStep0 = new WaitForStep("step0", procInstanceId);
-        assertTrue(waitForStep0.waitUntil());
+        final WaitForStep waitForStep0 = waitForStep("step0", startProcess);
         getProcessAPI().assignUserTask(waitForStep0.getStepId(), userId);
         getProcessAPI().executeActivity(waitForStep0.getStepId());
         getProcessAPI().executeActivity(waitForStep0.getStepId());
 
-        final WaitForStep waitForStep2 = new WaitForStep("step2", procInstanceId);
-        assertTrue(waitForStep2.waitUntil());
+        waitForStep("step2", startProcess);
 
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         assertEquals(numberOfUsers, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());

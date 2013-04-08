@@ -269,8 +269,9 @@ public class ActivityCommandExtTest extends CommonAPITest {
         final String mainInputName1 = "param1";
         final String resContent = "welcome Lily and Lucy and Mett";
 
-        final long processInstanceId = getProcessAPI().startProcess(processDefinition.getId()).getId();
-        assertTrue(new WaitForStep(50, 2000, "step1", processInstanceId).waitUntil());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long processInstanceId = processInstance.getId();
+        waitForStep("step1", processInstance);
 
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
@@ -375,8 +376,9 @@ public class ActivityCommandExtTest extends CommonAPITest {
     public void testExecuteActionsAndTerminate2() throws Exception {
         createAndDeployProcess2();
         final String mainInputName1 = "param1";
-        final long processInstanceId = getProcessAPI().startProcess(processDefinition.getId()).getId();
-        assertTrue(new WaitForStep(50, 2000, "step1", processInstanceId).waitUntil());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long processInstanceId = processInstance.getId();
+        waitForStep("step1", processInstance);
 
         // Main Expression
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();

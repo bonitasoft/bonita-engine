@@ -12,6 +12,8 @@ import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
 
+import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
+import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -33,6 +35,11 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     }
 
     @Override
+    public BreakpointService getBreakpointService() {
+        return this.getInstanceOf(BreakpointService.class);
+    }
+
+    @Override
     public SearchPlatformEntitiesDescriptor getSearchPlatformEntitiesDescriptor() {
         return this.getInstanceOf(SearchPlatformEntitiesDescriptor.class);
     }
@@ -40,6 +47,11 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     @Override
     public SearchEntitiesDescriptor getSearchEntitiesDescriptor() {
         return this.getInstanceOf(SearchEntitiesDescriptor.class);
+    }
+
+    @Override
+    public BPMInstanceBuilders getBPMInstanceBuilders() {
+        return this.getInstanceOf(BPMInstanceBuilders.class);
     }
 
     @Override

@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.api.DebugAPI;
 import org.bonitasoft.engine.api.DocumentAPI;
 
 /**

@@ -1,6 +1,20 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+	<bean id="hbm-bonita-process-instance-model-ext" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
+			</map>
+		</property>
+	</bean>
+	
 	<bean id="hbm-bonita-process-instance-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
 		<property name="resources">
 			<set>
@@ -43,7 +57,6 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="usertask" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="h" />
 			</map>
 		</property>

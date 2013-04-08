@@ -31,9 +31,9 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.WaitUntil;
-import org.bonitasoft.engine.wait.CheckNbAssignedTaskOf;
-import org.bonitasoft.engine.wait.CheckNbPendingTaskOf;
-import org.bonitasoft.engine.wait.WaitForCompletedArchivedStep;
+import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
+import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
+import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,10 +63,6 @@ public class ProcessManagementTest extends CommonAPISPTest {
     public void beforeTest() throws BonitaException {
         login();
         john = createUser(JOHN_USERNAME, PASSWORD);
-    }
-
-    private void skipTask(final long activityId) throws Exception {
-        getProcessAPI().setActivityStateByName(activityId, ActivityStates.SKIPPED_STATE);
     }
 
     @Test

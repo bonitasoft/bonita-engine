@@ -14,12 +14,14 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    ProcessResolutionTest.class,
-    HiddenTaskTest.class,
-    ManualTasksTest.class,
-    ProcessManagementTest.class,
-    TaskOnDemandTest.class,
-    ProcessParameterTest.class
+        ProcessResolutionTest.class,
+        HiddenTaskTest.class,
+        ManualTasksTest.class,
+        ProcessManagementTest.class,
+        TaskOnDemandTest.class,
+        ProcessParameterTest.class,
+        AbortProcessInstanceTest.class,
+        CancelProcessInstanceTest.class
 })
 public class ProcessTests {
 

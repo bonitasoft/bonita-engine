@@ -27,8 +27,8 @@ import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.wait.CheckNbAssignedTaskOf;
-import org.bonitasoft.engine.wait.CheckNbPendingTaskOf;
+import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
+import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,7 +126,8 @@ public class TaskOnDemandTest extends CommonAPISPTest {
 
         assertEquals(2, getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null).size());
         getProcessAPI().executeActivity(m2.getId());
-        assertTrue("newTask2 should be finished and archived", new WaitForFinalArchivedActivity(30, 2000, "newTask2", pInstance.getId()).waitUntil());
+        waitForFinalArchivedActivity("newTask2", pInstance);
+
         // m21 should be canceled, so only newTask1 should remain among the tasks assigned to Jack
         assertEquals("newTask21 should be canceled since its parent task has been executed", 1,
                 getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null).size());

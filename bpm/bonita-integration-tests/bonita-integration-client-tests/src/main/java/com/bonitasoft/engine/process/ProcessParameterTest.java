@@ -624,7 +624,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(delivery, userId, designProcessDefinition, paraMap);
         final long proDefId = processDefinition.getId();
         ProcessInstance processInstance = getProcessAPI().startProcess(proDefId);
-        assertNotNull(waitForUserTask(100, 10000, "step2", processInstance));
+        assertNotNull(waitForUserTask("step2", processInstance, 1000000));
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(proDefId);
         assertNotNull(processDeploymentInfo);
@@ -659,7 +659,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final long processDefinitionId = processDef.getId();
         getProcessAPI().enableProcess(processDefinitionId);
         processInstance = getProcessAPI().startProcess(processDefinitionId);
-        assertNotNull(waitForUserTask(100, 10000, "step2", processInstance));
+        assertNotNull(waitForUserTask("step2", processInstance, 1000000));
 
         assertEquals("bcd", getProcessAPI().getParameterInstance(processDefinitionId, paraName).getValue());
         final ConnectorImplementationDescriptor connectorRedeploy = getProcessAPI().getConnectorImplementation(processDefinitionId, connectorId,

@@ -16,16 +16,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
-import org.bonitasoft.engine.exception.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,20 +115,11 @@ public class APITestSPUtil extends APITestUtil {
         return count == minimalFrequency;
     }
 
-    protected ActivityInstance waitForUserTask(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance)
-            throws Exception {
-        final WaitForStep waitForStep1 = new WaitForStep(repeatEach, timeout, taskName, processInstance.getId(), TestStates.getReadyState(null));
-        if (!waitForStep1.waitUntil()) {
-            throw new ActivityInstanceNotFoundException(processInstance.getId());
-        }
-        return waitForStep1.getResult();
-    }
-
     protected SearchResult<HumanTaskInstance> waitForHumanTasks(final int repeatEach, final int timeout, final int nbTasks, final String taskName,
             final long processInstanceId) throws Exception {
         final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, true, nbTasks, new SearchOptionsBuilder(0, 10000)
                 .filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName)
-                .done());
+                .done(), getProcessAPI());
         assertTrue(checkNbOfHumanTasks.waitUntil());
         return checkNbOfHumanTasks.getHumanTaskInstances();
     }

@@ -187,22 +187,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Process -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Sequence -->
-		
+		<!-- Sequence -->	
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-sequence-api</artifactId>
@@ -795,28 +780,42 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+				<dependency>
+			<groupId>com.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
+			<artifactId>bonita-process-instance-model-impl-mybatis</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		
 		<!-- Process Migration -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
+			<groupId>com.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-instance-migration-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>

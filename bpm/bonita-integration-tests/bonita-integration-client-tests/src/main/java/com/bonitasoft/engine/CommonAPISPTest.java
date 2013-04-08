@@ -25,8 +25,6 @@ import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
-import org.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -45,6 +43,7 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -59,6 +58,8 @@ import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProcessManagementAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
+import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.platform.Tenant;
 
 /**

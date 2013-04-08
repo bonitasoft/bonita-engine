@@ -13,9 +13,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.service.ModelConvertor;
 
+import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
+import com.bonitasoft.engine.bpm.model.breakpoint.impl.BreakpointImpl;
+import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogBuilder;
 import com.bonitasoft.engine.log.SeverityLevel;
@@ -25,7 +29,7 @@ import com.bonitasoft.engine.platform.TenantImpl;
 /**
  * @author Matthieu Chaffotte
  */
-public final class SPModelConvertor {
+public final class SPModelConvertor extends ModelConvertor {
 
     public static List<Log> toLogs(final Collection<SQueriableLog> sQueriableLogs) {
         final List<Log> logs = new ArrayList<Log>();
@@ -68,6 +72,27 @@ public final class SPModelConvertor {
             tenants.add(toTenant(sTenant));
         }
         return tenants;
+    }
+
+    public static Breakpoint toBreakpoint(final SBreakpoint sBreakpoint) {
+        final BreakpointImpl breakpoint = new BreakpointImpl();
+        breakpoint.setId(sBreakpoint.getId());
+        breakpoint.setDefinitionId(sBreakpoint.getDefinitionId());
+        breakpoint.setInstanceId(sBreakpoint.getInstanceId());
+        breakpoint.setElementName(sBreakpoint.getElementName());
+        breakpoint.setInstanceScope(sBreakpoint.isInstanceScope());
+        breakpoint.setInterruptedStateId(sBreakpoint.getInterruptedStateId());
+        breakpoint.setStateId(sBreakpoint.getStateId());
+        return breakpoint;
+    }
+
+    public static List<Breakpoint> toBreakpoints(final List<SBreakpoint> sBreakpoints) {
+        final List<Breakpoint> breakpoints = new ArrayList<Breakpoint>(sBreakpoints.size());
+        for (final SBreakpoint sBreakpoint : sBreakpoints) {
+            final Breakpoint breakpoint = toBreakpoint(sBreakpoint);
+            breakpoints.add(breakpoint);
+        }
+        return breakpoints;
     }
 
 }

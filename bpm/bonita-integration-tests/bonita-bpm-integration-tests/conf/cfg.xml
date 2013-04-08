@@ -120,7 +120,7 @@
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 	</bean>
 
-	<bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
+	<bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="connectorService" ref="connectorService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />

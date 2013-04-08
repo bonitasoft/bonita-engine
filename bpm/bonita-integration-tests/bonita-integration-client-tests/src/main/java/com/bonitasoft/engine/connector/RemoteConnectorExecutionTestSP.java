@@ -747,7 +747,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Set<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
         final ActivityInstance activity = (ActivityInstance) activities.toArray()[0];
 
-        assertTrue(new WaitForStep(50, 2000, "step0", processInstance.getId()).waitUntil());
+        waitForStep("step0", processInstance);
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
@@ -862,7 +862,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // complete process
         getProcessAPI().executeActivity(activityId);
 
-        assertTrue(new WaitForStep(50, 2000, "step0", processInstance.getId()).waitUntil());
+        waitForStep("step0", processInstance);
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
@@ -974,7 +974,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // complete process
         getProcessAPI().executeActivity(activityId);
 
-        assertTrue(new WaitForStep(50, 2000, "step0", processInstance.getId()).waitUntil());
+        waitForStep("step0", processInstance);
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
