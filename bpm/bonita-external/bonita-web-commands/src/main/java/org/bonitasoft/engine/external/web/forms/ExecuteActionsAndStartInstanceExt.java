@@ -55,6 +55,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Ruiheng Fan
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 

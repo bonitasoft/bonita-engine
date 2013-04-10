@@ -9,6 +9,7 @@
 package org.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Ruiheng Fan
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminateTask {
 
@@ -97,8 +99,10 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws InvalidSessionException,
             ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition,
             NotSerializableException {
-        final Map<Operation, Map<String, Object>> operations = new HashMap<Operation, Map<String, Object>>(connectorsMap.size());
-        if (connectorsMap != null) {
+        if (connectorsMap == null) {
+            return Collections.emptyMap();
+        } else {
+            final Map<Operation, Map<String, Object>> operations = new HashMap<Operation, Map<String, Object>>(connectorsMap.size());
             for (final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry : connectorsMap.entrySet()) {
                 final ConnectorDefinition connectorDefinition = entry.getKey();
                 final Map<String, Map<String, Serializable>> contextMap = entry.getValue();
@@ -108,8 +112,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
                     operations.put(operation, resultMap);
                 }
             }
+            return operations;
         }
-        return operations;
     }
 
     private Map<String, Object> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
