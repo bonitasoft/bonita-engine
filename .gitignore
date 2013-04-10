@@ -59,6 +59,14 @@
 /bpm/bonita-core/bonita-instance-migration/.settings
 /bpm/bonita-core/bonita-instance-migration/.project
 
+# /bpm/bonita-core/bonita-instance-migration/bonita-instance-migration-impl
+/bpm/bonita-core/bonita-instance-migration/bonita-instance-migration-impl/target/
+/bpm/bonita-core/bonita-process-instance/bonita-process-instance-api/target/
+/bpm/bonita-core/bonita-process-instance/bonita-process-instance-impl/target/
+/bpm/bonita-core/bonita-process-instance/bonita-process-instance-model-impl-hibernate/target/
+/bpm/bonita-core/bonita-process-instance/bonita-process-instance-model-impl/target/
+/bpm/bonita-core/bonita-process-instance/bonita-process-instance-model/target/
+
 # /bpm/bonita-core/bonita-instance-migration/bonita-instance-migration-impl-mybatis/
 /bpm/bonita-core/bonita-instance-migration/bonita-instance-migration-impl-mybatis/target
 /bpm/bonita-core/bonita-instance-migration/bonita-instance-migration-impl-mybatis/.project
@@ -486,6 +494,9 @@
 # /services/bonita-persistence/
 /services/bonita-persistence/.settings
 /services/bonita-persistence/.project
+
+# /services/bonita-persistence/bonita-persistence-db/
+/services/bonita-persistence/bonita-persistence-db/target/
 
 # /services/bonita-persistence/bonita-persistence-hibernate/
 /services/bonita-persistence/bonita-persistence-hibernate/target
