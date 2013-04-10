@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.api.impl.LoginAPIExt;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -47,6 +45,9 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.bonitasoft.engine.api.impl.LoginAPIExt;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
@@ -93,11 +94,11 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     }
 
     protected SDataDefinitionBuilders getSDataDefinitionBuilders() {
-        return getServicesBuilder().geterSDataDefinitionBuilders();
+        return getServicesBuilder().getSDataDefinitionBuilders();
     }
 
     protected SDataInstanceBuilders getSDataInstanceBuilders() {
-        return getServicesBuilder().getSDataInstanceBuilders();
+        return getServicesBuilder().getSDataInstanceBuilder();
     }
 
     protected DataInstanceService getDataInstanceService() {

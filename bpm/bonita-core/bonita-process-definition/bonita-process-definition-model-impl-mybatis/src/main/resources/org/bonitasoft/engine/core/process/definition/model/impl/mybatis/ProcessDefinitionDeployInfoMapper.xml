@@ -1073,4 +1073,53 @@
 		</foreach>
 	</select>
 
+		<select id="getNumberOfSUserWhoCanStartProcess" parameterType="long" resultType="long">
+		SELECT COUNT(DISTINCT u.id)
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		AND u.id IN (
+			SELECT am.userId
+			FROM actor a,
+				 actormember am
+			WHERE a.id = am.actorId 
+			AND a.initiator = TRUE
+			AND a.scopeId IN (
+				SELECT p.processId
+				FROM process_definition p 
+				WHERE p.activationState = 'ENABLED'
+				AND p.processId = #{processId}
+			)
+		)
+		
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+	</select>
+
+	<select id="searchSUserWhoCanStartProcess" parameterType="map" resultMap="userResultMap">
+		SELECT DISTINCT u.*
+		FROM user_ u
+		WHERE u.tenantid = #{tenantid}
+		AND u.id IN (
+			SELECT am.userId
+			FROM actor a,
+				 actormember am
+			WHERE a.id = am.actorId 
+			AND a.initiator = TRUE
+			AND a.scopeId IN (
+				SELECT p.processId
+				FROM process_definition p 
+				WHERE p.activationState = 'ENABLED'
+				AND p.processId = #{processId}
+			)
+		)
+
+		<if test="filter != null">
+			AND ${filter}
+		</if>
+		<if test="orderBy != null">
+			ORDER BY ${orderBy}
+		</if>
+	</select>
+	
 </mapper>
