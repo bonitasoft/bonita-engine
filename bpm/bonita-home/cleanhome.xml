@@ -2,7 +2,6 @@
 
 	<property name="bos_home" value="../../../bonita-engine_Trunk/bpm/bonita-home"/>
 
-
 	<target name="mybatis">
 		<delete dir="${basedir}/target/home" />
 		<copy todir="${basedir}/target/home">

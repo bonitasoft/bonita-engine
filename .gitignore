@@ -161,20 +161,28 @@
 /bpm/bonita-deploy/bonita-deploy-ear2/target
 /bpm/bonita-deploy/bonita-deploy-ear2/.settings
 /bpm/bonita-deploy/bonita-deploy-ear2/.project
+/bpm/bonita-deploy/bonita-deploy-ear2/.classpath
 
 # /bpm/bonita-deploy/bonita-deploy-ear3/
 /bpm/bonita-deploy/bonita-deploy-ear3/target
 /bpm/bonita-deploy/bonita-deploy-ear3/.settings
 /bpm/bonita-deploy/bonita-deploy-ear3/.project
+/bpm/bonita-deploy/bonita-deploy-ear3/.classpath
+
+# /bpm/bonita-deploy/bonita-deploy-war/
+/bpm/bonita-deploy/bonita-deploy-war/target
+/bpm/bonita-deploy/bonita-deploy-war/.classpath
+/bpm/bonita-deploy/bonita-deploy-war/.project
+/bpm/bonita-deploy/bonita-deploy-war/.settings
+
+# /bpm/bonita-deploy/bonita-deploy-war/src/main/webapp/
+/bpm/bonita-deploy/bonita-deploy-war/src/main/webapp/META-INF
 
 # /bpm/bonita-deploy/bonita-engine-deploy/
 /bpm/bonita-deploy/bonita-engine-deploy/target
 /bpm/bonita-deploy/bonita-engine-deploy/.classpath
 /bpm/bonita-deploy/bonita-engine-deploy/.project
 /bpm/bonita-deploy/bonita-engine-deploy/.settings
-
-# bpm/bonita-deploy/bonita-deploy-war/
-bpm/bonita-deploy/bonita-deploy-war/target
 
 # /bpm/bonita-external/
 /bpm/bonita-external/.settings
@@ -190,7 +198,6 @@ bpm/bonita-deploy/bonita-deploy-war/target
 /bpm/bonita-home/target
 /bpm/bonita-home/.settings
 /bpm/bonita-home/.project
-/bpm/bonita-home/base/server/licenses/license.lic
 
 # /bpm/bonita-home/base/server/platform/conf/
 /bpm/bonita-home/base/server/platform/conf/bonita-platform.mysql.xml
@@ -214,24 +221,15 @@ bpm/bonita-deploy/bonita-deploy-war/target
 /bpm/bonita-integration-tests/bonita-integration-client-tests/.settings
 /bpm/bonita-integration-tests/bonita-integration-client-tests/.classpath
 
+# /bpm/bonita-integration-tests/bonita-integration-client-tests/src/main/resources/com/bonitasoft/engine/command/
+
+# /bpm/bonita-integration-tests/bonita-integration-client-tests/src/main/resources/com/bonitasoft/engine/command/web/
+
 # /bpm/bonita-integration-tests/bonita-integration-local-tests/
 /bpm/bonita-integration-tests/bonita-integration-local-tests/target
 /bpm/bonita-integration-tests/bonita-integration-local-tests/.settings
 /bpm/bonita-integration-tests/bonita-integration-local-tests/.classpath
 /bpm/bonita-integration-tests/bonita-integration-local-tests/.project
-/bpm/bonita-integration-tests/bonita-integration-local-tests/FILEPATH.h2.db
-/bpm/bonita-integration-tests/bonita-integration-local-tests/FILEPATH.trace.db
-
-
-# /bpm/bonita-integration-tests/bonita-integration-local-tests/src/main/resources/org/
-
-# /bpm/bonita-integration-tests/bonita-integration-local-tests/src/main/resources/org/bonitasoft/
-
-# /bpm/bonita-integration-tests/bonita-integration-local-tests/src/main/resources/org/bonitasoft/engine/
-
-# /bpm/bonita-integration-tests/bonita-integration-local-tests/src/main/resources/org/bonitasoft/engine/command/
-
-# /bpm/bonita-integration-tests/bonita-integration-local-tests/src/main/resources/org/bonitasoft/engine/command/web/
 
 # /bpm/bonita-integration-tests/bonita-integration-local-tests/src/test/java/org/bonitasoft/engine/test/
 /bpm/bonita-integration-tests/bonita-integration-local-tests/src/test/java/org/bonitasoft/engine/test/TemporaryLocalIntegrationTestsSP.java
@@ -242,6 +240,22 @@ bpm/bonita-deploy/bonita-deploy-war/target
 /bpm/bonita-server/.project
 /bpm/bonita-server/.settings
 /bpm/bonita-server/dependency-reduced-pom.xml
+
+# /bpm/bonita-util-sp/
+/bpm/bonita-util-sp/.settings
+/bpm/bonita-util-sp/.project
+
+# /bpm/bonita-util-sp/bonita-client-util-sp/
+/bpm/bonita-util-sp/bonita-client-util-sp/target
+/bpm/bonita-util-sp/bonita-client-util-sp/.settings
+/bpm/bonita-util-sp/bonita-client-util-sp/.classpath
+/bpm/bonita-util-sp/bonita-client-util-sp/.project
+
+# /bpm/bonita-util-sp/bonita-common-util-sp/
+/bpm/bonita-util-sp/bonita-common-util-sp/target
+/bpm/bonita-util-sp/bonita-common-util-sp/.settings
+/bpm/bonita-util-sp/bonita-common-util-sp/.classpath
+/bpm/bonita-util-sp/bonita-common-util-sp/.project
 
 # /services/
 /services/.settings
@@ -258,14 +272,11 @@ bpm/bonita-deploy/bonita-deploy-war/target
 /services/bonita-command/bonita-command-model-impl-mybatis/.project
 /services/bonita-command/bonita-command-model-impl-mybatis/build
 
-
 # /services/bonita-connector-executor-timedout/
 /services/bonita-connector-executor-timedout/target
-/services/bonita-connector-executor-timedout/.settings
 /services/bonita-connector-executor-timedout/.classpath
 /services/bonita-connector-executor-timedout/.project
-/services/bonita-connector-executor-timedout/build
-
+/services/bonita-connector-executor-timedout/.settings
 
 # /services/bonita-data/
 /services/bonita-data/.settings
@@ -478,11 +489,9 @@ bpm/bonita-deploy/bonita-deploy-war/target
 
 # /services/bonita-persistence/bonita-persistence-hibernate/
 /services/bonita-persistence/bonita-persistence-hibernate/target
-/services/bonita-persistence/bonita-persistence-hibernate/.settings
 /services/bonita-persistence/bonita-persistence-hibernate/.classpath
 /services/bonita-persistence/bonita-persistence-hibernate/.project
-/services/bonita-persistence/bonita-persistence-hibernate/.springBeans
-/services/bonita-persistence/bonita-persistence-hibernate/build
+/services/bonita-persistence/bonita-persistence-hibernate/.settings
 
 # /services/bonita-persistence/bonita-persistence-mybatis/
 /services/bonita-persistence/bonita-persistence-mybatis/target
@@ -569,17 +578,3 @@ bpm/bonita-deploy/bonita-deploy-war/target
 /services/bonita-work/bonita-work-parallel/target
 /services/bonita-work/bonita-work-parallel/.settings
 /services/bonita-work/bonita-work-parallel/build
-
-
-bpm/bonita-util-sp/bonita-common-util-sp/target
-bpm/bonita-util-sp/bonita-client-util-sp/target
-
-bpm/bonita-util-sp/bonita-client-util-sp/.classpath
-bpm/bonita-util-sp/bonita-client-util-sp/.project
-bpm/bonita-util-sp/bonita-client-util-sp/.settings
-bpm/bonita-util-sp/bonita-common-util-sp/.classpath
-bpm/bonita-util-sp/bonita-common-util-sp/.project
-bpm/bonita-util-sp/bonita-common-util-sp/.settings
-bpm/bonita-util-sp/.project
-bpm/bonita-util-sp/.settings
-
