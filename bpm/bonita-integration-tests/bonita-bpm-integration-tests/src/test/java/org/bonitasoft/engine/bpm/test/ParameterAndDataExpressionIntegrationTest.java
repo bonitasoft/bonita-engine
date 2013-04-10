@@ -98,7 +98,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     }
 
     protected SDataInstanceBuilders getSDataInstanceBuilders() {
-        return getServicesBuilder().getSDataInstanceBuilder();
+        return getServicesBuilder().getSDataInstanceBuilders();
     }
 
     protected DataInstanceService getDataInstanceService() {
