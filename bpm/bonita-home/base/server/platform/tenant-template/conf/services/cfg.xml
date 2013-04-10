@@ -170,11 +170,6 @@
 						<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 					</bean>
 				</entry>
-				<entry key="PROCESSINSTANCE_DELETED">
-                    <bean class="org.bonitasoft.engine.execution.handler.ProcessInstancesDeletedHandler">
-						<constructor-arg name="commentService" ref="commentService" />
-					</bean>
-				</entry>
 			</map>
 		</constructor-arg>
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />

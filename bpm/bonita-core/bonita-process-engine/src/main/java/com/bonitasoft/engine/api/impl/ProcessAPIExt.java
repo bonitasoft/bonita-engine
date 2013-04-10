@@ -189,7 +189,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SProcessDefinition serverProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final DeleteProcess deleteProcess = new DeleteProcess(processDefinitionService, serverProcessDefinition, processInstanceService,
-                    tenantAccessor.getArchiveService(), tenantAccessor.getCommentService(), tenantAccessor.getBPMInstanceBuilders(), actorMappingService);
+                    tenantAccessor.getArchiveService(), actorMappingService);
             transactionExecutor.execute(deleteProcess);
             final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
             final File file = new File(processesFolder);
@@ -626,7 +626,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws InvalidSessionException, ConnectorException {
-        Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
+        final Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
         connectorsToReset.put(connectorInstanceId, state);
         setConnectorInstanceState(connectorsToReset);
     }
