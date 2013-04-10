@@ -9,7 +9,7 @@
 package org.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -48,7 +48,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final Map<Operation, Map<String, Serializable>> operationsMap = getOperations(parameters);
+        final Map<Operation, Map<String, Object>> operationsMap = getOperations(parameters);
         final long sActivityInstanceID = getActivityInstanceId(parameters);
 
         final String message = "Mandatory parameter " + CONNECTORS_MAP_KEY + " is missing or not convertible to Map.";
@@ -74,7 +74,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
-                executeConnectors(sActivityInstanceID, connectorsMap, operationsMap);
+                final Map<Operation, Map<String, Object>> connectorOutputs = executeConnectors(sActivityInstanceID, connectorsMap);
+                operationsMap.putAll(connectorOutputs);
                 updateActivityInstanceVariables(operationsMap, sActivityInstanceID, processDefinitionID);
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -92,26 +93,26 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         return null;
     }
 
-    private void executeConnectors(final long sActivityInstanceID, final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap,
-            final Map<Operation, Map<String, Serializable>> operationsMap) throws InvalidSessionException, ActivityInstanceNotFoundException,
-            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException {
+    private Map<Operation, Map<String, Object>> executeConnectors(final long sActivityInstanceID,
+            final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws InvalidSessionException,
+            ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition,
+            NotSerializableException {
+        final Map<Operation, Map<String, Object>> operations = new HashMap<Operation, Map<String, Object>>(connectorsMap.size());
         if (connectorsMap != null) {
-            final Iterator<Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>>> iterator = connectorsMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry = iterator.next();
+            for (final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry : connectorsMap.entrySet()) {
                 final ConnectorDefinition connectorDefinition = entry.getKey();
                 final Map<String, Map<String, Serializable>> contextMap = entry.getValue();
-                Map<String, Serializable> resultMap = null;
-                resultMap = executeConnectorOnActivityInstance(connectorDefinition.getConnectorId(), connectorDefinition.getVersion(),
-                        connectorDefinition.getInputs(), contextMap, sActivityInstanceID);
+                final Map<String, Object> resultMap = executeConnectorOnActivityInstance(connectorDefinition.getConnectorId(),
+                        connectorDefinition.getVersion(), connectorDefinition.getInputs(), contextMap, sActivityInstanceID);
                 for (final Operation operation : connectorDefinition.getOutputs()) {
-                    operationsMap.put(operation, resultMap);
+                    operations.put(operation, resultMap);
                 }
             }
         }
+        return operations;
     }
 
-    private Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
+    private Map<String, Object> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
             throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorCondition, NotSerializableException {
