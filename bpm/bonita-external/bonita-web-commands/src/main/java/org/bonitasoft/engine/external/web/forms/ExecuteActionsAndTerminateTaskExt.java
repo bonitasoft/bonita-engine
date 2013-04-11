@@ -30,7 +30,7 @@ import org.bonitasoft.engine.exception.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.ConnectorException;
-import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
+import org.bonitasoft.engine.exception.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
@@ -97,8 +97,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
 
     private Map<Operation, Map<String, Object>> executeConnectors(final long sActivityInstanceID,
             final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws InvalidSessionException,
-            ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition,
-            NotSerializableException {
+            ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorConditionException, NotSerializableException {
         if (connectorsMap == null) {
             return Collections.emptyMap();
         } else {
@@ -119,7 +119,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
     private Map<String, Object> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
             throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorCondition, NotSerializableException {
+            InvalidEvaluationConnectorConditionException, NotSerializableException {
         final String containerType = "ACTIVITY_INSTANCE";
         if (connectorInputParameters.size() == inputValues.size()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -136,7 +136,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             return executeConnector(tenantAccessor, processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, connectorsExps, inputValues,
                     clazzLoader, expcontext);
         } else {
-            throw new InvalidEvaluationConnectorCondition(connectorInputParameters.size(), inputValues.size());
+            throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), inputValues.size());
         }
     }
 

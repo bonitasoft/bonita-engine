@@ -24,7 +24,7 @@ import org.bonitasoft.engine.exception.ArchivedActivityInstanceNotFoundException
 import org.bonitasoft.engine.exception.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.ConnectorException;
-import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
+import org.bonitasoft.engine.exception.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
@@ -91,7 +91,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -99,7 +99,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorAtProcessInstantiation(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
             throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorCondition, NotSerializableException;
+            InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given process instance initialized with operations.
@@ -126,7 +126,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -134,7 +134,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorAtProcessInstantiation(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long processInstanceId) throws InvalidSessionException,
-            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException;
+            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given activity instance.
@@ -160,7 +160,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -168,7 +168,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorOnActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long activityInstanceId)
             throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorCondition, NotSerializableException;
+            InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given activity instance.
@@ -196,7 +196,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -204,7 +204,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorOnActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long activityInstanceId) throws InvalidSessionException, ActivityInstanceNotFoundException,
-            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException;
+            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given activity instance finished.
@@ -230,7 +230,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -238,7 +238,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorOnCompletedActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long activityInstanceId)
             throws InvalidSessionException, ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException,
-            ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException;
+            ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given activity instance finished.
@@ -266,7 +266,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -275,7 +275,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long activityInstanceId) throws InvalidSessionException,
             ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorCondition, NotSerializableException;
+            InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given process instance finished.
@@ -298,7 +298,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -306,7 +306,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorOnCompletedProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
             throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorCondition, NotSerializableException;
+            InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given process instance finished with operations.
@@ -331,7 +331,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             errors thrown while loading class failed.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -339,7 +339,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorOnCompletedProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long processInstanceId) throws InvalidSessionException,
-            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException;
+            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given process instance.
@@ -363,14 +363,14 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
-            throws ClassLoaderException, InvalidSessionException, ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorCondition,
+            throws ClassLoaderException, InvalidSessionException, ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException,
             NotSerializableException;
 
     /**
@@ -397,7 +397,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
      * @throws ConnectorException
      *             error thrown when connect external application failed.
-     * @throws InvalidEvaluationConnectorCondition
+     * @throws InvalidEvaluationConnectorConditionException
      * @throws NotSerializableException
      *             error thrown when connector outputs are not serializable
      * @since 6.0
@@ -405,5 +405,5 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorOnProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long processInstanceId) throws ClassLoaderException, InvalidSessionException,
-            ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorCondition, NotSerializableException;
+            ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
 }

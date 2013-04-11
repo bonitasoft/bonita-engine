@@ -27,7 +27,7 @@ import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.bar.UserFilterContribution;
-import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormat;
+import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.util.FileUtil;
 
 /**
@@ -49,7 +49,7 @@ public class BusinessArchiveFactory {
         contributions.add(new ClasspathContribution());
     }
 
-    public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormat {
+    public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
         final File barFolder = File.createTempFile("tempBusinessArchive", "tmp");
         barFolder.delete();
         barFolder.mkdir();
@@ -59,14 +59,14 @@ public class BusinessArchiveFactory {
         try {
             for (final BusinessArchiveContribution contribution : contributions) {
                 if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
-                    throw new InvalidBusinessArchiveFormat("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
+                    throw new InvalidBusinessArchiveFormatException("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
                 }
             }
             return businessArchive;
-        } catch (InvalidBusinessArchiveFormat e) {
+        } catch (InvalidBusinessArchiveFormatException e) {
             throw e;
         } catch (Exception e) {
-            throw new InvalidBusinessArchiveFormat("Invalid format, can't read the BAR file", e);
+            throw new InvalidBusinessArchiveFormatException("Invalid format, can't read the BAR file", e);
         } finally {
             FileUtil.deleteDir(barFolder);
         }
@@ -78,9 +78,9 @@ public class BusinessArchiveFactory {
      * @param barOrFolder
      * @return
      * @throws IOException
-     * @throws InvalidBusinessArchiveFormat
+     * @throws InvalidBusinessArchiveFormatException
      */
-    public static BusinessArchive readBusinessArchive(final File barOrFolder) throws InvalidBusinessArchiveFormat, IOException {
+    public static BusinessArchive readBusinessArchive(final File barOrFolder) throws InvalidBusinessArchiveFormatException, IOException {
         if (!barOrFolder.exists()) {
             throw new FileNotFoundException("the file does not exists: " + barOrFolder.getAbsolutePath());
         }
@@ -88,7 +88,7 @@ public class BusinessArchiveFactory {
             final BusinessArchive businessArchive = new BusinessArchive();
             for (final BusinessArchiveContribution contribution : contributions) {
                 if (!contribution.readFromBarFolder(businessArchive, barOrFolder) && contribution.isMandatory()) {
-                    throw new InvalidBusinessArchiveFormat("Invalid format, can't read " + contribution.getName() + " from the BAR file");
+                    throw new InvalidBusinessArchiveFormatException("Invalid format, can't read " + contribution.getName() + " from the BAR file");
                 }
             }
             return businessArchive;

@@ -43,7 +43,7 @@ import org.bonitasoft.engine.core.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
-import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormat;
+import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.util.FileUtil;
@@ -425,7 +425,7 @@ public class BusinessArchiveTests {
         barFile.delete();
     }
 
-    @Test(expected = InvalidBusinessArchiveFormat.class)
+    @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidProcessFromBusinessArchive() throws Exception {
         final File tempFile = File.createTempFile("businessArchive", "folder");
         tempFile.delete();
@@ -467,7 +467,7 @@ public class BusinessArchiveTests {
         barFile.delete();
     }
 
-    @Test(expected = InvalidBusinessArchiveFormat.class)
+    @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidXMLProcessFromBusinessArchive() throws Exception {
         final File tempFile = File.createTempFile("businessArchive", "folder");
         tempFile.delete();

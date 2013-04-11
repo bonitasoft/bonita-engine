@@ -36,7 +36,7 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.ConnectorException;
-import org.bonitasoft.engine.exception.InvalidEvaluationConnectorCondition;
+import org.bonitasoft.engine.exception.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
@@ -122,7 +122,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     private Map<Operation, Map<String, Object>> executeConnectors(final long processDefId,
             final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws InvalidSessionException, ClassLoaderException,
-            ConnectorException, InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException, NotSerializableException {
+            ConnectorException, InvalidEvaluationConnectorConditionException, InvalidProcessDefinitionException, NotSerializableException {
         final Map<Operation, Map<String, Object>> operations = new HashMap<Operation, Map<String, Object>>(connectorsMap.size());
         for (final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry : connectorsMap.entrySet()) {
             final ConnectorDefinition connectorDefinition = entry.getKey();
@@ -204,8 +204,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     Map<String, Object> executeConnectorOnProcessDefinition(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processDefinitionId)
-            throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorCondition, InvalidProcessDefinitionException,
-            NotSerializableException {
+            throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
+            InvalidProcessDefinitionException, NotSerializableException {
         if (connectorInputParameters.size() == inputValues.size()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ClassLoader classLoader = getLocalClassLoader(tenantAccessor, processDefinitionId);
@@ -220,7 +220,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             return executeConnector(tenantAccessor, processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, connectorsExps, inputValues,
                     classLoader, expcontext);
         } else {
-            throw new InvalidEvaluationConnectorCondition(connectorInputParameters.size(), inputValues.size());
+            throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), inputValues.size());
         }
     }
 
