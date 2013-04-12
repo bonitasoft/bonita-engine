@@ -145,7 +145,7 @@
         <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
         <entry key="org.bonitasoft.engine.document.model.SDocumentContent" value="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
-        <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstanceTokenCount" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceTokenCountImpl" />
+        <entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
         
         <!-- archived objects -->
         <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />

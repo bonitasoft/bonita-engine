@@ -36,6 +36,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.ClientEventUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -143,16 +144,19 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         final String commentContent1 = "commentContent1";
         final String commentContent2 = "commentContent2";
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
+        waitForStep("step1", pi);
         getProcessAPI().addComment(pi.getId(), commentContent1);
         getProcessAPI().addComment(pi.getId(), commentContent2);
         logout();
 
         final long tenant1 = SPBPMTestUtil.constructTenant("suomenlinna", null, null, "hamme", "saari");
         loginWith("hamme", "saari", tenant1);
+        ClientEventUtil.deployCommand(getSession());
         final User user1 = createUser(USERNAME, PASSWORD);
         loginWith(USERNAME, PASSWORD, tenant1);
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition1.getId());
+        waitForStep("step1", pi1);
         final String commentContent11 = "commentContent11";
         final String commentContent12 = "commentContent12";
         getProcessAPI().addComment(pi1.getId(), commentContent11);
@@ -167,6 +171,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         assertEquals(2, commentList0.size());
         disableAndDelete(processDefinition1);
         deleteUser(user1);
+        ClientEventUtil.undeployCommand(getSession());
         logout();
         login();
         disableAndDelete(processDefinition);
@@ -175,7 +180,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,
-            InvalidSessionException, ProcessDeployException, ProcessDefinitionNotFoundException, InvalidBusinessArchiveFormatException, ObjectAlreadyExistsException {
+            InvalidSessionException, ProcessDeployException, ProcessDefinitionNotFoundException, InvalidBusinessArchiveFormatException,
+            ObjectAlreadyExistsException {
         final List<Long> ids = new ArrayList<Long>();
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;

@@ -13,4 +13,9 @@
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />
 	</root>
+<!--   Show events of synchro repository -->
+<!--   <logger name="org.bonitasoft.engine.test.synchro.SynchroRepository" level="DEBUG" /> -->
+<!--   Show token addition/deletion -->
+<!--   <logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" /> -->
+  
 </configuration>
