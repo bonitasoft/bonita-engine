@@ -6,9 +6,9 @@ http://www.springframework.org/schema/beans		http://www.springframework.org/sche
 http://www.springframework.org/schema/context	http://www.springframework.org/schema/context/spring-context-3.0.xsd
 ">
 
-	<import resource="classpath:datasource-dependency-${bonita.test.db.vendor}.xml" />
+	<import resource="classpath:datasource-dependency-${sysprop.bonita.db.vendor}.xml" />
 
-	<context:property-placeholder location="classpath:jdbc-${bonita.test.db.vendor}.properties" system-properties-mode="OVERRIDE" />
+	<context:property-placeholder location="classpath:jdbc-${sysprop.bonita.db.vendor}.properties" system-properties-mode="OVERRIDE" />
 
 	<!-- We need 2 datasources that target the same DB : -->
 	<!-- First datasource (bonitaDataSource) for the whole Bonita platform -->

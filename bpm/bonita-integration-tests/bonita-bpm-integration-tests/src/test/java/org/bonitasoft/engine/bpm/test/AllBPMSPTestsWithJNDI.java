@@ -33,7 +33,7 @@ public class AllBPMSPTestsWithJNDI {
     }
 
     private static void setupSpringContext() {
-        setSystemPropertyIfNotSet("bonita.test.db.vendor", "h2");
+        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");

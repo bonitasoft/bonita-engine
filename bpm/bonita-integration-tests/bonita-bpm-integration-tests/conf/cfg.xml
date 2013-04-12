@@ -5,7 +5,7 @@
 		<property name="locations">
 			<array>
 				<value>file:${bonita.services.folder}/bonita-platform.xml</value>
-				<value>file:${bonita.services.folder}/jdbc-${bonita.test.db.vendor}.xml</value>
+				<value>file:${bonita.services.folder}/jdbc-${sysprop.bonita.db.vendor}.xml</value>
 			</array>
 		</property>
 	</bean>

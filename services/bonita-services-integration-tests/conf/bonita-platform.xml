@@ -21,7 +21,7 @@
 	<entry key="database.sequence.manager.datasource.name">java:comp/env/bonitaSequenceManagerDS</entry>
 
 	<!-- Try to inherit the property from the System properties -->
-	<entry key="db.vendor">${bonita.test.db.vendor:h2}</entry>
+	<entry key="db.vendor">${sysprop.bonita.db.vendor:h2}</entry>
 
 	<!-- Hibernate specific configurations -->
 	<entry key="hibernate.journal.show_sql">false</entry>
