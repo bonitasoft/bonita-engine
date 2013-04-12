@@ -48,18 +48,14 @@
 	</bean>
 
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile">
-			<null />
-		</constructor-arg>
+		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/scheduler/${db.vendor}-createQuartzTables.sql" />
 		<constructor-arg name="initTablesFile">
 			<null />
 		</constructor-arg>
 		<constructor-arg name="cleanTablesFile">
 			<null />
 		</constructor-arg>
-		<constructor-arg name="dropTablesFile">
-			<null />
-		</constructor-arg>
+		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/scheduler/${db.vendor}-dropQuartzTables.sql" />
 		<constructor-arg name="filter" value="platform" />
 	</bean>
 
