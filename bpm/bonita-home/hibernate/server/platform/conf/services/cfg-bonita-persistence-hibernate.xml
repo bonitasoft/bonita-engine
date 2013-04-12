@@ -81,7 +81,6 @@
         <entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
         <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
         <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
-        <entry key="org.bonitasoft.engine.privilege.model.SPrivilege" value="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" />
         
         <entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
         <entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
@@ -97,7 +96,6 @@
         <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
         
         <!-- bpm -->
-        <entry key="org.bonitasoft.engine.actor.privilege.model.SActorPrivilege" value="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl" />
         <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
         <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" />
         <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
@@ -227,18 +225,12 @@
 				<entry key="getActorMembersOfGroup" value="true" />
 				<entry key="getActorMembersOfRole" value="true" />
 				<entry key="getActorMembersOfUser" value="true" />
-				<entry key="getActorPrivilegeByActorAndPrivilegeId" value="true" />
-				<entry key="getActorPrivileges" value="true" />
-				<entry key="getActorPrivilegesByActorId" value="true" />
-				<entry key="getActorPrivilegesByIds" value="true" />
 				<entry key="getActorsByIds" value="true" />
 				<entry key="getActorsOfScope" value="true" />
 				<entry key="getActorsOfScopes" value="true" />
 				<entry key="getActorsOfUser" value="true" />
 				<entry key="getActorsOfUserCanStartProcessDefinition" value="true" />
 				<entry key="getNumberOfActorMembersOfActor" value="true" />
-				<entry key="getNumberOfSActorPrivilege" value="true" />
-				<entry key="searchSActorPrivilege" value="true" />
 				<entry key="getDataInstanceByIds" value="true" />
 				<entry key="getDataInstanceIdFromMapping" value="true" />
 				<entry key="getDataInstanceIdsFromMapping" value="true" />
@@ -280,13 +272,11 @@
 				<ref bean="hbm-bonita-scheduler" />
 				<ref bean="hbm-bonita-document-model" />
 				<ref bean="hbm-bos-actor-mapping" />
-				<ref bean="hbm-bos-actor-privilege-model" />
 				<ref bean="hbm-bos-category-model" />
 				<ref bean="hbm-bos-command-model" />
 				<ref bean="hbm-bos-data-instance-model" />
 				<ref bean="hbm-bos-data-instance-model-arch" />
 				<ref bean="hbm-bos-platform-command-model" />
-				<ref bean="hbm-bos-privilege-model" />
 				<ref bean="hbm-bos-process-comment-model" />
 				<ref bean="hbm-bos-process-comment-model-arch" />
 				<ref bean="hbm-bos-process-document-mapping-model" />
@@ -302,7 +292,6 @@
 			<map>
                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write"/>
@@ -328,7 +317,6 @@
                 <entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="read-write"/>
-                <entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write"/>
                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write"/>

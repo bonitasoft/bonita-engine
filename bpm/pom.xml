@@ -11,7 +11,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bonita-actor-privilege</module>
 		<module>bonita-home</module>
 		<module>bonita-external</module>
 		<module>bonita-core</module>

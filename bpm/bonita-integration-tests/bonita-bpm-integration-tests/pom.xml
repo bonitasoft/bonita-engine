@@ -47,14 +47,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Actor Privilege -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Category -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.category</groupId>
@@ -171,14 +163,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Privilege -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Profile -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.profile</groupId>
@@ -225,26 +209,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
 			<artifactId>bonita-actor-mapping-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Actor Privilege -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -723,26 +687,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.authentication</groupId>
 			<artifactId>bonita-platform-authentication-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Privilege -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

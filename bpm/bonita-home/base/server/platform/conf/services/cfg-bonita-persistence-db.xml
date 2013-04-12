@@ -19,13 +19,11 @@
 				<ref bean="db-bonita-scheduler"/>
 				<ref bean="db-bonita-scheduler-quartz"/>
 				<ref bean="db-bos-actor-mapping"/>
-				<ref bean="db-bos-actor-privilege-model"/>
 				<ref bean="db-bos-category-model"/>
 				<ref bean="db-bos-command-model"/>
 				<ref bean="db-bos-data-instance-model"/>
 				<ref bean="db-bos-data-instance-model-arch"/>
 				<ref bean="db-bos-platform-command-model"/>
-				<ref bean="db-bos-privilege-model"/>
 				<ref bean="db-bos-process-comment-model"/>
 				<ref bean="db-bos-process-comment-model-arch"/>
 				<ref bean="db-bos-process-document-mapping-model"/>

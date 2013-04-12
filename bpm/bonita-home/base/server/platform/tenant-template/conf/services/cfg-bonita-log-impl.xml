@@ -7,9 +7,6 @@
         		<entry key="ACTOR_CREATED:INTERNAL" value="true" />
         		<entry key="ACTOR_DELETED:INTERNAL" value="true" />
         		<entry key="ACTOR_UPDATED:INTERNAL" value="true" />
-        		<entry key="ACTOR_PRIVILEGE_CREATED:INTERNAL" value="true" />
-        		<entry key="ACTOR_PRIVILEGE_DELETED:INTERNAL" value="true" />
-        		<entry key="ACTOR_PRIVILEGE_UPDATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
         		<entry key="CATEGORY_CREATED:INTERNAL" value="true" />
@@ -67,8 +64,6 @@
         		<entry key="MIGRATION_PLAN_MAPPING_CREATED:INTERNAL" value="true" />
         		<entry key="MIGRATION_PLAN_MAPPING_DELETED:INTERNAL" value="true" />
         		<entry key="PENDING_ACTIVITY_MAPPING_CREATED:INTERNAL" value="true" />
-        		<entry key="PRIVILEGE_CREATED:INTERNAL" value="true" />
-        		<entry key="PRIVILEGE_DELETED:INTERNAL" value="true" />
         		<entry key="PROCESS_DEFINITION_CREATED:INTERNAL" value="true" />
         		<entry key="PROCESS_DEFINITION_DELETED:INTERNAL" value="true" />
         		<entry key="PROCESS_DEFINITION_UPDATED:INTERNAL" value="true" />

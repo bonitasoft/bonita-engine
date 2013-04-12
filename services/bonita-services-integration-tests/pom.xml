@@ -477,32 +477,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Privilege -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Recorder -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>

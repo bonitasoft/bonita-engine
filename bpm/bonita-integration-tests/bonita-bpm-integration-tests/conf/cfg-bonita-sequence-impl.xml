@@ -35,8 +35,6 @@
 				<entry key="24" value="100" /><!-- P-metadata_def -->
 				<entry key="25" value="100" /><!-- P-metadata_val -->
 				<entry key="26" value="100" /><!-- user_contactinfo -->
-				<entry key="40" value="100" /><!-- privilege -->
-				<entry key="41" value="100" /><!-- privilege_excep -->
 				<entry key="50" value="100" /><!-- dataSource -->
 				<entry key="51" value="100" /><!-- dataSourceParameter -->
 				<entry key="60" value="100" /><!-- employee -->
@@ -48,8 +46,6 @@
 				<entry key="70" value="100" /><!-- jobDescriptor -->
 				<entry key="71" value="100" /><!-- jobParameter -->
 				<entry key="90" value="100" /><!-- command -->
-				<entry key="1060" value="100" /><!-- bos_privilege -->
-				<entry key="1070" value="100" /><!-- actor_privilege -->
 				<entry key="10000" value="100" /><!-- actor -->
 				<entry key="10001" value="100" /><!-- actorMapping -->
 				<entry key="10019" value="100" /><!-- Breakpoint -->
@@ -93,8 +89,6 @@
 				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobDescriptorImpl" value="70" />
 				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl" value="71" />
 				<entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="90" />
-				<entry key="org.bonitasoft.engine.actor.privilege.model.impl.SActorPrivilegeImpl" value="1070" />
-				<entry key="org.bonitasoft.engine.privilege.model.impl.SPrivilegeImpl" value="1060" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="9990" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="9991" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="9992" />

@@ -26,7 +26,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.actor.ActorMappingExportException;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.privilege.api.ActorPrivilegeService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CreateManualUserTask;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.api.impl.transaction.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.GetProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.GetSUser;
-import org.bonitasoft.engine.api.impl.transaction.RemoveActorPrivilegeById;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
@@ -44,7 +42,6 @@ import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
-import org.bonitasoft.engine.bpm.model.privilege.ActorPrivilege;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -124,11 +121,6 @@ import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.search.SearchActorPrivileges;
-import org.bonitasoft.engine.search.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -201,21 +193,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
             final File processeFolder = new File(file, String.valueOf(serverProcessDefinition.getId()));
             FileUtil.deleteDir(processeFolder);
-
-            // delete actorPrivileges
-            final ActorPrivilegeService actorPrivilegeService = tenantAccessor.getActorPrivilegeService();
-            final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-            final SearchOptions searchOptions = new SearchOptionsImpl(0, 10);
-            final SearchActorPrivileges searchActorPrivileges = new SearchActorPrivileges(actorPrivilegeService,
-                    searchEntitiesDescriptor.getActorPrivilegeDescriptor(), searchOptions);
-            transactionExecutor.execute(searchActorPrivileges);
-            final SearchResult<ActorPrivilege> actorPrisRes = searchActorPrivileges.getResult();
-            if (actorPrisRes.getCount() > 0) {
-                for (final ActorPrivilege actorPrivilege : actorPrisRes.getResult()) {
-                    final RemoveActorPrivilegeById removeActorPrivilegeById = new RemoveActorPrivilegeById(actorPrivilege.getId(), actorPrivilegeService);
-                    transactionExecutor.execute(removeActorPrivilegeById);
-                }
-            }
         } catch (final SProcessDefinitionNotFoundException e) {
             log(tenantAccessor, e);
             throw new ProcessDefinitionNotFoundException(e);

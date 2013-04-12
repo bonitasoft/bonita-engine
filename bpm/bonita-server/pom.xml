@@ -36,28 +36,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Actor Privilege -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.actor.privilege</groupId>
-			<artifactId>bonita-actor-privilege-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- API -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
@@ -568,28 +546,6 @@
 			<artifactId>bonita-platform-session-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<!-- Privilege -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.privilege</groupId>
-			<artifactId>bonita-privilege-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		
 		<!-- Process Comment -->
 		<dependency>
@@ -873,13 +829,6 @@
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
 									<include>com.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl-hibernate</include>
-									<!-- Actor Privilege -->
-									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model</include>
-									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl</include>
-									<include>com.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl-mybatis</include>
-									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-model-impl-hibernate</include>
-									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-api</include>
-									<include>org.bonitasoft.engine.actor.privilege:bonita-actor-privilege-api-impl</include>
 									<!-- API -->
 									<include>org.bonitasoft.engine.api:bonita-server-api</include>
 									<include>org.bonitasoft.engine.api:bonita-server-api-http</include>
@@ -1056,13 +1005,6 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
-									<!-- Privilege -->
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-model</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-model-impl</include>
-									<include>com.bonitasoft.engine.privilege:bonita-privilege-model-impl-mybatis</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-model-impl-hibernate</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-api</include>
-									<include>org.bonitasoft.engine.privilege:bonita-privilege-api-impl</include>
 									<!-- Process Comment -->
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl</include>

@@ -26,7 +26,6 @@
 		<module>bonita-persistence</module>
 		<module>bonita-platform</module>
 		<module>bonita-platform-command</module>
-		<module>bonita-privilege</module>
 		<module>bonita-profile</module>
 		<module>bonita-scheduler</module>
 		<module>bonita-work</module>

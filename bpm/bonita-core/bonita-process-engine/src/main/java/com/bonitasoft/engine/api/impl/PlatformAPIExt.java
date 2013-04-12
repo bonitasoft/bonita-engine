@@ -23,15 +23,12 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.ActivateTenant;
-import org.bonitasoft.engine.api.impl.transaction.CreateDefaultPrivileges;
 import org.bonitasoft.engine.api.impl.transaction.CreateTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.GetTenantInstance;
-import org.bonitasoft.engine.api.impl.transaction.RemovePrivilege;
-import org.bonitasoft.engine.bpm.model.privilege.Privilege;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.command.model.SCommandBuilder;
@@ -60,16 +57,11 @@ import org.bonitasoft.engine.platform.STenantCreationException;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.privilege.api.PrivilegeService;
-import org.bonitasoft.engine.privilege.model.buidler.PrivilegeBuilders;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.SearchPrivilegeDescriptor;
-import org.bonitasoft.engine.search.SearchPrivileges;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -209,8 +201,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = tenantServiceAccessor.getCommandService();
-            final PrivilegeService privilegeService = tenantServiceAccessor.getPrivilegeService();
-            final PrivilegeBuilders privilegeBuilders = tenantServiceAccessor.getPrivilegeBuilders();
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 sessionAccessor = serviceAccessorFactory.createSessionAccessor();
@@ -220,11 +210,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
                 final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
                 createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
-                final CreateDefaultPrivileges createDefaultPrivileges = new CreateDefaultPrivileges(privilegeService, privilegeBuilders);
-                createDefaultPrivileges.execute();
-
                 sessionService.deleteSession(session.getId());
-
                 return tenantId;
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
@@ -270,21 +256,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             // delete tenant in database
             final TransactionContent transactionContent = new DeleteTenant(tenantId, platformService);
             transactionExecutor.execute(transactionContent);
-
-            // delete default privileges
-            final TenantServiceAccessor tenantAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final PrivilegeService privilegeService = tenantAccessor.getPrivilegeService();
-            final SearchPrivilegeDescriptor privilegeSearcher = tenantAccessor.getSearchEntitiesDescriptor().getPrivilegeDescriptor();
-            final SearchOptions searchOptions = new SearchOptionsImpl(0, 10);
-            final SearchPrivileges searchPrivileges = new SearchPrivileges(privilegeService, privilegeSearcher, searchOptions);
-            transactionExecutor.execute(searchPrivileges);
-            final SearchResult<Privilege> privilegesRes = searchPrivileges.getResult();
-            if (privilegesRes.getCount() > 0) {
-                for (final Privilege pri : privilegesRes.getResult()) {
-                    final RemovePrivilege removePrivilege = new RemovePrivilege(pri.getId(), privilegeService);
-                    transactionExecutor.execute(removePrivilege);
-                }
-            }
 
             // delete tenant folder
             final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;
