@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.model;
 
-
 import org.bonitasoft.engine.bpm.model.impl.DesignProcessDefinitionImpl;
 
 /**
@@ -16,10 +15,6 @@ import org.bonitasoft.engine.bpm.model.impl.DesignProcessDefinitionImpl;
  */
 public class ProcessBuilder extends org.bonitasoft.engine.bpm.model.ProcessBuilder {
 
-    /**
-     * @param process
-     * @param processDefinitionBuilder
-     */
     ProcessBuilder(final DesignProcessDefinitionImpl process, final ProcessDefinitionBuilder processDefinitionBuilder) {
         super(process, processDefinitionBuilder);
     }

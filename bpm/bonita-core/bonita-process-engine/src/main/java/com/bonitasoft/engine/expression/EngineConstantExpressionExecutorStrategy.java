@@ -21,12 +21,6 @@ import com.bonitasoft.engine.api.impl.APIAccessorExt;
  */
 public class EngineConstantExpressionExecutorStrategy extends org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy {
 
-    /**
-     * @param activityInstanceService
-     * @param processInstanceService
-     * @param sessionService
-     * @param sessionAccessor
-     */
     public EngineConstantExpressionExecutorStrategy(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final SessionService sessionService, final ReadSessionAccessor sessionAccessor) {
         super(activityInstanceService, processInstanceService, sessionService, sessionAccessor);
