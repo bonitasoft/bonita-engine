@@ -477,7 +477,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
                     processInstanceService.deleteFlowNodeInstance(activityInstance, null);
                 } else {
-                    throw new ObjectDeletionException("Can't delete a task that is not a sub task", ManualTaskInstance.class);
+                    throw new ObjectDeletionException("Can't delete a task that is not a manual task", ManualTaskInstance.class);
                 }
             } catch (final SActivityInstanceNotFoundException e) {
                 throw new ObjectNotFoundException("can't find activity with id " + manualTaskId, e, ManualTaskInstance.class);

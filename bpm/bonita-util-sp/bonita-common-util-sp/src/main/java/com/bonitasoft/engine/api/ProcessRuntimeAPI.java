@@ -54,7 +54,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            the task priority to set
      * @return the matching an instance of manual task
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityExecutionErrorException
      *             An unexpected error occurred while executing the user task
      * @throws ActivityInterruptedException
@@ -62,12 +62,24 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @throws ActivityCreationException
      * @throws ActivityNotFoundException
      *             errors thrown if can't find corresponding activity
-     * since 6.0
+     *             since 6.0
      */
     ManualTaskInstance addManualUserTask(long humanTaskId, String taskName, String displayName, long assignTo, String description, Date dueDate,
             TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException, ActivityExecutionErrorException, ActivityCreationException,
             ActivityNotFoundException;
 
+    /**
+     * Delete a manual task. Only manual tasks can be deleted at runtime.
+     * 
+     * @param manualTaskId
+     *            the id of the task to delete
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws ObjectDeletionException
+     *             if the manual task could not be deleted.
+     * @throws ObjectNotFoundException
+     *             if the manual task could not be found with the provided id
+     */
     void deleteManualUserTask(final long manualTaskId) throws InvalidSessionException, ObjectDeletionException, ObjectNotFoundException;
 
     /**
@@ -85,7 +97,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the process instance
      * @return a map with connector parameter name and parameter value object
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ArchivedProcessInstanceNotFoundException
      * @throws ClassLoaderException
      *             errors thrown while loading class failed.
@@ -120,7 +132,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the process instance
      * @return a map with new values of elements set by the operations
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ArchivedProcessInstanceNotFoundException
      * @throws ClassLoaderException
      *             errors thrown while loading class failed.
@@ -134,7 +146,8 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorAtProcessInstantiation(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long processInstanceId) throws InvalidSessionException,
-            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
+            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
+            NotSerializableException;
 
     /**
      * Execute connector in given activity instance.
@@ -151,7 +164,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the activity instance
      * @return a map with connector parameter name and parameter value object
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *             if the activity cannot be found
      * @throws ProcessInstanceNotFoundException
@@ -187,7 +200,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the activity instance
      * @return a map with new values of elements set by the operations
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *             if the activity cannot be found
      * @throws ProcessInstanceNotFoundException
@@ -221,7 +234,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the activity instance
      * @return a map with connector parameter name and parameter value object
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ArchivedActivityInstanceNotFoundException
      *             if the activity cannot be found
      * @throws ProcessInstanceNotFoundException
@@ -257,7 +270,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the activity instance
      * @return a map with new values of elements set by the operations
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ArchivedActivityInstanceNotFoundException
      *             if the activity cannot be found
      * @throws ProcessInstanceNotFoundException
@@ -292,7 +305,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the process instance
      * @return a map with connector parameter name and parameter value object
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ArchivedProcessInstanceNotFoundException
      * @throws ClassLoaderException
      *             errors thrown while loading class failed.
@@ -325,7 +338,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the process instance
      * @return a map with new values of elements set by the operations
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ArchivedProcessInstanceNotFoundException
      * @throws ClassLoaderException
      *             errors thrown while loading class failed.
@@ -339,7 +352,8 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     Map<String, Serializable> executeConnectorOnCompletedProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long processInstanceId) throws InvalidSessionException,
-            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
+            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
+            NotSerializableException;
 
     /**
      * Execute connector in given process instance.
@@ -358,7 +372,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @throws ClassLoaderException
      *             errors thrown while loading class failed.
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
      *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
      * @throws ConnectorException
@@ -370,8 +384,8 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      */
     Map<String, Serializable> executeConnectorOnProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
-            throws ClassLoaderException, InvalidSessionException, ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException,
-            NotSerializableException;
+            throws ClassLoaderException, InvalidSessionException, ProcessInstanceNotFoundException, ConnectorException,
+            InvalidEvaluationConnectorConditionException, NotSerializableException;
 
     /**
      * Execute connector in given process instance with operations
@@ -392,7 +406,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @throws ClassLoaderException
      *             errors thrown while loading class failed.
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
      *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
      * @throws ConnectorException
