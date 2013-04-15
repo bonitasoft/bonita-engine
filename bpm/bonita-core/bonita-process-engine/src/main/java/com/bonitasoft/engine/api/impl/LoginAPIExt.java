@@ -27,6 +27,7 @@ import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
@@ -37,6 +38,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
 
     @Override
     public APISession login(final long tenantId, final String userName, final String password) throws LoginException {
+        LicenseChecker.getInstance().checkLicence();
         checkUsernameAndPassword(userName, password);
         final STenant sTenant = getTenant(tenantId);
         return login(userName, password, sTenant);
@@ -47,7 +49,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
         return TenantServiceSingleton.getInstance(tenantId);
     }
 
-    protected STenant getTenant(final Long tenantId) throws LoginException {
+    private STenant getTenant(final Long tenantId) throws LoginException {
         try {
             final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformServiceAccessor.getPlatformService();

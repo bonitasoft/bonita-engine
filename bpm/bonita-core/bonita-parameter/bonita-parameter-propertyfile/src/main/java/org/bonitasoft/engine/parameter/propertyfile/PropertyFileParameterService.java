@@ -32,9 +32,6 @@ import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
-import com.bonitasoft.manager.Features;
-import com.bonitasoft.manager.Manager;
-
 /**
  * @author Matthieu Chaffotte
  * @author Zhao Na
@@ -73,9 +70,6 @@ public class PropertyFileParameterService implements ParameterService {
 
     @Override
     public void addAll(final long processDefinitionId, final Map<String, String> parameters) throws SParameterProcessNotFoundException {
-        if (!Manager.isFeatureActive(Features.CREATE_PARAMETER)) {
-            throw new IllegalStateException("The parameter creation is not an active feature");
-        }
         try {
             final String filePath = getFilePathWithoutChecking(processDefinitionId);
             final Properties properties = new Properties();

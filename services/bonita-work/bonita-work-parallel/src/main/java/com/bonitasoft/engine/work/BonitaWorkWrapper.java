@@ -21,10 +21,6 @@ public class BonitaWorkWrapper extends NotifyingRunnable {
 
     private boolean cancelled = false;
 
-    /**
-     * @param runnableListener
-     * @param tenantId
-     */
     public BonitaWorkWrapper(final RunnableListener runnableListener, final long tenantId, final BonitaWork work) {
         super(runnableListener, tenantId);
         this.work = work;

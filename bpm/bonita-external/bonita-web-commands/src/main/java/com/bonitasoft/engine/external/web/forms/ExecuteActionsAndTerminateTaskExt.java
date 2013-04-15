@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package org.bonitasoft.engine.external.web.forms;
+package com.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -37,6 +37,7 @@ import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 

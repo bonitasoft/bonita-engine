@@ -1,16 +1,11 @@
-/**
+/*******************************************************************************
  * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.impl;
 
 import java.io.Serializable;
@@ -71,10 +66,6 @@ public class BreakpointServiceImpl implements BreakpointService {
 
         private final BusinessTransaction transaction;
 
-        /**
-         * @param breakpointServiceImpl
-         * @param transaction
-         */
         public ResetBreakpointFlag(final BreakpointServiceImpl breakpointServiceImpl, final BusinessTransaction transaction) {
             this.breakpointServiceImpl = breakpointServiceImpl;
             this.transaction = transaction;
@@ -303,4 +294,5 @@ public class BreakpointServiceImpl implements BreakpointService {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
+
 }

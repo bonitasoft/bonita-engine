@@ -149,10 +149,10 @@ import com.bonitasoft.engine.exception.InvalidParameterValueException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 import com.bonitasoft.manager.Features;
-import com.bonitasoft.manager.Manager;
 
 /**
  * @author Matthieu Chaffotte
@@ -213,6 +213,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws InvalidSessionException, InvalidParameterValueException {
+        LicenseChecker.getInstance().checkLicence(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         SProcessDefinition sDefinition = null;
@@ -410,9 +411,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public ManualTaskInstance addManualUserTask(final long humanTaskId, final String taskName, final String displayName, final long assignTo,
             final String description, final Date dueDate, final TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException,
             ActivityExecutionErrorException, ActivityCreationException, ActivityNotFoundException {
-        if (!Manager.isFeatureActive(Features.CREATE_MANUAL_TASK)) {
-            throw new IllegalStateException("The add of a manual task is not an active feature");
-        }
+        LicenseChecker.getInstance().checkLicence(Features.CREATE_MANUAL_TASK);
         TenantServiceAccessor tenantAccessor = null;
         final TaskPriority prio = priority != null ? priority : TaskPriority.NORMAL;
         try {
@@ -463,9 +462,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void deleteManualUserTask(final long manualTaskId) throws InvalidSessionException, ObjectDeletionException, ObjectNotFoundException {
-        if (!Manager.isFeatureActive(Features.CREATE_MANUAL_TASK)) {
-            throw new IllegalStateException("The add of a manual task is not an active feature");
-        }
+        LicenseChecker.getInstance().checkLicence(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -610,9 +607,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException {
-        if (!Manager.isFeatureActive(Features.SET_CONNECTOR_STATE)) {
-            throw new IllegalStateException("Set a connector state is not an active feature");
-        }
+        LicenseChecker.getInstance().checkLicence(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -633,9 +628,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException,
             ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException {
-        if (!Manager.isFeatureActive("REPLAY_ACTIVITY")) {
-            throw new IllegalStateException("The replay an activity is not an active feature");
-        }
+        LicenseChecker.getInstance().checkLicence(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
