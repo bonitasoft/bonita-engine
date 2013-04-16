@@ -53,6 +53,7 @@ public class LicenseChecker {
         final int count = random.nextInt(2);
         if (count == 0 && !Manager.isValid()) {
             stopNode();
+            throw new IllegalStateException(Manager.getErrorMessage());
         }
     }
 
