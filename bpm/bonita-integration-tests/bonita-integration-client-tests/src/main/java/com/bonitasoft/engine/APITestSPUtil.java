@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,17 +30,11 @@ import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.log.Log;
 
+import static org.junit.Assert.assertTrue;
+
 public class APITestSPUtil extends APITestUtil {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(APITestSPUtil.class);
-
-    protected static final String SUPERVISOR_ID_KEY = "supervisorId";
-
-    protected static final String ROLE_ID_KEY = "roleId";
-
-    protected static final String GROUP_ID_KEY = "groupId";
-
-    protected static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
 
     private LogAPI logAPI;
 

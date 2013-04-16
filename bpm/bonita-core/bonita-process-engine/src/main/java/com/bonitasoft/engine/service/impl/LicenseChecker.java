@@ -50,7 +50,7 @@ public class LicenseChecker {
     }
 
     public void checkLicence() {
-        final int count = random.nextInt(1);
+        final int count = random.nextInt(2);
         if (count == 0 && !Manager.isValid()) {
             stopNode();
         }
