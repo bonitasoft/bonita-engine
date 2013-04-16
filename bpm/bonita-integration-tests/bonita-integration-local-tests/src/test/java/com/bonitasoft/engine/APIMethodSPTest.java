@@ -6,8 +6,9 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package org.bonitasoft.engine.test;
+package com.bonitasoft.engine;
 
+import org.bonitasoft.engine.test.APIMethodTest;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.impl.LogAPIExt;
