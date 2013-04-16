@@ -29,13 +29,11 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 
-@Ignore("Not yet implemented")
 public class TimerBoundaryEventTest extends CommonAPISPTest {
 
     private User donaBenta;

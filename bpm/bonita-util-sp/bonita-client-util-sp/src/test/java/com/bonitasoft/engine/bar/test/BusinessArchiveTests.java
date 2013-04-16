@@ -323,20 +323,20 @@ public class BusinessArchiveTests {
         assertEquals(process.getProcessContainer().getStartEvents().size(), result.getProcessContainer().getStartEvents().size());
         assertEquals(1, result.getProcessContainer().getStartEvents().size());
         assertEquals(process.getProcessContainer().getStartEvents().get(0), result.getProcessContainer().getStartEvents().get(0));
-        assertEquals(1, result.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitons().size());
-        assertEquals(process.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitons().get(0).getOperations(), result
-                .getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitons().get(0).getOperations());
-        assertEquals(1, result.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitons().get(0).getOperations().size());
+        assertEquals(1, result.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().size());
+        assertEquals(process.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations(), result
+                .getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations());
+        assertEquals(1, result.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations().size());
 
         assertEquals(process.getProcessContainer().getIntermediateCatchEvents().size(), result.getProcessContainer().getIntermediateCatchEvents().size());
         assertEquals(1, result.getProcessContainer().getIntermediateCatchEvents().size());
         assertEquals(process.getProcessContainer().getIntermediateCatchEvents().get(0), result.getProcessContainer().getIntermediateCatchEvents().get(0));
-        assertEquals(1, result.getProcessContainer().getIntermediateCatchEvents().get(0).getMessageEventTriggerDefinitons().size());
+        assertEquals(1, result.getProcessContainer().getIntermediateCatchEvents().get(0).getMessageEventTriggerDefinitions().size());
 
         final CatchMessageEventTriggerDefinition expectedCatchMessageEventTrigger = process.getProcessContainer().getIntermediateCatchEvents().get(0)
-                .getMessageEventTriggerDefinitons().get(0);
+                .getMessageEventTriggerDefinitions().get(0);
         final CatchMessageEventTriggerDefinition actualCatchMessageEventTrigger = result.getProcessContainer().getIntermediateCatchEvents().get(0)
-                .getMessageEventTriggerDefinitons().get(0);
+                .getMessageEventTriggerDefinitions().get(0);
         assertEquals(expectedCatchMessageEventTrigger.getCorrelations(), actualCatchMessageEventTrigger.getCorrelations());
         assertEquals(1, actualCatchMessageEventTrigger.getCorrelations().size());
         assertEquals(expectedCatchMessageEventTrigger.getOperations(), actualCatchMessageEventTrigger.getOperations());
