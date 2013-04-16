@@ -53,7 +53,6 @@
 			<artifactId>bonita-server-api-http</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<!-- Archive -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.archive</groupId>
@@ -402,8 +401,13 @@
 
 		<!-- Migration -->
 		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-instance-migration-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-instance-migration-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -412,8 +416,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>bonita-instance-migration-impl-hibernate</artifactId>
 			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-instance-migration-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -955,6 +959,7 @@
 									<!-- Migration -->
 									<include>org.bonitasoft.engine.core:bonita-instance-migration-api</include>
 									<include>org.bonitasoft.engine.core:bonita-instance-migration-impl</include>
+									<include>com.bonitasoft.engine.core:bonita-instance-migration-impl</include>
 									<include>com.bonitasoft.engine.core:bonita-instance-migration-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core:bonita-instance-migration-impl-hibernate</include>
 									<!-- Monitoring -->
@@ -1031,6 +1036,7 @@
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
+									<include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<!-- Recorder -->
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
