@@ -1031,10 +1031,14 @@
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
 									<!-- Process Instance -->
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
+									<include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
+									<include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
 									<include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-hibernate</include>
+									<include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
+									<include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<!-- Recorder -->

@@ -14,8 +14,6 @@
 	<name>Bonita Process Definition</name>
 
 	<modules>
-		<module>bonita-process-definition-model</module>
-		<module>bonita-process-definition-model-impl</module>
 		<module>bonita-process-definition-model-impl-mybatis</module>
 	</modules>
 </project>
