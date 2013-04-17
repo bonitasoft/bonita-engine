@@ -23,4 +23,10 @@
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService"></constructor-arg>
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders"></constructor-arg>
 	</bean>
+	
+	<bean id="stringIndexOperationExecutorStrategy" class="com.bonitasoft.engine.operation.StringIndexOperationExecutorStrategy">
+		<constructor-arg name="processInstanceService" ref="processInstanceService" />
+		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+	</bean>
 </beans>

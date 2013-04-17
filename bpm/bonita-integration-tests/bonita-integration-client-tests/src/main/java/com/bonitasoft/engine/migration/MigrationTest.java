@@ -35,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 
@@ -213,13 +213,13 @@ public class MigrationTest extends CommonAPISPTest {
         final long migrationPlanId = importMigrationPlan("stepRename.xml");
         final String actorName = "actor";
 
-        final ProcessDefinitionBuilder designProcessDefinition1 = new ProcessDefinitionBuilder().createNewInstance("ProcessToMigrate", "1.0");
+        final ProcessDefinitionBuilderExt designProcessDefinition1 = new ProcessDefinitionBuilderExt().createNewInstance("ProcessToMigrate", "1.0");
         designProcessDefinition1.addActor(actorName);
         designProcessDefinition1.addUserTask("step1", actorName);
         designProcessDefinition1.addUserTask("step2", actorName);
         designProcessDefinition1.addTransition("step1", "step2");
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1.done(), actorName, john);
-        final ProcessDefinitionBuilder designProcessDefinition2 = new ProcessDefinitionBuilder().createNewInstance("MigratedProcess", "1.0");
+        final ProcessDefinitionBuilderExt designProcessDefinition2 = new ProcessDefinitionBuilderExt().createNewInstance("MigratedProcess", "1.0");
         designProcessDefinition2.addActor(actorName);
         designProcessDefinition2.addUserTask("step1", actorName);
         designProcessDefinition2.addUserTask("step2_migrated", actorName);

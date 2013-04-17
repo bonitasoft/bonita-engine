@@ -12,6 +12,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>bonita-archive</module>
 		<module>bonita-command</module>
 		<module>bonita-data</module>
 		<module>bonita-data-instance</module>

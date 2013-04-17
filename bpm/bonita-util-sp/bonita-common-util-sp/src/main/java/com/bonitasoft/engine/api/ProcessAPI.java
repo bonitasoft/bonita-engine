@@ -8,11 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.api.DocumentAPI;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface ProcessAPI extends org.bonitasoft.engine.api.ProcessAPI, ProcessManagementAPI, ProcessRuntimeAPI, DocumentAPI, DebugAPI {
+public interface ProcessAPI extends org.bonitasoft.engine.api.ProcessAPI, ProcessManagementAPI, ProcessRuntimeAPI, DebugAPI {
 
 }

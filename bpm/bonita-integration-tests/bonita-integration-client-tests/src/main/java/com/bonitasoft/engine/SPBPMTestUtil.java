@@ -33,7 +33,7 @@ import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotActivatedException;
 import com.bonitasoft.engine.platform.Tenant;
@@ -158,7 +158,7 @@ public class SPBPMTestUtil {
     public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
             final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator, final boolean parallelActivities)
             throws InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(processName, processVersion);
         if (!isHuman.isEmpty() && isHuman.contains(true)) {
             processBuilder.addActor(actorName);
             if (addActorInitiator) {

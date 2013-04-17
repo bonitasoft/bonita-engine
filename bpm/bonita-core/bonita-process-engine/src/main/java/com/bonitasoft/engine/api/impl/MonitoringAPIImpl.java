@@ -28,15 +28,20 @@ import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class MonitoringAPIImpl implements MonitoringAPI {
 
     @Override
     public long getNumberOfActiveTransactions() throws MonitoringException, InvalidSessionException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
+
         final TenantMonitoringService tenantMonitoringService = getTenantMonitoringService();
         return tenantMonitoringService.getNumberOfActiveTransactions();
     }
@@ -64,12 +69,16 @@ public class MonitoringAPIImpl implements MonitoringAPI {
 
     @Override
     public long getNumberOfExecutingProcesses() throws MonitoringException, InvalidSessionException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
+
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public long getNumberOfUsers() throws MonitoringException, InvalidSessionException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
+
         final TenantMonitoringService tenantMonitoringService = getTenantMonitoringService();
         final TransactionService transactionService = getTransactionService();
         final TechnicalLoggerService logger = getTechnicalLogger();

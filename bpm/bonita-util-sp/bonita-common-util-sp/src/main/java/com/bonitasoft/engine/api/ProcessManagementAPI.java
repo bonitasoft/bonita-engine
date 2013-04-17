@@ -17,6 +17,7 @@ import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.ConnectorException;
+import org.bonitasoft.engine.exception.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
@@ -188,6 +189,29 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException;
+
+    /**
+     * Updates the implementation version of the connector of the process definition.
+     * Removes the old the old .impl file, puts the new .impl file in the connector directory and reloads the cache.
+     * 
+     * @param processDefinitionId
+     *            the identifier of the process definition.
+     * @param connectorName
+     *            the name of the connector.
+     * @param connectorVersion
+     *            the version of the connector.
+     * @param connectorImplementationArchive
+     *            the zipped .impl file contented as a byte array.
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws InvalidConnectorImplementationException
+     *             if the implementation is not valid. (e.g. wrong format)
+     * @throws ConnectorException
+     *             if an exception occurs when setting the new implementation of the connector.
+     * @since 6.0
+     */
+    void setConnectorImplementation(long processDefinitionId, String connectorName, String connectorVersion, byte[] connectorImplementationArchive)
+            throws InvalidSessionException, InvalidConnectorImplementationException, ConnectorException;
 
     /**
      * set state of activity to its previous state and then execute.

@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 public class TaskOnDemandTest extends CommonAPISPTest {
 
@@ -63,7 +63,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         final String password = "secretPassword";
         final String delivery = "Delivery men";
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTaskOnDemand", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
         processBuilder.addActor(delivery).addDescription("kikoo lol").addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", delivery);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
 
@@ -99,7 +99,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         final String password = "secretPassword";
         final String delivery = "Delivery men";
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTaskOnDemandAndChildTask", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemandAndChildTask", "1.0");
         processBuilder.addActor(delivery).addDescription("kikoo lol").addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", delivery);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
 
@@ -246,7 +246,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     }
 
     private ProcessDefinition deployAndEnableSimpleProcess(final String actorName) throws BonitaException, InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTaskOnDemand", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
         processBuilder.addActor(actorName).addDescription("kikoo lol").addUserTask("userTask1", actorName);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), actorName, john);
         return processDefinition;
@@ -257,7 +257,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         final String password = "secretPassword";
         final String delivery = "Delivery men";
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTaskOnDemand", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
         processBuilder.addActor(delivery).addDescription("kikoo lol").addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", delivery);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
 

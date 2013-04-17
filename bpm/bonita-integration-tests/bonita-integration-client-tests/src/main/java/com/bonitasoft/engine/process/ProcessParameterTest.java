@@ -57,7 +57,7 @@ import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
 
 public class ProcessParameterTest extends CommonAPISPTest {
@@ -78,7 +78,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void getNoParametersWhenAddingNoParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -93,7 +93,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void getNumberOfParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key2", String.class.getCanonicalName())
                 .addParameter("key3", String.class.getCanonicalName()).addParameter("key4", String.class.getCanonicalName()).addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -114,7 +114,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void getNoParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -129,7 +129,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void getParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key.2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 
@@ -158,7 +158,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
     public void getParameter() throws BonitaException {
         final String parameterValue = "a very important piece of information";
         final String parameterName = "myParam1";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("getParameter", "1.0");
         processBuilder.addParameter("myParam1", String.class.getCanonicalName()).addDescription("Parameter description");
         processBuilder.addParameter("myParam2", String.class.getCanonicalName()).addUserTask("userTask1", null);
 
@@ -182,7 +182,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
     @Test
     public void deployWithNullParam() throws BonitaException {
         final String parameterName = "myParam1";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("getParameter", "1.0");
         processBuilder.addParameter("myParam1", String.class.getCanonicalName()).addParameter("myParam2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 
@@ -208,7 +208,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final String parameterValue = "a very important piece of information";
         final String parameterName = "myParam1";
         final String wrongParameterName = "wrongParameterName";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getUnknownParameter", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("getUnknownParameter", "1.0");
         processBuilder.addParameter("myParam1", String.class.getCanonicalName()).addParameter("myParam2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 
@@ -230,7 +230,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void updateParameter() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key.2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -255,7 +255,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test(expected = ParameterNotFoundException.class)
     public void updateFailsWhenParameterDoesNotExist() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -275,7 +275,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void updateAParameterWhichHasNotGotAnyDefaultValueWhichResolvesTheProcess() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -296,7 +296,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void updateAParameterWhichHasNotGotAnyDefaultValue() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -317,7 +317,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void sortParametersByNameAsc() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -344,7 +344,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void sortParametersByNameDesc() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -371,7 +371,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void getPageOne() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -396,7 +396,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void getPageTwo() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -421,7 +421,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test(expected = PageOutOfRangeException.class)
     public void getPageTwoOutOfBound() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -462,7 +462,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
     }
 
     private long createProcessWithUnresolvedParametersAndDeployIt() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -481,7 +481,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void emptyParameterIsAValidValue() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("emptyParameterIsAValidValue", "1.7");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("emptyParameterIsAValidValue", "1.7");
         processBuilder.addParameter("Astronaut", String.class.getCanonicalName()).addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -499,7 +499,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void resolvedDependencies() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addParameter("squirrel", String.class.getCanonicalName()).addParameter("donkey", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
@@ -522,7 +522,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void updateAParameterWithNullValueAndTheProcessIsUnresolved() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -550,7 +550,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void showResolvedAndUnresolvedParameters() throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addDescription("description").addParameter("bear", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
         final DesignProcessDefinition processDefinition = processBuilder.done();
@@ -585,7 +585,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final String paraName1 = "name";
         final String paraName2 = "age";
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addParameter(paraName1, String.class.getCanonicalName());
         processDefinitionBuilder.addParameter(paraName2, Integer.class.getCanonicalName());
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
@@ -618,7 +618,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final Map<String, String> paraMap = new HashMap<String, String>();
         paraMap.put(paraName, "abc");
 
-        final ProcessDefinitionBuilder designProcessDefinition = buildProcessWithOutputConnectorAndParameter(delivery, inputName, connectorId,
+        final ProcessDefinitionBuilderExt designProcessDefinition = buildProcessWithOutputConnectorAndParameter(delivery, inputName, connectorId,
                 connectorVersion, input1Expression, paraName);
 
         final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(delivery, userId, designProcessDefinition, paraMap);
@@ -672,9 +672,9 @@ public class ProcessParameterTest extends CommonAPISPTest {
         deleteUser(user.getId());
     }
 
-    private ProcessDefinitionBuilder buildProcessWithOutputConnectorAndParameter(final String delivery, final String inputName, final String connectorId,
+    private ProcessDefinitionBuilderExt buildProcessWithOutputConnectorAndParameter(final String delivery, final String inputName, final String connectorId,
             final String connectorVersion, final Expression input1Expression, final String paraName) {
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
                 .addInput(inputName, input1Expression);
@@ -685,7 +685,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
     }
 
     private ProcessDefinition deployProcessWithTestConnectorAndParameter(final String delivery, final long userId,
-            final ProcessDefinitionBuilder designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
+            final ProcessDefinitionBuilderExt designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         if (parameters != null) {
             businessArchive.setParameters(parameters);
@@ -711,7 +711,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
     public void testParametersAreWellTypped() throws Exception {
         final String actor = "acting";
         final User jack = createUserAndLogin("jack", "leaking_caldron");
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("testCantResolveDataInExpressionInDataDefaultValue",
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("testCantResolveDataInExpressionInDataDefaultValue",
                 "1");
         processBuilder.addActor(actor).addDescription("Process to test archiving mechanism");
         processBuilder.addDoubleData("aData", null);

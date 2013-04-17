@@ -14,11 +14,11 @@ import org.bonitasoft.engine.bpm.model.impl.ParameterDefinitionImpl;
 /**
  * @author Matthieu Chaffotte
  */
-public class ParameterDefinitionBuilder extends ProcessBuilder {
+public class ParameterDefinitionBuilder extends ProcessBuilderExt {
 
     private final ParameterDefinitionImpl parameter;
 
-    ParameterDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl process, final String parameterName,
+    ParameterDefinitionBuilder(final ProcessDefinitionBuilderExt processDefinitionBuilder, final DesignProcessDefinitionImpl process, final String parameterName,
             final String type) {
         super(process, processDefinitionBuilder);
         parameter = new ParameterDefinitionImpl(parameterName, type);

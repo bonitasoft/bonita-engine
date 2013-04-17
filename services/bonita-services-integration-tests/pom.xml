@@ -21,7 +21,7 @@
 
 		<!-- Archive -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.archive</groupId>
+			<groupId>com.bonitasoft.engine.archive</groupId>
 			<artifactId>bonita-archive-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

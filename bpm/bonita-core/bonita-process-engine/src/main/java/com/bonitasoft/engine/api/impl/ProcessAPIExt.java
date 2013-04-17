@@ -24,10 +24,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.ActorMappingExportException;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
+import org.bonitasoft.engine.api.impl.transaction.AddSDependency;
 import org.bonitasoft.engine.api.impl.transaction.CreateManualUserTask;
 import org.bonitasoft.engine.api.impl.transaction.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.GetActivityInstance;
@@ -40,7 +42,11 @@ import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
+import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.model.Index;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
+import org.bonitasoft.engine.bpm.model.ProcessDefinition;
+import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -53,6 +59,7 @@ import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -66,6 +73,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -78,6 +86,8 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
+import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.ActivityCreationException;
 import org.bonitasoft.engine.exception.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
@@ -92,6 +102,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.IllegalProcessStateException;
+import org.bonitasoft.engine.exception.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
@@ -100,9 +111,13 @@ import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.ProcessDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.ProcessDeletionException;
+import org.bonitasoft.engine.exception.ProcessDeployException;
+import org.bonitasoft.engine.exception.ProcessInstanceModificationException;
 import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceReadException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
@@ -131,9 +146,11 @@ import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.AddBreakpoint;
 import com.bonitasoft.engine.api.impl.transaction.RemoveBreakpoint;
+import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
+import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
@@ -142,6 +159,7 @@ import com.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointNot
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilder;
+import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import com.bonitasoft.engine.exception.BreakpointCreationException;
 import com.bonitasoft.engine.exception.BreakpointDeletionException;
 import com.bonitasoft.engine.exception.BreakpointNotFoundException;
@@ -213,7 +231,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws InvalidSessionException, InvalidParameterValueException {
-        LicenseChecker.getInstance().checkLicence(Features.CREATE_PARAMETER);
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         SProcessDefinition sDefinition = null;
@@ -411,7 +429,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public ManualTaskInstance addManualUserTask(final long humanTaskId, final String taskName, final String displayName, final long assignTo,
             final String description, final Date dueDate, final TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException,
             ActivityExecutionErrorException, ActivityCreationException, ActivityNotFoundException {
-        LicenseChecker.getInstance().checkLicence(Features.CREATE_MANUAL_TASK);
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         TenantServiceAccessor tenantAccessor = null;
         final TaskPriority prio = priority != null ? priority : TaskPriority.NORMAL;
         try {
@@ -462,7 +480,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void deleteManualUserTask(final long manualTaskId) throws InvalidSessionException, ObjectDeletionException, ObjectNotFoundException {
-        LicenseChecker.getInstance().checkLicence(Features.CREATE_MANUAL_TASK);
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -607,7 +625,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException {
-        LicenseChecker.getInstance().checkLicence(Features.SET_CONNECTOR_STATE);
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -616,6 +634,70 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             transactionExecutor.execute(txContent);
         } catch (final SBonitaException e) {
             throw new ConnectorException("Error resetting connector instance state", e);
+        }
+    }
+
+    /**
+     * byte[] is a zip file exported from studio
+     * clear: remove the old .impl file; put the new .impl file in the connector directory
+     * reload the cache, connectorId and connectorVersion are used here.
+     * Warning filesystem operation are not rolledback
+     * 
+     * @throws InvalidConnectorImplementationException
+     */
+    @Override
+    public void setConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion,
+            final byte[] connectorImplementationArchive) throws InvalidSessionException, ConnectorException, InvalidConnectorImplementationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.POST_DEPLOY_CONFIG);
+
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final DependencyService dependencyService = tenantAccessor.getDependencyService();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
+        final long tenantId = tenantAccessor.getTenantId();
+        try {
+            boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
+                // reload dependencies
+                dependencyService.deleteDependencies(processDefinitionId, "process");
+
+                transactionExecutor.completeTransaction(txOpened);
+                // reopen a new transaction: avoid primary key unique constraint violation
+                txOpened = transactionExecutor.openTransaction();
+
+                final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
+                final File file = new File(processFolder, "classpath");
+                if (file.exists() && file.isDirectory()) {
+                    final File[] listFiles = file.listFiles();
+                    for (final File jarFile : listFiles) {
+                        final String name = jarFile.getName();
+                        final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
+                        final AddSDependency addSDependency = new AddSDependency(dependencyService, dependencyBuilderAccessor,
+                                processDefinitionId + "_" + name, jarContent, processDefinitionId, "process");
+                        addSDependency.execute();
+                    }
+                }
+
+            } catch (final SInvalidConnectorImplementationException e) {
+                throw new InvalidConnectorImplementationException(e);
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } catch (final IOException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } catch (final BonitaHomeNotSetException e) {
+                transactionExecutor.setTransactionRollback();
+                throw new ConnectorException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new ConnectorException(e);
         }
     }
 
@@ -628,7 +710,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException,
             ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException {
-        LicenseChecker.getInstance().checkLicence(Features.REPLAY_ACTIVITY);
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -1194,6 +1276,69 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
         } catch (final STransactionException e) {
             throw new BonitaReadException(e);
+        }
+    }
+
+    @Override
+    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws InvalidSessionException, ProcessDeployException,
+            ProcessDefinitionAlreadyExistsException {
+        final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
+
+        if (processDefinition.getStringIndexValue(1) != null || processDefinition.getStringIndexLabel(1) != null ||
+                processDefinition.getStringIndexValue(2) != null || processDefinition.getStringIndexLabel(2) != null ||
+                processDefinition.getStringIndexValue(3) != null || processDefinition.getStringIndexLabel(3) != null ||
+                processDefinition.getStringIndexValue(4) != null || processDefinition.getStringIndexLabel(4) != null ||
+                processDefinition.getStringIndexValue(5) != null || processDefinition.getStringIndexLabel(5) != null) {
+            LicenseChecker.getInstance().checkLicenceAndFeature(Features.SEARCH_INDEX);
+        }
+
+        return super.deploy(businessArchive);
+    }
+
+    @Override
+    public ProcessInstance updateProcessInstanceIndex(final long processInstanceId, final Index index, final String value) throws InvalidSessionException,
+            ProcessInstanceNotFoundException, ProcessInstanceModificationException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
+        final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
+        try {
+            final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, updateBuilder, processInstanceId, index,
+                    value);
+            transactionExecutor.execute(updateProcessInstance);
+            return getProcessInstance(processInstanceId);
+        } catch (final SProcessInstanceNotFoundException spinfe) {
+            throw new ProcessInstanceNotFoundException(spinfe);
+        } catch (final SBonitaException sbe) {
+            throw new ProcessInstanceModificationException(sbe);
+        } catch (final ProcessInstanceReadException pire) {
+            throw new ProcessInstanceModificationException(pire);
+        }
+    }
+
+    @Override
+    public ProcessInstance updateProcessInstance(final long processInstanceId, final ProcessInstanceUpdateDescriptor updateDescriptor)
+            throws InvalidSessionException, ProcessInstanceNotFoundException, ProcessInstanceModificationException {
+        if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
+            throw new ProcessInstanceModificationException("The update descriptor does not contain field updates");
+        }
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
+        final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
+        try {
+            final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, updateDescriptor, updateBuilder,
+                    processInstanceId);
+            transactionExecutor.execute(updateProcessInstance);
+            return getProcessInstance(processInstanceId);
+        } catch (final SProcessInstanceNotFoundException spinfe) {
+            throw new ProcessInstanceNotFoundException(spinfe);
+        } catch (final SBonitaException sbe) {
+            throw new ProcessInstanceModificationException(sbe);
+        } catch (final ProcessInstanceReadException pire) {
+            throw new ProcessInstanceModificationException(pire);
         }
     }
 

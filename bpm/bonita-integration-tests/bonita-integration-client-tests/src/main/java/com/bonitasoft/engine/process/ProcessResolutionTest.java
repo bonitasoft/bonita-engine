@@ -8,27 +8,40 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ActorInstance;
+import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ParameterDefinition;
 import org.bonitasoft.engine.bpm.model.Problem;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
+import org.bonitasoft.engine.connector.Connector;
+import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.util.IOUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertNotNull;
 
 public class ProcessResolutionTest extends CommonAPISPTest {
 
@@ -45,7 +58,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
     @Cover(classes = { Problem.class, ProcessDefinition.class, ParameterDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
     @Test
     public void parameterUnset() throws BonitaException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt();
         builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addAutomaticTask("step1");
         final DesignProcessDefinition processDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
@@ -66,7 +79,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
     @Cover(classes = { Problem.class, ProcessDefinition.class, ParameterDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
     @Test
     public void resolveParameter() throws BonitaException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt();
         builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
@@ -81,6 +94,67 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         Assert.assertEquals(0, problems.size());
 
         deleteProcess(definition.getId());
+    }
+
+    @Cover(classes = { Problem.class, ProcessDefinition.class, Connector.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-556", keywords = { "process resolution" })
+    @Test
+    public void resolveConnectorImplementation() throws BonitaException, IOException {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt();
+        builder.createNewInstance("resolve", "1.0").addAutomaticTask("auto")
+                .addConnector("exec", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER);
+        final DesignProcessDefinition processDefinition = builder.done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
+        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
+
+        final String implSourchFile = "/org/bonitasoft/engine/connectors/TestConnectorWithModifiedOutput.impl";
+        final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;
+        final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
+        getProcessAPI().setConnectorImplementation(definition.getId(), "org.bonitasoft.connector.testConnectorWithOutput", "1.0",
+                connectorImplementationArchive);
+        final List<Problem> problems = getProcessAPI().getProcessResolutionProblems(definition.getId());
+        Assert.assertEquals(0, problems.size());
+
+        deleteProcess(definition.getId());
+    }
+
+    private byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {
+        // generate byte arrays of .impl and .jar files
+        InputStream stream = null;
+        ByteArrayOutputStream baos = null;
+        ZipOutputStream zos = null;
+        try {
+            stream = BPMRemoteTests.class.getResourceAsStream(implSourceFile);
+            assertNotNull(stream);
+            final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf('/') + 1, implSourceFile.lastIndexOf('.'));
+            final byte[] byteArray = IOUtils.toByteArray(stream);
+            final byte[] data = IOUtil.generateJar(implClass);
+            // read bytes of files to zip file byte array
+            baos = new ByteArrayOutputStream();
+            zos = new ZipOutputStream(baos);
+            ZipEntry entry = new ZipEntry(baseName + ".impl");
+            entry.setSize(byteArray.length);
+            zos.putNextEntry(entry);
+            zos.write(byteArray);
+            zos.closeEntry();
+            entry = new ZipEntry(baseName + ".jar");
+            entry.setSize(data.length);
+            zos.putNextEntry(entry);
+            zos.write(data);
+            zos.closeEntry();
+            return baos.toByteArray();
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+            if (zos != null) {
+                zos.close();
+            }
+            if (baos != null) {
+                baos.close();
+            }
+        }
     }
 
 }

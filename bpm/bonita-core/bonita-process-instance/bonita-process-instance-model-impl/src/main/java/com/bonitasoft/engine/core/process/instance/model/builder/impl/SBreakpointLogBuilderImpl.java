@@ -40,10 +40,8 @@ public class SBreakpointLogBuilderImpl extends CRUDELogBuilder implements SBreak
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
-            if (log.getNumericIndex(0) == 0L) {
-                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Flow Node Instance Id");
-            }
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(0) == 0L) {
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Flow Node Instance Id");
         }
     }
 

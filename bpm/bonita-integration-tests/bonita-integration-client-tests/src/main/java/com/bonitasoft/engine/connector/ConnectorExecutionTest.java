@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,7 +32,9 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Baptiste Mesta
@@ -68,7 +68,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
     }
 
     protected ProcessDefinition deployProcessWithDefaultTestConnector(final String delivery, final long userId,
-            final ProcessDefinitionBuilder designProcessDefinition) throws BonitaException, IOException {
+            final ProcessDefinitionBuilderExt designProcessDefinition) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
         final List<BarResource> connectorImplementations = generateDefaultConnectorImplementations();
@@ -104,7 +104,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         return resources;
     }
 
-    protected ProcessDefinition deployProcessWithExternalTestConnector(final ProcessDefinitionBuilder processDefBuilder, final String delivery,
+    protected ProcessDefinition deployProcessWithExternalTestConnector(final ProcessDefinitionBuilderExt processDefBuilder, final String delivery,
             final long userId) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefBuilder.done());
@@ -132,7 +132,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         return resources;
     }
 
-    protected ProcessDefinition deployProcessWithTestConnector(final String actor, final long userId, final ProcessDefinitionBuilder designProcessDefinition)
+    protected ProcessDefinition deployProcessWithTestConnector(final String actor, final long userId, final ProcessDefinitionBuilderExt designProcessDefinition)
             throws BonitaException, IOException {
         return deployProcessWithTestConnectorAndParameter(actor, userId, designProcessDefinition, null);
     }
@@ -160,7 +160,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
     }
 
     protected ProcessDefinition deployProcessWithTestConnectorAndParameter(final String delivery, final long userId,
-            final ProcessDefinitionBuilder designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
+            final ProcessDefinitionBuilderExt designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         if (parameters != null) {
             businessArchive.setParameters(parameters);

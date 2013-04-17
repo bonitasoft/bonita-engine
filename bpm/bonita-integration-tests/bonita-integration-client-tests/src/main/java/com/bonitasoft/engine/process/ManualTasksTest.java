@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 public class ManualTasksTest extends CommonAPISPTest {
 
@@ -52,7 +52,7 @@ public class ManualTasksTest extends CommonAPISPTest {
 
     private ProcessDefinition deployProcessWithUserTask(final User user1) throws BonitaException, InvalidSessionException, ProcessDefinitionNotFoundException,
             ProcessDefinitionReadException, ProcessDefinitionNotEnabledException, ProcessInstanceCreationException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor("myActor");
         processBuilder.addUserTask("Request", "myActor");
         return deployAndEnableWithActor(processBuilder.done(), "myActor", user1);

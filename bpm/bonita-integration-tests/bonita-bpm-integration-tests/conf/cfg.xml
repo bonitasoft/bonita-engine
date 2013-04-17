@@ -170,7 +170,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="processExecutor" class="org.bonitasoft.engine.execution.ProcessExecutorImpl">
+	<bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />

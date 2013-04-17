@@ -12,7 +12,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.model.Index;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
+import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.exception.ActivityCreationException;
@@ -29,8 +31,11 @@ import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceModificationException;
 import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
+
+import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
 
 /**
  * @author Matthieu Chaffotte
@@ -420,4 +425,45 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues,
             Map<Operation, Map<String, Serializable>> operations, long processInstanceId) throws ClassLoaderException, InvalidSessionException,
             ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException;
+
+    /**
+     * Update an index of a process instance.
+     * 
+     * @param processInstanceId
+     *            identifier of the process instance
+     * @param index
+     *            which index to update
+     * @param value
+     *            the new value for the index
+     * @return the updated process instance
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws ProcessInstanceNotFoundException
+     *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
+     * @throws ProcessInstanceModificationException
+     *             Error thrown while updating the instance of process failed.
+     * @since 6.0
+     */
+    ProcessInstance updateProcessInstanceIndex(long processInstanceId, Index index, String value) throws InvalidSessionException,
+            ProcessInstanceNotFoundException, ProcessInstanceModificationException;
+
+    /**
+     * Update an instance of process with the given processInstanceId.
+     * 
+     * @param processInstanceId
+     *            Identifier of the process instance
+     * @param updateDescriptor
+     *            including new value of all attributes adaptable
+     * @return the process instance updated
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws ProcessInstanceNotFoundException
+     *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
+     * @throws ProcessInstanceModificationException
+     *             error thrown while updating the instance of process failed.
+     * @since 6.0
+     */
+    ProcessInstance updateProcessInstance(long processInstanceId, ProcessInstanceUpdateDescriptor updateDescriptor) throws InvalidSessionException,
+            ProcessInstanceNotFoundException, ProcessInstanceModificationException;
+
 }

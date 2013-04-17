@@ -50,7 +50,7 @@ import org.bonitasoft.engine.util.FileUtil;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 /**
  * @author Baptiste Mesta
@@ -78,7 +78,7 @@ public class BusinessArchiveTests {
         barFile.delete();
 
         final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addDocumentDefinition("testDoc").addContentFileName("testFile.txt").addFile("testFile.txt").addDescription("desc")
                 .addMimeType("text/plain");
         processDefinitionBuilder.addDocumentDefinition("testDocUrl").addContentFileName("testFile.txt").addUrl("http://test.com/testFile.txt")
@@ -243,7 +243,7 @@ public class BusinessArchiveTests {
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
 
         final HashMap<String, String> initialParameters = new HashMap<String, String>();
@@ -279,7 +279,7 @@ public class BusinessArchiveTests {
         opb.createNewInstance().setOperator(ASSIGN_OPERATOR).setRightOperand(trueExpression).setType(OperatorType.ASSIGNMENT)
                 .setLeftOperand(leftOperandBuilder.done());
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addBooleanData("var1", null);
         processDefinitionBuilder.addStartEvent("start1").addMessageEventTrigger("m1").addOperation(opb.done());
         processDefinitionBuilder.addAutomaticTask("auto1");
@@ -374,7 +374,7 @@ public class BusinessArchiveTests {
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcessTT", "1.0");
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcessTT", "1.0");
         processDefinitionBuilder.addActor("Truck Driver");
         processDefinitionBuilder.addStartEvent("start1");
         processDefinitionBuilder.addAutomaticTask("auto1").addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
@@ -432,7 +432,7 @@ public class BusinessArchiveTests {
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1");
         processDefinitionBuilder.addAutomaticTask("auto1").addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
@@ -474,7 +474,7 @@ public class BusinessArchiveTests {
         final File barFile = File.createTempFile("businessArchive", ".bar");
         barFile.delete();
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1");
         processDefinitionBuilder.addAutomaticTask("auto1").addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
@@ -510,7 +510,7 @@ public class BusinessArchiveTests {
 
     @Test
     public void testParameters() {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key.2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 

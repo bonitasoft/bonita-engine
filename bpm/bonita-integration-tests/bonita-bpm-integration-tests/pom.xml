@@ -47,6 +47,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Archive -->
+		<dependency>
+			<groupId>com.bonitasoft.engine.archive</groupId>
+			<artifactId>bonita-archive-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
 		<!-- Category -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.category</groupId>
@@ -217,14 +225,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-server-api</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Archive -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.archive</groupId>
-			<artifactId>bonita-archive-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

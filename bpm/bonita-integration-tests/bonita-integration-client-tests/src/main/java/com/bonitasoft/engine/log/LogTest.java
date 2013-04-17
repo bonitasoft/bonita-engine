@@ -65,7 +65,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.connector.APIAccessorConnector;
 import com.bonitasoft.engine.exception.LogNotFoundException;
 
@@ -323,7 +323,7 @@ public class LogTest extends CommonAPISPTest {
     private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName, final String messageName, final String targetProcess,
             final String targetFlowNode, final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData,
             final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt();
         processBuilder.createNewInstance(processName, "1.0");
         addProcessData(processData, processBuilder);
         processBuilder.addStartEvent("startEvent");
@@ -346,7 +346,7 @@ public class LogTest extends CommonAPISPTest {
         return sendMessageProcess;
     }
 
-    private void addProcessData(final Map<String, String> data, final ProcessDefinitionBuilder processBuilder) {
+    private void addProcessData(final Map<String, String> data, final ProcessDefinitionBuilderExt processBuilder) {
         if (data != null) {
             for (final Entry<String, String> entry : data.entrySet()) {
                 processBuilder.addData(entry.getKey(), entry.getValue(), null);
@@ -380,7 +380,7 @@ public class LogTest extends CommonAPISPTest {
 
     private ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final String processName, final String userTaskName, final String actorName,
             final User user, final String messageName, final Map<String, String> data, final List<Operation> catchMessageOperations) throws BonitaException {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt();
         processBuilder.createNewInstance(processName, "1.0");
         addProcessData(data, processBuilder);
         final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger = processBuilder.addStartEvent("startEvent").addMessageEventTrigger(messageName);
@@ -423,7 +423,7 @@ public class LogTest extends CommonAPISPTest {
         createUser(johnName, "bpm");
         final String delivery = "Delivery men";
         final Expression dataDefaultValue = new ExpressionBuilder().createConstantLongExpression(0);
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
                 "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
         final String dataName = "myData1";
         final String procInstIdData = "procInstId";
@@ -488,7 +488,7 @@ public class LogTest extends CommonAPISPTest {
     }
 
     private ProcessDefinition deployProcessWithDefaultTestConnector(final String delivery, final long userId,
-            final ProcessDefinitionBuilder designProcessDefinition) throws BonitaException, IOException {
+            final ProcessDefinitionBuilderExt designProcessDefinition) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
         final List<BarResource> connectorImplementations = generateDefaultConnectorImplementations();

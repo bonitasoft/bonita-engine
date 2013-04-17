@@ -20,16 +20,21 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public long getCurrentMemoryUsage() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getCurrentMemoryUsage();
     }
@@ -47,102 +52,136 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public float getMemoryUsagePercentage() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getMemoryUsagePercentage();
     }
 
     @Override
     public double getSystemLoadAverage() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getSystemLoadAverage();
     }
 
     @Override
     public long getUpTime() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getUpTime();
     }
 
     @Override
     public long getStartTime() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getStartTime();
     }
 
     @Override
     public long getTotalThreadsCpuTime() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getTotalThreadsCpuTime();
     }
 
     @Override
     public int getThreadCount() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getThreadCount();
     }
 
     @Override
     public int getAvailableProcessors() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getAvailableProcessors();
     }
 
     @Override
     public String getOSArch() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getOSArch();
     }
 
     @Override
     public String getOSName() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getOSName();
     }
 
     @Override
     public String getOSVersion() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getOSVersion();
     }
 
     @Override
     public String getJvmName() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getJvmName();
     }
 
     @Override
     public String getJvmVendor() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getJvmVendor();
     }
 
     @Override
     public String getJvmVersion() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getJvmVersion();
     }
 
     @Override
     public Map<String, String> getJvmSystemProperties() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getJvmSystemProperties();
     }
 
     @Override
     public boolean isSchedulerStarted() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.isSchedulerStarted();
     }
 
     @Override
     public long getNumberOfActiveTransactions() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.getNumberOfActiveTransactions();
     }
 
     @Override
     public long getProcessCpuTime() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Process Cpu Time.");
@@ -152,6 +191,8 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public long getCommittedVirtualMemorySize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Committed Virtual Memory Size.");
@@ -161,6 +202,8 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public long getTotalSwapSpaceSize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Total Swap Space Size.");
@@ -170,6 +213,8 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public long getFreeSwapSpaceSize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Free Swap Space Size.");
@@ -179,6 +224,8 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public long getFreePhysicalMemorySize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Free Physical Memory Size.");
@@ -188,6 +235,8 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public long getTotalPhysicalMemorySize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Total Physical Memory Size.");
@@ -197,12 +246,16 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
     public boolean isOptionalMonitoringInformationAvailable() throws InvalidSessionException, MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         return platformMonitoringService.isOptionalMonitoringInformationAvailable();
     }
 
     @Override
     public Map<String, GcInfo> getLastGcInfo() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get the last GC info.");

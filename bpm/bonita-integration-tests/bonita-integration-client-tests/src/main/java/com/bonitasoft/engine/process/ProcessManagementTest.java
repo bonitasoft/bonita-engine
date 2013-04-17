@@ -8,22 +8,21 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 
+import org.bonitasoft.engine.api.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ActivityStates;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
+import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedHumanTaskInstance;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedManualTaskInstance;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.HumanTaskInstanceSearchDescriptor;
@@ -39,7 +38,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProcessManagementTest extends CommonAPISPTest {
 
@@ -72,7 +75,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         logout();
         loginWith(JOHN_USERNAME, PASSWORD);
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final String userTaskName = "userTask";
         processBuilder.addActor(actor).addDescription("test process with archived sub tasks").addUserTask(userTaskName, actor);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), actor, john);
@@ -152,7 +155,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final String delivery = "Delivery men";
         final User john = this.john;
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(delivery).addDescription("test process with sub task").addUserTask("userTask0", delivery).addUserTask("userTask1", delivery);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
 
@@ -222,7 +225,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         logout();
         loginWith(JOHN_USERNAME, PASSWORD);
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         final String userTaskName = "userTask";
         processBuilder.addActor(actor).addDescription("test process with archived sub tasks").addUserTask(userTaskName, actor);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), actor, john);
@@ -266,11 +269,11 @@ public class ProcessManagementTest extends CommonAPISPTest {
     }
 
     @Test
-    public void testExecuteTaskShouldCancelSubtasks() throws Exception {
+    public void executeTaskShouldCancelSubtasks() throws Exception {
         final String actor = "acting";
         loginWith(JOHN_USERNAME, PASSWORD);
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("testArchiveTaskShouldArchiveSubtasks", "1.0");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("testArchiveTaskShouldArchiveSubtasks", "1.0");
         final String userTaskName = "userTask";
         processBuilder.addActor(actor).addDescription("test Archive Task Should Archive Subtasks").addUserTask(userTaskName, actor);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), actor, john);
@@ -343,6 +346,79 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 .getCount());
 
         disableAndDelete(processDefinition);
+    }
+
+    @Test
+    public void getProcessInstancesWithLabelOnStringIndex() throws Exception {
+        final User user = createUser(USERNAME, PASSWORD);
+        ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        processBuilder.setStringIndex(1, "Label1", null);
+        processBuilder.setStringIndex(2, "Label2", null);
+        processBuilder.setStringIndex(3, "Label3", null);
+        processBuilder.setStringIndex(4, "Label4", null);
+        processBuilder.setStringIndex(5, "Label5", null);
+        final ProcessDefinition process1 = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, user);
+        processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("2" + PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        processBuilder.setStringIndex(1, "LabelBis1", null);
+        processBuilder.setStringIndex(2, "LabelBis2", null);
+        processBuilder.setStringIndex(3, "LabelBis3", null);
+        processBuilder.setStringIndex(4, "LabelBis4", null);
+        processBuilder.setStringIndex(5, "LabelBis5", null);
+        final ProcessDefinition process2 = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, user);
+        startProcessAndWaitForTask(process1.getId(), "step1");
+        startProcessAndWaitForTask(process2.getId(), "step1");
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        assertEquals(2, processInstances.size());
+        ProcessInstance processInstance = processInstances.get(0);
+        assertEquals("1" + PROCESS_NAME, processInstance.getName());
+        assertEquals("Label1", processInstance.getStringIndexLabel(1));
+        assertEquals("Label2", processInstance.getStringIndexLabel(2));
+        assertEquals("Label3", processInstance.getStringIndexLabel(3));
+        assertEquals("Label4", processInstance.getStringIndexLabel(4));
+        assertEquals("Label5", processInstance.getStringIndexLabel(5));
+        processInstance = processInstances.get(1);
+        assertEquals("2" + PROCESS_NAME, processInstance.getName());
+        assertEquals("LabelBis1", processInstance.getStringIndexLabel(1));
+        assertEquals("LabelBis2", processInstance.getStringIndexLabel(2));
+        assertEquals("LabelBis3", processInstance.getStringIndexLabel(3));
+        assertEquals("LabelBis4", processInstance.getStringIndexLabel(4));
+        assertEquals("LabelBis5", processInstance.getStringIndexLabel(5));
+        disableAndDelete(process1);
+        disableAndDelete(process2);
+        deleteUser(USERNAME);
+    }
+
+    @Test
+    public void getProcessInstancesWithStringIndex() throws Exception {
+        final User user = createUser(USERNAME, PASSWORD);
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+        processBuilder.setStringIndex(1, "Label1", expressionBuilder.createConstantStringExpression("Value1"));
+        processBuilder.setStringIndex(2, "Label2", expressionBuilder.createGroovyScriptExpression("script", "return \"a\"+\"b\";", String.class.getName()));
+        processBuilder.setStringIndex(3, "Label3", null);
+        final ProcessDefinition process1 = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, user);
+        startProcessAndWaitForTask(process1.getId(), "step1");
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        assertEquals(1, processInstances.size());
+        final ProcessInstance processInstance = processInstances.get(0);
+        assertEquals("Label1", processInstance.getStringIndexLabel(1));
+        assertEquals("Label2", processInstance.getStringIndexLabel(2));
+        assertEquals("Label3", processInstance.getStringIndexLabel(3));
+        assertEquals(null, processInstance.getStringIndexLabel(4));
+        assertEquals(null, processInstance.getStringIndexLabel(5));
+        assertEquals("Value1", processInstance.getStringIndex1());
+        assertEquals("ab", processInstance.getStringIndex2());
+        assertEquals(null, processInstance.getStringIndex3());
+        assertEquals(null, processInstance.getStringIndex4());
+        assertEquals(null, processInstance.getStringIndex5());
+        disableAndDelete(process1);
+        deleteUser(USERNAME);
     }
 
 }

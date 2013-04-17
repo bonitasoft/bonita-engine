@@ -55,7 +55,7 @@
 		</dependency>
 		<!-- Archive -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.archive</groupId>
+			<groupId>com.bonitasoft.engine.archive</groupId>
 			<artifactId>bonita-archive-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -839,6 +839,7 @@
 									<!-- Archive -->
 									<include>org.bonitasoft.engine.archive:bonita-archive-api</include>
 									<include>org.bonitasoft.engine.archive:bonita-archive-impl</include>
+									<include>com.bonitasoft.engine.archive:bonita-archive-impl</include>
 									<!-- Authentication -->
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
@@ -1019,7 +1020,9 @@
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
 									<!-- Process Definition -->
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
+									<include>com.bonitasoft.engine.core.process.definition:bonita-process-definition-model</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
+									<include>com.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl</include>
 									<include>com.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>

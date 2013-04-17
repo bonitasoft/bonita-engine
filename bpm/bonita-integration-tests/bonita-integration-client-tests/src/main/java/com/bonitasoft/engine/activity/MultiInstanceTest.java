@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 public class MultiInstanceTest extends CommonAPISPTest {
 
@@ -58,7 +58,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
     public void childOfRemainingInstancesAreAbortedAfterCompletionCondition() throws Exception {
         final String delivery = "Delivery men";
 
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt()
                 .createNewInstance("remainingInstancesAreAbortedAfterCompletionCondition", "1.0");
         builder.addActor(delivery).addDescription("Delivery all day and night long");
         final int loopMax = 3;

@@ -37,7 +37,6 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -50,7 +49,7 @@ import com.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointNot
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointLogBuilder;
-import com.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
+import com.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilderExt;
 
 /**
  * @author Baptiste Mesta
@@ -60,7 +59,7 @@ public class BreakpointServiceImpl implements BreakpointService {
     /**
      * @author Baptiste Mesta
      */
-    private final class ResetBreakpointFlag implements Synchronization {
+    private static final class ResetBreakpointFlag implements Synchronization {
 
         private final BreakpointServiceImpl breakpointServiceImpl;
 
@@ -93,7 +92,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 
     private static final Serializable BREAKPOINTS_ACTIVE = "BREAKPOINTS_ACTIVE";
 
-    protected final BPMInstanceBuilders instanceBuilders;
+    private final BPMInstanceBuilders instanceBuilders;
 
     private final EventService eventService;
 
@@ -114,8 +113,8 @@ public class BreakpointServiceImpl implements BreakpointService {
     private final TransactionService transactionService;
 
     public BreakpointServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final BPMInstanceBuilders instanceBuilders, final CacheService cacheService, final ReadSessionAccessor sessionAccessor,
-            final QueriableLoggerService queriableLoggerService, final TransactionService transactionService) {
+            final BPMInstanceBuilders instanceBuilders, final CacheService cacheService, final QueriableLoggerService queriableLoggerService,
+            final TransactionService transactionService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.instanceBuilders = instanceBuilders;
@@ -170,7 +169,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 
     @Override
     public SBreakpoint getBreakpoint(final long id) throws SBreakpointNotFoundException, SBonitaReadException {
-        final SBreakpoint breakpoint = persistenceRead.selectById(SelectDescriptorBuilder.getElementById(SBreakpoint.class, "Breakpoint", id));
+        final SBreakpoint breakpoint = persistenceRead.selectById(SelectDescriptorBuilderExt.getElementById(SBreakpoint.class, "Breakpoint", id));
         if (breakpoint == null) {
             throw new SBreakpointNotFoundException(id);
         }
@@ -205,7 +204,7 @@ public class BreakpointServiceImpl implements BreakpointService {
         } catch (final TenantIdNotSetException e) {
             throw new SBonitaReadException("unable to get tenantId", e);
         } catch (final CacheException e) {
-            throw new SBonitaReadException("unable to read from cache");
+            throw new SBonitaReadException("unable to read from cache", e);
         }
     }
 
@@ -235,7 +234,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 
     @Override
     public long getNumberOfBreakpoints() throws SBonitaReadException {
-        return persistenceRead.selectOne(SelectDescriptorBuilder.getNumberOfBreakpoints());
+        return persistenceRead.selectOne(SelectDescriptorBuilderExt.getNumberOfBreakpoints());
     }
 
     @Override
@@ -247,7 +246,7 @@ public class BreakpointServiceImpl implements BreakpointService {
         } else {
             queryOptions = new QueryOptions(fromIndex, maxResults, SBreakpoint.class, sortingField, sortingOrder);
         }
-        final SelectListDescriptor<SBreakpoint> elements = SelectDescriptorBuilder.getElements(SBreakpoint.class, "Breakpoint", queryOptions);
+        final SelectListDescriptor<SBreakpoint> elements = SelectDescriptorBuilderExt.getElements(SBreakpoint.class, "Breakpoint", queryOptions);
         return persistenceRead.selectList(elements);
     }
 
@@ -281,7 +280,7 @@ public class BreakpointServiceImpl implements BreakpointService {
         } catch (final TenantIdNotSetException e) {
             throw new SBonitaReadException("unable to get tenantId", e);
         } catch (final CacheException e) {
-            throw new SBonitaReadException("unable to read ");
+            throw new SBonitaReadException("unable to read ", e);
         }
     }
 

@@ -47,6 +47,7 @@ import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.StartNodeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -125,7 +126,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @Override
     public final long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String username,
             final String password) throws InvalidSessionException, TenantCreationException, PlatformNotStartedException, TenantAlreadyExistException {
-        LicenseChecker.getInstance().checkLicence(Features.CREATE_TENANT);
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
         TransactionExecutor transactionExecutor = null;
         PlatformService platformService = null;
@@ -688,4 +689,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
+    @Override
+    public void startNode() throws IllegalStateException, InvalidSessionException, StartNodeException {
+        LicenseChecker.getInstance().checkLicence();
+        super.startNode();
+    }
 }

@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 public class TimerBoundaryEventTest extends CommonAPISPTest {
 
@@ -56,7 +56,7 @@ public class TimerBoundaryEventTest extends CommonAPISPTest {
 
     private ProcessDefinition deployProcessWithBoundaryEvent(final long timerValue) throws BonitaException, InvalidProcessDefinitionException {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("pTimerBoundary", "2.0");
         final String actorName = "delivery";
         processDefinitionBuilder.addActor(actorName);
         processDefinitionBuilder.addStartEvent("start");

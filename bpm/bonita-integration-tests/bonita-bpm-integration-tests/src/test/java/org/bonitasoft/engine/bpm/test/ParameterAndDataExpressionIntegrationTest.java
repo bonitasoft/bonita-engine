@@ -47,7 +47,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
@@ -145,7 +145,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     private ProcessDefinition createProcessAndInsertParameterAndDeployIt(final String processName, final String version, final String taskName,
             final String parameterName, final String parameterValue) throws Exception {
         // create process Definition
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(processName, version);
         // processBuilder.addParameter(parameterName, String.class.getCanonicalName()).addUserTask(taskName, null);
         final Map<String, String> params = new HashMap<String, String>();
         params.put(parameterName, parameterValue);

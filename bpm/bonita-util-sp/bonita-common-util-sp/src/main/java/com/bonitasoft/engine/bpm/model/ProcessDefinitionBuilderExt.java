@@ -8,19 +8,26 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.model;
 
-import org.bonitasoft.engine.bpm.model.impl.DesignProcessDefinitionImpl;
+import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
  */
-public class ProcessBuilder extends org.bonitasoft.engine.bpm.model.ProcessBuilder {
+public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder {
 
-    ProcessBuilder(final DesignProcessDefinitionImpl process, final ProcessDefinitionBuilder processDefinitionBuilder) {
-        super(process, processDefinitionBuilder);
+    @Override
+    public ProcessDefinitionBuilderExt createNewInstance(final String name, final String version) {
+        super.createNewInstance(name, version);
+        return this;
     }
 
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
-        return new ParameterDefinitionBuilder((ProcessDefinitionBuilder) getProcessBuilder(), process, parameterName, type);
+        return new ParameterDefinitionBuilder(this, process, parameterName, type);
+    }
+
+    public void setStringIndex(final int index, final String label, final Expression initialValue) {
+        process.setStringIndex(index, label, initialValue);
     }
 
 }

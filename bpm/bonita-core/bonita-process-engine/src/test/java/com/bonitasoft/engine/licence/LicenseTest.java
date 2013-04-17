@@ -47,4 +47,14 @@ public class LicenseTest {
         valideFeature(Features.SET_CONNECTOR_STATE);
     }
 
+    @Test
+    public void bpmMonitoringFeature() {
+        valideFeature(Features.BPM_MONITORING);
+    }
+
+    @Test
+    public void resourceMonitoringFeature() {
+        valideFeature(Features.RESOURCE_MONITORING);
+    }
+
 }

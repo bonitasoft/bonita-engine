@@ -38,7 +38,6 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
         super(identityModelBuilder, bpmInstanceBuilders, flowNodeStateManager, sSupervisorBuilders, definitionBuilders, sProfileBuilderAccessor,
                 commentBuilders, categoryBuilderAccessor, sDocumentMappingBuilderAccessor, sExternalIdentityMappingBuilders, commandBuilderAccessor);
         logDescriptor = new SearchLogDescriptor(sQueriableLogModelBuilder.getQueriableLogBuilder());
-
     }
 
     public SearchLogDescriptor getLogDescriptor() {

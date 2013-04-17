@@ -11,6 +11,7 @@ package com.bonitasoft.engine.core.process.instance.recorder;
 import java.util.Collections;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
@@ -18,7 +19,7 @@ import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 /**
  * @author Celine Souchet
  */
-public class SelectDescriptorBuilder extends org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder {
+public class SelectDescriptorBuilderExt extends SelectDescriptorBuilder {
 
     public static SelectOneDescriptor<Long> getNumberOfBreakpoints() {
         final Map<String, Object> emptyMap = Collections.emptyMap();

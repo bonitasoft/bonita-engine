@@ -31,7 +31,6 @@ public class LicenseChecker {
     private static class LicenseCheckerHolder {
 
         public static final LicenseChecker INSTANCE = new LicenseChecker();
-
     }
 
     public static LicenseChecker getInstance() {
@@ -40,12 +39,21 @@ public class LicenseChecker {
 
     private LicenseChecker() {
         super();
-        exceptions = new HashMap<String, String>(5);
-        exceptions.put(Features.CREATE_MANUAL_TASK, "Create/delete a manual task is not an active feature");
-        exceptions.put(Features.CREATE_PARAMETER, "Create a parameter is not an active feature");
-        exceptions.put(Features.CREATE_TENANT, "Create a tenant is not an active feature");
-        exceptions.put(Features.REPLAY_ACTIVITY, "Replay an activity is not an active feature");
-        exceptions.put(Features.SET_CONNECTOR_STATE, "Set the connector state is not an active feature");
+        exceptions = new HashMap<String, String>(13);
+        exceptions.put(Features.BPM_MONITORING, "The bpm monitoring is not an active feature.");
+        exceptions.put(Features.CREATE_MANUAL_TASK, "The manual task creation/deletion is not an active feature.");
+        exceptions.put(Features.CREATE_PARAMETER, "The parameter creation is not an active feature.");
+        exceptions.put(Features.CREATE_TENANT, "The tenant creation is not an active feature.");
+        exceptions.put(Features.CUSTOM_PROFILES, "The profile customization is not an active feature.");
+        exceptions.put(Features.ENGINE_ARCHIVE_CONFIG, "The archive configuration is not an active feature.");
+        exceptions.put(Features.ENGINE_CLUSTERING, "The clustering is not an active feature.");
+        exceptions.put(Features.POST_DEPLOY_CONFIG, "The configuration change, after deployment, is not an active feature.");
+        exceptions.put(Features.REPLAY_ACTIVITY, "Replay an activity is not an active feature.");
+        exceptions.put(Features.RESOURCE_MONITORING, "The resource monitoring is not an active feature.");
+        exceptions.put(Features.SEARCH_INDEX, "Search index is not an active feature.");
+        exceptions.put(Features.SERVICE_MONITORING, "The service monitoring is not an active feature.");
+        exceptions.put(Features.SET_CONNECTOR_STATE, "Set the connector state is not an active feature.");
+
         random = new Random();
     }
 
@@ -53,11 +61,11 @@ public class LicenseChecker {
         final int count = random.nextInt(2);
         if (count == 0 && !Manager.isValid()) {
             stopNode();
-            throw new IllegalStateException(Manager.getErrorMessage());
+            throw new IllegalStateException("Your licence is not valid : " + Manager.getErrorMessage());
         }
     }
 
-    public void checkLicence(final String feature) {
+    public void checkLicenceAndFeature(final String feature) throws IllegalStateException {
         checkLicence();
         if (!Manager.isFeatureActive(feature)) {
             final String message = exceptions.get(feature);
