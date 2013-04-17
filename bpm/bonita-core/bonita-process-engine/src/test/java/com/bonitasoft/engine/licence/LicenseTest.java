@@ -23,6 +23,11 @@ public class LicenseTest {
     }
 
     @Test
+    public void bpmMonitoringFeature() {
+        valideFeature(Features.BPM_MONITORING);
+    }
+
+    @Test
     public void createManualTaskFeature() {
         valideFeature(Features.CREATE_MANUAL_TASK);
     }
@@ -38,23 +43,48 @@ public class LicenseTest {
     }
 
     @Test
+    public void customProfilesFeature() {
+        valideFeature(Features.CUSTOM_PROFILES);
+    }
+
+    @Test
+    public void engineArchiveConfigFeature() {
+        valideFeature(Features.ENGINE_ARCHIVE_CONFIG);
+    }
+
+    @Test
+    public void engineClusteringFeature() {
+        valideFeature(Features.ENGINE_CLUSTERING);
+    }
+
+    @Test
+    public void postDeployConfigFeature() {
+        valideFeature(Features.POST_DEPLOY_CONFIG);
+    }
+
+    @Test
     public void replayActivityFeature() {
         valideFeature(Features.REPLAY_ACTIVITY);
     }
 
     @Test
-    public void setConnectorStateFeature() {
-        valideFeature(Features.SET_CONNECTOR_STATE);
-    }
-
-    @Test
-    public void bpmMonitoringFeature() {
-        valideFeature(Features.BPM_MONITORING);
-    }
-
-    @Test
     public void resourceMonitoringFeature() {
         valideFeature(Features.RESOURCE_MONITORING);
+    }
+
+    @Test
+    public void searchIndexFeature() {
+        valideFeature(Features.SEARCH_INDEX);
+    }
+
+    @Test
+    public void serviceMonitoringFeature() {
+        valideFeature(Features.SERVICE_MONITORING);
+    }
+
+    @Test
+    public void setConnectorStateFeature() {
+        valideFeature(Features.SET_CONNECTOR_STATE);
     }
 
 }
