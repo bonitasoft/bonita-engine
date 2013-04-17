@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,6 +81,8 @@ import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantDeletionException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.exception.TenantUpdateException;
+import com.bonitasoft.engine.platform.LicenseInfo;
+import com.bonitasoft.engine.platform.LicenseInfoImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCriterion;
 import com.bonitasoft.engine.platform.TenantUpdateDescriptor;
@@ -92,6 +95,7 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 
 /**
  * @author Matthieu Chaffotte
@@ -694,4 +698,15 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         LicenseChecker.getInstance().checkLicence();
         super.startNode();
     }
+
+    @Override
+    public LicenseInfo getLicenseInfo() {
+        final Map<String, String> info = Manager.getInfo();
+        final String edition = info.get("subscriptionType");
+        final String licensee = info.get("customerName");
+        final List<String> features = Manager.activeFeatures();
+        final Date expirationDate = new Date(Long.valueOf(info.get("expirationDate")));
+        return new LicenseInfoImpl(licensee, expirationDate, edition, features, -25);
+    }
+
 }
