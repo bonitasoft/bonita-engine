@@ -41,49 +41,6 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="17" />
-		<property name="sqlTransformers">
-			<map>
-				<!-- Process instance: -->
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImplSQLTransformer" />
-				</entry>
-				<!-- Flow node instance: -->
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImplSQLTransformer" />
-				</entry>
-				<!-- Transition instance: -->
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImplSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImplSQLTransformer" />
-				</entry>
-			</map>
-		</property>
 	</bean>
 
 </beans>

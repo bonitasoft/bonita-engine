@@ -28,13 +28,6 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" value="0" />
-		<property name="sqlTransformers">
-			<map>
-				<entry key="org.bonitasoft.engine.persistence.model.Human">
-					<bean class="org.bonitasoft.engine.persistence.model.HumanSQLTransformer" />
-				</entry>
-			</map>
-		</property>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration" depends-on="dbProperties">

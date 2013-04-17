@@ -18,6 +18,7 @@ import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
 import org.bonitasoft.engine.services.impl.AbstractQueriableLoggerImpl;
+import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
@@ -51,7 +52,13 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
         BatchLogSynchronization synchro = synchronizations.get();
         if (synchro == null) {
             synchro = new BatchLogSynchronization(persistenceService, delayable);
+            synchronizations.set(synchro);
             transactionService.getTransaction().registerSynchronization(synchro);
+        } else {
+            final BusinessTransaction transaction = transactionService.getTransaction();
+            if (!transaction.getRegisteredSynchronizations().contains(synchro)) {
+                transaction.registerSynchronization(synchro);
+            }
         }
         return synchro;
     }

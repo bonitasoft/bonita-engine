@@ -33,11 +33,10 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
     public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final ReadSessionAccessor sessionAccessor, final boolean cacheEnabled, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
             final MyBatisConfigurationsProvider configurations, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
-            final String likeEscapeCharacter,
-            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager) throws SPersistenceException {
+            final String likeEscapeCharacter, final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager)
+            throws SPersistenceException {
         super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
-                likeEscapeCharacter,
-                technicalLoggerService, sequenceManager);
+                likeEscapeCharacter, technicalLoggerService, sequenceManager);
         this.sessionAccessor = sessionAccessor;
     }
 
@@ -50,18 +49,17 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
     }
 
     @Override
-    protected String getInsertScript(final List<PersistentObject> entities) throws SPersistenceException {
-        try {
-            return super.getInsertScript(entities).replaceAll(SQLTransformer.TENANTID_TOKEN, String.valueOf(getTenantId()));
-        } catch (final TenantIdNotSetException e) {
-            throw new SPersistenceException(e);
-        }
-    }
-
-    @Override
     public void insert(final PersistentObject entity) throws SPersistenceException {
         setTenant(entity);
         super.insert(entity);
+    }
+
+    @Override
+    public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
+        for (final PersistentObject persistentObject : entities) {
+            setTenant(persistentObject);
+        }
+        super.insertInBatch(entities);
     }
 
     protected void setTenant(final PersistentObject entity) throws SPersistenceException {

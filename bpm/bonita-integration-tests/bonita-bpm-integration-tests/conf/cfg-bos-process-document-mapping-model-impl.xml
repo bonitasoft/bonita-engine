@@ -21,13 +21,6 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="14" />
-		<property name="sqlTransformers">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl">
-					<bean class="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImplSQLTransformer" />
-				</entry>
-			</map>
-		</property>
 	</bean>
 
 </beans>

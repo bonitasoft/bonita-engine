@@ -11,13 +11,6 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/queriablelogger/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="2" />
-		<property name="sqlTransformers">
-			<map>
-				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" >
-					<bean class="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImplSqlTransformer" />
-				</entry>
-			</map>
-		</property>
 	</bean>
 
 </beans>

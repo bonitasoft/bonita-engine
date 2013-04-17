@@ -74,16 +74,18 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private final TechnicalLoggerPrintWriter errorWriter;
 
+    private final String statementDelimiter;
+
     public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final AbstractMyBatisConfigurationsProvider configurations,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService technicalLoggerService,
-            final SequenceManager sequenceManager) throws SPersistenceException {
+            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager) throws SPersistenceException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager);
         this.dbIdentifier = dbIdentifier;
         this.txService = txService;
         this.cacheEnabled = cacheEnabled;
         this.mybatisSqlSessionFactoryProvider = mybatisSqlSessionFactoryProvider;
+        this.statementDelimiter = statementDelimiter;
         statementMappings = new HashMap<String, StatementMapping>();
         classAliasMappings = new HashMap<String, String>();
         classFieldAliasMappings = new HashMap<String, String>();
@@ -273,6 +275,12 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
     @Override
     public void insert(final PersistentObject entity) throws SPersistenceException {
         setId(entity);
+        final InsertStatement statement = getInsertStatement(entity);
+
+        getSession().executeInsertStatement(statement);
+    }
+
+    private InsertStatement getInsertStatement(final PersistentObject entity) throws SPersistenceException {
         Map<String, Object> parameters;
         try {
             parameters = getDefaultParameters();
@@ -282,7 +290,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         parameters.put("entity", entity);
 
         InsertStatement statement = null;
-        final String insertStatement = getInsertStatement(entity);
+        final String insertStatement = getStringInsertStatement(entity);
 
         if (statementMappings.containsKey(insertStatement)) {
             final StatementMapping statementMapping = statementMappings.get(insertStatement);
@@ -293,23 +301,23 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         } else {
             statement = new InsertStatement(insertStatement, parameters, entity);
         }
-
-        getSession().executeInsertStatement(statement);
+        return statement;
     }
 
     @Override
     public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
+        final MybatisSession session = getSession();
         for (final PersistentObject entity : entities) {
             setId(entity);
+            final InsertStatement insertStatement = getInsertStatement(entity);
+            session.executeInsertStatement(insertStatement);
         }
-        final String sql = getInsertScript(entities);
-        executeInBatch(sql);
     }
 
     private void executeInBatch(final String sql) throws SPersistenceException {
         final MybatisSession session = getSession();
         final ScriptRunner runner = session.getScriptRunner();
-        runner.setDelimiter(SQLTransformer.DELIMITER);
+        runner.setDelimiter(statementDelimiter);
         runner.setLogWriter(null);// don't print scripts
         runner.setErrorLogWriter(errorWriter);
         runner.setAutoCommit(false);
@@ -329,22 +337,12 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         final String deleteScript = getSqlTransformer(classToPurge).getDeleteScript();
         if (deleteScript != null && !deleteScript.isEmpty()) {
             stringBuilder.append(deleteScript);
-            stringBuilder.append(SQLTransformer.DELIMITER);
+            stringBuilder.append(statementDelimiter);
             executeInBatch(stringBuilder.toString());
         }
     }
 
-    protected String getInsertScript(final List<PersistentObject> entities) throws SPersistenceException {
-        final String className = entities.get(0).getClass().getName();
-        final SQLTransformer sqlTransformer = getSqlTransformer(className);
-        if (sqlTransformer == null) {
-            throw new SPersistenceException("Unable to insert in batch: No transformer for " + className);
-        }
-        final String sql = sqlTransformer.getInsertScript(entities);
-        return sql;
-    }
-
-    private String getInsertStatement(final PersistentObject entity) {
+    private String getStringInsertStatement(final PersistentObject entity) {
         return getBasicStatement(entity.getClass(), "insert" + entity.getClass().getSimpleName());
     }
 
