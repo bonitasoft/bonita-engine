@@ -27,10 +27,6 @@ public class ListArchivingStrategy extends AbstractArchivingStrategy implements 
 
         // LicenseChecker.getInstance().checkLicenceAndFeature(Features.ENGINE_ARCHIVE_CONFIG);
 
-        if (!Manager.isValid()) {
-            throw new IllegalStateException("Your licence is not valid : " + Manager.getErrorMessage());
-        }
-
         if (!Manager.isFeatureActive(Features.ENGINE_ARCHIVE_CONFIG)) {
             throw new IllegalStateException("The archive configuration is not an active feature.");
         }
