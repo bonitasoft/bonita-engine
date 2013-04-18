@@ -12,9 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
+import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.parameter.ParameterService;
@@ -28,7 +29,7 @@ import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
  * @see {@link ParameterService}
  * @author Zhao Na
  */
-public class ParameterExpressionExecutorStrategy implements ExpressionExecutorStrategy {
+public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
     public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
 
@@ -70,14 +71,13 @@ public class ParameterExpressionExecutorStrategy implements ExpressionExecutorSt
     }
 
     @Override
-    public boolean validate(final String expressionContent) {
+    public void validate(final SExpression expression) throws SInvalidExpressionException {
+        super.validate(expression);
         // $ can be part of variable name
-        if (expressionContent != null && !expressionContent.isEmpty() && !expressionContent.trim().equals("")) {
-            if (expressionContent.matches("(^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]*")) {
-                return true;
-            }
+        if (!expression.getContent().matches("(^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]*")) {
+            throw new SInvalidExpressionException("The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: " + expression);
         }
-        return false;
+
     }
 
     @Override
@@ -86,8 +86,8 @@ public class ParameterExpressionExecutorStrategy implements ExpressionExecutorSt
     }
 
     @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
-            final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, dependencyValues, resolvedExpressions));

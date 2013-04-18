@@ -24,4 +24,6 @@
 
 	<bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy" />
 
+	<bean id="javaMethodCallExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.JavaMethodCallExpressionExecutorStrategy" />
+
 </beans>

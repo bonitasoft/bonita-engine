@@ -69,7 +69,7 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
         // if this entity has no id, set it
         Long tenantId = null;
         try {
-            tenantId = ClassReflector.invokeGetter(Long.class, entity, "getTenantId");
+            tenantId = ClassReflector.invokeGetter(entity, "getTenantId");
         } catch (final Exception e) {
             // this is a new object to save
         }
