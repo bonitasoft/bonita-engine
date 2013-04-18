@@ -13,6 +13,12 @@
  **/
 package com.bonitasoft.engine.search;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -63,13 +69,6 @@ import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
 
-import static org.hamcrest.core.Is.is;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -105,7 +104,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance instance4 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance5 = getProcessAPI().startProcess(processDefinition.getId());
         // prepare searchOptions
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 10,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
         // search and check result ASC
         assertTrue("no started process instances are found", new WaitUntil(500, 5000) {
 
@@ -114,7 +114,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 return getProcessAPI().searchOpenProcessInstances(searchOptions.done()).getCount() == 5;
             }
         }.waitUntil());
-        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 2, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 2,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstances(searchOptions1.done());
         assertNotNull(result);
@@ -125,7 +126,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(instance1.getId(), processInstanceList1.get(0).getId());
         assertEquals(instance2.getId(), processInstanceList1.get(1).getId());
 
-        final SearchOptionsBuilder searchOptions2 = buildSearchOptions(processDefinition.getId(), 2, 2, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions2 = buildSearchOptions(processDefinition.getId(), 2, 2,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
         result = getProcessAPI().searchOpenProcessInstances(searchOptions2.done());
         assertNotNull(result);
         assertEquals(5, result.getCount());
@@ -134,7 +136,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(1, processInstanceList2.size());
         assertEquals(instance5.getId(), processInstanceList2.get(0).getId());
 
-        final SearchOptionsBuilder searchOptions3 = buildSearchOptions(processDefinition.getId(), 0, 3, ProcessInstanceSearchDescriptor.ID, Order.DESC);
+        final SearchOptionsBuilder searchOptions3 = buildSearchOptions(processDefinition.getId(), 0, 3,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.DESC);
         // search and check result DESC
         result = getProcessAPI().searchOpenProcessInstances(searchOptions3.done());
         assertNotNull(result);
@@ -146,7 +149,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(instance4.getId(), processInstanceList3.get(1).getId());
         assertEquals(instance3.getId(), processInstanceList3.get(2).getId());
 
-        final SearchOptionsBuilder searchOptions4 = buildSearchOptions(processDefinition.getId() + 1, 0, 3, ProcessInstanceSearchDescriptor.ID, Order.DESC);
+        final SearchOptionsBuilder searchOptions4 = buildSearchOptions(processDefinition.getId() + 1, 0, 3,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.DESC);
         result = getProcessAPI().searchOpenProcessInstances(searchOptions4.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
@@ -166,7 +170,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create user
         final User user1 = createUser("user1", "bpm");
         // before supervisor
-        SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.NAME, Order.ASC);
+        SearchOptionsBuilder searchOptions = buildSearchOptions(0, 10, org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.NAME, Order.ASC);
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(user1.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
@@ -176,7 +180,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessSupervisor supervisor1 = createSupervisor(processDefinition.getId(), user1.getId());
 
         // prepare search options
-        searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptions = buildSearchOptions(0, 10, org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.NAME, Order.ASC);
         // search and check result
         result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(user1.getId(), searchOptions.done());
         assertNotNull(result);
@@ -200,7 +204,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(membership.getRoleId(), role.getId());
         assertEquals(membership.getGroupId(), group.getId());
         // prepare search options
-        searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptions = buildSearchOptions(0, 10, org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.NAME, Order.ASC);
         // search and check result
         result = getProcessAPI().searchOpenProcessInstancesSupervisedBy(supervisor.getId(), searchOptions.done());
         assertNotNull(result);
@@ -405,8 +409,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "14.3");
+                "SearchOpenProcessInstancesInvolvingUser", "14.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
@@ -421,11 +424,10 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
         // assign
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
+        assignAndExecuteStep(pendingTask, jack.getId());
         // executed but not archived
         SearchResult<ArchivedProcessInstance> result = getProcessAPI().searchArchivedProcessInstancesInvolvingUser(jack.getId(), searchOptions.done());
         assertNotNull(result);
@@ -437,9 +439,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         pendingTask = (UserTaskInstance) pendingTasks.get(0);
         assertEquals("step2", pendingTask.getName());
 
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
+        assignAndExecuteStep(pendingTask, jack.getId());
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -471,8 +471,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "15.3");
+                "SearchOpenProcessInstancesInvolvingUser", "15.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         // assign pending task to jack
@@ -483,16 +482,15 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         final List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is not started by jack but not finished: not in "workedOn"
         SearchResult<ArchivedProcessInstance> result = getProcessAPI().searchArchivedProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
         // assign
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
+        assignAndExecuteStep(pendingTask, jack.getId());
 
         // process finished: in worked on
         waitForProcessToFinish(processInstance);
@@ -524,8 +522,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "16.3");
+                "SearchOpenProcessInstancesInvolvingUser", "16.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
@@ -540,7 +537,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is not started by jack and jack has not performed tasks: not in "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(jack.getId(), searchOptions.done());
@@ -553,7 +551,6 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertNotNull(result);
         assertEquals(0, result.getCount());
 
-        getProcessAPI().executeActivity(pendingTask.getId());
         getProcessAPI().executeActivity(pendingTask.getId());
 
         pendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 500, 5000, false, 1, jack);
@@ -597,8 +594,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "16.3");
+                "SearchOpenProcessInstancesInvolvingUser", "16.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
@@ -610,16 +606,17 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         logout();
         loginWith(username, password);
-        waitAndExecute(p1, "step1", jack);
-        waitAndExecute(p2, "step1", jack);
-        waitAndExecute(p3, "step1", jack);
+        waitForUserTaskAndExecuteIt("step1", p1, jack.getId());
+        waitForUserTaskAndExecuteIt("step1", p2, jack.getId());
+        waitForUserTaskAndExecuteIt("step1", p3, jack.getId());
         logout();
         loginWith("john", password);
-        waitAndExecute(p4, "step1", john);
+        waitForUserTaskAndExecuteIt("step1", p4, john.getId());
 
         waitForPendingTasks(jack.getId(), 4);
 
@@ -648,8 +645,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "16.3");
+                "SearchOpenProcessInstancesInvolvingUser", "16.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
@@ -665,7 +661,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         loginWith("john", password);
         getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         waitForPendingTasks(jack.getId(), 4);
 
@@ -682,13 +679,6 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         deleteUser(john);
         deleteUser(jack);
         disableAndDelete(processDefinition);
-    }
-
-    private void waitAndExecute(final ProcessInstance processInstance, final String name, final User jack) throws Exception {
-        final ActivityInstance waitForUserTask = waitForUserTask(name, processInstance);
-        getProcessAPI().assignUserTask(waitForUserTask.getId(), jack.getId());
-        getProcessAPI().executeActivity(waitForUserTask.getId());
-        getProcessAPI().executeActivity(waitForUserTask.getId());
     }
 
     /*
@@ -709,8 +699,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = createProcessDefinition("SearchOpenProcessInstancesInvolvingUser", delivery, true, null,
-                null,
-                null, null, null);
+                null, null, null, null);
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -719,15 +708,14 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         final List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is started by jack and jack has not performed tasks: In "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(1, result.getCount());
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
+        assignAndExecuteStep(pendingTask, jack.getId());
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -752,8 +740,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "16.3");
+                "SearchOpenProcessInstancesInvolvingUser", "16.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
@@ -768,7 +755,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is not started by jack and jack has not performed tasks: not in "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
@@ -781,7 +769,6 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertNotNull(result);
         assertEquals(0, result.getCount());
 
-        getProcessAPI().executeActivity(pendingTask.getId());
         getProcessAPI().executeActivity(pendingTask.getId());
 
         pendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 500, 5000, false, 1, jack);
@@ -797,9 +784,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance processInstance2 = result.getResult().get(0);
         assertEquals(processInstance.getId(), processInstance2.getId());
 
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
+        assignAndExecuteStep(pendingTask, jack.getId());
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -825,8 +810,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "16.3");
+                "SearchOpenProcessInstancesInvolvingUser", "16.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
@@ -838,16 +822,17 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         logout();
         loginWith("jack", "bpm");
-        waitAndExecute(p1, "step1", jack);
-        waitAndExecute(p2, "step1", jack);
-        waitAndExecute(p3, "step1", jack);
+        waitForUserTaskAndExecuteIt("step1", p1, jack.getId());
+        waitForUserTaskAndExecuteIt("step1", p2, jack.getId());
+        waitForUserTaskAndExecuteIt("step1", p3, jack.getId());
         logout();
         loginWith("john", "bpm");
-        waitAndExecute(p4, "step1", john);
+        waitForUserTaskAndExecuteIt("step1", p4, john.getId());
 
         waitForPendingTasks(jack.getId(), 4);
 
@@ -874,8 +859,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "SearchOpenProcessInstancesInvolvingUser",
-                "16.3");
+                "SearchOpenProcessInstancesInvolvingUser", "16.3");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
@@ -894,7 +878,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         loginWith("pierre", "bpm");
         getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
         waitForPendingTasks(jack.getId(), 5);
 
         final SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
@@ -922,8 +907,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // create process
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = createProcessDefinition("SearchOpenProcessInstancesInvolvingUser", delivery, true, null,
-                null,
-                null, null, null);
+                null, null, null, null);
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -932,15 +916,14 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         final List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is started by jack and jack has not performed tasks: In "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(1, result.getCount());
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
-        getProcessAPI().executeActivity(pendingTask.getId());
+        assignAndExecuteStep(pendingTask, jack.getId());
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -973,7 +956,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance instance4 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance5 = getProcessAPI().startProcess(processDefinition.getId());
         // prepare searchOptions
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
         // search and check result ASC
         assertTrue("no pending user task instances are found", new WaitUntil(500, 5000) {
 
@@ -983,8 +967,9 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
             }
         }.waitUntil());
         // test started by correct user
-        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
-        searchOptions1.filter(ProcessInstanceSearchDescriptor.STARTED_BY, user.getId());
+        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 10,
+                org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        searchOptions1.filter(org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.STARTED_BY, user.getId());
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstances(searchOptions1.done());
         assertNotNull(result);
         assertEquals(5, result.getCount());
@@ -998,7 +983,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(instance5.getId(), processInstanceList1.get(4).getId());
 
         // test started by not existed user
-        searchOptions1.filter(ProcessInstanceSearchDescriptor.STARTED_BY, user.getId() + 1500);
+        searchOptions1.filter(org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor.STARTED_BY, user.getId() + 1500);
         result = getProcessAPI().searchOpenProcessInstances(searchOptions1.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
@@ -1028,8 +1013,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         waitForProcessToFinish(instance5);
         // test started by correct user
         final SearchOptionsBuilder opts = new SearchOptionsBuilder(0, 10);
-        opts.filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
-        opts.sort(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, Order.ASC);
+        opts.filter(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
+        opts.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, Order.ASC);
         final SearchResult<ArchivedProcessInstance> result = getProcessAPI().searchArchivedProcessInstancesInvolvingUser(user.getId(), opts.done());
         assertEquals(5, result.getCount());
         final List<ArchivedProcessInstance> processInstances = result.getResult();
@@ -1097,7 +1082,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         // Order by ARCHIVE_DATE
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         // searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE, Order.ASC);
         final SearchResult<ArchivedProcessInstance> result = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done());
         assertEquals(5, result.getCount());
         List<ArchivedProcessInstance> archivedProcessInstances = result.getResult();
@@ -1125,7 +1110,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by END_DATE
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.END_DATE, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.END_DATE, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1149,7 +1134,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by ID
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1161,7 +1146,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by LAST_UPDATE
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.LAST_UPDATE, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.LAST_UPDATE, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1173,7 +1158,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by NAME
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.NAME, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1219,7 +1204,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by SOURCE_OBJECT_ID
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1231,7 +1216,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by START_DATE
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.START_DATE, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.START_DATE, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1243,7 +1228,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by STARTED_BY
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.STARTED_BY, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.STARTED_BY, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1255,7 +1240,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Order by STATE_ID
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.STATE_ID, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.STATE_ID, Order.ASC);
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
@@ -1327,7 +1312,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Search term for STRING_INDEX
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
         searchOptionsBuilder.searchTerm("value1");
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
@@ -1480,8 +1465,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
             @Override
             protected boolean check() throws Exception {
-                final SearchOptions searchOpts = new SearchOptionsBuilder(0, 1).filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID,
-                        processInstance.getId()).done();
+                final SearchOptions searchOpts = new SearchOptionsBuilder(0, 1).filter(
+                        org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstance.getId()).done();
                 return getProcessAPI().searchArchivedProcessInstances(searchOpts).getCount() == 1;
             }
         }.waitUntil());
@@ -1531,7 +1516,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // search
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
-        searchBuilder.sort(ArchivedProcessInstancesSearchDescriptor.STATE_ID, Order.ASC);
+        searchBuilder.sort(org.bonitasoft.engine.search.ArchivedProcessInstancesSearchDescriptor.STATE_ID, Order.ASC);
 
         final SearchResult<ArchivedProcessInstance> searchResult = getProcessAPI().searchArchivedProcessInstances(searchBuilder.done());
         // check the result: 3 instances are expected, one in the state completed, one in the state canceled, and one in the state aborted

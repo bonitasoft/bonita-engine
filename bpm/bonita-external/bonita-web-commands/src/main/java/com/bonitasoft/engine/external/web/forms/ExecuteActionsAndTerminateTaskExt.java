@@ -58,7 +58,6 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap = getParameter(parameters, CONNECTORS_MAP_KEY, message);
 
         try {
-            executeActivity(sActivityInstanceID);
             // get the classloader of process
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
             final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();

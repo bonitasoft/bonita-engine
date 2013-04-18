@@ -8,6 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.List;
 
@@ -39,10 +43,6 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ProcessManagementTest extends CommonAPISPTest {
 
@@ -303,11 +303,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
             }
         }.waitUntil());
 
-        final long taskId = parentTask.getId();
-        getProcessAPI().assignUserTask(taskId, john.getId());
-
-        getProcessAPI().executeActivity(taskId);
-        getProcessAPI().executeActivity(taskId);
+        assignAndExecuteStep(parentTask, john.getId());
 
         assertTrue("Expecting no more task assigned to Jack", new WaitUntil(20, 1000) {
 

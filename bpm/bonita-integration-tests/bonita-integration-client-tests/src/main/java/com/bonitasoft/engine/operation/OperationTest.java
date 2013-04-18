@@ -1,5 +1,8 @@
 package com.bonitasoft.engine.operation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,9 +43,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -279,10 +279,8 @@ public class OperationTest extends CommonAPITest {
                     getProcessAPI().getProcessDataInstance(dataIndex.getKey(), startProcess.getId()).getValue());
         }
 
-        final long waitForStep0Id = waitForUserTask("step0", startProcess.getId()).getId();
-        getProcessAPI().assignUserTask(waitForStep0Id, john.getId());
-        getProcessAPI().executeActivity(waitForStep0Id);
-        getProcessAPI().executeActivity(waitForStep0Id);
+        final ActivityInstance waitForStep0 = waitForUserTask("step0", startProcess.getId());
+        assignAndExecuteStep(waitForStep0, john.getId());
 
         waitForUserTask("step2", startProcess.getId()).getId();
 
@@ -374,9 +372,7 @@ public class OperationTest extends CommonAPITest {
 
         waitForStep("step1", startProcess);
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(variableName, startProcess.getId()).getValue());
-        getProcessAPI().assignUserTask(waitForStep0.getStepId(), john.getId());
-        getProcessAPI().executeActivity(waitForStep0.getStepId());
-        getProcessAPI().executeActivity(waitForStep0.getStepId());
+        assignAndExecuteStep(waitForStep0.getResult(), john.getId());
 
         waitForStep("step2", startProcess);
 
@@ -430,9 +426,7 @@ public class OperationTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "Workers", john);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForStep waitForStep0 = waitForStep("step1", startProcess);
-        getProcessAPI().assignUserTask(waitForStep0.getStepId(), john.getId());
-        getProcessAPI().executeActivity(waitForStep0.getStepId());
-        getProcessAPI().executeActivity(waitForStep0.getStepId());
+        assignAndExecuteStep(waitForStep0.getResult(), john.getId());
 
         waitForStep("step2", startProcess);
 
@@ -462,9 +456,7 @@ public class OperationTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "Workers", john);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForStep waitForStep0 = waitForStep("step1", startProcess);
-        getProcessAPI().assignUserTask(waitForStep0.getStepId(), john.getId());
-        getProcessAPI().executeActivity(waitForStep0.getStepId());
-        getProcessAPI().executeActivity(waitForStep0.getStepId());
+        assignAndExecuteStep(waitForStep0.getResult(), john.getId());
 
         waitForStep("step2", startProcess);
 

@@ -241,7 +241,7 @@ public class ActivityCommandExtTest extends CommonAPITest {
         assertNotNull("User task step1 don't exist.", waitForUserTask("step1", processInstanceId, 12000));
         HumanTaskInstance userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC)
                 .get(0);
-        executeTask(getProcessAPI(), getSession().getUserId(), processInstanceId, userTaskInstance.getId());
+        assignAndExecuteStep(userTaskInstance, getSession().getUserId());
 
         assertNotNull("User task step2 don't exist.", waitForUserTask("step2", processInstanceId));
         userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC).get(0);

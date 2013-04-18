@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
+import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.core.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.ActivityInterruptedException;
@@ -36,8 +37,6 @@ import org.bonitasoft.engine.search.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.junit.Before;
@@ -179,21 +178,24 @@ public class BreakpointsTest extends CommonAPISPTest {
     }
 
     @Test
-    public void addBreakpointOnAProcessInstanceStateIsExecutedAfterResume() throws Exception {
+    public void addBreakpointOnHumanStepAndResumeIt() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("myProcessWithBreakPoints", "1.0");
         builder.addActor("actor");
         builder.addShortTextData("myData", new ExpressionBuilder().createConstantStringExpression("beforeUpdate"));
-        builder.addUserTask("step1", "actor").addOperation(new LeftOperandBuilder().createNewInstance("myData").done(), OperatorType.ASSIGNMENT, "=", null,
+        final UserTaskDefinitionBuilder addUserTask = builder.addUserTask("step1", "actor");
+        addUserTask.addOperation(new LeftOperandBuilder().createNewInstance("myData").done(), OperatorType.ASSIGNMENT, "=", null,
                 new ExpressionBuilder().createConstantStringExpression("afterUpdate"));
+        addUserTask.addBoundaryEvent("boundary").addSignalEventTrigger("unknown");
         builder.addUserTask("step2", "actor");
-        builder.addStartEvent("start").addTransition("start", "step1").addTransition("step1", "step2");
+        builder.addStartEvent("start").addTransition("start", "step1").addTransition("step1", "step2").addTransition("boundary", "step2");
         final String username = "baptiste.mesta";
         final String password = "secretPassword";
         final User user = createUser(username, password);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), "actor", user);
         final long id = processDefinition.getId();
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(id);
-        final long addBreakpoint = getProcessAPI().addBreakpoint(id, "step1", 11, 45);
+        // add breakpoint on completing with boundary state (must have a boundary on the user task)
+        final long addBreakpoint = getProcessAPI().addBreakpoint(id, "step1", 34, 45);
         try {
             waitForUserTaskAndExecuteIt("step1", processInstance1, user.getId());
         } catch (final ActivityInterruptedException e) {
@@ -208,38 +210,12 @@ public class BreakpointsTest extends CommonAPISPTest {
         final ActivityInstance activityInstance = activities.iterator().next();
         assertEquals("step1", activityInstance.getName());
         assertEquals("interrupted", activityInstance.getState());
-        assertEquals("beforeUpdate", getProcessAPI().getProcessDataInstance("myData", processInstance1.getId()).getValue());
-        getProcessAPI().executeActivity(activityInstance.getId());
+        assertEquals("afterUpdate", getProcessAPI().getProcessDataInstance("myData", processInstance1.getId()).getValue());
         getProcessAPI().executeActivity(activityInstance.getId());
         waitForUserTask("step2", processInstance1);
-        assertEquals("afterUpdate", getProcessAPI().getProcessDataInstance("myData", processInstance1.getId()).getValue());
         getProcessAPI().removeBreakpoint(addBreakpoint);
         disableAndDelete(processDefinition);
         deleteUser(user.getId());
-    }
-
-    @Test(expected = ActivityInterruptedException.class)
-    public void addBreakpointOnAHumanStep() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("BrokenProcess", "1.03",
-                Arrays.asList("step1", "step2"), Arrays.asList(true, false), "actor", true);
-        final String username = "baptiste.mesta";
-        final String password = "secretPassword";
-        final User user = createUser(username, password);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", user);
-        final long id = processDefinition.getId();
-        ProcessInstance processInstance = getProcessAPI().startProcess(id);
-        final long breakpointId = getProcessAPI().addBreakpoint(id, "step1", 11, 45);
-        processInstance = getProcessAPI().startProcess(id);
-        ActivityInstance result = null;
-        try {
-            final WaitForStep waitForStep1 = waitForStep(50, 1000, "step1", processInstance, TestStates.getReadyState(null));
-            result = waitForStep1.getResult();
-            assignAndExecuteStep(result, user.getId());
-        } finally {
-            getProcessAPI().removeBreakpoint(breakpointId);
-            disableAndDelete(processDefinition);
-            deleteUser(user.getId());
-        }
     }
 
 }
