@@ -98,6 +98,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl" value="10011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" value="10011" />
@@ -155,6 +156,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl" value="20011" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" value="20011" />

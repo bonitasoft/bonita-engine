@@ -120,7 +120,7 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl implements
                         + " in state category " + flowNodeInstance.getStateCategory() + " activity id=" + flowNodeInstance.getId());
             }
             nextState = flowNodeState.getId();
-        } while (!flowNodeState.preExecute(processDefinition, flowNodeInstance));
+        } while (!flowNodeState.shouldExecuteState(processDefinition, flowNodeInstance));
         try {
             if (!current.isInterrupting() && breakpointService.isBreakpointActive()) {
                 final SBreakpoint breakPointFor = breakpointService.getBreakPointFor(processDefinition.getId(), flowNodeInstance.getRootContainerId(),
