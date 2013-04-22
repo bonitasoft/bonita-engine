@@ -23,9 +23,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
@@ -123,9 +121,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         final String containerType = "ACTIVITY_INSTANCE";
         if (connectorInputParameters.size() == inputValues.size()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            final SActivityInstance activity = getActivityInstance(tenantAccessor, activityInstanceId);
-            final SProcessInstance processInstance = getProcessInstance(tenantAccessor, activity.getRootContainerId());
-            final long processDefinitionId = processInstance.getProcessDefinitionId();
+            final long processDefinitionId = getProcessInstance(tenantAccessor, getActivityInstance(tenantAccessor, activityInstanceId).getRootContainerId())
+                    .getProcessDefinitionId();
             final ClassLoader clazzLoader = getLocalClassLoader(tenantAccessor, processDefinitionId);
             final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);

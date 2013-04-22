@@ -33,8 +33,10 @@ import org.bonitasoft.engine.api.impl.transaction.AddSDependency;
 import org.bonitasoft.engine.api.impl.transaction.CreateManualUserTask;
 import org.bonitasoft.engine.api.impl.transaction.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.GetActivityInstance;
+import org.bonitasoft.engine.api.impl.transaction.GetArchivedProcessInstanceList;
+import org.bonitasoft.engine.api.impl.transaction.GetLastArchivedProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.GetProcessDefinition;
-import org.bonitasoft.engine.api.impl.transaction.GetSUser;
+import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
@@ -48,6 +50,7 @@ import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
+import org.bonitasoft.engine.bpm.model.archive.ArchivedProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -83,7 +86,6 @@ import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -863,10 +865,11 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                SAProcessInstance saprocessInstance;
-
-                saprocessInstance = processInstanceService.getArchivedProcessInstanceList(processInstanceId, persistenceService, 0, 1,
-                        saProcessInstanceBuilder.getIdKey(), OrderByType.ASC).get(0);
+                final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
+                        persistenceService, tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(),
+                        OrderByType.ASC);
+                getArchivedProcessInstanceList.execute();
+                final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
                 final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
                 final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
@@ -875,7 +878,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 expcontext.setContainerId(processInstanceId);
                 expcontext.setContainerType("PROCESS_INSTANCE");
                 expcontext.setProcessDefinitionId(processDefinitionId);
-                expcontext.setTime(saprocessInstance.getArchiveDate());
+                expcontext.setTime(saprocessInstance.getArchiveDate().getTime());
                 final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
@@ -1015,9 +1018,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SAActivityInstance aactivityInstance = activityInstanceService.getArchivedActivityInstance(activityInstanceId, persistenceService);
-                final long processInstanceId = aactivityInstance.getRootContainerId();
-                final SAProcessInstance processInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId, persistenceService);
-                final long processDefinitionId = processInstance.getProcessDefinitionId();
+
+                final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
+                        aactivityInstance.getRootContainerId(), persistenceService, tenantAccessor.getSearchEntitiesDescriptor());
+                getLastArchivedProcessInstance.execute();
+
+                final long processDefinitionId = getLastArchivedProcessInstance.getResult().getProcessDefinitionId();
                 final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
                 final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
@@ -1090,8 +1096,10 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                SAProcessInstance saprocessInstance;
-                saprocessInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId, persistenceService);
+                final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
+                        processInstanceId, persistenceService, tenantAccessor.getSearchEntitiesDescriptor());
+                getLastArchivedProcessInstance.execute();
+                final ArchivedProcessInstance saprocessInstance = getLastArchivedProcessInstance.getResult();
                 final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
                 final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
@@ -1100,7 +1108,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 expcontext.setContainerId(processInstanceId);
                 expcontext.setContainerType("PROCESS_INSTANCE");
                 expcontext.setProcessDefinitionId(processDefinitionId);
-                expcontext.setTime(saprocessInstance.getArchiveDate() + 500);
+                expcontext.setTime(saprocessInstance.getArchiveDate().getTime() + 500);
                 final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {

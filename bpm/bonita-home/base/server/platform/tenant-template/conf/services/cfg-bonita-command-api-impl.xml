@@ -14,12 +14,6 @@
 		<property name="defaultCommands">
 			<list>
 				<ref bean="getActorIdsForUserIdIncludingTeam" />
-				<ref bean="evaluateExpressionsOnProcessInstance" />
-				<ref bean="evaluateExpressionsOnProcessDefinition" />
-				<ref bean="evaluateExpressionsOnActivityInstance" />
-				<ref bean="evaluateExpressionsOnCompletedActivityInstance" />
-				<ref bean="evaluateExpressionOnCompletedProcessInstance" />
-				<ref bean="evaluateExpressionAtProcessInstanciation" />
 				<ref bean="isUserProcessSupervisor" />
 				<ref bean="createSupervisor" />
 				<ref bean="getSupervisor" />
@@ -81,78 +75,6 @@
 		</constructor-arg>
 		<constructor-arg name="implementation">
 			<value>org.bonitasoft.engine.external.actor.GetActorIdsForUserIdIncludingTeam</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="evaluateExpressionsOnProcessInstance" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>evaluateExpressionsOnProcessInstance</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Evaluate expression using data from process instance.</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.expression.EvaluateExpressionsOnProcessInstance</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="evaluateExpressionsOnProcessDefinition" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>evaluateExpressionsOnProcessDefinition</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Evaluate expression using data with default expression and parameter from process Definition.</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.expression.EvaluateExpressionsOnProcessDefinition</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="evaluateExpressionsOnActivityInstance" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>evaluateExpressionsOnActivityInstance</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Evaluate expression using data from activity instance.</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.expression.EvaluateExpressionsOnActivityInstance</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="evaluateExpressionsOnCompletedActivityInstance" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>evaluateExpressionsOnCompletedActivityInstance</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Evaluate expression using data from activity instance when activity completed.</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.expression.EvaluateExpressionsOnCompletedActivityInstance</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="evaluateExpressionOnCompletedProcessInstance" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>evaluateExpressionOnCompletedProcessInstance</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Evaluate expression using data from process instance when process completed.</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.expression.EvaluateExpressionOnCompletedProcessInstance</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="evaluateExpressionAtProcessInstanciation" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>evaluateExpressionAtProcessInstanciation</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Evaluate expression using data from process instance when process instantiated.</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.expression.EvaluateExpressionAtProcessInstanciation</value>
 		</constructor-arg>
 	</bean>
 
