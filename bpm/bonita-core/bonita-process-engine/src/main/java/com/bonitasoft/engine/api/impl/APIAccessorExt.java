@@ -17,6 +17,7 @@ import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PlatformInfoAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 
 /**
@@ -49,6 +50,11 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     @Override
     public CommandAPI getCommandAPI() {
         return new CommandAPIImpl();
+    }
+
+    @Override
+    public PlatformInfoAPI getPlatformInfoAPI() {
+        return new PlatformInfoAPIImpl();
     }
 
 }

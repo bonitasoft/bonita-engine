@@ -25,7 +25,6 @@ import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantDeletionException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.exception.TenantUpdateException;
-import com.bonitasoft.engine.platform.LicenseInfo;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCriterion;
 import com.bonitasoft.engine.platform.TenantUpdateDescriptor;
@@ -245,10 +244,5 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             since 6.0
      */
     SearchResult<Tenant> searchTenants(SearchOptions searchOptions) throws InvalidSessionException, SearchException;
-
-    /**
-     * @return
-     */
-    LicenseInfo getLicenseInfo();
 
 }

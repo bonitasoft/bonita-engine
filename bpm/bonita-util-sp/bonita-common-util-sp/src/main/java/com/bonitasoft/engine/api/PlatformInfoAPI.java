@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,27 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
+import com.bonitasoft.engine.platform.LicenseInfo;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
-public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
+public interface PlatformInfoAPI {
 
-    @Override
-    IdentityAPI getIdentityAPI();
-
-    @Override
-    ProcessAPI getProcessAPI();
-
-    MonitoringAPI getMonitoringAPI();
-
-    LogAPI getLogAPI();
-
-    PlatformInfoAPI getPlatformInfoAPI();
-
-    @Override
-    CommandAPI getCommandAPI();
+    /**
+     * @return
+     */
+    LicenseInfo getLicenseInfo();
 
 }

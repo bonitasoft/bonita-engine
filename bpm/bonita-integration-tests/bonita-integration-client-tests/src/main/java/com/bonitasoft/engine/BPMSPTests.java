@@ -24,6 +24,7 @@ import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.migration.MigrationTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
+import com.bonitasoft.engine.platform.PlatformInfoAPITest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
@@ -33,6 +34,7 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         SPIdentityTests.class,
         // SPPlatformTest.class, JIRA-482
         SPProcessManagementTest.class,
+        PlatformInfoAPITest.class ,
         LogTest.class,
         ExternalCommandsTestSP.class,
         BPMRemoteTests.class,
