@@ -55,7 +55,7 @@ public class PropertyFileParameterService implements ParameterService {
             final String filePath = getFilePath(processDefinitionId);
             final Properties properties = PropertiesManager.getProperties(filePath);
             if (!properties.containsKey(parameterName)) {
-                throw new SParameterNameNotFoundException("The paramter name " + parameterName + " does not exist");
+                throw new SParameterNameNotFoundException("The parameter name " + parameterName + " does not exist");
             }
             final String newValue = parameterValue == null ? NULL : parameterValue;
             putProperty(filePath, parameterName, newValue);
