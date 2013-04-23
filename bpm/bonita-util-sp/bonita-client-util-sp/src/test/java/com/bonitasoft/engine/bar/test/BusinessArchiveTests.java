@@ -32,6 +32,7 @@ import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.DocumentDefinition;
 import org.bonitasoft.engine.bpm.model.GatewayType;
 import org.bonitasoft.engine.bpm.model.IntermediateCatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.model.TransitionDefinition;
 import org.bonitasoft.engine.bpm.model.UserTaskDefinition;
@@ -70,6 +71,61 @@ public class BusinessArchiveTests {
             }
         }
         return dir.delete();
+    }
+
+    @Test(expected = InvalidBusinessArchiveFormatException.class)
+    public void invalidSPHashIsRejected() throws Exception {
+        final File tempFolder = File.createTempFile("businessArchive", "folder");
+        tempFolder.delete();
+
+        try {
+            final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MySPProcess", "1.0");
+            processDefinitionBuilder.addActor("BradPitt").addActor("Angelina").addAutomaticTask("a").addAutomaticTask("b").addTransition("a", "b")
+                    .addGateway("MyGate", GatewayType.PARALLEL);
+            final DesignProcessDefinition process = processDefinitionBuilder.done();
+            final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
+            com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
+            org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.readBusinessArchive(tempFolder);
+        } finally {
+            deleteDir(tempFolder);
+        }
+    }
+
+    @Test
+    public void validSPHashIsAccepted() throws Exception {
+        final File tempFolder = File.createTempFile("businessArchive", "folder");
+        tempFolder.delete();
+
+        try {
+            final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MySPProcess", "1.1");
+            processDefinitionBuilder.addActor("BradPitt").addActor("Angelina").addAutomaticTask("a").addAutomaticTask("b").addTransition("a", "b")
+                    .addGateway("MyGate", GatewayType.PARALLEL);
+            processDefinitionBuilder.addParameter("Metre", String.class.getName());
+            final DesignProcessDefinition process = processDefinitionBuilder.done();
+            final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
+            com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
+            com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.readBusinessArchive(tempFolder);
+        } finally {
+            deleteDir(tempFolder);
+        }
+    }
+
+    @Test
+    public void validBOSHashIsAccepted() throws Exception {
+        final File tempFolder = File.createTempFile("businessArchive", "folder");
+        tempFolder.delete();
+
+        try {
+            final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyBOSProcess", "1.0");
+            processDefinitionBuilder.addActor("BradPitt").addActor("Angelina").addAutomaticTask("a").addAutomaticTask("b").addTransition("a", "b")
+                    .addGateway("MyGate", GatewayType.PARALLEL);
+            final DesignProcessDefinition process = processDefinitionBuilder.done();
+            final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
+            org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
+            com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.readBusinessArchive(tempFolder);
+        } finally {
+            deleteDir(tempFolder);
+        }
     }
 
     @Test
