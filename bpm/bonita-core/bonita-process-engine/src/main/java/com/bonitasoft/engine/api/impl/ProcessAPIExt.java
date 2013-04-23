@@ -1305,7 +1305,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance updateProcessInstanceIndex(final long processInstanceId, final Index index, final String value) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, ProcessInstanceModificationException {
+            ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -1327,7 +1327,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance updateProcessInstance(final long processInstanceId, final ProcessInstanceUpdateDescriptor updateDescriptor)
-            throws InvalidSessionException, ProcessInstanceNotFoundException, ProcessInstanceModificationException {
+            throws InvalidSessionException, ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException {
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
             throw new ProcessInstanceModificationException("The update descriptor does not contain field updates");
         }

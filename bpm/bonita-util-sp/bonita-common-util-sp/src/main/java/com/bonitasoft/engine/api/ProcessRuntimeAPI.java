@@ -31,6 +31,7 @@ import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.ProcessInstanceModificationException;
 import org.bonitasoft.engine.exception.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
@@ -442,10 +443,13 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
      * @throws ProcessInstanceModificationException
      *             Error thrown while updating the instance of process failed.
+     * @throws ProcessDefinitionNotFoundException
+     *             Error thrown if no process definition have an id corresponding to the value of processDefinitionId of process instance with processInstanceId
+     *             parameter.
      * @since 6.0
      */
     ProcessInstance updateProcessInstanceIndex(long processInstanceId, Index index, String value) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, ProcessInstanceModificationException;
+            ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException;
 
     /**
      * Update an instance of process with the given processInstanceId.
@@ -461,9 +465,12 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             Error thrown if no process instance have an id corresponding to the value of processInstanceId parameter.
      * @throws ProcessInstanceModificationException
      *             error thrown while updating the instance of process failed.
+     * @throws ProcessDefinitionNotFoundException
+     *             Error thrown if no process definition have an id corresponding to the value of processDefinitionId of process instance with processInstanceId
+     *             parameter.
      * @since 6.0
      */
     ProcessInstance updateProcessInstance(long processInstanceId, ProcessInstanceUpdateDescriptor updateDescriptor) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, ProcessInstanceModificationException;
+            ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException;
 
 }
