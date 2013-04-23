@@ -39,7 +39,7 @@ public class LicenseChecker {
 
     private LicenseChecker() {
         super();
-        exceptions = new HashMap<String, String>(13);
+        exceptions = new HashMap<String, String>(14);
         exceptions.put(Features.BPM_MONITORING, "The bpm monitoring is not an active feature.");
         exceptions.put(Features.CREATE_MANUAL_TASK, "The manual task creation/deletion is not an active feature.");
         exceptions.put(Features.CREATE_PARAMETER, "The parameter creation is not an active feature.");
@@ -57,12 +57,13 @@ public class LicenseChecker {
         random = new Random();
     }
 
-    public void checkLicence() {
+    public boolean checkLicence() {
         final int count = random.nextInt(2);
         if (count == 0 && !Manager.isValid()) {
             stopNode();
-            throw new IllegalStateException("Your licence is not valid : " + Manager.getErrorMessage());
+            return false;
         }
+        return true;
     }
 
     public void checkLicenceAndFeature(final String feature) throws IllegalStateException {
@@ -76,7 +77,7 @@ public class LicenseChecker {
     private void stopNode() {
         final PlatformAPIExt platformAPI = new PlatformAPIExt();
         try {
-            platformAPI.stopNode();
+            platformAPI.stopNode("an invalid license");
         } catch (final InvalidSessionException ise) {
             throw new IllegalStateException(ise);
         } catch (final StopNodeException sne) {

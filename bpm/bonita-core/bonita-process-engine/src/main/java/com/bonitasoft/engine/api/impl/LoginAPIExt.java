@@ -37,8 +37,18 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
 
     @Override
+    public APISession login(final String userName, final String password) throws LoginException {
+        if (!LicenseChecker.getInstance().checkLicence()) {
+            throw new LoginException("The node is not started");
+        }
+        return super.login(userName, password);
+    }
+
+    @Override
     public APISession login(final long tenantId, final String userName, final String password) throws LoginException {
-        LicenseChecker.getInstance().checkLicence();
+        if (!LicenseChecker.getInstance().checkLicence()) {
+            throw new LoginException("The node is not started");
+        }
         checkUsernameAndPassword(userName, password);
         final STenant sTenant = getTenant(tenantId);
         return login(userName, password, sTenant);

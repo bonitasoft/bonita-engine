@@ -48,9 +48,11 @@ import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.StartNodeException;
+import org.bonitasoft.engine.exception.StopNodeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
@@ -690,9 +692,32 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public void startNode() throws IllegalStateException, InvalidSessionException, StartNodeException {
+    public void startNode() throws InvalidSessionException, StartNodeException {
         LicenseChecker.getInstance().checkLicence();
         super.startNode();
+    }
+
+    public void stopNode(final String message) throws InvalidSessionException, StopNodeException {
+        super.stopNode();
+        try {
+            final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            final TechnicalLoggerService loggerService = platformAccessor.getTechnicalLoggerService();
+            if (loggerService.isLoggable(PlatformAPIExt.class, TechnicalLogSeverity.ERROR)) {
+                loggerService.log(PlatformAPIExt.class, TechnicalLogSeverity.ERROR, "The engine was stopped due to " + message + ".");
+            }
+        } catch (final BonitaHomeNotSetException bhnse) {
+            throw new StopNodeException(bhnse);
+        } catch (final BonitaHomeConfigurationException bhce) {
+            throw new StopNodeException(bhce);
+        } catch (final InstantiationException ie) {
+            throw new StopNodeException(ie);
+        } catch (final IllegalAccessException iae) {
+            throw new StopNodeException(iae);
+        } catch (final ClassNotFoundException cnfe) {
+            throw new StopNodeException(cnfe);
+        } catch (final IOException ioe) {
+            throw new StopNodeException(ioe);
+        }
     }
 
 }
