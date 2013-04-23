@@ -115,7 +115,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
     }
 
-    private boolean isPlatformStarted(final PlatformServiceAccessor platformAccessor) {
+    public boolean isPlatformStarted(final PlatformServiceAccessor platformAccessor) {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         try {
             return schedulerService.isStarted();

@@ -8,14 +8,17 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.StopNodeException;
 
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
@@ -25,8 +28,6 @@ import com.bonitasoft.manager.Manager;
 public class LicenseChecker {
 
     private final Map<String, String> exceptions;
-
-    private final Random random;
 
     private static class LicenseCheckerHolder {
 
@@ -53,13 +54,10 @@ public class LicenseChecker {
         exceptions.put(Features.SEARCH_INDEX, "Search index is not an active feature.");
         exceptions.put(Features.SERVICE_MONITORING, "The service monitoring is not an active feature.");
         exceptions.put(Features.SET_CONNECTOR_STATE, "Set the connector state is not an active feature.");
-
-        random = new Random();
     }
 
     public boolean checkLicence() {
-        final int count = random.nextInt(2);
-        if (count == 0 && !Manager.isValid()) {
+        if (!Manager.isValid()) {
             stopNode();
             return false;
         }
@@ -77,11 +75,26 @@ public class LicenseChecker {
     private void stopNode() {
         final PlatformAPIExt platformAPI = new PlatformAPIExt();
         try {
-            platformAPI.stopNode("an invalid license");
+            final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            if (platformAPI.isPlatformStarted(platformAccessor)) {
+                platformAPI.stopNode("an invalid license");
+            }
         } catch (final InvalidSessionException ise) {
             throw new IllegalStateException(ise);
         } catch (final StopNodeException sne) {
             throw new IllegalStateException(sne);
+        } catch (final BonitaHomeNotSetException bhnse) {
+            throw new IllegalStateException(bhnse);
+        } catch (final BonitaHomeConfigurationException bhce) {
+            throw new IllegalStateException(bhce);
+        } catch (final InstantiationException ie) {
+            throw new IllegalStateException(ie);
+        } catch (final IllegalAccessException iae) {
+            throw new IllegalStateException(iae);
+        } catch (final ClassNotFoundException cnfe) {
+            throw new IllegalStateException(cnfe);
+        } catch (final IOException ioe) {
+            throw new IllegalStateException(ioe);
         }
     }
 
