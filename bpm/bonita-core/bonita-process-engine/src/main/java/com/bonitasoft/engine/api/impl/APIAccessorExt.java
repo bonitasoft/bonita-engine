@@ -19,6 +19,7 @@ import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.ReportAPI;
 
 /**
  * @author Matthieu Chaffotte
@@ -55,6 +56,11 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     @Override
     public NodeAPI getNodeAPI() {
         return new NodeAPIImpl();
+    }
+
+    @Override
+    public ReportAPI getReportAPI() {
+        return new ReportAPIExt();
     }
 
 }

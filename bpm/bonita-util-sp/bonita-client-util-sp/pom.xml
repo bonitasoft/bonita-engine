@@ -23,6 +23,11 @@
 			<artifactId>bonita-client-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -38,24 +43,5 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-	<profiles>
-		<profile>
-			<id>tests</id>
-			<dependencies>
-				<dependency>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-					<scope>test</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.bonitasoft.engine.util</groupId>
-					<artifactId>bonita-client-util</artifactId>
-					<version>${project.version}</version>
-					<type>test-jar</type>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
+
 </project>

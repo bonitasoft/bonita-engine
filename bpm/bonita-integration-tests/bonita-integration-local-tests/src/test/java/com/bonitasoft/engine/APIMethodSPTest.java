@@ -14,9 +14,24 @@ import org.junit.Test;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.MigrationAPIImpl;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
+import com.bonitasoft.engine.api.impl.NodeAPIImpl;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
+import com.bonitasoft.engine.api.impl.ProcessAPIExt;
+import com.bonitasoft.engine.api.impl.ReportAPIExt;
 
 public class APIMethodSPTest extends APIMethodTest {
+
+    @Override
+    @Test
+    public void checkAllMethodsOfProcessAPIThrowInvalidSessionException() {
+        checkThrowsInvalidSessionException(ProcessAPIExt.class);
+    }
+
+    @Override
+    @Test
+    public void checkAllMethodsOfProcessAPIContainsSerializableParameters() {
+        checkAllParametersAreSerializable(ProcessAPIExt.class);
+    }
 
     @Test
     public void checkAllMethodsOfLogAPIThrowInvalidSessionException() {
@@ -48,6 +63,18 @@ public class APIMethodSPTest extends APIMethodTest {
         checkAllParametersAreSerializable(MigrationAPIImpl.class);
     }
 
+    // @Override
+    // @Test
+    // public void checkAllMethodsOfPlatformAPIThrowInvalidSessionException() {
+    // checkThrowsInvalidSessionException(PlatformAPIExt.class);
+    // }
+    //
+    // @Override
+    // @Test
+    // public void checkAllMethodsOfPlatformAPIContainsSerializableParameters() {
+    // checkAllParametersAreSerializable(PlatformAPIExt.class);
+    // }
+
     @Test
     public void checkAllMethodsOfPlatformMonitoringAPIThrowInvalidSessionException() {
         checkThrowsInvalidSessionException(PlatformMonitoringAPIImpl.class);
@@ -56,6 +83,23 @@ public class APIMethodSPTest extends APIMethodTest {
     @Test
     public void checkAllMethodsOfPlatformMonitoringAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(PlatformMonitoringAPIImpl.class);
+    }
+
+    @Override
+    @Test
+    public void checkAllMethodsOfReportAPIThrowInvalidSessionException() {
+        checkThrowsInvalidSessionException(ReportAPIExt.class);
+    }
+
+    @Override
+    @Test
+    public void checkAllMethodsOfReportAPIContainsSerializableParameters() {
+        checkAllParametersAreSerializable(ReportAPIExt.class);
+    }
+
+    @Test
+    public void checkAllMethodsOfNodeAPIContainsSerializableParameters() {
+        checkAllParametersAreSerializable(NodeAPIImpl.class);
     }
 
 }

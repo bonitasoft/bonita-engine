@@ -8,15 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import java.sql.SQLException;
-
 import javax.naming.Context;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
-import org.h2.tools.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -25,18 +21,11 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.bonitasoft.engine.BPMSPTests;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-        BPMSPTests.class,
-        BPMLocalSuiteTests.class,
-        LocalLogTest.class,
-        APIMethodSPTest.class,
-        ConnectorExecutionTimeOutTest.class
-})
+@SuiteClasses({ LicenseTest.class })
 public class LocalIntegrationTestsSP {
 
     static ConfigurableApplicationContext springContext;
@@ -47,9 +36,9 @@ public class LocalIntegrationTestsSP {
 
         setupSpringContext();
 
-        PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.createPlatform();
         platformLoginAPI.logout(session);
 
@@ -59,9 +48,9 @@ public class LocalIntegrationTestsSP {
     @AfterClass
     public static void afterClass() throws BonitaException {
         System.err.println("=================== LocalIntegrationTestsSP.afterClass()");
-        PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.deletePlaftorm();
         platformLoginAPI.logout(session);
 
@@ -82,7 +71,7 @@ public class LocalIntegrationTestsSP {
         springContext.close();
     }
 
-    private static void setSystemPropertyIfNotSet(String property, String value) {
+    private static void setSystemPropertyIfNotSet(final String property, final String value) {
         System.setProperty(property, System.getProperty(property, value));
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -30,5 +30,8 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
     @Override
     CommandAPI getCommandAPI();
+
+    @Override
+    ReportAPI getReportAPI();
 
 }
