@@ -86,10 +86,10 @@ public class PlatformAPIAccessor {
         return getAPI(PlatformCommandAPI.class, session);
     }
 
-    public static PlatformInfoAPI getPlatformInfoAPI() throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static NodeAPI getPlatformInfoAPI() throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
-        final ClientInterceptor interceptor = new ClientInterceptor(PlatformInfoAPI.class.getName(), serverAPI);
-        return (PlatformInfoAPI) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { PlatformInfoAPI.class }, interceptor);
+        final ClientInterceptor interceptor = new ClientInterceptor(NodeAPI.class.getName(), serverAPI);
+        return (NodeAPI) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { NodeAPI.class }, interceptor);
     }
 
 }

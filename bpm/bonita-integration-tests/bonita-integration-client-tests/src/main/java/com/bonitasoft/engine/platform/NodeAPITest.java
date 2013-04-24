@@ -14,13 +14,13 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.PlatformInfoAPI;
+import com.bonitasoft.engine.api.NodeAPI;
 
-public class PlatformInfoAPITest extends CommonAPISPTest {
+public class NodeAPITest extends CommonAPISPTest {
 
     @Test
     public void getLincenseInfo() throws Exception {
-        final PlatformInfoAPI platformInfoAPI = PlatformAPIAccessor.getPlatformInfoAPI();
+        final NodeAPI platformInfoAPI = PlatformAPIAccessor.getPlatformInfoAPI();
         final LicenseInfo licenseInfo = platformInfoAPI.getLicenseInfo();
 
         assertTrue(licenseInfo.getExpirationDate().getTime() > System.currentTimeMillis());

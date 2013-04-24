@@ -26,7 +26,7 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
     LogAPI getLogAPI();
 
-    PlatformInfoAPI getPlatformInfoAPI();
+    NodeAPI getNodeAPI();
 
     @Override
     CommandAPI getCommandAPI();

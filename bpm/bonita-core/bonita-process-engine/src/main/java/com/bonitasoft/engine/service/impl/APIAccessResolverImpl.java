@@ -30,14 +30,14 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MigrationAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
-import com.bonitasoft.engine.api.PlatformInfoAPI;
+import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
 import com.bonitasoft.engine.api.impl.MigrationAPIImpl;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
-import com.bonitasoft.engine.api.impl.PlatformInfoAPIImpl;
+import com.bonitasoft.engine.api.impl.NodeAPIImpl;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 
@@ -49,7 +49,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
     private static final Map<String, Object> apis = new HashMap<String, Object>(12);
 
     private static final List<String> NO_SESSION_APIS = Arrays.asList(PlatformLoginAPI.class.getName(), LoginAPI.class.getName(),
-            com.bonitasoft.engine.api.LoginAPI.class.getName(), PlatformInfoAPI.class.getName());
+            com.bonitasoft.engine.api.LoginAPI.class.getName(), NodeAPI.class.getName());
 
     static {
         apis.put(PlatformAPI.class.getName(), new PlatformAPIExt());
@@ -66,7 +66,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(LogAPI.class.getName(), new LogAPIExt());
         apis.put(CommandAPI.class.getName(), new CommandAPIImpl());
         apis.put(PlatformCommandAPI.class.getName(), new PlatformCommandAPIImpl());
-        apis.put(PlatformInfoAPI.class.getName(), new PlatformInfoAPIImpl());
+        apis.put(NodeAPI.class.getName(), new NodeAPIImpl());
     }
 
     @Override

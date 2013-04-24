@@ -11,12 +11,18 @@ package com.bonitasoft.engine.api;
 import com.bonitasoft.engine.platform.LicenseInfo;
 
 /**
+ * Handle nodes
+ * A node is a JVM that allows the engine to run on a platform
+ * 
  * @author Baptiste Mesta
  */
-public interface PlatformInfoAPI {
+public interface NodeAPI {
 
     /**
+     * get the license informations for this node
+     * 
      * @return
+     *         License informations
      */
     LicenseInfo getLicenseInfo();
 

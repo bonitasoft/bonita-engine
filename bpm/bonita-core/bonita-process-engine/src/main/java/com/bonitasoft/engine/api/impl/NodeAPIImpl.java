@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.api.PlatformInfoAPI;
+import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.platform.LicenseInfo;
 import com.bonitasoft.engine.platform.LicenseInfoImpl;
 import com.bonitasoft.manager.Manager;
@@ -20,7 +20,7 @@ import com.bonitasoft.manager.Manager;
 /**
  * @author Baptiste Mesta
  */
-public class PlatformInfoAPIImpl implements PlatformInfoAPI {
+public class NodeAPIImpl implements NodeAPI {
 
     @Override
     public LicenseInfo getLicenseInfo() {
@@ -29,6 +29,11 @@ public class PlatformInfoAPIImpl implements PlatformInfoAPI {
         final String licensee = info.get("customerName");
         final List<String> features = Manager.activeFeatures();
         final Date expirationDate = new Date(Long.valueOf(info.get("expirationDate")));
-        return new LicenseInfoImpl(licensee, expirationDate, edition, features, -25);
+        final String numberOfCPUCoresAsString = info.get("numberOfCPUCores");
+        int numberOfCPUCores = -1;
+        if (numberOfCPUCoresAsString != null) {
+            numberOfCPUCores = Integer.valueOf(numberOfCPUCoresAsString);
+        }
+        return new LicenseInfoImpl(licensee, expirationDate, edition, features, numberOfCPUCores);
     }
 }
