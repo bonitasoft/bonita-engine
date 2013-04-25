@@ -19,7 +19,7 @@ import com.bonitasoft.engine.api.NodeAPI;
 public class NodeAPITest extends CommonAPISPTest {
 
     @Test
-    public void getLincenseInfo() throws Exception {
+    public void getLicenseInfo() throws Exception {
         final NodeAPI platformInfoAPI = PlatformAPIAccessor.getPlatformInfoAPI();
         final LicenseInfo licenseInfo = platformInfoAPI.getLicenseInfo();
 
