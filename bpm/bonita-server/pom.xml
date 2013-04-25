@@ -59,7 +59,7 @@
 			<artifactId>bonita-archive-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Authentication -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.authentication</groupId>
@@ -189,14 +189,14 @@
 			<artifactId>bonita-data-instance-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Data Source -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
 			<artifactId>bonita-data-instance-data-source-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Delete -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
@@ -252,7 +252,7 @@
 			<artifactId>bonita-document-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Document Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
@@ -399,28 +399,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Migration -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-instance-migration-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-instance-migration-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-instance-migration-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-instance-migration-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Monitoring -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.monitoring</groupId>
@@ -462,7 +440,7 @@
 			<groupId>com.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-hibernate-sp</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 
 		<!-- Platform -->
 		<dependency>
@@ -538,8 +516,8 @@
 			<artifactId>bonita-platform-login-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<!-- Platform Session -->		
+
+		<!-- Platform Session -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.session</groupId>
 			<artifactId>bonita-platform-session-model-impl</artifactId>
@@ -550,7 +528,7 @@
 			<artifactId>bonita-platform-session-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Process Comment -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
@@ -628,7 +606,7 @@
 			<artifactId>bonita-process-document-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Process Instance -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
@@ -650,7 +628,7 @@
 			<artifactId>bonita-process-instance-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Recorder -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
@@ -805,7 +783,7 @@
 			<artifactId>bonita-profile-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Not in shade -->
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
@@ -867,7 +845,7 @@
 									<include>org.bonitasoft.engine.connector:bonita-connector-executor-api</include>
 									<include>org.bonitasoft.engine.connector:bonita-connector-executor-api-impl</include>
 									<include>com.bonitasoft.engine:bonita-connector-executor-timedout</include>
-									<!-- Connector  -->
+									<!-- Connector -->
 									<include>org.bonitasoft.engine.core.connector:bonita-connector-service-api</include>
 									<include>org.bonitasoft.engine.core.connector:bonita-connector-service-api-impl</include>
 									<!-- Data -->
@@ -957,12 +935,6 @@
 									<include>org.bonitasoft.engine.log:bonita-log-api</include>
 									<include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
-									<!-- Migration -->
-									<include>org.bonitasoft.engine.core:bonita-instance-migration-api</include>
-									<include>org.bonitasoft.engine.core:bonita-instance-migration-impl</include>
-									<include>com.bonitasoft.engine.core:bonita-instance-migration-impl</include>
-									<include>com.bonitasoft.engine.core:bonita-instance-migration-impl-mybatis</include>
-									<include>org.bonitasoft.engine.core:bonita-instance-migration-impl-hibernate</include>
 									<!-- Monitoring -->
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
 									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
@@ -991,7 +963,7 @@
 									<!-- Platform Authentication -->
 									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api</include>
 									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api-impl</include>
-									<!-- Platform Command-->
+									<!-- Platform Command -->
 									<include>org.bonitasoft.engine.platform.command:bonita-platform-command-model</include>
 									<include>org.bonitasoft.engine.platform.command:bonita-platform-command-model-impl</include>
 									<include>com.bonitasoft.engine.platform.command:bonita-platform-command-model-impl-mybatis</include>
@@ -1003,7 +975,7 @@
 									<include>com.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl-mybatis</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-impl</include>
-									<!-- Platform Login-->
+									<!-- Platform Login -->
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
 									<!-- Platform Session -->

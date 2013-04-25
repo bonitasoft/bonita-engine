@@ -10,7 +10,6 @@ package com.bonitasoft.engine.core.migration.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.model.ProcessInstanceState;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.core.migration.MigrationPlanService;
 import org.bonitasoft.engine.core.migration.exceptions.SInvalidMigrationPlanException;
@@ -78,7 +77,6 @@ public class MigrationPlanServiceExt extends MigrationPlanServiceImpl implements
             SProcessInstance processInstance;
             try {
                 processInstance = processInstanceService.getProcessInstance(processInstanceId);
-                processInstanceService.setState(processInstance, ProcessInstanceState.TO_MIGRATE);
                 processInstanceService.setMigrationPlanId(processInstance, migrationPlanId);
                 for (final SMigrationMapping mapping : migrationPlan.getMappings()) {
                     breakpointService.addBreakpoint(breakpointBuilder

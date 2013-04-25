@@ -12,7 +12,6 @@ import org.bonitasoft.engine.test.APIMethodTest;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.impl.LogAPIExt;
-import com.bonitasoft.engine.api.impl.MigrationAPIImpl;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.NodeAPIImpl;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
@@ -51,16 +50,6 @@ public class APIMethodSPTest extends APIMethodTest {
     @Test
     public void checkAllMethodsOfMonitoringAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(MonitoringAPIImpl.class);
-    }
-
-    @Test
-    public void checkAllMethodsOfMigrationAPIThrowInvalidSessionException() {
-        checkThrowsInvalidSessionException(MigrationAPIImpl.class);
-    }
-
-    @Test
-    public void checkAllMethodsOfMigrationAPIContainsSerializableParameters() {
-        checkAllParametersAreSerializable(MigrationAPIImpl.class);
     }
 
     // @Override

@@ -21,7 +21,6 @@ import com.bonitasoft.engine.external.ExternalCommandsTestSP;
 import com.bonitasoft.engine.external.SPProfileMemberCommandTest;
 import com.bonitasoft.engine.identity.SPIdentityTests;
 import com.bonitasoft.engine.log.LogTest;
-import com.bonitasoft.engine.migration.MigrationTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
 import com.bonitasoft.engine.platform.NodeAPITest;
@@ -45,7 +44,6 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         RemoteConnectorExecutionTestSP.class,
         PlatformMonitoringAPITest.class,
         MonitoringAPITest.class,
-        MigrationTest.class,
         BreakpointsTest.class,
         SearchEntitiesTests.class
 })

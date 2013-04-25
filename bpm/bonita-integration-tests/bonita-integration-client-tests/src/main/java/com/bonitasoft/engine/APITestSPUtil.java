@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.MigrationAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.log.Log;
@@ -38,8 +37,6 @@ public class APITestSPUtil extends APITestUtil {
 
     private LogAPI logAPI;
 
-    private MigrationAPI migrationAPI;
-
     public static int DEFAULT_REPEAT = 50;
 
     public static int DEFAULT_TIMEOUT = 2000;
@@ -49,7 +46,6 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setMigrationAPI(TenantAPIAccessor.getMigrationAPI(getSession()));
     }
 
     @Override
@@ -59,7 +55,6 @@ public class APITestSPUtil extends APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
-        setMigrationAPI(TenantAPIAccessor.getMigrationAPI(getSession()));
     }
 
     @Override
@@ -69,7 +64,6 @@ public class APITestSPUtil extends APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
-        setMigrationAPI(TenantAPIAccessor.getMigrationAPI(getSession()));
     }
 
     protected void login(final long tenantId) throws BonitaException {
@@ -77,7 +71,6 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setMigrationAPI(TenantAPIAccessor.getMigrationAPI(getSession()));
     }
 
     @Override
@@ -87,7 +80,6 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(null);
         setProcessAPI(null);
         setCommandAPI(null);
-        setMigrationAPI(null);
     }
 
     public LogAPI getLogAPI() {
@@ -127,11 +119,4 @@ public class APITestSPUtil extends APITestUtil {
         return (ProcessAPI) super.getProcessAPI();
     }
 
-    protected void setMigrationAPI(final MigrationAPI migrationAPI) {
-        this.migrationAPI = migrationAPI;
-    }
-
-    public MigrationAPI getMigrationAPI() {
-        return migrationAPI;
-    }
 }

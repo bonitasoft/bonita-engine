@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -80,11 +80,6 @@ public final class TenantAPIAccessor {
     public static ProcessAPI getProcessAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(ProcessAPI.class, session);
-    }
-
-    public static MigrationAPI getMigrationAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
-        return getAPI(MigrationAPI.class, session);
     }
 
     public static MonitoringAPI getMonitoringAPI(final APISession session) throws BonitaHomeNotSetException, UnableToReadBonitaClientConfiguration,

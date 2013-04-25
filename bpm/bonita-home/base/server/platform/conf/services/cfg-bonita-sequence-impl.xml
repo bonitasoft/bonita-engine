@@ -56,7 +56,6 @@
 				<!-- <entry key="10050" value="100" />supervisor -->
 				<!-- <entry key="10070" value="100" />ExternalIdentityMapping -->
 				<!-- <entry key="10090" value="100" />document_content -->
-				<!-- <entry key="10100" value="100" />MigrationPlanDescriptor -->
 				<!-- <entry key="20040" value="100" />SADocumentMapping -->
 			</map>
 		</constructor-arg>
@@ -144,7 +143,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
 				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
-				<entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl" value="10100" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" value="10110" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />

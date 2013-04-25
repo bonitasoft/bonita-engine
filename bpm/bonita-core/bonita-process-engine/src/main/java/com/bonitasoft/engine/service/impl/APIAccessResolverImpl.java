@@ -30,16 +30,14 @@ import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.MigrationAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
-import com.bonitasoft.engine.api.impl.MigrationAPIImpl;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
-import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 import com.bonitasoft.engine.api.impl.NodeAPIImpl;
+import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 import com.bonitasoft.engine.api.impl.ReportAPIExt;
@@ -65,7 +63,6 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(MonitoringAPI.class.getName(), new MonitoringAPIImpl());
         apis.put(ProcessAPI.class.getName(), new ProcessAPIExt());
         apis.put(com.bonitasoft.engine.api.ProcessAPI.class.getName(), new ProcessAPIExt());
-        apis.put(MigrationAPI.class.getName(), new MigrationAPIImpl());
         apis.put(LogAPI.class.getName(), new LogAPIExt());
         apis.put(CommandAPI.class.getName(), new CommandAPIImpl());
         apis.put(PlatformCommandAPI.class.getName(), new PlatformCommandAPIImpl());
