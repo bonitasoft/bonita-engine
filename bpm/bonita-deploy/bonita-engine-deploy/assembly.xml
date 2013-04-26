@@ -52,7 +52,7 @@
 		<dependencySet>
 			<outputDirectory>resources</outputDirectory>
 			<includes>
-				<include>com.bonitasoft.engine:bonita-home-sp</include>
+				<include>com.bonitasoft.engine:bonita-home-sp:zip:performance-mybatis</include>
 			</includes>
 			<unpack>true</unpack>
 		</dependencySet>

@@ -52,7 +52,7 @@
 		<dependencySet>
 			<outputDirectory>resources</outputDirectory>
 			<includes>
-				<include>com.bonitasoft.engine:bonita-home-sp:zip:hibernate</include>
+				<include>com.bonitasoft.engine:bonita-home-sp:zip:teamwork</include>
 			</includes>
 			<unpack>true</unpack>
 		</dependencySet>

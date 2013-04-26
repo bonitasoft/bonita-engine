@@ -82,13 +82,13 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<bonita.home.classifier>hibernate</bonita.home.classifier>
+				<bonita.home.classifier>teamwork</bonita.home.classifier>
 			</properties>
 		</profile>
 		<profile>
 			<id>mybatis</id>
 			<properties>
-				<bonita.home.classifier></bonita.home.classifier>
+				<bonita.home.classifier>performance-mybatis</bonita.home.classifier>
 			</properties>
 		</profile>
 	</profiles>

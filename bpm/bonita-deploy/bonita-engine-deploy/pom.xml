@@ -33,14 +33,14 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-home-sp</artifactId>
 			<version>${project.version}</version>
-			<classifier></classifier>
+			<classifier>performance-mybatis</classifier>
 			<type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-home-sp</artifactId>
 			<version>${project.version}</version>
-			<classifier>hibernate</classifier>
+			<classifier>teamwork</classifier>
 			<type>zip</type>
 		</dependency>
 		<dependency>
