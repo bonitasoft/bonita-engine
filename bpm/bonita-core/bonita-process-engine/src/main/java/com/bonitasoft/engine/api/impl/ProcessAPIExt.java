@@ -99,7 +99,6 @@ import org.bonitasoft.engine.exception.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.ArchivedActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaReadException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.ConnectorException;
@@ -135,7 +134,6 @@ import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SOutOfBoundException;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
-import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -146,28 +144,16 @@ import org.bonitasoft.engine.util.FileUtil;
 
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.impl.transaction.AddBreakpoint;
-import com.bonitasoft.engine.api.impl.transaction.RemoveBreakpoint;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
-import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
-import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
-import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointNotFoundException;
-import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilder;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
-import com.bonitasoft.engine.exception.BreakpointCreationException;
-import com.bonitasoft.engine.exception.BreakpointDeletionException;
-import com.bonitasoft.engine.exception.BreakpointNotFoundException;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
-import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -1209,94 +1195,15 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public long addBreakpoint(final long definitionId, final long instanceId, final String elementName, final int idOfTheStateToInterrupt,
-            final int idOfTheInterruptingState) throws InvalidSessionException, BreakpointCreationException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final BPMInstanceBuilders breakpointBuilder = tenantAccessor.getBPMInstanceBuilders();
-        final AddBreakpoint transactionContent = new AddBreakpoint(breakpointService, breakpointBuilder, definitionId, instanceId, elementName,
-                idOfTheStateToInterrupt, idOfTheInterruptingState);
-        try {
-            transactionExecutor.execute(transactionContent);
-        } catch (final SBonitaException e) {
-            throw new BreakpointCreationException(e);
-        }
-        return transactionContent.getResult().getId();
-    }
-
-    @Override
-    public long addBreakpoint(final long definitionId, final String elementName, final int idOfTheStateToInterrupt, final int idOfTheInterruptingState)
-            throws InvalidSessionException, BreakpointCreationException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final BPMInstanceBuilders breakpointBuilder = tenantAccessor.getBPMInstanceBuilders();
-        final AddBreakpoint transactionContent = new AddBreakpoint(breakpointService, breakpointBuilder, definitionId, elementName, idOfTheStateToInterrupt,
-                idOfTheInterruptingState);
-        try {
-            transactionExecutor.execute(transactionContent);
-        } catch (final SBonitaException e) {
-            throw new BreakpointCreationException(e);
-        }
-        return transactionContent.getResult().getId();
-    }
-
-    @Override
-    public void removeBreakpoint(final long id) throws InvalidSessionException, BreakpointDeletionException, BreakpointNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final RemoveBreakpoint transactionContent = new RemoveBreakpoint(breakpointService, id);
-        try {
-            transactionExecutor.execute(transactionContent);
-        } catch (final SBreakpointNotFoundException e) {
-            throw new BreakpointNotFoundException(id);
-        } catch (final SBonitaException e) {
-            throw new BreakpointDeletionException(e);
-        }
-    }
-
-    @Override
-    public List<Breakpoint> getBreakpoints(final int pageNumber, final int numberPerPage, final BreakpointCriterion sort) throws InvalidSessionException,
-            BonitaReadException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final SBreakpointBuilder builder = tenantAccessor.getBPMInstanceBuilders().getSBreakpointBuilder();
-        try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final long totalNumber = breakpointService.getNumberOfBreakpoints();
-                PageIndexCheckingUtil.checkIfPageIsOutOfRange(totalNumber, pageNumber, numberPerPage);
-                final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForBreakpoints(sort, builder);
-                final List<SBreakpoint> breakpoints = breakpointService.getBreakpoints(pageNumber * numberPerPage, numberPerPage, orderAndField.getField(),
-                        orderAndField.getOrder());
-                return SPModelConvertor.toBreakpoints(breakpoints);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new BonitaReadException(e);
-            } catch (final PageOutOfRangeException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new BonitaReadException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
-            throw new BonitaReadException(e);
-        }
-    }
-
-    @Override
     public ProcessDefinition deploy(final BusinessArchive businessArchive) throws InvalidSessionException, ProcessDeployException,
             ProcessDefinitionAlreadyExistsException {
         final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
 
-        if (processDefinition.getStringIndexValue(1) != null || processDefinition.getStringIndexLabel(1) != null ||
-                processDefinition.getStringIndexValue(2) != null || processDefinition.getStringIndexLabel(2) != null ||
-                processDefinition.getStringIndexValue(3) != null || processDefinition.getStringIndexLabel(3) != null ||
-                processDefinition.getStringIndexValue(4) != null || processDefinition.getStringIndexLabel(4) != null ||
-                processDefinition.getStringIndexValue(5) != null || processDefinition.getStringIndexLabel(5) != null) {
+        if (processDefinition.getStringIndexValue(1) != null || processDefinition.getStringIndexLabel(1) != null
+                || processDefinition.getStringIndexValue(2) != null || processDefinition.getStringIndexLabel(2) != null
+                || processDefinition.getStringIndexValue(3) != null || processDefinition.getStringIndexLabel(3) != null
+                || processDefinition.getStringIndexValue(4) != null || processDefinition.getStringIndexLabel(4) != null
+                || processDefinition.getStringIndexValue(5) != null || processDefinition.getStringIndexLabel(5) != null) {
             LicenseChecker.getInstance().checkLicenceAndFeature(Features.SEARCH_INDEX);
         }
 

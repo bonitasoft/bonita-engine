@@ -10,10 +10,10 @@ package com.bonitasoft.engine;
 
 import javax.naming.Context;
 
+import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -26,13 +26,7 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-    BPMSPTests.class,
-    BPMLocalSuiteTests.class,
-    LocalLogTest.class,
-    APIMethodSPTest.class,
-    ConnectorExecutionTimeOutTest.class
-})
+@SuiteClasses({ BPMRemoteTests.class })
 public class LocalIntegrationTestsSP {
 
     static ConfigurableApplicationContext springContext;

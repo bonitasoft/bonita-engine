@@ -13,10 +13,11 @@
  **/
 package com.bonitasoft.engine.search;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.AutomaticTaskInstance;
@@ -40,6 +41,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -83,7 +87,13 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
         final DesignProcessDefinition designProcessDef2 = definitionBuilder.done();
 
         final ProcessDefinition processDef2 = deployAndEnableWithActor(designProcessDef2, ACTOR_NAME, user);
-        final long breakpointId = getProcessAPI().addBreakpoint(processDef2.getId(), "automaticTask", 2, 45);
+
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDef2.getId());
+        parameters.put("elementName", "automaticTask");
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         // start three times and get 3 processInstance for processDef2
         final ProcessInstance pi21 = getProcessAPI().startProcess(processDef2.getId());
         final ProcessInstance pi22 = getProcessAPI().startProcess(processDef2.getId());
@@ -184,7 +194,7 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
         }
 
         deleteUser(user.getId());
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(processDef1);
         disableAndDelete(processDef2);
     }

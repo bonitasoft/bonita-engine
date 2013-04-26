@@ -14,7 +14,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.MultiInstanceTest;
-import com.bonitasoft.engine.breakpoint.BreakpointsTest;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
 import com.bonitasoft.engine.event.TimerBoundaryEventTest;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
@@ -44,7 +43,6 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         RemoteConnectorExecutionTestSP.class,
         PlatformMonitoringAPITest.class,
         MonitoringAPITest.class,
-        BreakpointsTest.class,
         SearchEntitiesTests.class
 })
 public class BPMSPTests {

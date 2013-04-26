@@ -8,10 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertTrue;
-
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.api.CommandAPI;
@@ -62,9 +64,8 @@ import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.platform.Tenant;
 
-/**
- * @author Matthieu Chaffotte
- */
+import static org.junit.Assert.assertTrue;
+
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPTest.class);
@@ -201,12 +202,16 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
                 messages.add(categoryBuilder.toString());
             }
 
-            final List<Breakpoint> breakpoints = processAPI.getBreakpoints(0, 10000, BreakpointCriterion.DEFINITION_ID_ASC);
+            final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+            parameters.put("pageNumber", 0);
+            parameters.put("numberPerPage", 10000);
+            parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
+            final List<Breakpoint> breakpoints = (List<Breakpoint>) commandAPI.execute("getBreakpoints", parameters);
             if (breakpoints.size() > 0) {
                 final StringBuilder bpBuilder = new StringBuilder("Breakpoints are still present: ");
                 for (final Breakpoint breakpoint : breakpoints) {
                     bpBuilder.append(breakpoint.getElementName()).append(", ");
-                    processAPI.removeBreakpoint(breakpoint.getId());
+                    commandAPI.execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpoint.getId()));
                 }
                 messages.add(bpBuilder.toString());
             }

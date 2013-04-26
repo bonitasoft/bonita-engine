@@ -1,10 +1,10 @@
 package com.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
@@ -22,6 +22,10 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
 import org.bonitasoft.engine.test.wait.WaitForFlowNode;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
 
@@ -54,7 +58,13 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // add breakpoint
         final String gatewayName = "gateway1";
-        final long breakpointId = getProcessAPI().addBreakpoint(targetProcess.getId(), gatewayName, 2, 45);
+
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", targetProcess.getId());
+        parameters.put("elementName", gatewayName);
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
 
         final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);
@@ -65,12 +75,12 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertEquals(targetProcess.getId(), targetProcInstToBeAborted.getProcessDefinitionId());
 
         // wait for the breakpoint
-        final Long waitForGatewayToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(),
-                gatewayName, false, 350000);
+        final Long waitForGatewayToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(), gatewayName, false,
+                350000);
         assertNotNull(waitForGatewayToBeExecutedId);
 
-        final Long waitForGatewayToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(),
-                gatewayName, false, 350000);
+        final Long waitForGatewayToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), gatewayName, false,
+                350000);
         assertNotNull(waitForGatewayToBeAbortedId);
 
         // resume the break point for the gateway of the first child --> normal state
@@ -100,7 +110,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // the parent process instance must finish in normal state
         waitForProcessToFinish(parentProcessInstance);
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(parentProcess);
         disableAndDelete(targetProcess);
     }
@@ -114,7 +124,12 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         final ProcessDefinition parentProcess = deployProcessWithMultiInstanceCallActivity(loopCardinality, targetProcess.getName(), targetProcess.getVersion());
 
         // add breakpoint
-        final long breakpointId = getProcessAPI().addBreakpoint(targetProcess.getId(), taskName1, 2, 45);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", targetProcess.getId());
+        parameters.put("elementName", taskName1);
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
 
         final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);;
@@ -130,8 +145,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
                 25000);
         assertNotNull(waitForFlowNodeToBeExecutedId);
 
-        final Long waitForFlowNodeToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), taskName1, false,
-                25000);
+        final Long waitForFlowNodeToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), taskName1, false, 25000);
         assertNotNull(waitForFlowNodeToBeAbortedId);
 
         // resume the break point for the first child --> normal state
@@ -161,7 +175,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         // the parent process instance must finish in normal state
         waitForProcessToFinish(parentProcessInstance);
 
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(parentProcess);
         disableAndDelete(targetProcess);
     }
@@ -176,7 +190,12 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // add breakpoint
         final String startEventName = "start";
-        final long breakpointId = getProcessAPI().addBreakpoint(targetProcess.getId(), startEventName, 2, 45);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", targetProcess.getId());
+        parameters.put("elementName", startEventName);
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
 
         final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);;
@@ -223,7 +242,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // the parent process instance must finish in normal state
         waitForProcessToFinish(parentProcessInstance);
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(parentProcess);
         disableAndDelete(targetProcess);
     }
@@ -236,7 +255,12 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         final ProcessDefinition parentProcess = deployProcessWithMultiInstanceCallActivity(loopCardinality, targetProcess.getName(), targetProcess.getVersion());
 
         // add breakpoint
-        final long breakpointId = getProcessAPI().addBreakpoint(targetProcess.getId(), throwEventName, 2, 45);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", targetProcess.getId());
+        parameters.put("elementName", throwEventName);
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
 
         final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);;
@@ -248,8 +272,8 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertEquals(targetProcess.getId(), targetProcInstToBeAborted.getProcessDefinitionId());
 
         // wait for the breakpoint
-        final Long waitForFlowNodeToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(),
-                throwEventName, false, 25000);
+        final Long waitForFlowNodeToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(), throwEventName,
+                false, 25000);
         assertNotNull(waitForFlowNodeToBeExecutedId);
 
         final Long waitForFlowNodeToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), throwEventName, false,
@@ -283,7 +307,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // the parent process instance must finish in normal state
         waitForProcessToFinish(parentProcessInstance);
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(parentProcess);
         disableAndDelete(targetProcess);
     }

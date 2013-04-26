@@ -13,28 +13,26 @@
  **/
 package com.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.ActivationState;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.model.event.EventInstance;
-import org.bonitasoft.engine.bpm.model.event.trigger.TimerType;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -47,9 +45,20 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final String taskName2 = "auto2";
         final ProcessDefinition processDefinition = deployProcessWith2AutomaticTasks(taskName1, taskName2);
 
-        // add break points
-        final long breakpointId1 = getProcessAPI().addBreakpoint(processDefinition.getId(), taskName1, 2, 45);
-        final long breakpointId2 = getProcessAPI().addBreakpoint(processDefinition.getId(), taskName2, 2, 45);
+        // add breakpoints
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", taskName1);
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId1 = (Long) getCommandAPI().execute("addBreakpoint", parameters);
+
+        final Map<String, Serializable> parameters2 = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", taskName2);
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId2 = (Long) getCommandAPI().execute("addBreakpoint", parameters2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final CheckNbOfActivities checkNbOfInterrupted = checkNbOfActivitiesInInterruptingState(processInstance, 2);
@@ -70,8 +79,8 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         assertEquals(TestStates.getCancelledState(), archTask1.getState());
         assertEquals(TestStates.getCancelledState(), archTask2.getState());
 
-        getProcessAPI().removeBreakpoint(breakpointId1);
-        getProcessAPI().removeBreakpoint(breakpointId2);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId1));
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId2));
         disableAndDelete(processDefinition);
 
     }
@@ -82,8 +91,13 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final String taskName2 = "auto2";
         final ProcessDefinition processDefinition = deployProcessWith2AutomaticTasks(taskName1, taskName2);
 
-        // add break points
-        final long breakpointId = getProcessAPI().addBreakpoint(processDefinition.getId(), "start", 2, 45);
+        // add breakpoint
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", "start");
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "start", TestStates.getInterruptingState());
@@ -103,7 +117,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // only start even must exist and its not an activity instance
         assertEquals(0, archivedActivityInstances.size());
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(processDefinition);
     }
 
@@ -113,8 +127,13 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final String taskName2 = "auto2";
         final ProcessDefinition processDefinition = deployProcessWith2AutomaticTasks(taskName1, taskName2);
 
-        // add break points
-        final long breakpointId = getProcessAPI().addBreakpoint(processDefinition.getId(), "end1", 2, 45);
+        // add breakpoint
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", "end1");
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "end1", TestStates.getInterruptingState());
@@ -127,7 +146,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeActivity(end.getId());
 
         waitForProcessToFinish(processInstance, TestStates.getCancelledState());
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(processDefinition);
     }
 
@@ -136,8 +155,13 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final String eventName = "sendMessage";
         final ProcessDefinition processDefinition = deployProcessWithIntermediateThrowMessageEvent(eventName, "m1", "p1", "receiveMessage");
 
-        // add break points
-        final long breakpointId = getProcessAPI().addBreakpoint(processDefinition.getId(), "sendMessage", 2, 45);
+        // add breakpoint
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", "sendMessage");
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "sendMessage", TestStates.getInterruptingState());
@@ -153,19 +177,23 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // verify that the execution does not pass through the activity after the intermediate event
         checkWasntExecuted(processInstance, "auto2");
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(processDefinition);
     }
 
     @Test
     public void cancelParallelMergeGatewayIntance() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithParallelGateways();
-        // add break points
-        final long breakpointId = getProcessAPI().addBreakpoint(processDefinition.getId(), "gateway2", 2, 45);
+        // add breakpoint
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", "gateway2");
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway2", false,
-                35000);
+        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway2", false, 35000);
         assertNotNull(waitForFlowNodeId);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
@@ -176,7 +204,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // verify that the execution does not pass through the activity after the gateway
         checkWasntExecuted(processInstance, "step4");
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(processDefinition);
 
     }
@@ -184,12 +212,16 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
     @Test
     public void cancelParallelSplitGatewayIntance() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithParallelGateways();
-        // add break points
-        final long breakpointId = getProcessAPI().addBreakpoint(processDefinition.getId(), "gateway1", 2, 45);
+        // add breakpoint
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", "gateway1");
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway1", false,
-                25000);
+        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway1", false, 25000);
         assertNotNull(waitForFlowNodeId);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
@@ -201,7 +233,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         // verify that the execution does not pass through the activities after the gateway
         checkWasntExecuted(processInstance, "step2");
         checkWasntExecuted(processInstance, "step3");
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(processDefinition);
 
     }
@@ -209,12 +241,16 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
     @Test
     public void cancelExclusiveGatewayWithDefaultTransition() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithExclusiveSplitGateway();
-        // add break points
-        final long breakpointId = getProcessAPI().addBreakpoint(processDefinition.getId(), "gateway1", 2, 45);
+        // add breakpoint
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("definitionId", processDefinition.getId());
+        parameters.put("elementName", "gateway1");
+        parameters.put("idOfTheStateToInterrupt", 2);
+        parameters.put("idOfTheInterruptingState", 45);
+        final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway1", false,
-                25000);
+        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway1", false, 25000);
         assertNotNull(waitForFlowNodeId);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
@@ -227,27 +263,8 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         checkWasntExecuted(processInstance, "step2");
         checkWasntExecuted(processInstance, "step3");
         checkWasntExecuted(processInstance, "step4");
-        getProcessAPI().removeBreakpoint(breakpointId);
+        getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDelete(processDefinition);
-    }
-
-    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue, final String step1Name,
-            final String step2Name) throws BonitaException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0");
-        processDefinitionBuilder.addStartEvent("start");
-        processDefinitionBuilder.addAutomaticTask(step1Name);
-        processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue);
-        processDefinitionBuilder.addAutomaticTask(step2Name);
-        processDefinitionBuilder.addEndEvent("end");
-        processDefinitionBuilder.addTransition("start", step1Name);
-        processDefinitionBuilder.addTransition(step1Name, "intermediateCatchEvent");
-        processDefinitionBuilder.addTransition("intermediateCatchEvent", step2Name);
-        processDefinitionBuilder.addTransition(step2Name, "end");
-
-        final ProcessDefinition definition = deployAndEnableProcess(processDefinitionBuilder.getProcess());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        return definition;
     }
 
 }
