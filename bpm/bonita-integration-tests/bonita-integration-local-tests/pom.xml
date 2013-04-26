@@ -82,7 +82,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<bonita.home.classifier>teamwork</bonita.home.classifier>
+				<bonita.home.classifier>performance</bonita.home.classifier>
 			</properties>
 		</profile>
 		<profile>
