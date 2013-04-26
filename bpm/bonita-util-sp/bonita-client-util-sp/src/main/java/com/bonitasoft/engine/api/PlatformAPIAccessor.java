@@ -86,7 +86,7 @@ public class PlatformAPIAccessor {
         return getAPI(PlatformCommandAPI.class, session);
     }
 
-    public static NodeAPI getPlatformInfoAPI() throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static NodeAPI getNodeAPI() throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor interceptor = new ClientInterceptor(NodeAPI.class.getName(), serverAPI);
         return (NodeAPI) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { NodeAPI.class }, interceptor);

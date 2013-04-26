@@ -20,7 +20,7 @@ public class NodeAPITest extends CommonAPISPTest {
 
     @Test
     public void getLicenseInfo() throws Exception {
-        final NodeAPI platformInfoAPI = PlatformAPIAccessor.getPlatformInfoAPI();
+        final NodeAPI platformInfoAPI = PlatformAPIAccessor.getNodeAPI();
         final LicenseInfo licenseInfo = platformInfoAPI.getLicenseInfo();
 
         assertTrue(licenseInfo.getExpirationDate().getTime() > System.currentTimeMillis());
