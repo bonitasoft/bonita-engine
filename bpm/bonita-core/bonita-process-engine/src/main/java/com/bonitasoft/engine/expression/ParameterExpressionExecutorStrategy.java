@@ -66,7 +66,7 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
             }
             return result;
         } catch (final SParameterProcessNotFoundException e) {
-            throw new SExpressionEvaluationException("Referenced arameter '" + expressionContent + "' does not exist", e);
+            throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", e);
         }
     }
 
