@@ -38,6 +38,7 @@ import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
+import org.bonitasoft.engine.bpm.model.data.DataInstance;
 import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
@@ -177,6 +178,43 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertEquals("Parameter description", parameter.getDescription());
 
         getProcessAPI().deleteProcess(definition.getId());
+    }
+
+    @Test
+    public void setProcessDataDefaultValueWithParameterValue() throws Exception {
+        final User user = createUser("jules", "his_password");
+        final String parameterName = "anotherParam";
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("setDataDefaultValueWithParameter", "9.23");
+        String actorName = "anyActor";
+        processBuilder.addActor(actorName);
+        final String aTask = "userTask1";
+        String dataName = "aData";
+        processBuilder
+                .addParameter(parameterName, String.class.getCanonicalName())
+                .addData(dataName, String.class.getName(),
+                        new ExpressionBuilder().createParameterExpression("takes value of default parameter value", parameterName, String.class.getName()))
+                .addUserTask(aTask, actorName);
+
+        final DesignProcessDefinition design = processBuilder.done();
+        final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
+        businessArchive.setProcessDefinition(design);
+        final Map<String, String> params = new HashMap<String, String>(1);
+        String paramValue = "4 is the answer";
+        params.put(parameterName, paramValue);
+        businessArchive.setParameters(params);
+
+        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        addMappingOfActorsForUser(actorName, user.getId(), definition);
+        long processDefinitionId = definition.getId();
+        getProcessAPI().enableProcess(processDefinitionId);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
+        assertNotNull(waitForUserTask(aTask, processInstance, 1000));
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
+        assertEquals(paramValue, dataInstance.getValue());
+
+        disableAndDelete(processDefinitionId);
+
+        deleteUser(user.getId());
     }
 
     @Test
@@ -708,11 +746,11 @@ public class ProcessParameterTest extends CommonAPISPTest {
     }
 
     @Test
-    public void testParametersAreWellTypped() throws Exception {
+    public void testParametersAreWellTyped() throws Exception {
         final String actor = "acting";
         final User jack = createUserAndLogin("jack", "leaking_caldron");
-        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("testCantResolveDataInExpressionInDataDefaultValue",
-                "1");
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "testCantResolveDataInExpressionInDataDefaultValue", "1");
         processBuilder.addActor(actor).addDescription("Process to test archiving mechanism");
         processBuilder.addDoubleData("aData", null);
         processBuilder.addParameter("integerValue", String.class.getName());
