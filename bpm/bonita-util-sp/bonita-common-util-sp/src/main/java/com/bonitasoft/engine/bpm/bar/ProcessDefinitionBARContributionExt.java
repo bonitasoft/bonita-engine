@@ -14,6 +14,7 @@
 package com.bonitasoft.engine.bpm.bar;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -35,10 +36,15 @@ public class ProcessDefinitionBARContributionExt extends org.bonitasoft.engine.b
     protected void checkProcessInfos(final File barFolder, final DesignProcessDefinition processDefinition) throws InvalidBusinessArchiveFormatException {
         try {
             super.checkProcessInfos(barFolder, processDefinition);
-        } catch (InvalidBusinessArchiveFormatException inv) {
+        } catch (final InvalidBusinessArchiveFormatException inv) {
             final String processInfos = super.getProcessInfos(generateInfosFromDefinition(processDefinition));
-            final String fileContent = IOUtil.getFileContent(new File(barFolder, PROCESS_INFOS_FILE)).trim();
-            if (!processInfos.equals(fileContent)) {
+            String fileContent;
+            try {
+                fileContent = IOUtil.read(new File(barFolder, PROCESS_INFOS_FILE)).trim();
+                if (!processInfos.equals(fileContent)) {
+                    throw new InvalidBusinessArchiveFormatException("Invalid Business Archive format");
+                }
+            } catch (final IOException e) {
                 throw new InvalidBusinessArchiveFormatException("Invalid Business Archive format");
             }
         }

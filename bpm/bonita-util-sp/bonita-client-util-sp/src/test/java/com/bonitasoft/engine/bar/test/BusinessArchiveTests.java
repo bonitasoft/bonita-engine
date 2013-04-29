@@ -47,7 +47,7 @@ import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.util.FileUtil;
+import org.bonitasoft.engine.util.IOUtil;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
@@ -507,12 +507,12 @@ public class BusinessArchiveTests {
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
 
         final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        String fileContent = FileUtil.read(file);
+        String fileContent = IOUtil.read(file);
         fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
         fileContent = fileContent.replace("</processDefinition", "</porcessDefinition");
         file.delete();
         file.createNewFile();
-        FileUtil.write(file, fileContent);
+        IOUtil.write(file, fileContent);
         try {
             BusinessArchiveFactory.readBusinessArchive(tempFile);
         } finally {
@@ -549,11 +549,11 @@ public class BusinessArchiveTests {
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFile);
 
         final File file = new File(tempFile, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        String fileContent = FileUtil.read(file);
+        String fileContent = IOUtil.read(file);
         fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
         file.delete();
         file.createNewFile();
-        FileUtil.write(file, fileContent);
+        IOUtil.write(file, fileContent);
         try {
             BusinessArchiveFactory.readBusinessArchive(tempFile);
         } finally {

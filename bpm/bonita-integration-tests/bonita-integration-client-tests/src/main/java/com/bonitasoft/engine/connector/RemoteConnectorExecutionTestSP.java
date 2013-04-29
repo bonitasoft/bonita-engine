@@ -1196,6 +1196,39 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
     }
 
+    @Cover(classes = { ProcessAPI.class, ConnectorImplementationDescriptor.class }, concept = BPMNConcept.CONNECTOR, keywords = { "setConnectorImplementation" }, jira = "ENGINE-1215")
+    @Test
+    public void testSetConnectorImplementationWithNotAZipFile() throws Exception {
+        final String delivery = "Delivery men";
+        final String valueOfInput = "valueOfInput";
+        final String connectorId = "org.bonitasoft.connector.testExternalConnector";
+        final String connectorVersion = "1.0";
+        final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression(valueOfInput);
+        final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
+
+        final ProcessDefinitionBuilderExt designProcessDefinition = buildProcessWithOuputConnector(delivery, input1Expression, defaultValueExpression,
+                connectorId, connectorVersion, "myVar");
+        final ProcessDefinition processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, delivery, johnUserId);
+        final long proDefId = processDefinition.getId();
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(proDefId);
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
+        final ConnectorImplementationDescriptor connector = getProcessAPI().getConnectorImplementation(proDefId, connectorId, connectorVersion);
+        assertEquals(TestExternalConnector.class.getName(), connector.getImplementationClassName());
+        assertEquals(connectorVersion, connector.getVersion());
+
+        final String implSourchFile = "/org/bonitasoft/engine/connectors/TestConnectorWithModifiedOutput.impl";
+        final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;
+        final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
+        try {
+            getProcessAPI().setConnectorImplementation(proDefId, connectorId, connectorVersion, connectorImplementationArchive);
+            fail();
+        } catch (final InvalidConnectorImplementationException e) {
+            // ok
+        } finally {
+            disableAndDelete(proDefId);
+        }
+    }
+
     @Test
     public void testGetConnectorImplementation() throws Exception {
         final String delivery = "Delivery men";

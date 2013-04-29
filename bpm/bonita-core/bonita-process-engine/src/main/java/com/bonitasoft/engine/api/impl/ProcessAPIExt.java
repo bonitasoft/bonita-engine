@@ -140,7 +140,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.util.FileUtil;
+import org.bonitasoft.engine.util.IOUtil;
 
 import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
@@ -198,7 +198,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getParameterService().deleteAll(serverProcessDefinition.getId());
             }
             final File processeFolder = new File(file, String.valueOf(serverProcessDefinition.getId()));
-            FileUtil.deleteDir(processeFolder);
+            IOUtil.deleteDir(processeFolder);
         } catch (final SProcessDefinitionNotFoundException e) {
             log(tenantAccessor, e);
             throw new ProcessDefinitionNotFoundException(e);
@@ -212,6 +212,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             log(tenantAccessor, e);
             throw new BonitaRuntimeException(e);
         } catch (final SBonitaException e) {
+            log(tenantAccessor, e);
+            throw new ProcessDeletionException(e);
+        } catch (final IOException e) {
             log(tenantAccessor, e);
             throw new ProcessDeletionException(e);
         }
@@ -787,8 +790,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (!parasF.exists()) {
                 parasF.createNewFile();
             }
-            final String content = FileUtil.read(currentParasF);
-            FileUtil.write(parasF, content);
+            final String content = IOUtil.read(currentParasF);
+            IOUtil.write(parasF, content);
         }
 
         // export actormapping
@@ -802,12 +805,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final ActorMappingExportException e) {
             throw new BonitaRuntimeException(e);
         }
-        FileUtil.write(actormappF, xmlcontent);
+        IOUtil.write(actormappF, xmlcontent);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ZipOutputStream zos = new ZipOutputStream(baos);
         try {
-            FileUtil.zipDir(processFolder.getPath(), zos, processFolder.getPath());
+            IOUtil.zipDir(processFolder.getPath(), zos, processFolder.getPath());
             return baos.toByteArray();
         } finally {
             zos.close();

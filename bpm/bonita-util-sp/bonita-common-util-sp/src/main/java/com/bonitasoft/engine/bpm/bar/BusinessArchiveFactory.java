@@ -27,7 +27,7 @@ import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.UserFilterContribution;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.util.FileUtil;
+import org.bonitasoft.engine.util.IOUtil;
 
 /**
  * @author Baptiste Mesta
@@ -52,7 +52,7 @@ public class BusinessArchiveFactory {
         final File barFolder = File.createTempFile("tempBusinessArchive", "tmp");
         barFolder.delete();
         barFolder.mkdir();
-        FileUtil.unzipToFolder(inputStream, barFolder);
+        IOUtil.unzipToFolder(inputStream, barFolder);
 
         final BusinessArchive businessArchive = new BusinessArchive();
         try {
@@ -67,7 +67,7 @@ public class BusinessArchiveFactory {
         } catch (Exception e) {
             throw new InvalidBusinessArchiveFormatException("Invalid format, can't read the BAR file", e);
         } finally {
-            FileUtil.deleteDir(barFolder);
+            IOUtil.deleteDir(barFolder);
         }
     }
 
@@ -124,7 +124,7 @@ public class BusinessArchiveFactory {
         tempFile.mkdir();
         writeBusinessArchiveToFolder(businessArchive, tempFile);
         zipBarFolder(businessArchiveFile, tempFile);
-        FileUtil.deleteDir(tempFile);
+        IOUtil.deleteDir(tempFile);
     }
 
     public static String businessArchiveFolderToFile(final File destFile, final String folderPath) throws IOException {
@@ -139,7 +139,7 @@ public class BusinessArchiveFactory {
         }
         final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(businessArchiveFile));
         try {
-            FileUtil.zipDir(folder.getAbsolutePath(), zos, folder.getAbsolutePath());
+            IOUtil.zipDir(folder.getAbsolutePath(), zos, folder.getAbsolutePath());
         } finally {
             zos.close();
         }
