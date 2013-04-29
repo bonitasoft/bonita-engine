@@ -26,12 +26,12 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.model.ActivityDefinition;
+import org.bonitasoft.engine.bpm.model.CatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.DocumentDefinition;
 import org.bonitasoft.engine.bpm.model.GatewayType;
-import org.bonitasoft.engine.bpm.model.IntermediateCatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.model.TransitionDefinition;
@@ -339,7 +339,7 @@ public class BusinessArchiveTests {
         processDefinitionBuilder.addBooleanData("var1", null);
         processDefinitionBuilder.addStartEvent("start1").addMessageEventTrigger("m1").addOperation(opb.done());
         processDefinitionBuilder.addAutomaticTask("auto1");
-        final IntermediateCatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processDefinitionBuilder
+        final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processDefinitionBuilder
                 .addIntermediateCatchEvent("waitForMessage").addMessageEventTrigger("m2");
         catchMessageEventTriggerDefinitionBuilder.addCorrelation(conditionKey, trueExpression);
         catchMessageEventTriggerDefinitionBuilder.addOperation(opb.done());
