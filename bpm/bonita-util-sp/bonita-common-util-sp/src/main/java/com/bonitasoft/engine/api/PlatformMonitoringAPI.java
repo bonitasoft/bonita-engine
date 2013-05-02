@@ -10,9 +10,9 @@ package com.bonitasoft.engine.api;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.MonitoringException;
 import org.bonitasoft.engine.exception.UnavailableInformationException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.management.GcInfo;
 
 /**

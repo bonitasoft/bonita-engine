@@ -15,8 +15,8 @@ import java.util.Map;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.ConnectorException;
-import org.bonitasoft.engine.exception.ConnectorValidationException;
+import org.bonitasoft.engine.exception.connector.ConnectorException;
+import org.bonitasoft.engine.exception.connector.ConnectorValidationException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 
 import com.bonitasoft.engine.api.APIAccessor;

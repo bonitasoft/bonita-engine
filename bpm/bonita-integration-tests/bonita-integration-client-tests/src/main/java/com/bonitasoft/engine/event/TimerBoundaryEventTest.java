@@ -8,9 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
@@ -21,7 +18,7 @@ import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.model.event.trigger.TimerType;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -33,6 +30,9 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TimerBoundaryEventTest extends CommonAPISPTest {
 

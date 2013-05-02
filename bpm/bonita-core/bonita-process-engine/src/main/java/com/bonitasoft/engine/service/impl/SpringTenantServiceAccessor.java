@@ -12,7 +12,7 @@ import org.bonitasoft.engine.parameter.ParameterService;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import com.bonitasoft.engine.search.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**

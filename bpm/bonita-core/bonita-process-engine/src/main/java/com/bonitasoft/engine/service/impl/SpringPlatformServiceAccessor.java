@@ -10,7 +10,7 @@ package com.bonitasoft.engine.service.impl;
 
 import org.bonitasoft.engine.service.impl.SpringPlatformFileSystemBeanAccessor;
 
-import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 

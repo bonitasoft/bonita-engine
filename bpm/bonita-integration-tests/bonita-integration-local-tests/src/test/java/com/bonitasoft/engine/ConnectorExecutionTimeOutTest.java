@@ -25,7 +25,7 @@ import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
-import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;

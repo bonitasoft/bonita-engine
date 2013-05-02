@@ -27,7 +27,7 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 
-	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.SearchEntitiesDescriptor">
+	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />

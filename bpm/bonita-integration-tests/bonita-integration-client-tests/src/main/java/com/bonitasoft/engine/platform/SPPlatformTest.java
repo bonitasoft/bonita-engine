@@ -8,27 +8,22 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.PlatformCreationException;
-import org.bonitasoft.engine.exception.PlatformDeletionException;
-import org.bonitasoft.engine.exception.PlatformLoginException;
-import org.bonitasoft.engine.exception.PlatformLogoutException;
-import org.bonitasoft.engine.exception.PlatformNotExistException;
-import org.bonitasoft.engine.exception.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.exception.platform.PlatformCreationException;
+import org.bonitasoft.engine.exception.platform.PlatformDeletionException;
+import org.bonitasoft.engine.exception.platform.PlatformLoginException;
+import org.bonitasoft.engine.exception.platform.PlatformLogoutException;
+import org.bonitasoft.engine.exception.platform.PlatformNotExistException;
+import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.Order;
@@ -53,6 +48,11 @@ import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.exception.TenantUpdateException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SPPlatformTest {
 

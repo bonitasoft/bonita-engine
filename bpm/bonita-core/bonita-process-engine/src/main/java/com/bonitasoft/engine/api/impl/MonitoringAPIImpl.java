@@ -14,8 +14,8 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.MonitoringException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.TenantMonitoringService;

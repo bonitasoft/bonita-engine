@@ -47,7 +47,7 @@
         <constructor-arg name="validator" ref="xmlValidator" />
     </bean>
 
-	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor">
+	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor">
 		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />
 	</bean>
 

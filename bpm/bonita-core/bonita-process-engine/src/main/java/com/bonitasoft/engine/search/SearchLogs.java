@@ -16,6 +16,8 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
+import com.bonitasoft.engine.search.descriptor.SearchLogDescriptor;
+
 /**
  * @author Julien Mege
  */

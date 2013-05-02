@@ -14,8 +14,8 @@ import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import com.bonitasoft.engine.search.SearchEntitiesDescriptor;
-import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 

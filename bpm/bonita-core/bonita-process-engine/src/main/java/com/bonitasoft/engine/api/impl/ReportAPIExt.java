@@ -11,7 +11,7 @@ package com.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.ReportAPIImpl;
-import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
 

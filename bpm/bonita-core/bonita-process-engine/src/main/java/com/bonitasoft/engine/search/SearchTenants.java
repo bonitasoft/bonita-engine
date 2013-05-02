@@ -16,6 +16,8 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.search.SearchOptions;
 
+import com.bonitasoft.engine.search.descriptor.SearchTenantDescriptor;
+
 /**
  * @author Zhao Na
  */

@@ -8,9 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,16 +21,16 @@ import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.ObjectAlreadyExistsException;
-import org.bonitasoft.engine.exception.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.exception.ProcessDeployException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.exception.process.ProcessDeployException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SearchCommentsDescriptor;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.descriptor.SearchCommentsDescriptor;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.ClientEventUtil;
@@ -45,6 +42,9 @@ import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 public class SPProcessManagementTest extends CommonAPISPTest {
 

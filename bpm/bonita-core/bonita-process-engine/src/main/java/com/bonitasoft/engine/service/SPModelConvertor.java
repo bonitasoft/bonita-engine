@@ -89,8 +89,7 @@ public final class SPModelConvertor extends ModelConvertor {
     public static List<Breakpoint> toBreakpoints(final List<SBreakpoint> sBreakpoints) {
         final List<Breakpoint> breakpoints = new ArrayList<Breakpoint>(sBreakpoints.size());
         for (final SBreakpoint sBreakpoint : sBreakpoints) {
-            final Breakpoint breakpoint = toBreakpoint(sBreakpoint);
-            breakpoints.add(breakpoint);
+            breakpoints.add(toBreakpoint(sBreakpoint));
         }
         return breakpoints;
     }

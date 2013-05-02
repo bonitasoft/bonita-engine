@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service;
 
-import com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 
 /**
  * @author Matthieu Chaffotte

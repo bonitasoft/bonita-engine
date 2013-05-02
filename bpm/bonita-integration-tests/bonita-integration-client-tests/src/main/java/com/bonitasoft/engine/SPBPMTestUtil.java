@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertNull;
-
 import java.util.List;
 
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -19,11 +17,11 @@ import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.exception.LoginException;
-import org.bonitasoft.engine.exception.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.platform.LoginException;
+import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
+import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
@@ -37,6 +35,8 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotActivatedException;
 import com.bonitasoft.engine.platform.Tenant;
+
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Elias Ricken de Medeiros

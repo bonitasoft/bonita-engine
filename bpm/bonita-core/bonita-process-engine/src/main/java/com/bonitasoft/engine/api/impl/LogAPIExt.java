@@ -18,8 +18,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
@@ -32,14 +32,14 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetLogInstance;
 import com.bonitasoft.engine.api.impl.transaction.GetLogsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.GetNumberOfLogInstance;
+import com.bonitasoft.engine.api.impl.transaction.GetNumberOfLogInstances;
 import com.bonitasoft.engine.exception.LogNotFoundException;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogBuilder;
 import com.bonitasoft.engine.log.LogCriterion;
 import com.bonitasoft.engine.log.SeverityLevel;
-import com.bonitasoft.engine.search.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.SearchLogs;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -96,7 +96,7 @@ public class LogAPIExt implements LogAPI {
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final TransactionContentWithResult<Integer> transactionContent = new GetNumberOfLogInstance("getNumberOfLogs", loggerService);
+            final TransactionContentWithResult<Integer> transactionContent = new GetNumberOfLogInstances("getNumberOfLogs", loggerService);
 
             transactionExecutor.execute(transactionContent);
             return transactionContent.getResult();

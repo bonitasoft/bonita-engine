@@ -11,7 +11,7 @@ package com.bonitasoft.engine.search;
 /**
  * @author Celine Souchet
  */
-public class ProcessInstanceSearchDescriptor extends org.bonitasoft.engine.search.ProcessInstanceSearchDescriptor {
+public class ProcessInstanceSearchDescriptor extends org.bonitasoft.engine.search.descriptor.ProcessInstanceSearchDescriptor {
 
     public static final String STRING_INDEX_1 = "index1";
 

@@ -11,14 +11,14 @@ package com.bonitasoft.engine.api.impl;
 import java.io.IOException;
 
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
-import org.bonitasoft.engine.api.impl.transaction.GetDefaultTenantInstance;
-import org.bonitasoft.engine.api.impl.transaction.GetTenantInstance;
+import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
+import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.LoginException;
+import org.bonitasoft.engine.exception.platform.LoginException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;

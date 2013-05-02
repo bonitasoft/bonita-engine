@@ -8,10 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 
@@ -28,11 +24,11 @@ import org.bonitasoft.engine.bpm.model.archive.ArchivedManualTaskInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.search.ArchivedHumanTaskInstanceSearchDescriptor;
-import org.bonitasoft.engine.search.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.descriptor.ArchivedHumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.search.descriptor.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
@@ -43,6 +39,10 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProcessManagementTest extends CommonAPISPTest {
 

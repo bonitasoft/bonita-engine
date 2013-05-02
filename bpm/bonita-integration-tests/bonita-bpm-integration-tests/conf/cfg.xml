@@ -62,7 +62,7 @@
         <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
 
-	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.SearchEntitiesDescriptor">
+	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
@@ -77,7 +77,7 @@
 		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
 	</bean>
 	
-	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.SearchPlatformEntitiesDescriptor">
+	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor">
 		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />
 	</bean>
 	

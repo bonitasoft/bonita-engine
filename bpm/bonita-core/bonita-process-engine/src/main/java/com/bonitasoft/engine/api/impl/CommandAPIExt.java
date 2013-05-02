@@ -14,7 +14,7 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
-import org.bonitasoft.engine.exception.InvalidSessionException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.service.TenantServiceAccessor;

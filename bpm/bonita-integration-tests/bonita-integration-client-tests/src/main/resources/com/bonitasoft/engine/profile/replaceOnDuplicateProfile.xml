@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
+
+	<profile name="Process owner">
+			<description>Process profile</description>
+			<iconPath>/profiles/profileAdmin.png</iconPath>
+			<profileEntries>
+				  <parentProfileEntry name="Process">
+			        <parentName>NULL</parentName>
+			        <index>8</index>
+			        <description>Process DES</description>
+			        <type>folder</type>
+			        <page></page>
+			      </parentProfileEntry>
+			</profileEntries>
+			  <profileMapping>
+				<roles>
+				  <role>role2</role>
+				</roles>
+				<users>
+				  <user>userName4</user>
+				</users>
+				<groups>
+				  <group>/groupPath1</group>
+				</groups>
+				<memberships>
+					<membership>
+						<role>role1</role>
+						<group>/groupPath1</group>
+					</membership>
+				</memberships>
+			  </profileMapping>
+	</profile>
+
+    <profile name="Team Manager">
+		<description>TM profile2</description>
+		<iconPath>/profiles/profileTeamManager2.png</iconPath>
+		<profileEntries>
+			  <parentProfileEntry name="Home2">
+					<parentName>NULL</parentName>
+					<index>0</index>
+					<description>My team activitys dashboard2</description>
+					<type>link</type>
+					<page></page>
+			  </parentProfileEntry>
+		</profileEntries>
+		  <profileMapping>
+			<users>
+			  <user>userName2</user>
+			  <user>userName5</user>
+			</users>
+			<roles>
+			  <role>role1</role>
+			</roles>
+		  </profileMapping>
+	</profile>
+</profiles:proFiles>

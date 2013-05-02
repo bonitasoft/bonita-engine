@@ -15,7 +15,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 /**
  * @author Bole Zhang
  */
-public class GetNumberOfLogInstance implements TransactionContentWithResult<Integer> {
+public class GetNumberOfLogInstances implements TransactionContentWithResult<Integer> {
 
     private final QueriableLoggerService loggerService;
 
@@ -23,7 +23,7 @@ public class GetNumberOfLogInstance implements TransactionContentWithResult<Inte
 
     private final String instanceName;
 
-    public GetNumberOfLogInstance(final String instanceName, final QueriableLoggerService loggerService) {
+    public GetNumberOfLogInstances(final String instanceName, final QueriableLoggerService loggerService) {
         this.instanceName = instanceName;
         this.loggerService = loggerService;
     }

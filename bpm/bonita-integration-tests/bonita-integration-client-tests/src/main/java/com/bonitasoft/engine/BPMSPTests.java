@@ -17,7 +17,6 @@ import com.bonitasoft.engine.activity.MultiInstanceTest;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
 import com.bonitasoft.engine.event.TimerBoundaryEventTest;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
-import com.bonitasoft.engine.external.SPProfileMemberCommandTest;
 import com.bonitasoft.engine.identity.SPIdentityTests;
 import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
@@ -25,6 +24,7 @@ import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
 import com.bonitasoft.engine.platform.NodeAPITest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 import com.bonitasoft.engine.process.ProcessTests;
+import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
 
 @RunWith(Suite.class)
@@ -32,13 +32,13 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         SPIdentityTests.class,
         // SPPlatformTest.class, JIRA-482
         SPProcessManagementTest.class,
-        NodeAPITest.class ,
+        NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
         BPMRemoteTests.class,
-        SPProfileMemberCommandTest.class,
         MultiInstanceTest.class,
         ProcessTests.class,
+        ProfileTests.class,
         TimerBoundaryEventTest.class,
         RemoteConnectorExecutionTestSP.class,
         PlatformMonitoringAPITest.class,

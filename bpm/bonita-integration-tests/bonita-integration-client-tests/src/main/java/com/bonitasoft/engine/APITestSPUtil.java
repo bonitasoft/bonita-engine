@@ -16,9 +16,9 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.search.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.descriptor.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.slf4j.Logger;
@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.log.Log;
 
@@ -37,14 +38,26 @@ public class APITestSPUtil extends APITestUtil {
 
     private LogAPI logAPI;
 
+    private ProfileAPI profileAPI;
+
     public static int DEFAULT_REPEAT = 50;
 
     public static int DEFAULT_TIMEOUT = 2000;
+
+    @Override
+    public ProfileAPI getProfileAPI() {
+        return profileAPI;
+    }
+
+    public void setProfileAPI(final ProfileAPI profileAPI) {
+        this.profileAPI = profileAPI;
+    }
 
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(userName, password, tenantId));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
+        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
     }
 
@@ -53,6 +66,7 @@ public class APITestSPUtil extends APITestUtil {
         setSession(SPBPMTestUtil.loginOnDefaultTenant(userName, password));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
+        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
@@ -62,6 +76,7 @@ public class APITestSPUtil extends APITestUtil {
         setSession(SPBPMTestUtil.loginOnDefaultTenant());
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
+        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
@@ -70,6 +85,7 @@ public class APITestSPUtil extends APITestUtil {
         setSession(SPBPMTestUtil.loginTenant(tenantId));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
+        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
     }
 
@@ -79,6 +95,7 @@ public class APITestSPUtil extends APITestUtil {
         setSession(null);
         setIdentityAPI(null);
         setProcessAPI(null);
+        setProfileAPI(null);
         setCommandAPI(null);
     }
 

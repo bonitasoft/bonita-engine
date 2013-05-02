@@ -8,13 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,14 +45,14 @@ import org.bonitasoft.engine.core.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
-import org.bonitasoft.engine.exception.ActivityExecutionFailedException;
-import org.bonitasoft.engine.exception.ConnectorException;
 import org.bonitasoft.engine.exception.DataNotFoundException;
-import org.bonitasoft.engine.exception.InvalidConnectorImplementationException;
-import org.bonitasoft.engine.exception.InvalidExpressionException;
-import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
+import org.bonitasoft.engine.exception.connector.ConnectorException;
+import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
+import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
@@ -70,6 +63,14 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+
+import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Baptiste Mesta

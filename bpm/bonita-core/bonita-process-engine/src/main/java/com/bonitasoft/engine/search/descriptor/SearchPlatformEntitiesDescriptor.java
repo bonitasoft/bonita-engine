@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.search;
+package com.bonitasoft.engine.search.descriptor;
 
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 

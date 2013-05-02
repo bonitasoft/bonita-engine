@@ -23,10 +23,10 @@ import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.InvalidSessionException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnableToReadBonitaClientConfiguration;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
@@ -95,6 +95,11 @@ public final class TenantAPIAccessor {
     public static CommandAPI getCommandAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(CommandAPI.class, session);
+    }
+
+    public static ProfileAPI getProfileAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
+        return getAPI(ProfileAPI.class, session);
     }
 
 }
