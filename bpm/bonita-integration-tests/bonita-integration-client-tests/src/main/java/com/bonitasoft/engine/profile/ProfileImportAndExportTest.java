@@ -153,7 +153,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final long olderId = (Long) searchedProfilesResig.getResult().get(0).get(idKey);
         final long newId = (Long) searchedProfilesResig.getResult().get(1).get(idKey);
         assertList(
-                Arrays.asList(2L, adminProfileId, "Team Manager", "Administrator", "TM profile", "Administrator profile"),
+                Arrays.asList(5L, adminProfileId, "Administrator", "Team Manager", "TM profile", "Administrator profile"),
                 Arrays.asList(searchedProfilesResig.getCount(), olderId, searchedProfilesResig.getResult().get(0).get(nameKey), searchedProfilesResig
                         .getResult().get(1).get(nameKey), searchedProfilesResig.getResult().get(0).get(descriptionKey), searchedProfilesResig.getResult()
                         .get(1).get(descriptionKey)));

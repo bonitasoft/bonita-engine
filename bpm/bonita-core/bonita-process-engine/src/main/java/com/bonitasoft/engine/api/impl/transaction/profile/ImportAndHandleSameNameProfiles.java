@@ -26,6 +26,7 @@ import org.bonitasoft.engine.profile.ExportedProfile;
 import org.bonitasoft.engine.profile.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
@@ -68,8 +69,9 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
         for (final ExportedProfile profile : profiles) {
             // insert profile
             if (profile.getName() != null && !"".equals(profile.getName())) {
-                SProfile existingProfile = profileService.getProfileByName(profile.getName());
-                if (existingProfile != null) {
+                try {
+                    profileService.getProfileByName(profile.getName());
+
                     /*
                      * if (ImportPolicy.REPLACE_DUPLICATES.equals(profilePolicy)) {
                      * profileService.deleteProfile(existingProfile);
@@ -81,6 +83,7 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
                     if (ImportPolicy.FAIL_ON_DUPLICATES.equals(profilePolicy)) {
                         throw new SProfileImportDuplicatedException("There's a same name profile when import a profile named " + profile.getName());
                     }
+                } catch (final SProfileNotFoundException e) {
                 }
 
                 SProfile sprofile = profileBuilder.createNewInstance(profile.getName()).setDescription(profile.getDescription())

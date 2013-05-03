@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.api.impl.transaction.profile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -105,8 +104,9 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PROFILE_ID, profileId));
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PARENT_ID, parentId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SProfileEntry.class, ProfileEntrySearchDescriptor.INDEX,
-                OrderByType.ASC));
+        final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(2);
+        orderByOptions.add(new OrderByOption(SProfileEntry.class, ProfileEntrySearchDescriptor.INDEX, OrderByType.ASC));
+        orderByOptions.add(new OrderByOption(SProfileEntry.class, ProfileEntrySearchDescriptor.NAME, OrderByType.ASC));
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
         return profileService.searchProfileEntries(queryOptions);
     }

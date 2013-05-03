@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
 
-	<profile name="Administrator">
-		<description>Administrator profile</description>
-		<iconPath>/profiles/profileAdmin.png</iconPath>
+	<profile name="Plop">
+		<description>Plop profile</description>
+		<iconPath>/profiles/plop.png</iconPath>
 		<profileEntries>
-			<parentProfileEntry name="BPM">
+			<parentProfileEntry name="PlopEntry">
 				<parentName>NULL</parentName>
 				<index>4</index>
 				<description>BPM DES</description>
@@ -17,9 +17,6 @@
 			<roles>
 				<role>role60</role>
 			</roles>
-			<users>
-				<user>userName3</user>
-			</users>
 		</profileMapping>
 	</profile>
 
