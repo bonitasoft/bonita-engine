@@ -73,22 +73,22 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
     private void updateProfileEntryIndex(final SProfileEntry profileEntry, final int i) throws SProfileEntryNotFoundException,
             SProfileEntryUpdateException {
         final long insertedIndex = insertedProfileEntry.getIndex();
-        final int j = i * 2;
+        final long j = i * 2;
         if (profileEntry.getId() != insertedProfileEntry.getId()) {
             if (insertedIndex > j && profileEntry.getIndex() != j) {
-                updateProfileEntry(profileEntry, (long) j);
+                updateProfileEntry(profileEntry, j);
             }
             if (insertedIndex == j) {
-                updateProfileEntry(profileEntry, (long) (j + 2));
+                updateProfileEntry(profileEntry, j + 2);
             }
             if (insertedIndex < j) {
-                updateProfileEntry(profileEntry, (long) j);
+                updateProfileEntry(profileEntry, j);
             }
         } else {
             if (insertedIndex < 0) {
                 updateProfileEntry(profileEntry, Long.valueOf(0));
             } else if (insertedIndex > j) {
-                updateProfileEntry(profileEntry, (long) j);
+                updateProfileEntry(profileEntry, j);
             }
         }
     }
@@ -98,7 +98,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
         Long parentId = null;
         if (insertedProfileEntry != null) {
             profileId = insertedProfileEntry.getProfileId();
-            parentId = insertedProfileEntry.getParentId();;
+            parentId = insertedProfileEntry.getParentId();
         }
 
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
@@ -106,7 +106,6 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PARENT_ID, parentId));
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(2);
         orderByOptions.add(new OrderByOption(SProfileEntry.class, ProfileEntrySearchDescriptor.INDEX, OrderByType.ASC));
-        orderByOptions.add(new OrderByOption(SProfileEntry.class, ProfileEntrySearchDescriptor.NAME, OrderByType.ASC));
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
         return profileService.searchProfileEntries(queryOptions);
     }

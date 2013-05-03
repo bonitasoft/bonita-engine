@@ -200,7 +200,7 @@
 		</profileMapping>
 	</profile>
 
-	<profile name="Team manager">
+	<profile name="Team Manager">
 		<description>Team Manager profile</description>
 		<iconPath>/profiles/profileTeamManager.png</iconPath>
 		<profileEntries>

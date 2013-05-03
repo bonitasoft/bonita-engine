@@ -31,7 +31,7 @@ public class ExportAllProfiles extends AbstractExportProfiles {
     protected XMLNode getProfilesXmlNode() throws SBonitaException {
         final String NS_PREFIX = "profiles";
         final String NAME_SPACE = "http://www.bonitasoft.org/ns/profile/6.0";
-        final XMLNode profilesNode = new XMLNode(NS_PREFIX + ":profiles");
+        final XMLNode profilesNode = new XMLNode(NS_PREFIX + ":proFiles");
         profilesNode.addAttribute("xmlns:" + NS_PREFIX, NAME_SPACE);
 
         int index = 0;
