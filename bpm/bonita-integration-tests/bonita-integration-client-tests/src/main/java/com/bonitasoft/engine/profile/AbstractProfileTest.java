@@ -1,21 +1,17 @@
-/**
+/*******************************************************************************
  * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,11 +74,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
     public void before() throws Exception {
         login();
 
-        user1 = createUser("userName1", "User1Pwd", "User1FirstName", "User1LastName");
-        user2 = createUser("userName2", "User2Pwd", "User2FirstName", "User2LastName");
-        user3 = createUser("userName3", "User3Pwd", "User3FirstName", "User3LastName");
-        user4 = createUser("userName4", "User4Pwd", "User4FirstName", "User4LastName");
-        user5 = createUser("userName5", "User5Pwd", "User5FirstName", "User5LastName");
+        createUsers();
 
         group1 = createGroup("group1");
         group2 = createGroup("group2");
@@ -111,14 +103,18 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
         }
     }
 
+    private List<User> createUsers() throws BonitaException {
+        user1 = createUser("userName1", "User1Pwd", "User1FirstName", "User1LastName");
+        user2 = createUser("userName2", "User2Pwd", "User2FirstName", "User2LastName");
+        user3 = createUser("userName3", "User3Pwd", "User3FirstName", "User3LastName");
+        user4 = createUser("userName4", "User4Pwd", "User4FirstName", "User4LastName");
+        user5 = createUser("userName5", "User5Pwd", "User5FirstName", "User5LastName");
+        return Arrays.asList(user1, user2, user3, user4, user5);
+    }
+
     @After
     public void after() throws BonitaException, IOException {
-        deleteUser(user1.getId());
-        deleteUser(user2.getId());
-        deleteUser(user3.getId());
-        deleteUser(user4.getId());
-        deleteUser(user5.getId());
-
+        deleteUsers(user1, user2, user3, user4, user5);
         deleteGroups(group1, group2, group3);
         deleteRoles(role1, role2, role3);
 

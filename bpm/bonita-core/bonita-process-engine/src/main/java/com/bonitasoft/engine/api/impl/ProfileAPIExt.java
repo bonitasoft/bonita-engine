@@ -491,6 +491,10 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             final Long index, final String type, final String page) throws InvalidSessionException, ProfileEntryCreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
+        if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
+            throw new ProfileEntryCreationException("For a link, the page is mandatory.");
+        }
+
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -506,6 +510,9 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         }
         if (index != null) {
             profileEntryBuilder.setIndex(index);
+        } else {
+            // Insert the profile entry at the end of the profile entry list
+            profileEntryBuilder.setIndex(Long.MAX_VALUE);
         }
         profileEntryBuilder.setType(type);
         profileEntryBuilder.setPage(page);
@@ -574,8 +581,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         boolean indexToUpdate = false;
 
         final UpdateProfileEntry updateProfileEntryTransaction = new UpdateProfileEntry(profileService, profileService.getSProfileBuilderAccessor()
-                .getSProfileEntryUpdateBuilder(), id,
-                updateDescriptor);
+                .getSProfileEntryUpdateBuilder(), id, updateDescriptor);
         try {
             transactionExecutor.execute(updateProfileEntryTransaction);
             profileEntry = updateProfileEntryTransaction.getResult();

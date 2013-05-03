@@ -11,13 +11,6 @@ import org.bonitasoft.engine.profile.model.SProfileEntry;
 
 public class ProfileEntryUtils {
 
-    /**
-     * Profile entry attributes
-     */
-    public static enum ProfileEntryType {
-        folder, link
-    }
-
     public static Map<String, Serializable> profileEntryToMap(final SProfileEntry profileEntry) {
         final Map<String, Serializable> profileEntryMap = new HashMap<String, Serializable>();
         profileEntryMap.put(SProfileEntryBuilder.ID, profileEntry.getId());

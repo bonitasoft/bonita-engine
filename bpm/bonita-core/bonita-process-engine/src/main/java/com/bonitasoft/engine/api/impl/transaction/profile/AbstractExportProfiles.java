@@ -1,16 +1,11 @@
-/**
+/*******************************************************************************
  * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction.profile;
 
 import java.util.ArrayList;
@@ -45,6 +40,8 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Celine Souchet
  */
 public abstract class AbstractExportProfiles implements TransactionContentWithResult<String> {
+
+    private static final int NUMBER_OF_RESULTS = 100;
 
     private final static String USER_SUFFIX = "ForUser";
 
@@ -266,25 +263,25 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         return null;
     }
 
-    protected List<SProfile> searchProfiles(final int index) throws SBonitaSearchException {
-        final QueryOptions queryOptions = new QueryOptions(index, 100, Collections.singletonList(new OrderByOption(SProfile.class,
-                SProfileBuilder.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
+    protected List<SProfile> searchProfiles(final int fromIndex) throws SBonitaSearchException {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
+                SProfile.class, SProfileBuilder.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
         return profileService.searchProfiles(queryOptions);
     }
 
     protected List<SProfileEntry> searchProfileEntries(final int fromIndex, final long profileId, final long parentId) throws SBonitaSearchException {
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SProfileEntry.class,
-                SProfileEntryBuilder.INDEX, OrderByType.ASC));
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilder.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilder.PROFILE_ID, profileId));
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilder.PARENT_ID, parentId));
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, 100, orderByOptions, filters, null);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
         return profileService.searchProfileEntries(queryOptions);
     }
 
-    private List<SProfileMember> searchProfileMembers(final int index, final long profileId, final String querySuffix) throws SBonitaSearchException {
-        final QueryOptions queryOptions = new QueryOptions(index, 100, Collections.singletonList(new OrderByOption(SProfileMember.class,
-                SProfileMemberBuilder.ID, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
+    private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId, final String querySuffix) throws SBonitaSearchException {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
+                SProfileMember.class, SProfileMemberBuilder.ID, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
         return profileService.searchProfileMembers(profileId, querySuffix, queryOptions);
     }
 

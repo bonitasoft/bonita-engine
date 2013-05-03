@@ -1,17 +1,11 @@
-/**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright (C) 2011, 2013 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction.profile;
 
 import java.io.Serializable;
@@ -21,6 +15,8 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.SProfileEntryUpdateException;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -56,7 +52,14 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
     @Override
     public void execute() throws SBonitaException {
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
-        profileService.updateProfileEntry(sProfileEntry, getProfileEntryUpdateDescriptor());
+        final EntityUpdateDescriptor profileEntryUpdateDescriptor = getProfileEntryUpdateDescriptor();
+        final Map<String, Object> fields = profileEntryUpdateDescriptor.getFields();
+        if ("link".equalsIgnoreCase((String) fields.get(SProfileEntryBuilder.TYPE))
+                && ((String) fields.get(SProfileEntryBuilder.PAGE) == null || "".equals(fields.get(SProfileEntryBuilder.PAGE)))) {
+            throw new SProfileEntryUpdateException("For a link, the page is mandatory.");
+        }
+
+        profileService.updateProfileEntry(sProfileEntry, profileEntryUpdateDescriptor);
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
     }
 

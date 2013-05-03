@@ -2,44 +2,44 @@
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
 
 	<profile name="Administrator">
-			<description>Administrator profile</description>
-			<iconPath>/profiles/profileAdmin.png</iconPath>
-			<profileEntries>
-				  <parentProfileEntry name="BPM">
-			        <parentName>NULL</parentName>
-			        <index>4</index>
-			        <description>BPM DES</description>
-			        <type>folder</type>
-			        <page></page>
-			      </parentProfileEntry>
-			</profileEntries>
-			  <profileMapping>
-				<roles>
-				  <role>role1</role>
-				</roles>
-				<users>
-				  <user>userName3</user>
-				</users>
-			  </profileMapping>
+		<description>Administrator profile</description>
+		<iconPath>/profiles/profileAdmin.png</iconPath>
+		<profileEntries>
+			<parentProfileEntry name="BPM">
+				<parentName>NULL</parentName>
+				<index>4</index>
+				<description>BPM DES</description>
+				<type>folder</type>
+				<page></page>
+			</parentProfileEntry>
+		</profileEntries>
+		<profileMapping>
+			<roles>
+				<role>role60</role>
+			</roles>
+			<users>
+				<user>userName3</user>
+			</users>
+		</profileMapping>
 	</profile>
 
-    <profile name="Team Manager">
+	<profile name="Team Manager">
 		<description>TM profile</description>
 		<iconPath>/profiles/profileTeamManager.png</iconPath>
 		<profileEntries>
-			  <parentProfileEntry name="Home">
-					<parentName>NULL</parentName>
-					<index>0</index>
-					<description>My team activitys dashboard</description>
-					<type>CurrentUserTeamTasksDashboard</type>
-					<page></page>
-			  </parentProfileEntry>
+			<parentProfileEntry name="Home">
+				<parentName>NULL</parentName>
+				<index>0</index>
+				<description>My team activitys dashboard</description>
+				<type>CurrentUserTeamTasksDashboard</type>
+				<page></page>
+			</parentProfileEntry>
 		</profileEntries>
-		  <profileMapping>
+		<profileMapping>
 			<users>
-			  <user>userName1</user>
-			  <user>userName2</user>
+				<user>userName1</user>
+				<user>userName2</user>
 			</users>
-		  </profileMapping>
+		</profileMapping>
 	</profile>
 </profiles:proFiles>

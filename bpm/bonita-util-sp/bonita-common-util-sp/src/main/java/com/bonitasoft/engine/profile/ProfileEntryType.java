@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -9,12 +9,10 @@
 package com.bonitasoft.engine.profile;
 
 /**
- * @author Zhao Na
- * @author Matthieu Chaffotte
- * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
-public enum ImportPolicy {
+public enum ProfileEntryType {
 
-    DELETE_EXISTING, REPLACE_DUPLICATES, FAIL_ON_DUPLICATES, IGNORE_DUPLICATES; // , MERGE_DUPLICATES (Merge should retain existing IDs)
+    FOLDER, LINK;
 
 }

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -18,6 +17,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
+import com.bonitasoft.engine.exception.profile.ProfileEntryCreationException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 
@@ -102,7 +102,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
-    @Test(expected = CommandParameterizationException.class)
+    @Test(expected = ProfileEntryCreationException.class)
     public void createProfileEntryWithWrongParameter() throws Exception {
         getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", null, adminProfileId, Long.valueOf(2), "link", null);
     }
@@ -239,10 +239,10 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().deleteProfile(profileId);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Not Existing" }, story = "Execute profile command with not existing", jira = "ENGINE-548")
     @Test(expected = ProfileEntryDeletionException.class)
-    public void deleteProfileEntryWithWrongParameter() throws Exception {
-        getProfileAPI().deleteProfileEntry(6);
+    public void deleteProfileEntryNotExisting() throws Exception {
+        getProfileAPI().deleteProfileEntry(165486489646541L);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
@@ -256,6 +256,16 @@ public class ProfileEntryTest extends AbstractProfileTest {
         updateDescriptor.page(null);
         updateDescriptor.index(Long.valueOf(0));
         getProfileAPI().updateProfileEntry((Long) createdProfileEntry.get("id"), updateDescriptor);
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Not Existing" }, story = "Execute profile command with not existing", jira = "ENGINE-548")
+    @Test(expected = ProfileEntryUpdateException.class)
+    public void updateProfileEntryNotExisting() throws Exception {
+        final ProfileEntryUpdateDescriptor updateDescriptor = new ProfileEntryUpdateDescriptor();
+        updateDescriptor.type("link");
+        updateDescriptor.page(null);
+        updateDescriptor.index(Long.valueOf(0));
+        getProfileAPI().updateProfileEntry(16464654L, updateDescriptor);
     }
 
 }

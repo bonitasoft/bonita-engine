@@ -13,10 +13,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -31,34 +27,29 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.exception.profile.ProfileExportException;
-import com.bonitasoft.engine.exception.profile.ProfileMemberCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class ProfileImportAndExportTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.")
     @Test
     public void exportAllProfiles() throws BonitaException, IOException {
-        final List<User> users = createUsers();
-        final List<Map<String, Serializable>> profileMembers = createProfileMembers(users);
         final Map<Long, Long> numberOfProfileMembers = getProfileAPI().getNumberOfProfileMembers(Arrays.asList(adminProfileId, userProfileId));
         assertNotNull(numberOfProfileMembers);
         assertEquals(2, numberOfProfileMembers.size());
-        assertEquals(Long.valueOf(2), numberOfProfileMembers.get(adminProfileId));
-        assertEquals(Long.valueOf(3), numberOfProfileMembers.get(userProfileId));
+        assertEquals(Long.valueOf(5), numberOfProfileMembers.get(adminProfileId));
+        assertEquals(Long.valueOf(1), numberOfProfileMembers.get(userProfileId));
 
         final byte[] profilebytes = getProfileAPI().exportAllProfiles();
 
         final String xmlStr = new String(profilebytes);
         final String[] strs = xmlStr.split("profile name=\"");
-        assertEquals(3, strs.length);
+        assertEquals(5, strs.length);
         assertEquals("Administrator", strs[1].substring(0, strs[1].indexOf('\"')));
-        assertEquals("User", strs[2].substring(0, strs[2].indexOf('\"')));
+        assertEquals("Process owner", strs[2].substring(0, strs[2].indexOf('\"')));
         // assertEquals("Process owner", strs[3].substring(0, strs[3].indexOf("\"")));
         // assertEquals("User", strs[4].substring(0, strs[4].indexOf("\"")));
         final File f = new File("AllProfiles.xml");
@@ -70,32 +61,19 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         fileOutputStream.flush();
         fileOutputStream.close();
         f.delete();
-
-        // delete profile
-        for (final Map<String, Serializable> addProfileMemberResult : profileMembers) {
-            deleteProfileMember(addProfileMemberResult);
-        }
-
-        // delete user
-        for (final User user : users) {
-            deleteUsers(user);
-        }
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export specified profiles.")
     @Test
     public void exportProfilesSpecified() throws BonitaException, IOException {
-        final List<User> users = createUsers();
-        final List<Map<String, Serializable>> profileMembers = createProfileMembers(users);
-
         final List<Long> profileIds = new ArrayList<Long>();
         profileIds.add(adminProfileId);
         profileIds.add(userProfileId);
         final Map<Long, Long> numberOfProfileMembers = getProfileAPI().getNumberOfProfileMembers(profileIds);
         assertNotNull(numberOfProfileMembers);
         assertEquals(2, numberOfProfileMembers.size());
-        assertEquals(Long.valueOf(2), numberOfProfileMembers.get(adminProfileId));
-        assertEquals(Long.valueOf(3), numberOfProfileMembers.get(userProfileId));
+        assertEquals(Long.valueOf(5), numberOfProfileMembers.get(adminProfileId));
+        assertEquals(Long.valueOf(1), numberOfProfileMembers.get(userProfileId));
 
         final long[] profIds = { profileIds.get(1).longValue() };
         final byte[] profilebytes = getProfileAPI().exportProfilesWithIdsSpecified(profIds);
@@ -114,70 +92,11 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         fileOutputStream.flush();
         fileOutputStream.close();
         f.delete();
-
-        // delete profile
-        for (final Map<String, Serializable> addProfileMemberResult : profileMembers) {
-            deleteProfileMember(addProfileMemberResult);
-        }
-
-        // delete user
-        for (final User user : users) {
-            deleteUsers(user);
-        }
-    }
-
-    private void deleteProfileMember(final Map<String, Serializable> addProfileMemberResult) throws InvalidSessionException, ProfileMemberDeletionException {
-        getProfileAPI().deleteProfileMember((Long) addProfileMemberResult.get(PROFILE_MEMBER_ID));
-    }
-
-    private List<Map<String, Serializable>> createProfileMembers(final List<User> users) throws InvalidSessionException, ProfileMemberCreationException {
-        final List<Map<String, Serializable>> res = new ArrayList<Map<String, Serializable>>();
-        // Add UserProfiles
-        for (final User user : users) {
-            // users 1 & 2 are associated with profile with ID 1 (Administrator), others with profile with ID 2 (User):
-            final Map<String, Serializable> addProfileMemberResult;
-            if (user.getUserName().endsWith("1") || user.getUserName().endsWith("2")) {
-                addProfileMemberResult = getProfileAPI().createProfileMember(adminProfileId, user.getId(), null, null);
-            } else {
-                addProfileMemberResult = getProfileAPI().createProfileMember(userProfileId, user.getId(), null, null);
-            }
-            res.add(addProfileMemberResult);
-        }
-        return res;
-    }
-
-    private List<User> createUsers() throws BonitaException {
-        final User user1 = createUser("userName1", "User1Pwd", "User1FirstName", "User1LastName");
-        final User user2 = createUser("userName2", "User2Pwd", "User2FirstName", "User2LastName");
-        final User user3 = createUser("userName3", "User3Pwd", "User3FirstName", "User3LastName");
-        final User user4 = createUser("userName4", "User4Pwd", "User4FirstName", "User4LastName");
-        final User user5 = createUser("userName5", "User5Pwd", "User5FirstName", "User5LastName");
-        return Arrays.asList(user1, user2, user3, user4, user5);
-    }
-
-    private List<Role> createRoles(final int k) throws BonitaException {
-        final List<Role> roles = new ArrayList<Role>();
-        for (int i = 1; i <= k; i++) {
-            final Role role = createRole("role" + i);
-            roles.add(role);
-        }
-        return roles;
-    }
-
-    private List<Group> createGroups(final int k) throws BonitaException {
-        final List<Group> groups = new ArrayList<Group>();
-        for (int i = 1; i <= k; i++) {
-            final Group group = createGroup("groupPath" + i);
-            groups.add(group);
-        }
-        return groups;
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.")
     @Test
     public void importAndExport() throws BonitaException, IOException, SAXException {
-        final List<User> users = createUsers();
-
         final InputStream xmlStream1 = ProfileImportAndExportTest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
         final List<String> warningMsgs1 = getProfileAPI().importProfilesUsingSpecifiedPolicy(xmlContent, ImportPolicy.DELETE_EXISTING);
@@ -188,47 +107,6 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final byte[] profilebytes = getProfileAPI().exportAllProfiles();
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.compareXML(new String(xmlContent), new String(profilebytes));
-
-        // delete user
-        for (final User user : users) {
-            deleteUsers(user);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profile fail on duplicate.")
-    @Test
-    public void importProfileFailOnDuplicate() {
-        boolean testCompleted = false;
-        try {
-            final String nameKey = "name";
-            final String descriptionKey = "description";
-
-            final InputStream xmlStream = ProfileImportAndExportTest.class.getResourceAsStream("deleteExistingProfile.xml");
-            final List<String> warningMsgs = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream), ImportPolicy.DELETE_EXISTING);
-            assertEquals(2, warningMsgs.size());
-
-            final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-            builder.sort(ProfileSearchDescriptor.ID, Order.ASC);
-            final SearchResult<HashMap<String, Serializable>> searchedProfilesfl = getProfileAPI()
-                    .searchProfiles(builder.done());
-            assertNotNull(searchedProfilesfl);
-            assertList(
-                    Arrays.asList(1l, "Team Manager", "TM profile"),
-                    Arrays.asList(searchedProfilesfl.getCount(), searchedProfilesfl.getResult().get(0).get(nameKey),
-                            searchedProfilesfl.getResult().get(0).get(descriptionKey)));
-
-            final InputStream xmlStreamfl = ProfileImportAndExportTest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
-            testCompleted = true;
-            // last must throw Exception:
-            getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamfl), ImportPolicy.FAIL_ON_DUPLICATES);
-            fail("Should throw ExecutionException");
-        } catch (final Exception cee) {
-            if (!testCompleted) {
-                fail("Test not completed");
-            }
-        }
-
     }
 
     @SuppressWarnings("unchecked")
@@ -239,33 +117,34 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final String nameKey = "name";
         final String descriptionKey = "description";
 
-        final List<User> usersig = createUsers();
-
-        final InputStream xmlStream = ProfileImportAndExportTest.class.getResourceAsStream("deleteExistingProfile.xml");
-        final List<String> warningMsgs = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream), ImportPolicy.DELETE_EXISTING);
-        assertEquals(0, warningMsgs.size());
-
-        // profiles
-        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.sort(ProfileSearchDescriptor.ID, Order.ASC);
-        final SearchResult<HashMap<String, Serializable>> searchedProfilesig = getProfileAPI().searchProfiles(builder.done());
-        assertNotNull(searchedProfilesig);
-        assertList(
-                Arrays.asList(1l, "Team Manager", "TM profile"),
-                Arrays.asList(searchedProfilesig.getCount(), searchedProfilesig.getResult().get(0).get(nameKey),
-                        searchedProfilesig.getResult().get(0).get(descriptionKey)));
-
+        // final InputStream xmlStream = ProfileImportAndExportTest.class.getResourceAsStream("deleteExistingProfile.xml");
+        // final List<String> warningMsgs = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStream), ImportPolicy.DELETE_EXISTING);
+        // assertEquals(0, warningMsgs.size());
+        //
+        // // profiles
+        // SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        // builder.sort(ProfileSearchDescriptor.ID, Order.ASC);
+        // final SearchResult<HashMap<String, Serializable>> searchedProfilesig = getProfileAPI().searchProfiles(builder.done());
+        // assertNotNull(searchedProfilesig);
+        // assertList(
+        // Arrays.asList(1l, "Team Manager", "TM profile"),
+        // Arrays.asList(searchedProfilesig.getCount(), searchedProfilesig.getResult().get(0).get(nameKey),
+        // searchedProfilesig.getResult().get(0).get(descriptionKey)));
+        //
         // profile entries
-        builder = new SearchOptionsBuilder(0, 10);
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.NAME, Order.ASC);
-        builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, searchedProfilesig.getResult().get(0).get(idKey));
+        builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, adminProfileId);
         final List<HashMap<String, Serializable>> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
         assertNotNull(searchedProfileEntries);
-        assertEquals(1, searchedProfileEntries.size());
+        assertEquals(10, searchedProfileEntries.size());
 
+        /**
+         * FailAndIgnoreOnDuplicate
+         */
         final InputStream xmlStreamig = ProfileImportAndExportTest.class.getResourceAsStream("failAndIgnoreOnDuplicateProfile.xml");
         final List<String> warningMsgsig = getProfileAPI().importProfilesUsingSpecifiedPolicy(IOUtils.toByteArray(xmlStreamig), ImportPolicy.IGNORE_DUPLICATES);
-        assertEquals("Role with name role1 not found.", warningMsgsig.get(0));
+        assertEquals("Role with name role60 not found.", warningMsgsig.get(0));
 
         // check profiles
         builder = new SearchOptionsBuilder(0, 10);
@@ -274,7 +153,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final long olderId = (Long) searchedProfilesResig.getResult().get(0).get(idKey);
         final long newId = (Long) searchedProfilesResig.getResult().get(1).get(idKey);
         assertList(
-                Arrays.asList(2L, searchedProfilesig.getResult().get(0).get(idKey), "Team Manager", "Administrator", "TM profile", "Administrator profile"),
+                Arrays.asList(2L, adminProfileId, "Team Manager", "Administrator", "TM profile", "Administrator profile"),
                 Arrays.asList(searchedProfilesResig.getCount(), olderId, searchedProfilesResig.getResult().get(0).get(nameKey), searchedProfilesResig
                         .getResult().get(1).get(nameKey), searchedProfilesResig.getResult().get(0).get(descriptionKey), searchedProfilesResig.getResult()
                         .get(1).get(descriptionKey)));
@@ -305,25 +184,16 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final SearchResult<HashMap<String, Serializable>> searchpmRes1 = getProfileAPI().searchProfileMembersForProfile(newId, "user",
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(1, searchpmRes1.getCount());
-        assertList(Arrays.asList(usersig.get(2).getId(), newId),
+        assertList(Arrays.asList(user3.getId(), newId),
                 Arrays.asList(searchpmRes1.getResult().get(0).get("userId"), searchpmRes1.getResult().get(0).get("profileId")));
 
         final SearchResult<HashMap<String, Serializable>> searchpmRes2 = getProfileAPI().searchProfileMembersForProfile(olderId, "role",
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(0, searchpmRes2.getCount());
 
-        // delete user
-        for (final User user : usersig) {
-            deleteUsers(user);
-        }
-
         /**
          * ReplaceOnDuplicate
          */
-        final List<User> usersrp = createUsers();
-        final List<Role> roles = createRoles(1);
-        final List<Group> groups = createGroups(1);
-
         // profiles
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.ID, Order.ASC);
@@ -388,14 +258,14 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final SearchResult<HashMap<String, Serializable>> searchpmRes1rl = getProfileAPI().searchProfileMembersForProfile(newId1, "user",
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(1, searchpmRes1rl.getCount());
-        assertList(Arrays.asList(usersrp.get(3).getId(), newId1),
+        assertList(Arrays.asList(user4.getId(), newId1),
                 Arrays.asList(searchpmRes1rl.getResult().get(0).get("userId"), searchpmRes1rl.getResult().get(0).get("profileId")));
 
         // for group
         final SearchResult<HashMap<String, Serializable>> searchpmRes1Group = getProfileAPI().searchProfileMembersForProfile(newId1, "group",
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(1, searchpmRes1Group.getCount());
-        assertList(Arrays.asList(groups.get(0).getId(), newId1),
+        assertList(Arrays.asList(group1.getId(), newId1),
                 Arrays.asList(searchpmRes1Group.getResult().get(0).get("groupId"), searchpmRes1Group.getResult().get(0).get("profileId")));
 
         // for memebership
@@ -403,7 +273,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(1, searchpmRes1mem.getCount());
         assertList(
-                Arrays.asList(groups.get(0).getId(), roles.get(0).getId(), newId1),
+                Arrays.asList(group1.getId(), role1.getId(), newId1),
                 Arrays.asList(searchpmRes1mem.getResult().get(0).get("groupId"), searchpmRes1mem.getResult().get(0).get("roleId"), searchpmRes1mem.getResult()
                         .get(0).get("profileId")));
 
@@ -411,14 +281,14 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final SearchResult<HashMap<String, Serializable>> searchpmRes = getProfileAPI().searchProfileMembersForProfile(newId2, "user",
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(2, searchpmRes.getCount());
-        assertList(Arrays.asList(usersrp.get(1).getId(), usersrp.get(4).getId()),
+        assertList(Arrays.asList(user2.getId(), user5.getId()),
                 Arrays.asList(searchpmRes.getResult().get(0).get("userId"), searchpmRes.getResult().get(1).get("userId")));
 
         // for role
         final SearchResult<HashMap<String, Serializable>> searchpmResRole = getProfileAPI().searchProfileMembersForProfile(newId2, "role",
                 new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(1, searchpmResRole.getCount());
-        assertList(Arrays.asList(roles.get(0).getId()), Arrays.asList(searchpmResRole.getResult().get(0).get("roleId")));
+        assertList(Arrays.asList(role1.getId()), Arrays.asList(searchpmResRole.getResult().get(0).get("roleId")));
 
         /**
          * ExportAndImport
@@ -428,27 +298,12 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
 
         final byte[] profilebytes = xmlBytes;
         assertEquals(new String(xmlBytes), new String(profilebytes));
-
-        // delete user
-        for (final User user : usersrp) {
-            deleteUsers(user);
-        }
-        // delete role
-        for (final Role role : roles) {
-            deleteRoles(role);
-        }
-        // delete group
-        for (final Group group : groups) {
-            deleteGroups(group);
-        }
     }
 
     @SuppressWarnings("unchecked")
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profiles and delete existing.")
     @Test
     public void importProfilesDeleteExisting() throws BonitaException, IOException {
-        final List<User> users = createUsers();
-
         final String idKey = "id";
         final String nameKey = "name";
         final String descriptionKey = "description";
@@ -521,7 +376,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
                 .searchProfileMembersForProfile(newId1, "user", new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         assertEquals(2, searchpms.getCount());
         assertList(
-                Arrays.asList(users.get(0).getId(), users.get(1).getId(), newId1, newId1),
+                Arrays.asList(user1.getId(), user2.getId(), newId1, newId1),
                 Arrays.asList(searchpms.getResult().get(0).get("userId"), searchpms.getResult().get(1).get("userId"),
                         searchpms.getResult().get(0).get("profileId"), searchpms.getResult().get(1).get("profileId")));
 
@@ -529,11 +384,6 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
             final SearchResult<HashMap<String, Serializable>> searchpms1 = getProfileAPI()
                     .searchProfileMembersForProfile(i, "user", new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
             assertEquals(0, searchpms1.getCount());
-        }
-
-        // delete user
-        for (final User user : users) {
-            deleteUsers(user);
         }
     }
 
