@@ -66,6 +66,7 @@ import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntry;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnDelete;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnInsert;
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
+import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor.ProfileEntryField;
 import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
 import com.bonitasoft.engine.exception.profile.ProfileCreationException;
 import com.bonitasoft.engine.exception.profile.ProfileDeletionException;
@@ -578,7 +579,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         SProfileEntry profileEntry;
-        boolean indexToUpdate = false;
 
         final UpdateProfileEntry updateProfileEntryTransaction = new UpdateProfileEntry(profileService, profileService.getSProfileBuilderAccessor()
                 .getSProfileEntryUpdateBuilder(), id, updateDescriptor);
@@ -589,7 +589,8 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             throw new ProfileEntryUpdateException(e);
         }
 
-        if (indexToUpdate) {
+        final Map<ProfileEntryField, Serializable> fields = updateDescriptor.getFields();
+        if (fields.get(ProfileEntryField.INDEX) != null) {
             final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, profileEntry);
             try {
                 transactionExecutor.execute(updateProfileEntryIndexTransaction);

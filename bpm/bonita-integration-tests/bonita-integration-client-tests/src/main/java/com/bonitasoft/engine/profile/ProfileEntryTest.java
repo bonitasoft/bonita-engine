@@ -219,21 +219,20 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
         // Update Profile Entry
         final ProfileEntryUpdateDescriptor updateDescriptor = new ProfileEntryUpdateDescriptor();
-        updateDescriptor.index(Long.valueOf(0));
+        updateDescriptor.index(Long.valueOf(-1));
         getProfileAPI().updateProfileEntry((Long) profileEntry.get("id"), updateDescriptor);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
+        builder.filter(ProfileEntrySearchDescriptor.PARENT_ID, profileMenuId);
         final List<HashMap<String, Serializable>> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
         assertEquals(Long.valueOf(0), searchedProfileEntries.get(0).get("index"));
-        assertEquals("Menu1", searchedProfileEntries.get(0).get("name"));
-        assertEquals(Long.valueOf(0), searchedProfileEntries.get(1).get("index"));
-        assertEquals("ProfileEntry3", searchedProfileEntries.get(1).get("name"));
-        assertEquals(Long.valueOf(2), searchedProfileEntries.get(2).get("index"));
-        assertEquals("ProfileEntry1", searchedProfileEntries.get(2).get("name"));
-        assertEquals(Long.valueOf(4), searchedProfileEntries.get(3).get("index"));
-        assertEquals("ProfileEntry2", searchedProfileEntries.get(3).get("name"));
+        assertEquals("ProfileEntry3", searchedProfileEntries.get(0).get("name"));
+        assertEquals(Long.valueOf(2), searchedProfileEntries.get(1).get("index"));
+        assertEquals("ProfileEntry1", searchedProfileEntries.get(1).get("name"));
+        assertEquals(Long.valueOf(4), searchedProfileEntries.get(2).get("index"));
+        assertEquals("ProfileEntry2", searchedProfileEntries.get(2).get("name"));
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
