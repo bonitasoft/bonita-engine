@@ -66,7 +66,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3))
                 .addCompletionCondition(
                         new ExpressionBuilder().createGroovyScriptExpression("childOfRemainingInstancesAreAbortedAfterCompletionCondition",
-                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineName() + " == 1 ", Boolean.class.getName(),
+                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " == 1 ", Boolean.class.getName(),
                                 new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);

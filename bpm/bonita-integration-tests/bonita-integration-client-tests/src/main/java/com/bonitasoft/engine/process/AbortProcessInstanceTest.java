@@ -41,7 +41,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
                 .addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopCardinality))
                 .addCompletionCondition(
                         new ExpressionBuilder().createGroovyScriptExpression("deployProcessWithMultiInstanceCallActivity",
-                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineName() + " == 1 ", Boolean.class.getName(),
+                                ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName() + " == 1 ", Boolean.class.getName(),
                                 new ExpressionBuilder().createEngineConstant(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES)));
         builder.addEndEvent("end");
         builder.addTransition("start", "callActivity");
