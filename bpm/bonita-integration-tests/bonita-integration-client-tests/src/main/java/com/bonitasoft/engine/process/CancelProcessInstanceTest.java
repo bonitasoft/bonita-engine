@@ -49,10 +49,10 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId1 = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final Map<String, Serializable> parameters2 = new HashMap<String, Serializable>();
-        parameters.put("definitionId", processDefinition.getId());
-        parameters.put("elementName", taskName2);
-        parameters.put("idOfTheStateToInterrupt", 2);
-        parameters.put("idOfTheInterruptingState", 45);
+        parameters2.put("definitionId", processDefinition.getId());
+        parameters2.put("elementName", taskName2);
+        parameters2.put("idOfTheStateToInterrupt", 2);
+        parameters2.put("idOfTheInterruptingState", 45);
         final Long breakpointId2 = (Long) getCommandAPI().execute("addBreakpoint", parameters2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());

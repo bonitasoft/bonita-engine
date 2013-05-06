@@ -13,6 +13,7 @@ import org.bonitasoft.engine.api.IdentityAPI;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
@@ -33,5 +34,7 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
     @Override
     ReportingAPI getReportingAPI();
+
+    ProfileAPI getProfileAPI();
 
 }
