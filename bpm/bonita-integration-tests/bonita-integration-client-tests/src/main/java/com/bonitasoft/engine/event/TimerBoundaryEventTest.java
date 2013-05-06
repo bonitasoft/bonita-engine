@@ -94,11 +94,12 @@ public class TimerBoundaryEventTest extends CommonAPISPTest {
 
         Thread.sleep(timerDuration); // wait timer trigger
 
-        final WaitForStep waitForExceptionStep = waitForStep(50, 500, "exceptionStep", processInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForExceptionStep = waitForStep(100, 500, "exceptionStep", processInstance, TestStates.getReadyState(null));
 
-        ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
-        assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
+        // ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
+        // assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
 
+        ArchivedActivityInstance archActivityInst = waitForArchivedActivity(waitForStep1.getStepId(), TestStates.getAbortedState());
         if (addChild) {
             archActivityInst = getProcessAPI().getArchivedActivityInstance(manualUserTask.getId());
             assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
