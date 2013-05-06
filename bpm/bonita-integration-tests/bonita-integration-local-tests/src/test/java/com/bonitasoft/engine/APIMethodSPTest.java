@@ -16,7 +16,7 @@ import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.NodeAPIImpl;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
-import com.bonitasoft.engine.api.impl.ReportAPIExt;
+import com.bonitasoft.engine.api.impl.ReportingAPIExt;
 
 public class APIMethodSPTest extends APIMethodTest {
 
@@ -77,13 +77,13 @@ public class APIMethodSPTest extends APIMethodTest {
     @Override
     @Test
     public void checkAllMethodsOfReportAPIThrowInvalidSessionException() {
-        checkThrowsInvalidSessionException(ReportAPIExt.class);
+        checkThrowsInvalidSessionException(ReportingAPIExt.class);
     }
 
     @Override
     @Test
     public void checkAllMethodsOfReportAPIContainsSerializableParameters() {
-        checkAllParametersAreSerializable(ReportAPIExt.class);
+        checkAllParametersAreSerializable(ReportingAPIExt.class);
     }
 
     @Test

@@ -6,16 +6,14 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.api.impl;
+package com.bonitasoft.engine.api;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.ReportAPIImpl;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
 
-import com.bonitasoft.engine.api.ReportAPI;
 import com.bonitasoft.engine.reporting.ReportAlreadyExistsException;
 import com.bonitasoft.engine.reporting.ReportCreationException;
 import com.bonitasoft.engine.reporting.ReportDeletionException;
@@ -23,24 +21,12 @@ import com.bonitasoft.engine.reporting.ReportDeletionException;
 /**
  * @author Matthieu Chaffotte
  */
-public class ReportAPIExt extends ReportAPIImpl implements ReportAPI {
+public interface ReportingAPI extends org.bonitasoft.engine.api.ReportingAPI {
 
-    @Override
-    public Report addReport(final String name, final byte[] content) throws InvalidSessionException, ReportAlreadyExistsException, ReportCreationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    Report addReport(String name, byte[] content) throws InvalidSessionException, ReportAlreadyExistsException, ReportCreationException;
 
-    @Override
-    public void deleteReport(final long reportId) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException {
-        // TODO Auto-generated method stub
+    void deleteReport(long reportId) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException;
 
-    }
-
-    @Override
-    public void deleteReports(final List<Long> reportIds) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException {
-        // TODO Auto-generated method stub
-
-    }
+    void deleteReports(List<Long> reportIds) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException;
 
 }

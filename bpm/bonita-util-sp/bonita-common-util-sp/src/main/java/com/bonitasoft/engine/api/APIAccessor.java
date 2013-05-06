@@ -32,6 +32,6 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
     CommandAPI getCommandAPI();
 
     @Override
-    ReportAPI getReportAPI();
+    ReportingAPI getReportingAPI();
 
 }
