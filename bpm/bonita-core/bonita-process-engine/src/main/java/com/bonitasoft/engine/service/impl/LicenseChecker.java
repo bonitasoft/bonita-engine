@@ -98,4 +98,11 @@ public class LicenseChecker {
         }
     }
 
+    /**
+     * @return the license error message, if any.
+     */
+    public String getErrorMessage() {
+        return Manager.getErrorMessage();
+    }
+
 }

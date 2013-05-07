@@ -39,7 +39,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     @Override
     public APISession login(final String userName, final String password) throws LoginException {
         if (!LicenseChecker.getInstance().checkLicence()) {
-            throw new LoginException("The node is not started");
+            throw new LoginException("The node is not started: " + LicenseChecker.getInstance().getErrorMessage());
         }
         return super.login(userName, password);
     }
