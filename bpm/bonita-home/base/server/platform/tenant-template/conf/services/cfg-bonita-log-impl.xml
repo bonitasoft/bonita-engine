@@ -72,6 +72,8 @@
         		<entry key="PROFILE_DELETED:INTERNAL" value="true" />
         		<entry key="PROFILE_UPDATED:INTERNAL" value="true" />
         		<entry key="PROFILE_MEMBER_DELETED:INTERNAL" value="true" />
+        		<entry key="REPORT_CREATED:INTERNAL" value="true" />
+        		<entry key="REPORT_DELETED:INTERNAL" value="true" />
         		<entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
         		<entry key="SUPERVISOR_CREATED:INTERNAL" value="true" />
         		<entry key="SUPERVISOR_DELETED:INTERNAL" value="true" />

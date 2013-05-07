@@ -11,11 +11,20 @@ package com.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.ReportingAPIImpl;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
+import org.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
+import org.bonitasoft.engine.service.ModelConvertor;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 import com.bonitasoft.engine.api.ReportingAPI;
+import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
+import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReport;
+import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReports;
 import com.bonitasoft.engine.reporting.ReportAlreadyExistsException;
 import com.bonitasoft.engine.reporting.ReportCreationException;
 import com.bonitasoft.engine.reporting.ReportDeletionException;
@@ -26,21 +35,48 @@ import com.bonitasoft.engine.reporting.ReportDeletionException;
 public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
 
     @Override
-    public Report addReport(final String name, final byte[] content) throws InvalidSessionException, ReportAlreadyExistsException, ReportCreationException {
-        // TODO Auto-generated method stub
-        return null;
+    public Report addReport(final String name, final String description, final byte[] content) throws InvalidSessionException, ReportAlreadyExistsException,
+            ReportCreationException {
+
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final AddReport addReport = new AddReport(tenantAccessor, name, description, content);
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        try {
+            transactionExecutor.execute(addReport);
+            return ModelConvertor.toReport(addReport.getResult());
+        } catch (final SReportAlreadyExistsException sraee) {
+            throw new ReportAlreadyExistsException(sraee);
+        } catch (final SBonitaException sbe) {
+            throw new ReportCreationException(sbe);
+        }
     }
 
     @Override
     public void deleteReport(final long reportId) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException {
-        // TODO Auto-generated method stub
-
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DeleteReport deleteReport = new DeleteReport(tenantAccessor, reportId);
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        try {
+            transactionExecutor.execute(deleteReport);
+        } catch (final SReportNotFoundException srnfe) {
+            throw new ReportNotFoundException(srnfe);
+        } catch (final SBonitaException sbe) {
+            throw new ReportDeletionException(sbe);
+        }
     }
 
     @Override
     public void deleteReports(final List<Long> reportIds) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException {
-        // TODO Auto-generated method stub
-
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DeleteReports deleteReports = new DeleteReports(tenantAccessor, reportIds);
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        try {
+            transactionExecutor.execute(deleteReports);
+        } catch (final SReportNotFoundException srnfe) {
+            throw new ReportNotFoundException(srnfe);
+        } catch (final SBonitaException sbe) {
+            throw new ReportDeletionException(sbe);
+        }
     }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,13 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
-import java.io.Serializable;
 import java.util.Date;
+
+import org.bonitasoft.engine.bpm.model.BonitaObject;
 
 /**
  * @author Feng Hui
+ * @author Matthieu Chaffotte
  */
-public interface Tenant extends Serializable {
+public interface Tenant extends BonitaObject {
 
     long getId();
 

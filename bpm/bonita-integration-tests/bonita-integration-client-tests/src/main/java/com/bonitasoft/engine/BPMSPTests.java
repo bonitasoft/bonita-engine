@@ -25,6 +25,7 @@ import com.bonitasoft.engine.platform.NodeAPITest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
+import com.bonitasoft.engine.reporting.ReportingAPIIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
 
 @RunWith(Suite.class)
@@ -43,7 +44,8 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         RemoteConnectorExecutionTestSP.class,
         PlatformMonitoringAPITest.class,
         MonitoringAPITest.class,
-        SearchEntitiesTests.class
+        SearchEntitiesTests.class,
+        ReportingAPIIT.class
 })
 public class BPMSPTests {
 

@@ -552,6 +552,11 @@
 			<artifactId>bonita-reporting-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.reporting</groupId>
+			<artifactId>bonita-reporting-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Scheduler -->
 		<dependency>
@@ -907,6 +912,7 @@
 									<!-- Reporting -->
 									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
 									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>

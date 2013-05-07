@@ -31,6 +31,7 @@
 				<ref bean="db-bos-profile-model"/>
 				<ref bean="db-bos-supervisor-mapping"/>
 				<ref bean="db-bos-external-identity-mapping"/>
+				<ref bean="db-bonita-reporting-model"/>
 			</list>
 		</property>
 	</bean>

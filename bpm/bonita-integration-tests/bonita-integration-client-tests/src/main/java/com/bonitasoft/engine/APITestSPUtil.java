@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
+import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.log.Log;
 
@@ -40,6 +41,8 @@ public class APITestSPUtil extends APITestUtil {
 
     private ProfileAPI profileAPI;
 
+    private ReportingAPI reportingAPI;
+
     public static int DEFAULT_REPEAT = 50;
 
     public static int DEFAULT_TIMEOUT = 2000;
@@ -49,8 +52,17 @@ public class APITestSPUtil extends APITestUtil {
         return profileAPI;
     }
 
-    public void setProfileAPI(final ProfileAPI profileAPI) {
+    private void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
+    }
+
+    @Override
+    public ReportingAPI getReportingAPI() {
+        return reportingAPI;
+    }
+
+    private void setReportingAPI(final ReportingAPI reportingAPI) {
+        this.reportingAPI = reportingAPI;
     }
 
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
@@ -59,6 +71,7 @@ public class APITestSPUtil extends APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
+        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
     }
 
     @Override
@@ -68,6 +81,7 @@ public class APITestSPUtil extends APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
+        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -78,6 +92,7 @@ public class APITestSPUtil extends APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
+        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -87,6 +102,7 @@ public class APITestSPUtil extends APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
+        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
     }
 
     @Override

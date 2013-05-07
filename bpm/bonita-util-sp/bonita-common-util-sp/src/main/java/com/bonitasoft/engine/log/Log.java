@@ -8,15 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine.log;
 
-import java.io.Serializable;
 import java.util.Date;
+
+import org.bonitasoft.engine.bpm.model.BonitaObject;
 
 /**
  * @author Lu Kai
  * @author Bole Zhang
  * @author Matthieu Chaffotte
  */
-public interface Log extends Serializable {
+public interface Log extends BonitaObject {
 
     long getLogId();
 

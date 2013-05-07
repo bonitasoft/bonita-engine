@@ -23,7 +23,8 @@ import com.bonitasoft.engine.reporting.ReportDeletionException;
  */
 public interface ReportingAPI extends org.bonitasoft.engine.api.ReportingAPI {
 
-    Report addReport(String name, byte[] content) throws InvalidSessionException, ReportAlreadyExistsException, ReportCreationException;
+    Report addReport(String name, final String description, byte[] content) throws InvalidSessionException, ReportAlreadyExistsException,
+            ReportCreationException;
 
     void deleteReport(long reportId) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException;
 
