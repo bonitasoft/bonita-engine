@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.profile;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -10,6 +12,8 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.identity.UserAlreadyExistException;
 import org.bonitasoft.engine.exception.identity.UserCreationException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.exception.profile.ProfileMemberCreationException;
+import org.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -28,10 +32,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProfileAPI;
-import com.bonitasoft.engine.exception.profile.ProfileMemberCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
-
-import static org.junit.Assert.assertEquals;
 
 public class ProfileMemberTest extends AbstractProfileTest {
 
@@ -88,8 +88,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals(1, searchedProfileMember.getResult().size());
     }
 
-    private void checkCreateAndDeleProfileMember(final String memberType, final Long userId, final Long groupId, Long roleId)
-            throws BonitaException {
+    private void checkCreateAndDeleProfileMember(final String memberType, final Long userId, final Long groupId, final Long roleId) throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
         SearchResult<HashMap<String, Serializable>> searchedProfileMember = getProfileAPI().searchProfileMembersForProfile(adminProfileId, memberType,

@@ -23,8 +23,6 @@ import com.bonitasoft.engine.exception.profile.ProfileEntryDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 import com.bonitasoft.engine.exception.profile.ProfileExportException;
 import com.bonitasoft.engine.exception.profile.ProfileImportException;
-import com.bonitasoft.engine.exception.profile.ProfileMemberCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileUpdateException;
 import com.bonitasoft.engine.profile.ImportPolicy;
 
@@ -126,36 +124,6 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @since 6.0
      */
     Map<String, Serializable> updateProfile(long id, ProfileUpdateDescriptor updateDescriptor) throws InvalidSessionException, ProfileUpdateException;
-
-    /**
-     * Create a new profile member
-     * 
-     * @param profileId
-     * @param userId
-     * @param groupId
-     * @param roleId
-     * @return The created profile member
-     * @throws InvalidSessionException
-     *             occurs when the session is not valid
-     * @throws ProfileMemberCreationException
-     *             errors thrown if can't create the new profile member
-     * @since 6.0
-     */
-    Map<String, Serializable> createProfileMember(Long profileId, Long userId, Long groupId, Long roleId) throws InvalidSessionException,
-            ProfileMemberCreationException;
-
-    /**
-     * Delete a specific profile member
-     * 
-     * @param profilMemberId
-     *            profile member identifier to delete
-     * @throws InvalidSessionException
-     *             occurs when the session is not valid
-     * @throws ProfileMemberDeletionException
-     *             errors thrown if can't delete the profile member
-     * @since 6.0
-     */
-    void deleteProfileMember(Long profilMemberId) throws InvalidSessionException, ProfileMemberDeletionException;
 
     /**
      * Create a new profile entry

@@ -20,11 +20,6 @@ import org.bonitasoft.engine.api.impl.transaction.profile.DeleteAllExistingProfi
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileByName;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileEntry;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
-import org.bonitasoft.engine.bpm.model.MemberType;
-import org.bonitasoft.engine.command.SGroupProfileMemberAlreadyExistsException;
-import org.bonitasoft.engine.command.SRoleProfileMemberAlreadyExistsException;
-import org.bonitasoft.engine.command.SUserMembershipProfileMemberAlreadyExistsException;
-import org.bonitasoft.engine.command.SUserProfileMemberAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
@@ -39,10 +34,6 @@ import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.search.SearchEntityDescriptor;
-import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
-import org.bonitasoft.engine.search.profile.SearchProfileMembersForProfile;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.xml.Parser;
@@ -53,10 +44,8 @@ import org.bonitasoft.engine.xml.XMLWriter;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.impl.transaction.profile.CreateProfile;
 import com.bonitasoft.engine.api.impl.transaction.profile.CreateProfileEntry;
-import com.bonitasoft.engine.api.impl.transaction.profile.CreateProfileMember;
 import com.bonitasoft.engine.api.impl.transaction.profile.DeleteProfile;
 import com.bonitasoft.engine.api.impl.transaction.profile.DeleteProfileEntry;
-import com.bonitasoft.engine.api.impl.transaction.profile.DeleteProfileMember;
 import com.bonitasoft.engine.api.impl.transaction.profile.ExportAllProfiles;
 import com.bonitasoft.engine.api.impl.transaction.profile.ExportProfilesSpecified;
 import com.bonitasoft.engine.api.impl.transaction.profile.ImportAndHandleSameNameProfiles;
@@ -75,11 +64,8 @@ import com.bonitasoft.engine.exception.profile.ProfileEntryDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 import com.bonitasoft.engine.exception.profile.ProfileExportException;
 import com.bonitasoft.engine.exception.profile.ProfileImportException;
-import com.bonitasoft.engine.exception.profile.ProfileMemberCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileUpdateException;
 import com.bonitasoft.engine.profile.ImportPolicy;
-import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -92,7 +78,7 @@ import com.bonitasoft.manager.Features;
 public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
-    protected TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
+    public TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -104,8 +90,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public Map<String, Serializable> createProfile(final String profileName, final String profileDescription, final String profileIconPath)
-            throws InvalidSessionException,
-            ProfileCreationException {
+            throws InvalidSessionException, ProfileCreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -374,120 +359,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Map<String, Serializable> createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId)
-            throws InvalidSessionException, ProfileMemberCreationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
-
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ProfileService profileService = tenantAccessor.getProfileService();
-        final IdentityService identityService = tenantAccessor.getIdentityService();
-
-        final MemberType memberType = getMemberType(userId, groupId, roleId);
-
-        final CreateProfileMember addUserProfile = new CreateProfileMember(profileService, identityService, profileId, userId,
-                groupId, roleId, memberType);
-
-        try {
-            transactionExecutor.execute(addUserProfile);
-            return addUserProfile.getResult();
-        } catch (final SBonitaException e) {
-            try {
-                checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType, e);
-            } catch (SBonitaException e1) {
-                throw new ProfileMemberCreationException(e1);
-            }
-            throw new ProfileMemberCreationException(e);
-        }
-    }
-
-    private void checkIfProfileMemberExists(final TenantServiceAccessor tenantAccessor, final ProfileService profileService, final Long profileId,
-            final Long userId, final Long groupId, final Long roleId, final MemberType memberType, final SBonitaException e) throws SBonitaException {
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchEntityDescriptor searchDescriptor = searchEntitiesDescriptor.getProfileMemberUserDescriptor();
-        final SearchOptions searchOptions = new SearchOptionsImpl(0, 1);
-        SearchProfileMembersForProfile searchProfileMembersForProfile;
-
-        switch (memberType) {
-            case USER:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile(profileId, "ForUser", profileService,
-                        searchDescriptor, searchOptions);
-                transactionExecutor.execute(searchProfileMembersForProfile);
-
-                if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SUserProfileMemberAlreadyExistsException("A profileMember with userId \"" + userId + "\" already exists", e);
-                }
-                break;
-            case GROUP:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile(profileId, "ForGroup", profileService,
-                        searchDescriptor, searchOptions);
-                transactionExecutor.execute(searchProfileMembersForProfile);
-
-                if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SGroupProfileMemberAlreadyExistsException("A profileMember with groupId \"" + groupId + "\" already exists", e);
-                }
-                break;
-            case ROLE:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile(profileId, "ForRole", profileService,
-                        searchDescriptor, searchOptions);
-                transactionExecutor.execute(searchProfileMembersForProfile);
-
-                if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SRoleProfileMemberAlreadyExistsException("A profileMember with roleId \"" + roleId + "\" already exists", e);
-                }
-                break;
-            default:
-                searchProfileMembersForProfile = new SearchProfileMembersForProfile(profileId, "ForRoleAndGroup", profileService,
-                        searchDescriptor, searchOptions);
-                transactionExecutor.execute(searchProfileMembersForProfile);
-
-                if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SUserMembershipProfileMemberAlreadyExistsException("A profileMember with groupId \"" + groupId + "\" and roleId \"" + roleId
-                            + "\" already exists", e);
-                }
-                break;
-        }
-    }
-
-    protected MemberType getMemberType(final Long userId, final Long groupId, final Long roleId) throws ProfileMemberCreationException {
-        MemberType memberType = null;
-        if (userId != null) {
-            memberType = MemberType.USER;
-        } else if (groupId != null && roleId == null) {
-            memberType = MemberType.GROUP;
-        } else if (roleId != null && groupId == null) {
-            memberType = MemberType.ROLE;
-        } else if (roleId != null && groupId != null) {
-            memberType = MemberType.MEMBERSHIP;
-        } else {
-            final StringBuilder stb = new StringBuilder("Parameters map must contain at least one of entries: ");
-            stb.append(ProfileMemberUtils.USER_ID);
-            stb.append(", ");
-            stb.append(ProfileMemberUtils.GROUP_ID);
-            stb.append(", ");
-            stb.append(ProfileMemberUtils.ROLE_ID);
-            throw new ProfileMemberCreationException(stb.toString());
-        }
-        return memberType;
-    }
-
-    @Override
-    public void deleteProfileMember(final Long profilMemberId) throws InvalidSessionException, ProfileMemberDeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ProfileService profileService = tenantAccessor.getProfileService();
-
-        final DeleteProfileMember deleteUserProfileTransaction = new DeleteProfileMember(profileService, profilMemberId);
-
-        try {
-            transactionExecutor.execute(deleteUserProfileTransaction);
-        } catch (final SBonitaException e) {
-            throw new ProfileMemberDeletionException(e);
-        }
-    }
-
-    @Override
     public Map<String, Serializable> createProfileEntry(final String name, final String description, final Long parentId, final long profileId,
             final Long index, final String type, final String page) throws InvalidSessionException, ProfileEntryCreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
@@ -526,8 +397,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             throw new ProfileEntryCreationException(e);
         }
 
-        final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService,
-                profileEntry);
+        final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, profileEntry);
         try {
             transactionExecutor.execute(updateProfileEntryIndexTransaction);
         } catch (final SBonitaException e) {
@@ -560,8 +430,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             throw new ProfileEntryDeletionException(e);
         }
 
-        final UpdateProfileEntryIndexOnDelete updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnDelete(profileService,
-                profileEntry);
+        final UpdateProfileEntryIndexOnDelete updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnDelete(profileService, profileEntry);
         try {
             transactionExecutor.execute(updateProfileEntryIndexTransaction);
         } catch (final SBonitaException e) {
