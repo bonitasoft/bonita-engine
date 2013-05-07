@@ -5,9 +5,9 @@
     <comment>Bonita platform core configuration</comment>
     
     <!-- Default service accessors -->
-    <entry key="platformClassName">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
-    <entry key="tenantClassName">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
-    <entry key="sessionAccessor">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
+    <entry key="platformClassName">com.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
+    <entry key="tenantClassName">com.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
+    <entry key="sessionAccessor">com.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
     
     <!-- Platform administrator -->
     <entry key="platformAdminUsername">platformAdmin</entry>

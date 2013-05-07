@@ -1,7 +1,8 @@
-package org.bonitasoft.engine.bpm.test;
+package com.bonitasoft.engine.bpm.test;
 
 import javax.naming.Context;
 
+import org.bonitasoft.engine.bpm.test.AllBPMTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
