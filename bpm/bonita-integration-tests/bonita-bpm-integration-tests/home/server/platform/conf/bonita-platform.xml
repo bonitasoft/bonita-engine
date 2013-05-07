@@ -5,43 +5,34 @@
     <comment>Bonita platform core configuration</comment>
     
     <!-- Default service accessors -->
-    
     <entry key="platformClassName">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
     <entry key="tenantClassName">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
     <entry key="sessionAccessor">org.bonitasoft.engine.bpm.test.SPBPMServicesBuilder</entry>
     
     <!-- Platform administrator -->
-    
     <entry key="platformAdminUsername">platformAdmin</entry>
     <entry key="platformAdminPassword">platform</entry>
 
-    <!-- H2 configuration -->
+	<!-- Try to inherit the property from the System properties -->
+	<entry key="db.vendor">${sysprop.bonita.db.vendor:h2}</entry>
 
-    <entry key="db.vendor">h2</entry>
-    <entry key="db.version">notspecified</entry>
-    <entry key="sql.delimiter">;</entry>
-    <entry key="hibernate.journal.dialect">org.hibernate.dialect.H2Dialect</entry>
     <!-- this datasource name is used by the engine to get connected to the database -->
     <entry key="database.journal.datasource.name">java:comp/env/bonitaDS</entry>
+    <entry key="database.sequence.manager.datasource.name">java:comp/env/bonitaSequenceManagerDS</entry>
     
-    <!-- these jdbc connection parameters are used by the sequence manager which needs a direct jdbc connection -->
-    <entry key="database.journal.connection.driver_class">org.h2.Driver</entry>
-    <entry key="database.journal.connection.url">jdbc:h2:file:${bonita.home}/server/platform/work/bonita6_journal;FILE_LOCK=NO;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</entry>
-    <entry key="database.journal.connection.username">sa</entry>
-    <entry key="database.journal.connection.password"/>
-
     <!-- Hibernate specific configurations -->
     <entry key="hibernate.journal.show_sql">false</entry>
     <entry key="hibernate.journal.format_sql">false</entry>
     <entry key="hibernate.journal.use_sql_comments">false</entry>
 
+	<!-- Archives -->
     <entry key="org.bonitasoft.engine.archive.name">DEFINITIVE_0</entry>
     <entry key="org.bonitasoft.engine.archive.oldestTime">1230739200052</entry>
     <entry key="org.bonitasoft.engine.archive.newestTime">9999999999999</entry>
-    <entry key="org.bonitasoft.engine.archive.regexp">.*</entry>
-    <entry key="org.bonitasoft.engine.cron">0/5 * * * * ?</entry>
 
-    <entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</entry>
+	<!-- Seconds Minutes Hours Day-of-Month Month Day-of-Week Year (optional field) -->
+	<entry key="org.bonitasoft.engine.cron">0/5 * * * * ?</entry>
+	<entry key="org.bonitasoft.engine.clean.invalid.sessions.cron">0 0 */2 * * ?</entry>
 
     <entry key="document.servlet.url">downloadDocument</entry>
 </properties>
