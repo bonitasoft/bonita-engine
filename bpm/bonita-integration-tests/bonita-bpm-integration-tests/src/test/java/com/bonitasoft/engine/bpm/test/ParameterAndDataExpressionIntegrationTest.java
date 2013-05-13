@@ -40,7 +40,6 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
-import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Ignore;
@@ -59,10 +58,9 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
 
     @After
     public void tearDownPersistence() throws Exception {
-        final BusinessTransaction btx = getTransactionService().createTransaction();
-        btx.begin();
+        getTransactionService().begin();
         final long tenantId = PlatformUtil.getDefaultTenantId(getPlatformService());
-        btx.complete();
+        getTransactionService().complete();
         sSession = new LoginAPIExt().login(tenantId, TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         getSessionAccessor().setSessionInfo(sSession.getId(), sSession.getTenantId());
 
@@ -156,7 +154,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         businessArchive.setProcessDefinition(processDefinition);
         // deploy the archive
 
-        return processAPIImpl.deploy(businessArchive.done());
+        return this.processAPIImpl.deploy(businessArchive.done());
     }
 
     @Ignore("Wait until new service configuration")
@@ -168,7 +166,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         // create expression
         // check
         assertEquals("baptiste", createAndEvaluateParameterExpression(nameParameter, deployId, "processDefinitionId"));
-        processAPIImpl.deleteProcess(deploy.getId());
+        this.processAPIImpl.deleteProcess(deploy.getId());
     }
 
     @Test(expected = SExpressionEvaluationException.class)
@@ -180,7 +178,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         try {
             createAndEvaluateParameterExpression("nonExistingParameter", deployId, "processDefinitionId");
         } finally {
-            processAPIImpl.deleteProcess(deploy.getId());
+            this.processAPIImpl.deleteProcess(deploy.getId());
         }
     }
 

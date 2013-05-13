@@ -23,7 +23,6 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.test.util.TestUtil;
-import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -46,21 +45,19 @@ public class RecorderAndEventServiceTest extends CommonServiceTest {
 
     @AfterClass
     public static void tearDownPersistence() throws Exception {
-        TestUtil.stopScheduler(getServicesBuilder().buildSchedulerService());
+        TestUtil.stopScheduler(getServicesBuilder().buildSchedulerService(), getTransactionService());
     }
 
     @Test
     public void testUpdateEmployeeName() throws Exception {
         // Add an Employee using persistence service
-        BusinessTransaction btx = getTransactionService().createTransaction();
-        btx.begin();
+        getTransactionService().begin();
         Employee employee = new Employee("John", 15);
         persistenceService.insert(employee);
-        btx.complete();
+        getTransactionService().complete();
 
         // Update an Employee using recorder
-        btx = getTransactionService().createTransaction();
-        btx.begin();
+        getTransactionService().begin();
         final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>("getEmployeeById", Employee.class, employee.getId());
         employee = persistenceService.selectById(selectByIdDescriptor);
         // Make UpdateRecord parameter
@@ -80,21 +77,19 @@ public class RecorderAndEventServiceTest extends CommonServiceTest {
         recorder.recordUpdate(updateRecord, updateEvent);
         assertEquals(true, employeeHandler.isUpdated());
 
-        btx.complete();
+        getTransactionService().complete();
     }
 
     @Test
     public void testNotUpdateEmployeeName() throws Exception {
         // Add an Employee using persistence service
-        BusinessTransaction btx = getTransactionService().createTransaction();
-        btx.begin();
+        getTransactionService().begin();
         Employee employee = new Employee("John", 15);
         persistenceService.insert(employee);
-        btx.complete();
+        getTransactionService().complete();
 
         // Update an Employee using recorder
-        btx = getTransactionService().createTransaction();
-        btx.begin();
+        getTransactionService().begin();
 
         final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>("getEmployeeById", Employee.class, employee.getId());
         employee = persistenceService.selectById(selectByIdDescriptor);
@@ -117,7 +112,7 @@ public class RecorderAndEventServiceTest extends CommonServiceTest {
         // assert if employeeHandler is executed
         assertEquals(false, employeeHandler.isUpdated());
 
-        btx.complete();
+        getTransactionService().complete();
     }
 
     private SEmployeeHandlerImpl resetEmployeeHandler(final EventService updateEventService, final String eventType) {

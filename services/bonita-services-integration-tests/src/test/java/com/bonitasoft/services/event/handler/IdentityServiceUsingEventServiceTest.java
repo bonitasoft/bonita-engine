@@ -19,7 +19,6 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.junit.Test;
 
 /**
@@ -41,16 +40,14 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceTest {
 
     @Test
     public void testUserPasswordUpdate() throws Exception {
-        BusinessTransaction tx = getTransactionService().createTransaction();
-        tx.begin();
+        getTransactionService().begin();
         final String userName = "Zhang";
         final SUserBuilder userBuilder = builder.getUserBuilder();
         userBuilder.createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
         SUser user = identityService.createUser(userBuilder.done());
-        tx.complete();
+        getTransactionService().complete();
 
-        tx = getTransactionService().createTransaction();
-        tx.begin();
+        getTransactionService().begin();
         user = identityService.getUser(user.getId());
 
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
@@ -62,22 +59,20 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceTest {
         assertEquals(user.getPassword(), userUpdateEventHandler.getPassword(userName));
 
         identityService.deleteUser(user);
-        tx.complete();
+        getTransactionService().complete();
     }
 
     @Test
     public void testUserPasswordNotUpdate() throws Exception {
-        BusinessTransaction tx = getTransactionService().createTransaction();
-        tx.begin();
+        getTransactionService().begin();
 
         final String userName = "Zhang";
         final SUserBuilder userBuilder = builder.getUserBuilder();
         userBuilder.createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
         SUser user = identityService.createUser(userBuilder.done());
-        tx.complete();
+        getTransactionService().complete();
 
-        tx = getTransactionService().createTransaction();
-        tx.begin();
+        getTransactionService().begin();
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
         user = identityService.getUser(user.getId());
@@ -86,20 +81,18 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceTest {
 
         assertNull(userUpdateEventHandler.getPassword(userName));
         identityService.deleteUser(user);
-        tx.complete();
+        getTransactionService().complete();
     }
 
     @Test
     public void testUpdateUserWithoutPasswordChange() throws Exception {
-        BusinessTransaction tx = getTransactionService().createTransaction();
-        tx.begin();
+        getTransactionService().begin();
         final SUserBuilder userBuilder = builder.getUserBuilder();
         userBuilder.createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User");
         SUser user = identityService.createUser(userBuilder.done());
-        tx.complete();
+        getTransactionService().complete();
 
-        tx = getTransactionService().createTransaction();
-        tx.begin();
+        getTransactionService().begin();
         user = identityService.getUser(user.getId());
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
@@ -109,7 +102,7 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceTest {
 
         assertNull(userUpdateEventHandler.getPassword("testUpdateUser2"));
         identityService.deleteUser(user);
-        tx.complete();
+        getTransactionService().complete();
     }
 
     private UserUpdateEventHandler resetUserPasswordUpdateEventHandler(final EventService eventService) {
