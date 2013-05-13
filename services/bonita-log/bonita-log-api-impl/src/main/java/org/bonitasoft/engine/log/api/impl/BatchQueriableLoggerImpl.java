@@ -18,7 +18,6 @@ import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
 import org.bonitasoft.engine.services.impl.AbstractQueriableLoggerImpl;
-import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
@@ -49,15 +48,14 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     }
 
     private synchronized BatchLogSynchronization getBatchLogSynchronization() throws STransactionNotFoundException {
-        BatchLogSynchronization synchro = synchronizations.get();
+        BatchLogSynchronization synchro = this.synchronizations.get();
         if (synchro == null) {
-            synchro = new BatchLogSynchronization(persistenceService, delayable);
-            synchronizations.set(synchro);
-            transactionService.getTransaction().registerSynchronization(synchro);
+            synchro = new BatchLogSynchronization(this.persistenceService, this.delayable);
+            this.synchronizations.set(synchro);
+            this.transactionService.registerBonitaSynchronization(synchro);
         } else {
-            final BusinessTransaction transaction = transactionService.getTransaction();
-            if (!transaction.getRegisteredSynchronizations().contains(synchro)) {
-                transaction.registerSynchronization(synchro);
+            if (!this.transactionService.getBonitaSynchronizations().contains(synchro)) {
+                this.transactionService.registerBonitaSynchronization(synchro);
             }
         }
         return synchro;
@@ -72,7 +70,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
                 synchro.addLog(sQueriableLog);
             }
         } catch (final STransactionNotFoundException e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
+            this.logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
         }
     }
 

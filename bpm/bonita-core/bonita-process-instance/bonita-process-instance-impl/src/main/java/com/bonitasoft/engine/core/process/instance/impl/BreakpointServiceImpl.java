@@ -11,8 +11,6 @@ package com.bonitasoft.engine.core.process.instance.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.transaction.Synchronization;
-
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -38,7 +36,7 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
-import org.bonitasoft.engine.transaction.BusinessTransaction;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
 
@@ -59,25 +57,22 @@ public class BreakpointServiceImpl implements BreakpointService {
     /**
      * @author Baptiste Mesta
      */
-    private static final class ResetBreakpointFlag implements Synchronization {
+    private static final class ResetBreakpointFlag implements BonitaTransactionSynchronization {
 
         private final BreakpointServiceImpl breakpointServiceImpl;
 
-        private final BusinessTransaction transaction;
-
-        public ResetBreakpointFlag(final BreakpointServiceImpl breakpointServiceImpl, final BusinessTransaction transaction) {
+        public ResetBreakpointFlag(final BreakpointServiceImpl breakpointServiceImpl) {
             this.breakpointServiceImpl = breakpointServiceImpl;
-            this.transaction = transaction;
         }
 
         @Override
-        public void beforeCompletion() {
+        public void beforeCommit() {
         }
 
         @Override
-        public void afterCompletion(final int status) {
-            if (TransactionState.COMMITTED.equals(transaction.getState())) {
-                breakpointServiceImpl.isBreakpointsSynched = false;
+        public void afterCompletion(final TransactionState transactionState) {
+            if (TransactionState.COMMITTED.equals(transactionState)) {
+                this.breakpointServiceImpl.isBreakpointsSynched = false;
             }
         }
     }
@@ -122,8 +117,8 @@ public class BreakpointServiceImpl implements BreakpointService {
         this.cacheService = cacheService;
         this.queriableLoggerService = queriableLoggerService;
         this.transactionService = transactionService;
-        defaultSortingField = instanceBuilders.getSBreakpointBuilder().getDefinitionIdKey();
-        defaulOrder = OrderByType.ASC;
+        this.defaultSortingField = instanceBuilders.getSBreakpointBuilder().getDefinitionIdKey();
+        this.defaulOrder = OrderByType.ASC;
     }
 
     @Override
@@ -131,16 +126,15 @@ public class BreakpointServiceImpl implements BreakpointService {
         final SBreakpointLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_BREAKPOINT_ADDED, breakpoint);
         final InsertRecord insertRecord = new InsertRecord(breakpoint);
         SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(BREAKPOINT, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
+        if (this.eventService.hasHandlers(BREAKPOINT, EventActionType.CREATED)) {
+            final SEventBuilder eventBuilder = this.eventService.getEventBuilder();
             insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(BREAKPOINT).setObject(breakpoint).done();
         }
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            this.recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(breakpoint.getId(), SQueriableLog.STATUS_OK, logBuilder, "addBreakpoint");
-            final BusinessTransaction transaction = transactionService.getTransaction();
-            transaction.registerSynchronization(new ResetBreakpointFlag(this, transaction));
-            isBreakpointsSynched = false;// FIXME register that in a synchronization to refresh breakpoints after commit
+            this.transactionService.registerBonitaSynchronization(new ResetBreakpointFlag(this));
+            this.isBreakpointsSynched = false;// FIXME register that in a synchronization to refresh breakpoints after commit
         } catch (final SBonitaException e) {
             initiateLogBuilder(breakpoint.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addBreakpoint");
             throw new SBreakpointCreationException(e);
@@ -152,15 +146,15 @@ public class BreakpointServiceImpl implements BreakpointService {
     public void removeBreakpoint(final long id) throws SBreakpointDeletionException, SBreakpointNotFoundException, SBonitaReadException {
         final SBreakpoint sBreakpoint = getBreakpoint(id);
         SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(BREAKPOINT, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(BREAKPOINT).setObject(sBreakpoint).done();
+        if (this.eventService.hasHandlers(BREAKPOINT, EventActionType.DELETED)) {
+            deleteEvent = (SDeleteEvent) this.eventService.getEventBuilder().createDeleteEvent(BREAKPOINT).setObject(sBreakpoint).done();
         }
         final DeleteRecord deleteRecord = new DeleteRecord(sBreakpoint);
         final SBreakpointLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, REMOVING_BREAKPOINT, sBreakpoint);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            this.recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(id, SQueriableLog.STATUS_OK, logBuilder, "removeBreakpoint");
-            isBreakpointsSynched = false;
+            this.isBreakpointsSynched = false;
         } catch (final SRecorderException e) {
             initiateLogBuilder(id, SQueriableLog.STATUS_FAIL, logBuilder, "removeBreakpoint");
             throw new SBreakpointDeletionException(e);
@@ -169,7 +163,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 
     @Override
     public SBreakpoint getBreakpoint(final long id) throws SBreakpointNotFoundException, SBonitaReadException {
-        final SBreakpoint breakpoint = persistenceRead.selectById(SelectDescriptorBuilderExt.getElementById(SBreakpoint.class, "Breakpoint", id));
+        final SBreakpoint breakpoint = this.persistenceRead.selectById(SelectDescriptorBuilderExt.getElementById(SBreakpoint.class, "Breakpoint", id));
         if (breakpoint == null) {
             throw new SBreakpointNotFoundException(id);
         }
@@ -185,7 +179,7 @@ public class BreakpointServiceImpl implements BreakpointService {
     }
 
     protected SBreakpointLogBuilder getQueriableLog(final ActionType actionType, final String message, final SBreakpoint breakpoint) {
-        final SBreakpointLogBuilder logBuilder = instanceBuilders.getSBreakpointLogBuilder();
+        final SBreakpointLogBuilder logBuilder = this.instanceBuilders.getSBreakpointLogBuilder();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.definitionId(breakpoint.getDefinitionId());
@@ -195,10 +189,10 @@ public class BreakpointServiceImpl implements BreakpointService {
     @Override
     public boolean isBreakpointActive() throws SBonitaReadException {
         try {
-            Boolean active = (Boolean) cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE);
-            if (!isBreakpointsSynched || active == null) {// active might be out of cache
+            Boolean active = (Boolean) this.cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE);
+            if (!this.isBreakpointsSynched || active == null) {// active might be out of cache
                 synchronizeBreakpoints();
-                active = (Boolean) cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE);
+                active = (Boolean) this.cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE);
             }
             return active == null ? false : active;
         } catch (final TenantIdNotSetException e) {
@@ -214,27 +208,27 @@ public class BreakpointServiceImpl implements BreakpointService {
      * @throws SBonitaReadException
      */
     private synchronized void synchronizeBreakpoints() throws CacheException, TenantIdNotSetException, SBonitaReadException {
-        if (!isBreakpointsSynched || cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE) == null) {// double synchronization check
-            cacheService.clear(BREAKPOINTS);
+        if (!this.isBreakpointsSynched || this.cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE) == null) {// double synchronization check
+            this.cacheService.clear(BREAKPOINTS);
             long nbOfBreakpoints = getNumberOfBreakpoints();
             int index = 0;
             final boolean active = nbOfBreakpoints > 0;
             while (nbOfBreakpoints > 0) {
-                final List<SBreakpoint> breakpoints = getBreakpoints(index, index + BATCH_SIZE, defaultSortingField, defaulOrder);
+                final List<SBreakpoint> breakpoints = getBreakpoints(index, index + BATCH_SIZE, this.defaultSortingField, this.defaulOrder);
                 nbOfBreakpoints -= BATCH_SIZE;
                 index += BATCH_SIZE;
                 for (final SBreakpoint breakpoint : breakpoints) {
                     addBreakpointInCache(BREAKPOINTS, breakpoint);
                 }
             }
-            cacheService.store(BREAKPOINTS, BREAKPOINTS_ACTIVE, active);
-            isBreakpointsSynched = true;
+            this.cacheService.store(BREAKPOINTS, BREAKPOINTS_ACTIVE, active);
+            this.isBreakpointsSynched = true;
         }
     }
 
     @Override
     public long getNumberOfBreakpoints() throws SBonitaReadException {
-        return persistenceRead.selectOne(SelectDescriptorBuilderExt.getNumberOfBreakpoints());
+        return this.persistenceRead.selectOne(SelectDescriptorBuilderExt.getNumberOfBreakpoints());
     }
 
     @Override
@@ -242,20 +236,20 @@ public class BreakpointServiceImpl implements BreakpointService {
             throws SBonitaReadException {
         final QueryOptions queryOptions;
         if (sortingField == null || sortingOrder == null) {
-            queryOptions = new QueryOptions(fromIndex, maxResults, SBreakpoint.class, defaultSortingField, defaulOrder);
+            queryOptions = new QueryOptions(fromIndex, maxResults, SBreakpoint.class, this.defaultSortingField, this.defaulOrder);
         } else {
             queryOptions = new QueryOptions(fromIndex, maxResults, SBreakpoint.class, sortingField, sortingOrder);
         }
         final SelectListDescriptor<SBreakpoint> elements = SelectDescriptorBuilderExt.getElements(SBreakpoint.class, "Breakpoint", queryOptions);
-        return persistenceRead.selectList(elements);
+        return this.persistenceRead.selectList(elements);
     }
 
     private void addBreakpointInCache(final String cacheName, final SBreakpoint breakpoint) throws CacheException {
         if (breakpoint.isInstanceScope()) {
-            cacheService.store(cacheName, getBreakpointKey(INSTANCE_KEY, breakpoint.getInstanceId(), breakpoint.getElementName(), breakpoint.getStateId()),
+            this.cacheService.store(cacheName, getBreakpointKey(INSTANCE_KEY, breakpoint.getInstanceId(), breakpoint.getElementName(), breakpoint.getStateId()),
                     breakpoint);
         } else {
-            cacheService.store(cacheName, getBreakpointKey(DEFINITION_KEY, breakpoint.getDefinitionId(), breakpoint.getElementName(), breakpoint.getStateId()),
+            this.cacheService.store(cacheName, getBreakpointKey(DEFINITION_KEY, breakpoint.getDefinitionId(), breakpoint.getElementName(), breakpoint.getStateId()),
                     breakpoint);
         }
     }
@@ -268,13 +262,13 @@ public class BreakpointServiceImpl implements BreakpointService {
     public SBreakpoint getBreakPointFor(final long definitionId, final long instanceId, final String elementName, final int stateId)
             throws SBonitaReadException {
         try {
-            if (!isBreakpointsSynched) {
+            if (!this.isBreakpointsSynched) {
                 synchronizeBreakpoints();
             }
             // FIXME do not use cache? breakpoints might go out of cache...
-            SBreakpoint breakpoint = (SBreakpoint) cacheService.get(BREAKPOINTS, getBreakpointKey(INSTANCE_KEY, instanceId, elementName, stateId));
+            SBreakpoint breakpoint = (SBreakpoint) this.cacheService.get(BREAKPOINTS, getBreakpointKey(INSTANCE_KEY, instanceId, elementName, stateId));
             if (breakpoint == null) {
-                breakpoint = (SBreakpoint) cacheService.get(BREAKPOINTS, getBreakpointKey(DEFINITION_KEY, definitionId, elementName, stateId));
+                breakpoint = (SBreakpoint) this.cacheService.get(BREAKPOINTS, getBreakpointKey(DEFINITION_KEY, definitionId, elementName, stateId));
             }
             return breakpoint;
         } catch (final TenantIdNotSetException e) {
@@ -289,8 +283,8 @@ public class BreakpointServiceImpl implements BreakpointService {
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
         final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
+        if (this.queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
+            this.queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 

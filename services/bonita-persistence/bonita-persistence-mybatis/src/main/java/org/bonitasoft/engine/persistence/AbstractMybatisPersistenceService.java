@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -39,26 +42,19 @@ import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.STransactionResourceException;
-import org.bonitasoft.engine.transaction.TechnicalTransaction;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Charles Souillard
  * @author Matthieu Chaffotte
  */
-public abstract class AbstractMybatisPersistenceService extends AbstractDBPersistenceService implements MybatisTechnicalTransactionListener {
+public abstract class AbstractMybatisPersistenceService extends AbstractDBPersistenceService {
 
     private final String dbIdentifier;
 
     private final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider;
 
-    private final ThreadLocal<MybatisTechnicalTransaction> technicalTxs = new ThreadLocal<MybatisTechnicalTransaction>();
-
     private final TransactionService txService;
-
-    private final boolean cacheEnabled;
 
     private final Map<String, StatementMapping> statementMappings;
 
@@ -76,24 +72,23 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private final String statementDelimiter;
 
-    public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
+    public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final AbstractMyBatisConfigurationsProvider configurations,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager) throws SPersistenceException {
-        super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager);
+            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager, final DataSource datasource) throws SPersistenceException {
+        super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource);
         this.dbIdentifier = dbIdentifier;
         this.txService = txService;
-        this.cacheEnabled = cacheEnabled;
         this.mybatisSqlSessionFactoryProvider = mybatisSqlSessionFactoryProvider;
         this.statementDelimiter = statementDelimiter;
-        statementMappings = new HashMap<String, StatementMapping>();
-        classAliasMappings = new HashMap<String, String>();
-        classFieldAliasMappings = new HashMap<String, String>();
-        dbStatementsMapping = new HashMap<String, String>();
-        entityMappings = new HashMap<String, String>();
+        this.statementMappings = new HashMap<String, StatementMapping>();
+        this.classAliasMappings = new HashMap<String, String>();
+        this.classFieldAliasMappings = new HashMap<String, String>();
+        this.dbStatementsMapping = new HashMap<String, String>();
+        this.entityMappings = new HashMap<String, String>();
         this.initMappings(configurations);
-        debugWriter = new TechnicalLoggerPrintWriter(technicalLoggerService, TechnicalLogSeverity.DEBUG);
-        errorWriter = new TechnicalLoggerPrintWriter(technicalLoggerService, TechnicalLogSeverity.ERROR);
+        this.debugWriter = new TechnicalLoggerPrintWriter(technicalLoggerService, TechnicalLogSeverity.DEBUG);
+        this.errorWriter = new TechnicalLoggerPrintWriter(technicalLoggerService, TechnicalLogSeverity.ERROR);
     }
 
     private void initMappings(final AbstractMyBatisConfigurationsProvider configurations) {
@@ -103,74 +98,22 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
     }
 
     private void initMappings(final AbstractMyBatisConfiguration myBatisConfiguration) {
-        statementMappings.putAll(myBatisConfiguration.getStatementMappings());
-        classAliasMappings.putAll(myBatisConfiguration.getClassAliasMappings());
-        classFieldAliasMappings.putAll(myBatisConfiguration.getClassFieldAliasMappings());
-        dbStatementsMapping.putAll(myBatisConfiguration.getDbStatementsMapping());
-        entityMappings.putAll(myBatisConfiguration.getEntityMappings());
+        this.statementMappings.putAll(myBatisConfiguration.getStatementMappings());
+        this.classAliasMappings.putAll(myBatisConfiguration.getClassAliasMappings());
+        this.classFieldAliasMappings.putAll(myBatisConfiguration.getClassFieldAliasMappings());
+        this.dbStatementsMapping.putAll(myBatisConfiguration.getDbStatementsMapping());
+        this.entityMappings.putAll(myBatisConfiguration.getEntityMappings());
     }
 
-    private MybatisTechnicalTransaction getTechnicalTx() {
-        return technicalTxs.get();
-    }
-
-    @Override
-    public void close(final MybatisSession session) {
-        if (isCurrentSession(session)) {
-            closeCurrentSession();
-        }
-    }
-
-    private boolean isCurrentSession(final MybatisSession session) {
-        final MybatisSession currentSession = getCurrentSession();
-        return currentSession != null && currentSession.equals(session);
-    }
-
-    private MybatisSession getCurrentSession() {
-        final MybatisTechnicalTransaction technicalTx = getTechnicalTx();
-        if (technicalTx != null) {
-            return technicalTx.getSession();
-        }
+    private SqlSession getSession() throws SPersistenceException {
+        // TODO charles how to get the current session in MyBatis associated to the current JTA transaction?
         return null;
     }
 
-    private void closeCurrentSession() {
-        technicalTxs.remove();
-    }
-
-    MybatisTechnicalTransaction createTechnicalTransaction(final MybatisTechnicalTransactionListener listener, final boolean enableCache)
-            throws SPersistenceException {
-        final SqlSession session = mybatisSqlSessionFactoryProvider.getSqlSessionFactory().openSession();
-        final boolean useCache = cacheEnabled && enableCache;
-        return new MybatisTechnicalTransaction(listener, session, useCache);
-    }
-
-    private MybatisSession getSession() throws SPersistenceException {
-        MybatisTechnicalTransaction technicalTx = getTechnicalTx();
-        if (technicalTx != null) {
-            return technicalTx.getSession();
-        }
-        org.bonitasoft.engine.transaction.BusinessTransaction globalTransaction = null;
-        try {
-            globalTransaction = txService.getTransaction();
-        } catch (final STransactionNotFoundException e) {
-            throw new SPersistenceException(e);
-        }
-        technicalTx = createTechnicalTransaction(this, globalTransaction.isCacheEnabled());
-
-        try {
-            globalTransaction.enlistTechnicalTransaction(technicalTx);
-        } catch (final STransactionResourceException e) {
-            technicalTx.getSession().close();
-            throw new SPersistenceException(e);
-        }
-        technicalTxs.set(technicalTx);
-        return technicalTx.getSession();
-    }
-
     @Override
-    protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements)
+    protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements, final boolean useDataSourceConnection)
             throws SPersistenceException, IOException {
+        // TODO charles use the useDataSourceConnection parameter
         StringReader reader = null;
         try {
             final URL url = this.getClass().getResource(sqlResource);
@@ -187,10 +130,10 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
             }
             reader = new StringReader(fileContent);
 
-            final MybatisSession session = getSession();
-            final ScriptRunner runner = session.getScriptRunner();
-            runner.setLogWriter(debugWriter);
-            runner.setErrorLogWriter(errorWriter);
+            final SqlSession session = getSession();
+            final ScriptRunner runner = getScriptRunner(session);
+            runner.setLogWriter(this.debugWriter);
+            runner.setErrorLogWriter(this.errorWriter);
             runner.setDelimiter(statementDelimiter);
             runner.setAutoCommit(true);
             runner.setStopOnError(true);
@@ -255,8 +198,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private void delete(final String deleteStatement, final Map<String, Object> parameters) throws SPersistenceException {
         DeleteStatement statement = null;
-        if (statementMappings.containsKey(deleteStatement)) {
-            final StatementMapping statementMapping = statementMappings.get(deleteStatement);
+        if (this.statementMappings.containsKey(deleteStatement)) {
+            final StatementMapping statementMapping = this.statementMappings.get(deleteStatement);
             if (statementMapping.hasParameter()) {
                 parameters.put(statementMapping.getParameterName(), statementMapping.getParameterValue());
             }
@@ -264,20 +207,14 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         } else {
             statement = new DeleteStatement(deleteStatement, parameters);
         }
-        getSession().executeDeleteStatement(statement);
-    }
-
-    @Override
-    public TechnicalTransaction getTechnicalTransaction() {
-        return technicalTxs.get();
+        statement.execute(getSession());
     }
 
     @Override
     public void insert(final PersistentObject entity) throws SPersistenceException {
         setId(entity);
         final InsertStatement statement = getInsertStatement(entity);
-
-        getSession().executeInsertStatement(statement);
+        statement.execute(getSession());
     }
 
     private InsertStatement getInsertStatement(final PersistentObject entity) throws SPersistenceException {
@@ -292,8 +229,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         InsertStatement statement = null;
         final String insertStatement = getStringInsertStatement(entity);
 
-        if (statementMappings.containsKey(insertStatement)) {
-            final StatementMapping statementMapping = statementMappings.get(insertStatement);
+        if (this.statementMappings.containsKey(insertStatement)) {
+            final StatementMapping statementMapping = this.statementMappings.get(insertStatement);
             if (statementMapping.hasParameter()) {
                 parameters.put(statementMapping.getParameterName(), statementMapping.getParameterValue());
             }
@@ -306,20 +243,20 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     @Override
     public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
-        final MybatisSession session = getSession();
+        final SqlSession session = getSession();
         for (final PersistentObject entity : entities) {
             setId(entity);
             final InsertStatement insertStatement = getInsertStatement(entity);
-            session.executeInsertStatement(insertStatement);
+            insertStatement.execute(session);
         }
     }
 
     private void executeInBatch(final String sql) throws SPersistenceException {
-        final MybatisSession session = getSession();
-        final ScriptRunner runner = session.getScriptRunner();
-        runner.setDelimiter(statementDelimiter);
+        final SqlSession session = getSession();
+        final ScriptRunner runner = getScriptRunner(session);
+        runner.setDelimiter(this.statementDelimiter);
         runner.setLogWriter(null);// don't print scripts
-        runner.setErrorLogWriter(errorWriter);
+        runner.setErrorLogWriter(this.errorWriter);
         runner.setAutoCommit(false);
         runner.setStopOnError(true);
         runner.setSendFullScript(false);
@@ -337,7 +274,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         final String deleteScript = getSqlTransformer(classToPurge).getDeleteScript();
         if (deleteScript != null && !deleteScript.isEmpty()) {
             stringBuilder.append(deleteScript);
-            stringBuilder.append(statementDelimiter);
+            stringBuilder.append(this.statementDelimiter);
             executeInBatch(stringBuilder.toString());
         }
     }
@@ -373,16 +310,16 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         statement.append('.');
         statement.append(queryName);
         final String defaultStatement = statement.toString();
-        if (dbStatementsMapping.containsKey(dbIdentifier + "_" + queryName)) {
-            return dbStatementsMapping.get(dbIdentifier + "_" + queryName);
+        if (this.dbStatementsMapping.containsKey(this.dbIdentifier + "_" + queryName)) {
+            return this.dbStatementsMapping.get(this.dbIdentifier + "_" + queryName);
         }
         return defaultStatement;
     }
 
     private String getEntityClassName(final Class<? extends PersistentObject> entityClass) {
         final String className = entityClass.getName();
-        if (entityMappings.containsKey(className)) {
-            return entityMappings.get(className);
+        if (this.entityMappings.containsKey(className)) {
+            return this.entityMappings.get(className);
         }
         return className;
     }
@@ -398,7 +335,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         this.update(getSession(), updateDescriptor);
     }
 
-    void update(final MybatisSession session, final UpdateDescriptor updateDescriptor) throws SPersistenceException {
+    void update(final SqlSession session, final UpdateDescriptor updateDescriptor) throws SPersistenceException {
 
         final PersistentObject entity = updateDescriptor.getEntity();
 
@@ -423,8 +360,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
         UpdateStatement statement = null;
         final String updateStatement = getUpdateStatement(updateDescriptor.getEntity());
-        if (statementMappings.containsKey(updateStatement)) {
-            final StatementMapping statementMapping = statementMappings.get(updateStatement);
+        if (this.statementMappings.containsKey(updateStatement)) {
+            final StatementMapping statementMapping = this.statementMappings.get(updateStatement);
             if (statementMapping.hasParameter()) {
                 parameters.put(statementMapping.getParameterName(), statementMapping.getParameterValue());
             }
@@ -432,7 +369,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         } else {
             statement = new UpdateStatement(updateStatement, parameters, entity);
         }
-        session.executeUpdateStatement(statement);
+        statement.execute(session);
     }
 
     private void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
@@ -458,7 +395,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
         final String selectStatement = this.getSelectStatement(selectDescriptor, parameters);
         try {
-            return getSession().executeSelectOneStatement(new SelectOneStatement<T>(selectStatement, parameters));
+            final T result = new SelectOneStatement<T>(selectStatement, parameters).execute(getSession());
+            return result;
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
@@ -473,7 +411,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         }
     }
 
-    <T extends PersistentObject> T selectById(final MybatisSession session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
+    <T extends PersistentObject> T selectById(final SqlSession session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
         Map<String, Object> parameters;
         try {
             parameters = getDefaultParameters();
@@ -483,9 +421,10 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         parameters.put("id", selectDescriptor.getId());
 
         final String selectStatement = this.getSelectStatement(selectDescriptor, parameters);
-        try {
-            return session.executeSelectByIdStatement(new SelectByIdStatement<T>(selectStatement, parameters, selectDescriptor.getEntityType(),
-                    selectDescriptor.getId()));
+        try {            
+            final SelectByIdStatement<T> statement = new SelectByIdStatement<T>(selectStatement, parameters, selectDescriptor.getEntityType(),
+                    selectDescriptor.getId());
+            return statement.execute(getSession());
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
@@ -493,8 +432,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private <T> String getSelectStatement(final AbstractSelectDescriptor<T> selectDescriptor, final Map<String, Object> parameters) throws SBonitaReadException {
         final String selectStatement = this.getSelectStatement(selectDescriptor);
-        if (statementMappings.containsKey(selectStatement)) {
-            final StatementMapping statementMapping = statementMappings.get(selectStatement);
+        if (this.statementMappings.containsKey(selectStatement)) {
+            final StatementMapping statementMapping = this.statementMappings.get(selectStatement);
             if (statementMapping.hasParameter()) {
                 parameters.put(statementMapping.getParameterName(), statementMapping.getParameterValue());
             }
@@ -541,8 +480,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         SelectListStatement<T> statement = null;
         final String selectStatement = this.getSelectStatement(selectDescriptor);
 
-        if (statementMappings.containsKey(selectStatement)) {
-            final StatementMapping statementMapping = statementMappings.get(selectStatement);
+        if (this.statementMappings.containsKey(selectStatement)) {
+            final StatementMapping statementMapping = this.statementMappings.get(selectStatement);
             if (statementMapping.hasParameter()) {
                 parameters.put(statementMapping.getParameterName(), statementMapping.getParameterValue());
             }
@@ -551,7 +490,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
             statement = new SelectListStatement<T>(selectStatement, parameters, getRowBounds(selectDescriptor));
         }
         try {
-            return getSession().executeSelectListStatement(statement);
+            return statement.execute(getSession());
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         } catch (final IllegalArgumentException e) {
@@ -593,13 +532,13 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
             final Set<String> fields = new HashSet<String>();
             for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
                 final String className = entry.getKey().getName();
-                final String alias = classAliasMappings.get(className);
+                final String alias = this.classAliasMappings.get(className);
                 for (final String fieldName : entry.getValue()) {
                     final StringBuilder aliasBuilder = new StringBuilder(alias);
                     aliasBuilder.append('.');
                     final String fieldQualifiedName = className + "." + fieldName;
-                    if (classFieldAliasMappings.containsKey(fieldQualifiedName)) {
-                        aliasBuilder.append(classFieldAliasMappings.get(fieldQualifiedName));
+                    if (this.classFieldAliasMappings.containsKey(fieldQualifiedName)) {
+                        aliasBuilder.append(this.classFieldAliasMappings.get(fieldQualifiedName));
                     } else {
                         aliasBuilder.append(fieldName);
                     }
@@ -701,14 +640,25 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
     }
 
     private void appendFieldClassAlias(final StringBuilder builder, final String className, final String fieldName) {
-        builder.append(classAliasMappings.get(className));
+        builder.append(this.classAliasMappings.get(className));
         builder.append('.');
         final String fieldQualifiedName = className + "." + fieldName;
-        if (classFieldAliasMappings.containsKey(fieldQualifiedName)) {
-            builder.append(classFieldAliasMappings.get(fieldQualifiedName));
+        if (this.classFieldAliasMappings.containsKey(fieldQualifiedName)) {
+            builder.append(this.classFieldAliasMappings.get(fieldQualifiedName));
         } else {
             builder.append(fieldName);
         }
 
+    }
+    
+    private ScriptRunner getScriptRunner(final SqlSession session) {
+        final Connection connection = session.getConnection();
+        final ScriptRunner runner = new ScriptRunner(connection);
+        return runner;
+    }
+    
+    @Override
+    public void flushStatements() throws SPersistenceException {
+        getSession().flushStatements();
     }
 }

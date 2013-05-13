@@ -11,6 +11,8 @@ package org.bonitasoft.engine.persistence;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -22,14 +24,14 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class PlatformMybatisPersistenceService extends AbstractMybatisPersistenceService {
 
-    public PlatformMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService, final boolean cacheEnabled,
+    public PlatformMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final PlatformMyBatisConfigurationsProvider configurations,
             final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
             final TechnicalLoggerService technicalLoggerService,
-            final SequenceManager sequenceManager) throws SPersistenceException {
-        super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
+            final SequenceManager sequenceManager, final DataSource datasource) throws SPersistenceException {
+        super(name, dbIdentifier, txService, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
                 likeEscapeCharacter,
-                technicalLoggerService, sequenceManager);
+                technicalLoggerService, sequenceManager, datasource);
     }
 
     @Override
