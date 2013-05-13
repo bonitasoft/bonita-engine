@@ -2,8 +2,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyServiceImpl">
-		<constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-	</bean>
+    <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
+    <constructor-arg name="logger" ref="technicalLoggerService" />
+    <constructor-arg name="classLoaderService" ref="classLoaderService" />
+  </bean>
 
 </beans>
