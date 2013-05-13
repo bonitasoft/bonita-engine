@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.MonitoringException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 
 /**
  * @author Zhao Na
@@ -28,7 +27,7 @@ public interface MonitoringAPI {
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      */
-    long getNumberOfActiveTransactions() throws MonitoringException, InvalidSessionException;
+    long getNumberOfActiveTransactions() throws MonitoringException;
 
     /**
      * Get the number of all executing processes
@@ -40,7 +39,7 @@ public interface MonitoringAPI {
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      */
-    long getNumberOfExecutingProcesses() throws MonitoringException, InvalidSessionException;
+    long getNumberOfExecutingProcesses() throws MonitoringException;
 
     /**
      * Get the number of all users
@@ -52,6 +51,6 @@ public interface MonitoringAPI {
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      */
-    long getNumberOfUsers() throws MonitoringException, InvalidSessionException;
+    long getNumberOfUsers() throws MonitoringException;
 
 }

@@ -52,7 +52,6 @@ import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
@@ -65,7 +64,6 @@ import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -1318,7 +1316,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     private void waitForStep2AndCheckDataInstanceValue(final String exptectedValue, final String dataName, final ProcessInstance procInst) throws Exception,
-            InvalidSessionException, DataNotFoundException {
+            DataNotFoundException {
         waitForUserTask("step2", procInst);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, procInst.getId());
         assertEquals(exptectedValue, dataInstance.getValue());

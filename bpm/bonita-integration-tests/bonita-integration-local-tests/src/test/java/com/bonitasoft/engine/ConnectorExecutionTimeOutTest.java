@@ -25,7 +25,7 @@ import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -47,13 +47,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
 
-    protected TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
         } catch (final Exception e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
     }
 

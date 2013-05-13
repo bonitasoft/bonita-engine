@@ -30,7 +30,6 @@ import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -94,9 +93,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
     }
 
     private Map<Operation, Map<String, Object>> executeConnectors(final long sActivityInstanceID,
-            final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws InvalidSessionException,
-            ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException {
+            final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws ActivityInstanceNotFoundException,
+            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         if (connectorsMap == null) {
             return Collections.emptyMap();
         } else {
@@ -116,7 +114,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
 
     private Map<String, Object> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            throws ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorConditionException, NotSerializableException {
         final String containerType = "ACTIVITY_INSTANCE";
         if (connectorInputParameters.size() == inputValues.size()) {

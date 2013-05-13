@@ -12,8 +12,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
-
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
 import com.bonitasoft.engine.exception.profile.ProfileCreationException;
@@ -28,6 +26,7 @@ import com.bonitasoft.engine.profile.ImportPolicy;
 
 /**
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
 
@@ -48,7 +47,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't create the new profile
      * @since 6.0
      */
-    Map<String, Serializable> createProfile(String name, String description, String iconPath) throws InvalidSessionException, ProfileCreationException;
+    Map<String, Serializable> createProfile(String name, String description, String iconPath) throws ProfileCreationException;
 
     /**
      * Delete a specific profile
@@ -61,7 +60,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't delete the profile
      * @since 6.0
      */
-    void deleteProfile(long id) throws InvalidSessionException, ProfileDeletionException;
+    void deleteProfile(long id) throws ProfileDeletionException;
 
     /**
      * Export all profiles from DataBase to XML file
@@ -74,7 +73,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't export profiles
      * @since 6.0
      */
-    byte[] exportAllProfiles() throws InvalidSessionException, ProfileExportException;
+    byte[] exportAllProfiles() throws ProfileExportException;
 
     /**
      * Export specific profiles from DataBase to XML file
@@ -89,7 +88,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't export profiles
      * @since 6.0
      */
-    byte[] exportProfilesWithIdsSpecified(long[] profileIds) throws InvalidSessionException, ProfileExportException;
+    byte[] exportProfilesWithIdsSpecified(long[] profileIds) throws ProfileExportException;
 
     /**
      * Import profiles from XML file.
@@ -106,7 +105,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't import profiles
      * @since 6.0
      */
-    List<String> importProfilesUsingSpecifiedPolicy(byte[] xmlContent, ImportPolicy policy) throws InvalidSessionException, ProfileImportException;
+    List<String> importProfilesUsingSpecifiedPolicy(byte[] xmlContent, ImportPolicy policy) throws ProfileImportException;
 
     /**
      * Update a profile.
@@ -123,7 +122,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't update profiles
      * @since 6.0
      */
-    Map<String, Serializable> updateProfile(long id, ProfileUpdateDescriptor updateDescriptor) throws InvalidSessionException, ProfileUpdateException;
+    Map<String, Serializable> updateProfile(long id, ProfileUpdateDescriptor updateDescriptor) throws ProfileUpdateException;
 
     /**
      * Create a new profile entry
@@ -150,7 +149,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @since 6.0
      */
     Map<String, Serializable> createProfileEntry(String name, String description, Long parentId, long profileId, Long index, String type, String page)
-            throws InvalidSessionException, ProfileEntryCreationException;
+            throws ProfileEntryCreationException;
 
     /**
      * Delete a specific profile entry
@@ -163,7 +162,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't delete the profile entry
      * @since 6.0
      */
-    void deleteProfileEntry(long profileEntryId) throws InvalidSessionException, ProfileEntryDeletionException;
+    void deleteProfileEntry(long profileEntryId) throws ProfileEntryDeletionException;
 
     /**
      * Update a profile entry.
@@ -179,7 +178,6 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't update the profile entry
      * @since 6.0
      */
-    Map<String, Serializable> updateProfileEntry(long id, ProfileEntryUpdateDescriptor updateDescriptor) throws InvalidSessionException,
-            ProfileEntryUpdateException;
+    Map<String, Serializable> updateProfileEntry(long id, ProfileEntryUpdateDescriptor updateDescriptor) throws ProfileEntryUpdateException;
 
 }

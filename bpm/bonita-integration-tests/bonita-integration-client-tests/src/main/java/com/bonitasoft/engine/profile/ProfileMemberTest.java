@@ -9,7 +9,6 @@ import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.identity.UserAlreadyExistException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
@@ -194,13 +193,13 @@ public class ProfileMemberTest extends AbstractProfileTest {
     }
 
     private User createUserByUsernameAndPassword(final String userName, final String firstName, final String lastName, final String password)
-            throws UserAlreadyExistException, CreationException, InvalidSessionException {
+            throws UserAlreadyExistException, CreationException {
         final UserBuilder userBuilder = new UserBuilder().createNewInstance(userName, password);
         userBuilder.setFirstName(firstName).setLastName(lastName);
         return getIdentityAPI().createUser(userBuilder.done(), null, null);
     }
 
-    private void deleteProfileMember(final Map<String, Serializable> addProfileMemberResult) throws InvalidSessionException, ProfileMemberDeletionException {
+    private void deleteProfileMember(final Map<String, Serializable> addProfileMemberResult) throws ProfileMemberDeletionException {
         getProfileAPI().deleteProfileMember((Long) addProfileMemberResult.get(PROFILE_MEMBER_ID));
     }
 }

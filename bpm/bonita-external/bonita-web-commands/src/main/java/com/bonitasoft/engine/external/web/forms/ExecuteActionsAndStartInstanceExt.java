@@ -40,7 +40,6 @@ import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotEnabledException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
@@ -122,8 +121,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
     }
 
     private Map<Operation, Map<String, Object>> executeConnectors(final long processDefId,
-            final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws InvalidSessionException, ClassLoaderException,
-            ConnectorException, InvalidEvaluationConnectorConditionException, InvalidProcessDefinitionException, NotSerializableException {
+            final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorConditionException, InvalidProcessDefinitionException, NotSerializableException {
         final Map<Operation, Map<String, Object>> operations = new HashMap<Operation, Map<String, Object>>(connectorsMap.size());
         for (final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry : connectorsMap.entrySet()) {
             final ConnectorDefinition connectorDefinition = entry.getKey();
@@ -139,8 +138,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
     }
 
     private ProcessInstance startProcess(long userId, final long processDefinitionId, final Map<Operation, Map<String, Object>> operations)
-            throws InvalidSessionException, ProcessDefinitionNotFoundException, CreationException, ProcessDefinitionReadException,
-            ProcessDefinitionNotEnabledException, OperationExecutionException {
+            throws ProcessDefinitionNotFoundException, CreationException, ProcessDefinitionReadException, ProcessDefinitionNotEnabledException,
+            OperationExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -205,8 +204,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     Map<String, Object> executeConnectorOnProcessDefinition(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processDefinitionId)
-            throws InvalidSessionException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
-            InvalidProcessDefinitionException, NotSerializableException {
+            throws ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, InvalidProcessDefinitionException,
+            NotSerializableException {
         if (connectorInputParameters.size() == inputValues.size()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ClassLoader classLoader = getLocalClassLoader(tenantAccessor, processDefinitionId);

@@ -16,7 +16,6 @@ import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
 import org.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -35,8 +34,7 @@ import com.bonitasoft.engine.reporting.ReportDeletionException;
 public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
 
     @Override
-    public Report addReport(final String name, final String description, final byte[] content) throws InvalidSessionException, ReportAlreadyExistsException,
-            CreationException {
+    public Report addReport(final String name, final String description, final byte[] content) throws ReportAlreadyExistsException, CreationException {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final AddReport addReport = new AddReport(tenantAccessor, name, description, content);
@@ -52,7 +50,7 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
     }
 
     @Override
-    public void deleteReport(final long reportId) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException {
+    public void deleteReport(final long reportId) throws ReportNotFoundException, ReportDeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReport deleteReport = new DeleteReport(tenantAccessor, reportId);
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -66,7 +64,7 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
     }
 
     @Override
-    public void deleteReports(final List<Long> reportIds) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException {
+    public void deleteReports(final List<Long> reportIds) throws ReportNotFoundException, ReportDeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReports deleteReports = new DeleteReports(tenantAccessor, reportIds);
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();

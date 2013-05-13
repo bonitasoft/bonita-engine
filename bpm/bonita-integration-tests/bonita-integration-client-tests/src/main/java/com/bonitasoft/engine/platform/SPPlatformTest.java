@@ -74,8 +74,7 @@ public class SPPlatformTest {
         platformAPI.startNode();
     }
 
-    private static void logAsPlatformAdmin() throws PlatformLoginException, InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    private static void logAsPlatformAdmin() throws PlatformLoginException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         session = platformLoginAPI.login("platformAdmin", "platform");
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
     }

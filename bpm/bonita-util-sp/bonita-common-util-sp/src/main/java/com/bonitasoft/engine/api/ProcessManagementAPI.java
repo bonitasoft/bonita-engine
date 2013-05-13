@@ -22,7 +22,6 @@ import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException
 import org.bonitasoft.engine.exception.activity.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.task.RetryTaskException;
 
@@ -48,7 +47,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Error thrown if no processDefinition have an id corresponding to the parameter.
      * @since 6.0
      */
-    int getNumberOfParameterInstances(long processDefinitionUUID) throws InvalidSessionException, ProcessDefinitionNotFoundException;
+    int getNumberOfParameterInstances(long processDefinitionUUID) throws ProcessDefinitionNotFoundException;
 
     /**
      * Get a parameter instance by process definition UUID
@@ -66,8 +65,8 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Error thrown if the given parameter is not found.
      * @since 6.0
      */
-    ParameterInstance getParameterInstance(long processDefinitionUUID, String parameterName) throws InvalidSessionException,
-            ProcessDefinitionNotFoundException, ParameterNotFoundException;
+    ParameterInstance getParameterInstance(long processDefinitionUUID, String parameterName) throws ProcessDefinitionNotFoundException,
+            ParameterNotFoundException;
 
     /**
      * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
@@ -90,7 +89,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     List<ParameterInstance> getParameterInstances(long processDefinitionUUID, int pageIndex, int numberPerPage, ParameterSorting sort)
-            throws InvalidSessionException, ProcessDefinitionNotFoundException, PageOutOfRangeException;
+            throws ProcessDefinitionNotFoundException, PageOutOfRangeException;
 
     /**
      * Update an existing parameter of a process definition.
@@ -111,8 +110,8 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Error thrown if the given parameter is invalid.
      * @since 6.0
      */
-    void updateParameterInstanceValue(long processDefinitionUUID, String parameterName, String parameterValue) throws InvalidSessionException,
-            ProcessDefinitionNotFoundException, ParameterNotFoundException, InvalidParameterValueException;
+    void updateParameterInstanceValue(long processDefinitionUUID, String parameterName, String parameterValue) throws ProcessDefinitionNotFoundException,
+            ParameterNotFoundException, InvalidParameterValueException;
 
     /**
      * Import the parameters by a processDefinition id and an array byte of parametersXML
@@ -127,7 +126,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Error thrown if is value in the parameter is invalid
      * @since 6.0
      */
-    void importParameters(long pDefinitionId, byte[] parametersXML) throws InvalidSessionException, InvalidParameterValueException;
+    void importParameters(long pDefinitionId, byte[] parametersXML) throws InvalidParameterValueException;
 
     /**
      * Retrieve the list of connector instances on an activity instance
@@ -143,7 +142,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     List<ConnectorInstance> getConnectorInstancesOfActivity(long activityInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
-            throws InvalidSessionException, ObjectReadException, PageOutOfRangeException;
+            throws ObjectReadException, PageOutOfRangeException;
 
     /**
      * Retrieve the list of connector instances on a process instance
@@ -159,7 +158,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     List<ConnectorInstance> getConnectorInstancesOfProcess(long processInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
-            throws InvalidSessionException, ObjectReadException, PageOutOfRangeException;
+            throws ObjectReadException, PageOutOfRangeException;
 
     /**
      * Allows to reset the state of an instance of connector
@@ -174,7 +173,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             if a connector-related problem occurs
      * @since 6.0
      */
-    void setConnectorInstanceState(long connectorInstanceId, ConnectorStateReset state) throws InvalidSessionException, ConnectorException;
+    void setConnectorInstanceState(long connectorInstanceId, ConnectorStateReset state) throws ConnectorException;
 
     /**
      * Allows to reset connector instance states for a Collection of connector instances at once.
@@ -188,7 +187,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             if a connector-related problem occurs
      * @since 6.0
      */
-    void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException;
+    void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorException;
 
     /**
      * Updates the implementation version of the connector of the process definition.
@@ -211,7 +210,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     void setConnectorImplementation(long processDefinitionId, String connectorName, String connectorVersion, byte[] connectorImplementationArchive)
-            throws InvalidSessionException, InvalidConnectorImplementationException, ConnectorException;
+            throws InvalidConnectorImplementationException, ConnectorException;
 
     /**
      * set state of activity to its previous state and then execute.
@@ -233,8 +232,8 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws ObjectModificationException
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ActivityNotFoundException,
-            RetryTaskException, ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException;
+    void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityNotFoundException, RetryTaskException,
+            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException;
 
     /**
      * Replay a task that was in failed state.
@@ -254,7 +253,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             When the activity can't be replayed because it's not in a good state, i.e. connectors in fail are present
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException, ObjectModificationException,
+    void replayActivity(long activityInstanceId) throws ObjectNotFoundException, ObjectReadException, ObjectModificationException,
             ActivityExecutionFailedException;
 
 }

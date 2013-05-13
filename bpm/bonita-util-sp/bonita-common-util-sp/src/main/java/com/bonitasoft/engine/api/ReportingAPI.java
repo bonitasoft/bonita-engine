@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
 
@@ -23,10 +22,10 @@ import com.bonitasoft.engine.reporting.ReportDeletionException;
  */
 public interface ReportingAPI extends org.bonitasoft.engine.api.ReportingAPI {
 
-    Report addReport(String name, final String description, byte[] content) throws InvalidSessionException, ReportAlreadyExistsException, CreationException;
+    Report addReport(String name, final String description, byte[] content) throws ReportAlreadyExistsException, CreationException;
 
-    void deleteReport(long reportId) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException;
+    void deleteReport(long reportId) throws ReportNotFoundException, ReportDeletionException;
 
-    void deleteReports(List<Long> reportIds) throws InvalidSessionException, ReportNotFoundException, ReportDeletionException;
+    void deleteReports(List<Long> reportIds) throws ReportNotFoundException, ReportDeletionException;
 
 }

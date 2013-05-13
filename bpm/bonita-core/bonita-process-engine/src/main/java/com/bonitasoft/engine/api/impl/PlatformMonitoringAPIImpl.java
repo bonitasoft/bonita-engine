@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.exception.MonitoringException;
 import org.bonitasoft.engine.exception.UnavailableInformationException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.management.GcInfo;
 import org.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -32,7 +31,7 @@ import com.bonitasoft.manager.Features;
 public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
     @Override
-    public long getCurrentMemoryUsage() throws InvalidSessionException, MonitoringException {
+    public long getCurrentMemoryUsage() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -51,7 +50,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public float getMemoryUsagePercentage() throws InvalidSessionException, MonitoringException {
+    public float getMemoryUsagePercentage() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -59,7 +58,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public double getSystemLoadAverage() throws InvalidSessionException, MonitoringException {
+    public double getSystemLoadAverage() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -67,7 +66,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getUpTime() throws InvalidSessionException, MonitoringException {
+    public long getUpTime() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -75,7 +74,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getStartTime() throws InvalidSessionException, MonitoringException {
+    public long getStartTime() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -83,7 +82,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getTotalThreadsCpuTime() throws InvalidSessionException, MonitoringException {
+    public long getTotalThreadsCpuTime() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -91,7 +90,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public int getThreadCount() throws InvalidSessionException, MonitoringException {
+    public int getThreadCount() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -99,7 +98,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public int getAvailableProcessors() throws InvalidSessionException, MonitoringException {
+    public int getAvailableProcessors() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -107,7 +106,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public String getOSArch() throws InvalidSessionException, MonitoringException {
+    public String getOSArch() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -115,7 +114,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public String getOSName() throws InvalidSessionException, MonitoringException {
+    public String getOSName() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -123,7 +122,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public String getOSVersion() throws InvalidSessionException, MonitoringException {
+    public String getOSVersion() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -131,7 +130,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public String getJvmName() throws InvalidSessionException, MonitoringException {
+    public String getJvmName() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -139,7 +138,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public String getJvmVendor() throws InvalidSessionException, MonitoringException {
+    public String getJvmVendor() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -147,7 +146,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public String getJvmVersion() throws InvalidSessionException, MonitoringException {
+    public String getJvmVersion() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -155,7 +154,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public Map<String, String> getJvmSystemProperties() throws InvalidSessionException, MonitoringException {
+    public Map<String, String> getJvmSystemProperties() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -163,7 +162,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public boolean isSchedulerStarted() throws InvalidSessionException, MonitoringException {
+    public boolean isSchedulerStarted() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -171,7 +170,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getNumberOfActiveTransactions() throws InvalidSessionException, MonitoringException {
+    public long getNumberOfActiveTransactions() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -179,7 +178,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getProcessCpuTime() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+    public long getProcessCpuTime() throws MonitoringException, UnavailableInformationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -190,7 +189,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getCommittedVirtualMemorySize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+    public long getCommittedVirtualMemorySize() throws MonitoringException, UnavailableInformationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -201,7 +200,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getTotalSwapSpaceSize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+    public long getTotalSwapSpaceSize() throws MonitoringException, UnavailableInformationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -212,7 +211,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getFreeSwapSpaceSize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+    public long getFreeSwapSpaceSize() throws MonitoringException, UnavailableInformationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -223,7 +222,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getFreePhysicalMemorySize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+    public long getFreePhysicalMemorySize() throws MonitoringException, UnavailableInformationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -234,7 +233,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public long getTotalPhysicalMemorySize() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+    public long getTotalPhysicalMemorySize() throws MonitoringException, UnavailableInformationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -245,7 +244,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public boolean isOptionalMonitoringInformationAvailable() throws InvalidSessionException, MonitoringException {
+    public boolean isOptionalMonitoringInformationAvailable() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
@@ -253,7 +252,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     }
 
     @Override
-    public Map<String, GcInfo> getLastGcInfo() throws InvalidSessionException, MonitoringException, UnavailableInformationException {
+    public Map<String, GcInfo> getLastGcInfo() throws MonitoringException, UnavailableInformationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();

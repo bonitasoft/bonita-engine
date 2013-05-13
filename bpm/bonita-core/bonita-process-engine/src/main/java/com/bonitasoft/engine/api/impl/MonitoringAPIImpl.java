@@ -9,8 +9,8 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.MonitoringException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.TenantMonitoringService;
@@ -34,44 +34,43 @@ import com.bonitasoft.manager.Features;
 public class MonitoringAPIImpl implements MonitoringAPI {
 
     @Override
-    public long getNumberOfActiveTransactions() throws MonitoringException, InvalidSessionException {
+    public long getNumberOfActiveTransactions() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
 
         final TenantMonitoringService tenantMonitoringService = getTenantMonitoringService();
         return tenantMonitoringService.getNumberOfActiveTransactions();
     }
 
-    private TenantMonitoringService getTenantMonitoringService() throws InvalidSessionException {
+    private TenantMonitoringService getTenantMonitoringService() {
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         return tenantServiceAccessor.getTenantMonitoringService();
     }
 
-    private TenantServiceAccessor getTenantServiceAccessor() throws InvalidSessionException {
+    private TenantServiceAccessor getTenantServiceAccessor() {
         long tenantId = 0;
         SessionAccessor sessionAccessor = null;
         try {
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         } catch (final Exception e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
         try {
             tenantId = sessionAccessor.getTenantId();
         } catch (final TenantIdNotSetException e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
         return TenantServiceSingleton.getInstance(tenantId);
     }
 
     @Override
-    public long getNumberOfExecutingProcesses() throws MonitoringException, InvalidSessionException {
+    public long getNumberOfExecutingProcesses() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
-
-        // TODO Auto-generated method stub
+        // FIXME
         return 0;
     }
 
     @Override
-    public long getNumberOfUsers() throws MonitoringException, InvalidSessionException {
+    public long getNumberOfUsers() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
 
         final TenantMonitoringService tenantMonitoringService = getTenantMonitoringService();
@@ -100,12 +99,12 @@ public class MonitoringAPIImpl implements MonitoringAPI {
         return numberOfUsers;
     }
 
-    private TransactionService getTransactionService() throws InvalidSessionException {
+    private TransactionService getTransactionService() {
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         return tenantServiceAccessor.getTransactionService();
     }
 
-    private TechnicalLoggerService getTechnicalLogger() throws InvalidSessionException {
+    private TechnicalLoggerService getTechnicalLogger() {
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         return tenantServiceAccessor.getTechnicalLoggerService();
     }

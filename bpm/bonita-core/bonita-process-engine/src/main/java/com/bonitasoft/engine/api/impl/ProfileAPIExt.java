@@ -22,7 +22,7 @@ import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileEntry;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.ExportedProfile;
@@ -82,19 +82,19 @@ import com.bonitasoft.manager.Features;
 public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
-    public TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
+    public TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
         } catch (final Exception e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
     }
 
     @Override
     public Map<String, Serializable> createProfile(final String profileName, final String profileDescription, final String profileIconPath)
-            throws InvalidSessionException, ProfileCreationException {
+            throws ProfileCreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -121,7 +121,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public void deleteProfile(final long id) throws InvalidSessionException, ProfileDeletionException {
+    public void deleteProfile(final long id) throws ProfileDeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -135,7 +135,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public byte[] exportAllProfiles() throws InvalidSessionException, ProfileExportException {
+    public byte[] exportAllProfiles() throws ProfileExportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -153,7 +153,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public byte[] exportProfilesWithIdsSpecified(final long[] profileIds) throws InvalidSessionException, ProfileExportException {
+    public byte[] exportProfilesWithIdsSpecified(final long[] profileIds) throws ProfileExportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -179,8 +179,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public List<String> importProfilesUsingSpecifiedPolicy(final byte[] xmlContent, final ImportPolicy policy) throws InvalidSessionException,
-            ProfileImportException {
+    public List<String> importProfilesUsingSpecifiedPolicy(final byte[] xmlContent, final ImportPolicy policy) throws ProfileImportException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -337,8 +336,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Map<String, Serializable> updateProfile(final long id, final ProfileUpdateDescriptor updateDescriptor) throws InvalidSessionException,
-            ProfileUpdateException {
+    public Map<String, Serializable> updateProfile(final long id, final ProfileUpdateDescriptor updateDescriptor) throws ProfileUpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
@@ -364,7 +362,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public Map<String, Serializable> createProfileEntry(final String name, final String description, final Long parentId, final long profileId,
-            final Long index, final String type, final String page) throws InvalidSessionException, ProfileEntryCreationException {
+            final Long index, final String type, final String page) throws ProfileEntryCreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
@@ -412,7 +410,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public void deleteProfileEntry(final long profileEntryId) throws InvalidSessionException, ProfileEntryDeletionException {
+    public void deleteProfileEntry(final long profileEntryId) throws ProfileEntryDeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -443,8 +441,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Map<String, Serializable> updateProfileEntry(final long id, final ProfileEntryUpdateDescriptor updateDescriptor) throws InvalidSessionException,
-            ProfileEntryUpdateException {
+    public Map<String, Serializable> updateProfileEntry(final long id, final ProfileEntryUpdateDescriptor updateDescriptor) throws ProfileEntryUpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
