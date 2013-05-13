@@ -16,8 +16,8 @@ import java.util.Set;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.search.FieldDescriptor;
-import org.bonitasoft.engine.search.SearchEntityDescriptor;
+import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.descriptor.TenantSearchDescriptor;
 
 /**

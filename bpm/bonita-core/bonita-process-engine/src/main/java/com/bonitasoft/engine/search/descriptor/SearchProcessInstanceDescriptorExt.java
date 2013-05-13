@@ -9,8 +9,8 @@
 package com.bonitasoft.engine.search.descriptor;
 
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.search.FieldDescriptor;
-import org.bonitasoft.engine.search.SearchProcessInstanceDescriptor;
+import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
