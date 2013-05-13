@@ -12,12 +12,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
 import com.bonitasoft.engine.exception.profile.ProfileCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 import com.bonitasoft.engine.exception.profile.ProfileExportException;
 import com.bonitasoft.engine.exception.profile.ProfileImportException;
@@ -60,7 +61,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't delete the profile
      * @since 6.0
      */
-    void deleteProfile(long id) throws ProfileDeletionException;
+    void deleteProfile(long id) throws DeletionException;
 
     /**
      * Export all profiles from DataBase to XML file
@@ -162,7 +163,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't delete the profile entry
      * @since 6.0
      */
-    void deleteProfileEntry(long profileEntryId) throws ProfileEntryDeletionException;
+    void deleteProfileEntry(long profileEntryId) throws DeletionException;
 
     /**
      * Update a profile entry.

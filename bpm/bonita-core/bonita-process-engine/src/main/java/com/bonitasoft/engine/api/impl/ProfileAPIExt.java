@@ -23,6 +23,7 @@ import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.ExportedProfile;
@@ -34,10 +35,6 @@ import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
-import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
-import org.bonitasoft.engine.search.profile.SearchProfileMembersForProfile;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.xml.Parser;
@@ -62,9 +59,7 @@ import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor.ProfileEntryField;
 import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
 import com.bonitasoft.engine.exception.profile.ProfileCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 import com.bonitasoft.engine.exception.profile.ProfileExportException;
 import com.bonitasoft.engine.exception.profile.ProfileImportException;
@@ -121,7 +116,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public void deleteProfile(final long id) throws ProfileDeletionException {
+    public void deleteProfile(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -130,7 +125,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         try {
             transactionExecutor.execute(deleteProfileTransaction);
         } catch (final SBonitaException e) {
-            throw new ProfileDeletionException(e);
+            throw new DeletionException(e);
         }
     }
 
@@ -410,7 +405,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public void deleteProfileEntry(final long profileEntryId) throws ProfileEntryDeletionException {
+    public void deleteProfileEntry(final long profileEntryId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -422,21 +417,21 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             transactionExecutor.execute(getProfileEntryTransaction);
             profileEntry = getProfileEntryTransaction.getResult();
         } catch (final SBonitaException e) {
-            throw new ProfileEntryDeletionException(e);
+            throw new DeletionException(e);
         }
 
         final DeleteProfileEntry deleteProfileEntryTransaction = new DeleteProfileEntry(profileService, profileEntryId);
         try {
             transactionExecutor.execute(deleteProfileEntryTransaction);
         } catch (final SBonitaException e) {
-            throw new ProfileEntryDeletionException(e);
+            throw new DeletionException(e);
         }
 
         final UpdateProfileEntryIndexOnDelete updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnDelete(profileService, profileEntry);
         try {
             transactionExecutor.execute(updateProfileEntryIndexTransaction);
         } catch (final SBonitaException e) {
-            throw new ProfileEntryDeletionException(e);
+            throw new DeletionException(e);
         }
     }
 

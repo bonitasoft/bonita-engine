@@ -11,8 +11,10 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -21,7 +23,6 @@ import com.bonitasoft.engine.exception.TenantActivationException;
 import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantCreationException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
-import com.bonitasoft.engine.exception.TenantDeletionException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.exception.TenantUpdateException;
 import com.bonitasoft.engine.platform.Tenant;
@@ -79,7 +80,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant deletion
      *             since 6.0
      */
-    void deleteTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, TenantDeletionException;
+    void deleteTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, DeletionException;
 
     /**
      * Activate a tenant.

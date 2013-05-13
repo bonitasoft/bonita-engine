@@ -11,11 +11,11 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
 
 import com.bonitasoft.engine.reporting.ReportAlreadyExistsException;
-import com.bonitasoft.engine.reporting.ReportDeletionException;
 
 /**
  * @author Matthieu Chaffotte
@@ -24,8 +24,8 @@ public interface ReportingAPI extends org.bonitasoft.engine.api.ReportingAPI {
 
     Report addReport(String name, final String description, byte[] content) throws ReportAlreadyExistsException, CreationException;
 
-    void deleteReport(long reportId) throws ReportNotFoundException, ReportDeletionException;
+    void deleteReport(long reportId) throws ReportNotFoundException, DeletionException;
 
-    void deleteReports(List<Long> reportIds) throws ReportNotFoundException, ReportDeletionException;
+    void deleteReports(List<Long> reportIds) throws ReportNotFoundException, DeletionException;
 
 }

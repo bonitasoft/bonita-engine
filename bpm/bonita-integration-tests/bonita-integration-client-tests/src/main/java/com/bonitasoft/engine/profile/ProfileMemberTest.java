@@ -8,8 +8,8 @@ import java.util.Map;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.identity.UserAlreadyExistException;
-import org.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -105,7 +105,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
-    @Test(expected = ProfileMemberDeletionException.class)
+    @Test(expected = DeletionException.class)
     public void deleteProfileMemberWithWrongParameter() throws Exception {
         getProfileAPI().deleteProfileMember(856L);
     }
@@ -199,7 +199,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         return getIdentityAPI().createUser(userBuilder.done(), null, null);
     }
 
-    private void deleteProfileMember(final Map<String, Serializable> addProfileMemberResult) throws ProfileMemberDeletionException {
+    private void deleteProfileMember(final Map<String, Serializable> addProfileMemberResult) throws DeletionException {
         getProfileAPI().deleteProfileMember((Long) addProfileMemberResult.get(PROFILE_MEMBER_ID));
     }
 }

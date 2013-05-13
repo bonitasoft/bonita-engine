@@ -94,9 +94,9 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.IllegalProcessStateException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
@@ -113,7 +113,6 @@ import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorCondi
 import org.bonitasoft.engine.exception.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessDeletionException;
 import org.bonitasoft.engine.exception.process.ProcessDeployException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceReadException;
@@ -178,7 +177,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteProcess(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessDeletionException, IllegalProcessStateException {
+    public void deleteProcess(final long processDefinitionId) throws ProcessDefinitionNotFoundException, DeletionException, IllegalProcessStateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -208,16 +207,16 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new IllegalProcessStateException(e);
         } catch (final SProcessDefinitionReadException e) {
             log(tenantAccessor, e);
-            throw new ProcessDeletionException(e);
+            throw new DeletionException(e);
         } catch (final BonitaHomeNotSetException e) {
             log(tenantAccessor, e);
             throw new BonitaRuntimeException(e);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
-            throw new ProcessDeletionException(e);
+            throw new DeletionException(e);
         } catch (final IOException e) {
             log(tenantAccessor, e);
-            throw new ProcessDeletionException(e);
+            throw new DeletionException(e);
         }
     }
 
@@ -469,7 +468,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteManualUserTask(final long manualTaskId) throws ObjectDeletionException, ObjectNotFoundException {
+    public void deleteManualUserTask(final long manualTaskId) throws DeletionException, ObjectNotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
@@ -482,18 +481,18 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
                     processInstanceService.deleteFlowNodeInstance(activityInstance, null);
                 } else {
-                    throw new ObjectDeletionException("Can't delete a task that is not a manual task", ManualTaskInstance.class);
+                    throw new DeletionException("Can't delete a task that is not a manual task");
                 }
             } catch (final SActivityInstanceNotFoundException e) {
                 throw new ObjectNotFoundException("can't find activity with id " + manualTaskId, e, ManualTaskInstance.class);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
-                throw new ObjectDeletionException(e, ManualTaskInstance.class);
+                throw new DeletionException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new ObjectDeletionException(e, ManualTaskInstance.class);
+            throw new DeletionException(e);
         }
     }
 

@@ -43,6 +43,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
@@ -78,7 +79,6 @@ import com.bonitasoft.engine.exception.TenantActivationException;
 import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantCreationException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
-import com.bonitasoft.engine.exception.TenantDeletionException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.exception.TenantUpdateException;
 import com.bonitasoft.engine.platform.Tenant;
@@ -239,7 +239,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public void deleteTenant(final long tenantId) throws TenantNotFoundException, TenantDeletionException, PlatformNotStartedException {
+    public void deleteTenant(final long tenantId) throws TenantNotFoundException, DeletionException, PlatformNotStartedException {
         PlatformServiceAccessor platformAccessor = null;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
@@ -267,10 +267,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new TenantNotFoundException(tenantId);
         } catch (final SDeletingActivatedTenantException e) {
             log(platformAccessor, e, TechnicalLogSeverity.ERROR);
-            throw new TenantDeletionException("Unable to delete an activated tenant " + tenantId);
+            throw new DeletionException("Unable to delete an activated tenant " + tenantId);
         } catch (final Exception e) {
             log(platformAccessor, e, TechnicalLogSeverity.ERROR);
-            throw new TenantDeletionException(tenantId);
+            throw new DeletionException(e);
         }
     }
 

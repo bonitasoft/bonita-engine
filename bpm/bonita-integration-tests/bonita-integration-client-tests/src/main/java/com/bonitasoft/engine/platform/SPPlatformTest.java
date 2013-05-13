@@ -15,11 +15,11 @@ import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
-import org.bonitasoft.engine.exception.platform.PlatformDeletionException;
 import org.bonitasoft.engine.exception.platform.PlatformLoginException;
 import org.bonitasoft.engine.exception.platform.PlatformLogoutException;
 import org.bonitasoft.engine.exception.platform.PlatformNotExistException;
@@ -706,7 +706,7 @@ public class SPPlatformTest {
         }
     }
 
-    @Test(expected = PlatformDeletionException.class)
+    @Test(expected = DeletionException.class)
     public void deletePlatformWithTenantExist() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
         try {

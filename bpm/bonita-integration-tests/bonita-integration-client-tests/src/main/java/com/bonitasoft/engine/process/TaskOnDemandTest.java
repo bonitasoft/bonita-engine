@@ -17,7 +17,7 @@ import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.ObjectDeletionException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.identity.User;
@@ -219,7 +219,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     }
 
     @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
-    @Test(expected = ObjectDeletionException.class)
+    @Test(expected = DeletionException.class)
     public void deleteNotManualTask() throws Exception {
         final String password = "secretPassword";
         final String delivery = "Delivery men";

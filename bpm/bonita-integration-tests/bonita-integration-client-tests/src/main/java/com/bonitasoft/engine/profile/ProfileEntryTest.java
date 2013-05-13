@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -18,7 +19,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
 import com.bonitasoft.engine.exception.profile.ProfileEntryCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryDeletionException;
 import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 
 import static org.junit.Assert.assertEquals;
@@ -61,12 +61,9 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create profile entry in 2nd position.")
     @Test
     public void insertInIndex2() throws BonitaException, IOException {
-        getProfileAPI().createProfileEntry("ProfileEntry0", "Description profileEntry1", Long.valueOf(12),
-                adminProfileId, Long.valueOf(0), "folder", "MyPage");
-        getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", Long.valueOf(12), adminProfileId,
-                Long.valueOf(1), "folder", "MyPage");
-        getProfileAPI().createProfileEntry("ProfileEntry3", "Description profileEntry1", Long.valueOf(12), adminProfileId,
-                Long.valueOf(2), "folder", "MyPage");
+        getProfileAPI().createProfileEntry("ProfileEntry0", "Description profileEntry1", Long.valueOf(12), adminProfileId, Long.valueOf(0), "folder", "MyPage");
+        getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", Long.valueOf(12), adminProfileId, Long.valueOf(1), "folder", "MyPage");
+        getProfileAPI().createProfileEntry("ProfileEntry3", "Description profileEntry1", Long.valueOf(12), adminProfileId, Long.valueOf(2), "folder", "MyPage");
 
         // insert the element between 0 and 2
         final Map<String, Serializable> createdProfileEntry = getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry1",
@@ -90,8 +87,8 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", null, profileId, Long.valueOf(2), "folder", null);
 
         // Create Profile entry 3 without Index
-        final Map<String, Serializable> profileEntryWithoutIndex = getProfileAPI()
-                .createProfileEntry("ProfileEntryWithoutIndex", "Description profileEntryWithoutIndex", null, profileId, null, "folder", null);
+        final Map<String, Serializable> profileEntryWithoutIndex = getProfileAPI().createProfileEntry("ProfileEntryWithoutIndex",
+                "Description profileEntryWithoutIndex", null, profileId, null, "folder", null);
 
         final Map<String, Serializable> getProfileEntryResult = getProfileAPI().getProfileEntry((Long) profileEntryWithoutIndex.get("id"));
         assertEquals(profileEntryWithoutIndex.get("id"), getProfileEntryResult.get("id"));
@@ -203,8 +200,8 @@ public class ProfileEntryTest extends AbstractProfileTest {
         final Long profileId = (Long) createdProfile.get("id");
 
         // Create Profile Entry Menu1
-        final Map<String, Serializable> createdProfileMenu = getProfileAPI().createProfileEntry("Menu1", "Description Menu1", null, profileId,
-                Long.valueOf(0), "folder", null);
+        final Map<String, Serializable> createdProfileMenu = getProfileAPI().createProfileEntry("Menu1", "Description Menu1", null, profileId, Long.valueOf(0),
+                "folder", null);
         final Long profileMenuId = (Long) createdProfileMenu.get("id");
 
         // Create Profile Entry 1
@@ -239,7 +236,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Not Existing" }, story = "Execute profile command with not existing", jira = "ENGINE-548")
-    @Test(expected = ProfileEntryDeletionException.class)
+    @Test(expected = DeletionException.class)
     public void deleteProfileEntryNotExisting() throws Exception {
         getProfileAPI().deleteProfileEntry(165486489646541L);
     }

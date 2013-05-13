@@ -16,6 +16,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
 import org.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -26,7 +27,6 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReports;
 import com.bonitasoft.engine.reporting.ReportAlreadyExistsException;
-import com.bonitasoft.engine.reporting.ReportDeletionException;
 
 /**
  * @author Matthieu Chaffotte
@@ -50,7 +50,7 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
     }
 
     @Override
-    public void deleteReport(final long reportId) throws ReportNotFoundException, ReportDeletionException {
+    public void deleteReport(final long reportId) throws ReportNotFoundException, DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReport deleteReport = new DeleteReport(tenantAccessor, reportId);
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -59,12 +59,12 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
         } catch (final SReportNotFoundException srnfe) {
             throw new ReportNotFoundException(srnfe);
         } catch (final SBonitaException sbe) {
-            throw new ReportDeletionException(sbe);
+            throw new DeletionException(sbe);
         }
     }
 
     @Override
-    public void deleteReports(final List<Long> reportIds) throws ReportNotFoundException, ReportDeletionException {
+    public void deleteReports(final List<Long> reportIds) throws ReportNotFoundException, DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReports deleteReports = new DeleteReports(tenantAccessor, reportIds);
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -73,7 +73,7 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
         } catch (final SReportNotFoundException srnfe) {
             throw new ReportNotFoundException(srnfe);
         } catch (final SBonitaException sbe) {
-            throw new ReportDeletionException(sbe);
+            throw new DeletionException(sbe);
         }
     }
 
