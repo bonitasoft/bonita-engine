@@ -26,13 +26,13 @@ import org.bonitasoft.engine.bpm.model.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.UserTaskInstance;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotEnabledException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionReadException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceCreationException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
@@ -59,7 +59,6 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
 
 import static org.hamcrest.core.Is.is;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -100,8 +99,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance instance4 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance5 = getProcessAPI().startProcess(processDefinition.getId());
         // prepare searchOptions
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 10,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         // search and check result ASC
         assertTrue("no started process instances are found", new WaitUntil(500, 5000) {
 
@@ -110,8 +108,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 return getProcessAPI().searchOpenProcessInstances(searchOptions.done()).getCount() == 5;
             }
         }.waitUntil());
-        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 2,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 2, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstances(searchOptions1.done());
         assertNotNull(result);
@@ -122,8 +119,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(instance1.getId(), processInstanceList1.get(0).getId());
         assertEquals(instance2.getId(), processInstanceList1.get(1).getId());
 
-        final SearchOptionsBuilder searchOptions2 = buildSearchOptions(processDefinition.getId(), 2, 2,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions2 = buildSearchOptions(processDefinition.getId(), 2, 2, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         result = getProcessAPI().searchOpenProcessInstances(searchOptions2.done());
         assertNotNull(result);
         assertEquals(5, result.getCount());
@@ -132,8 +128,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(1, processInstanceList2.size());
         assertEquals(instance5.getId(), processInstanceList2.get(0).getId());
 
-        final SearchOptionsBuilder searchOptions3 = buildSearchOptions(processDefinition.getId(), 0, 3,
-                ProcessInstanceSearchDescriptor.ID, Order.DESC);
+        final SearchOptionsBuilder searchOptions3 = buildSearchOptions(processDefinition.getId(), 0, 3, ProcessInstanceSearchDescriptor.ID, Order.DESC);
         // search and check result DESC
         result = getProcessAPI().searchOpenProcessInstances(searchOptions3.done());
         assertNotNull(result);
@@ -145,8 +140,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertEquals(instance4.getId(), processInstanceList3.get(1).getId());
         assertEquals(instance3.getId(), processInstanceList3.get(2).getId());
 
-        final SearchOptionsBuilder searchOptions4 = buildSearchOptions(processDefinition.getId() + 1, 0, 3,
-                ProcessInstanceSearchDescriptor.ID, Order.DESC);
+        final SearchOptionsBuilder searchOptions4 = buildSearchOptions(processDefinition.getId() + 1, 0, 3, ProcessInstanceSearchDescriptor.ID, Order.DESC);
         result = getProcessAPI().searchOpenProcessInstances(searchOptions4.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
@@ -420,8 +414,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         // assign
         assignAndExecuteStep(pendingTask, jack.getId());
         // executed but not archived
@@ -478,8 +471,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         final List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is not started by jack but not finished: not in "workedOn"
         SearchResult<ArchivedProcessInstance> result = getProcessAPI().searchArchivedProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
@@ -533,8 +525,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is not started by jack and jack has not performed tasks: not in "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(jack.getId(), searchOptions.done());
@@ -602,8 +593,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         logout();
         loginWith(username, password);
@@ -657,8 +647,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         loginWith("john", password);
         getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         waitForPendingTasks(jack.getId(), 4);
 
@@ -704,8 +693,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         final List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is started by jack and jack has not performed tasks: In "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
@@ -751,8 +739,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is not started by jack and jack has not performed tasks: not in "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
@@ -818,8 +805,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         logout();
         loginWith("jack", "bpm");
@@ -874,8 +860,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         loginWith("pierre", "bpm");
         getProcessAPI().startProcess(processDefinition.getId());
 
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         waitForPendingTasks(jack.getId(), 5);
 
         final SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
@@ -912,8 +897,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         assertTrue(pendingTaskOf.waitUntil());
         final List<HumanTaskInstance> pendingTasks = pendingTaskOf.getPendingHumanTaskInstances();
         final UserTaskInstance pendingTask = (UserTaskInstance) pendingTasks.get(0);
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
 
         // the process is started by jack and jack has not performed tasks: In "workedOn"
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
@@ -952,8 +936,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final ProcessInstance instance4 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance5 = getProcessAPI().startProcess(processDefinition.getId());
         // prepare searchOptions
-        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions = buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         // search and check result ASC
         assertTrue("no pending user task instances are found", new WaitUntil(500, 5000) {
 
@@ -963,8 +946,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
             }
         }.waitUntil());
         // test started by correct user
-        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 10,
-                ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        final SearchOptionsBuilder searchOptions1 = buildSearchOptions(processDefinition.getId(), 0, 10, ProcessInstanceSearchDescriptor.ID, Order.ASC);
         searchOptions1.filter(ProcessInstanceSearchDescriptor.STARTED_BY, user.getId());
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstances(searchOptions1.done());
         assertNotNull(result);
@@ -1461,8 +1443,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
             @Override
             protected boolean check() throws Exception {
-                final SearchOptions searchOpts = new SearchOptionsBuilder(0, 1).filter(
-                        ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstance.getId()).done();
+                final SearchOptions searchOpts = new SearchOptionsBuilder(0, 1).filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID,
+                        processInstance.getId()).done();
                 return getProcessAPI().searchArchivedProcessInstances(searchOpts).getCount() == 1;
             }
         }.waitUntil());
@@ -1554,7 +1536,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
     }
 
     private ProcessDefinition createArchivedProcessInstanceInStateCompletedAndCanceled() throws InvalidSessionException, ProcessDefinitionNotFoundException,
-            ProcessDefinitionReadException, ProcessDefinitionNotEnabledException, ProcessInstanceCreationException, Exception {
+            ProcessDefinitionReadException, ProcessDefinitionNotEnabledException, CreationException, Exception {
         final String actorName = "delivery";
         final String userTaskName = "step1";
         // deploy and start simple process

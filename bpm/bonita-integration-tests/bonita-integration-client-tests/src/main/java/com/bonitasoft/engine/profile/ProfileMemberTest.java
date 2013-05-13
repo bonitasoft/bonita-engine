@@ -1,7 +1,5 @@
 package com.bonitasoft.engine.profile;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -9,10 +7,9 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.identity.UserAlreadyExistException;
-import org.bonitasoft.engine.exception.identity.UserCreationException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
-import org.bonitasoft.engine.exception.profile.ProfileMemberCreationException;
 import org.bonitasoft.engine.exception.profile.ProfileMemberDeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
@@ -32,6 +29,8 @@ import org.junit.Test;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProfileAPI;
+
+import static org.junit.Assert.assertEquals;
 
 public class ProfileMemberTest extends AbstractProfileTest {
 
@@ -65,7 +64,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
-    @Test(expected = ProfileMemberCreationException.class)
+    @Test(expected = CreationException.class)
     public void createProfileMemberWithWrongParameter() throws Exception {
         getProfileAPI().createProfileMember(856L, null, null, null);
     }
@@ -113,28 +112,28 @@ public class ProfileMemberTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Twice", "Same" }, jira = "ENGINE-919")
-    @Test(expected = ProfileMemberCreationException.class)
+    @Test(expected = CreationException.class)
     public void createTwiceSameProfileMemberWithUser() throws BonitaException, IOException {
         getProfileAPI().createProfileMember(adminProfileId, user1.getId(), null, null);
         getProfileAPI().createProfileMember(adminProfileId, user1.getId(), null, null);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Twice", "Same" }, jira = "ENGINE-919")
-    @Test(expected = ProfileMemberCreationException.class)
+    @Test(expected = CreationException.class)
     public void createTwiceSameProfileMemberWithRole() throws BonitaException, IOException {
         getProfileAPI().createProfileMember(adminProfileId, null, null, role1.getId());
         getProfileAPI().createProfileMember(adminProfileId, null, null, role1.getId());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group", "Twice", "Same" }, jira = "ENGINE-919")
-    @Test(expected = ProfileMemberCreationException.class)
+    @Test(expected = CreationException.class)
     public void createTwiceSameProfileMemberWithGroup() throws BonitaException, IOException {
         getProfileAPI().createProfileMember(adminProfileId, null, group1.getId(), null);
         getProfileAPI().createProfileMember(adminProfileId, null, group1.getId(), null);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "UserMembership", "Twice", "Same" }, jira = "ENGINE-919")
-    @Test(expected = ProfileMemberCreationException.class)
+    @Test(expected = CreationException.class)
     public void createTwiceSameProfileMemberWithMembership() throws BonitaException, IOException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
 
@@ -195,7 +194,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
     }
 
     private User createUserByUsernameAndPassword(final String userName, final String firstName, final String lastName, final String password)
-            throws UserAlreadyExistException, UserCreationException, InvalidSessionException {
+            throws UserAlreadyExistException, CreationException, InvalidSessionException {
         final UserBuilder userBuilder = new UserBuilder().createNewInstance(userName, password);
         userBuilder.setFirstName(firstName).setLastName(lastName);
         return getIdentityAPI().createUser(userBuilder.done(), null, null);

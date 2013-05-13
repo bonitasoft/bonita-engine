@@ -18,10 +18,10 @@ import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.exception.ClassLoaderException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
-import org.bonitasoft.engine.exception.activity.ActivityCreationException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.activity.ActivityInterruptedException;
@@ -71,7 +71,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             since 6.0
      */
     ManualTaskInstance addManualUserTask(long humanTaskId, String taskName, String displayName, long assignTo, String description, Date dueDate,
-            TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException, ActivityExecutionErrorException, ActivityCreationException,
+            TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException, ActivityExecutionErrorException, CreationException,
             ActivityNotFoundException;
 
     /**

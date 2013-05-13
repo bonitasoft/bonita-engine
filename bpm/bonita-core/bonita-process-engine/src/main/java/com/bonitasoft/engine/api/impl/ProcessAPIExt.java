@@ -93,6 +93,7 @@ import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.IllegalProcessStateException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
@@ -100,7 +101,6 @@ import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.activity.ActivityCreationException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
@@ -419,7 +419,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public ManualTaskInstance addManualUserTask(final long humanTaskId, final String taskName, final String displayName, final long assignTo,
             final String description, final Date dueDate, final TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException,
-            ActivityExecutionErrorException, ActivityCreationException, ActivityNotFoundException {
+            ActivityExecutionErrorException, CreationException, ActivityNotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         TenantServiceAccessor tenantAccessor = null;
         final TaskPriority prio = priority != null ? priority : TaskPriority.NORMAL;
@@ -441,7 +441,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new ActivityNotFoundException("The parent activity is not a Human task", humanTaskId);
             }
             if (((SHumanTaskInstance) activityInstance).getAssigneeId() != userId) {
-                throw new ActivityCreationException("Unable to create a child task from this task, it's not assigned to you!");
+                throw new CreationException("Unable to create a child task from this task, it's not assigned to you!");
             }
             final TransactionContentWithResult<SManualTaskInstance> createManualUserTask = new CreateManualUserTask(activityInstanceService, taskName, -1,
                     displayName, humanTaskId, assignTo, description, dueDate, STaskPriority.valueOf(prio.name()));
@@ -456,7 +456,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new ActivityNotFoundException(e.getMessage(), humanTaskId);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
-            throw new ActivityCreationException(e.getMessage());
+            throw new CreationException(e.getMessage());
         } catch (final InvalidSessionException e) {
             throw e;
         } catch (final ActivityInterruptedException e) {

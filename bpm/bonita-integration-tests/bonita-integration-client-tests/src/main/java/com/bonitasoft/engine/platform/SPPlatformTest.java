@@ -14,11 +14,11 @@ import java.util.List;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
-import org.bonitasoft.engine.exception.platform.PlatformCreationException;
 import org.bonitasoft.engine.exception.platform.PlatformDeletionException;
 import org.bonitasoft.engine.exception.platform.PlatformLoginException;
 import org.bonitasoft.engine.exception.platform.PlatformLogoutException;
@@ -306,7 +306,7 @@ public class SPPlatformTest {
         assertTrue(platformAPI.isPlatformCreated());
     }
 
-    @Test(expected = PlatformCreationException.class)
+    @Test(expected = CreationException.class)
     public void createPlatformException() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
         platformAPI.createAndInitializePlatform();

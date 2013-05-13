@@ -15,6 +15,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
 import org.bonitasoft.engine.core.reporting.SReportNotFoundException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.reporting.Report;
 import org.bonitasoft.engine.reporting.ReportNotFoundException;
@@ -26,7 +27,6 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReports;
 import com.bonitasoft.engine.reporting.ReportAlreadyExistsException;
-import com.bonitasoft.engine.reporting.ReportCreationException;
 import com.bonitasoft.engine.reporting.ReportDeletionException;
 
 /**
@@ -36,7 +36,7 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
 
     @Override
     public Report addReport(final String name, final String description, final byte[] content) throws InvalidSessionException, ReportAlreadyExistsException,
-            ReportCreationException {
+            CreationException {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final AddReport addReport = new AddReport(tenantAccessor, name, description, content);
@@ -47,7 +47,7 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
         } catch (final SReportAlreadyExistsException sraee) {
             throw new ReportAlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
-            throw new ReportCreationException(sbe);
+            throw new CreationException(sbe);
         }
     }
 

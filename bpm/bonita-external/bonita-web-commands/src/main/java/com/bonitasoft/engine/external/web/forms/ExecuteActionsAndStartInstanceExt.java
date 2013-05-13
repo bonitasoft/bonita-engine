@@ -35,6 +35,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
@@ -44,7 +45,6 @@ import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotEnabledException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionReadException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceCreationException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -139,7 +139,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
     }
 
     private ProcessInstance startProcess(long userId, final long processDefinitionId, final Map<Operation, Map<String, Object>> operations)
-            throws InvalidSessionException, ProcessDefinitionNotFoundException, ProcessInstanceCreationException, ProcessDefinitionReadException,
+            throws InvalidSessionException, ProcessDefinitionNotFoundException, CreationException, ProcessDefinitionReadException,
             ProcessDefinitionNotEnabledException, OperationExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -171,7 +171,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             startedInstance = processExecutor.start(userId, sDefinition, sOperations);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
-            throw new ProcessInstanceCreationException(e);
+            throw new CreationException(e);
         }// FIXME in case process instance creation exception -> put it in failed
         return ModelConvertor.toProcessInstance(sDefinition, startedInstance);
     }
