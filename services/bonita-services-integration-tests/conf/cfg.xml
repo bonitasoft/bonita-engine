@@ -4,7 +4,7 @@
 	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<array>
-				<value>file:${bonita.services.folder}/bonita-platform.xml</value>
+				<value>file:${bonita.services.folder}/bonita-platform.properties</value>
 				<value>file:${bonita.services.folder}/jdbc-${sysprop.bonita.db.vendor}.xml</value>
 			</array>
 		</property>
@@ -36,11 +36,8 @@
 	</bean>
 
 	<bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
-		<constructor-arg name="platformDependencyService" ref="platformDependencyService" />
-		<constructor-arg name="dependencyService" ref="dependencyService" />
 		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="transactionService" ref="transactionService" />
+    <constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="testLogBuilder" class="org.bonitasoft.engine.archive.model.TestLogBuilder" />
