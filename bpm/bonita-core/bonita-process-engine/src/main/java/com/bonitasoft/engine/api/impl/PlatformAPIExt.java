@@ -43,9 +43,11 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.platform.StartNodeException;
 import org.bonitasoft.engine.exception.platform.StopNodeException;
@@ -77,10 +79,8 @@ import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.exception.TenantActivationException;
 import com.bonitasoft.engine.exception.TenantAlreadyExistException;
-import com.bonitasoft.engine.exception.TenantCreationException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
-import com.bonitasoft.engine.exception.TenantUpdateException;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCriterion;
 import com.bonitasoft.engine.platform.TenantUpdateDescriptor;
@@ -126,7 +126,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public final long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String username,
-            final String password) throws TenantCreationException, PlatformNotStartedException, TenantAlreadyExistException {
+            final String password) throws CreationException, PlatformNotStartedException, TenantAlreadyExistException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
         TransactionExecutor transactionExecutor = null;
@@ -145,13 +145,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw e;
         } catch (final Exception e) {
             log(platformAccessor, e, TechnicalLogSeverity.ERROR);
-            throw new TenantCreationException(e);
+            throw new CreationException(e);
         }
         return create(tenantName, description, iconName, iconPath, username, password, false);
     }
 
     private long create(final String tenantName, final String description, final String iconName, final String iconPath, final String userName,
-            final String password, final boolean isDefault) throws TenantCreationException, PlatformNotStartedException {
+            final String password, final boolean isDefault) throws CreationException, PlatformNotStartedException {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         try {
@@ -217,7 +217,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 cleanSessionAccessor(sessionAccessor);
             }
         } catch (final Exception e) {
-            throw new TenantCreationException("Unable to create tenant " + tenantName, e);
+            throw new CreationException("Unable to create tenant " + tenantName, e);
         }
     }
 
@@ -584,9 +584,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public Tenant updateTenant(final long tenantId, final TenantUpdateDescriptor udpateDescriptor) throws PlatformNotStartedException, TenantUpdateException {
+    public Tenant updateTenant(final long tenantId, final TenantUpdateDescriptor udpateDescriptor) throws PlatformNotStartedException, UpdateException {
         if (udpateDescriptor == null || udpateDescriptor.getFields().isEmpty()) {
-            throw new TenantUpdateException("The update descriptor does not contain field updates");
+            throw new UpdateException("The update descriptor does not contain field updates");
         }
         PlatformServiceAccessor platformAccessor;
         try {
@@ -616,23 +616,23 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             transactionExecutor.execute(updateTenant);
             return getTenantById(tenantId);
         } catch (final TenantNotFoundException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final BonitaHomeNotSetException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final BonitaHomeConfigurationException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final InstantiationException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final IllegalAccessException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final ClassNotFoundException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final IOException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final SBonitaException e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         } catch (final Exception e) {
-            throw new TenantUpdateException(e);
+            throw new UpdateException(e);
         }
     }
 

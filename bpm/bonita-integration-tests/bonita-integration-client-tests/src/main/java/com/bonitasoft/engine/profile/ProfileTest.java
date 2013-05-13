@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -26,8 +28,6 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
-import com.bonitasoft.engine.exception.profile.ProfileCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileUpdateException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -80,7 +80,7 @@ public class ProfileTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Wrong parameter" }, jira = "ENGINE-548")
-    @Test(expected = ProfileCreationException.class)
+    @Test(expected = CreationException.class)
     public void createProfileWithWrongParameter() throws Exception {
         getProfileAPI().createProfile(null, null, null);
     }
@@ -109,7 +109,7 @@ public class ProfileTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Wrong parameter" }, jira = "ENGINE-548")
-    @Test(expected = ProfileUpdateException.class)
+    @Test(expected = UpdateException.class)
     public void updateProfileWithWrongParameter() throws Exception {
         getProfileAPI().updateProfile(2, null);
     }

@@ -12,17 +12,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
-import com.bonitasoft.engine.exception.profile.ProfileCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 import com.bonitasoft.engine.exception.profile.ProfileExportException;
 import com.bonitasoft.engine.exception.profile.ProfileImportException;
-import com.bonitasoft.engine.exception.profile.ProfileUpdateException;
 import com.bonitasoft.engine.profile.ImportPolicy;
 
 /**
@@ -48,7 +46,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't create the new profile
      * @since 6.0
      */
-    Map<String, Serializable> createProfile(String name, String description, String iconPath) throws ProfileCreationException;
+    Map<String, Serializable> createProfile(String name, String description, String iconPath) throws CreationException;
 
     /**
      * Delete a specific profile
@@ -123,7 +121,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't update profiles
      * @since 6.0
      */
-    Map<String, Serializable> updateProfile(long id, ProfileUpdateDescriptor updateDescriptor) throws ProfileUpdateException;
+    Map<String, Serializable> updateProfile(long id, ProfileUpdateDescriptor updateDescriptor) throws UpdateException;
 
     /**
      * Create a new profile entry
@@ -150,7 +148,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @since 6.0
      */
     Map<String, Serializable> createProfileEntry(String name, String description, Long parentId, long profileId, Long index, String type, String page)
-            throws ProfileEntryCreationException;
+            throws CreationException;
 
     /**
      * Delete a specific profile entry
@@ -179,6 +177,6 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't update the profile entry
      * @since 6.0
      */
-    Map<String, Serializable> updateProfileEntry(long id, ProfileEntryUpdateDescriptor updateDescriptor) throws ProfileEntryUpdateException;
+    Map<String, Serializable> updateProfileEntry(long id, ProfileEntryUpdateDescriptor updateDescriptor) throws UpdateException;
 
 }

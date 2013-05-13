@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -11,9 +11,11 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -21,10 +23,8 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.exception.TenantActivationException;
 import com.bonitasoft.engine.exception.TenantAlreadyExistException;
-import com.bonitasoft.engine.exception.TenantCreationException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
-import com.bonitasoft.engine.exception.TenantUpdateException;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCriterion;
 import com.bonitasoft.engine.platform.TenantUpdateDescriptor;
@@ -63,7 +63,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             since 6.0
      */
     long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String userName,
-            final String password) throws PlatformNotStartedException, TenantCreationException, TenantAlreadyExistException;
+            final String password) throws PlatformNotStartedException, CreationException, TenantAlreadyExistException;
 
     /**
      * Delete a tenant.
@@ -230,7 +230,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant updated
      *             since 6.0
      */
-    Tenant updateTenant(long tenantId, TenantUpdateDescriptor udpateDescriptor) throws PlatformNotStartedException, TenantUpdateException;
+    Tenant updateTenant(long tenantId, TenantUpdateDescriptor udpateDescriptor) throws PlatformNotStartedException, UpdateException;
 
     /**
      * Search tenant under the given condition,including pagination,term,filter,sort.

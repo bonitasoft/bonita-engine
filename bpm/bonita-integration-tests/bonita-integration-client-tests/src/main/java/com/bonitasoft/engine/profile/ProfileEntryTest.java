@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -18,8 +20,6 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
-import com.bonitasoft.engine.exception.profile.ProfileEntryCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -99,7 +99,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
-    @Test(expected = ProfileEntryCreationException.class)
+    @Test(expected = CreationException.class)
     public void createProfileEntryWithWrongParameter() throws Exception {
         getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", null, adminProfileId, Long.valueOf(2), "link", null);
     }
@@ -242,7 +242,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
-    @Test(expected = ProfileEntryUpdateException.class)
+    @Test(expected = UpdateException.class)
     public void updateProfileEntryWithWrongParameter() throws Exception {
         final Map<String, Serializable> createdProfileEntry = getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", Long.valueOf(1),
                 adminProfileId, Long.valueOf(0), "folder", "MyPage");
@@ -255,7 +255,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Not Existing" }, story = "Execute profile command with not existing", jira = "ENGINE-548")
-    @Test(expected = ProfileEntryUpdateException.class)
+    @Test(expected = UpdateException.class)
     public void updateProfileEntryNotExisting() throws Exception {
         final ProfileEntryUpdateDescriptor updateDescriptor = new ProfileEntryUpdateDescriptor();
         updateDescriptor.type("link");

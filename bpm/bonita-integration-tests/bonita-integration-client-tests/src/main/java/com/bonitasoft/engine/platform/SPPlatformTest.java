@@ -19,6 +19,7 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.platform.PlatformLoginException;
 import org.bonitasoft.engine.exception.platform.PlatformLogoutException;
@@ -47,7 +48,6 @@ import com.bonitasoft.engine.exception.TenantActivationException;
 import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
-import com.bonitasoft.engine.exception.TenantUpdateException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -836,7 +836,7 @@ public class SPPlatformTest {
         platformAPI.deleteTenant(tenantId);
     }
 
-    @Test(expected = TenantUpdateException.class)
+    @Test(expected = UpdateException.class)
     public void updateTenantWithTenantUpdateException() throws Exception {
         // create tenant
         final long tenantId = platformAPI.createTenant("tenantName", "test update tenant", "testIconName", "testIconPath", "username", "123");

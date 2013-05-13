@@ -23,7 +23,9 @@ import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.ExportedProfile;
@@ -58,12 +60,8 @@ import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryInde
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor.ProfileEntryField;
 import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
-import com.bonitasoft.engine.exception.profile.ProfileCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryCreationException;
-import com.bonitasoft.engine.exception.profile.ProfileEntryUpdateException;
 import com.bonitasoft.engine.exception.profile.ProfileExportException;
 import com.bonitasoft.engine.exception.profile.ProfileImportException;
-import com.bonitasoft.engine.exception.profile.ProfileUpdateException;
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
@@ -89,7 +87,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public Map<String, Serializable> createProfile(final String profileName, final String profileDescription, final String profileIconPath)
-            throws ProfileCreationException {
+            throws CreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -109,7 +107,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             transactionExecutor.execute(addProfileTransaction);
             profile = addProfileTransaction.getResult();
         } catch (final SBonitaException e) {
-            throw new ProfileCreationException(e);
+            throw new CreationException(e);
         }
 
         return ProfileUtils.profileToMap(ModelConvertor.toProfile(profile));
@@ -331,11 +329,11 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Map<String, Serializable> updateProfile(final long id, final ProfileUpdateDescriptor updateDescriptor) throws ProfileUpdateException {
+    public Map<String, Serializable> updateProfile(final long id, final ProfileUpdateDescriptor updateDescriptor) throws UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
-            throw new ProfileUpdateException("The update descriptor does not contain field updates");
+            throw new UpdateException("The update descriptor does not contain field updates");
         }
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -349,7 +347,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             transactionExecutor.execute(updateProfile);
             profile = updateProfile.getResult();
         } catch (final SBonitaException e) {
-            throw new ProfileUpdateException(e);
+            throw new UpdateException(e);
         }
 
         return ProfileUtils.profileToMap(ModelConvertor.toProfile(profile));
@@ -357,11 +355,11 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public Map<String, Serializable> createProfileEntry(final String name, final String description, final Long parentId, final long profileId,
-            final Long index, final String type, final String page) throws ProfileEntryCreationException {
+            final Long index, final String type, final String page) throws CreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
-            throw new ProfileEntryCreationException("For a link, the page is mandatory.");
+            throw new CreationException("For a link, the page is mandatory.");
         }
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -391,14 +389,14 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             transactionExecutor.execute(addProfileEntryTransaction);
             profileEntry = addProfileEntryTransaction.getResult();
         } catch (final SBonitaException e) {
-            throw new ProfileEntryCreationException(e);
+            throw new CreationException(e);
         }
 
         final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, profileEntry);
         try {
             transactionExecutor.execute(updateProfileEntryIndexTransaction);
         } catch (final SBonitaException e) {
-            throw new ProfileEntryCreationException(e);
+            throw new CreationException(e);
         }
 
         return ProfileEntryUtils.profileEntryToMap(profileEntry);
@@ -436,7 +434,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Map<String, Serializable> updateProfileEntry(final long id, final ProfileEntryUpdateDescriptor updateDescriptor) throws ProfileEntryUpdateException {
+    public Map<String, Serializable> updateProfileEntry(final long id, final ProfileEntryUpdateDescriptor updateDescriptor) throws UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -451,7 +449,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             transactionExecutor.execute(updateProfileEntryTransaction);
             profileEntry = updateProfileEntryTransaction.getResult();
         } catch (final SBonitaException e) {
-            throw new ProfileEntryUpdateException(e);
+            throw new UpdateException(e);
         }
 
         final Map<ProfileEntryField, Serializable> fields = updateDescriptor.getFields();
@@ -460,7 +458,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             try {
                 transactionExecutor.execute(updateProfileEntryIndexTransaction);
             } catch (final SBonitaException e) {
-                throw new ProfileEntryUpdateException(e);
+                throw new UpdateException(e);
             }
         }
 
