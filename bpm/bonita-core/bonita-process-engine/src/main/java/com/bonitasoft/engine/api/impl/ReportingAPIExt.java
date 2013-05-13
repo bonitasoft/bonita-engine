@@ -15,6 +15,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
 import org.bonitasoft.engine.core.reporting.SReportNotFoundException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.reporting.Report;
@@ -26,7 +27,6 @@ import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReports;
-import com.bonitasoft.engine.reporting.ReportAlreadyExistsException;
 
 /**
  * @author Matthieu Chaffotte
@@ -34,7 +34,7 @@ import com.bonitasoft.engine.reporting.ReportAlreadyExistsException;
 public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
 
     @Override
-    public Report addReport(final String name, final String description, final byte[] content) throws ReportAlreadyExistsException, CreationException {
+    public Report addReport(final String name, final String description, final byte[] content) throws AlreadyExistsException, CreationException {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final AddReport addReport = new AddReport(tenantAccessor, name, description, content);
@@ -43,7 +43,7 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
             transactionExecutor.execute(addReport);
             return ModelConvertor.toReport(addReport.getResult());
         } catch (final SReportAlreadyExistsException sraee) {
-            throw new ReportAlreadyExistsException(sraee);
+            throw new AlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }

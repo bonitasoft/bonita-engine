@@ -10,6 +10,7 @@ package com.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -22,7 +23,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.exception.TenantActivationException;
-import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.platform.Tenant;
@@ -63,7 +63,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             since 6.0
      */
     long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String userName,
-            final String password) throws PlatformNotStartedException, CreationException, TenantAlreadyExistException;
+            final String password) throws PlatformNotStartedException, CreationException, AlreadyExistsException;
 
     /**
      * Delete a tenant.

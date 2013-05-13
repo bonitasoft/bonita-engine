@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -45,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.exception.TenantActivationException;
-import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 
@@ -368,7 +368,7 @@ public class SPPlatformTest {
 
     }
 
-    @Test(expected = TenantAlreadyExistException.class)
+    @Test(expected = AlreadyExistsException.class)
     public void createExistedTenant() throws BonitaException {
         final long tenantId = platformAPI.createTenant("tenantName", "it is a tenant", "testIconName", "testIconPath", "bole", "321");
         try {

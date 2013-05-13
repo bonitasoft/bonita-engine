@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.identity.UserAlreadyExistException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -193,7 +193,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
     }
 
     private User createUserByUsernameAndPassword(final String userName, final String firstName, final String lastName, final String password)
-            throws UserAlreadyExistException, CreationException {
+            throws AlreadyExistsException, CreationException {
         final UserBuilder userBuilder = new UserBuilder().createNewInstance(userName, password);
         userBuilder.setFirstName(firstName).setLastName(lastName);
         return getIdentityAPI().createUser(userBuilder.done(), null, null);

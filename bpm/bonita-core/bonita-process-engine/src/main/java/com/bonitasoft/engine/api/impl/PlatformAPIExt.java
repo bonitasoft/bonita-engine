@@ -39,6 +39,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -78,7 +79,6 @@ import com.bonitasoft.engine.api.impl.transaction.GetTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.exception.TenantActivationException;
-import com.bonitasoft.engine.exception.TenantAlreadyExistException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
 import com.bonitasoft.engine.platform.Tenant;
@@ -126,7 +126,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public final long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String username,
-            final String password) throws CreationException, PlatformNotStartedException, TenantAlreadyExistException {
+            final String password) throws CreationException, PlatformNotStartedException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
         TransactionExecutor transactionExecutor = null;
@@ -138,10 +138,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final GetTenantInstance transactionContent = new GetTenantInstance(tenantName, platformService);
             transactionExecutor.execute(transactionContent);
             final String message = "Tenant named \"" + tenantName + "\" already exists!";
-            throw new TenantAlreadyExistException(message);
+            throw new AlreadyExistsException(message);
         } catch (final STenantNotFoundException e) {
             // ok
-        } catch (final TenantAlreadyExistException e) {
+        } catch (final AlreadyExistsException e) {
             throw e;
         } catch (final Exception e) {
             log(platformAccessor, e, TechnicalLogSeverity.ERROR);

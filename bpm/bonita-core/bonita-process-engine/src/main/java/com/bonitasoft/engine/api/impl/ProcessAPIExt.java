@@ -90,6 +90,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
@@ -111,7 +112,6 @@ import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.exception.process.ArchivedProcessInstanceNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessDeployException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
@@ -1192,7 +1192,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, ProcessDefinitionAlreadyExistsException {
+    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException {
         final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
 
         if (processDefinition.getStringIndexValue(1) != null || processDefinition.getStringIndexLabel(1) != null
