@@ -8,7 +8,7 @@
   <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices">
     <property name="serverId" value="btm-bonita" />
     <property name="debugZeroResourceTransaction" value="false" />
-    <property name="defaultTransactionTimeout" value="300" /> <!-- lvaills : TO REMOVE -->
+    <!-- property name="defaultTransactionTimeout" value="300" /-->
   </bean>
 
   <!-- create BTM transaction manager -->
