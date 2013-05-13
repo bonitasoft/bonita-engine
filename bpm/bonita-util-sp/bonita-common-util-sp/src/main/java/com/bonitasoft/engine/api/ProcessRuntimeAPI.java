@@ -22,6 +22,7 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.activity.ActivityInterruptedException;
@@ -29,9 +30,9 @@ import org.bonitasoft.engine.exception.activity.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.activity.ArchivedActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceModificationException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 
@@ -443,8 +444,8 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *             parameter.
      * @since 6.0
      */
-    ProcessInstance updateProcessInstanceIndex(long processInstanceId, Index index, String value) throws ProcessInstanceNotFoundException,
-            ProcessInstanceModificationException, ProcessDefinitionNotFoundException;
+    ProcessInstance updateProcessInstanceIndex(long processInstanceId, Index index, String value) throws ProcessInstanceNotFoundException, UpdateException,
+            ProcessDefinitionNotFoundException;
 
     /**
      * Update an instance of process with the given processInstanceId.
@@ -466,6 +467,6 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @since 6.0
      */
     ProcessInstance updateProcessInstance(long processInstanceId, ProcessInstanceUpdateDescriptor updateDescriptor) throws ProcessInstanceNotFoundException,
-            ProcessInstanceModificationException, ProcessDefinitionNotFoundException;
+            UpdateException, ProcessDefinitionNotFoundException;
 
 }

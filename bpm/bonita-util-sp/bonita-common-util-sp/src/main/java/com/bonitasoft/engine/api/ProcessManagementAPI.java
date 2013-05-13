@@ -14,14 +14,15 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
-import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.activity.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.task.RetryTaskException;
 
@@ -233,7 +234,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityNotFoundException, RetryTaskException,
-            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException;
+            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, UpdateException;
 
     /**
      * Replay a task that was in failed state.
@@ -253,7 +254,6 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             When the activity can't be replayed because it's not in a good state, i.e. connectors in fail are present
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId) throws ObjectNotFoundException, ObjectReadException, ObjectModificationException,
-            ActivityExecutionFailedException;
+    void replayActivity(long activityInstanceId) throws ObjectNotFoundException, ObjectReadException, UpdateException, ActivityExecutionFailedException;
 
 }

@@ -97,10 +97,10 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.IllegalProcessStateException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectDeletionException;
-import org.bonitasoft.engine.exception.ObjectModificationException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
@@ -115,7 +115,6 @@ import org.bonitasoft.engine.exception.process.ProcessDefinitionAlreadyExistsExc
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessDeletionException;
 import org.bonitasoft.engine.exception.process.ProcessDeployException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceModificationException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceReadException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
@@ -693,14 +692,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId) throws ObjectNotFoundException, ObjectReadException, ObjectModificationException,
+    public void replayActivity(final long activityInstanceId) throws ObjectNotFoundException, ObjectReadException, UpdateException,
             ActivityExecutionFailedException {
         replayActivity(activityInstanceId, null);
     }
 
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ObjectNotFoundException,
-            ObjectReadException, ActivityExecutionFailedException, ObjectModificationException {
+            ObjectReadException, ActivityExecutionFailedException, UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -749,9 +748,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final SActivityInstanceNotFoundException e) {
                 throw new ObjectNotFoundException(e, ActivityInstance.class);
             } catch (final SFlowNodeModificationException e) {
-                throw new ObjectModificationException(e, ActivityInstance.class);
+                throw new UpdateException(e);
             } catch (final SConnectorInstanceModificationException e) {
-                throw new ObjectModificationException(e, ConnectorInstance.class);
+                throw new UpdateException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
@@ -1211,7 +1210,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance updateProcessInstanceIndex(final long processInstanceId, final Index index, final String value)
-            throws ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException {
+            throws ProcessInstanceNotFoundException, UpdateException, ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -1225,17 +1224,17 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SProcessInstanceNotFoundException spinfe) {
             throw new ProcessInstanceNotFoundException(spinfe);
         } catch (final SBonitaException sbe) {
-            throw new ProcessInstanceModificationException(sbe);
+            throw new UpdateException(sbe);
         } catch (final ProcessInstanceReadException pire) {
-            throw new ProcessInstanceModificationException(pire);
+            throw new UpdateException(pire);
         }
     }
 
     @Override
     public ProcessInstance updateProcessInstance(final long processInstanceId, final ProcessInstanceUpdateDescriptor updateDescriptor)
-            throws ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException {
+            throws ProcessInstanceNotFoundException, UpdateException, ProcessDefinitionNotFoundException {
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
-            throw new ProcessInstanceModificationException("The update descriptor does not contain field updates");
+            throw new UpdateException("The update descriptor does not contain field updates");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -1250,9 +1249,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SProcessInstanceNotFoundException spinfe) {
             throw new ProcessInstanceNotFoundException(spinfe);
         } catch (final SBonitaException sbe) {
-            throw new ProcessInstanceModificationException(sbe);
+            throw new UpdateException(sbe);
         } catch (final ProcessInstanceReadException pire) {
-            throw new ProcessInstanceModificationException(pire);
+            throw new UpdateException(pire);
         }
     }
 
