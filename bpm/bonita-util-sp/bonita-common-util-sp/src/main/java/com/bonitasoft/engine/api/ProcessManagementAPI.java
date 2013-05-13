@@ -15,8 +15,8 @@ import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
-import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.activity.ActivityNotFoundException;
@@ -143,7 +143,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     List<ConnectorInstance> getConnectorInstancesOfActivity(long activityInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
-            throws ObjectReadException, PageOutOfRangeException;
+            throws RetrieveException, PageOutOfRangeException;
 
     /**
      * Retrieve the list of connector instances on a process instance
@@ -159,7 +159,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     List<ConnectorInstance> getConnectorInstancesOfProcess(long processInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
-            throws ObjectReadException, PageOutOfRangeException;
+            throws RetrieveException, PageOutOfRangeException;
 
     /**
      * Allows to reset the state of an instance of connector
@@ -228,13 +228,13 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws RetryTaskException
      *             errors happened when one of the two step that re-set state of the task and execute it again failed.
      * @throws ActivityExecutionFailedException
-     * @throws ObjectReadException
+     * @throws RetrieveException
      * @throws ObjectNotFoundException
      * @throws ObjectModificationException
      * @since 6.0
      */
     void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityNotFoundException, RetryTaskException,
-            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, UpdateException;
+            ObjectNotFoundException, RetrieveException, ActivityExecutionFailedException, UpdateException;
 
     /**
      * Replay a task that was in failed state.
@@ -246,7 +246,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws InvalidSessionException
      * @throws ObjectNotFoundException
      *             When the activity does not exists
-     * @throws ObjectReadException
+     * @throws RetrieveException
      *             When the activity or connectors couldn't be read
      * @throws ObjectModificationException
      *             When the activity can't be modified
@@ -254,6 +254,6 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             When the activity can't be replayed because it's not in a good state, i.e. connectors in fail are present
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId) throws ObjectNotFoundException, ObjectReadException, UpdateException, ActivityExecutionFailedException;
+    void replayActivity(long activityInstanceId) throws ObjectNotFoundException, RetrieveException, UpdateException, ActivityExecutionFailedException;
 
 }

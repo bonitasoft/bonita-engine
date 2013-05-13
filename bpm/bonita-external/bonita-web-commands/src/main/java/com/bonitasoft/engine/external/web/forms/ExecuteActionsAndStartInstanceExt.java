@@ -38,12 +38,12 @@ import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotEnabledException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionReadException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -138,8 +138,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
     }
 
     private ProcessInstance startProcess(long userId, final long processDefinitionId, final Map<Operation, Map<String, Object>> operations)
-            throws ProcessDefinitionNotFoundException, CreationException, ProcessDefinitionReadException, ProcessDefinitionNotEnabledException,
-            OperationExecutionException {
+            throws ProcessDefinitionNotFoundException, CreationException, RetrieveException, ProcessDefinitionNotEnabledException, OperationExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -162,7 +161,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
-            throw new ProcessDefinitionReadException(e);
+            throw new RetrieveException(e);
         }
         SProcessInstance startedInstance;
         try {

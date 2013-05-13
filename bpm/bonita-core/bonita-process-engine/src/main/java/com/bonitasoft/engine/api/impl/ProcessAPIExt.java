@@ -98,8 +98,8 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.IllegalProcessStateException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ObjectNotFoundException;
-import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
@@ -115,7 +115,6 @@ import org.bonitasoft.engine.exception.process.ProcessDefinitionAlreadyExistsExc
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.process.ProcessDeployException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceReadException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
@@ -510,12 +509,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ConnectorInstance> getConnectorInstancesOfActivity(final long activityInstanceId, final int pageNumber, final int numberPerPage,
-            final ConnectorInstanceCriterion order) throws ObjectReadException, PageOutOfRangeException {
+            final ConnectorInstanceCriterion order) throws RetrieveException, PageOutOfRangeException {
         return getConnectorInstancesFor(activityInstanceId, pageNumber, numberPerPage, SConnectorInstance.FLOWNODE_TYPE, order);
     }
 
     private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int pageNumber, final int numberPerPage, final String flownodeType,
-            final ConnectorInstanceCriterion order) throws PageOutOfRangeException, ObjectReadException {
+            final ConnectorInstanceCriterion order) throws PageOutOfRangeException, RetrieveException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -590,18 +589,18 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         * numberPerPage, numberPerPage, fieldName, orderByType);
                 return ModelConvertor.toConnectorInstances(connectorInstances);
             } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e, ConnectorInstance.class);
+                throw new RetrieveException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new ObjectReadException(e, ConnectorInstance.class);
+            throw new RetrieveException(e);
         }
     }
 
     @Override
     public List<ConnectorInstance> getConnectorInstancesOfProcess(final long processInstanceId, final int pageNumber, final int numberPerPage,
-            final ConnectorInstanceCriterion order) throws ObjectReadException, PageOutOfRangeException {
+            final ConnectorInstanceCriterion order) throws RetrieveException, PageOutOfRangeException {
         return getConnectorInstancesFor(processInstanceId, pageNumber, numberPerPage, SConnectorInstance.PROCESS_TYPE, order);
     }
 
@@ -691,14 +690,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId) throws ObjectNotFoundException, ObjectReadException, UpdateException,
+    public void replayActivity(final long activityInstanceId) throws ObjectNotFoundException, RetrieveException, UpdateException,
             ActivityExecutionFailedException {
         replayActivity(activityInstanceId, null);
     }
 
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ObjectNotFoundException,
-            ObjectReadException, ActivityExecutionFailedException, UpdateException {
+            RetrieveException, ActivityExecutionFailedException, UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -741,9 +740,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     containerType = SFlowElementsContainerType.FLOWNODE.name();
                 }
             } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e, ConnectorInstance.class);
+                throw new RetrieveException(e);
             } catch (final SActivityReadException e) {
-                throw new ObjectReadException(e, ActivityInstance.class);
+                throw new RetrieveException(e);
             } catch (final SActivityInstanceNotFoundException e) {
                 throw new ObjectNotFoundException(e, ActivityInstance.class);
             } catch (final SFlowNodeModificationException e) {
@@ -754,12 +753,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new ObjectReadException(e, ActivityInstance.class);
+            throw new RetrieveException(e);
         }
         try {
             containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType, null);
         } catch (final SActivityReadException e) {
-            throw new ObjectReadException(e, ActivityInstance.class);
+            throw new RetrieveException(e);
         } catch (final SBonitaException e) {
             throw new ActivityExecutionFailedException(e);
         }
@@ -1224,8 +1223,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new ProcessInstanceNotFoundException(spinfe);
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
-        } catch (final ProcessInstanceReadException pire) {
-            throw new UpdateException(pire);
+        } catch (final RetrieveException re) {
+            throw new UpdateException(re);
         }
     }
 
@@ -1249,8 +1248,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new ProcessInstanceNotFoundException(spinfe);
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
-        } catch (final ProcessInstanceReadException pire) {
-            throw new UpdateException(pire);
+        } catch (final RetrieveException re) {
+            throw new UpdateException(re);
         }
     }
 
