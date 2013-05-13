@@ -16,6 +16,10 @@ package org.bonitasoft.engine.parameter.propertyfile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -23,7 +27,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.SOutOfBoundException;
 import org.bonitasoft.engine.parameter.SParameter;
@@ -38,6 +45,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -51,6 +59,10 @@ public class PropertyFileParameterServiceTest {
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
+
+    // here the mock will always return null when get is called: it's like the cache store nothing
+    @Mock
+    private CacheService cacheService;
 
     @InjectMocks
     private PropertyFileParameterService propertyFileParameterService;
@@ -155,10 +167,27 @@ public class PropertyFileParameterServiceTest {
         assertFalse(propertyFileParameterService.containsNullValues(PROCESS_DEFINITION_ID));
     }
 
+    @Test(expected = SParameterProcessNotFoundException.class)
+    public void testCacheThrowException() throws Exception {
+        doThrow(new CacheException("exception")).when(cacheService).store(anyString(), anyString(), Matchers.<Properties> any(Properties.class));
+        propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("aParam", "paramValue"));
+    }
+
     @Test
     public void testGetParameter() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("aParam", "paramValue"));
 
+        final SParameter sParameter = propertyFileParameterService.get(PROCESS_DEFINITION_ID, "aParam");
+        assertEquals("paramValue", sParameter.getValue());
+        verify(cacheService, atLeastOnce()).store(anyString(), anyString(), Matchers.<Properties> any(Properties.class));
+        verify(cacheService).get(anyString(), anyString());
+    }
+
+    @Test
+    public void testGetParameterWithCache() throws Exception {
+        final Properties properties = new Properties();
+        properties.put("aParam", "paramValue");
+        when(cacheService.get(anyString(), anyString())).thenReturn(properties);
         final SParameter sParameter = propertyFileParameterService.get(PROCESS_DEFINITION_ID, "aParam");
         assertEquals("paramValue", sParameter.getValue());
     }
@@ -167,7 +196,7 @@ public class PropertyFileParameterServiceTest {
     public void testGetUnexistingParameter() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("otherParam", "paramValue"));
 
-        final SParameter sParameter = propertyFileParameterService.get(PROCESS_DEFINITION_ID, "aParam");
+        propertyFileParameterService.get(PROCESS_DEFINITION_ID, "aParam");
     }
 
     @Test
