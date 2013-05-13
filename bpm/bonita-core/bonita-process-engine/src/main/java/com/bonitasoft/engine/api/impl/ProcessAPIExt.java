@@ -39,7 +39,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
@@ -97,8 +96,8 @@ import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.IllegalProcessStateException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -467,7 +466,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteManualUserTask(final long manualTaskId) throws DeletionException, ObjectNotFoundException {
+    public void deleteManualUserTask(final long manualTaskId) throws DeletionException, NotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
@@ -483,7 +482,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     throw new DeletionException("Can't delete a task that is not a manual task");
                 }
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new ObjectNotFoundException("can't find activity with id " + manualTaskId, e, ManualTaskInstance.class);
+                throw new NotFoundException("can't find activity with id " + manualTaskId, e);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
                 throw new DeletionException(e);
@@ -690,13 +689,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId) throws ObjectNotFoundException, RetrieveException, UpdateException,
-            ActivityExecutionFailedException {
+    public void replayActivity(final long activityInstanceId) throws NotFoundException, RetrieveException, UpdateException, ActivityExecutionFailedException {
         replayActivity(activityInstanceId, null);
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ObjectNotFoundException,
+    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws NotFoundException,
             RetrieveException, ActivityExecutionFailedException, UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -744,7 +742,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final SActivityReadException e) {
                 throw new RetrieveException(e);
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new ObjectNotFoundException(e, ActivityInstance.class);
+                throw new NotFoundException(e);
             } catch (final SFlowNodeModificationException e) {
                 throw new UpdateException(e);
             } catch (final SConnectorInstanceModificationException e) {

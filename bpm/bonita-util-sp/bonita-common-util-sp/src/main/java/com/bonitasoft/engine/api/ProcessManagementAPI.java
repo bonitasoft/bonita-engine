@@ -14,7 +14,7 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
-import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -234,7 +234,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @since 6.0
      */
     void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityNotFoundException, RetryTaskException,
-            ObjectNotFoundException, RetrieveException, ActivityExecutionFailedException, UpdateException;
+            NotFoundException, RetrieveException, ActivityExecutionFailedException, UpdateException;
 
     /**
      * Replay a task that was in failed state.
@@ -254,6 +254,6 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             When the activity can't be replayed because it's not in a good state, i.e. connectors in fail are present
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId) throws ObjectNotFoundException, RetrieveException, UpdateException, ActivityExecutionFailedException;
+    void replayActivity(long activityInstanceId) throws NotFoundException, RetrieveException, UpdateException, ActivityExecutionFailedException;
 
 }

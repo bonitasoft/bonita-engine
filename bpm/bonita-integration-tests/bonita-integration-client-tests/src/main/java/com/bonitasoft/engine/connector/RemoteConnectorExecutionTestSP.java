@@ -46,8 +46,8 @@ import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.DataNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
@@ -418,7 +418,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
     }
 
-    @Test(expected = ObjectNotFoundException.class)
+    @Test(expected = NotFoundException.class)
     public void testReplayUnknownActivity() throws Exception {
         getProcessAPI().replayActivity(-123456789l);
     }

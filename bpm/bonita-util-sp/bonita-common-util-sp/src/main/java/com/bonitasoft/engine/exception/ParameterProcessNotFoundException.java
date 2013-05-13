@@ -8,22 +8,21 @@
  *******************************************************************************/
 package com.bonitasoft.engine.exception;
 
-import org.bonitasoft.engine.bpm.model.ParameterDefinition;
-import org.bonitasoft.engine.exception.ObjectNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ParameterProcessNotFoundException extends ObjectNotFoundException {
+public class ParameterProcessNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -6743209754015668676L;
 
     public ParameterProcessNotFoundException(final String message) {
-        super(message, ParameterDefinition.class);
+        super(message);
     }
 
     public ParameterProcessNotFoundException(final Throwable cause) {
-        super(cause, ParameterDefinition.class);
+        super(cause);
     }
 
 }

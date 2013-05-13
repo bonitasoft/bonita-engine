@@ -20,8 +20,8 @@ import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.ObjectNotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
@@ -85,7 +85,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @throws ObjectNotFoundException
      *             if the manual task could not be found with the provided id
      */
-    void deleteManualUserTask(final long manualTaskId) throws DeletionException, ObjectNotFoundException;
+    void deleteManualUserTask(final long manualTaskId) throws DeletionException, NotFoundException;
 
     /**
      * Execute connector in given process instance initialized.
