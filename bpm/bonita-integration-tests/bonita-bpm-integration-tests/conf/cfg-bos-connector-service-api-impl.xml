@@ -8,6 +8,8 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="operationService" ref="operationService" />
+		<constructor-arg name="dependencyBuilderAccessor" ref="dependencyBuilderAccessor" />
+		<constructor-arg name="dependencyService" ref="dependencyService" />
 	</bean>
 	
 	<bean id="connectorInstanceService" class="org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImpl">

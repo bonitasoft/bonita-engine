@@ -8,20 +8,20 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.model.ActivationState;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.AutomaticTaskDefinitionBuilder;
@@ -57,18 +57,10 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.util.IOUtil;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Baptiste Mesta
@@ -1275,44 +1267,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals(connectorImplementationClassName3, connectorImplementation.getImplementationClassName());
 
         disableAndDelete(processDefinition);
-    }
-
-    private byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {
-        // generate byte arrays of .impl and .jar files
-        InputStream stream = null;
-        ByteArrayOutputStream baos = null;
-        ZipOutputStream zos = null;
-        try {
-            stream = BPMRemoteTests.class.getResourceAsStream(implSourceFile);
-            assertNotNull(stream);
-            final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf('/') + 1, implSourceFile.lastIndexOf('.'));
-            final byte[] byteArray = IOUtils.toByteArray(stream);
-            final byte[] data = IOUtil.generateJar(implClass);
-            // read bytes of files to zip file byte array
-            baos = new ByteArrayOutputStream();
-            zos = new ZipOutputStream(baos);
-            ZipEntry entry = new ZipEntry(baseName + ".impl");
-            entry.setSize(byteArray.length);
-            zos.putNextEntry(entry);
-            zos.write(byteArray);
-            zos.closeEntry();
-            entry = new ZipEntry(baseName + ".jar");
-            entry.setSize(data.length);
-            zos.putNextEntry(entry);
-            zos.write(data);
-            zos.closeEntry();
-            return baos.toByteArray();
-        } finally {
-            if (stream != null) {
-                stream.close();
-            }
-            if (zos != null) {
-                zos.close();
-            }
-            if (baos != null) {
-                baos.close();
-            }
-        }
     }
 
     private void waitForStep2AndCheckDataInstanceValue(final String exptectedValue, final String dataName, final ProcessInstance procInst) throws Exception,

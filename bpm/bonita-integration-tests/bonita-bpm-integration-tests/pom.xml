@@ -1069,7 +1069,7 @@
 						<bonita.file.filter>${bonita.file.filter}</bonita.file.filter>
 					</systemPropertyVariables>
 					<includes>
-						<include>org/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
+						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
 					</includes>
 				</configuration>
 			</plugin>

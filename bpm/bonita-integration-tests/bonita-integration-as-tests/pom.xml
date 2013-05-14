@@ -15,7 +15,7 @@
 	<properties>
 		<distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
 		<bonita.home>${project.build.directory}/bonita</bonita.home>
-		<bonita.home.classifier>hibernate</bonita.home.classifier>
+		<bonita.home.classifier>hibernate-teamwork</bonita.home.classifier>
 		<bonita.version></bonita.version>
 		<!-- TESTS DIRS -->
 		<test.class>com.bonitasoft.engine.BPMSPTestsForServers</test.class>

@@ -8,11 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
@@ -33,8 +38,6 @@ import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Baptiste Mesta
@@ -180,6 +183,44 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         addMappingOfActorsForUser(delivery, userId, processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
+    }
+
+    protected byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {
+        // generate byte arrays of .impl and .jar files
+        InputStream stream = null;
+        ByteArrayOutputStream baos = null;
+        ZipOutputStream zos = null;
+        try {
+            stream = BPMRemoteTests.class.getResourceAsStream(implSourceFile);
+            assertNotNull(stream);
+            final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf('/') + 1, implSourceFile.lastIndexOf('.'));
+            final byte[] byteArray = IOUtils.toByteArray(stream);
+            final byte[] data = IOUtil.generateJar(implClass);
+            // read bytes of files to zip file byte array
+            baos = new ByteArrayOutputStream();
+            zos = new ZipOutputStream(baos);
+            ZipEntry entry = new ZipEntry(baseName + ".impl");
+            entry.setSize(byteArray.length);
+            zos.putNextEntry(entry);
+            zos.write(byteArray);
+            zos.closeEntry();
+            entry = new ZipEntry(baseName + ".jar");
+            entry.setSize(data.length);
+            zos.putNextEntry(entry);
+            zos.write(data);
+            zos.closeEntry();
+            return baos.toByteArray();
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+            if (zos != null) {
+                zos.close();
+            }
+            if (baos != null) {
+                baos.close();
+            }
+        }
     }
 
 }

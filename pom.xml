@@ -127,6 +127,7 @@
 								<include>com.bonitasoft.engine.*</include>
 							</includes>
  							<destFile>${jacoco.file}</destFile>
+							<append>true</append>
 						</configuration>
 						<executions>
 							<execution>

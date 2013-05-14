@@ -24,13 +24,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.ActorMappingExportException;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
-import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
@@ -87,8 +85,6 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
-import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -144,7 +140,6 @@ import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
-import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
@@ -266,18 +261,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SParameterProcessNotFoundException e) {
             throw new InvalidParameterValueException(e);
         }
-    }
-
-    @Override
-    protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sDefinition, final long tenantId) throws BonitaHomeNotSetException,
-            IOException {
-        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-        final File file = new File(processesFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        final File processFolder = new File(file, String.valueOf(sDefinition.getId()));
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
     }
 
     private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
@@ -640,44 +623,16 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
-        final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
         final long tenantId = tenantAccessor.getTenantId();
         try {
             boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
-                // reload dependencies
-                dependencyService.deleteDependencies(processDefinitionId, "process");
-
-                transactionExecutor.completeTransaction(txOpened);
-                // reopen a new transaction: avoid primary key unique constraint violation
-                txOpened = transactionExecutor.openTransaction();
-
-                final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
-                final File file = new File(processFolder, "classpath");
-                if (file.exists() && file.isDirectory()) {
-                    final File[] listFiles = file.listFiles();
-                    for (final File jarFile : listFiles) {
-                        final String name = jarFile.getName();
-                        final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
-                        final AddSDependency addSDependency = new AddSDependency(dependencyService, dependencyBuilderAccessor,
-                                processDefinitionId + "_" + name, jarContent, processDefinitionId, "process");
-                        addSDependency.execute();
-                    }
-                }
-
             } catch (final SInvalidConnectorImplementationException e) {
                 throw new InvalidConnectorImplementationException(e);
             } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorException(e);
-            } catch (final IOException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorException(e);
-            } catch (final BonitaHomeNotSetException e) {
                 transactionExecutor.setTransactionRollback();
                 throw new ConnectorException(e);
             } finally {

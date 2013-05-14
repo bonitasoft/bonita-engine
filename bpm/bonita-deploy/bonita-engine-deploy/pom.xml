@@ -77,8 +77,8 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly.xml</descriptor>
-								<descriptor>assembly-hibernate.xml</descriptor>
+								<descriptor>assembly-mybatis-performance.xml</descriptor>
+								<descriptor>assembly-hibernate-teamwork.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>
