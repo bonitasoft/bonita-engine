@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -45,7 +44,6 @@ import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
@@ -58,6 +56,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ProcessAPI;
 
 import static org.junit.Assert.assertEquals;
@@ -69,7 +68,7 @@ import static org.junit.Assert.assertTrue;
  * @author Celine Souchet
  * @author Elias Ricken de Medeiros
  */
-public class ActivityCommandExtTest extends CommonAPITest {
+public class ActivityCommandExtTest extends CommonAPISPTest {
 
     private static final String OPERATIONS_MAP_KEY = "OPERATIONS_MAP_KEY";
 
@@ -94,8 +93,6 @@ public class ActivityCommandExtTest extends CommonAPITest {
     private final String dataName3 = "var3";
 
     private final String intDataName = "intVar";
-
-    private final String inputName = "input1";
 
     private final String delivery = "Delivery men";
 
@@ -459,15 +456,6 @@ public class ActivityCommandExtTest extends CommonAPITest {
             list.add(keyIt.next());
         }
         return list;
-    }
-
-    private Operation buildIntegerOperation(final String dataInstanceName, final int newConstantValue) throws InvalidExpressionException {
-        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final Expression expression = new ExpressionBuilder().createConstantIntegerExpression(newConstantValue);
-        final Operation operation;
-        operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
-                .setRightOperand(expression).done();
-        return operation;
     }
 
     private Operation createOperation(final String dataName, final OperatorType operatorType, final String operator, final Expression rightOperand) {

@@ -67,11 +67,6 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         login();
     }
 
-    private void logoutThenlogin() throws BonitaException {
-        logout();
-        login();
-    }
-
     private void logoutThenloginAs(final String userName, final String password, final long tenantId) throws BonitaException {
         logout();
         loginWith(userName, password, tenantId);
