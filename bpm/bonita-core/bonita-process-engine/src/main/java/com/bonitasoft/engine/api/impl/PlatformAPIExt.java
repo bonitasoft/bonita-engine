@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -75,7 +74,6 @@ import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
-import com.bonitasoft.engine.api.impl.transaction.GetTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.exception.TenantActivationException;
@@ -382,29 +380,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new TenantDeactivationException("Tenant deactivation failed.", e);
         } finally {
             cleanSessionAccessor(sessionAccessor);
-        }
-    }
-
-    @Override
-    public List<Tenant> getTenants(final int pageIndex, final int numberPerPage) throws PlatformNotStartedException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        if (!isPlatformStarted(platformAccessor)) {
-            throw new PlatformNotStartedException();
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContentWithResult<List<STenant>> transactionContent = new GetTenants(platformService);
-        try {
-            transactionExecutor.execute(transactionContent);
-            final List<STenant> sTenants = transactionContent.getResult();
-            return SPModelConvertor.toTenants(sTenants);
-        } catch (final Exception e) {
-            return Collections.emptyList();
         }
     }
 

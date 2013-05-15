@@ -118,23 +118,6 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
 
     /**
      * Get a list of tenants.
-     * If no tenants existed, return empty.
-     * 
-     * @param pageIndex
-     *            Index of the page to be returned. First page has index 0.
-     * @param numberPerPage
-     *            Number of result per page. Maximum number of result returned.
-     * @return the list of Tenant objects
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
-     *             since 6.0
-     */
-    List<Tenant> getTenants(final int pageIndex, final int numberPerPage) throws PlatformNotStartedException;
-
-    /**
-     * Get a list of tenants.
      * 
      * @param pageIndex
      *            the starting point, the first page is 1

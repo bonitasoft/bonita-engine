@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertNull;
+
 import java.util.List;
 
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -17,12 +19,13 @@ import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.platform.LoginException;
-import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.ClientEventUtil;
@@ -35,8 +38,6 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotActivatedException;
 import com.bonitasoft.engine.platform.Tenant;
-
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -76,10 +77,10 @@ public class SPBPMTestUtil {
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         List<Tenant> tenants = null;
         try {
-            tenants = platformAPI.getTenants(0, 1000);
-        } catch (final PlatformNotStartedException pnse) {
+            tenants = platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getResult();
+        } catch (final SearchException e) {
             platformAPI.startNode();
-            tenants = platformAPI.getTenants(0, 1000);
+            tenants = platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getResult();
         }
         for (final Tenant tenant : tenants) {
             try {

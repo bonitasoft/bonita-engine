@@ -8,6 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +23,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -48,11 +54,6 @@ import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.exception.TenantActivationException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class SPPlatformTest {
 
@@ -131,7 +132,7 @@ public class SPPlatformTest {
     public void useAnAPIWithInvalidSession() throws Exception {
         try {
             platformLoginAPI.logout(session);
-            platformAPI.getTenants(0, 1000);
+            platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done());
             fail();
         } finally {
             logAsPlatformAdmin();
@@ -382,7 +383,7 @@ public class SPPlatformTest {
     public void getTenantByName() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
 
-        assertEquals(2, platformAPI.getTenants(0, 1000).size());
+        assertEquals(2, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
         final Tenant tenant = platformAPI.getTenantByName("TENANT_1");
 
         assertEquals("TENANT_1", tenant.getName());
@@ -412,7 +413,7 @@ public class SPPlatformTest {
     public void getTenantById() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
 
-        assertEquals(1, platformAPI.getTenants(0, 1000).size());
+        assertEquals(1, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
         final Tenant tenant = platformAPI.getTenantById(tenantId);
 
         assertEquals(DEFAULT_TENANT_NAME, tenant.getName());
@@ -474,11 +475,11 @@ public class SPPlatformTest {
         final long tenantA = platformAPI.createTenant(tenantNameA, "", "testIconName", "testIconPath", "nameA", "passwordA");
         final long tenantB = platformAPI.createTenant(tenantNameB, "", "testIconName", "testIconPath", "nameB", "passwordB");
 
-        final List<Tenant> tenantsA = platformAPI.getTenants(0, 1000);
+        final List<Tenant> tenantsA = platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getResult();
         assertEquals(2, tenantsA.size());
         platformAPI.deleteTenant(tenantA);
 
-        final List<Tenant> tenantsB = platformAPI.getTenants(0, 1000);
+        final List<Tenant> tenantsB = platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getResult();
         assertEquals(1, tenantsB.size());
         platformAPI.deleteTenant(tenantB);
     }
@@ -648,8 +649,8 @@ public class SPPlatformTest {
         final long tenant3Id = platformAPI.createTenant("test3", "test", "testIconName", "testIconPath", "tenant_test3", "tenant_test_password");
         final long tenant4Id = platformAPI.createTenant("test4", "test", "testIconName", "testIconPath", "tenant_test4", "tenant_test_password");
         final long tenant5Id = platformAPI.createTenant("test5", "test", "testIconName", "testIconPath", "tenant_test5", "tenant_test_password");
-        assertNotNull(platformAPI.getTenants(0, 1000));
-        assertEquals(5, platformAPI.getTenants(0, 1000).size());
+        assertNotNull(platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()));
+        assertEquals(5, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
         try {
             platformAPI.getTenants(3, 2, TenantCriterion.NAME_ASC);
         } finally {
@@ -663,9 +664,9 @@ public class SPPlatformTest {
 
     @Test
     public void getAllTenants() throws BonitaException {
-        assertEquals(0, platformAPI.getTenants(0, 1000).size());
+        assertEquals(0, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
         final long tenantId = createATenant("TENANT_1");
-        assertEquals(1, platformAPI.getTenants(0, 1000).size());
+        assertEquals(1, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
         deleteATenant(tenantId);
     }
 
@@ -687,9 +688,9 @@ public class SPPlatformTest {
         try {
             platformAPI.stopNode();
             try {
-                platformAPI.getTenants(0, 1000);
+                platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done());
                 fail();
-            } catch (final PlatformNotStartedException e) {
+            } catch (final SearchException e) {
             }
             try {
                 platformAPI.getTenantById(1l);
