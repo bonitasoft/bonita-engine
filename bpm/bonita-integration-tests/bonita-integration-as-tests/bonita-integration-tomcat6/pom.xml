@@ -15,12 +15,12 @@
     <properties>
         <server.port>8383</server.port>
         <provider.port>8123</provider.port>
-        <tomcat.version>6.0.36</tomcat.version>
+        <tomcat.version>6.0.35</tomcat.version>
         <tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
         <tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
         <tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
         <tomcat.deploy.dir>${tomcat.home}/webapps</tomcat.deploy.dir>
-        <tomcat.url>http://apache.crihan.fr/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
         <tomcat.zip.folder>${user.home}</tomcat.zip.folder>
         <bonita.home>${tomcat.home}/bonita</bonita.home>
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
