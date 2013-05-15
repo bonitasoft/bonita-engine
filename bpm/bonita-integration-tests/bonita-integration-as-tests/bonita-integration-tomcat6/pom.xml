@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
     <parent>
         <artifactId>bonita-integration-as-tests</artifactId>
@@ -52,13 +52,20 @@
                                     </then>
                                 </if>
                                 <unzip dest="${project.build.directory}" src="${tomcat.zip.folder}/${tomcat.name}.zip" />
-                                <replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
-                                <replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
-                                <replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
-                                <!-- override global context XML file in order to declare the datasources -->
-                                <copy tofile="${tomcat.conf.dir}/context.xml" file="tomcat/conf/context.xml" />
+                                <!-- override global context XML file in order to declare the datasources and the Transaction Manager -->
+                                <copy todir="${tomcat.conf.dir}">
+                                	<fileset dir="tomcat/conf"/>
+                                </copy>
+
+								<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
+								<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
+								<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
+
                                 <copy todir="${tomcat.home}/lib">
                                     <fileset dir="target/driver">
+                                        <include name="*jar"/>
+                                    </fileset>
+                                    <fileset dir="target/tx-manager">
                                         <include name="*jar"/>
                                     </fileset>
                                 </copy>
@@ -137,14 +144,19 @@
                 </executions>
                 <configuration>
                     <container>
-                        <containerId>tomcat6x</containerId>
-                        <home>${tomcat.home}</home>
-                        <systemProperties>
-                            <bonita.home>${bonita.home}</bonita.home>
-                            <file.encoding>${project.build.sourceEncoding}</file.encoding>
-                            <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
-                        </systemProperties>
-                    </container>
+            <containerId>tomcat6x</containerId>
+            <home>${tomcat.home}</home>
+            <systemProperties>
+              <bonita.home>${bonita.home}</bonita.home>
+              <file.encoding>${project.build.sourceEncoding}</file.encoding>
+              <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+
+              <sysprop.bonita.db.vendor>mysql</sysprop.bonita.db.vendor>
+                            <!-- Bitronix properties -->
+                            <btm.root>${tomcat.home}</btm.root>
+                            <bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties</bitronix.tm.configuration>
+            </systemProperties>
+          </container>
                     <configuration>
                         <type>existing</type>
                         <home>${tomcat.home}</home>

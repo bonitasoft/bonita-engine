@@ -11,17 +11,6 @@
 		</property>
 	</bean>
 
-
-  <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName" value="java:comp/UserTransaction" /> <!-- TODO : make it configurable -->
-  </bean>
-  
- <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl">
-    <constructor-arg name="logger" ref="technicalLoggerService" />
-    <constructor-arg name="txManager" ref="transactionManager" />
-    <constructor-arg name="eventService" ref="eventService" />
-	</bean>
-
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -70,11 +59,6 @@
         		<bean class="org.bonitasoft.engine.restart.RestartProcessHandler" />
         	</list>
         </property>
-<!--         <property name="jobsToRegister" > -->
-<!--         	<list> -->
-<!--         		<ref bean="deleteRegister"></ref> -->
-<!--         	</list> -->
-<!--         </property> -->
 	</bean>
 
 </beans>
