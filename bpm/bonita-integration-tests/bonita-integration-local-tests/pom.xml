@@ -73,6 +73,14 @@
 			<version>0.7.1.RELEASE</version>
 		</dependency>
 		
+		
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+		
 		<dependency>
       <groupId>org.codehaus.btm</groupId>
       <artifactId>btm</artifactId>
