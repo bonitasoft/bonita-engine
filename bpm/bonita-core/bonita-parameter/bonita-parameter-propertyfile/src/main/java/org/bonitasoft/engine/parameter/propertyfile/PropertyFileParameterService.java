@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.PropertiesManager;
@@ -42,10 +44,15 @@ public class PropertyFileParameterService implements ParameterService {
 
     private static final String NULL = "-==NULLL==-";
 
+    private static final String CACHE_NAME = "parameters";
+
     private final ReadSessionAccessor sessionAccessor;
 
-    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor) {
+    private final CacheService cacheService;
+
+    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor, final CacheService cacheService) {
         this.sessionAccessor = sessionAccessor;
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -53,7 +60,7 @@ public class PropertyFileParameterService implements ParameterService {
             SParameterNameNotFoundException {
         try {
             final String filePath = getFilePath(processDefinitionId);
-            final Properties properties = PropertiesManager.getProperties(filePath);
+            final Properties properties = getProperties(filePath);
             if (!properties.containsKey(parameterName)) {
                 throw new SParameterNameNotFoundException("The parameter name " + parameterName + " does not exist");
             }
@@ -64,6 +71,8 @@ public class PropertyFileParameterService implements ParameterService {
         } catch (final IOException e) {
             throw new SParameterProcessNotFoundException(e);
         } catch (final TenantIdNotSetException e) {
+            throw new SParameterProcessNotFoundException(e);
+        } catch (final CacheException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
@@ -81,14 +90,21 @@ public class PropertyFileParameterService implements ParameterService {
             }
             final File file = new File(filePath);
             file.createNewFile();
-            PropertiesManager.saveProperties(properties, file);
+            saveProperties(properties, file.getAbsolutePath());
         } catch (final BonitaHomeNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
         } catch (final IOException e) {
             throw new SParameterProcessNotFoundException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
+        } catch (final CacheException e) {
+            throw new SParameterProcessNotFoundException(e);
         }
+    }
+
+    private void saveProperties(final Properties properties, final String filePath) throws IOException, CacheException {
+        cacheService.store(CACHE_NAME, filePath, properties);
+        PropertiesManager.saveProperties(properties, filePath);
     }
 
     @Override
@@ -136,8 +152,8 @@ public class PropertyFileParameterService implements ParameterService {
         return pathBuilder.toString();
     }
 
-    private List<SParameter> getListProperties(final String fileName, final boolean onlyNulls) throws IOException {
-        final Properties properties = PropertiesManager.getProperties(fileName);
+    private List<SParameter> getListProperties(final String fileName, final boolean onlyNulls) throws IOException, CacheException {
+        final Properties properties = getProperties(fileName);
         final List<SParameter> paramters = new ArrayList<SParameter>();
         for (final Entry<Object, Object> property : properties.entrySet()) {
             String value = (String) property.getValue();
@@ -153,7 +169,7 @@ public class PropertyFileParameterService implements ParameterService {
         return paramters;
     }
 
-    private List<SParameter> getOrderedParameters(final String filePath, final OrderBy order, final boolean onlyNulls) throws IOException {
+    private List<SParameter> getOrderedParameters(final String filePath, final OrderBy order, final boolean onlyNulls) throws IOException, CacheException {
         final Comparator<SParameter> sorting;
         switch (order) {
             case NAME_DESC:
@@ -169,10 +185,10 @@ public class PropertyFileParameterService implements ParameterService {
         return sortedList;
     }
 
-    private synchronized void putProperty(final String fileName, final String key, final String value) throws IOException {
-        final Properties properties = PropertiesManager.getProperties(fileName);
+    private synchronized void putProperty(final String filePath, final String key, final String value) throws IOException, CacheException {
+        final Properties properties = getProperties(filePath);
         properties.put(key, value);
-        PropertiesManager.saveProperties(properties, fileName);
+        saveProperties(properties, filePath);
     }
 
     @Override
@@ -180,7 +196,7 @@ public class PropertyFileParameterService implements ParameterService {
         String filePath;
         try {
             filePath = getFilePath(processDefinitionId);
-            final Properties properties = PropertiesManager.getProperties(filePath);
+            final Properties properties = getProperties(filePath);
             final Collection<Object> values = properties.values();
             final Iterator<Object> iterator = values.iterator();
             boolean contains = false;
@@ -197,6 +213,8 @@ public class PropertyFileParameterService implements ParameterService {
             throw new SParameterProcessNotFoundException(e);
         } catch (final IOException e) {
             throw new SParameterProcessNotFoundException(e);
+        } catch (final CacheException e) {
+            throw new SParameterProcessNotFoundException(e);
         }
     }
 
@@ -205,7 +223,7 @@ public class PropertyFileParameterService implements ParameterService {
             SParameterProcessNotFoundException {
         try {
             final String filePath = getFilePath(processDefinitionId);
-            final Properties properties = PropertiesManager.getProperties(filePath);
+            final Properties properties = getProperties(filePath);
             final String property = properties.getProperty(parameterName);
             if (property == null) {
                 throw new SParameterProcessNotFoundException(parameterName);
@@ -220,7 +238,22 @@ public class PropertyFileParameterService implements ParameterService {
             throw new SParameterProcessNotFoundException(e);
         } catch (final IOException e) {
             throw new SParameterProcessNotFoundException(e);
+        } catch (final CacheException e) {
+            throw new SParameterProcessNotFoundException(e);
         }
+    }
+
+    private Properties getProperties(final String filePath) throws IOException, CacheException {
+        final Object object = cacheService.get(CACHE_NAME, filePath);
+        Properties properties;
+        if (object != null) {
+            properties = (Properties) object;
+        } else {
+            properties = PropertiesManager.getProperties(filePath);
+            cacheService.store(CACHE_NAME, filePath, properties);
+        }
+        return properties;
+
     }
 
     @Override
@@ -257,6 +290,8 @@ public class PropertyFileParameterService implements ParameterService {
         } catch (final TenantIdNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
         } catch (final IOException e) {
+            throw new SParameterProcessNotFoundException(e);
+        } catch (final CacheException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }

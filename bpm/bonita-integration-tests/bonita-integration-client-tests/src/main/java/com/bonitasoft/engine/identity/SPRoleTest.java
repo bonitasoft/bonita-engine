@@ -8,12 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.identity;
 
-import static org.junit.Assert.assertEquals;
-
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleBuilder;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +19,8 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+
+import static org.junit.Assert.assertEquals;
 
 public class SPRoleTest extends CommonAPISPTest {
 
@@ -43,13 +42,11 @@ public class SPRoleTest extends CommonAPISPTest {
         final long tenantId1 = SPBPMTestUtil.constructTenant("tenant1", "iconName", "iconPath", "install", "install");
         final APISession session1 = SPBPMTestUtil.loginTenant(tenantId1);
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
-        final RoleBuilder roleBuilder1 = new RoleBuilder().createNewInstance(role);
-        final Role role1 = identityAPI1.createRole(roleBuilder1.done());
+        final Role role1 = identityAPI1.createRole(role);
 
         final APISession session2 = SPBPMTestUtil.loginDefaultTenant();
         final IdentityAPI identityAPI2 = TenantAPIAccessor.getIdentityAPI(session2);
-        final RoleBuilder roleBuilder2 = new RoleBuilder().createNewInstance(role);
-        final Role role2 = identityAPI2.createRole(roleBuilder2.done());
+        final Role role2 = identityAPI2.createRole(role);
 
         assertEquals(role, role1.getName());
         assertEquals(role1.getName(), role2.getName());

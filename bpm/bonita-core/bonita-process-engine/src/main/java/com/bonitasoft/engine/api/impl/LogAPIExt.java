@@ -19,7 +19,6 @@ import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
@@ -50,23 +49,23 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
  */
 public class LogAPIExt implements LogAPI {
 
-    private static TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
+    private static TenantServiceAccessor getTenantAccessor() {
         SessionAccessor sessionAccessor = null;
         try {
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         } catch (final Exception e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
         try {
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
         } catch (final TenantIdNotSetException e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
     }
 
     @Override
-    public Log getLog(final long logId) throws InvalidSessionException, LogNotFoundException {
+    public Log getLog(final long logId) throws LogNotFoundException {
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final QueriableLoggerService loggerService = getTenantAccessor().getQueriableLoggerService();
         try {
@@ -91,7 +90,7 @@ public class LogAPIExt implements LogAPI {
     }
 
     @Override
-    public int getNumberOfLogs() throws InvalidSessionException {
+    public int getNumberOfLogs() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -106,8 +105,7 @@ public class LogAPIExt implements LogAPI {
     }
 
     @Override
-    public List<Log> getLogs(final int pageIndex, final int numberPerPage, final LogCriterion pagingCriterion) throws PageOutOfRangeException,
-            InvalidSessionException {
+    public List<Log> getLogs(final int pageIndex, final int numberPerPage, final LogCriterion pagingCriterion) throws PageOutOfRangeException {
         final int totalNumber = getNumberOfLogs();
         PageIndexCheckingUtil.checkIfPageIsOutOfRange(totalNumber, pageIndex, numberPerPage);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -160,7 +158,7 @@ public class LogAPIExt implements LogAPI {
     }
 
     @Override
-    public SearchResult<Log> searchLogs(final SearchOptions searchOptions) throws InvalidSessionException {
+    public SearchResult<Log> searchLogs(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();

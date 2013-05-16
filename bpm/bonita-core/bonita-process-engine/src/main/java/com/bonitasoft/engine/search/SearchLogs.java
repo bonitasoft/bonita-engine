@@ -10,9 +10,9 @@ package com.bonitasoft.engine.search;
 
 import java.util.List;
 
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 

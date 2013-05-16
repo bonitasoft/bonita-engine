@@ -9,7 +9,7 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -21,13 +21,13 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
  */
 public class CommandAPIExt extends CommandAPIImpl {
 
-    protected static TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
+    protected static TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
         } catch (final Exception e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
     }
 

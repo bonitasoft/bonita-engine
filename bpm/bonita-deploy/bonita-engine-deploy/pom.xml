@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-deploy</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.0.0-beta-024-SNAPSHOT</version>
+		<version>6.0.0-beta-026-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-engine-deploy</artifactId>
@@ -77,8 +77,8 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly.xml</descriptor>
-								<descriptor>assembly-hibernate.xml</descriptor>
+								<descriptor>assembly-mybatis-performance.xml</descriptor>
+								<descriptor>assembly-hibernate-teamwork.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>

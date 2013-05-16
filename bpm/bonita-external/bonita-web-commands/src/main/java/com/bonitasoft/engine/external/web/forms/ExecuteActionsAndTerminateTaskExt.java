@@ -9,28 +9,31 @@
 package com.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
+import org.bonitasoft.engine.bpm.model.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.core.connector.ConnectorResult;
+import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.Operation;
+import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -49,11 +52,12 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final Map<Operation, Map<String, Object>> operationsMap = getOperations(parameters);
+        final List<Operation> operationsList = getOperations(parameters);
+        final Map<String, Serializable> operationsContext = getOperationsContext(parameters);
         final long sActivityInstanceID = getActivityInstanceId(parameters);
 
-        final String message = "Mandatory parameter " + CONNECTORS_MAP_KEY + " is missing or not convertible to Map.";
-        final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap = getParameter(parameters, CONNECTORS_MAP_KEY, message);
+        final String message = "Mandatory parameter " + CONNECTORS_LIST_KEY + " is missing or not convertible to List.";
+        final List<ConnectorDefinitionWithInputValues> connectorsList = getParameter(parameters, CONNECTORS_LIST_KEY, message);
 
         try {
             // get the classloader of process
@@ -67,18 +71,17 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
                 processDefinitionID = flowNodeInstance.getLogicalGroup(0);
                 processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
+                // set the classloader and update activity instance variable
+                final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+                try {
+                    Thread.currentThread().setContextClassLoader(processClassloader);
+                    executeConnectors(sActivityInstanceID, processDefinitionID, connectorsList);
+                    updateActivityInstanceVariables(operationsList, operationsContext, sActivityInstanceID, processDefinitionID);
+                } finally {
+                    Thread.currentThread().setContextClassLoader(contextClassLoader);
+                }
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
-            }
-            // set the classloader and update activity instance variable
-            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            try {
-                Thread.currentThread().setContextClassLoader(processClassloader);
-                final Map<Operation, Map<String, Object>> connectorOutputs = executeConnectors(sActivityInstanceID, connectorsMap);
-                operationsMap.putAll(connectorOutputs);
-                updateActivityInstanceVariables(operationsMap, sActivityInstanceID, processDefinitionID);
-            } finally {
-                Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
             executeActivity(sActivityInstanceID);
         } catch (final BonitaException e) {
@@ -93,47 +96,39 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         return null;
     }
 
-    private Map<Operation, Map<String, Object>> executeConnectors(final long sActivityInstanceID,
-            final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws InvalidSessionException,
-            ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException {
-        if (connectorsMap == null) {
-            return Collections.emptyMap();
-        } else {
-            final Map<Operation, Map<String, Object>> operations = new HashMap<Operation, Map<String, Object>>(connectorsMap.size());
-            for (final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry : connectorsMap.entrySet()) {
-                final ConnectorDefinition connectorDefinition = entry.getKey();
-                final Map<String, Map<String, Serializable>> contextMap = entry.getValue();
-                final Map<String, Object> resultMap = executeConnectorOnActivityInstance(connectorDefinition.getConnectorId(),
-                        connectorDefinition.getVersion(), connectorDefinition.getInputs(), contextMap, sActivityInstanceID);
-                for (final Operation operation : connectorDefinition.getOutputs()) {
-                    operations.put(operation, resultMap);
-                }
-            }
-            return operations;
+    private void executeConnectors(final long sActivityInstanceID, final long processDefinitionID, final List<ConnectorDefinitionWithInputValues> connectors)
+            throws ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorConditionException, NotSerializableException, SBonitaException {
+        if (connectors == null) {
+            return;
         }
-    }
-
-    private Map<String, Object> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException {
-        final String containerType = "ACTIVITY_INSTANCE";
-        if (connectorInputParameters.size() == inputValues.size()) {
+        for (final ConnectorDefinitionWithInputValues connectorWithInputValues : connectors) {
+            final ConnectorDefinition connectorDefinition = connectorWithInputValues.getConnectorDefinition();
+            final Map<String, Map<String, Serializable>> contextMap = connectorWithInputValues.getInputValues();
+            final Map<String, Expression> connectorInputParameters = connectorDefinition.getInputs();
+            if (connectorInputParameters.size() != contextMap.size()) {
+                throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), contextMap.size());
+            }
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            final long processDefinitionId = getProcessInstance(tenantAccessor, getActivityInstance(tenantAccessor, activityInstanceId).getRootContainerId())
+            final long processDefinitionId = getProcessInstance(tenantAccessor, getActivityInstance(tenantAccessor, sActivityInstanceID).getRootContainerId())
                     .getProcessDefinitionId();
-            final ClassLoader clazzLoader = getLocalClassLoader(tenantAccessor, processDefinitionId);
             final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final String connectorDefinitionId = connectorDefinition.getConnectorId();
+            final ConnectorService connectorService = tenantAccessor.getConnectorService();
             final SExpressionContext expcontext = new SExpressionContext();
-            expcontext.setContainerId(activityInstanceId);
-            expcontext.setContainerType(containerType);
-            expcontext.setProcessDefinitionId(processDefinitionId);
-            return executeConnector(tenantAccessor, processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, connectorsExps, inputValues,
-                    clazzLoader, expcontext);
-        } else {
-            throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), inputValues.size());
+            expcontext.setContainerId(sActivityInstanceID);
+            expcontext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
+            expcontext.setProcessDefinitionId(processDefinitionID);
+            final ConnectorResult result = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                    connectorDefinition.getVersion(), connectorsExps, contextMap, Thread.currentThread().getContextClassLoader(), expcontext);
+            final List<Operation> outputs = connectorDefinition.getOutputs();
+            final ArrayList<SOperation> operations = new ArrayList<SOperation>(outputs.size());
+            for (final Operation operation : outputs) {
+                operations.add(ModelConvertor.constructSOperation(operation, tenantAccessor));
+            }
+            expcontext.setInputValues(result.getResult());
+            connectorService.executeOutputOperation(operations, expcontext, result);
         }
     }
 

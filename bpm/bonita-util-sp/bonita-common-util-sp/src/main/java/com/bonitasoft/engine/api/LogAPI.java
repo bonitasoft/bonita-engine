@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -35,7 +34,7 @@ public interface LogAPI {
      * @throws InvalidSessionException
      *             since 6.0
      */
-    Log getLog(long logId) throws LogNotFoundException, InvalidSessionException;
+    Log getLog(long logId) throws LogNotFoundException;
 
     /**
      * get the total number of logs
@@ -46,7 +45,7 @@ public interface LogAPI {
      *             since 6.0
      */
     @Deprecated
-    int getNumberOfLogs() throws InvalidSessionException;
+    int getNumberOfLogs();
 
     /**
      * retrieve logs to support pagination
@@ -64,7 +63,7 @@ public interface LogAPI {
      *             since 6.0
      */
     @Deprecated
-    List<Log> getLogs(int pageIndex, int numberPerPage, LogCriterion pagingCriterion) throws PageOutOfRangeException, InvalidSessionException;
+    List<Log> getLogs(int pageIndex, int numberPerPage, LogCriterion pagingCriterion) throws PageOutOfRangeException;
 
     /**
      * retrieve logs to support search functionality
@@ -75,6 +74,6 @@ public interface LogAPI {
      * @throws InvalidSessionException
      *             since 6.0
      */
-    SearchResult<Log> searchLogs(SearchOptions searchOptions) throws InvalidSessionException;
+    SearchResult<Log> searchLogs(SearchOptions searchOptions);
 
 }

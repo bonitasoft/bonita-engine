@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
-import org.bonitasoft.engine.search.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.service.SPModelConvertor;

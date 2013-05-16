@@ -9,9 +9,11 @@
 package com.bonitasoft.engine.execution;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bpm.model.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -23,6 +25,7 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -43,6 +46,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -86,30 +90,34 @@ public class ProcessExecutorExt extends ProcessExecutorImpl implements ProcessEx
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final ArchiveService archiveService, final LockService lockService, final TokenService tokenService,
-            final EventsHandler eventsHandler, final BPMDefinitionBuilders bpmDefinitionBuilders) {
+            final EventsHandler eventsHandler, final BPMDefinitionBuilders bpmDefinitionBuilders, final SOperationBuilders operationBuilders) {
         super(instanceBuilders, activityInstanceService, processInstanceService, flowNodeStateManager, logger, flowNodeExecutor, transactionExecutor,
                 workService, processDefinitionService, gatewayInstanceService, transitionService, eventInstanceService, connectorService,
                 connectorInstanceService, classLoaderService, operationService, expressionBuilders, expressionResolverService, eventService, handlers,
                 processDocumentService, documentBuilder, sessionAccessor, containerRegistry, bpmInstancesCreator, archiveService, lockService, tokenService,
-                eventsHandler, bpmDefinitionBuilders);
+                eventsHandler, bpmDefinitionBuilders, operationBuilders);
 
         this.instanceBuilders = instanceBuilders;
     }
 
     @Override
     protected boolean initialize(final long userId, final SProcessDefinition sDefinition, final SProcessInstance sInstance,
-            final SExpressionContext expressionContext, final Map<SOperation, Map<String, Object>> operations,
-            final SFlowElementContainerDefinition processContainer) throws SProcessInstanceCreationException {
+            final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
+            final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
+            throws SProcessInstanceCreationException {
         try {
             // Create SDataInstances
-            bpmInstancesCreator.createDataInstances(sInstance, processContainer.getDataDefinitions(), expressionContext, operations);
+            bpmInstancesCreator.createDataInstances(sInstance, processContainer.getDataDefinitions(), expressionContext, operations, context);
             try {
                 initializeStringIndexes(sInstance, sDefinition);
             } catch (final SBonitaException e) {
                 throw new SProcessInstanceCreationException("unable to initialize string index on process instance", e);
             }
             createDocuments(sDefinition, sInstance, userId);
-            executeOperations(operations, sInstance);
+            if (connectors != null) {
+                executeConnectors(sDefinition, connectors);
+            }
+            executeOperations(operations, context, sInstance);
 
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
@@ -122,6 +130,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl implements ProcessEx
         } catch (final BonitaHomeNotSetException e) {
             throw new SProcessInstanceCreationException(e);
         } catch (final IOException e) {
+            throw new SProcessInstanceCreationException(e);
+        } catch (final InvalidEvaluationConnectorConditionException e) {
             throw new SProcessInstanceCreationException(e);
         }
     }

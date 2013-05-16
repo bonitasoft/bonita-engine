@@ -14,7 +14,6 @@ import org.bonitasoft.engine.commons.StringUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -24,10 +23,10 @@ import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.model.Profile;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.search.profile.SearchProfileMembersForProfile;
 import org.bonitasoft.engine.search.profile.SearchProfiles;
@@ -73,8 +72,7 @@ public class ProfileUtils {
         return profileMaps;
     }
 
-    public static XMLNode getProfileXmlNode(final TenantServiceAccessor tenantAccessor, final List<Long> profileIds) throws InvalidSessionException,
-            SearchException {
+    public static XMLNode getProfileXmlNode(final TenantServiceAccessor tenantAccessor, final List<Long> profileIds) throws SearchException {
         final String USER_SUFFIX = "ForUser";
         final String ROLE_SUFFIX = "ForRole";
         final String GROUP_SUFFIX = "ForGroup";
@@ -133,8 +131,8 @@ public class ProfileUtils {
                     if (ROLE_AND_GROUP_SUFFIX.equals(type)) {
                         descriptor = searchEntitiesDescriptor.getProfileMemberUserDescriptor();
                     }
-                    final SearchProfileMembersForProfile searcher = new SearchProfileMembersForProfile(profileId, type, profileService,
-                            descriptor, searchOptions);
+                    final SearchProfileMembersForProfile searcher = new SearchProfileMembersForProfile(profileId, type, profileService, descriptor,
+                            searchOptions);
                     try {
                         transactionExecutor.execute(searcher);
                     } catch (final SBonitaException e) {
@@ -161,8 +159,7 @@ public class ProfileUtils {
     }
 
     private static XMLNode getProfileElementNode(final TenantServiceAccessor tenantAccessor, final List<HashMap<String, Serializable>> profMemberList,
-            final String nodeType)
-            throws InvalidSessionException, SearchException {
+            final String nodeType) throws SearchException {
         final String user_node = "users";
         final String role_node = "roles";
         final String group_node = "groups";
@@ -199,7 +196,7 @@ public class ProfileUtils {
         return elementnode;
     }
 
-    private static String getUsername(final TenantServiceAccessor tenantAccessor, final long userId) throws InvalidSessionException, SearchException {
+    private static String getUsername(final TenantServiceAccessor tenantAccessor, final long userId) throws SearchException {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final GetSUser getUser = new GetSUser(identityService, userId);
@@ -212,7 +209,7 @@ public class ProfileUtils {
         return user.getUserName();
     }
 
-    private static String getRoleName(final TenantServiceAccessor tenantAccessor, final long roleId) throws InvalidSessionException, SearchException {
+    private static String getRoleName(final TenantServiceAccessor tenantAccessor, final long roleId) throws SearchException {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final GetRole getRole = new GetRole(roleId, identityService);
@@ -225,7 +222,7 @@ public class ProfileUtils {
         return role.getName();
     }
 
-    private static String getGroupName(final TenantServiceAccessor tenantAccessor, final long groupId) throws InvalidSessionException, SearchException {
+    private static String getGroupName(final TenantServiceAccessor tenantAccessor, final long groupId) throws SearchException {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final GetSGroup getGroup = new GetSGroup(groupId, identityService);

@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +33,6 @@ import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCriterion;
 import org.bonitasoft.engine.identity.Role;
@@ -63,8 +64,6 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.platform.Tenant;
-
-import static org.junit.Assert.assertTrue;
 
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
@@ -123,7 +122,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
         final List<String> messages = new ArrayList<String>();
         final PlatformSession platformSession = SPBPMTestUtil.loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        final List<Tenant> tenants = platformAPI.getTenants(0, 1000);
+        final List<Tenant> tenants = platformAPI.searchTenants(new SearchOptionsBuilder(0, 100).done()).getResult();
         SPBPMTestUtil.logoutPlatform(platformSession);
         for (final Tenant tenant : tenants) {
             final APISession apiSession = SPBPMTestUtil.loginTenant(tenant.getId());
@@ -240,7 +239,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
         return next;
     }
 
-    protected void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws InvalidSessionException, SearchException {
+    protected void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws SearchException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
         searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, parentProcessInstance.getId());
         searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, flowNodeName);

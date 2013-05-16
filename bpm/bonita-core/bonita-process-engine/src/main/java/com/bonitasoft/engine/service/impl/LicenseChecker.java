@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.platform.StopNodeException;
 
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
@@ -79,8 +78,6 @@ public class LicenseChecker {
             if (platformAPI.isPlatformStarted(platformAccessor)) {
                 platformAPI.stopNode("an invalid license");
             }
-        } catch (final InvalidSessionException ise) {
-            throw new IllegalStateException(ise);
         } catch (final StopNodeException sne) {
             throw new IllegalStateException(sne);
         } catch (final BonitaHomeNotSetException bhnse) {

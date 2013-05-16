@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
-import org.bonitasoft.engine.search.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.service.SPModelConvertor;

@@ -22,29 +22,13 @@ public class APIMethodSPTest extends APIMethodTest {
 
     @Override
     @Test
-    public void checkAllMethodsOfProcessAPIThrowInvalidSessionException() {
-        checkThrowsInvalidSessionException(ProcessAPIExt.class);
-    }
-
-    @Override
-    @Test
     public void checkAllMethodsOfProcessAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(ProcessAPIExt.class);
     }
 
     @Test
-    public void checkAllMethodsOfLogAPIThrowInvalidSessionException() {
-        checkThrowsInvalidSessionException(LogAPIExt.class);
-    }
-
-    @Test
     public void checkAllMethodsOfLogAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(LogAPIExt.class);
-    }
-
-    @Test
-    public void checkAllMethodsOfMonitoringAPIThrowInvalidSessionException() {
-        checkThrowsInvalidSessionException(MonitoringAPIImpl.class);
     }
 
     @Test
@@ -54,30 +38,13 @@ public class APIMethodSPTest extends APIMethodTest {
 
     // @Override
     // @Test
-    // public void checkAllMethodsOfPlatformAPIThrowInvalidSessionException() {
-    // checkThrowsInvalidSessionException(PlatformAPIExt.class);
-    // }
-    //
-    // @Override
-    // @Test
     // public void checkAllMethodsOfPlatformAPIContainsSerializableParameters() {
     // checkAllParametersAreSerializable(PlatformAPIExt.class);
     // }
 
     @Test
-    public void checkAllMethodsOfPlatformMonitoringAPIThrowInvalidSessionException() {
-        checkThrowsInvalidSessionException(PlatformMonitoringAPIImpl.class);
-    }
-
-    @Test
     public void checkAllMethodsOfPlatformMonitoringAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(PlatformMonitoringAPIImpl.class);
-    }
-
-    @Override
-    @Test
-    public void checkAllMethodsOfReportAPIThrowInvalidSessionException() {
-        checkThrowsInvalidSessionException(ReportingAPIExt.class);
     }
 
     @Override

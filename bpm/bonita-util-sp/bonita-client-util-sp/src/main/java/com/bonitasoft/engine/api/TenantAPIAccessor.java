@@ -26,7 +26,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnableToReadBonitaClientConfiguration;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
@@ -59,8 +58,7 @@ public final class TenantAPIAccessor {
         APITypeManager.refresh();
     }
 
-    private static <T> T getAPI(final Class<T> clazz, final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    private static <T> T getAPI(final Class<T> clazz, final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientSessionInterceptor sessionInterceptor = new ClientSessionInterceptor(clazz.getName(), serverAPI, session);
         return (T) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
@@ -72,38 +70,32 @@ public final class TenantAPIAccessor {
         return (LoginAPI) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { LoginAPI.class }, interceptor);
     }
 
-    public static IdentityAPI getIdentityAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    public static IdentityAPI getIdentityAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(IdentityAPI.class, session);
     }
 
-    public static ProcessAPI getProcessAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    public static ProcessAPI getProcessAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProcessAPI.class, session);
     }
 
     public static MonitoringAPI getMonitoringAPI(final APISession session) throws BonitaHomeNotSetException, UnableToReadBonitaClientConfiguration,
-            UnknownAPITypeException, ServerAPIException, InvalidSessionException {
+            UnknownAPITypeException, ServerAPIException {
         return getAPI(MonitoringAPI.class, session);
     }
 
-    public static LogAPI getLogAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    public static LogAPI getLogAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(LogAPI.class, session);
     }
 
-    public static CommandAPI getCommandAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    public static CommandAPI getCommandAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(CommandAPI.class, session);
     }
 
-    public static ProfileAPI getProfileAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    public static ProfileAPI getProfileAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProfileAPI.class, session);
     }
 
-    public static ReportingAPI getReportingAPI(final APISession session) throws InvalidSessionException, BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    public static ReportingAPI getReportingAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ReportingAPI.class, session);
     }
 

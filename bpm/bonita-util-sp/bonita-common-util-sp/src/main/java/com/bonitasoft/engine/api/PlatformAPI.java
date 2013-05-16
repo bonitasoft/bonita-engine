@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -10,21 +10,21 @@ package com.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.exception.TenantActivationException;
-import com.bonitasoft.engine.exception.TenantAlreadyExistException;
-import com.bonitasoft.engine.exception.TenantCreationException;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
-import com.bonitasoft.engine.exception.TenantDeletionException;
 import com.bonitasoft.engine.exception.TenantNotFoundException;
-import com.bonitasoft.engine.exception.TenantUpdateException;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCriterion;
 import com.bonitasoft.engine.platform.TenantUpdateDescriptor;
@@ -63,7 +63,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             since 6.0
      */
     long createTenant(final String tenantName, final String description, final String iconName, final String iconPath, final String userName,
-            final String password) throws InvalidSessionException, PlatformNotStartedException, TenantCreationException, TenantAlreadyExistException;
+            final String password) throws PlatformNotStartedException, CreationException, AlreadyExistsException;
 
     /**
      * Delete a tenant.
@@ -80,7 +80,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant deletion
      *             since 6.0
      */
-    void deleteTenant(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException, TenantDeletionException;
+    void deleteTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, DeletionException;
 
     /**
      * Activate a tenant.
@@ -97,7 +97,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant activation
      *             since 6.0
      */
-    void activateTenant(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException, TenantActivationException;
+    void activateTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, TenantActivationException;
 
     /**
      * De-activate a tenant.
@@ -114,24 +114,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant deactivation
      *             since 6.0
      */
-    void deactiveTenant(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException, TenantDeactivationException;
-
-    /**
-     * Get a list of tenants.
-     * If no tenants existed, return empty.
-     * 
-     * @param pageIndex
-     *            Index of the page to be returned. First page has index 0.
-     * @param numberPerPage
-     *            Number of result per page. Maximum number of result returned.
-     * @return the list of Tenant objects
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
-     *             since 6.0
-     */
-    List<Tenant> getTenants(final int pageIndex, final int numberPerPage) throws InvalidSessionException, PlatformNotStartedException;
+    void deactiveTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, TenantDeactivationException;
 
     /**
      * Get a list of tenants.
@@ -152,8 +135,8 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @throws BonitaException
      *             since 6.0
      */
-    List<Tenant> getTenants(int pageIndex, int numberPerPage, TenantCriterion pagingCriterion) throws InvalidSessionException, PlatformNotStartedException,
-            PageOutOfRangeException, BonitaException;
+    List<Tenant> getTenants(int pageIndex, int numberPerPage, TenantCriterion pagingCriterion) throws PlatformNotStartedException, PageOutOfRangeException,
+            BonitaException;
 
     /**
      * Get a tenant using its name.
@@ -169,7 +152,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      *             since 6.0
      */
-    Tenant getTenantByName(String tenantName) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException;
+    Tenant getTenantByName(String tenantName) throws PlatformNotStartedException, TenantNotFoundException;
 
     /**
      * Get default tenant.
@@ -183,7 +166,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      *             since 6.0
      */
-    Tenant getDefaultTenant() throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException;
+    Tenant getDefaultTenant() throws PlatformNotStartedException, TenantNotFoundException;
 
     /**
      * get a tenant using its tenantId
@@ -199,7 +182,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      *             since 6.0
      */
-    Tenant getTenantById(long tenantId) throws InvalidSessionException, PlatformNotStartedException, TenantNotFoundException;
+    Tenant getTenantById(long tenantId) throws PlatformNotStartedException, TenantNotFoundException;
 
     /**
      * Get the total number of tenants.
@@ -212,7 +195,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown if the platform is not started
      *             since 6.0
      */
-    int getNumberOfTenants() throws InvalidSessionException, PlatformNotStartedException;
+    int getNumberOfTenants() throws PlatformNotStartedException;
 
     /**
      * Update a tenant with its tenantId and new content.
@@ -230,8 +213,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant updated
      *             since 6.0
      */
-    Tenant updateTenant(long tenantId, TenantUpdateDescriptor udpateDescriptor) throws InvalidSessionException, PlatformNotStartedException,
-            TenantUpdateException;
+    Tenant updateTenant(long tenantId, TenantUpdateDescriptor udpateDescriptor) throws PlatformNotStartedException, UpdateException;
 
     /**
      * Search tenant under the given condition,including pagination,term,filter,sort.
@@ -243,6 +225,6 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @throws SearchException
      *             since 6.0
      */
-    SearchResult<Tenant> searchTenants(SearchOptions searchOptions) throws InvalidSessionException, SearchException;
+    SearchResult<Tenant> searchTenants(SearchOptions searchOptions) throws SearchException;
 
 }

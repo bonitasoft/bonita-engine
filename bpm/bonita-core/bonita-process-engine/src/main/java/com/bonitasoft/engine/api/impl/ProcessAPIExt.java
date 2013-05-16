@@ -24,13 +24,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.ActorMappingExportException;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
-import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
@@ -39,7 +37,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorState;
@@ -88,19 +85,18 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
-import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.IllegalProcessStateException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.ObjectDeletionException;
-import org.bonitasoft.engine.exception.ObjectModificationException;
-import org.bonitasoft.engine.exception.ObjectNotFoundException;
-import org.bonitasoft.engine.exception.ObjectReadException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
@@ -110,15 +106,10 @@ import org.bonitasoft.engine.exception.activity.ArchivedActivityInstanceNotFound
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.ArchivedProcessInstanceNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessDeletionException;
 import org.bonitasoft.engine.exception.process.ProcessDeployException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceModificationException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceReadException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
@@ -136,6 +127,9 @@ import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.process.SearchProcessInstances;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -146,7 +140,6 @@ import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
-import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
@@ -154,6 +147,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import com.bonitasoft.engine.exception.InvalidParameterValueException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -165,19 +159,18 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
-    private static TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
+    private static TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
         } catch (final Exception e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
     }
 
     @Override
-    public void deleteProcess(final long processDefinitionId) throws InvalidSessionException, ProcessDefinitionNotFoundException, ProcessDeletionException,
-            IllegalProcessStateException {
+    public void deleteProcess(final long processDefinitionId) throws ProcessDefinitionNotFoundException, DeletionException, IllegalProcessStateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -207,21 +200,21 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new IllegalProcessStateException(e);
         } catch (final SProcessDefinitionReadException e) {
             log(tenantAccessor, e);
-            throw new ProcessDeletionException(e);
+            throw new DeletionException(e);
         } catch (final BonitaHomeNotSetException e) {
             log(tenantAccessor, e);
             throw new BonitaRuntimeException(e);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
-            throw new ProcessDeletionException(e);
+            throw new DeletionException(e);
         } catch (final IOException e) {
             log(tenantAccessor, e);
-            throw new ProcessDeletionException(e);
+            throw new DeletionException(e);
         }
     }
 
     @Override
-    public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws InvalidSessionException, InvalidParameterValueException {
+    public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws InvalidParameterValueException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -270,18 +263,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Override
-    protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sDefinition, final long tenantId) throws BonitaHomeNotSetException,
-            IOException {
-        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-        final File file = new File(processesFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        final File processFolder = new File(file, String.valueOf(sDefinition.getId()));
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
-    }
-
     private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
@@ -304,7 +285,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public int getNumberOfParameterInstances(final long processDefinitionUUID) throws InvalidSessionException, ProcessDefinitionNotFoundException {
+    public int getNumberOfParameterInstances(final long processDefinitionUUID) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -319,8 +300,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws InvalidSessionException,
-            ProcessDefinitionNotFoundException, ParameterNotFoundException {
+    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws ProcessDefinitionNotFoundException,
+            ParameterNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -345,7 +326,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int pageIndex, final int numberPerPage,
-            final ParameterSorting sort) throws InvalidSessionException, ProcessDefinitionNotFoundException, PageOutOfRangeException {
+            final ParameterSorting sort) throws ProcessDefinitionNotFoundException, PageOutOfRangeException {
         final int totalNumber = getNumberOfParameterInstances(processDefinitionId);
         PageIndexCheckingUtil.checkIfPageIsOutOfRange(totalNumber, pageIndex, numberPerPage);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -392,7 +373,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateParameterInstanceValue(final long processDefinitionId, final String parameterName, final String parameterValue)
-            throws InvalidSessionException, ProcessDefinitionNotFoundException, ParameterNotFoundException, InvalidParameterValueException {
+            throws ProcessDefinitionNotFoundException, ParameterNotFoundException, InvalidParameterValueException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -418,8 +399,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ManualTaskInstance addManualUserTask(final long humanTaskId, final String taskName, final String displayName, final long assignTo,
-            final String description, final Date dueDate, final TaskPriority priority) throws InvalidSessionException, ActivityInterruptedException,
-            ActivityExecutionErrorException, CreationException, ActivityNotFoundException {
+            final String description, final Date dueDate, final TaskPriority priority) throws ActivityInterruptedException, ActivityExecutionErrorException,
+            CreationException, ActivityNotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         TenantServiceAccessor tenantAccessor = null;
         final TaskPriority prio = priority != null ? priority : TaskPriority.NORMAL;
@@ -457,8 +438,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e.getMessage());
-        } catch (final InvalidSessionException e) {
-            throw e;
         } catch (final ActivityInterruptedException e) {
             throw e;
         } catch (final ActivityExecutionErrorException e) {
@@ -470,7 +449,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteManualUserTask(final long manualTaskId) throws InvalidSessionException, ObjectDeletionException, ObjectNotFoundException {
+    public void deleteManualUserTask(final long manualTaskId) throws DeletionException, NotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
@@ -483,22 +462,22 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
                     processInstanceService.deleteFlowNodeInstance(activityInstance, null);
                 } else {
-                    throw new ObjectDeletionException("Can't delete a task that is not a manual task", ManualTaskInstance.class);
+                    throw new DeletionException("Can't delete a task that is not a manual task");
                 }
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new ObjectNotFoundException("can't find activity with id " + manualTaskId, e, ManualTaskInstance.class);
+                throw new NotFoundException("can't find activity with id " + manualTaskId, e);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
-                throw new ObjectDeletionException(e, ManualTaskInstance.class);
+                throw new DeletionException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new ObjectDeletionException(e, ManualTaskInstance.class);
+            throw new DeletionException(e);
         }
     }
 
-    private String getUserNameFromSession() throws InvalidSessionException {
+    private String getUserNameFromSession() {
         SessionAccessor sessionAccessor = null;
         try {
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -506,18 +485,18 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             return platformServiceAccessor.getSessionService().getSession(sessionId).getUserName();
         } catch (final Exception e) {
-            throw new InvalidSessionException(e);
+            throw new BonitaRuntimeException(e);
         }
     }
 
     @Override
     public List<ConnectorInstance> getConnectorInstancesOfActivity(final long activityInstanceId, final int pageNumber, final int numberPerPage,
-            final ConnectorInstanceCriterion order) throws InvalidSessionException, ObjectReadException, PageOutOfRangeException {
+            final ConnectorInstanceCriterion order) throws RetrieveException, PageOutOfRangeException {
         return getConnectorInstancesFor(activityInstanceId, pageNumber, numberPerPage, SConnectorInstance.FLOWNODE_TYPE, order);
     }
 
     private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int pageNumber, final int numberPerPage, final String flownodeType,
-            final ConnectorInstanceCriterion order) throws InvalidSessionException, PageOutOfRangeException, ObjectReadException {
+            final ConnectorInstanceCriterion order) throws PageOutOfRangeException, RetrieveException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -592,30 +571,30 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         * numberPerPage, numberPerPage, fieldName, orderByType);
                 return ModelConvertor.toConnectorInstances(connectorInstances);
             } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e, ConnectorInstance.class);
+                throw new RetrieveException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new ObjectReadException(e, ConnectorInstance.class);
+            throw new RetrieveException(e);
         }
     }
 
     @Override
     public List<ConnectorInstance> getConnectorInstancesOfProcess(final long processInstanceId, final int pageNumber, final int numberPerPage,
-            final ConnectorInstanceCriterion order) throws InvalidSessionException, ObjectReadException, PageOutOfRangeException {
+            final ConnectorInstanceCriterion order) throws RetrieveException, PageOutOfRangeException {
         return getConnectorInstancesFor(processInstanceId, pageNumber, numberPerPage, SConnectorInstance.PROCESS_TYPE, order);
     }
 
     @Override
-    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws InvalidSessionException, ConnectorException {
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws ConnectorException {
         final Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
         connectorsToReset.put(connectorInstanceId, state);
         setConnectorInstanceState(connectorsToReset);
     }
 
     @Override
-    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException, ConnectorException {
+    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -638,50 +617,22 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
      */
     @Override
     public void setConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion,
-            final byte[] connectorImplementationArchive) throws InvalidSessionException, ConnectorException, InvalidConnectorImplementationException {
+            final byte[] connectorImplementationArchive) throws ConnectorException, InvalidConnectorImplementationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.POST_DEPLOY_CONFIG);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
-        final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
         final long tenantId = tenantAccessor.getTenantId();
         try {
             boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
-                // reload dependencies
-                dependencyService.deleteDependencies(processDefinitionId, "process");
-
-                transactionExecutor.completeTransaction(txOpened);
-                // reopen a new transaction: avoid primary key unique constraint violation
-                txOpened = transactionExecutor.openTransaction();
-
-                final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
-                final File file = new File(processFolder, "classpath");
-                if (file.exists() && file.isDirectory()) {
-                    final File[] listFiles = file.listFiles();
-                    for (final File jarFile : listFiles) {
-                        final String name = jarFile.getName();
-                        final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
-                        final AddSDependency addSDependency = new AddSDependency(dependencyService, dependencyBuilderAccessor,
-                                processDefinitionId + "_" + name, jarContent, processDefinitionId, "process");
-                        addSDependency.execute();
-                    }
-                }
-
             } catch (final SInvalidConnectorImplementationException e) {
                 throw new InvalidConnectorImplementationException(e);
             } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorException(e);
-            } catch (final IOException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorException(e);
-            } catch (final BonitaHomeNotSetException e) {
                 transactionExecutor.setTransactionRollback();
                 throw new ConnectorException(e);
             } finally {
@@ -693,14 +644,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId) throws InvalidSessionException, ObjectNotFoundException, ObjectReadException,
-            ObjectModificationException, ActivityExecutionFailedException {
+    public void replayActivity(final long activityInstanceId) throws NotFoundException, RetrieveException, UpdateException, ActivityExecutionFailedException {
         replayActivity(activityInstanceId, null);
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws InvalidSessionException,
-            ObjectNotFoundException, ObjectReadException, ActivityExecutionFailedException, ObjectModificationException {
+    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws NotFoundException,
+            RetrieveException, ActivityExecutionFailedException, UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -743,25 +693,25 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     containerType = SFlowElementsContainerType.FLOWNODE.name();
                 }
             } catch (final SConnectorInstanceReadException e) {
-                throw new ObjectReadException(e, ConnectorInstance.class);
+                throw new RetrieveException(e);
             } catch (final SActivityReadException e) {
-                throw new ObjectReadException(e, ActivityInstance.class);
+                throw new RetrieveException(e);
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new ObjectNotFoundException(e, ActivityInstance.class);
+                throw new NotFoundException(e);
             } catch (final SFlowNodeModificationException e) {
-                throw new ObjectModificationException(e, ActivityInstance.class);
+                throw new UpdateException(e);
             } catch (final SConnectorInstanceModificationException e) {
-                throw new ObjectModificationException(e, ConnectorInstance.class);
+                throw new UpdateException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new ObjectReadException(e, ActivityInstance.class);
+            throw new RetrieveException(e);
         }
         try {
             containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType, null);
         } catch (final SActivityReadException e) {
-            throw new ObjectReadException(e, ActivityInstance.class);
+            throw new RetrieveException(e);
         } catch (final SBonitaException e) {
             throw new ActivityExecutionFailedException(e);
         }
@@ -769,7 +719,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     // TODO delete files after use/if an exception occurs
-    public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws BonitaRuntimeException, IOException, InvalidSessionException {
+    public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws BonitaRuntimeException, IOException {
         String processesFolder;
         try {
             final long tenantId = getTenantAccessor().getTenantId();
@@ -820,26 +770,25 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException {
+            throws ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
+            NotSerializableException {
         return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, processInstanceId);
+                inputValues, null, null, processInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws InvalidSessionException,
-            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
-            NotSerializableException {
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ArchivedProcessInstanceNotFoundException,
+            ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, processInstanceId);
+                inputValues, operations, operationsInputValues, processInstanceId);
     }
 
     private Map<String, Serializable> executeConnectorAtProcessInstantiationWithOtWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
-            throws InvalidEvaluationConnectorConditionException, InvalidSessionException, ConnectorException, ArchivedProcessInstanceNotFoundException,
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long processInstanceId) throws InvalidEvaluationConnectorConditionException, ConnectorException, ArchivedProcessInstanceNotFoundException,
             ClassLoaderException, NotSerializableException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -872,7 +821,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -902,28 +851,31 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws InvalidSessionException, ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            throws ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, activityInstanceId);
+                inputValues, null, null, activityInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId) throws InvalidSessionException, ConnectorException,
-            NotSerializableException, ClassLoaderException, InvalidEvaluationConnectorConditionException {
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ConnectorException, NotSerializableException,
+            ClassLoaderException, InvalidEvaluationConnectorConditionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, activityInstanceId);
+                inputValues, operations, operationsInputValues, activityInstanceId);
     }
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
+     * 
+     * @param operationsInputValues
      */
     private Map<String, Serializable> executeConnectorOnActivityInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId)
-            throws InvalidSessionException, ConnectorException, NotSerializableException, ClassLoaderException, InvalidEvaluationConnectorConditionException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long activityInstanceId) throws ConnectorException, NotSerializableException, ClassLoaderException,
+            InvalidEvaluationConnectorConditionException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
@@ -948,7 +900,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -972,27 +924,26 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws InvalidSessionException, ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException,
-            ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
+            throws ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
+            InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, activityInstanceId);
+                inputValues, null, null, activityInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId) throws InvalidSessionException,
-            ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException {
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ArchivedActivityInstanceNotFoundException,
+            ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, activityInstanceId);
+                inputValues, operations, operationsInputValues, activityInstanceId);
     }
 
     private Map<String, Serializable> executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId)
-            throws InvalidEvaluationConnectorConditionException, InvalidSessionException, ArchivedActivityInstanceNotFoundException, ClassLoaderException,
-            NotSerializableException, ConnectorException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long activityInstanceId) throws InvalidEvaluationConnectorConditionException, ArchivedActivityInstanceNotFoundException,
+            ClassLoaderException, NotSerializableException, ConnectorException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -1025,7 +976,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -1052,26 +1003,25 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException {
+            throws ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
+            NotSerializableException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, processInstanceId);
+                inputValues, null, null, processInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws InvalidSessionException,
-            ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
-            NotSerializableException {
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ArchivedProcessInstanceNotFoundException,
+            ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, processInstanceId);
+                inputValues, operations, operationsInputValues, processInstanceId);
     }
 
     private Map<String, Serializable> executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
-            throws InvalidEvaluationConnectorConditionException, InvalidSessionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException,
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long processInstanceId) throws InvalidEvaluationConnectorConditionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException,
             NotSerializableException, ConnectorException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -1102,7 +1052,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -1132,28 +1082,31 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ClassLoaderException, InvalidSessionException, ProcessInstanceNotFoundException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException {
+            throws ClassLoaderException, ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException,
+            NotSerializableException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, processInstanceId);
+                inputValues, null, null, processInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws ClassLoaderException, InvalidSessionException,
-            ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ClassLoaderException, ProcessInstanceNotFoundException,
+            ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, processInstanceId);
+                inputValues, operations, operationsInputValues, processInstanceId);
     }
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
+     * 
+     * @param operationsInputValues
      */
     private Map<String, Serializable> executeConnectorOnProcessInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
-            throws InvalidEvaluationConnectorConditionException, InvalidSessionException, NotSerializableException, ClassLoaderException, ConnectorException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long processInstanceId) throws InvalidEvaluationConnectorConditionException, NotSerializableException, ClassLoaderException,
+            ConnectorException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
@@ -1176,7 +1129,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -1198,8 +1151,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws InvalidSessionException, ProcessDeployException,
-            ProcessDefinitionAlreadyExistsException {
+    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException {
         final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
 
         if (processDefinition.getStringIndexValue(1) != null || processDefinition.getStringIndexLabel(1) != null
@@ -1214,8 +1166,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessInstance updateProcessInstanceIndex(final long processInstanceId, final Index index, final String value) throws InvalidSessionException,
-            ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException {
+    public ProcessInstance updateProcessInstanceIndex(final long processInstanceId, final Index index, final String value)
+            throws ProcessInstanceNotFoundException, UpdateException, ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -1229,17 +1181,17 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SProcessInstanceNotFoundException spinfe) {
             throw new ProcessInstanceNotFoundException(spinfe);
         } catch (final SBonitaException sbe) {
-            throw new ProcessInstanceModificationException(sbe);
-        } catch (final ProcessInstanceReadException pire) {
-            throw new ProcessInstanceModificationException(pire);
+            throw new UpdateException(sbe);
+        } catch (final RetrieveException re) {
+            throw new UpdateException(re);
         }
     }
 
     @Override
     public ProcessInstance updateProcessInstance(final long processInstanceId, final ProcessInstanceUpdateDescriptor updateDescriptor)
-            throws InvalidSessionException, ProcessInstanceNotFoundException, ProcessInstanceModificationException, ProcessDefinitionNotFoundException {
+            throws ProcessInstanceNotFoundException, UpdateException, ProcessDefinitionNotFoundException {
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
-            throw new ProcessInstanceModificationException("The update descriptor does not contain field updates");
+            throw new UpdateException("The update descriptor does not contain field updates");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -1254,9 +1206,25 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SProcessInstanceNotFoundException spinfe) {
             throw new ProcessInstanceNotFoundException(spinfe);
         } catch (final SBonitaException sbe) {
-            throw new ProcessInstanceModificationException(sbe);
-        } catch (final ProcessInstanceReadException pire) {
-            throw new ProcessInstanceModificationException(pire);
+            throw new UpdateException(sbe);
+        } catch (final RetrieveException re) {
+            throw new UpdateException(re);
+        }
+    }
+
+    protected SearchResult<ProcessInstance> searchProcessInstances(final TenantServiceAccessor tenantAccessor, final SearchOptions searchOptions) {
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+
+        try {
+            final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
+                    searchEntitiesDescriptor.getProcessInstanceDescriptor(), searchOptions, processDefinitionService);
+            transactionExecutor.execute(searchProcessInstances);
+            return searchProcessInstances.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new BonitaRuntimeException(sbe);
         }
     }
 
