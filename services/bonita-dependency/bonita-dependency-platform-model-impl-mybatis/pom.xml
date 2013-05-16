@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-dependency</artifactId>
 		<groupId>com.bonitasoft.engine.dependency</groupId>
-		<version>6.0.0-beta-025</version>
+		<version>6.0.0-beta-026-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-dependency-platform-model-impl-mybatis</artifactId>
