@@ -9,13 +9,11 @@
 package com.bonitasoft.engine.external.web.forms;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.model.ActivationState;
-import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
+import org.bonitasoft.engine.bpm.model.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -23,7 +21,6 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
@@ -34,19 +31,12 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.connector.ConnectorException;
-import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
-import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotEnabledException;
 import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -59,21 +49,28 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
+    @SuppressWarnings("unchecked")
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        Map<Operation, Map<String, Object>> operationsMap = null;
-        Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsInputValues = null;
+        final List<Operation> operations;
+        final List<ConnectorDefinitionWithInputValues> connectorsWithInput;
+        final Map<String, Object> operationsInputValues;
         try {
-            operationsMap = (HashMap<Operation, Map<String, Object>>) parameters.get(OPERATIONS_MAP_KEY);
+            operations = (List<Operation>) parameters.get(OPERATIONS_LIST_KEY);
         } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_MAP_KEY + " is missing or not convertible to Map.", e);
+            throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_LIST_KEY + " is missing or not convertible to List.", e);
+        }
+        try {
+            operationsInputValues = (Map<String, Object>) parameters.get(OPERATIONS_INPUT_KEY);
+        } catch (final Exception e) {
+            throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_INPUT_KEY + " is missing or not convertible to Map.", e);
         }
 
         try {
-            connectorsInputValues = (Map<ConnectorDefinition, Map<String, Map<String, Serializable>>>) parameters.get(CONNECTORS_MAP_KEY);
+            connectorsWithInput = (List<ConnectorDefinitionWithInputValues>) parameters.get(CONNECTORS_LIST_KEY);
         } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + CONNECTORS_MAP_KEY + " is missing or not convertible to Map.", e);
+            throw new SCommandParameterizationException("Mandatory parameter " + CONNECTORS_LIST_KEY + " is missing or not convertible to List.", e);
         }
 
         long sProcessDefinitionID = 0L;
@@ -103,9 +100,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
-                final Map<Operation, Map<String, Object>> connectorOutputs = executeConnectors(sProcessDefinitionID, connectorsInputValues);
-                operationsMap.putAll(connectorOutputs);
-                return startProcess(userId, sProcessDefinitionID, operationsMap).getId();
+
+                return startProcess(userId, sProcessDefinitionID, operations, operationsInputValues, connectorsWithInput).getId();
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
@@ -120,25 +116,9 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         }
     }
 
-    private Map<Operation, Map<String, Object>> executeConnectors(final long processDefId,
-            final Map<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectorsMap) throws ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, InvalidProcessDefinitionException, NotSerializableException {
-        final Map<Operation, Map<String, Object>> operations = new HashMap<Operation, Map<String, Object>>(connectorsMap.size());
-        for (final Entry<ConnectorDefinition, Map<String, Map<String, Serializable>>> entry : connectorsMap.entrySet()) {
-            final ConnectorDefinition connectorDefinition = entry.getKey();
-            final Map<String, Map<String, Serializable>> contextInputValues = entry.getValue();
-            final Map<String, Object> resultMap = executeConnectorOnProcessDefinition(connectorDefinition.getConnectorId(), connectorDefinition.getVersion(),
-                    connectorDefinition.getInputs(), contextInputValues, processDefId);
-            final List<Operation> outputs = connectorDefinition.getOutputs();
-            for (final Operation operation : outputs) {
-                operations.put(operation, resultMap);
-            }
-        }
-        return operations;
-    }
-
-    private ProcessInstance startProcess(long userId, final long processDefinitionId, final Map<Operation, Map<String, Object>> operations)
-            throws ProcessDefinitionNotFoundException, CreationException, RetrieveException, ProcessDefinitionNotEnabledException, OperationExecutionException {
+    private ProcessInstance startProcess(long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Object> context,
+            final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws ProcessDefinitionNotFoundException, CreationException,
+            RetrieveException, ProcessDefinitionNotEnabledException, OperationExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -165,8 +145,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         }
         SProcessInstance startedInstance;
         try {
-            final Map<SOperation, Map<String, Object>> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
-            startedInstance = processExecutor.start(userId, sDefinition, sOperations);
+            final List<SOperation> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
+            startedInstance = processExecutor.start(userId, sDefinition, sOperations, context, connectorsWithInput);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e);
@@ -198,28 +178,6 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         @Override
         public SProcessDefinitionDeployInfo getResult() {
             return processDefinitionDI;
-        }
-    }
-
-    Map<String, Object> executeConnectorOnProcessDefinition(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processDefinitionId)
-            throws ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, InvalidProcessDefinitionException,
-            NotSerializableException {
-        if (connectorInputParameters.size() == inputValues.size()) {
-            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            final ClassLoader classLoader = getLocalClassLoader(tenantAccessor, processDefinitionId);
-            final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
-            final SExpressionContext expcontext = new SExpressionContext();
-            expcontext.setProcessDefinitionId(processDefinitionId);
-            final SProcessDefinition processDef = getProcessDefinition(tenantAccessor, processDefinitionId);
-            if (processDef != null) {
-                expcontext.setProcessDefinition(processDef);
-            }
-            return executeConnector(tenantAccessor, processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, connectorsExps, inputValues,
-                    classLoader, expcontext);
-        } else {
-            throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), inputValues.size());
         }
     }
 

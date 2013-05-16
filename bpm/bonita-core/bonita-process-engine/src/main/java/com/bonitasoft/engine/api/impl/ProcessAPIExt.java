@@ -773,23 +773,23 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throws ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
             NotSerializableException {
         return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, processInstanceId);
+                inputValues, null, null, processInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws ArchivedProcessInstanceNotFoundException,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ArchivedProcessInstanceNotFoundException,
             ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, processInstanceId);
+                inputValues, operations, operationsInputValues, processInstanceId);
     }
 
     private Map<String, Serializable> executeConnectorAtProcessInstantiationWithOtWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
-            throws InvalidEvaluationConnectorConditionException, ConnectorException, ArchivedProcessInstanceNotFoundException, ClassLoaderException,
-            NotSerializableException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long processInstanceId) throws InvalidEvaluationConnectorConditionException, ConnectorException, ArchivedProcessInstanceNotFoundException,
+            ClassLoaderException, NotSerializableException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -821,7 +821,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -854,25 +854,28 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throws ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, activityInstanceId);
+                inputValues, null, null, activityInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId) throws ConnectorException, NotSerializableException,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ConnectorException, NotSerializableException,
             ClassLoaderException, InvalidEvaluationConnectorConditionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, activityInstanceId);
+                inputValues, operations, operationsInputValues, activityInstanceId);
     }
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
+     * 
+     * @param operationsInputValues
      */
     private Map<String, Serializable> executeConnectorOnActivityInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId)
-            throws ConnectorException, NotSerializableException, ClassLoaderException, InvalidEvaluationConnectorConditionException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long activityInstanceId) throws ConnectorException, NotSerializableException, ClassLoaderException,
+            InvalidEvaluationConnectorConditionException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
@@ -897,7 +900,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -924,23 +927,23 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throws ArchivedActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
             InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, activityInstanceId);
+                inputValues, null, null, activityInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId) throws ArchivedActivityInstanceNotFoundException,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ArchivedActivityInstanceNotFoundException,
             ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, activityInstanceId);
+                inputValues, operations, operationsInputValues, activityInstanceId);
     }
 
     private Map<String, Serializable> executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long activityInstanceId)
-            throws InvalidEvaluationConnectorConditionException, ArchivedActivityInstanceNotFoundException, ClassLoaderException, NotSerializableException,
-            ConnectorException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long activityInstanceId) throws InvalidEvaluationConnectorConditionException, ArchivedActivityInstanceNotFoundException,
+            ClassLoaderException, NotSerializableException, ConnectorException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -973,7 +976,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -1003,23 +1006,23 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throws ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
             NotSerializableException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, processInstanceId);
+                inputValues, null, null, processInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws ArchivedProcessInstanceNotFoundException,
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ArchivedProcessInstanceNotFoundException,
             ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, processInstanceId);
+                inputValues, operations, operationsInputValues, processInstanceId);
     }
 
     private Map<String, Serializable> executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
-            throws InvalidEvaluationConnectorConditionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException, NotSerializableException,
-            ConnectorException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long processInstanceId) throws InvalidEvaluationConnectorConditionException, ArchivedProcessInstanceNotFoundException, ClassLoaderException,
+            NotSerializableException, ConnectorException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -1049,7 +1052,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }
@@ -1082,25 +1085,28 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throws ClassLoaderException, ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException,
             NotSerializableException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, processInstanceId);
+                inputValues, null, null, processInstanceId);
     }
 
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
-            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues,
-            final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId) throws ClassLoaderException,
-            ProcessInstanceNotFoundException, ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
+            final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ClassLoaderException, ProcessInstanceNotFoundException,
+            ConnectorException, InvalidEvaluationConnectorConditionException, NotSerializableException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, operations, processInstanceId);
+                inputValues, operations, operationsInputValues, processInstanceId);
     }
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
+     * 
+     * @param operationsInputValues
      */
     private Map<String, Serializable> executeConnectorOnProcessInstanceWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final Map<Operation, Map<String, Serializable>> operations, final long processInstanceId)
-            throws InvalidEvaluationConnectorConditionException, NotSerializableException, ClassLoaderException, ConnectorException {
+            final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
+            final long processInstanceId) throws InvalidEvaluationConnectorConditionException, NotSerializableException, ClassLoaderException,
+            ConnectorException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
@@ -1123,7 +1129,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                         connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
                 if (operations != null) {
                     // execute operations
-                    return executeOperations(connectorResult, operations, expcontext, classLoader, tenantAccessor);
+                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
                 } else {
                     return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
                 }

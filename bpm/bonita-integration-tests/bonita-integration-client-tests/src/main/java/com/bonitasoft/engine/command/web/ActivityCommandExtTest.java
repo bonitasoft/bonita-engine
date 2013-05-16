@@ -8,6 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.command.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -27,7 +31,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.model.ConnectorDefinition;
+import org.bonitasoft.engine.bpm.model.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
@@ -36,6 +40,7 @@ import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.data.DataInstance;
 import org.bonitasoft.engine.bpm.model.impl.ConnectorDefinitionImpl;
+import org.bonitasoft.engine.bpm.model.impl.ConnectorDefinitionWithInputValuesImpl;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestExternalConnector;
 import org.bonitasoft.engine.core.operation.LeftOperand;
@@ -59,10 +64,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ProcessAPI;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Ruiheng Fan
  * @author Celine Souchet
@@ -70,7 +71,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class ActivityCommandExtTest extends CommonAPISPTest {
 
-    private static final String OPERATIONS_MAP_KEY = "OPERATIONS_MAP_KEY";
+    /*
+     * List<Operation>
+     */
+    protected static final String OPERATIONS_LIST_KEY = "OPERATIONS_LIST_KEY";
+
+    /*
+     * Map<String, Object>
+     */
+    protected static final String OPERATIONS_INPUT_KEY = "OPERATIONS_INPUT_KEY";
+
+    /*
+     * List<ConnectorDefinitionWithInputValues>
+     */
+    protected static final String CONNECTORS_LIST_KEY = "CONNECTORS_LIST_KEY";
 
     private static final String ACTIVITY_INSTANCE_ID_KEY = "ACTIVITY_INSTANCE_ID_KEY";
 
@@ -147,9 +161,6 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         processDefinition = deployAndEnableWithActor(builder.done(), actorName, businessUser);
 
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
-        // final Map<String, Map<String, Serializable>> inputValues = new HashMap<String, Map<String, Serializable>>();
-        final HashMap<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>();
-        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
         final String fieldName = "field_entier";
         final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(myDdataName).done();
         final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("int_conversion_script", "Integer.parseInt(" + fieldName + ")",
@@ -157,12 +168,14 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final Operation operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
         final String enteredValue = "17";
+        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
+        final HashMap<String, Serializable> contexts = new HashMap<String, Serializable>();
         contexts.put(fieldName, enteredValue);
-
-        operations.put(operation, contexts);
-        parameters.put("CONNECTORS_MAP_KEY", new HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>>(0));
+        operations.add(operation);
+        parameters.put(CONNECTORS_LIST_KEY, new ArrayList<ConnectorDefinitionWithInputValues>(0));
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDefinition.getId());
-        parameters.put(OPERATIONS_MAP_KEY, operations);
+        parameters.put(OPERATIONS_LIST_KEY, operations);
+        parameters.put(OPERATIONS_INPUT_KEY, contexts);
         parameters.put("USER_ID_KEY", businessUser.getId());
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
         assertTrue("processInstanceId should be > 0", processInstanceId > 0);
@@ -221,17 +234,18 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final ConnectorDefinitionImpl connectDefinition = new ConnectorDefinitionImpl("myConnector", "org.bonitasoft.connector.testExternalConnector", "1.0",
                 ConnectorEvent.ON_ENTER);
         connectDefinition.addInput(mainInputName1, mainExp);
-        final HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectors = new HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>>();
-        connectors.put(connectDefinition, inputValues);
+        final ArrayList<ConnectorDefinitionWithInputValues> connectors = new ArrayList<ConnectorDefinitionWithInputValues>();
+        connectors.add(new ConnectorDefinitionWithInputValuesImpl(connectDefinition, inputValues));
 
-        final HashMap<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>();
-        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
+        final ArrayList<Operation> operations = new ArrayList<Operation>();
+        final HashMap<String, Serializable> contexts = new HashMap<String, Serializable>();
         contexts.put("page", "1");
         final Operation integerOperation = buildIntegerOperation(dataName, 2);
-        operations.put(integerOperation, contexts);
-        parameters.put("CONNECTORS_MAP_KEY", connectors);
+        operations.add(integerOperation);
+        parameters.put(CONNECTORS_LIST_KEY, connectors);
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDefinition.getId());
-        parameters.put(OPERATIONS_MAP_KEY, operations);
+        parameters.put(OPERATIONS_LIST_KEY, operations);
+        parameters.put(OPERATIONS_INPUT_KEY, contexts);
         parameters.put("USER_ID_KEY", firstUser.getId());
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
 
@@ -270,7 +284,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final long processInstanceId = processInstance.getId();
         waitForStep("step1", processInstance);
 
-        final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
+        final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
         fieldValues.put(inputName1, valueOfInput1);
         fieldValues.put(inputName2, valueOfInput2);
@@ -300,19 +314,20 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final Operation operation = createOperation(dataName, OperatorType.ASSIGNMENT, "=", rightOperand);
         final Operation operation2 = createOperation(dataName2, OperatorType.ASSIGNMENT, "=", rightOperand2);
         final Operation operation3 = createOperation(dataName3, OperatorType.ASSIGNMENT, "=", rightOperand3);
-        final Map<Operation, Map<String, Serializable>> operationsMap = new HashMap<Operation, Map<String, Serializable>>();
-        operationsMap.put(operation, fieldValues);
+        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
+        operations.add(operation);
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         final ConnectorDefinitionImpl connectDefinition = new ConnectorDefinitionImpl("myConnector", "org.bonitasoft.connector.testExternalConnector", "1.0",
                 ConnectorEvent.ON_ENTER);
         connectDefinition.addInput(mainInputName1, mainExp);
         connectDefinition.addOutput(operation2);
         connectDefinition.addOutput(operation3);
-        final HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectors = new HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>>();
-        connectors.put(connectDefinition, inputValues);
-        parameters.put("CONNECTORS_MAP_KEY", connectors);
+        final ArrayList<ConnectorDefinitionWithInputValuesImpl> connectors = new ArrayList<ConnectorDefinitionWithInputValuesImpl>();
+        connectors.add(new ConnectorDefinitionWithInputValuesImpl(connectDefinition, inputValues));
+        parameters.put(CONNECTORS_LIST_KEY, connectors);
         parameters.put(ACTIVITY_INSTANCE_ID_KEY, taskId);
-        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
+        parameters.put(OPERATIONS_LIST_KEY, operations);
+        parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
         assertTrue("no pending user task instances are found", new WaitUntil(50, 1000) {
@@ -351,13 +366,13 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
                 Collections.singletonList(dataExpression));
 
         final Operation operation = createOperation(intDataName, OperatorType.ASSIGNMENT, "=", rightOperand);
-        final Map<Operation, Map<String, Serializable>> operationsMap = new HashMap<Operation, Map<String, Serializable>>();
-        operationsMap.put(operation, Collections.<String, Serializable> emptyMap());
-
+        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
+        operations.add(operation);
         // execute the command
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(ACTIVITY_INSTANCE_ID_KEY, userTask.getId());
-        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
+        parameters.put(OPERATIONS_LIST_KEY, operations);
+        parameters.put(OPERATIONS_INPUT_KEY, new HashMap<String, Serializable>(0));
 
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
@@ -378,7 +393,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         waitForStep("step1", processInstance);
 
         // Main Expression
-        final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
+        final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "field_fieldId1_Ryan");
         final List<String> names = getInputValueNames(fieldValues);
         final List<String> values = getInputValueValues(fieldValues);
@@ -398,19 +413,20 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final Operation operation = createOperation(dataName, OperatorType.ASSIGNMENT, "=", rightOperand);
         final Operation operation2 = createOperation(dataName2, OperatorType.ASSIGNMENT, "=", rightOperand2);
         final Operation operation3 = createOperation(dataName3, OperatorType.ASSIGNMENT, "=", rightOperand3);
-        final Map<Operation, Map<String, Serializable>> operationsMap = new HashMap<Operation, Map<String, Serializable>>();
-        operationsMap.put(operation, fieldValues);
+        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
+        operations.add(operation);
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         final ConnectorDefinitionImpl connectDefinition = new ConnectorDefinitionImpl("myConnector", "org.bonitasoft.connector.testExternalConnector", "1.0",
                 ConnectorEvent.ON_ENTER);
         connectDefinition.addInput(mainInputName1, mainExp);
         connectDefinition.addOutput(operation2);
         connectDefinition.addOutput(operation3);
-        final HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>> connectors = new HashMap<ConnectorDefinition, Map<String, Map<String, Serializable>>>();
-        connectors.put(connectDefinition, inputValues);
-        parameters.put("CONNECTORS_MAP_KEY", connectors);
+        final ArrayList<ConnectorDefinitionWithInputValues> connectors = new ArrayList<ConnectorDefinitionWithInputValues>();
+        connectors.add(new ConnectorDefinitionWithInputValuesImpl(connectDefinition, inputValues));
+        parameters.put(CONNECTORS_LIST_KEY, connectors);
         parameters.put(ACTIVITY_INSTANCE_ID_KEY, taskId);
-        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
+        parameters.put(OPERATIONS_LIST_KEY, operations);
+        parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
         assertTrue("no pending user task instances are found", new WaitUntil(50, 1000) {
@@ -528,16 +544,17 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         getProcessAPI().assignUserTask(taskId, getSession().getUserId());
 
         // execute it with operation using the command
-        final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
+        final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         // the operation execute a groovy script that depend in a class in the jar
         final Expression rightOperand = new ExpressionBuilder().createGroovyScriptExpression("myScript",
                 "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName());
         final Operation operation = createOperation("Application", OperatorType.ASSIGNMENT, "=", rightOperand);
-        final Map<Operation, Map<String, Serializable>> operationsMap = new HashMap<Operation, Map<String, Serializable>>();
-        operationsMap.put(operation, fieldValues);
+        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
+        operations.add(operation);
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(ACTIVITY_INSTANCE_ID_KEY, taskId);
-        parameters.put(OPERATIONS_MAP_KEY, (Serializable) operationsMap);
+        parameters.put(OPERATIONS_LIST_KEY, operations);
+        parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
 
         // just check the operation is executed normally
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);

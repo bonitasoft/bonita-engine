@@ -16,12 +16,14 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.model.ActivationState;
 import org.bonitasoft.engine.bpm.model.ActivityInstance;
 import org.bonitasoft.engine.bpm.model.AutomaticTaskDefinitionBuilder;
@@ -59,7 +61,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
-import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 /**
@@ -440,24 +441,20 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // connector return param1="welcome Lily and Lucy and Mett"
         // operations: put "Jack" in data valueOfInput3, param1 in "externalData" and "John" in "externalDataConst"
         // Create Operation map:
-        final Map<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>();
+        final List<Operation> operations = new ArrayList<Operation>();
         // set valueOfInput3
         final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        operations
-                .put(new OperationBuilder().createSetDataOperation("valueOfInput3", new ExpressionBuilder().createConstantStringExpression("Jack")), contexts);
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
-                        .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT)
-                        .done(), contexts);
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
-                        .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done(), contexts);
+        operations.add(new OperationBuilder().createSetDataOperation("valueOfInput3", new ExpressionBuilder().createConstantStringExpression("Jack")));
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
+                .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT).done());
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
+                .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done());
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters("param1", mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues("param1", Arrays.asList("valueOfInput1", "valueOfInput2"),
                 Arrays.asList("Lily", "Lucy"));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
-                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, step1.getId());
+                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, contexts, step1.getId());
 
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));
@@ -493,21 +490,18 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // connector return param1="welcome Lily and Lucy and Mett"
         // operations: put param1 in "externalData" and "John" in "externalDataConst"
         // Create Operation map:
-        final Map<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>();
+        final List<Operation> operations = new ArrayList<Operation>();
         final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
-                        .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT)
-                        .done(), contexts);
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
-                        .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done(), contexts);
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
+                .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT).done());
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
+                .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done());
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters("param1", mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues("param1", Arrays.asList("valueOfInput1", "valueOfInput2"),
                 Arrays.asList("Lily", "Lucy"));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnCompletedActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
-                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, step1.getId());
+                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, contexts, step1.getId());
 
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));
@@ -541,26 +535,27 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // connector return param1="welcome Lily and Lucy and Mett"
         // operations: put "Jack" in data valueOfInput3, param1 in "externalData" and "John" in "externalDataConst"
         // Create Operation map:
-        final Map<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>();
+        final List<Operation> operations = new ArrayList<Operation>();
         // set valueOfInput3
         final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
-                        .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT)
-                        .done(), contexts);
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
-                        .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done(), contexts);
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
+                .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT).done());
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
+                .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done());
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters("param1", mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues("param1", Arrays.asList("valueOfInput1", "valueOfInput2"),
                 Arrays.asList("Lily", "Lucy"));
 
-        Map<String, Serializable> res = getProcessAPI().executeConnectorOnCompletedProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
-                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, processInstance.getId());
+        Map<String, Serializable> res = getProcessAPI()
+                .executeConnectorOnCompletedProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
+                        ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, contexts,
+                        processInstance.getId());
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));
-        res = getProcessAPI().executeConnectorAtProcessInstantiation(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
-                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, processInstance.getId());
+        res = getProcessAPI()
+                .executeConnectorAtProcessInstantiation(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
+                        ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, contexts,
+                        processInstance.getId());
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));
 
@@ -593,24 +588,22 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // connector return param1="welcome Lily and Lucy and Mett"
         // operations: put "Jack" in data valueOfInput3, param1 in "externalData" and "John" in "externalDataConst"
         // Create Operation map:
-        final Map<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>();
+        final List<Operation> operations = new ArrayList<Operation>();
         // set valueOfInput3
         final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
-        operations
-                .put(new OperationBuilder().createSetDataOperation("valueOfInput3", new ExpressionBuilder().createConstantStringExpression("Jack")), contexts);
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
-                        .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT)
-                        .done(), contexts);
-        operations.put(
-                new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
-                        .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done(), contexts);
+        operations.add(new OperationBuilder().createSetDataOperation("valueOfInput3", new ExpressionBuilder().createConstantStringExpression("Jack")));
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
+                .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT).done());
+        operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
+                .setRightOperand(new ExpressionBuilder().createConstantStringExpression("John")).setType(OperatorType.ASSIGNMENT).done());
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters("param1", mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues("param1", Arrays.asList("valueOfInput1", "valueOfInput2"),
                 Arrays.asList("Lily", "Lucy"));
 
-        final Map<String, Serializable> res = getProcessAPI().executeConnectorOnProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
-                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, processInstance.getId());
+        final Map<String, Serializable> res = getProcessAPI()
+                .executeConnectorOnProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
+                        ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, operations, contexts,
+                        processInstance.getId());
 
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));

@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,8 +41,6 @@ import com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta
@@ -120,17 +120,17 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
 
         // execute command:
         final String commandName = "getUpdatedVariableValuesForActivityInstance";
-        final HashMap<Operation, Map<String, Serializable>> operations = new HashMap<Operation, Map<String, Serializable>>(1);
-        operations.put(
-                new OperationBuilder()
-                        .createNewInstance()
-                        .setLeftOperand("value", true)
-                        .setType(OperatorType.ASSIGNMENT)
-                        .setRightOperand(
-                                new ExpressionBuilder().createGroovyScriptExpression("script", "output.getValue()", String.class.getName(),
-                                        new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType"))).done(), results);
+        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
+        operations.add(new OperationBuilder()
+                .createNewInstance()
+                .setLeftOperand("value", true)
+                .setType(OperatorType.ASSIGNMENT)
+                .setRightOperand(
+                        new ExpressionBuilder().createGroovyScriptExpression("script", "output.getValue()", String.class.getName(),
+                                new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType"))).done());
         final HashMap<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-        commandParameters.put("OPERATIONS_WITH_CONTEXT_MAP_KEY", operations);
+        commandParameters.put("OPERATIONS_LIST_KEY", operations);
+        commandParameters.put("OPERATIONS_INPUT_KEY", (Serializable) results);
         final HashMap<String, Serializable> currentvalues = new HashMap<String, Serializable>();
         currentvalues.put("value", "test");
         commandParameters.put("CURRENT_VARIABLE_VALUES_MAP_KEY", currentvalues);

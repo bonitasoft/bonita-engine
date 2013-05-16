@@ -179,6 +179,7 @@
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
+		<constructor-arg name="operationBuilders" ref="sOperationBuilders"/>
 	</bean>
 	
 	<bean id="documentReferenceExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DocumentReferenceExpressionExecutorStrategy">
