@@ -3,9 +3,6 @@ package com.bonitasoft.engine.profile;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -82,26 +79,26 @@ public class ProfileMemberTest extends AbstractProfileTest {
         // check there is no user mixmaster.spike anymore in this profile
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
-        final SearchResult<HashMap<String, Serializable>> searchedProfileMember = getProfileAPI().searchProfileMembersForProfile(adminProfileId, "user",
-                builder.done());
+        builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, adminProfileId);
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
     }
 
     private void checkCreateAndDeleProfileMember(final String memberType, final Long userId, final Long groupId, final Long roleId) throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
-        SearchResult<HashMap<String, Serializable>> searchedProfileMember = getProfileAPI().searchProfileMembersForProfile(adminProfileId, memberType,
-                builder.done());
+        builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, adminProfileId);
+        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers(memberType, builder.done());
         final long numberOfProfileMembersBeforeCreation = searchedProfileMember.getCount();
 
-        final Map<String, Serializable> addProfileMemberResult = getProfileAPI().createProfileMember(adminProfileId, userId, groupId, roleId);
+        final ProfileMember addProfileMemberResult = getProfileAPI().createProfileMember(adminProfileId, userId, groupId, roleId);
 
-        searchedProfileMember = getProfileAPI().searchProfileMembersForProfile(adminProfileId, memberType, builder.done());
+        searchedProfileMember = getProfileAPI().searchProfileMembers(memberType, builder.done());
         assertEquals(numberOfProfileMembersBeforeCreation + 1, searchedProfileMember.getCount());
 
         // delete UserProfile1
-        deleteProfileMember(addProfileMemberResult);
-        searchedProfileMember = getProfileAPI().searchProfileMembersForProfile(adminProfileId, memberType, builder.done());
+        getProfileAPI().deleteProfileMember(addProfileMemberResult.getId());
+        searchedProfileMember = getProfileAPI().searchProfileMembers(memberType, builder.done());
         assertEquals(numberOfProfileMembersBeforeCreation, searchedProfileMember.getCount());
     }
 
@@ -163,21 +160,21 @@ public class ProfileMemberTest extends AbstractProfileTest {
         login();
 
         // Create UserProfile1
-        final Map<String, Serializable> addProfileMemberResult1 = getProfileAPI().createProfileMember(Long.valueOf(1), user1.getId(), null, null);
+        final ProfileMember addProfileMemberResult = getProfileAPI().createProfileMember(Long.valueOf(1), user1.getId(), null, null);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, Long.valueOf(1));
         // builder.sort(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, Order.ASC);
-        SearchResult<HashMap<String, Serializable>> searchedProfileMember = getProfileAPI().searchProfileMembersForProfile(Long.valueOf(1), "user",
-                builder.done());
+        SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
         assertEquals(1, searchedProfileMember.getResult().size());
-        assertEquals("User1FirstName", searchedProfileMember.getResult().get(0).get("displayNamePart1"));
-        assertEquals("User1LastName", searchedProfileMember.getResult().get(0).get("displayNamePart2"));
-        assertEquals("userName1", searchedProfileMember.getResult().get(0).get("displayNamePart3"));
+        assertEquals("User1FirstName", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
+        assertEquals("User1LastName", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
+        assertEquals("userName1", searchedProfileMember.getResult().get(0).getDisplayNamePart3());
 
         // delete UserProfile1
-        deleteProfileMember(addProfileMemberResult1);
+        getProfileAPI().deleteProfileMember(addProfileMemberResult.getId());
 
-        searchedProfileMember = getProfileAPI().searchProfileMembersForProfile(Long.valueOf(1), "user", builder.done());
+        searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
         assertEquals(0, searchedProfileMember.getResult().size());
         getIdentityAPI().deleteUser(user1.getId());
 
@@ -200,7 +197,4 @@ public class ProfileMemberTest extends AbstractProfileTest {
         return getIdentityAPI().createUser(userBuilder.done(), null, null);
     }
 
-    private void deleteProfileMember(final Map<String, Serializable> addProfileMemberResult) throws DeletionException {
-        getProfileAPI().deleteProfileMember((Long) addProfileMemberResult.get(PROFILE_MEMBER_ID));
-    }
 }

@@ -281,8 +281,9 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
 
     private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId, final String querySuffix) throws SBonitaSearchException {
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
-                SProfileMember.class, SProfileMemberBuilder.ID, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
-        return profileService.searchProfileMembers(profileId, querySuffix, queryOptions);
+                SProfileMember.class, SProfileMemberBuilder.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SProfileMember.class,
+                SProfileMemberBuilder.PROFILE_ID, profileId)), null);
+        return profileService.searchProfileMembers(querySuffix, queryOptions);
     }
 
     private String getUsername(final long userId) throws SUserNotFoundException {

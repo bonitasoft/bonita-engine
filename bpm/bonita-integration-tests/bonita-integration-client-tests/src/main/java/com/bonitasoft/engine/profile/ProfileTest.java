@@ -9,14 +9,13 @@
 package com.bonitasoft.engine.profile;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.profile.model.Profile;
+import org.bonitasoft.engine.profile.model.ProfileEntry;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -27,7 +26,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProfileAPI;
-import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,32 +38,32 @@ public class ProfileTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.")
     @Test
     public void defaultProfileCreation() throws BonitaException, IOException {
-        Map<String, Serializable> getProfileResult = getProfileAPI().getProfile(adminProfileId);
-        assertEquals("Administrator", getProfileResult.get("name"));
+        Profile getProfileResult = getProfileAPI().getProfile(adminProfileId);
+        assertEquals("Administrator", getProfileResult.getName());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, adminProfileId);
-        final SearchResult<HashMap<String, Serializable>> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
+        final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
         assertEquals(ADMIN_PROFILE_ENTRY_COUNT, searchedProfileEntries.getCount());
 
         getProfileResult = getProfileAPI().getProfile(userProfileId);
-        assertEquals("User", getProfileResult.get("name"));
+        assertEquals("User", getProfileResult.getName());
 
         final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
         builder2.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
         builder2.filter(ProfileEntrySearchDescriptor.PROFILE_ID, userProfileId);
-        final SearchResult<HashMap<String, Serializable>> searchedProfileEntries2 = getProfileAPI().searchProfileEntries(builder2.done());
+        final SearchResult<ProfileEntry> searchedProfileEntries2 = getProfileAPI().searchProfileEntries(builder2.done());
         assertEquals(USER_PROFILE_ENTRY_COUNT, searchedProfileEntries2.getCount());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Create", "Delete" }, story = "Create and delete profile.")
     @Test
     public void createAndDeleteProfile() throws BonitaException, IOException {
-        final Map<String, Serializable> createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "iconPath");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "iconPath");
 
-        final Map<String, Serializable> getProfileResult = getProfileAPI().getProfile((Long) createdProfile.get("id"));
-        assertEquals(createdProfile.get("id"), getProfileResult.get("id"));
+        final Profile getProfileResult = getProfileAPI().getProfile(createdProfile.getId());
+        assertEquals(createdProfile.getId(), getProfileResult.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);
@@ -73,7 +71,7 @@ public class ProfileTest extends AbstractProfileTest {
         assertEquals(Long.valueOf(5), profileCount);
 
         // Delete profile1 using id
-        getProfileAPI().deleteProfile((Long) getProfileResult.get("id"));
+        getProfileAPI().deleteProfile(getProfileResult.getId());
 
         profileCount = getProfileAPI().searchProfiles(builder.done()).getCount();
         assertEquals(Long.valueOf(4), profileCount);
@@ -88,19 +86,19 @@ public class ProfileTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Update" }, story = "Update profile.")
     @Test
     public void updateProfile() throws BonitaException, IOException {
-        final Map<String, Serializable> createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
 
-        final ProfileUpdateDescriptor updateDescriptor = new ProfileUpdateDescriptor();
+        final ProfileUpdater updateDescriptor = new ProfileUpdater();
         updateDescriptor.description("Updated description");
         updateDescriptor.name("Updated Name");
         updateDescriptor.iconPath("Updated iconPath");
-        final Map<String, Serializable> upDateProfileResult = getProfileAPI().updateProfile((Long) createdProfile.get("id"), updateDescriptor);
-        assertEquals("Updated Name", upDateProfileResult.get("name"));
-        assertEquals("Updated description", upDateProfileResult.get("description"));
-        assertEquals("Updated iconPath", upDateProfileResult.get("iconPath"));
+        final Profile upDateProfileResult = getProfileAPI().updateProfile(createdProfile.getId(), updateDescriptor);
+        assertEquals("Updated Name", upDateProfileResult.getName());
+        assertEquals("Updated description", upDateProfileResult.getDescription());
+        assertEquals("Updated iconPath", upDateProfileResult.getIconPath());
 
         // Delete profile1 using id
-        getProfileAPI().deleteProfile((Long) createdProfile.get("id"));
+        getProfileAPI().deleteProfile(createdProfile.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);

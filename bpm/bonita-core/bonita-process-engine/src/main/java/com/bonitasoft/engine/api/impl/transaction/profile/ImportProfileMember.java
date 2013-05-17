@@ -6,7 +6,9 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.api.impl.transaction.profile;import java.util.ArrayList;
+package com.bonitasoft.engine.api.impl.transaction.profile;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
@@ -19,8 +21,9 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.profile.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.model.ExportedProfileMapping;
+
 ;
 
 /**

@@ -28,7 +28,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Test
     public void addGetAndDeleteReport() throws BonitaException {
-        final Report report = getReportingAPI().addReport("report1", null, null);
+        final Report report = getReportingAPI().createReport("report1", null, null);
         Assert.assertEquals("report1", report.getName());
         Assert.assertFalse(report.isProvided());
 
@@ -37,7 +37,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Test
     public void searchProfiles() throws BonitaException {
-        final Report report = getReportingAPI().addReport("report1", null, null);
+        final Report report = getReportingAPI().createReport("report1", null, null);
         final SearchOptionsImpl options = new SearchOptionsImpl(0, 10);
         options.addFilter(ReportSearchDescriptor.NAME, "report1");
         final SearchResult<Report> searchReports = getReportingAPI().searchReports(options);

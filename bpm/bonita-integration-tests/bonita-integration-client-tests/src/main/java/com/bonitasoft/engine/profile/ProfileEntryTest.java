@@ -1,15 +1,15 @@
 package com.bonitasoft.engine.profile;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.profile.ProfileEntryCreator;
+import org.bonitasoft.engine.profile.model.Profile;
+import org.bonitasoft.engine.profile.model.ProfileEntry;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -19,7 +19,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProfileAPI;
-import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,27 +31,28 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create and delete profile entry.")
     @Test
     public void createAndDeleteProfileEntry() throws BonitaException, IOException {
-        final Map<String, Serializable> createdProfileEntry = getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", Long.valueOf(1),
-                adminProfileId, Long.valueOf(0), "folder", "MyPage");
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry1", adminProfileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder").setParentId(1L).setPage("MyPage");
+        final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
 
-        final Map<String, Serializable> getProfileEntryResult = getProfileAPI().getProfileEntry((Long) createdProfileEntry.get("id"));
-        assertEquals(createdProfileEntry.get("id"), getProfileEntryResult.get("id"));
-        assertEquals("ProfileEntry1", getProfileEntryResult.get("name"));
-        assertEquals("Description profileEntry1", getProfileEntryResult.get("description"));
-        assertEquals(adminProfileId, getProfileEntryResult.get("profileId"));
-        assertEquals(Long.valueOf(1), getProfileEntryResult.get("parentId"));
-        assertEquals(Long.valueOf(0), getProfileEntryResult.get("index"));
-        assertEquals("folder", getProfileEntryResult.get("type"));
-        assertEquals("MyPage", getProfileEntryResult.get("page"));
+        final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(createdProfileEntry.getId());
+        assertEquals(createdProfileEntry.getId(), getProfileEntryResult.getId());
+        assertEquals("ProfileEntry1", getProfileEntryResult.getName());
+        assertEquals("Description profileEntry1", getProfileEntryResult.getDescription());
+        assertEquals(adminProfileId, getProfileEntryResult.getProfileId());
+        assertEquals(1L, getProfileEntryResult.getParentId());
+        assertEquals(0L, getProfileEntryResult.getIndex());
+        assertEquals("folder", getProfileEntryResult.getType());
+        assertEquals("MyPage", getProfileEntryResult.getPage());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, adminProfileId);
-        SearchResult<HashMap<String, Serializable>> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
+        SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
         assertEquals(ADMIN_PROFILE_ENTRY_COUNT + 1, searchedProfileEntries.getCount());
 
         // Delete profile1 using id
-        getProfileAPI().deleteProfileEntry((Long) getProfileEntryResult.get("id"));
+        getProfileAPI().deleteProfileEntry(getProfileEntryResult.getId());
 
         searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
         assertEquals(ADMIN_PROFILE_ENTRY_COUNT, searchedProfileEntries.getCount());
@@ -61,38 +61,50 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create profile entry in 2nd position.")
     @Test
     public void insertInIndex2() throws BonitaException, IOException {
-        getProfileAPI().createProfileEntry("ProfileEntry0", "Description profileEntry1", Long.valueOf(12), adminProfileId, Long.valueOf(0), "folder", "MyPage");
-        getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", Long.valueOf(12), adminProfileId, Long.valueOf(1), "folder", "MyPage");
-        getProfileAPI().createProfileEntry("ProfileEntry3", "Description profileEntry1", Long.valueOf(12), adminProfileId, Long.valueOf(2), "folder", "MyPage");
+        final ProfileEntryCreator profileEntryCreator0 = new ProfileEntryCreator("ProfileEntry0", adminProfileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder").setParentId(12L).setPage("MyPage");
+        getProfileAPI().createProfileEntry(profileEntryCreator0);
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", adminProfileId).setDescription("Description profileEntry1")
+                .setIndex(1L).setType("folder").setParentId(12L).setPage("MyPage");
+        getProfileAPI().createProfileEntry(profileEntryCreator1);
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntry3", adminProfileId).setDescription("Description profileEntry1")
+                .setIndex(2L).setType("folder").setParentId(12L).setPage("MyPage");
+        getProfileAPI().createProfileEntry(profileEntryCreator3);
 
         // insert the element between 0 and 2
-        final Map<String, Serializable> createdProfileEntry = getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry1",
-                Long.valueOf(12), adminProfileId, Long.valueOf(2), "folder", "MyPage");
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry1")
+                .setIndex(2L).setType("folder").setParentId(12L).setPage("MyPage");
+        final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator2);
 
-        final Map<String, Serializable> getProfileEntryResult = getProfileAPI().getProfileEntry((Long) createdProfileEntry.get("id"));
-        assertEquals(Long.valueOf(2), getProfileEntryResult.get("index"));
+        final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(createdProfileEntry.getId());
+        assertEquals(2L, getProfileEntryResult.getIndex());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "No index" }, story = "Create profile entry without index.")
     @Test
     public void createProfileEntryWithoutIndex() throws BonitaException, IOException {
         // Create Profile1
-        final Map<String, Serializable> createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
-        final Long profileId = (Long) createdProfile.get("id");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
-        getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", null, profileId, Long.valueOf(0), "folder", null);
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder");
+        getProfileAPI().createProfileEntry(profileEntryCreator1);
 
         // Create Profile entry 2
-        getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", null, profileId, Long.valueOf(2), "folder", null);
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
+                .setIndex(2L).setType("folder");
+        getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         // Create Profile entry 3 without Index
-        final Map<String, Serializable> profileEntryWithoutIndex = getProfileAPI().createProfileEntry("ProfileEntryWithoutIndex",
-                "Description profileEntryWithoutIndex", null, profileId, null, "folder", null);
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntryWithoutIndex", profileId).setDescription(
+                "Description profileEntryWithoutIndex").setType("folder");
+        final ProfileEntry profileEntryWithoutIndex = getProfileAPI().createProfileEntry(profileEntryCreator3);
 
-        final Map<String, Serializable> getProfileEntryResult = getProfileAPI().getProfileEntry((Long) profileEntryWithoutIndex.get("id"));
-        assertEquals(profileEntryWithoutIndex.get("id"), getProfileEntryResult.get("id"));
-        assertEquals(Long.valueOf(4), getProfileEntryResult.get("index"));
+        final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(profileEntryWithoutIndex.getId());
+        assertEquals(profileEntryWithoutIndex.getId(), getProfileEntryResult.getId());
+        assertEquals(4L, getProfileEntryResult.getIndex());
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
@@ -101,61 +113,69 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
     @Test(expected = CreationException.class)
     public void createProfileEntryWithWrongParameter() throws Exception {
-        getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", null, adminProfileId, Long.valueOf(2), "link", null);
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry2")
+                .setType("link");
+        getProfileAPI().createProfileEntry(profileEntryCreator);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update" }, story = "Update profile entry.")
     @Test
     public void updateProfileEntry() throws BonitaException, IOException {
-        final Map<String, Serializable> createdProfile = getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", Long.valueOf(1),
-                adminProfileId, Long.valueOf(12), "folder", null);
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry2")
+                .setType("folder").setIndex(12L).setParentId(1L);
+        final ProfileEntry createdProfile = getProfileAPI().createProfileEntry(profileEntryCreator);
 
         // Update Profile Entry
-        final ProfileEntryUpdateDescriptor updateDescriptor = new ProfileEntryUpdateDescriptor();
+        final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
         updateDescriptor.name("UpdatedProfileEntry3");
         updateDescriptor.description("Updated Description profileEntry3");
-        updateDescriptor.parentId(Long.valueOf(1));
+        updateDescriptor.parentId(1L);
         updateDescriptor.profileId(adminProfileId);
         updateDescriptor.type("link");
         updateDescriptor.page("myPage");
-        updateDescriptor.index(Long.valueOf(0));
-        final Map<String, Serializable> upDateProfileEntryResult = getProfileAPI().updateProfileEntry((Long) createdProfile.get("id"), updateDescriptor);
-        assertEquals("UpdatedProfileEntry3", upDateProfileEntryResult.get("name"));
-        assertEquals("Updated Description profileEntry3", upDateProfileEntryResult.get("description"));
-        assertEquals("myPage", upDateProfileEntryResult.get("page"));
+        updateDescriptor.index(0L);
+        final ProfileEntry upDateProfileEntryResult = getProfileAPI().updateProfileEntry(createdProfile.getId(), updateDescriptor);
+        assertEquals("UpdatedProfileEntry3", upDateProfileEntryResult.getName());
+        assertEquals("Updated Description profileEntry3", upDateProfileEntryResult.getDescription());
+        assertEquals("myPage", upDateProfileEntryResult.getPage());
 
         // Delete profile Entry 1 using id
-        getProfileAPI().deleteProfileEntry((Long) createdProfile.get("id"));
+        getProfileAPI().deleteProfileEntry(createdProfile.getId());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Delete", "Index" }, story = "Update profile entry index on delete.")
     @Test
     public void updateProfileEntryIndexOnDelete() throws BonitaException, IOException {
         // Create Profile1
-        final Map<String, Serializable> createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
-        final Long profileId = (Long) createdProfile.get("id");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
-        getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", null, profileId, Long.valueOf(0), "folder", null);
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder");
+        getProfileAPI().createProfileEntry(profileEntryCreator1);
 
         // Create Profile entry 2
-        final Map<String, Serializable> profileToDelete = getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", null, profileId,
-                Long.valueOf(2), "folder", null);
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
+                .setIndex(2L).setType("folder");
+        final ProfileEntry profileEntryToDelete = getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         // Create Profile Entry 3
-        getProfileAPI().createProfileEntry("ProfileEntry3", "Description profileEntry3", null, profileId, Long.valueOf(4), "folder", null);
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntry3", profileId).setDescription("Description profileEntry3")
+                .setIndex(4L).setType("folder");
+        getProfileAPI().createProfileEntry(profileEntryCreator3);
 
         // Delete Profile Entry 2
-        getProfileAPI().deleteProfileEntry((Long) profileToDelete.get("id"));
+        getProfileAPI().deleteProfileEntry(profileEntryToDelete.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
-        final List<HashMap<String, Serializable>> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
-        assertEquals(Long.valueOf(0), searchedProfileEntries.get(0).get("index"));
-        assertEquals("ProfileEntry1", searchedProfileEntries.get(0).get("name"));
-        assertEquals(Long.valueOf(2), searchedProfileEntries.get(1).get("index"));
-        assertEquals("ProfileEntry3", searchedProfileEntries.get(1).get("name"));
+        final List<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+        assertEquals(0L, searchedProfileEntries.get(0).getIndex());
+        assertEquals("ProfileEntry1", searchedProfileEntries.get(0).getName());
+        assertEquals(2L, searchedProfileEntries.get(1).getIndex());
+        assertEquals("ProfileEntry3", searchedProfileEntries.get(1).getName());
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
@@ -165,28 +185,34 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryIndexOnInsert() throws BonitaException, IOException {
         // Create Profile Entry 1
-        final Map<String, Serializable> createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
-        final Long profileId = (Long) createdProfile.get("id");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final long profileId = createdProfile.getId();
 
         // Create Profile Entry 1
-        getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", null, profileId, Long.valueOf(0), "folder", null);
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder");
+        getProfileAPI().createProfileEntry(profileEntryCreator1);
 
         // Create Profile Entry 3
-        getProfileAPI().createProfileEntry("ProfileEntry3", "Description profileEntry3", null, profileId, Long.valueOf(2), "folder", null);
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntry3", profileId).setDescription("Description profileEntry3")
+                .setIndex(2L).setType("folder");
+        getProfileAPI().createProfileEntry(profileEntryCreator3);
 
         // Create Profile entry 2
-        getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", null, profileId, Long.valueOf(2), "folder", null);
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
+                .setIndex(2L).setType("folder");
+        getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
-        final List<HashMap<String, Serializable>> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
-        assertEquals(Long.valueOf(0), searchedProfileEntries.get(0).get("index"));
-        assertEquals("ProfileEntry1", searchedProfileEntries.get(0).get("name"));
-        assertEquals(Long.valueOf(2), searchedProfileEntries.get(1).get("index"));
-        assertEquals("ProfileEntry2", searchedProfileEntries.get(1).get("name"));
-        assertEquals(Long.valueOf(4), searchedProfileEntries.get(2).get("index"));
-        assertEquals("ProfileEntry3", searchedProfileEntries.get(2).get("name"));
+        final List<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+        assertEquals(0L, searchedProfileEntries.get(0).getIndex());
+        assertEquals("ProfileEntry1", searchedProfileEntries.get(0).getName());
+        assertEquals(2L, searchedProfileEntries.get(1).getIndex());
+        assertEquals("ProfileEntry2", searchedProfileEntries.get(1).getName());
+        assertEquals(4L, searchedProfileEntries.get(2).getIndex());
+        assertEquals("ProfileEntry3", searchedProfileEntries.get(2).getName());
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
@@ -196,40 +222,46 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryIndexOnUpdate() throws BonitaException, IOException {
         // Create Profile1
-        final Map<String, Serializable> createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
-        final Long profileId = (Long) createdProfile.get("id");
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final long profileId = createdProfile.getId();
 
         // Create Profile Entry Menu1
-        final Map<String, Serializable> createdProfileMenu = getProfileAPI().createProfileEntry("Menu1", "Description Menu1", null, profileId, Long.valueOf(0),
-                "folder", null);
-        final Long profileMenuId = (Long) createdProfileMenu.get("id");
+        final ProfileEntryCreator profileEntryCreatorMenu1 = new ProfileEntryCreator("Menu1", profileId).setDescription("Description Menu1")
+                .setIndex(0L).setType("folder");
+        final ProfileEntry createdProfileMenu = getProfileAPI().createProfileEntry(profileEntryCreatorMenu1);
+        final long profileMenuId = createdProfileMenu.getId();
 
         // Create Profile Entry 1
-        getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", profileMenuId, profileId, Long.valueOf(0), "folder", null);
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder").setParentId(profileMenuId);
+        getProfileAPI().createProfileEntry(profileEntryCreator1);
 
         // Create Profile entry 2
-        getProfileAPI().createProfileEntry("ProfileEntry2", "Description profileEntry2", profileMenuId, profileId, Long.valueOf(2), "folder", null);
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
+                .setIndex(2L).setType("folder").setParentId(profileMenuId);
+        getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         // Create Profile Entry 3
-        final Map<String, Serializable> profileEntry = getProfileAPI().createProfileEntry("ProfileEntry3", "Description profileEntry3", profileMenuId,
-                profileId, Long.valueOf(4), "folder", null);
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntry3", profileId).setDescription("Description profileEntry3")
+                .setIndex(4L).setType("folder").setParentId(profileMenuId);
+        final ProfileEntry profileEntry = getProfileAPI().createProfileEntry(profileEntryCreator3);
 
         // Update Profile Entry
-        final ProfileEntryUpdateDescriptor updateDescriptor = new ProfileEntryUpdateDescriptor();
+        final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
         updateDescriptor.index(Long.valueOf(-1));
-        getProfileAPI().updateProfileEntry((Long) profileEntry.get("id"), updateDescriptor);
+        getProfileAPI().updateProfileEntry(profileEntry.getId(), updateDescriptor);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
         builder.filter(ProfileEntrySearchDescriptor.PARENT_ID, profileMenuId);
-        final List<HashMap<String, Serializable>> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
-        assertEquals(Long.valueOf(0), searchedProfileEntries.get(0).get("index"));
-        assertEquals("ProfileEntry3", searchedProfileEntries.get(0).get("name"));
-        assertEquals(Long.valueOf(2), searchedProfileEntries.get(1).get("index"));
-        assertEquals("ProfileEntry1", searchedProfileEntries.get(1).get("name"));
-        assertEquals(Long.valueOf(4), searchedProfileEntries.get(2).get("index"));
-        assertEquals("ProfileEntry2", searchedProfileEntries.get(2).get("name"));
+        final List<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+        assertEquals(0L, searchedProfileEntries.get(0).getIndex());
+        assertEquals("ProfileEntry3", searchedProfileEntries.get(0).getName());
+        assertEquals(2L, searchedProfileEntries.get(1).getIndex());
+        assertEquals("ProfileEntry1", searchedProfileEntries.get(1).getName());
+        assertEquals(4L, searchedProfileEntries.get(2).getIndex());
+        assertEquals("ProfileEntry2", searchedProfileEntries.get(2).getName());
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
@@ -244,23 +276,23 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Wrong parameter" }, story = "Execute profile command with wrong parameter", jira = "ENGINE-548")
     @Test(expected = UpdateException.class)
     public void updateProfileEntryWithWrongParameter() throws Exception {
-        final Map<String, Serializable> createdProfileEntry = getProfileAPI().createProfileEntry("ProfileEntry1", "Description profileEntry1", Long.valueOf(1),
-                adminProfileId, Long.valueOf(0), "folder", "MyPage");
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry1", adminProfileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder");
+        final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
 
-        final ProfileEntryUpdateDescriptor updateDescriptor = new ProfileEntryUpdateDescriptor();
+        final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
         updateDescriptor.type("link");
-        updateDescriptor.page(null);
-        updateDescriptor.index(Long.valueOf(0));
-        getProfileAPI().updateProfileEntry((Long) createdProfileEntry.get("id"), updateDescriptor);
+        updateDescriptor.page("");
+        getProfileAPI().updateProfileEntry(createdProfileEntry.getId(), updateDescriptor);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Not Existing" }, story = "Execute profile command with not existing", jira = "ENGINE-548")
     @Test(expected = UpdateException.class)
     public void updateProfileEntryNotExisting() throws Exception {
-        final ProfileEntryUpdateDescriptor updateDescriptor = new ProfileEntryUpdateDescriptor();
+        final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
         updateDescriptor.type("link");
         updateDescriptor.page(null);
-        updateDescriptor.index(Long.valueOf(0));
+        updateDescriptor.index(0L);
         getProfileAPI().updateProfileEntry(16464654L, updateDescriptor);
     }
 

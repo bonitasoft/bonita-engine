@@ -10,7 +10,6 @@ package com.bonitasoft.engine.log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,6 +46,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdateDescriptor;
+import org.bonitasoft.engine.profile.model.Profile;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -416,7 +416,6 @@ public class LogTest extends CommonAPISPTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutputUsingAPIAccessor() throws Exception {
         final String johnName = "john";
         createUser(johnName, "bpm");
@@ -429,13 +428,13 @@ public class LogTest extends CommonAPISPTest {
         final String nbLogsData = "nbLogsData";
         final String searchLogsData = "searchLogsData";
         final String getLogsData = "getLogsData";
-        final String profileAttributeMapData = "profileAttributeMapData";
+        final String profileData = "profileData";
         designProcessDefinition.addLongData(dataName, dataDefaultValue);
         designProcessDefinition.addLongData(procInstIdData, dataDefaultValue);
         designProcessDefinition.addIntegerData(nbLogsData, new ExpressionBuilder().createConstantIntegerExpression(0));
         designProcessDefinition.addData(searchLogsData, SearchResult.class.getName(), null);
         designProcessDefinition.addData(getLogsData, List.class.getName(), dataDefaultValue);
-        designProcessDefinition.addData(profileAttributeMapData, Map.class.getName(), dataDefaultValue);
+        designProcessDefinition.addData(profileData, Profile.class.getName(), dataDefaultValue);
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step0", delivery);
         designProcessDefinition
@@ -451,8 +450,8 @@ public class LogTest extends CommonAPISPTest {
                         new ExpressionBuilder().createInputExpression("searchLogs", SearchResult.class.getName()))
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(getLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression("getLogs", List.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName(profileAttributeMapData).done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression("profileAttributeMap", Map.class.getName()));
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(profileData).done(), OperatorType.ASSIGNMENT, "=", null,
+                        new ExpressionBuilder().createInputExpression("profile", Profile.class.getName()));
         designProcessDefinition.addUserTask("step2", delivery);
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
@@ -475,10 +474,8 @@ public class LogTest extends CommonAPISPTest {
         assertTrue("Number of SearchResult should be > 0",
                 ((SearchResult<?>) getProcessAPI().getProcessDataInstance(searchLogsData, procInstanceId).getValue()).getCount() > 0);
         assertTrue("Number of getLogs should be > 0", ((List<?>) getProcessAPI().getProcessDataInstance(getLogsData, procInstanceId).getValue()).size() > 0);
-        final Map<String, Serializable> profileAttributes = (Map<String, Serializable>) getProcessAPI().getProcessDataInstance(profileAttributeMapData,
-                procInstanceId).getValue();
-        assertTrue("Size of profileAttributeMap should be > 0", profileAttributes.size() > 0);
-        assertEquals("addProfileCommandFromConnector", profileAttributes.get("name"));
+        final Profile profile = (Profile) getProcessAPI().getProcessDataInstance(profileData, procInstanceId).getValue();
+        assertEquals("addProfileCommandFromConnector", profile.getName());
 
         deleteUser(johnName);
         disableAndDelete(processDefinition);

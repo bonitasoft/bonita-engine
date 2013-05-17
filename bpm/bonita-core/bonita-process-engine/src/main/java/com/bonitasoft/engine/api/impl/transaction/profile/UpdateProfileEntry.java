@@ -21,8 +21,8 @@ import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
-import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor;
-import com.bonitasoft.engine.bpm.model.ProfileEntryUpdateDescriptor.ProfileEntryField;
+import com.bonitasoft.engine.profile.ProfileEntryUpdater;
+import com.bonitasoft.engine.profile.ProfileEntryUpdater.ProfileEntryUpdateField;
 
 /**
  * @author Julien Mege
@@ -34,14 +34,14 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
 
     private final Long profileEntryId;
 
-    private final ProfileEntryUpdateDescriptor updateDescriptor;
+    private final ProfileEntryUpdater updateDescriptor;
 
     private final SProfileEntryUpdateBuilder updateBuilder;
 
     private SProfileEntry sProfileEntry = null;
 
     public UpdateProfileEntry(final ProfileService profileService, final SProfileEntryUpdateBuilder updateBuilder, final Long profileEntryId,
-            final ProfileEntryUpdateDescriptor updateDescriptor) {
+            final ProfileEntryUpdater updateDescriptor) {
         super();
         this.profileService = profileService;
         this.profileEntryId = profileEntryId;
@@ -54,8 +54,9 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
         final EntityUpdateDescriptor profileEntryUpdateDescriptor = getProfileEntryUpdateDescriptor();
         final Map<String, Object> fields = profileEntryUpdateDescriptor.getFields();
-        if ("link".equalsIgnoreCase((String) fields.get(SProfileEntryBuilder.TYPE))
-                && ((String) fields.get(SProfileEntryBuilder.PAGE) == null || "".equals(fields.get(SProfileEntryBuilder.PAGE)))) {
+        final String type = (String) fields.get(SProfileEntryBuilder.TYPE);
+        final String page = (String) fields.get(SProfileEntryBuilder.PAGE);
+        if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
             throw new SProfileEntryUpdateException("For a link, the page is mandatory.");
         }
 
@@ -69,8 +70,8 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
     }
 
     private EntityUpdateDescriptor getProfileEntryUpdateDescriptor() {
-        final Map<ProfileEntryField, Serializable> fields = updateDescriptor.getFields();
-        for (final Entry<ProfileEntryField, Serializable> field : fields.entrySet()) {
+        final Map<ProfileEntryUpdateField, Serializable> fields = updateDescriptor.getFields();
+        for (final Entry<ProfileEntryUpdateField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
                 case NAME:
                     updateBuilder.setName((String) field.getValue());

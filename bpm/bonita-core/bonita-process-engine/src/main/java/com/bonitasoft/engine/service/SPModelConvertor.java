@@ -16,7 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilder;import org.bonitasoft.engine.profile.ProfileCreator;
+import org.bonitasoft.engine.profile.ProfileCreator.ProfileField;
+import org.bonitasoft.engine.profile.ProfileEntryCreator;
+import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
+import org.bonitasoft.engine.profile.builder.SProfileBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.service.ModelConvertor;
 
@@ -111,4 +118,47 @@ public final class SPModelConvertor extends ModelConvertor {
         return breakpoints;
     }
 
+    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder) {
+        final Map<ProfileField, Serializable> fields = creator.getFields();
+        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME));
+        final String description = (String) fields.get(ProfileField.DESCRIPTION);
+        if (description != null) {
+            newSProfileBuilder.setDescription(description);
+        }
+        final String iconPath = (String) fields.get(ProfileField.ICON_PATH);
+        if (iconPath != null) {
+            newSProfileBuilder.setIconPath(iconPath);
+        }
+        return newSProfileBuilder.done();
+    }
+
+    public static SProfileEntry constructSProfileEntry(final ProfileEntryCreator creator, final SProfileEntryBuilder sProfileEntryBuilder) {
+        final Map<ProfileEntryField, Serializable> fields = creator.getFields();
+        final SProfileEntryBuilder newSProfileEntryBuilder = sProfileEntryBuilder.createNewInstance((String) fields.get(ProfileEntryField.NAME),
+                (Long) fields.get(ProfileEntryField.PROFILE_ID));
+        final String description = (String) fields.get(ProfileEntryField.DESCRIPTION);
+        if (description != null) {
+            newSProfileEntryBuilder.setDescription(description);
+        }
+        final Long index = (Long) fields.get(ProfileEntryField.INDEX);
+        if (index != null) {
+            newSProfileEntryBuilder.setIndex(index);
+        } else {
+            // Insert the profile entry at the end of the profile entry list
+            newSProfileEntryBuilder.setIndex(Long.MAX_VALUE);
+        }
+        final String page = (String) fields.get(ProfileEntryField.PAGE);
+        if (page != null) {
+            newSProfileEntryBuilder.setPage(page);
+        }
+        final Long parentId = (Long) fields.get(ProfileEntryField.PARENT_ID);
+        if (parentId != null) {
+            newSProfileEntryBuilder.setParentId(parentId);
+        }
+        final String type = (String) fields.get(ProfileEntryField.TYPE);
+        if (type != null) {
+            newSProfileEntryBuilder.setType(type);
+        }
+        return newSProfileEntryBuilder.done();
+    }
 }

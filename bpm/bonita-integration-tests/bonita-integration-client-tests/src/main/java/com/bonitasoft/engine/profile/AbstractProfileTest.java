@@ -21,6 +21,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.profile.model.Profile;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.descriptor.ProfileSearchDescriptor;
@@ -44,9 +45,9 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
 
     protected static final int USER_PROFILE_ENTRY_COUNT = 17;
 
-    protected Long adminProfileId;
+    protected long adminProfileId;
 
-    protected Long userProfileId;
+    protected long userProfileId;
 
     protected User user1;
 
@@ -92,13 +93,13 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
 
         // search for the newly created profile IDs:
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, Integer.MAX_VALUE).sort(ProfileSearchDescriptor.NAME, Order.ASC);
-        final List<HashMap<String, Serializable>> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
+        final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
         assertEquals(4, profiles.size());
-        for (final HashMap<String, Serializable> map : profiles) {
-            if ("Administrator".equals(map.get("name"))) {
-                adminProfileId = (Long) map.get("id");
-            } else if ("User".equals(map.get("name"))) {
-                userProfileId = (Long) map.get("id");
+        for (final Profile map : profiles) {
+            if ("Administrator".equals(map.getName())) {
+                adminProfileId = map.getId();
+            } else if ("User".equals(map.getName())) {
+                userProfileId = map.getId();
             }
         }
     }

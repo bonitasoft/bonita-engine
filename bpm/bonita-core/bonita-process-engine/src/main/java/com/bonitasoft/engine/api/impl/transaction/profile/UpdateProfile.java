@@ -19,8 +19,8 @@ import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
-import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor;
-import com.bonitasoft.engine.bpm.model.ProfileUpdateDescriptor.ProfileField;
+import com.bonitasoft.engine.profile.ProfileUpdater;
+import com.bonitasoft.engine.profile.ProfileUpdater.ProfileField;
 
 /**
  * @author Julien Mege
@@ -32,14 +32,14 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
 
     private final Long profileId;
 
-    private final ProfileUpdateDescriptor updateDescriptor;
+    private final ProfileUpdater updateDescriptor;
 
     private final SProfileUpdateBuilder updateBuilder;
 
     private SProfile profile = null;
 
     public UpdateProfile(final ProfileService profileService, final SProfileUpdateBuilder updateBuilder, final Long profileId,
-            final ProfileUpdateDescriptor updateDescriptor) {
+            final ProfileUpdater updateDescriptor) {
         super();
         this.profileService = profileService;
         this.profileId = profileId;

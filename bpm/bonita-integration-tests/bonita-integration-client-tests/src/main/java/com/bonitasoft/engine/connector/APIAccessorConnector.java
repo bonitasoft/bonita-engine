@@ -8,12 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
 import org.bonitasoft.engine.exception.connector.ConnectorValidationException;
+import org.bonitasoft.engine.profile.model.Profile;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 
 import com.bonitasoft.engine.api.LogAPI;
@@ -43,12 +41,11 @@ public class APIAccessorConnector extends AbstractConnector {
             setOutputParameter("searchLogs", logAPI.searchLogs(new SearchOptionsBuilder(0, numberOfLogs).done()));
             setOutputParameter("getLogs", logAPI.getLogs(0, numberOfLogs, LogCriterion.SEVERITY_LEVEL_DESC));
 
-            final Map<String, Serializable> profileAttributeMap = getAPIAccessor().getProfileAPI().createProfile("addProfileCommandFromConnector",
+            final Profile profile = getAPIAccessor().getProfileAPI().createProfile("addProfileCommandFromConnector",
                     "test of call to a command through getAPIAccessor from a Connector implementation", "");
-            setOutputParameter("profileAttributeMap", profileAttributeMap);
+            setOutputParameter("profile", profile);
 
             getAPIAccessor().getProcessAPI().getNumberOfCategories();
-
         } catch (final BonitaException e) {
             throw new ConnectorException(e);
         }

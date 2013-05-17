@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.bpm.model;
+package com.bonitasoft.engine.profile;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * @author Celine Souchet
  */
-public class ProfileMemberUpdateDescriptor implements Serializable {
+public class ProfileMemberUpdater implements Serializable {
 
     private static final long serialVersionUID = 728214104237982027L;
 
@@ -25,7 +25,7 @@ public class ProfileMemberUpdateDescriptor implements Serializable {
 
     private final Map<ProfileMemberField, Serializable> fields;
 
-    public ProfileMemberUpdateDescriptor() {
+    public ProfileMemberUpdater() {
         fields = new HashMap<ProfileMemberField, Serializable>(3);
     }
 
