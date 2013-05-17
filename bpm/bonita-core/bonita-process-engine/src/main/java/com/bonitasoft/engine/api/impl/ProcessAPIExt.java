@@ -64,7 +64,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -91,7 +90,6 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.IllegalProcessStateException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.PageOutOfRangeException;
@@ -170,7 +168,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteProcess(final long processDefinitionId) throws ProcessDefinitionNotFoundException, DeletionException, IllegalProcessStateException {
+    public void deleteProcess(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -192,12 +190,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
             final File processeFolder = new File(file, String.valueOf(serverProcessDefinition.getId()));
             IOUtil.deleteDir(processeFolder);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            log(tenantAccessor, e);
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SDeletingEnabledProcessException e) {
-            log(tenantAccessor, e);
-            throw new IllegalProcessStateException(e);
         } catch (final SProcessDefinitionReadException e) {
             log(tenantAccessor, e);
             throw new DeletionException(e);
@@ -626,7 +618,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final long tenantId = tenantAccessor.getTenantId();
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
+            final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
