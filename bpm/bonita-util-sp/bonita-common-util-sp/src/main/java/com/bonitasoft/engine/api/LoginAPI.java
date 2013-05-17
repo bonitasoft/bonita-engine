@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -27,7 +27,7 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      *            the password
      * @return the session to use with other tenant API methods
      * @throws LoginException
-     *             occurs when an exception is thrown during the login
+     *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
      *             since 6.0
      */
     APISession login(long tenantId, String userName, String password) throws LoginException;
