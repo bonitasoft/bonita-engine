@@ -45,7 +45,6 @@ import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdateDescriptor;
 import org.bonitasoft.engine.search.Order;
@@ -532,7 +531,7 @@ public class LogTest extends CommonAPISPTest {
 
     @Test
     public void log() throws BonitaException, InterruptedException {
-        final Group group = getIdentityAPI().createGroup(new GroupBuilder().createNewInstance("group1").done());
+        final Group group = getIdentityAPI().createGroup("group1", null);
         getIdentityAPI().deleteGroup(group.getId());
 
         final int initialNumberOfLogs = getLogAPI().getNumberOfLogs();
