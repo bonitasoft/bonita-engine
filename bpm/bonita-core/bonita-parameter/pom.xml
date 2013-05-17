@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.0.0-beta-026</version>
+		<version>6.0.0-beta-027-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.bonitasoft.engine.core.parameter</groupId>
