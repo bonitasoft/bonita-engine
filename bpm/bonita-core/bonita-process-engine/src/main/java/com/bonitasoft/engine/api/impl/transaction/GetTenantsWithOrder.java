@@ -23,28 +23,28 @@ public class GetTenantsWithOrder implements TransactionContentWithResult<List<ST
 
     private final PlatformService platformService;
 
-    private final int pageIndex;
+    private final int startIndex;
 
     private final OrderByType orderContent;
 
     private final String fieldContent;
 
-    private final int numberPerPage;
+    private final int maxResults;
 
     private List<STenant> tenantList;
 
-    public GetTenantsWithOrder(final PlatformService platformService, final int pageIndex, final OrderByType orderContent, final String fieldContent,
-            final int numberPerPage) {
+    public GetTenantsWithOrder(final PlatformService platformService, final int startIndex, final int maxResults, final OrderByType orderContent,
+            final String fieldContent) {
         this.platformService = platformService;
-        this.pageIndex = pageIndex;
+        this.startIndex = startIndex;
         this.orderContent = orderContent;
         this.fieldContent = fieldContent;
-        this.numberPerPage = numberPerPage;
+        this.maxResults = maxResults;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        tenantList = platformService.getTenants(pageIndex, numberPerPage, fieldContent, orderContent);
+        tenantList = platformService.getTenants(startIndex, maxResults, fieldContent, orderContent);
     }
 
     @Override

@@ -30,14 +30,6 @@ import com.bonitasoft.manager.Features;
  */
 public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
-    @Override
-    public long getCurrentMemoryUsage() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
-
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
-        return platformMonitoringService.getCurrentMemoryUsage();
-    }
-
     private PlatformMonitoringService getPlatformMonitoring() throws MonitoringException {
         PlatformServiceAccessor platformServiceAccessor = null;
         try {
@@ -47,6 +39,14 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
         }
 
         return platformServiceAccessor.getPlatformMonitoringService();
+    }
+
+    @Override
+    public long getCurrentMemoryUsage() throws MonitoringException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        return platformMonitoringService.getCurrentMemoryUsage();
     }
 
     @Override

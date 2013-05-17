@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.platform.TenantCreator;
 
 // @RunWith(PowerMockRunner.class)
 // @PrepareForTest(Manager.class)
@@ -18,7 +19,7 @@ public class LicenseTest extends CommonAPISPTest {
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         try {
             // License invalid == not exists
-            platformAPI.createTenant("lumi corp", "The snow maker", null, null, "lumi", "lumi");
+            platformAPI.createTenant(new TenantCreator("lumi corp", "The snow maker", null, null, "lumi", "lumi"));
         } catch (final Exception e) {
             logoutPlatform(session);
         }

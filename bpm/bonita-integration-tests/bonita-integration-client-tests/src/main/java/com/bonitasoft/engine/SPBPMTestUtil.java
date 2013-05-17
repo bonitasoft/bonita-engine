@@ -38,6 +38,7 @@ import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.exception.TenantDeactivationException;
 import com.bonitasoft.engine.exception.TenantNotActivatedException;
 import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantCreator;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -119,7 +120,8 @@ public class SPBPMTestUtil {
             final String password) throws BonitaException {
         final PlatformSession session = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        final long tenantId = platformAPI.createTenant(tenantName, DEFAULT_TENANT_DESCRIPTION, iconName, iconPath, techinalUsername, password);
+        final long tenantId = platformAPI
+                .createTenant(new TenantCreator(tenantName, DEFAULT_TENANT_DESCRIPTION, iconName, iconPath, techinalUsername, password));
         platformAPI.activateTenant(tenantId);
         logoutPlatform(session);
         return tenantId;

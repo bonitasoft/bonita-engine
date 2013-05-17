@@ -30,7 +30,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.platform.PlatformLoginException;
 import org.bonitasoft.engine.exception.platform.PlatformLogoutException;
-import org.bonitasoft.engine.exception.platform.PlatformNotExistException;
+import org.bonitasoft.engine.exception.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -71,7 +71,11 @@ public class SPPlatformTest {
     public static void beforeClass() throws BonitaException, BonitaHomeNotSetException {
         platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         logAsPlatformAdmin();
-        platformAPI.createAndInitializePlatform();
+        try {
+            platformAPI.initializePlatform();
+        } catch (final CreationException e) {
+            // Platform already created
+        }
         platformAPI.startNode();
     }
 
@@ -85,7 +89,7 @@ public class SPPlatformTest {
         if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
             platformAPI.stopNode();
         }
-        platformAPI.deletePlaftorm();
+        platformAPI.cleanPlatform();
         platformLoginAPI.logout(session);
     }
 
@@ -94,17 +98,17 @@ public class SPPlatformTest {
 
         @Override
         public void starting(final Description d) {
-            LOGGER.error("Starting test: " + getClass().getName() + "." + d.getMethodName());
+            LOGGER.info("Starting test: " + getClass().getName() + "." + d.getMethodName());
         }
 
         @Override
-        public void failed(final Throwable cause, final Description d) {
-            LOGGER.error("Failed test: " + getClass().getName() + "." + d.getMethodName());
+        public void failed(@SuppressWarnings("unused") final Throwable cause, final Description d) {
+            LOGGER.info("Failed test: " + getClass().getName() + "." + d.getMethodName());
         }
 
         @Override
         public void succeeded(final Description d) {
-            LOGGER.error("Succeeded test: " + getClass().getName() + "." + d.getMethodName());
+            LOGGER.info("Succeeded test: " + getClass().getName() + "." + d.getMethodName());
         }
 
     };
@@ -114,7 +118,7 @@ public class SPPlatformTest {
     }
 
     private long createATenant(final String tenantName) throws BonitaException {
-        return platformAPI.createTenant(tenantName, "", "testIconName", "testIconPath", "default_tenant", "default_password");
+        return platformAPI.createTenant(new TenantCreator(tenantName, "", "testIconName", "testIconPath", "default_tenant", "default_password"));
     }
 
     @Test(expected = PlatformLoginException.class)
@@ -154,8 +158,8 @@ public class SPPlatformTest {
         // create tenant
         final List<Tenant> listTenant = new ArrayList<Tenant>();
         for (int i = 0; i < 10; i++) {
-            final long tenantID = platformAPI.createTenant("tenantName" + i, "test search tenant ", "testIconName" + i, "testIconPath" + i, "username" + i,
-                    "123");
+            final long tenantID = platformAPI.createTenant(new TenantCreator("tenantName" + i, "test search tenant ", "testIconName" + i, "testIconPath" + i,
+                    "username" + i, "123"));
             final Tenant tenant = platformAPI.getTenantById(tenantID);
             listTenant.add(tenant);
         }
@@ -261,8 +265,8 @@ public class SPPlatformTest {
         }
 
         for (int k = 0; k < 5; k++) {
-            final TenantUpdateDescriptor udpateDescriptor = new TenantUpdateDescriptor();
-            udpateDescriptor.updateStatus("ACTIVATED");
+            final TenantUpdater udpateDescriptor = new TenantUpdater();
+            udpateDescriptor.setStatus("ACTIVATED");
             platformAPI.updateTenant(listTenant.get(k).getId(), udpateDescriptor);
         }
 
@@ -289,8 +293,8 @@ public class SPPlatformTest {
         }
 
         for (int k = 0; k < 5; k++) {
-            final TenantUpdateDescriptor udpateDescriptor = new TenantUpdateDescriptor();
-            udpateDescriptor.updateStatus("DEACTIVATED");
+            final TenantUpdater udpateDescriptor = new TenantUpdater();
+            udpateDescriptor.setStatus("DEACTIVATED");
             platformAPI.updateTenant(listTenant.get(k).getId(), udpateDescriptor);
         }
 
@@ -346,7 +350,7 @@ public class SPPlatformTest {
 
     @Test
     public void createTenant() throws BonitaException {
-        final long testId = platformAPI.createTenant("test", "test create tenant", "testIconName", "testIconPath", "name", "123");
+        final long testId = platformAPI.createTenant(new TenantCreator("test", "test create tenant", "testIconName", "testIconPath", "name", "123"));
         final Tenant tenant = platformAPI.getTenantById(testId);
         assertEquals("test", tenant.getName());
         assertEquals("testIconName", tenant.getIconName());
@@ -361,7 +365,7 @@ public class SPPlatformTest {
         platformLoginAPI.logout(session);
         try {
             platformAPI = PlatformAPIAccessor.getPlatformAPI(null);
-            platformAPI.createTenant("test", "test create tenant", "testIconName", "testIconPath", "name", "123");
+            platformAPI.createTenant(new TenantCreator("test", "test create tenant", "testIconName", "testIconPath", "name", "123"));
             fail("can't get platform api with null session");
         } finally {
             logAsPlatformAdmin();
@@ -371,9 +375,9 @@ public class SPPlatformTest {
 
     @Test(expected = AlreadyExistsException.class)
     public void createExistedTenant() throws BonitaException {
-        final long tenantId = platformAPI.createTenant("tenantName", "it is a tenant", "testIconName", "testIconPath", "bole", "321");
+        final long tenantId = platformAPI.createTenant(new TenantCreator("tenantName", "it is a tenant", "testIconName", "testIconPath", "bole", "321"));
         try {
-            platformAPI.createTenant("tenantName", "", "testIconName", "testIconPath", "", "");
+            platformAPI.createTenant(new TenantCreator("tenantName", "", "testIconName", "testIconPath", "", ""));
         } finally {
             platformAPI.deleteTenant(tenantId);
         }
@@ -472,8 +476,8 @@ public class SPPlatformTest {
     public void deleteTenant() throws BonitaException {
         final String tenantNameA = "testA";
         final String tenantNameB = "testB";
-        final long tenantA = platformAPI.createTenant(tenantNameA, "", "testIconName", "testIconPath", "nameA", "passwordA");
-        final long tenantB = platformAPI.createTenant(tenantNameB, "", "testIconName", "testIconPath", "nameB", "passwordB");
+        final long tenantA = platformAPI.createTenant(new TenantCreator(tenantNameA, "", "testIconName", "testIconPath", "nameA", "passwordA"));
+        final long tenantB = platformAPI.createTenant(new TenantCreator(tenantNameB, "", "testIconName", "testIconPath", "nameB", "passwordB"));
 
         final List<Tenant> tenantsA = platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getResult();
         assertEquals(2, tenantsA.size());
@@ -500,15 +504,15 @@ public class SPPlatformTest {
         final String tenantName7 = "test7";
         final String tenantName8 = "test8";
         final String tenantName9 = "test9";
-        final long tenant1 = platformAPI.createTenant(tenantName1, "", "testIconName", "testIconPath", "testname1", "testpassword1");
-        final long tenant2 = platformAPI.createTenant(tenantName2, "", "testIconName", "testIconPath", "testname2", "testpassword2");
-        final long tenant3 = platformAPI.createTenant(tenantName3, "", "testIconName", "testIconPath", "testname3", "testpassword3");
-        final long tenant4 = platformAPI.createTenant(tenantName4, "", "testIconName", "testIconPath", "testname4", "testpassword4");
-        final long tenant5 = platformAPI.createTenant(tenantName5, "", "testIconName", "testIconPath", "testname5", "testpassword5");
-        final long tenant6 = platformAPI.createTenant(tenantName6, "", "testIconName", "testIconPath", "testname6", "testpassword6");
-        final long tenant7 = platformAPI.createTenant(tenantName7, "", "testIconName", "testIconPath", "testname7", "testpassword7");
-        final long tenant8 = platformAPI.createTenant(tenantName8, "", "testIconName", "testIconPath", "testname8", "testpassword8");
-        final long tenant9 = platformAPI.createTenant(tenantName9, "", "testIconName", "testIconPath", "testname9", "testpassword9");
+        final long tenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "", "testIconName", "testIconPath", "testname1", "testpassword1"));
+        final long tenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "", "testIconName", "testIconPath", "testname2", "testpassword2"));
+        final long tenant3 = platformAPI.createTenant(new TenantCreator(tenantName3, "", "testIconName", "testIconPath", "testname3", "testpassword3"));
+        final long tenant4 = platformAPI.createTenant(new TenantCreator(tenantName4, "", "testIconName", "testIconPath", "testname4", "testpassword4"));
+        final long tenant5 = platformAPI.createTenant(new TenantCreator(tenantName5, "", "testIconName", "testIconPath", "testname5", "testpassword5"));
+        final long tenant6 = platformAPI.createTenant(new TenantCreator(tenantName6, "", "testIconName", "testIconPath", "testname6", "testpassword6"));
+        final long tenant7 = platformAPI.createTenant(new TenantCreator(tenantName7, "", "testIconName", "testIconPath", "testname7", "testpassword7"));
+        final long tenant8 = platformAPI.createTenant(new TenantCreator(tenantName8, "", "testIconName", "testIconPath", "testname8", "testpassword8"));
+        final long tenant9 = platformAPI.createTenant(new TenantCreator(tenantName9, "", "testIconName", "testIconPath", "testname9", "testpassword9"));
 
         final List<Tenant> tenants1 = platformAPI.getTenants(0, 3, TenantCriterion.NAME_ASC);
         final List<Tenant> tenants2 = platformAPI.getTenants(1, 3, TenantCriterion.NAME_ASC);
@@ -547,9 +551,9 @@ public class SPPlatformTest {
         final String tenantName1 = "test1";
         final String tenantName2 = "test2";
         final String tenantName3 = "test3";
-        final long tenant1 = platformAPI.createTenant(tenantName1, "a", "testIconName", "testIconPath", "testname1", "testpassword1");
-        final long tenant2 = platformAPI.createTenant(tenantName2, "c", "testIconName", "testIconPath", "testname2", "testpassword2");
-        final long tenant3 = platformAPI.createTenant(tenantName3, "b", "testIconName", "testIconPath", "testname3", "testpassword3");
+        final long tenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "a", "testIconName", "testIconPath", "testname1", "testpassword1"));
+        final long tenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "c", "testIconName", "testIconPath", "testname2", "testpassword2"));
+        final long tenant3 = platformAPI.createTenant(new TenantCreator(tenantName3, "b", "testIconName", "testIconPath", "testname3", "testpassword3"));
         final List<Tenant> tenantsDescAsc = platformAPI.getTenants(0, 3, TenantCriterion.DESC_ASC);
         final List<Tenant> tenantsDescDesc = platformAPI.getTenants(0, 3, TenantCriterion.DESC_DESC);
         final int count = platformAPI.getNumberOfTenants();
@@ -587,8 +591,8 @@ public class SPPlatformTest {
     public void getTenantsWithOrderByStatus() throws BonitaException {
         final String tenantName1 = "test1";
         final String tenantName2 = "test2";
-        final long tenant1 = platformAPI.createTenant(tenantName1, "a", "testIconName", "testIconPath", "testname1", "testpassword1");
-        final long tenant2 = platformAPI.createTenant(tenantName2, "c", "testIconName", "testIconPath", "testname2", "testpassword2");
+        final long tenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "a", "testIconName", "testIconPath", "testname1", "testpassword1"));
+        final long tenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "c", "testIconName", "testIconPath", "testname2", "testpassword2"));
         platformAPI.activateTenant(tenant2);
         final List<Tenant> tenantsDescAsc = platformAPI.getTenants(0, 2, TenantCriterion.STATE_ASC);
         final List<Tenant> tenantsDescDesc = platformAPI.getTenants(0, 2, TenantCriterion.STATE_DESC);
@@ -610,9 +614,9 @@ public class SPPlatformTest {
         final String tenantName1 = "test1";
         final String tenantName2 = "test2";
         final String tenantName3 = "test3";
-        final long createTenant1 = platformAPI.createTenant(tenantName1, "", "testIconName", "testIconPath", "testname1", "testpassword1");
-        final long createTenant2 = platformAPI.createTenant(tenantName2, "", "testIconName", "testIconPath", "testname2", "testpassword2");
-        final long createTenant3 = platformAPI.createTenant(tenantName3, "", "testIconName", "testIconPath", "testname3", "testpassword3");
+        final long createTenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "", "testIconName", "testIconPath", "testname1", "testpassword1"));
+        final long createTenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "", "testIconName", "testIconPath", "testname2", "testpassword2"));
+        final long createTenant3 = platformAPI.createTenant(new TenantCreator(tenantName3, "", "testIconName", "testIconPath", "testname3", "testpassword3"));
         try {
             final List<Tenant> testTenants = platformAPI.getTenants(0, 3, TenantCriterion.NAME_ASC);
             assertNotNull(testTenants);
@@ -644,11 +648,16 @@ public class SPPlatformTest {
 
     @Test(expected = PageOutOfRangeException.class)
     public void getTenantsWithTotalPageOutOfRange() throws BonitaException {
-        final long tenant1Id = platformAPI.createTenant("test1", "test", "testIconName", "testIconPath", "tenant_test1", "tenant_test_password");
-        final long tenant2Id = platformAPI.createTenant("test2", "test", "testIconName", "testIconPath", "tenant_test2", "tenant_test_password");
-        final long tenant3Id = platformAPI.createTenant("test3", "test", "testIconName", "testIconPath", "tenant_test3", "tenant_test_password");
-        final long tenant4Id = platformAPI.createTenant("test4", "test", "testIconName", "testIconPath", "tenant_test4", "tenant_test_password");
-        final long tenant5Id = platformAPI.createTenant("test5", "test", "testIconName", "testIconPath", "tenant_test5", "tenant_test_password");
+        final long tenant1Id = platformAPI.createTenant(new TenantCreator("test1", "test", "testIconName", "testIconPath", "tenant_test1",
+                "tenant_test_password"));
+        final long tenant2Id = platformAPI.createTenant(new TenantCreator("test2", "test", "testIconName", "testIconPath", "tenant_test2",
+                "tenant_test_password"));
+        final long tenant3Id = platformAPI.createTenant(new TenantCreator("test3", "test", "testIconName", "testIconPath", "tenant_test3",
+                "tenant_test_password"));
+        final long tenant4Id = platformAPI.createTenant(new TenantCreator("test4", "test", "testIconName", "testIconPath", "tenant_test4",
+                "tenant_test_password"));
+        final long tenant5Id = platformAPI.createTenant(new TenantCreator("test5", "test", "testIconName", "testIconPath", "tenant_test5",
+                "tenant_test_password"));
         assertNotNull(platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()));
         assertEquals(5, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
         try {
@@ -670,7 +679,7 @@ public class SPPlatformTest {
         deleteATenant(tenantId);
     }
 
-    @Test(expected = PlatformNotExistException.class)
+    @Test(expected = PlatformNotFoundException.class)
     public void deletePlatform() throws BonitaException {
         try {
             platformAPI.deletePlaftorm();
@@ -722,8 +731,8 @@ public class SPPlatformTest {
     @Test
     public void getNumberOfTenants() throws BonitaException {
         assertEquals(0, platformAPI.getNumberOfTenants());
-        final long createTenant = platformAPI.createTenant("test", "testDescription eeeeeeeeeeeeeeeeeeeeeee", "testIconName", "testIconPath", "testname",
-                "testpass");
+        final long createTenant = platformAPI.createTenant(new TenantCreator("test", "testDescription eeeeeeeeeeeeeeeeeeeeeee", "testIconName", "testIconPath",
+                "testname", "testpass"));
         final int numberOfTenants = platformAPI.getNumberOfTenants();
         platformAPI.deleteTenant(createTenant);
         assertEquals(1, numberOfTenants);
@@ -796,12 +805,12 @@ public class SPPlatformTest {
         platformAPI.stopNode();
         state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STOPPED, state);
-        // test exception:PlatformNotExistException
+        // test exception:PlatformNotFoundException
         platformAPI.deletePlaftorm();
         try {
             state = platformAPI.getPlatformState();
             fail();
-        } catch (final PlatformNotExistException e) {
+        } catch (final PlatformNotFoundException e) {
             platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
             logAsPlatformAdmin();
             platformAPI.createAndInitializePlatform();
@@ -812,7 +821,8 @@ public class SPPlatformTest {
     @Test
     public void updateTenant() throws Exception {
         // create tenant
-        final long tenantId = platformAPI.createTenant("tenantName", "test update tenant", "testIconName", "testIconPath", "username", "123");
+        final long tenantId = platformAPI
+                .createTenant(new TenantCreator("tenantName", "test update tenant", "testIconName", "testIconPath", "username", "123"));
         final Tenant tenant = platformAPI.getTenantById(tenantId);
         assertEquals("tenantName", tenant.getName());
         assertEquals("testIconName", tenant.getIconName());
@@ -821,11 +831,11 @@ public class SPPlatformTest {
         // We do not want to add in API methods to read password (for security reasons)
         // session = BPMTestUtil.loginDefaultTenant("username","123");
         // update tenant
-        final TenantUpdateDescriptor udpateDescriptor = new TenantUpdateDescriptor();
-        udpateDescriptor.updateName("updatedTenantName");
-        udpateDescriptor.updateIconName("updatedIconName");
-        udpateDescriptor.updateUsername("updatedUsername");
-        udpateDescriptor.updatePassword("updatedPassword");
+        final TenantUpdater udpateDescriptor = new TenantUpdater();
+        udpateDescriptor.setName("updatedTenantName");
+        udpateDescriptor.setIconName("updatedIconName");
+        udpateDescriptor.setUsername("updatedUsername");
+        udpateDescriptor.setPassword("updatedPassword");
         final Tenant updatedTenant = platformAPI.updateTenant(tenantId, udpateDescriptor);
         assertEquals(tenantId, updatedTenant.getId());
         assertEquals("updatedTenantName", updatedTenant.getName());
@@ -840,12 +850,13 @@ public class SPPlatformTest {
     @Test(expected = UpdateException.class)
     public void updateTenantWithTenantUpdateException() throws Exception {
         // create tenant
-        final long tenantId = platformAPI.createTenant("tenantName", "test update tenant", "testIconName", "testIconPath", "username", "123");
+        final long tenantId = platformAPI
+                .createTenant(new TenantCreator("tenantName", "test update tenant", "testIconName", "testIconPath", "username", "123"));
         platformAPI.getTenantById(tenantId);
         // update tenant
-        final TenantUpdateDescriptor udpateDescriptor = new TenantUpdateDescriptor();
-        udpateDescriptor.updateName("updatedTenantName");
-        udpateDescriptor.updateIconName("updatedIconName");
+        final TenantUpdater udpateDescriptor = new TenantUpdater();
+        udpateDescriptor.setName("updatedTenantName");
+        udpateDescriptor.setIconName("updatedIconName");
         try {
             platformAPI.updateTenant(tenantId + 100, udpateDescriptor);
         } finally {
@@ -857,15 +868,15 @@ public class SPPlatformTest {
     @Test(expected = PlatformNotStartedException.class)
     public void updateTenantWithPlatformNotStartedException() throws Exception {
         // create tenant
-        final long tenantId = platformAPI.createTenant("tenantName", "test update tenant with PlatformNotStartedException", "testIconName", "testIconPath",
-                "username", "123");
+        final long tenantId = platformAPI.createTenant(new TenantCreator("tenantName", "test update tenant with PlatformNotStartedException", "testIconName",
+                "testIconPath", "username", "123"));
         platformAPI.getTenantById(tenantId);
         // stop platform
         platformAPI.stopNode();
         // update tenant
-        final TenantUpdateDescriptor udpateDescriptor = new TenantUpdateDescriptor();
-        udpateDescriptor.updateName("updatedTenantName");
-        udpateDescriptor.updateIconName("updatedIconName");
+        final TenantUpdater udpateDescriptor = new TenantUpdater();
+        udpateDescriptor.setName("updatedTenantName");
+        udpateDescriptor.setIconName("updatedIconName");
         try {
             platformAPI.updateTenant(tenantId, udpateDescriptor);
         } finally {

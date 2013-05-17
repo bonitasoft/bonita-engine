@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,10 +14,11 @@ import java.util.Map;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
-public class TenantUpdateDescriptor implements Serializable {
+public class TenantUpdater implements Serializable {
 
-    private static final long serialVersionUID = 728214104237982027L;
+    private static final long serialVersionUID = -3608167879596202047L;
 
     public enum TenantField {
         NAME, DESCRIPTION, ICON_NAME, ICON_PATH, STATUS, USERNAME, PASSWOWRD;
@@ -25,35 +26,35 @@ public class TenantUpdateDescriptor implements Serializable {
 
     private final Map<TenantField, Serializable> fields;
 
-    public TenantUpdateDescriptor() {
+    public TenantUpdater() {
         fields = new HashMap<TenantField, Serializable>();
     }
 
-    public void updateName(final String name) {
+    public void setName(final String name) {
         fields.put(TenantField.NAME, name);
     }
 
-    public void updateDescription(final String description) {
+    public void setDescription(final String description) {
         fields.put(TenantField.DESCRIPTION, description);
     }
 
-    public void updateIconName(final String iconName) {
+    public void setIconName(final String iconName) {
         fields.put(TenantField.ICON_NAME, iconName);
     }
 
-    public void updateIconPath(final String iconPath) {
+    public void setIconPath(final String iconPath) {
         fields.put(TenantField.ICON_PATH, iconPath);
     }
 
-    public void updateStatus(final String status) {
+    public void setStatus(final String status) {
         fields.put(TenantField.STATUS, status);
     }
 
-    public void updateUsername(final String username) {
+    public void setUsername(final String username) {
         fields.put(TenantField.USERNAME, username);
     }
 
-    public void updatePassword(final String password) {
+    public void setPassword(final String password) {
         fields.put(TenantField.PASSWOWRD, password);
     }
 

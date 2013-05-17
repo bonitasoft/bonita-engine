@@ -19,7 +19,7 @@ public class TenantNotFoundException extends BonitaException {
     private static final long serialVersionUID = 5645446219034832398L;
 
     public TenantNotFoundException(final long tenantId) {
-        super("Unable to find the tenant with id" + tenantId);
+        super("Unable to find the tenant with id: " + tenantId);
     }
 
     public TenantNotFoundException(final String message) {

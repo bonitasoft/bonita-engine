@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,9 +44,6 @@ import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 
 public class SPProcessManagementTest extends CommonAPISPTest {
 
@@ -79,8 +79,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
 
         PlatformSession platformSession = APITestUtil.loginPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        final long tenantId = platformAPI.createTenant(tenantName, "default", "defaultIconName", "defaultIconPath", "default_tenant_name",
-                "default_tenant_password");
+        final long tenantId = platformAPI.createTenant(new TenantCreator(tenantName, "default", "defaultIconName", "defaultIconPath", "default_tenant_name",
+                "default_tenant_password"));
         platformAPI.activateTenant(tenantId);
         APITestUtil.logoutPlatform(platformSession);
 

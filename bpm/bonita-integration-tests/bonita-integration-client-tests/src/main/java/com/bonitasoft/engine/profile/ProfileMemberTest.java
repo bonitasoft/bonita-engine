@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.profile;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -28,8 +30,7 @@ import org.junit.Test;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProfileAPI;
-
-import static org.junit.Assert.assertEquals;
+import com.bonitasoft.engine.platform.TenantCreator;
 
 public class ProfileMemberTest extends AbstractProfileTest {
 
@@ -149,7 +150,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        final Long tenant2Id = platformAPI.createTenant("tenant2", "", "IconName2", "IconPath2", "default_tenant2", "default_password2");
+        final Long tenant2Id = platformAPI.createTenant(new TenantCreator("tenant2", "", "IconName2", "IconPath2", "default_tenant2", "default_password2"));
         platformAPI.activateTenant(tenant2Id);
 
         platformLoginAPI.logout(platformSession);

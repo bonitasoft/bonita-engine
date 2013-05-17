@@ -8,12 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.service.ModelConvertor;
 
@@ -24,12 +27,16 @@ import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogBuilder;
 import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantCreator.TenantField;
 import com.bonitasoft.engine.platform.TenantImpl;
 
 /**
  * @author Matthieu Chaffotte
  */
 public final class SPModelConvertor extends ModelConvertor {
+
+    private static final String PLATFORM_STATUS_DEACTIVATED = "DEACTIVATED";
 
     public static List<Log> toLogs(final Collection<SQueriableLog> sQueriableLogs) {
         final List<Log> logs = new ArrayList<Log>();
@@ -64,6 +71,16 @@ public final class SPModelConvertor extends ModelConvertor {
         tenant.setCreationDate(new Date(sTenant.getCreated()));
         // no createdBy in tenantImpl
         return tenant;
+    }
+
+    public static STenant constructTenant(final TenantCreator tCreator, final STenantBuilder sTenantBuilder) {
+        final Map<TenantField, Serializable> fields = tCreator.getFields();
+        sTenantBuilder.createNewInstance((String) fields.get(TenantField.NAME), "defaultUser", System.currentTimeMillis(), PLATFORM_STATUS_DEACTIVATED,
+                (Boolean) fields.get(TenantField.DEFAULT_TENANT));
+        sTenantBuilder.setDescription((String) fields.get(TenantField.DESCRIPTION));
+        sTenantBuilder.setIconName((String) fields.get(TenantField.ICON_NAME));
+        sTenantBuilder.setIconPath((String) fields.get(TenantField.ICON_PATH));
+        return sTenantBuilder.done();
     }
 
     public static List<Tenant> toTenants(final List<STenant> sTenants) {

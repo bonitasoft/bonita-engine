@@ -29,6 +29,7 @@ import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.platform.TenantCreator;
 
 /**
  * @author Yanyan Liu
@@ -52,9 +53,10 @@ public class TenantTest {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.createAndInitializePlatform();
+        platformAPI.initializePlatform();
         platformAPI.startNode();
-        defaultTenantId = platformAPI.createTenant(DEFAULT_TENANT, "default", "testIconName", "testIconPath", "default_tenant_name", "default_tenant_password");
+        defaultTenantId = platformAPI.createTenant(new TenantCreator(DEFAULT_TENANT, "default", "testIconName", "testIconPath", "default_tenant_name",
+                "default_tenant_password"));
         platformAPI.activateTenant(defaultTenantId);
         defaultTenantId = platformAPI.getTenantByName(DEFAULT_TENANT).getId();
         platformLoginAPI.logout(session);
@@ -68,7 +70,7 @@ public class TenantTest {
         platformAPI.deactiveTenant(defaultTenantId);
         platformAPI.deleteTenant(defaultTenantId);
         platformAPI.stopNode();
-        platformAPI.deletePlaftorm();
+        platformAPI.cleanPlatform();
         platformLoginAPI.logout(session);
     }
 

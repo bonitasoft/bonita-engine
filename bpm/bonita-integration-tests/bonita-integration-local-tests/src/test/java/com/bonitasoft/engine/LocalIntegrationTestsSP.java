@@ -10,9 +10,8 @@ package com.bonitasoft.engine;
 
 import javax.naming.Context;
 
-import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -21,9 +20,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -43,25 +39,15 @@ public class LocalIntegrationTestsSP {
         System.err.println("=================== LocalIntegrationTestsSP.beforeClass()");
 
         setupSpringContext();
-
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.createPlatform();
-        platformLoginAPI.logout(session);
-
+        APITestUtil.createPlatformStructure();
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
         System.err.println("=================== LocalIntegrationTestsSP.afterClass()");
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.deletePlaftorm();
-        platformLoginAPI.logout(session);
 
+        APITestUtil.deletePlatformStructure();
         closeSpringContext();
     }
 

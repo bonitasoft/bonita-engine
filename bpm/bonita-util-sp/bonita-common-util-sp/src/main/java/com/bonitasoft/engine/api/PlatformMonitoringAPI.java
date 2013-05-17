@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.exception.MonitoringException;
 import org.bonitasoft.engine.exception.UnavailableInformationException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.management.GcInfo;
 
 /**
@@ -82,10 +83,10 @@ public interface PlatformMonitoringAPI {
      * Usually, a timestamp represents the time elapsed since the 1st of January, 1970.
      * 
      * @return a timestamp (in millisecond) which indicates the date when the Java virtual machine started
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     long getStartTime() throws MonitoringException;
@@ -95,10 +96,10 @@ public interface PlatformMonitoringAPI {
      * consumed by each live threads.
      * 
      * @return the total CPU time for all live threads in nanoseconds
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     long getTotalThreadsCpuTime() throws MonitoringException;
@@ -107,10 +108,10 @@ public interface PlatformMonitoringAPI {
      * Returns the current number of live threads including both daemon and non-daemon threads.
      * 
      * @return the current number of live threads including both daemon and non-daemon threads
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     int getThreadCount() throws MonitoringException;
@@ -119,10 +120,10 @@ public interface PlatformMonitoringAPI {
      * Returns the number of processors available to the Java virtual machine.
      * 
      * @return the number of processors available to the Java virtual machine
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     int getAvailableProcessors() throws MonitoringException;
@@ -131,10 +132,10 @@ public interface PlatformMonitoringAPI {
      * Returns the operating system architecture.
      * 
      * @return the operating system architecture as a string
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     String getOSArch() throws MonitoringException;
@@ -143,10 +144,10 @@ public interface PlatformMonitoringAPI {
      * Return the OS name.
      * 
      * @return the OS name
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     String getOSName() throws MonitoringException;
@@ -155,10 +156,10 @@ public interface PlatformMonitoringAPI {
      * Return the OS version.
      * 
      * @return the OS version
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     String getOSVersion() throws MonitoringException;
@@ -167,10 +168,10 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine implementation name.
      * 
      * @return the Java virtual machine implementation name
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     String getJvmName() throws MonitoringException;
@@ -179,10 +180,10 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine implementation vendor.
      * 
      * @return the Java virtual machine implementation vendor
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     String getJvmVendor() throws MonitoringException;
@@ -191,10 +192,10 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine implementation version.
      * 
      * @return the Java virtual machine implementation version
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     String getJvmVersion() throws MonitoringException;
@@ -203,10 +204,10 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine System properties list.
      * 
      * @return a map of the Java virtual machine System properties
-     * @throws MonitoringException
-     *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     Map<String, String> getJvmSystemProperties() throws MonitoringException;
@@ -243,7 +244,9 @@ public interface PlatformMonitoringAPI {
      * 
      * @return the CPU time used by the process in nanoseconds, or -1 if this operation is not supported.
      * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     long getProcessCpuTime() throws MonitoringException, UnavailableInformationException;
@@ -251,6 +254,12 @@ public interface PlatformMonitoringAPI {
     /**
      * Returns the amount of virtual memory that is guaranteed to be available to the running process in bytes, or -1 if this operation is not supported.
      * 
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
+     * @throws UnavailableInformationException
+     *             if the information is not available for the current JVM
      * @since6.0
      */
     long getCommittedVirtualMemorySize() throws MonitoringException, UnavailableInformationException;
@@ -258,6 +267,12 @@ public interface PlatformMonitoringAPI {
     /**
      * Returns the total amount of swap space in bytes.
      * 
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
+     * @throws UnavailableInformationException
+     *             if the information is not available for the current JVM
      * @since6.0
      */
     long getTotalSwapSpaceSize() throws MonitoringException, UnavailableInformationException;
@@ -265,6 +280,12 @@ public interface PlatformMonitoringAPI {
     /**
      * Returns the amount of free swap space in bytes.
      * 
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
+     * @throws UnavailableInformationException
+     *             if the information is not available for the current JVM
      * @since6.0
      */
     long getFreeSwapSpaceSize() throws MonitoringException, UnavailableInformationException;
@@ -272,6 +293,12 @@ public interface PlatformMonitoringAPI {
     /**
      * Returns the amount of free physical memory in bytes.
      * 
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
+     * @throws UnavailableInformationException
+     *             if the information is not available for the current JVM
      * @since6.0
      */
     long getFreePhysicalMemorySize() throws MonitoringException, UnavailableInformationException;
@@ -279,6 +306,12 @@ public interface PlatformMonitoringAPI {
     /**
      * Returns the total amount of physical memory in bytes.
      * 
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
+     * @throws UnavailableInformationException
+     *             if the information is not available for the current JVM
      * @since6.0
      */
     long getTotalPhysicalMemorySize() throws MonitoringException, UnavailableInformationException;
@@ -286,6 +319,10 @@ public interface PlatformMonitoringAPI {
     /**
      * Returns true if engine is running on top of a SUN/Oracle JVM
      * 
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @since6.0
      */
     boolean isOptionalMonitoringInformationAvailable() throws MonitoringException;
@@ -296,10 +333,13 @@ public interface PlatformMonitoringAPI {
      * The inner Map<String key, String value> represents the LastGcInfo instance.
      * The possible keys are StartTime, EndTime, Duration, MemoryUsageBeforeGc and MemoryUsageAfterGc.
      * 
-     * @return
+     * @return the resulting map
      * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
+     *             occurs when an exception is thrown during monitoring
      * @throws UnavailableInformationException
+     *             if the information is not available for the current JVM
      * @since6.0
      */
     Map<String, GcInfo> getLastGcInfo() throws MonitoringException, UnavailableInformationException;
