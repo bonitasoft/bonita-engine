@@ -562,6 +562,13 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
 
 		<!-- Work -->
 		<dependency>
@@ -674,6 +681,14 @@
 			<artifactId>bonecp</artifactId>
 			<version>0.7.1.RELEASE</version>
 		</dependency>
+		
+		<!-- Transaction -->
+    <dependency>
+      <groupId>org.codehaus.btm</groupId>
+      <artifactId>btm</artifactId>
+      <version>2.1.3</version>
+      <scope>test</scope>
+    </dependency>
 	</dependencies>
 
 	<profiles>

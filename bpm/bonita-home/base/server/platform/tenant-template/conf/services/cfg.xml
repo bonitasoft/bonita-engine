@@ -19,14 +19,6 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
-		<constructor-arg name="platformDependencyService" ref="platformDependencyService" />
-		<constructor-arg name="dependencyService" ref="dependencyService" />
-		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="transactionService" ref="transactionService" />
-	</bean>
-
 	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />

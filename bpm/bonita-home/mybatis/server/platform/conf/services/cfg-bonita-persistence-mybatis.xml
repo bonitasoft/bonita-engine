@@ -5,7 +5,6 @@
 		<constructor-arg name="name" value="platform" />
 		<constructor-arg name="dbIdentifier" value="${db.vendor}" />
 		<constructor-arg name="txService" ref="transactionService" />
-		<constructor-arg name="cacheEnabled" value="true" />
 		<constructor-arg name="mybatisSqlSessionFactoryProvider" ref="mybatisJournalSqlSessionFactoryProvider" />
 		<constructor-arg name="configurations" ref="platformMyBatisConfigurations" />
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
@@ -13,6 +12,7 @@
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 	</bean>
 	
 	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantMybatisPersistenceService" depends-on="dbProperties">
@@ -20,7 +20,6 @@
 		<constructor-arg name="dbIdentifier" value="${db.vendor}" />
 		<constructor-arg name="txService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="cacheEnabled" value="true" />
 		<constructor-arg name="mybatisSqlSessionFactoryProvider" ref="mybatisJournalSqlSessionFactoryProvider" />
 		<constructor-arg name="configurations" ref="myBatisConfigurations" />
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
@@ -28,6 +27,7 @@
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 	</bean>
 
 	<bean id="mybatisJournalSqlSessionFactoryProvider" class="org.bonitasoft.engine.persistence.MybatisSqlSessionFactoryProvider">

@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.persistence;
 
+import javax.sql.DataSource;
+
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.DBConfigurationsProvider;
 import org.bonitasoft.engine.persistence.HibernateConfigurationProvider;
@@ -19,10 +21,10 @@ public class TenantHibernatePersistenceService extends org.bonitasoft.engine.per
     
     public TenantHibernatePersistenceService(final String name, final TransactionService txService, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
-            final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager)
+            final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource)
             throws SPersistenceException {
         super(name, txService, sessionAccessor, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
-                sequenceManager);
+                sequenceManager, datasource);
     }
     
     @Override

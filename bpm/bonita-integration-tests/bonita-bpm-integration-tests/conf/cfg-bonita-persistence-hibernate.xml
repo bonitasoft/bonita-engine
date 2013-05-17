@@ -10,6 +10,7 @@
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 	</bean>
 	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="journal" />
@@ -21,11 +22,16 @@
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 	</bean>
 
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
 		<constructor-arg name="properties">
 			<props>
+        <prop key="hibernate.current_session_context_class">jta</prop>
+        <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>
+<!--        <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.BTMTransactionManagerLookup</prop> -->
+        <prop key="hibernate.transaction.manager_lookup_class">org.bonitasoft.engine.persistence.BTMJNDITransactionManagerLookup</prop>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
 				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>

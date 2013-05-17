@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -31,19 +33,19 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
     private final ReadSessionAccessor sessionAccessor;
 
     public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
-            final ReadSessionAccessor sessionAccessor, final boolean cacheEnabled, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
+            final ReadSessionAccessor sessionAccessor, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
             final MyBatisConfigurationsProvider configurations, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
-            final String likeEscapeCharacter, final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager)
+            final String likeEscapeCharacter, final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager, final DataSource datasource)
             throws SPersistenceException {
-        super(name, dbIdentifier, txService, cacheEnabled, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
-                likeEscapeCharacter, technicalLoggerService, sequenceManager);
+        super(name, dbIdentifier, txService, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
+                likeEscapeCharacter, technicalLoggerService, sequenceManager, datasource);
         this.sessionAccessor = sessionAccessor;
     }
 
     @Override
     protected Map<String, Object> getDefaultParameters() throws TenantIdNotSetException {
         final Map<String, Object> parameters = new HashMap<String, Object>();
-        final Long tenantId = sessionAccessor.getTenantId();
+        final Long tenantId = this.sessionAccessor.getTenantId();
         parameters.put("tenantid", tenantId);
         return parameters;
     }
@@ -87,7 +89,7 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
 
     @Override
     protected long getTenantId() throws TenantIdNotSetException {
-        return sessionAccessor.getTenantId();
+        return this.sessionAccessor.getTenantId();
     }
 
 }

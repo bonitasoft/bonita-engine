@@ -19,7 +19,6 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
-import org.bonitasoft.engine.transaction.BusinessTransaction;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.api.MonitoringAPI;
@@ -77,24 +76,20 @@ public class MonitoringAPIImpl implements MonitoringAPI {
         final TransactionService transactionService = getTransactionService();
         final TechnicalLoggerService logger = getTechnicalLogger();
 
-        BusinessTransaction btx = null;
         long numberOfUsers;
         try {
-            btx = transactionService.createTransaction();
-            btx.begin();
+            transactionService.begin();
             numberOfUsers = tenantMonitoringService.getNumberOfUsers();
         } catch (final SBonitaException e) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             throw new MonitoringException(e.getMessage());
         } finally {
-            if (btx != null) {
                 try {
-                    btx.complete();
+                    transactionService.complete();
                 } catch (final SBonitaException e) {
                     logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
                     throw new MonitoringException(e.getMessage());
                 }
-            }
         }
         return numberOfUsers;
     }

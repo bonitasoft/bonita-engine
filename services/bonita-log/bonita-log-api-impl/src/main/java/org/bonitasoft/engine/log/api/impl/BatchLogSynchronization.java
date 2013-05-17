@@ -11,15 +11,14 @@ package org.bonitasoft.engine.log.api.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
-
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.TransactionState;
 
-public class BatchLogSynchronization implements Synchronization {
+public class BatchLogSynchronization implements BonitaTransactionSynchronization {
 
     private final PersistenceService persistenceService;
 
@@ -36,37 +35,38 @@ public class BatchLogSynchronization implements Synchronization {
     }
 
     @Override
-    public void afterCompletion(final int transactionStatus) {
-        if (delayable && Status.STATUS_COMMITTED == transactionStatus) {
-            BatchLogBuffer.getInstance().addLogs(logs);
+    public void afterCompletion(final TransactionState transactionState) {
+        if (this.delayable && TransactionState.COMMITTED == transactionState) {
+            BatchLogBuffer.getInstance().addLogs(this.logs);
             final InsertBatchLogsJobRegister register = InsertBatchLogsJobRegister.getInstance();
             register.registerJobIfNotRegistered();
         }
     }
 
     @Override
-    public void beforeCompletion() {
-        if (!delayable) {
-            if (logs != null && !logs.isEmpty()) {
+    public void beforeCommit() {
+        if (!this.delayable) {
+            if (this.logs != null && !this.logs.isEmpty()) {
                 try {
-                    persistenceService.insertInBatch(new ArrayList<PersistentObject>(logs));
+                    this.persistenceService.insertInBatch(new ArrayList<PersistentObject>(this.logs));
+                    this.persistenceService.flushStatements();
                 } catch (final SPersistenceException e) {
-                    exception = e;
+                    this.exception = e;
                     // FIXME what to do?
                 } finally {
-                    logs.clear();
+                    this.logs.clear();
                 }
             }
         }
     }
 
     public Exception getException() {
-        return exception;
+        return this.exception;
     }
 
     public void addLog(final SQueriableLog sQueriableLog) {
         // no synchronized required as we are working on a threadLocal
-        logs.add(sQueriableLog);
+        this.logs.add(sQueriableLog);
     }
 
 }
