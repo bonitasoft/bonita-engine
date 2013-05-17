@@ -131,6 +131,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         designProcessDefinition.addUserTask("step1", delivery);
         designProcessDefinition.addUserTask("step2", delivery);
         designProcessDefinition.addTransition("step1", "step2");
+        designProcessDefinition.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, delivery, businessUser.getId());
     }
 
@@ -211,6 +212,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final String inputName2 = "valueOfInput2";
         final String inputName3 = "valueOfInput3";
         final String mainInputName1 = "param1";
+        final String resContent = "welcome Lily and Lucy and Mett";
 
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
@@ -234,6 +236,9 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final ConnectorDefinitionImpl connectDefinition = new ConnectorDefinitionImpl("myConnector", "org.bonitasoft.connector.testExternalConnector", "1.0",
                 ConnectorEvent.ON_ENTER);
         connectDefinition.addInput(mainInputName1, mainExp);
+        // set the data with the output of the connector
+        connectDefinition.addOutput(new OperationBuilder().createSetDataOperation("text",
+                new ExpressionBuilder().createInputExpression(mainInputName1, String.class.getName())));
         final ArrayList<ConnectorDefinitionWithInputValues> connectors = new ArrayList<ConnectorDefinitionWithInputValues>();
         connectors.add(new ConnectorDefinitionWithInputValuesImpl(connectDefinition, inputValues));
 
@@ -248,6 +253,8 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         parameters.put(OPERATIONS_INPUT_KEY, contexts);
         parameters.put("USER_ID_KEY", firstUser.getId());
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
+
+        assertEquals(resContent, getProcessAPI().getProcessDataInstance("text", processInstanceId).getValue());
 
         assertNotNull("User task step1 don't exist.", waitForUserTask("step1", processInstanceId, 12000));
         HumanTaskInstance userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC)
