@@ -1,18 +1,10 @@
 package com.bonitasoft.engine.monitoring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.UnavailableInformationException;
-import org.bonitasoft.engine.management.GcInfo;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -21,6 +13,12 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Elias Ricken de Medeiros

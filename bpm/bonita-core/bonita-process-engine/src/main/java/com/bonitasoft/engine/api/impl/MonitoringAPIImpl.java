@@ -10,7 +10,6 @@ package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.MonitoringException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.monitoring.TenantMonitoringService;
@@ -22,6 +21,7 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.monitoring.MonitoringException;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.manager.Features;
 
@@ -84,12 +84,12 @@ public class MonitoringAPIImpl implements MonitoringAPI {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             throw new MonitoringException(e.getMessage());
         } finally {
-                try {
-                    transactionService.complete();
-                } catch (final SBonitaException e) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-                    throw new MonitoringException(e.getMessage());
-                }
+            try {
+                transactionService.complete();
+            } catch (final SBonitaException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+                throw new MonitoringException(e.getMessage());
+            }
         }
         return numberOfUsers;
     }

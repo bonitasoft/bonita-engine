@@ -12,11 +12,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.bonitasoft.engine.monitoring.SGcInfo;
+import org.bonitasoft.engine.monitoring.SMemoryUsage;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;import org.bonitasoft.engine.profile.ProfileCreator;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.profile.ProfileCreator;
 import org.bonitasoft.engine.profile.ProfileCreator.ProfileField;
 import org.bonitasoft.engine.profile.ProfileEntryCreator;
 import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
@@ -33,6 +38,10 @@ import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogBuilder;
 import com.bonitasoft.engine.log.SeverityLevel;
+import com.bonitasoft.engine.monitoring.GcInfo;
+import com.bonitasoft.engine.monitoring.MemoryUsage;
+import com.bonitasoft.engine.monitoring.impl.GcInfoImpl;
+import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
@@ -161,4 +170,40 @@ public final class SPModelConvertor extends ModelConvertor {
         }
         return newSProfileEntryBuilder.done();
     }
+
+    public static Map<String, GcInfo> toGcInfos(final Map<String, SGcInfo> lastGcInfo) {
+        final Map<String, GcInfo> gcInfo = new HashMap<String, GcInfo>();
+        for (final Entry<String, SGcInfo> entry : lastGcInfo.entrySet()) {
+            gcInfo.put(entry.getKey(), toGcInfo(entry.getValue()));
+        }
+        return gcInfo;
+    }
+
+    private static GcInfo toGcInfo(final SGcInfo sGcInfo) {
+        final long startTime = sGcInfo.getStartTime();
+        final long endTime = sGcInfo.getEndTime();
+        final long duration = sGcInfo.getDuration();
+        final Map<String, MemoryUsage> memoryUsageBeforeGc = new HashMap<String, MemoryUsage>();
+        final Map<String, SMemoryUsage> beforeGc = sGcInfo.getMemoryUsageBeforeGc();
+        for (final Entry<String, SMemoryUsage> mem : beforeGc.entrySet()) {
+            final SMemoryUsage sMemoryUsage = mem.getValue();
+            memoryUsageBeforeGc.put(mem.getKey(), toMemoryUsage(sMemoryUsage));
+        }
+        final Map<String, MemoryUsage> memoryUsageAfterGc = new HashMap<String, MemoryUsage>();
+        final Map<String, SMemoryUsage> afterGc = sGcInfo.getMemoryUsageAfterGc();
+        for (final Entry<String, SMemoryUsage> mem : afterGc.entrySet()) {
+            final SMemoryUsage sMemoryUsage = mem.getValue();
+            memoryUsageAfterGc.put(mem.getKey(), toMemoryUsage(sMemoryUsage));
+        }
+        return new GcInfoImpl(startTime, endTime, duration, memoryUsageBeforeGc, memoryUsageAfterGc);
+    }
+
+    private static MemoryUsage toMemoryUsage(final SMemoryUsage sMemoryUsage) {
+        final long committed = sMemoryUsage.getCommitted();
+        final long max = sMemoryUsage.getMax();
+        final long init = sMemoryUsage.getInit();
+        final long used = sMemoryUsage.getUsed();
+        return new MemoryUsageImpl(committed, max, init, used);
+    }
+
 }

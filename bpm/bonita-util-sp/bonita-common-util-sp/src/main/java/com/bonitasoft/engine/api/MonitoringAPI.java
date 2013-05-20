@@ -8,7 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.exception.MonitoringException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+
+import com.bonitasoft.engine.monitoring.MonitoringException;
 
 /**
  * @author Zhao Na

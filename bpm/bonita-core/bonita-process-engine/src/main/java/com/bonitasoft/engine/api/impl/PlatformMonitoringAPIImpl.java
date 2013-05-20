@@ -10,15 +10,15 @@ package com.bonitasoft.engine.api.impl;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.exception.MonitoringException;
-import org.bonitasoft.engine.exception.UnavailableInformationException;
-import org.bonitasoft.engine.management.GcInfo;
 import org.bonitasoft.engine.monitoring.PlatformMonitoringService;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
+import com.bonitasoft.engine.monitoring.GcInfo;
+import com.bonitasoft.engine.monitoring.MonitoringException;
+import com.bonitasoft.engine.monitoring.UnavailableInformationException;
+import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.manager.Features;
 
@@ -259,7 +259,7 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get the last GC info.");
         }
-        return ModelConvertor.toGcInfos(platformMonitoringService.getLastGcInfo());
+        return SPModelConvertor.toGcInfos(platformMonitoringService.getLastGcInfo());
     }
 
 }
