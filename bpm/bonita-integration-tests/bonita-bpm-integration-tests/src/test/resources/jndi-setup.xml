@@ -7,7 +7,12 @@
   <!--  Bitronix Transaction Manager embedded configuration -->
   <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices">
     <property name="serverId" value="btm-bonita" />
+    <property name="logPart1Filename" value="target/btm1.tlog" />
+    <property name="logPart2Filename" value="target/btm2.tlog" />
+
     <property name="debugZeroResourceTransaction" value="false" />
+    <!-- property name="warnAboutZeroResourceTransaction" value="false" /-->
+    <!-- property name="defaultTransactionTimeout" value="300" /-->
   </bean>
 
   <!-- create BTM transaction manager -->
@@ -30,6 +35,3 @@
   </bean>
 
 </beans>
-
-
-
