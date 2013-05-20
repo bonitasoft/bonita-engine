@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,6 +62,8 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.platform.Tenant;
+
+import static org.junit.Assert.assertTrue;
 
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
@@ -202,8 +202,8 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             }
 
             final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-            parameters.put("pageNumber", 0);
-            parameters.put("numberPerPage", 10000);
+            parameters.put("startIndex", 0);
+            parameters.put("maxResults", 10000);
             parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
             final List<Breakpoint> breakpoints = (List<Breakpoint>) commandAPI.execute("getBreakpoints", parameters);
             if (breakpoints.size() > 0) {

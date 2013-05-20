@@ -12,12 +12,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.transaction.STransactionException;
 
@@ -36,8 +34,8 @@ public class GetBreakpointsCommand extends TenantCommand {
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor tenantAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final int pageNumber = getIntegerMandadoryParameter(parameters, "pageNumber");
-        final int numberPerPage = getIntegerMandadoryParameter(parameters, "numberPerPage");
+        final int startIndex = getIntegerMandadoryParameter(parameters, "startIndex");
+        final int maxResults = getIntegerMandadoryParameter(parameters, "maxResults");
         final BreakpointCriterion sort = getParameter(parameters, "sort", "");
         final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -45,16 +43,11 @@ public class GetBreakpointsCommand extends TenantCommand {
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                final long totalNumber = breakpointService.getNumberOfBreakpoints();
-                PageIndexCheckingUtil.checkIfPageIsOutOfRange(totalNumber, pageNumber, numberPerPage);
                 final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForBreakpoints(sort, builder);
-                final List<SBreakpoint> breakpoints = breakpointService.getBreakpoints(pageNumber * numberPerPage, numberPerPage, orderAndField.getField(),
+                final List<SBreakpoint> breakpoints = breakpointService.getBreakpoints(startIndex, maxResults, orderAndField.getField(),
                         orderAndField.getOrder());
                 return (Serializable) SPModelConvertor.toBreakpoints(breakpoints);
             } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new SCommandExecutionException(e);
-            } catch (final PageOutOfRangeException e) {
                 transactionExecutor.setTransactionRollback();
                 throw new SCommandExecutionException(e);
             } finally {
