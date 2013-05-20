@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -36,7 +36,7 @@ import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.model.breakpoint.impl.BreakpointImpl;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.log.Log;
-import com.bonitasoft.engine.log.LogBuilder;
+import com.bonitasoft.engine.log.LogImpl;
 import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.monitoring.GcInfo;
 import com.bonitasoft.engine.monitoring.MemoryUsage;
@@ -64,15 +64,15 @@ public final class SPModelConvertor extends ModelConvertor {
     }
 
     public static Log toLog(final SQueriableLog sQueriableLog) {
-        final LogBuilder logBuilder = new LogBuilder().createNewInstance(sQueriableLog.getRawMessage(), sQueriableLog.getUserId(),
-                new Date(sQueriableLog.getTimeStamp()));
-        logBuilder.setLogId(sQueriableLog.getId());
-        logBuilder.setActionType(sQueriableLog.getActionType());
-        logBuilder.setActionScope(sQueriableLog.getActionScope());
-        logBuilder.setCallerClassName(sQueriableLog.getCallerClassName());
-        logBuilder.setCallerMethodName(sQueriableLog.getCallerMethodName());
-        logBuilder.setSeverity(SeverityLevel.valueOf(sQueriableLog.getSeverity().name()));
-        return logBuilder.done();
+        final LogImpl log = new LogImpl(sQueriableLog.getId(), sQueriableLog.getRawMessage());
+        log.setActionScope(sQueriableLog.getActionScope());
+        log.setActionType(sQueriableLog.getActionType());
+        log.setCallerClassName(sQueriableLog.getCallerClassName());
+        log.setCallerMethodName(sQueriableLog.getCallerMethodName());
+        log.setCreatedBy(sQueriableLog.getUserId());
+        log.setCreationDate(new Date(sQueriableLog.getTimeStamp()));
+        log.setSeverityLevel(SeverityLevel.valueOf(sQueriableLog.getSeverity().name()));
+        return log;
     }
 
     public static Tenant toTenant(final STenant sTenant) {

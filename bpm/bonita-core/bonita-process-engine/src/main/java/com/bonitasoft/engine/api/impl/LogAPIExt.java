@@ -8,23 +8,19 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.services.SQueriableLogNotFoundException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
@@ -32,13 +28,12 @@ import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetLogInstance;
 import com.bonitasoft.engine.api.impl.transaction.GetLogsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfLogInstances;
-import com.bonitasoft.engine.exception.LogNotFoundException;
 import com.bonitasoft.engine.log.Log;
-import com.bonitasoft.engine.log.LogBuilder;
 import com.bonitasoft.engine.log.LogCriterion;
-import com.bonitasoft.engine.log.SeverityLevel;
+import com.bonitasoft.engine.log.LogNotFoundException;
 import com.bonitasoft.engine.search.SearchLogs;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -66,26 +61,17 @@ public class LogAPIExt implements LogAPI {
 
     @Override
     public Log getLog(final long logId) throws LogNotFoundException {
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
-        final QueriableLoggerService loggerService = getTenantAccessor().getQueriableLoggerService();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         try {
-            final TransactionContentWithResult<SQueriableLog> transactionContentWithResult = new GetLogInstance(logId, loggerService);
-            transactionExecutor.execute(transactionContentWithResult);
-            final SQueriableLog sLog = transactionContentWithResult.getResult();
-            if (sLog == null) {
-                throw new LogNotFoundException("log Not Found.");
-            }
-            final LogBuilder logBuilder = new LogBuilder().createNewInstance(sLog.getRawMessage(), sLog.getUserId(), new Date(sLog.getTimeStamp()));
-            logBuilder.setLogId(sLog.getId());
-            logBuilder.setActionType(sLog.getActionType());
-            logBuilder.setActionScope(sLog.getActionScope());
-            logBuilder.setCallerClassName(sLog.getCallerClassName());
-            logBuilder.setCallerMethodName(sLog.getCallerMethodName());
-            logBuilder.setSeverity(SeverityLevel.valueOf(sLog.getSeverity().name()));
-            final Log log = logBuilder.done();
-            return log;
-        } catch (final SBonitaException e) {
-            throw new LogNotFoundException("log Not Found.", e);
+            final GetLogInstance getLogInstance = new GetLogInstance(logId, loggerService);
+            transactionExecutor.execute(getLogInstance);
+            return SPModelConvertor.toLog(getLogInstance.getResult());
+        } catch (final SQueriableLogNotFoundException sqlnfe) {
+            throw new LogNotFoundException(sqlnfe);
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
         }
     }
 
@@ -95,27 +81,23 @@ public class LogAPIExt implements LogAPI {
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final TransactionContentWithResult<Integer> transactionContent = new GetNumberOfLogInstances("getNumberOfLogs", loggerService);
-
+            final GetNumberOfLogInstances transactionContent = new GetNumberOfLogInstances(loggerService);
             transactionExecutor.execute(transactionContent);
             return transactionContent.getResult();
-        } catch (final SBonitaException e) {
-            return 0;
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
         }
     }
 
     @Override
-    public List<Log> getLogs(final int pageIndex, final int numberPerPage, final LogCriterion pagingCriterion) throws PageOutOfRangeException {
-        final int totalNumber = getNumberOfLogs();
-        PageIndexCheckingUtil.checkIfPageIsOutOfRange(totalNumber, pageIndex, numberPerPage);
+    public List<Log> getLogs(final int startIndex, final int maxResults, final LogCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final SIndexedLogBuilder queriableLogBuilder = tenantAccessor.getSQueriableLogModelBuilder().getQueriableLogBuilder();
         String field = null;
         OrderByType order = null;
-        switch (pagingCriterion) {
-
+        switch (criterion) {
             case CREATED_BY_ASC:
                 field = queriableLogBuilder.getUserIdKey();
                 order = OrderByType.ASC;
@@ -148,47 +130,27 @@ public class LogAPIExt implements LogAPI {
         try {
             final String fieldContent = field;
             final OrderByType orderContent = order;
-            final TransactionContentWithResult<List<SQueriableLog>> transactionContent = new GetLogsWithOrder(numberPerPage, orderContent, loggerService,
-                    fieldContent, pageIndex);
-            transactionExecutor.execute(transactionContent);
-            return getLogsFromSLogs(transactionContent.getResult());
-        } catch (final SBonitaException e) {
-            throw new PageOutOfRangeException(e);
+            final GetLogsWithOrder getLogs = new GetLogsWithOrder(loggerService, startIndex, maxResults, orderContent, fieldContent);
+            transactionExecutor.execute(getLogs);
+            return SPModelConvertor.toLogs(getLogs.getResult());
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
         }
     }
 
     @Override
-    public SearchResult<Log> searchLogs(final SearchOptions searchOptions) {
+    public SearchResult<Log> searchLogs(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-
         final SearchLogs searchLogs = new SearchLogs(loggerService, searchEntitiesDescriptor.getLogDescriptor(), searchOptions);
         try {
             transactionExecutor.execute(searchLogs);
             return searchLogs.getResult();
         } catch (final SBonitaException sbe) {
-            throw new BonitaRuntimeException(sbe);
+            throw new SearchException(sbe);
         }
-    }
-
-    private List<Log> getLogsFromSLogs(final List<SQueriableLog> sLogs) {
-        final List<Log> logs = new ArrayList<Log>();
-        if (sLogs != null) {
-            for (final SQueriableLog sLog : sLogs) {
-                final LogBuilder logBuilder = new LogBuilder().createNewInstance(sLog.getRawMessage(), sLog.getUserId(), new Date(sLog.getTimeStamp()));
-                logBuilder.setLogId(sLog.getId());
-                logBuilder.setActionType(sLog.getActionType());
-                logBuilder.setActionScope(sLog.getActionScope());
-                logBuilder.setCallerClassName(sLog.getCallerClassName());
-                logBuilder.setCallerMethodName(sLog.getCallerMethodName());
-                logBuilder.setSeverity(SeverityLevel.valueOf(sLog.getSeverity().name()));
-                final Log log = logBuilder.done();
-                logs.add(log);
-            }
-        }
-        return Collections.unmodifiableList(logs);
     }
 
 }

@@ -38,8 +38,7 @@ import org.bonitasoft.engine.core.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -61,7 +60,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.connector.APIAccessorConnector;
-import com.bonitasoft.engine.exception.LogNotFoundException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -85,10 +83,10 @@ public class LogTest extends CommonAPISPTest {
         getLogAPI().getLog(System.currentTimeMillis());
     }
 
-    @Test(expected = PageOutOfRangeException.class)
+    @Test
     public void testLogsPageOutOfRangException() throws BonitaException {
-        // page 2 does not exist
-        getLogAPI().getLogs(2, getLogAPI().getNumberOfLogs() * 2, LogCriterion.DEFAULT);
+        final List<Log> logs = getLogAPI().getLogs(getLogAPI().getNumberOfLogs() * 2, 10, LogCriterion.DEFAULT);
+        assertTrue(logs.isEmpty());
     }
 
     @Test
@@ -274,7 +272,7 @@ public class LogTest extends CommonAPISPTest {
         assertEquals(initialCount + 2, searchLogs.getCount());
     }
 
-    @Test(expected = BonitaRuntimeException.class)
+    @Test(expected = SearchException.class)
     public void searchLogWithWrongSortKey() throws BonitaException {
         final User user1 = getIdentityAPI().createUser("user1WrongSortKey", "bpm");
         getIdentityAPI().deleteUser(user1.getId());
@@ -548,17 +546,17 @@ public class LogTest extends CommonAPISPTest {
 
         final List<Log> logs = getLogAPI().getLogs(0, 3, LogCriterion.CREATION_DATE_DESC);
         assertEquals("IDENTITY_USER_DELETED", logs.get(0).getActionType());
-        assertEquals(SeverityLevel.INTERNAL, logs.get(0).getSeverity());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(0).getSeverityLevel());
         assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(0).getCallerClassName());
         assertEquals("deleteUser", logs.get(0).getCallerMethodName());
 
         assertEquals("IDENTITY_USER_UPDATED", logs.get(1).getActionType());
-        assertEquals(SeverityLevel.INTERNAL, logs.get(1).getSeverity());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(1).getSeverityLevel());
         assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(1).getCallerClassName());
         assertEquals("updateUser", logs.get(1).getCallerMethodName());
 
         assertEquals("IDENTITY_USER_CREATED", logs.get(2).getActionType());
-        assertEquals(SeverityLevel.INTERNAL, logs.get(2).getSeverity());
+        assertEquals(SeverityLevel.INTERNAL, logs.get(2).getSeverityLevel());
         assertEquals("org.bonitasoft.engine.identity.impl.IdentityServiceImpl", logs.get(2).getCallerClassName());
         assertEquals("createUser", logs.get(2).getCallerMethodName());
     }

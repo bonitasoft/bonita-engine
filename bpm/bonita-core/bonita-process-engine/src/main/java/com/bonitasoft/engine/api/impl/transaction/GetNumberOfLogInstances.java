@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,6 +14,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Bole Zhang
+ * @author Matthieu Chaffotte
  */
 public class GetNumberOfLogInstances implements TransactionContentWithResult<Integer> {
 
@@ -21,18 +22,13 @@ public class GetNumberOfLogInstances implements TransactionContentWithResult<Int
 
     private int number;
 
-    private final String instanceName;
-
-    public GetNumberOfLogInstances(final String instanceName, final QueriableLoggerService loggerService) {
-        this.instanceName = instanceName;
+    public GetNumberOfLogInstances(final QueriableLoggerService loggerService) {
         this.loggerService = loggerService;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        if (instanceName.equals("getNumberOfLogs")) {
-            number = loggerService.getNumberOfLogs();
-        }
+        number = loggerService.getNumberOfLogs();
     }
 
     @Override

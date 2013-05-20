@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -10,13 +10,16 @@ package com.bonitasoft.engine.log;
 
 import java.util.Date;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public class LogImpl implements Log {
 
     private static final long serialVersionUID = 3783837487970304334L;
 
-    private long logId;
+    private final long logId;
 
-    private String message;
+    private final String message;
 
     private SeverityLevel severityLevel;
 
@@ -32,13 +35,9 @@ public class LogImpl implements Log {
 
     private String callerMethodName;
 
-    private SeverityLevel severity;
-
-    public void setLogId(final long logId) {
+    public LogImpl(final long logId, final String message) {
+        super();
         this.logId = logId;
-    }
-
-    public void setMessage(final String message) {
         this.message = message;
     }
 
@@ -68,10 +67,6 @@ public class LogImpl implements Log {
 
     public void setCallerMethodName(final String callerMethodName) {
         this.callerMethodName = callerMethodName;
-    }
-
-    public void setSeverity(final SeverityLevel severity) {
-        this.severity = severity;
     }
 
     @Override
@@ -110,11 +105,6 @@ public class LogImpl implements Log {
     }
 
     @Override
-    public SeverityLevel getSeverity() {
-        return severity;
-    }
-
-    @Override
     public String getCallerClassName() {
         return callerClassName;
     }
@@ -136,7 +126,6 @@ public class LogImpl implements Log {
         result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
         result = prime * result + (int) (logId ^ logId >>> 32);
         result = prime * result + (message == null ? 0 : message.hashCode());
-        result = prime * result + (severity == null ? 0 : severity.hashCode());
         result = prime * result + (severityLevel == null ? 0 : severityLevel.hashCode());
         return result;
     }
@@ -203,9 +192,6 @@ public class LogImpl implements Log {
                 return false;
             }
         } else if (!message.equals(other.message)) {
-            return false;
-        }
-        if (severity != other.severity) {
             return false;
         }
         if (severityLevel != other.severityLevel) {

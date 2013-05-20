@@ -8,33 +8,18 @@
  *******************************************************************************/
 package com.bonitasoft.engine.log;
 
-import java.util.Date;
-
-import org.bonitasoft.engine.bpm.model.BonitaObject;
+import org.bonitasoft.engine.exception.BonitaException;
 
 /**
- * @author Lu Kai
  * @author Bole Zhang
  * @author Matthieu Chaffotte
  */
-public interface Log extends BonitaObject {
+public class LogNotFoundException extends BonitaException {
 
-    long getLogId();
+    private static final long serialVersionUID = 1901535152006080386L;
 
-    String getMessage();
-
-    SeverityLevel getSeverityLevel();
-
-    String getCreatedBy();
-
-    Date getCreationDate();
-
-    String getActionType();
-
-    String getActionScope();
-
-    String getCallerClassName();
-
-    String getCallerMethodName();
+    public LogNotFoundException(final Throwable cause) {
+        super(cause);
+    }
 
 }

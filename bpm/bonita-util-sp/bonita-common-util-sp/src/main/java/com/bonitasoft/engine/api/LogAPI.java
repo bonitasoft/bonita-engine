@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -10,13 +10,15 @@ package com.bonitasoft.engine.api;
 
 import java.util.List;
 
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
-import com.bonitasoft.engine.exception.LogNotFoundException;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogCriterion;
+import com.bonitasoft.engine.log.LogNotFoundException;
 
 /**
  * @author Bole Zhang
@@ -25,55 +27,65 @@ import com.bonitasoft.engine.log.LogCriterion;
 public interface LogAPI {
 
     /**
-     * Retrieves the log by giving its identifier
+     * Retrieves the log.
      * 
-     * @param logId
-     *            the log identifier
-     * @return the Log object meet the criteria
+     * @param roleId
+     *            the identifier of the log
+     * @return the role
      * @throws LogNotFoundException
+     *             If the log identifier does not refer to an existing log
+     * @throws RetrieveException
+     *             If an exception occurs during the role retrieving
      * @throws InvalidSessionException
-     *             since 6.0
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.0
      */
     Log getLog(long logId) throws LogNotFoundException;
 
     /**
-     * get the total number of logs
+     * Returns the total number of logs.
      * 
      * @return the total number of logs
+     * @throws RetrieveException
+     *             If an exception occurs during the count retrieving
      * @throws InvalidSessionException
-     * @Deprecated use {@link #searchLogs(SearchOptions)} instead.
-     *             since 6.0
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.0
      */
-    @Deprecated
     int getNumberOfLogs();
 
     /**
-     * retrieve logs to support pagination
+     * Retrieves the paginated list of logs.
+     * <b>
+     * It retrieves from the startIndex to the startIndex + maxResults.
      * 
-     * @param pageIndex
-     *            the starting point
-     * @param numberPerPage
-     *            the number of Logs to be retrieved
-     * @param pagingCriterion
-     *            the criterion used to sort the retried logs
-     * @throws PageOutOfRangeException
-     * @return the list of Log objects
+     * @param startIndex
+     *            the start index
+     * @param maxResults
+     *            the max number of logs
+     * @param criterion
+     *            the sorting criterion
+     * @return the paginated list of logs
+     * @throws RetrieveException
+     *             If an exception occurs during the log retrieving
      * @throws InvalidSessionException
-     * @Deprecated use {@link #searchLogs(SearchOptions)} instead.
-     *             since 6.0
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.0
      */
-    @Deprecated
-    List<Log> getLogs(int pageIndex, int numberPerPage, LogCriterion pagingCriterion) throws PageOutOfRangeException;
+    List<Log> getLogs(int startIndex, int maxResults, LogCriterion criterion);
 
     /**
-     * retrieve logs to support search functionality
+     * Searches logs according to the criteria containing in the options.
      * 
-     * @param SearchOptions
-     *            searchOptions
-     * @return the SearchResult<Log>
+     * @param options
+     *            the search criteria
+     * @return the search result
+     * @throws SearchException
+     *             If an exception occurs during the log searching
      * @throws InvalidSessionException
-     *             since 6.0
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.0
      */
-    SearchResult<Log> searchLogs(SearchOptions searchOptions);
+    SearchResult<Log> searchLogs(SearchOptions searchOptions) throws SearchException;
 
 }
