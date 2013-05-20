@@ -5,14 +5,12 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserBuilder;
 import org.bonitasoft.engine.profile.model.ProfileMember;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -154,7 +152,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
 
         loginWith("default_tenant2", "default_password2", tenant2Id);
 
-        final User userTenant2 = createUserByUsernameAndPassword("userName_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2", "UserPwd_tenant2");
+        final User userTenant2 = createUser("userName_tenant2", "UserPwd_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2");
         getProfileAPI().createProfileMember(Long.valueOf(1), userTenant2.getId(), null, null);
         logout();
         login();
@@ -188,13 +186,6 @@ public class ProfileMemberTest extends AbstractProfileTest {
         platformAPI.deleteTenant(tenant2Id);
 
         login();
-    }
-
-    private User createUserByUsernameAndPassword(final String userName, final String firstName, final String lastName, final String password)
-            throws AlreadyExistsException, CreationException {
-        final UserBuilder userBuilder = new UserBuilder().createNewInstance(userName, password);
-        userBuilder.setFirstName(firstName).setLastName(lastName);
-        return getIdentityAPI().createUser(userBuilder.done(), null, null);
     }
 
 }

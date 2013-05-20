@@ -45,7 +45,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserUpdateDescriptor;
+import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.profile.model.Profile;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -114,10 +114,10 @@ public class LogTest extends CommonAPISPTest {
         assertEquals(before + 1, actual);
 
         // update user: add one log
-        final UserUpdateDescriptor updateDescriptor = new UserUpdateDescriptor();
-        updateDescriptor.updateUserName("new");
-        updateDescriptor.updatePassword("newPassword");
-        getIdentityAPI().updateUser(userOld.getId(), updateDescriptor, null, null);
+        final UserUpdater updateDescriptor = new UserUpdater();
+        updateDescriptor.setUserName("new");
+        updateDescriptor.setPassword("newPassword");
+        getIdentityAPI().updateUser(userOld.getId(), updateDescriptor);
 
         actual = getLogAPI().getNumberOfLogs();
         assertEquals(before + 2, actual);
@@ -536,10 +536,10 @@ public class LogTest extends CommonAPISPTest {
         final User userOld = getIdentityAPI().createUser("old", "oldPassword");
         assertEquals(initialNumberOfLogs + 1, getLogAPI().getNumberOfLogs());
         Thread.sleep(10);
-        final UserUpdateDescriptor updateDescriptor = new UserUpdateDescriptor();
-        updateDescriptor.updateUserName("new");
-        updateDescriptor.updatePassword("newPassword");
-        getIdentityAPI().updateUser(userOld.getId(), updateDescriptor, null, null);
+        final UserUpdater updateDescriptor = new UserUpdater();
+        updateDescriptor.setUserName("new");
+        updateDescriptor.setPassword("newPassword");
+        getIdentityAPI().updateUser(userOld.getId(), updateDescriptor);
         assertEquals(initialNumberOfLogs + 2, getLogAPI().getNumberOfLogs());
 
         Thread.sleep(10);
