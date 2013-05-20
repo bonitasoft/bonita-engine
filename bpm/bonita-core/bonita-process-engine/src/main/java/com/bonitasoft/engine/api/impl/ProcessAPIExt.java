@@ -85,6 +85,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
@@ -190,10 +191,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
             final File processeFolder = new File(file, String.valueOf(serverProcessDefinition.getId()));
             IOUtil.deleteDir(processeFolder);
-        } catch (final SProcessDefinitionReadException e) {
-            log(tenantAccessor, e);
-            throw new DeletionException(e);
-        } catch (final BonitaHomeNotSetException e) {
+        } catch (final BonitaException e) {
             log(tenantAccessor, e);
             throw new BonitaRuntimeException(e);
         } catch (final SBonitaException e) {
@@ -430,10 +428,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e.getMessage());
-        } catch (final ActivityInterruptedException e) {
-            throw e;
-        } catch (final ActivityExecutionErrorException e) {
-            throw e;
         } catch (final Exception e) {
             log(tenantAccessor, e);
             throw new ActivityExecutionErrorException(e.getMessage());
