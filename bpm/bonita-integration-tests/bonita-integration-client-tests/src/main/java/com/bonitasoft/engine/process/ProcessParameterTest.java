@@ -8,6 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,8 +43,8 @@ import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -54,13 +60,6 @@ import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
-
-import static org.hamcrest.CoreMatchers.is;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 public class ProcessParameterTest extends CommonAPISPTest {
 
@@ -109,7 +108,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         getProcessAPI().deleteProcess(definition.getId());
     }
 
-    @Test(expected = ProcessDefinitionNotFoundException.class)
+    @Test(expected = RetrieveException.class)
     public void getNumberOfParametersThrowsAnExceptionBecauseTheProcessDoesNotExist() throws BonitaException {
         getProcessAPI().getNumberOfParameterInstances(45);
     }
@@ -186,10 +185,10 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final User user = createUser("jules", "his_password");
         final String parameterName = "anotherParam";
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("setDataDefaultValueWithParameter", "9.23");
-        String actorName = "anyActor";
+        final String actorName = "anyActor";
         processBuilder.addActor(actorName);
         final String aTask = "userTask1";
-        String dataName = "aData";
+        final String dataName = "aData";
         processBuilder
                 .addParameter(parameterName, String.class.getCanonicalName())
                 .addData(dataName, String.class.getName(),
@@ -200,13 +199,13 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(design);
         final Map<String, String> params = new HashMap<String, String>(1);
-        String paramValue = "4 is the answer";
+        final String paramValue = "4 is the answer";
         params.put(parameterName, paramValue);
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         addMappingOfActorsForUser(actorName, user.getId(), definition);
-        long processDefinitionId = definition.getId();
+        final long processDefinitionId = definition.getId();
         getProcessAPI().enableProcess(processDefinitionId);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
         assertNotNull(waitForUserTask(aTask, processInstance, 1000));
@@ -237,7 +236,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         getProcessAPI().deleteProcess(definition.getId());
     }
 
-    @Test(expected = ProcessDefinitionNotFoundException.class)
+    @Test(expected = RetrieveException.class)
     public void getParameterOfAnUnknownProcess() throws BonitaException {
         getProcessAPI().getParameterInstance(123456789l, "unknown");
     }
@@ -349,7 +348,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         getProcessAPI().deleteProcess(definition.getId());
     }
 
-    @Test(expected = ProcessDefinitionNotFoundException.class)
+    @Test(expected = UpdateException.class)
     public void updateFailsWhenProcessDefinitionDoesNotExist() throws BonitaException {
         getProcessAPI().updateParameterInstanceValue(12, "key1", "bee");
     }
@@ -450,7 +449,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 1, 2, ParameterSorting.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 2, 2, ParameterSorting.NAME_DESC);
         assertEquals(2, parameters.size());
         assertEquals("bee", parameters.get(0).getName());
         assertEquals("bear", parameters.get(1).getName());
@@ -458,7 +457,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         getProcessAPI().deleteProcess(definition.getId());
     }
 
-    @Test(expected = PageOutOfRangeException.class)
+    @Test
     public void getPageTwoOutOfBound() throws BonitaException {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addParameter("bee", String.class.getCanonicalName()).addParameter("bear", String.class.getCanonicalName())
@@ -475,11 +474,9 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        try {
-            getProcessAPI().getParameterInstances(definition.getId(), 1, 8, ParameterSorting.NAME_ASC);
-        } finally {
-            getProcessAPI().deleteProcess(definition.getId());
-        }
+        final List<ParameterInstance> parameterInstances = getProcessAPI().getParameterInstances(definition.getId(), 8, 8, ParameterSorting.NAME_ASC);
+        assertEquals(0, parameterInstances.size());
+        getProcessAPI().deleteProcess(definition.getId());
     }
 
     @Test

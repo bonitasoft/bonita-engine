@@ -276,7 +276,7 @@ public class PropertyFileParameterService implements ParameterService {
 
             final int numberOfParameters = orderedParameters.size();
             if (fromIndex != 0 && numberOfParameters <= fromIndex) {
-                throw new SOutOfBoundException("Index " + fromIndex + " >= " + numberOfParameters);
+                return Collections.emptyList();
             }
             final int maxIndex = fromIndex + numberOfResult > numberOfParameters ? numberOfParameters : fromIndex + numberOfResult;
             final List<SParameter> parameters = new ArrayList<SParameter>();

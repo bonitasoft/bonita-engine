@@ -50,8 +50,8 @@ import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.DataNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
-import org.bonitasoft.engine.exception.connector.ConnectorException;
+import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.activity.ActivityExecutionException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.Expression;
@@ -219,7 +219,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
     }
 
-    @Test(expected = ConnectorException.class)
+    @Test(expected = UpdateException.class)
     public void testSetConnectorStateOnUnkownConnector() throws Exception {
         getProcessAPI().setConnectorInstanceState(-123456789l, ConnectorStateReset.SKIPPED);
     }
@@ -381,7 +381,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
-    @Test(expected = ActivityExecutionFailedException.class)
+    @Test(expected = ActivityExecutionException.class)
     public void testReplayActivityWithUnresolvedFailedConnectors() throws Exception {
         final String delivery = "Delivery men";
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");

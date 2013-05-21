@@ -14,20 +14,15 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.model.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
-import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
+import org.bonitasoft.engine.exception.activity.ActivityExecutionException;
 import org.bonitasoft.engine.exception.activity.ActivityNotFoundException;
-import org.bonitasoft.engine.exception.connector.ConnectorException;
+import org.bonitasoft.engine.exception.connector.ConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.exception.task.RetryTaskException;
 
 import com.bonitasoft.engine.bpm.model.ParameterInstance;
-import com.bonitasoft.engine.exception.InvalidParameterValueException;
+import com.bonitasoft.engine.exception.ImportParameterException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
 
 /**
@@ -39,80 +34,66 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
     /**
      * Gets how many parameters the process definition contains.
      * 
-     * @param processDefinitionUUID
+     * @param processDefinitionId
      *            Identifier of the processDefinition
      * @return the number of parameters of a process definition
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws ProcessDefinitionNotFoundException
-     *             Error thrown if no processDefinition have an id corresponding to the parameter.
      * @since 6.0
      */
-    int getNumberOfParameterInstances(long processDefinitionUUID) throws ProcessDefinitionNotFoundException;
+    int getNumberOfParameterInstances(long processDefinitionId);
 
     /**
      * Get a parameter instance by process definition UUID
      * 
-     * @param processDefinitionUUID
+     * @param processDefinitionId
      *            Identifier of the processDefinition
      * @param parameterName
      *            The parameter name for get ParameterInstance
      * @return the ParameterInstance of the process with processDefinitionUUID and name parameterName
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws ProcessDefinitionNotFoundException
-     *             Error thrown if no processDefinition have an id corresponding to the parameter.
      * @throws ParameterNotFoundException
      *             Error thrown if the given parameter is not found.
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    ParameterInstance getParameterInstance(long processDefinitionUUID, String parameterName) throws ProcessDefinitionNotFoundException,
-            ParameterNotFoundException;
+    ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws ParameterNotFoundException;
 
     /**
      * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
      * 
-     * @param processDefinitionUUID
+     * @param processDefinitionId
      *            Identifier of the processDefinition
-     * @param pageIndex
+     * @param startIndex
      *            Index of the page to be returned. First page has index 0.
-     * @param numberPerPage
+     * @param maxResults
      *            Number of result per page. Maximum number of result returned.
      * @param sort
      *            The criterion to sort the result
      * @return The ordered list of parameter instances
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws ProcessDefinitionNotFoundException
-     *             Error thrown if no processDefinition have an id corresponding to the parameter.
-     * @throws PageOutOfRangeException
-     *             Error thrown if page is out of the range.
      * @since 6.0
      */
-    List<ParameterInstance> getParameterInstances(long processDefinitionUUID, int pageIndex, int numberPerPage, ParameterSorting sort)
-            throws ProcessDefinitionNotFoundException, PageOutOfRangeException;
+    List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterSorting sort);
 
     /**
      * Update an existing parameter of a process definition.
      * 
-     * @param processDefinitionUUID
+     * @param processDefinitionId
      *            Identifier of the processDefinition
      * @param parameterName
      *            the parameter name
      * @param parameterValue
      *            the new value of the parameter
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws ProcessDefinitionNotFoundException
-     *             Error thrown if no processDefinition have an id corresponding to the parameter.
      * @throws ParameterNotFoundException
      *             Error thrown if the given parameter is not found.
-     * @throws InvalidParameterValueException
-     *             Error thrown if the given parameter is invalid.
+     * @throws UpdateException
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    void updateParameterInstanceValue(long processDefinitionUUID, String parameterName, String parameterValue) throws ProcessDefinitionNotFoundException,
-            ParameterNotFoundException, InvalidParameterValueException;
+    void updateParameterInstanceValue(long processDefinitionId, String parameterName, String parameterValue) throws ParameterNotFoundException, UpdateException;
 
     /**
      * Import the parameters by a processDefinition id and an array byte of parametersXML
@@ -121,45 +102,40 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            Identifier of the processDefinition
      * @param parametersXML
      *            The parameter with XML format.
+     * @throws ImportParameterException
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws InvalidParameterValueException
-     *             Error thrown if is value in the parameter is invalid
+     *             if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    void importParameters(long pDefinitionId, byte[] parametersXML) throws InvalidParameterValueException;
+    void importParameters(long pDefinitionId, byte[] parametersXML) throws ImportParameterException;
 
     /**
      * Retrieve the list of connector instances on an activity instance
      * 
      * @param activityInstanceId
      *            the id of the element on which we want the connector instances
-     * @param pageNumber
-     * @param numberPerPage
-     * @param order
+     * @param startIndex
+     * @param maxResults
+     * @param sortingCriterion
      * @return
      *         the list of connector instance on this element
-     * @throws PageOutOfRangeException
      * @since 6.0
      */
-    List<ConnectorInstance> getConnectorInstancesOfActivity(long activityInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
-            throws RetrieveException, PageOutOfRangeException;
+    List<ConnectorInstance> getConnectorInstancesOfActivity(long activityInstanceId, int startIndex, int maxResults, ConnectorInstanceCriterion sortingCriterion);
 
     /**
      * Retrieve the list of connector instances on a process instance
      * 
      * @param processInstanceId
      *            the id of the element on which we want the connector instances
-     * @param pageNumber
-     * @param numberPerPage
-     * @param order
+     * @param startIndex
+     * @param maxResults
+     * @param sortingCriterion
      * @return
      *         the list of connector instance on this element
-     * @throws PageOutOfRangeException
      * @since 6.0
      */
-    List<ConnectorInstance> getConnectorInstancesOfProcess(long processInstanceId, int pageNumber, int numberPerPage, ConnectorInstanceCriterion order)
-            throws RetrieveException, PageOutOfRangeException;
+    List<ConnectorInstance> getConnectorInstancesOfProcess(long processInstanceId, int startIndex, int maxResults, ConnectorInstanceCriterion sortingCriterion);
 
     /**
      * Allows to reset the state of an instance of connector
@@ -168,27 +144,30 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            the id of the connector to change
      * @param state
      *            the state to set on the connector
+     * @throws UpdateException
+     * @throws ConnectorInstanceNotFoundException
+     *             TODO
      * @throws InvalidSessionException
      *             if no current valid engine session is found
-     * @throws ConnectorException
-     *             if a connector-related problem occurs
      * @since 6.0
      */
-    void setConnectorInstanceState(long connectorInstanceId, ConnectorStateReset state) throws ConnectorException;
+    void setConnectorInstanceState(long connectorInstanceId, ConnectorStateReset state) throws UpdateException, ConnectorInstanceNotFoundException;
 
     /**
      * Allows to reset connector instance states for a Collection of connector instances at once.
      * 
      * @param connectorsToReset
-     *            a Map containing, as key, the connnector instance id, and as value, the <code>ConnectorStateReset</code> value to reset the connector instance
+     *            a Map containing, as key, the connector instance id, and as value, the <code>ConnectorStateReset</code> value to reset the connector instance
      *            to.
+     * @throws ConnectorInstanceNotFoundException
+     *             TODO
+     * @throws UpdateException
+     *             TODO
      * @throws InvalidSessionException
      *             if no current valid engine session is found
-     * @throws ConnectorException
-     *             if a connector-related problem occurs
      * @since 6.0
      */
-    void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorException;
+    void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorInstanceNotFoundException, UpdateException;
 
     /**
      * Updates the implementation version of the connector of the process definition.
@@ -202,16 +181,15 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            the version of the connector.
      * @param connectorImplementationArchive
      *            the zipped .impl file contented as a byte array.
-     * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
      * @throws InvalidConnectorImplementationException
      *             if the implementation is not valid. (e.g. wrong format)
-     * @throws ConnectorException
-     *             if an exception occurs when setting the new implementation of the connector.
+     * @throws UpdateException
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     void setConnectorImplementation(long processDefinitionId, String connectorName, String connectorVersion, byte[] connectorImplementationArchive)
-            throws InvalidConnectorImplementationException, ConnectorException;
+            throws InvalidConnectorImplementationException, UpdateException;
 
     /**
      * set state of activity to its previous state and then execute.
@@ -221,20 +199,15 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            Identifier of the activity instance
      * @param connectorsToReset
      *            Map of connectors to reset before retrying the task
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws ActivityNotFoundException
      *             errors thrown if can't find corresponding activity
-     * @throws RetryTaskException
-     *             errors happened when one of the two step that re-set state of the task and execute it again failed.
-     * @throws ActivityExecutionFailedException
-     * @throws RetrieveException
-     * @throws ObjectNotFoundException
-     * @throws ObjectModificationException
+     * @throws ActivityExecutionException
+     *             TODO
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityNotFoundException, RetryTaskException,
-            NotFoundException, RetrieveException, ActivityExecutionFailedException, UpdateException;
+    void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityNotFoundException, ActivityExecutionException;
 
     /**
      * Replay a task that was in failed state.
@@ -243,17 +216,14 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * 
      * @param activityInstanceId
      *            the activity to replay
+     * @throws ActivityExecutionException
+     *             TODO
+     * @throws ActivityNotFoundException
+     *             TODO
      * @throws InvalidSessionException
-     * @throws ObjectNotFoundException
-     *             When the activity does not exists
-     * @throws RetrieveException
-     *             When the activity or connectors couldn't be read
-     * @throws ObjectModificationException
      *             When the activity can't be modified
-     * @throws ActivityExecutionFailedException
-     *             When the activity can't be replayed because it's not in a good state, i.e. connectors in fail are present
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId) throws NotFoundException, RetrieveException, UpdateException, ActivityExecutionFailedException;
+    void replayActivity(long activityInstanceId) throws ActivityExecutionException, ActivityNotFoundException;
 
 }

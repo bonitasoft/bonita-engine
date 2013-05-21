@@ -32,7 +32,6 @@ import java.util.Properties;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.parameter.OrderBy;
-import org.bonitasoft.engine.parameter.SOutOfBoundException;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
@@ -245,14 +244,15 @@ public class PropertyFileParameterServiceTest {
 
     }
 
-    @Test(expected = SOutOfBoundException.class)
+    @Test
     public void testGetParametersPaginatedOutOfBound() throws Exception {
         final Map<String, String> map = new HashMap<String, String>(3);
         map.put("a", "value1");
         map.put("b", "value2");
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, map);
 
-        propertyFileParameterService.get(PROCESS_DEFINITION_ID, 2, 10, OrderBy.NAME_ASC);
+        final List<SParameter> list = propertyFileParameterService.get(PROCESS_DEFINITION_ID, 2, 10, OrderBy.NAME_ASC);
+        assertEquals(0, list.size());
     }
 
     @Test

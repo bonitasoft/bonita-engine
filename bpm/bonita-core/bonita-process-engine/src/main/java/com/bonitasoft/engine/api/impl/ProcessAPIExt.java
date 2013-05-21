@@ -26,7 +26,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.actor.ActorMappingExportException;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.api.impl.PageIndexCheckingUtil;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
@@ -57,7 +56,6 @@ import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
-import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -70,8 +68,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -91,18 +87,20 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
+import org.bonitasoft.engine.exception.ProcessExportException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionErrorException;
-import org.bonitasoft.engine.exception.activity.ActivityExecutionFailedException;
+import org.bonitasoft.engine.exception.activity.ActivityExecutionException;
 import org.bonitasoft.engine.exception.activity.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.activity.ActivityInterruptedException;
 import org.bonitasoft.engine.exception.activity.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.activity.ArchivedActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.connector.ConnectorException;
+import org.bonitasoft.engine.exception.connector.ConnectorExecutionException;
+import org.bonitasoft.engine.exception.connector.ConnectorInstanceNotFoundException;
+import org.bonitasoft.engine.exception.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.exception.process.ArchivedProcessInstanceNotFoundException;
@@ -121,7 +119,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
-import org.bonitasoft.engine.parameter.SOutOfBoundException;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -144,7 +141,7 @@ import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
 import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
-import com.bonitasoft.engine.exception.InvalidParameterValueException;
+import com.bonitasoft.engine.exception.ImportParameterException;
 import com.bonitasoft.engine.exception.ParameterNotFoundException;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -204,7 +201,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws InvalidParameterValueException {
+    public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws ImportParameterException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -215,7 +212,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             try {
                 transactionExecutor.execute(getProcessDefinition);
             } catch (final SBonitaException e) {
-                throw new InvalidParameterValueException(e);
+                throw new ImportParameterException(e);
             }
             sDefinition = getProcessDefinition.getResult();
         }
@@ -229,7 +226,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             try {
                 property.load(new ByteArrayInputStream(parametersXML));
             } catch (final IOException e1) {
-                throw new InvalidParameterValueException(e1);
+                throw new ImportParameterException(e1);
             }
 
             for (final Entry<Object, Object> entry : property.entrySet()) {
@@ -249,7 +246,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             parameterService.addAll(sDefinition.getId(), storedParameters);
         } catch (final SParameterProcessNotFoundException e) {
-            throw new InvalidParameterValueException(e);
+            throw new ImportParameterException(e);
         }
     }
 
@@ -275,23 +272,20 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public int getNumberOfParameterInstances(final long processDefinitionUUID) throws ProcessDefinitionNotFoundException {
+    public int getNumberOfParameterInstances(final long processDefinitionId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionUUID, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
             return sProcessDefinition.getParameters().size();
-        } catch (final SProcessDefinitionReadException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
         }
     }
 
     @Override
-    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws ProcessDefinitionNotFoundException,
-            ParameterNotFoundException {
+    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws ParameterNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -307,18 +301,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             return new ParameterImpl(name, description, value, type);
         } catch (final SParameterProcessNotFoundException e) {
             throw new ParameterNotFoundException(processDefinitionId, parameterName);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionReadException e) {
-            throw new ProcessDefinitionNotFoundException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
         }
     }
 
     @Override
-    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int pageIndex, final int numberPerPage,
-            final ParameterSorting sort) throws ProcessDefinitionNotFoundException, PageOutOfRangeException {
-        final int totalNumber = getNumberOfParameterInstances(processDefinitionId);
-        PageIndexCheckingUtil.checkIfPageIsOutOfRange(totalNumber, pageIndex, numberPerPage);
+    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults, final ParameterSorting sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -338,7 +327,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (sProcessDefinition.getParameters().isEmpty()) {
                 return Collections.emptyList();
             }
-            final List<SParameter> parameters = parameterService.get(processDefinitionId, pageIndex * numberPerPage, numberPerPage, order);
+            final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults, order);
             final List<ParameterInstance> paramterInstances = new ArrayList<ParameterInstance>();
             for (int i = 0; i < parameters.size(); i++) {
                 final SParameter parameter = parameters.get(i);
@@ -350,20 +339,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 paramterInstances.add(new ParameterImpl(name, description, value, type));
             }
             return paramterInstances;
-        } catch (final SParameterProcessNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionReadException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SOutOfBoundException e) {
-            throw new PageOutOfRangeException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
         }
     }
 
     @Override
     public void updateParameterInstanceValue(final long processDefinitionId, final String parameterName, final String parameterValue)
-            throws ProcessDefinitionNotFoundException, ParameterNotFoundException, InvalidParameterValueException {
+            throws ParameterNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -377,13 +360,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             parameterService.update(processDefinitionId, parameterName, parameterValue);
             tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         } catch (final SParameterProcessNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionReadException e) {
-            throw new ProcessDefinitionNotFoundException(e);
+            throw new ParameterNotFoundException(e);
         } catch (final SBonitaException e) {
-            throw new ProcessDefinitionNotFoundException(e);
+            throw new UpdateException(e);
         }
     }
 
@@ -435,7 +414,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteManualUserTask(final long manualTaskId) throws DeletionException, NotFoundException {
+    public void deleteManualUserTask(final long manualTaskId) throws DeletionException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
@@ -450,8 +429,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 } else {
                     throw new DeletionException("Can't delete a task that is not a manual task");
                 }
-            } catch (final SActivityInstanceNotFoundException e) {
-                throw new NotFoundException("can't find activity with id " + manualTaskId, e);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
                 throw new DeletionException(e);
@@ -476,13 +453,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<ConnectorInstance> getConnectorInstancesOfActivity(final long activityInstanceId, final int pageNumber, final int numberPerPage,
-            final ConnectorInstanceCriterion order) throws RetrieveException, PageOutOfRangeException {
-        return getConnectorInstancesFor(activityInstanceId, pageNumber, numberPerPage, SConnectorInstance.FLOWNODE_TYPE, order);
+    public List<ConnectorInstance> getConnectorInstancesOfActivity(final long activityInstanceId, final int startIndex, final int maxResults,
+            final ConnectorInstanceCriterion sortingCriterion) {
+        return getConnectorInstancesFor(activityInstanceId, startIndex, maxResults, SConnectorInstance.FLOWNODE_TYPE, sortingCriterion);
     }
 
-    private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int pageNumber, final int numberPerPage, final String flownodeType,
-            final ConnectorInstanceCriterion order) throws PageOutOfRangeException, RetrieveException {
+    private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int startIndex, final int maxResults, final String flownodeType,
+            final ConnectorInstanceCriterion order) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -549,12 +526,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
-            long numberOfConnectorInstances;
             try {
-                numberOfConnectorInstances = connectorInstanceService.getNumberOfConnectorInstances(instanceId, flownodeType);
-                PageIndexCheckingUtil.checkIfPageIsOutOfRange(numberOfConnectorInstances, pageNumber, numberPerPage);
-                final List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(instanceId, flownodeType, pageNumber
-                        * numberPerPage, numberPerPage, fieldName, orderByType);
+                final List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(instanceId, flownodeType, startIndex,
+                        maxResults, fieldName, orderByType);
                 return ModelConvertor.toConnectorInstances(connectorInstances);
             } catch (final SConnectorInstanceReadException e) {
                 throw new RetrieveException(e);
@@ -567,20 +541,21 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<ConnectorInstance> getConnectorInstancesOfProcess(final long processInstanceId, final int pageNumber, final int numberPerPage,
-            final ConnectorInstanceCriterion order) throws RetrieveException, PageOutOfRangeException {
-        return getConnectorInstancesFor(processInstanceId, pageNumber, numberPerPage, SConnectorInstance.PROCESS_TYPE, order);
+    public List<ConnectorInstance> getConnectorInstancesOfProcess(final long processInstanceId, final int startIndex, final int maxResults,
+            final ConnectorInstanceCriterion sortingCriterion) {
+        return getConnectorInstancesFor(processInstanceId, startIndex, maxResults, SConnectorInstance.PROCESS_TYPE, sortingCriterion);
     }
 
     @Override
-    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws ConnectorException {
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws UpdateException,
+            ConnectorInstanceNotFoundException {
         final Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
         connectorsToReset.put(connectorInstanceId, state);
         setConnectorInstanceState(connectorsToReset);
     }
 
     @Override
-    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorException {
+    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorInstanceNotFoundException, UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -589,7 +564,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             transactionExecutor.execute(txContent);
         } catch (final SBonitaException e) {
-            throw new ConnectorException("Error resetting connector instance state", e);
+            throw new UpdateException(e);
         }
     }
 
@@ -603,7 +578,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
      */
     @Override
     public void setConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion,
-            final byte[] connectorImplementationArchive) throws ConnectorException, InvalidConnectorImplementationException {
+            final byte[] connectorImplementationArchive) throws InvalidConnectorImplementationException, UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.POST_DEPLOY_CONFIG);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -620,23 +595,23 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new InvalidConnectorImplementationException(e);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
-                throw new ConnectorException(e);
+                throw new UpdateException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new ConnectorException(e);
+            throw new UpdateException(e);
         }
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId) throws NotFoundException, RetrieveException, UpdateException, ActivityExecutionFailedException {
+    public void replayActivity(final long activityInstanceId) throws ActivityExecutionException, ActivityNotFoundException {
         replayActivity(activityInstanceId, null);
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws NotFoundException,
-            RetrieveException, ActivityExecutionFailedException, UpdateException {
+    public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityExecutionException,
+            ActivityNotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -662,13 +637,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId,
                         SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
                 if (!connectorInstances.isEmpty()) {
-                    throw new ActivityExecutionFailedException("There is at least one connector in failed on ON_ENTER of the activity: "
+                    throw new ActivityExecutionException("There is at least one connector in failed on ON_ENTER of the activity: "
                             + connectorInstances.get(0).getName());
                 }
                 connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
                         ConnectorEvent.ON_FINISH, 0, 1, ConnectorState.FAILED.name());
                 if (!connectorInstances.isEmpty()) {
-                    throw new ActivityExecutionFailedException("There is at least one connector in failed on ON_FINISH of the activity: "
+                    throw new ActivityExecutionException("There is at least one connector in failed on ON_FINISH of the activity: "
                             + connectorInstances.get(0).getName());
                 }
                 // can change state and call execute
@@ -678,34 +653,26 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 if (activityInstance.getLogicalGroup(2) > 0) {
                     containerType = SFlowElementsContainerType.FLOWNODE.name();
                 }
-            } catch (final SConnectorInstanceReadException e) {
-                throw new RetrieveException(e);
-            } catch (final SActivityReadException e) {
-                throw new RetrieveException(e);
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new NotFoundException(e);
-            } catch (final SFlowNodeModificationException e) {
-                throw new UpdateException(e);
-            } catch (final SConnectorInstanceModificationException e) {
-                throw new UpdateException(e);
+                throw new ActivityNotFoundException(e);
+            } catch (final SBonitaException e) {
+                throw new ActivityExecutionException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
         } catch (final STransactionException e) {
-            throw new RetrieveException(e);
+            throw new ActivityExecutionException(e);
         }
         try {
             containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType, null);
-        } catch (final SActivityReadException e) {
-            throw new RetrieveException(e);
         } catch (final SBonitaException e) {
-            throw new ActivityExecutionFailedException(e);
+            throw new ActivityExecutionException(e);
         }
     }
 
     @Override
     // TODO delete files after use/if an exception occurs
-    public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws BonitaRuntimeException, IOException {
+    public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         String processesFolder;
         try {
             final long tenantId = getTenantAccessor().getTenantId();
@@ -720,44 +687,47 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final File processFolder = new File(file, String.valueOf(processDefinitionId));
 
         // copy current parameter to parameter file
-        final File currentParasF = new File(processFolder.getPath(), "current-parameters.properties");
-        if (currentParasF.exists()) {
-            final File parasF = new File(processFolder.getPath(), "parameters.properties");
-            if (!parasF.exists()) {
-                parasF.createNewFile();
+        try {
+            final File currentParasF = new File(processFolder.getPath(), "current-parameters.properties");
+            if (currentParasF.exists()) {
+                final File parasF = new File(processFolder.getPath(), "parameters.properties");
+                if (!parasF.exists()) {
+                    parasF.createNewFile();
+                }
+                final String content = IOUtil.read(currentParasF);
+                IOUtil.write(parasF, content);
             }
-            final String content = IOUtil.read(currentParasF);
-            IOUtil.write(parasF, content);
-        }
 
-        // export actormapping
-        final File actormappF = new File(processFolder.getPath(), "actorMapping.xml");
-        if (!actormappF.exists()) {
-            actormappF.createNewFile();
-        }
-        String xmlcontent = "";
-        try {
-            xmlcontent = exportActorMapping(processDefinitionId);
-        } catch (final ActorMappingExportException e) {
-            throw new BonitaRuntimeException(e);
-        }
-        IOUtil.write(actormappF, xmlcontent);
+            // export actormapping
+            final File actormappF = new File(processFolder.getPath(), "actorMapping.xml");
+            if (!actormappF.exists()) {
+                actormappF.createNewFile();
+            }
+            String xmlcontent = "";
+            try {
+                xmlcontent = exportActorMapping(processDefinitionId);
+            } catch (final ActorMappingExportException e) {
+                throw new ProcessExportException(e);
+            }
+            IOUtil.write(actormappF, xmlcontent);
 
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ZipOutputStream zos = new ZipOutputStream(baos);
-        try {
-            IOUtil.zipDir(processFolder.getPath(), zos, processFolder.getPath());
-            return baos.toByteArray();
-        } finally {
-            zos.close();
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ZipOutputStream zos = new ZipOutputStream(baos);
+            try {
+                IOUtil.zipDir(processFolder.getPath(), zos, processFolder.getPath());
+                return baos.toByteArray();
+            } finally {
+                zos.close();
+            }
+        } catch (final IOException e) {
+            throw new ProcessExportException(e);
         }
     }
 
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ArchivedProcessInstanceNotFoundException, ClassLoaderException, ConnectorException, InvalidEvaluationConnectorConditionException,
-            NotSerializableException {
+            throws NotSerializableException, ConnectorExecutionException, ConnectorNotFoundException {
         return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
