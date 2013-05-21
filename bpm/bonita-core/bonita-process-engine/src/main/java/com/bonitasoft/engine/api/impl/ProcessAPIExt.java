@@ -728,8 +728,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
             throws NotSerializableException, ConnectorExecutionException, ConnectorNotFoundException {
-        return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
-                inputValues, null, null, processInstanceId);
+        try {
+            return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+                    inputValues, null, null, processInstanceId);
+        } catch (final Exception e) {
+            // TODO temporary to be able to commit
+            throw new ConnectorExecutionException(e);
+        }
     }
 
     @Override
