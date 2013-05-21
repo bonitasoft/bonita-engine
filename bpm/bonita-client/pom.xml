@@ -85,6 +85,7 @@
 						<configuration>
 							<includeDependencySources>true</includeDependencySources>
 							<dependencySourceIncludes>
+								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
 								<dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude>
 							</dependencySourceIncludes>
 						</configuration>

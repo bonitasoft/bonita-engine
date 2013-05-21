@@ -111,6 +111,12 @@
 			</build>
 		</profile>
 		<profile>
+			<id>javadoc</id>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+			</properties>
+		</profile>
+		<profile>
 			<id>sonar</id>
 			<modules>
 				<module>services</module>
