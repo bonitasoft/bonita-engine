@@ -33,7 +33,7 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
+import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdater;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -73,8 +73,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         waitForStep("step2", processInstance1);
 
-        final ProcessInstanceUpdateDescriptor updateDescriptor = new ProcessInstanceUpdateDescriptor();
-        updateDescriptor.updateStringIndex1("metsassa");
+        final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
+        updateDescriptor.setStringIndex1("metsassa");
         ProcessInstance processInstance = getProcessAPI().updateProcessInstance(processInstance1.getId(), updateDescriptor);
         assertEquals("metsassa", processInstance.getStringIndex1());
 
@@ -107,8 +107,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         waitForStep("step2", processInstance1);
 
-        final ProcessInstanceUpdateDescriptor updateDescriptor = new ProcessInstanceUpdateDescriptor();
-        updateDescriptor.updateStringIndex2("metsassa");
+        final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
+        updateDescriptor.setStringIndex2("metsassa");
         ProcessInstance processInstance = getProcessAPI().updateProcessInstance(processInstance1.getId(), updateDescriptor);
         assertEquals("metsassa", processInstance.getStringIndex2());
 
@@ -141,8 +141,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         waitForStep("step2", processInstance1);
 
-        final ProcessInstanceUpdateDescriptor updateDescriptor = new ProcessInstanceUpdateDescriptor();
-        updateDescriptor.updateStringIndex3("metsassa");
+        final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
+        updateDescriptor.setStringIndex3("metsassa");
         ProcessInstance processInstance = getProcessAPI().updateProcessInstance(processInstance1.getId(), updateDescriptor);
         assertEquals("metsassa", processInstance.getStringIndex3());
 
@@ -175,8 +175,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         waitForStep("step2", processInstance1);
 
-        final ProcessInstanceUpdateDescriptor updateDescriptor = new ProcessInstanceUpdateDescriptor();
-        updateDescriptor.updateStringIndex4("metsassa");
+        final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
+        updateDescriptor.setStringIndex4("metsassa");
         ProcessInstance processInstance = getProcessAPI().updateProcessInstance(processInstance1.getId(), updateDescriptor);
         assertEquals("metsassa", processInstance.getStringIndex4());
 
@@ -209,8 +209,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         waitForStep("step2", processInstance1);
 
-        final ProcessInstanceUpdateDescriptor updateDescriptor = new ProcessInstanceUpdateDescriptor();
-        updateDescriptor.updateStringIndex5("metsassa");
+        final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
+        updateDescriptor.setStringIndex5("metsassa");
         ProcessInstance processInstance = getProcessAPI().updateProcessInstance(processInstance1.getId(), updateDescriptor);
         assertEquals("metsassa", processInstance.getStringIndex5());
 

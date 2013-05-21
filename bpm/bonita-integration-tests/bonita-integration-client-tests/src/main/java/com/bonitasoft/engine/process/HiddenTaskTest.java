@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
 
 public class HiddenTaskTest extends CommonAPISPTest {
 
@@ -79,8 +80,9 @@ public class HiddenTaskTest extends CommonAPISPTest {
         final List<HumanTaskInstance> pendingTasks = checkNbOPendingTasks.getPendingHumanTasks();
         final HumanTaskInstance task1 = pendingTasks.get(0);
         getProcessAPI().assignUserTask(task1.getId(), user.getId());
-        final ManualTaskInstance manualTask = getProcessAPI().addManualUserTask(task1.getId(), "MySubTask", "My visible hidden sub-task", user.getId(),
+        final ManualTaskCreator taskCreator = buildManualUserTaskCreator(task1.getId(), "MySubTask", "My visible hidden sub-task", user.getId(),
                 "Sub task that should be shown as hidden when so", null, TaskPriority.NORMAL);
+        final ManualTaskInstance manualTask = getProcessAPI().addManualUserTask(taskCreator);
 
         getProcessAPI().hideTasks(user.getId(), manualTask.getId());
 

@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
@@ -29,10 +32,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TimerBoundaryEventTest extends CommonAPISPTest {
 
@@ -88,8 +89,9 @@ public class TimerBoundaryEventTest extends CommonAPISPTest {
         ManualTaskInstance manualUserTask = null;
         if (addChild) {
             getProcessAPI().assignUserTask(waitForStep1.getStepId(), donaBenta.getId());
-            manualUserTask = getProcessAPI().addManualUserTask(waitForStep1.getStepId(), "childOfStep1", "childOfStep1", donaBenta.getId(), "child task",
-                    new Date(), TaskPriority.NORMAL);
+            final ManualTaskCreator taskCreator = buildManualUserTaskCreator(waitForStep1.getStepId(), "childOfStep1", "childOfStep1", donaBenta.getId(),
+                    "child task", new Date(), TaskPriority.NORMAL);
+            manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
         }
 
         Thread.sleep(timerDuration); // wait timer trigger

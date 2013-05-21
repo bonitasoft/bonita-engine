@@ -49,9 +49,9 @@ import org.bonitasoft.engine.core.operation.OperationBuilder;
 import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.DataNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.activity.ActivityExecutionException;
+import org.bonitasoft.engine.exception.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.Expression;
@@ -728,7 +728,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance", "No serializable output" }, story = "Execute connector on an activity instance with no serializable output.", jira = "ENGINE-823")
-    @Test(expected = NotSerializableException.class)
+    @Test(expected = ConnectorExecutionException.class)
     public void testExecuteConnectorOnActivityInstanceWithNotSerializableOutput() throws Exception {
         final String delivery = "Delivery men";
         final String valueOfInput1 = "Lily";
@@ -835,7 +835,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed activity", "No serializable output" }, story = "Execute connector on completed activity instance with no serializable output.", jira = "ENGINE-823")
-    @Test(expected = NotSerializableException.class)
+    @Test(expected = ConnectorExecutionException.class)
     public void testExecuteConnectorOnCompletedActivityInstanceWithNotSerializableOutput() throws Exception {
         final String delivery = "Delivery men";
         final String valueOfInput1 = "Lily";
@@ -942,7 +942,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed process instance", "Process instance",
             "No serializable output" }, story = "Execute connector on completed process instance with no serializable output.", jira = "ENGINE-823")
-    @Test(expected = NotSerializableException.class)
+    @Test(expected = ConnectorExecutionException.class)
     public void testExecuteConnectorOnCompletedProcessInstanceWithNotSerializableOutput() throws Exception {
         final String delivery = "Delivery men";
         final String valueOfInput1 = "Lily";
@@ -1050,7 +1050,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process instance", "No serializable output" }, story = "Execute connector on process instance with no serializable output.", jira = "ENGINE-823")
-    @Test(expected = NotSerializableException.class)
+    @Test(expected = ConnectorExecutionException.class)
     public void testExecuteConnectorOnProcessInstanceWithNotSerializableOutput() throws Exception {
         final String delivery = "Delivery men";
         final String valueOfInput1 = "Lily";

@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * @author Matthieu Chaffotte
  */
-public class ProcessInstanceUpdateDescriptor implements Serializable {
+public class ProcessInstanceUpdater implements Serializable {
 
     private static final long serialVersionUID = 728214104237982027L;
 
@@ -25,27 +25,27 @@ public class ProcessInstanceUpdateDescriptor implements Serializable {
 
     private final Map<ProcessInstanceField, Serializable> fields;
 
-    public ProcessInstanceUpdateDescriptor() {
+    public ProcessInstanceUpdater() {
         fields = new HashMap<ProcessInstanceField, Serializable>(3);
     }
 
-    public void updateStringIndex1(final String stringIndex) {
+    public void setStringIndex1(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_1, stringIndex);
     }
 
-    public void updateStringIndex2(final String stringIndex) {
+    public void setStringIndex2(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_2, stringIndex);
     }
 
-    public void updateStringIndex3(final String stringIndex) {
+    public void setStringIndex3(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_3, stringIndex);
     }
 
-    public void updateStringIndex4(final String stringIndex) {
+    public void setStringIndex4(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_4, stringIndex);
     }
 
-    public void updateStringIndex5(final String stringIndex) {
+    public void setStringIndex5(final String stringIndex) {
         fields.put(ProcessInstanceField.STRING_INDEX_5, stringIndex);
     }
 

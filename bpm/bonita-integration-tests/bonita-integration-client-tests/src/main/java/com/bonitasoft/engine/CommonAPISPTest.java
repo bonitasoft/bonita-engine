@@ -8,9 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ import org.bonitasoft.engine.bpm.model.ProcessDefinition;
 import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.model.ProcessInstance;
+import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.bpm.model.archive.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -59,11 +63,10 @@ import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProcessManagementAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.platform.Tenant;
-
-import static org.junit.Assert.assertTrue;
 
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
@@ -254,6 +257,18 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
         final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorSorting.NAME_ASC);
         final ActorInstance actor = actors.get(0);
         getProcessAPI().addUserToActor(actor.getId(), userId);
+    }
+
+    protected ManualTaskCreator buildManualUserTaskCreator(final long parentTaskId, final String taskName, final String displayName, final long assignTo,
+            final String description, final Date dueDate, final TaskPriority priority) {
+        final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTaskId, taskName);
+        taskCreator.setDisplayName(displayName);
+        taskCreator.setAssignTo(assignTo);
+        taskCreator.setDescription(description);
+        taskCreator.setDueDate(dueDate);
+        taskCreator.setPriority(priority);
+        return taskCreator;
+
     }
 
 }

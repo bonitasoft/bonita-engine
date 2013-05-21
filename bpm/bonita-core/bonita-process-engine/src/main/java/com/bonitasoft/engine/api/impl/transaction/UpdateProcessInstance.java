@@ -19,8 +19,8 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
-import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor;
-import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdateDescriptor.ProcessInstanceField;
+import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdater;
+import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdater.ProcessInstanceField;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 
 /**
@@ -30,7 +30,7 @@ public class UpdateProcessInstance implements TransactionContent {
 
     private final ProcessInstanceService instanceService;
 
-    private final ProcessInstanceUpdateDescriptor descriptor;
+    private final ProcessInstanceUpdater descriptor;
 
     private final long processInstanceId;
 
@@ -40,7 +40,7 @@ public class UpdateProcessInstance implements TransactionContent {
 
     private String value;
 
-    public UpdateProcessInstance(final ProcessInstanceService instanceService, final ProcessInstanceUpdateDescriptor descriptor,
+    public UpdateProcessInstance(final ProcessInstanceService instanceService, final ProcessInstanceUpdater descriptor,
             final SProcessInstanceUpdateBuilder updateBuilder, final long processInstanceId) {
         super();
         this.instanceService = instanceService;

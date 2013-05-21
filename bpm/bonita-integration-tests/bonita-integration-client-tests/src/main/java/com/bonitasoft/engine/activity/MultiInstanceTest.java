@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 public class MultiInstanceTest extends CommonAPISPTest {
@@ -58,8 +59,8 @@ public class MultiInstanceTest extends CommonAPISPTest {
     public void childOfRemainingInstancesAreAbortedAfterCompletionCondition() throws Exception {
         final String delivery = "Delivery men";
 
-        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt()
-                .createNewInstance("remainingInstancesAreAbortedAfterCompletionCondition", "1.0");
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("remainingInstancesAreAbortedAfterCompletionCondition",
+                "1.0");
         builder.addActor(delivery).addDescription("Delivery all day and night long");
         final int loopMax = 3;
         builder.addUserTask("step1", delivery)
@@ -84,8 +85,13 @@ public class MultiInstanceTest extends CommonAPISPTest {
         for (int i = 0; i < numberOfTask; i++) {
             final HumanTaskInstance pendingTask = pendingTasks.get(i);
             getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
-            getProcessAPI().addManualUserTask(pendingTask.getId(), "manual1" + i, "manual1" + i, john.getId(), "manual task", new Date(), null);
-            getProcessAPI().addManualUserTask(pendingTask.getId(), "manual2" + i, "manual2" + i, john.getId(), "manual task", new Date(), TaskPriority.NORMAL);
+            ManualTaskCreator taskCreator = buildManualUserTaskCreator(pendingTask.getId(), "manual1" + i, "manual1" + i, john.getId(), "manual task",
+                    new Date(), null);
+            getProcessAPI().addManualUserTask(taskCreator);
+
+            taskCreator = buildManualUserTaskCreator(pendingTask.getId(), "manual2" + i, "manual2" + i, john.getId(), "manual task", new Date(),
+                    TaskPriority.NORMAL);
+            getProcessAPI().addManualUserTask(taskCreator);
         }
 
         for (int i = 0; i < numberOfTaskToCompleteMI; i++) {

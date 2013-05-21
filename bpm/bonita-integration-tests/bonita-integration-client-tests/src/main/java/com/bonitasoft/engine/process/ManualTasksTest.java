@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
 
 public class ManualTasksTest extends CommonAPISPTest {
@@ -63,8 +64,8 @@ public class ManualTasksTest extends CommonAPISPTest {
         loginWith("login1", "password");
         getProcessAPI().assignUserTask(taskId, user.getId());
 
-        final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskId, "subtask", "MySubTask", user.getId(), "desk", new Date(),
-                TaskPriority.NORMAL);
+        final ManualTaskCreator taskCreator = buildManualUserTaskCreator(taskId, "subtask", "MySubTask", user.getId(), "desk", new Date(), TaskPriority.NORMAL);
+        final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
         try {
             getProcessAPI().releaseUserTask(manualUserTask.getId());
         } finally {
