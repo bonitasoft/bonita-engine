@@ -14,7 +14,6 @@ import java.util.Map;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.EJB2ServerAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
-import org.bonitasoft.engine.api.EngineAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -61,13 +60,13 @@ public class PlatformAPIAccessor {
             UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientSessionInterceptor sessionInterceptor = new ClientSessionInterceptor(clazz.getName(), serverAPI, session);
-        return (T) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
     }
 
     public static PlatformLoginAPI getPlatformLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor interceptor = new ClientInterceptor(PlatformLoginAPI.class.getName(), serverAPI);
-        return (PlatformLoginAPI) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { PlatformLoginAPI.class }, interceptor);
+        return (PlatformLoginAPI) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { PlatformLoginAPI.class }, interceptor);
     }
 
     public static PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
@@ -87,7 +86,7 @@ public class PlatformAPIAccessor {
     public static NodeAPI getNodeAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor interceptor = new ClientInterceptor(NodeAPI.class.getName(), serverAPI);
-        return (NodeAPI) Proxy.newProxyInstance(EngineAPI.class.getClassLoader(), new Class[] { NodeAPI.class }, interceptor);
+        return (NodeAPI) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { NodeAPI.class }, interceptor);
     }
 
 }

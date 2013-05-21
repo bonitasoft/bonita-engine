@@ -23,10 +23,10 @@ import org.bonitasoft.engine.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
-import org.bonitasoft.engine.profile.model.ExportedParentProfileEntry;
-import org.bonitasoft.engine.profile.model.ExportedProfile;
-import org.bonitasoft.engine.profile.model.ExportedProfileEntry;
-import org.bonitasoft.engine.profile.model.ExportedProfileMapping;
+import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
+import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
+import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
@@ -96,8 +96,7 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
         }
     }
 
-    private long insertProfile(final ExportedProfile profile) throws SProfileAlreadyExistsException,
-            SProfileCreationException {
+    private long insertProfile(final ExportedProfile profile) throws SProfileAlreadyExistsException, SProfileCreationException {
         final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
 
@@ -130,8 +129,8 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
         final SProfileEntryBuilder proEntryBuilder = builders.getSProfileEntryBuilder();
 
         final SProfileEntry sproEntrytp = proEntryBuilder.createNewInstance(childProfileEntry.getName(), profileId)
-                .setDescription(childProfileEntry.getDescription()).setIndex(childProfileEntry.getIndex())
-                .setPage(childProfileEntry.getPage()).setParentId(parentId).setType(childProfileEntry.getType()).done();
+                .setDescription(childProfileEntry.getDescription()).setIndex(childProfileEntry.getIndex()).setPage(childProfileEntry.getPage())
+                .setParentId(parentId).setType(childProfileEntry.getType()).done();
         profileService.createProfileEntry(sproEntrytp);
     }
 

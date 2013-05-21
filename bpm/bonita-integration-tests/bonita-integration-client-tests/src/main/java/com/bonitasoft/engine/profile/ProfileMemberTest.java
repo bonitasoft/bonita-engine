@@ -11,7 +11,7 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.profile.model.ProfileMember;
+import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;

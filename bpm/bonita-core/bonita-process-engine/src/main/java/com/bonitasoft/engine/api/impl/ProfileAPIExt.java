@@ -28,19 +28,19 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileCreator;
+import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryCreator;
 import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
-import org.bonitasoft.engine.profile.model.ExportedParentProfileEntry;
-import org.bonitasoft.engine.profile.model.ExportedProfile;
-import org.bonitasoft.engine.profile.model.ExportedProfileEntry;
-import org.bonitasoft.engine.profile.model.ExportedProfileMapping;
-import org.bonitasoft.engine.profile.model.Profile;
-import org.bonitasoft.engine.profile.model.ProfileEntry;
+import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
+import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
+import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -107,8 +107,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Profile createProfile(final String name, final String description, final String iconPath)
-            throws CreationException {
+    public Profile createProfile(final String name, final String description, final String iconPath) throws CreationException {
         final ProfileCreator creator = new ProfileCreator(name);
         creator.setDescription(description);
         creator.setIconPath(iconPath);
@@ -226,7 +225,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
                         throw new ExecutionException("Can't remove profile with id " + existingProfile.getId(), e);
                     }
                 }
-                final CreateProfile createProfile = new CreateProfile(profileService, profileBuilder, new ProfileCreator(profile));
+                final CreateProfile createProfile = new CreateProfile(profileService, profileBuilder, getProfileCreator(profile));
                 try {
                     transactionExecutor.execute(createProfile);
                 } catch (final SBonitaException e) {
@@ -238,7 +237,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
                 final List<ExportedParentProfileEntry> parentProfileEntries = profile.getParentProfileEntries();
                 final long profileId = newProfile.getId();
                 for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
-                    final ProfileEntryCreator parentProfileEntryCreator = new ProfileEntryCreator(parentProfileEntry, profileId, 0);
+                    final ProfileEntryCreator parentProfileEntryCreator = getProfileEntryCreator(parentProfileEntry, profileId, 0);
                     final CreateProfileEntry createProfileEntry = new CreateProfileEntry(profileService, sProfileEntryBuilder, parentProfileEntryCreator);
                     try {
                         transactionExecutor.execute(createProfileEntry);
@@ -251,7 +250,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
                     final List<ExportedProfileEntry> childrenProEn = parentProfileEntry.getChildProfileEntries();
                     if (childrenProEn != null && childrenProEn.size() > 0) {
                         for (final ExportedProfileEntry childProfileEntry : childrenProEn) {
-                            final ProfileEntryCreator childProfileEntryCreator = new ProfileEntryCreator(childProfileEntry, profileId, parentProfileEntryId);
+                            final ProfileEntryCreator childProfileEntryCreator = getProfileEntryCreator(childProfileEntry, profileId, parentProfileEntryId);
                             final CreateProfileEntry addProfileEntryTransactionc = new CreateProfileEntry(profileService, sProfileEntryBuilder,
                                     childProfileEntryCreator);
                             try {
@@ -384,13 +383,14 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public ProfileEntry createProfileEntry(String name, String description, long profileId, String type) throws CreationException {
+    public ProfileEntry createProfileEntry(final String name, final String description, final long profileId, final String type) throws CreationException {
         final ProfileEntryCreator creator = new ProfileEntryCreator(name, profileId).setDescription(description).setType(type);
         return createProfileEntry(creator);
     }
 
     @Override
-    public ProfileEntry createProfileEntry(String name, String description, long profileId, String type, final String page) throws CreationException {
+    public ProfileEntry createProfileEntry(final String name, final String description, final long profileId, final String type, final String page)
+            throws CreationException {
         final ProfileEntryCreator creator = new ProfileEntryCreator(name, profileId).setDescription(description).setType(type).setPage(page);
         return createProfileEntry(creator);
     }
@@ -456,6 +456,33 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         }
 
         return SPModelConvertor.toProfileEntry(sProfileEntry);
+    }
+
+    private ProfileCreator getProfileCreator(final ExportedProfile exportedProfile) {
+        final ProfileCreator creator = new ProfileCreator(exportedProfile.getName());
+        creator.setDescription(exportedProfile.getDescription());
+        creator.setIconPath(exportedProfile.getIconPath());
+        return creator;
+    }
+
+    private ProfileEntryCreator getProfileEntryCreator(final ExportedParentProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
+        final ProfileEntryCreator creator = new ProfileEntryCreator(exportedProfileEntry.getName(), profileId);
+        creator.setParentId(parentId);
+        creator.setDescription(exportedProfileEntry.getDescription());
+        creator.setIndex(exportedProfileEntry.getIndex());
+        creator.setPage(exportedProfileEntry.getPage());
+        creator.setType(exportedProfileEntry.getType());
+        return creator;
+    }
+
+    private ProfileEntryCreator getProfileEntryCreator(final ExportedProfileEntry exportedProfileEntry, final long profileId, final long parentId) {
+        final ProfileEntryCreator creator = new ProfileEntryCreator(exportedProfileEntry.getName(), profileId);
+        creator.setParentId(parentId);
+        creator.setDescription(exportedProfileEntry.getDescription());
+        creator.setIndex(exportedProfileEntry.getIndex());
+        creator.setPage(exportedProfileEntry.getPage());
+        creator.setType(exportedProfileEntry.getType());
+        return creator;
     }
 
 }

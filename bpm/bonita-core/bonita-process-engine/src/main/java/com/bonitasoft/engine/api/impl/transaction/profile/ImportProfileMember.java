@@ -22,9 +22,7 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.model.ExportedProfileMapping;
-
-;
+import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 
 /**
  * @author Zhao Na
@@ -57,7 +55,7 @@ public class ImportProfileMember implements TransactionContentWithResult<List<St
             SUser user = null;
             try {
                 user = identityService.getUserByUserName(userName);
-            } catch (SUserNotFoundException e) {
+            } catch (final SUserNotFoundException e) {
                 warnings.add("User with name " + userName + " not found.");
                 continue;
             }
@@ -67,7 +65,7 @@ public class ImportProfileMember implements TransactionContentWithResult<List<St
             SRole role = null;
             try {
                 role = identityService.getRoleByName(roleName);
-            } catch (SRoleNotFoundException e) {
+            } catch (final SRoleNotFoundException e) {
                 warnings.add("Role with name " + roleName + " not found.");
                 continue;
             }
@@ -77,7 +75,7 @@ public class ImportProfileMember implements TransactionContentWithResult<List<St
             SGroup group = null;
             try {
                 group = identityService.getGroupByPath(groupPath);
-            } catch (SGroupNotFoundException e) {
+            } catch (final SGroupNotFoundException e) {
                 warnings.add("Group with path " + groupPath + " not found.");
                 continue;
             }
@@ -90,14 +88,14 @@ public class ImportProfileMember implements TransactionContentWithResult<List<St
             SGroup group = null;
             try {
                 group = identityService.getGroupByPath(membership.getKey());
-            } catch (SGroupNotFoundException e) {
+            } catch (final SGroupNotFoundException e) {
                 warnings.add("Group with path " + membership.getKey() + " not found in profile memberShip.");
                 hasGroup = true;
             }
             SRole role = null;
             try {
                 role = identityService.getRoleByName(membership.getValue());
-            } catch (SRoleNotFoundException e) {
+            } catch (final SRoleNotFoundException e) {
                 warnings.add("Role with name " + membership.getValue() + " not found in profile memberShip.");
                 hasRole = true;
             }

@@ -38,7 +38,7 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.session.PlatformSessionImpl;
+import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;

@@ -32,7 +32,7 @@ import org.bonitasoft.engine.connectors.TestExternalConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.util.IOUtil;
+import org.bonitasoft.engine.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 

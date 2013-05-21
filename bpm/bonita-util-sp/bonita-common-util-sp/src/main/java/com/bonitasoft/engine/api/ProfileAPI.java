@@ -10,14 +10,17 @@ package com.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.profile.ProfileEntryNotFoundException;
+import org.bonitasoft.engine.exception.profile.ProfileNotFoundException;
+import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileCreator;
+import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryCreator;
-import org.bonitasoft.engine.profile.model.Profile;
-import org.bonitasoft.engine.profile.model.ProfileEntry;
 
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater;
@@ -43,7 +46,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't create the new profile
      * @since 6.0
      */
-    Profile createProfile(String name, String description, String iconPath) throws CreationException;
+    Profile createProfile(String name, String description, String iconPath) throws AlreadyExistsException, CreationException;
 
     /**
      * Create a new profile
@@ -55,7 +58,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't create the new profile
      * @since 6.0
      */
-    Profile createProfile(ProfileCreator creator) throws CreationException;
+    Profile createProfile(ProfileCreator creator) throws AlreadyExistsException, CreationException;
 
     /**
      * Delete a specific profile
@@ -119,7 +122,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't update profiles
      * @since 6.0
      */
-    Profile updateProfile(long id, ProfileUpdater updater) throws UpdateException;
+    Profile updateProfile(long id, ProfileUpdater updater) throws ProfileNotFoundException, UpdateException;
 
     /**
      * Create a new profile entry
@@ -132,7 +135,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't create the new profile entry
      * @since 6.0
      */
-    ProfileEntry createProfileEntry(ProfileEntryCreator creator) throws CreationException;
+    ProfileEntry createProfileEntry(ProfileEntryCreator creator) throws AlreadyExistsException, CreationException;
 
     /**
      * Create a new profile entry
@@ -150,7 +153,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't create the new profile entry
      * @since 6.0
      */
-    ProfileEntry createProfileEntry(String name, String description, long profileId, String type) throws CreationException;
+    ProfileEntry createProfileEntry(String name, String description, long profileId, String type) throws AlreadyExistsException, CreationException;
 
     /**
      * Create a new profile entry
@@ -170,7 +173,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't create the new profile entry
      * @since 6.0
      */
-    ProfileEntry createProfileEntry(String name, String description, long profileId, String type, String page) throws CreationException;
+    ProfileEntry createProfileEntry(String name, String description, long profileId, String type, String page) throws AlreadyExistsException, CreationException;
 
     /**
      * Delete a specific profile entry
@@ -195,6 +198,6 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             errors thrown if can't update the profile entry
      * @since 6.0
      */
-    ProfileEntry updateProfileEntry(long id, ProfileEntryUpdater updater) throws UpdateException;
+    ProfileEntry updateProfileEntry(long id, ProfileEntryUpdater updater) throws ProfileEntryNotFoundException, UpdateException;
 
 }

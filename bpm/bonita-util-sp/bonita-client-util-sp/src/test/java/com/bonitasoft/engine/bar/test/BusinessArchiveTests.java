@@ -47,7 +47,7 @@ import org.bonitasoft.engine.core.operation.OperatorType;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.util.IOUtil;
+import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
