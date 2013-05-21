@@ -17,10 +17,6 @@ import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionNotEnabledException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.task.UnreleasableTaskException;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
@@ -49,8 +45,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         loginWith(JOHN, "bpm");
     }
 
-    private ProcessDefinition deployProcessWithUserTask(final User user1) throws BonitaException, ProcessDefinitionNotFoundException, RetrieveException,
-            ProcessDefinitionNotEnabledException, CreationException {
+    private ProcessDefinition deployProcessWithUserTask(final User user1) throws Exception {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor("myActor");
         processBuilder.addUserTask("Request", "myActor");
