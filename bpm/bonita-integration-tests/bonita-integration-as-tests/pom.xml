@@ -26,6 +26,12 @@
 	</properties>
 
 	<dependencies>
+	  <dependency>
+    <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-synchro-server</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-integration-client-tests-sp</artifactId>
@@ -42,34 +48,6 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.16</version>
     </dependency>
-
-    <!-- Transaction manager dependencies -->
-    <dependency>
-      <groupId>org.codehaus.btm</groupId>
-      <artifactId>btm</artifactId>
-      <version>${bitronix.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.btm</groupId>
-      <artifactId>btm-tomcat55-lifecycle</artifactId>
-      <version>${bitronix.version}</version>
-    </dependency>
-    
 	</dependencies>
 
 	<build>
@@ -117,30 +95,9 @@
                   <outputDirectory>${project.build.directory}/driver</outputDirectory>
                 </artifactItem>
 
-                                <!-- http://docs.codehaus.org/display/BTM/Tomcat2x#Tomcat2x-Step1CopytheBTMjars -->
                 <artifactItem>
-                  <groupId>org.codehaus.btm</groupId>
-                  <artifactId>btm</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>javax.transaction</groupId>
-                  <artifactId>jta</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-api</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-jdk14</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.codehaus.btm</groupId>
-                  <artifactId>btm-tomcat55-lifecycle</artifactId>
+                  <groupId>org.bonitasoft.engine</groupId>
+                  <artifactId>bonita-synchro-server</artifactId>
                   <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
                 </artifactItem>
               </artifactItems>

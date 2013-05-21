@@ -14,6 +14,14 @@
 	</properties>
 
 	<dependencies>
+	  <!-- Synchro repo -->
+    <dependency>
+    <groupId>org.bonitasoft.engine</groupId>
+      <artifactId>bonita-synchro-server</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
 		<dependency>
 			<groupId>com.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-process-engine</artifactId>

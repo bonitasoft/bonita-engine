@@ -31,8 +31,7 @@
 			<props>
         <prop key="hibernate.current_session_context_class">jta</prop>
         <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>
-<!--        <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.BTMTransactionManagerLookup</prop> -->
-        <prop key="hibernate.transaction.manager_lookup_class">org.bonitasoft.engine.persistence.BTMJNDITransactionManagerLookup</prop>
+        <prop key="hibernate.transaction.manager_lookup_class">${hibernate.transaction.manager_lookup_class}</prop>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
 				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>

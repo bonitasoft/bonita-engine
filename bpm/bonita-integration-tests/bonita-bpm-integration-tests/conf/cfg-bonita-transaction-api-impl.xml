@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
   <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName" value="java:comp/UserTransaction" /> <!-- TODO : make it configurable -->
+    <property name="jndiName" value="${transaction.manager}" />
   </bean>
   
  <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl">
