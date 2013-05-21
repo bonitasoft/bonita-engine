@@ -19,7 +19,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.transaction.STransactionException;
 
-import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
+import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilder;

@@ -10,7 +10,7 @@ package com.bonitasoft.engine.api;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 import com.bonitasoft.engine.monitoring.GcInfo;
 import com.bonitasoft.engine.monitoring.MonitoringException;

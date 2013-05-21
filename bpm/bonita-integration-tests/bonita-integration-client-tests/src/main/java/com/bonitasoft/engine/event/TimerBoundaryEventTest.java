@@ -13,15 +13,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.definition.TaskPriority;
-import org.bonitasoft.engine.bpm.definition.TimerType;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -32,8 +32,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class TimerBoundaryEventTest extends CommonAPISPTest {
 

@@ -32,12 +32,12 @@ import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.service.ModelConvertor;
 
-import com.bonitasoft.engine.bpm.model.breakpoint.Breakpoint;
-import com.bonitasoft.engine.bpm.model.breakpoint.impl.BreakpointImpl;
+import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
+import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.log.Log;
-import com.bonitasoft.engine.log.LogImpl;
 import com.bonitasoft.engine.log.SeverityLevel;
+import com.bonitasoft.engine.log.impl.LogImpl;
 import com.bonitasoft.engine.monitoring.GcInfo;
 import com.bonitasoft.engine.monitoring.MemoryUsage;
 import com.bonitasoft.engine.monitoring.impl.GcInfoImpl;
@@ -45,7 +45,7 @@ import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
-import com.bonitasoft.engine.platform.TenantImpl;
+import com.bonitasoft.engine.platform.impl.TenantImpl;
 
 /**
  * @author Matthieu Chaffotte

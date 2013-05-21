@@ -13,8 +13,8 @@ import java.util.Date;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.platform.LoginException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.junit.Test;
 

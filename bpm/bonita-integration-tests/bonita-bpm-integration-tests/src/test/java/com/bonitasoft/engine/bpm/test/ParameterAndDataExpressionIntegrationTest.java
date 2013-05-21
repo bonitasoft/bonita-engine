@@ -46,7 +46,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 

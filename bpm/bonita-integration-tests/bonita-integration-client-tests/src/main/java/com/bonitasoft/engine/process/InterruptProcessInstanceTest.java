@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.process;
 
-import org.bonitasoft.engine.bpm.model.GatewayType;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;

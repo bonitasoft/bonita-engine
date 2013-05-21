@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.model.Index;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -32,8 +31,11 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdater;
+import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
+import com.bonitasoft.engine.bpm.process.Index;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceSearchDescriptor;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

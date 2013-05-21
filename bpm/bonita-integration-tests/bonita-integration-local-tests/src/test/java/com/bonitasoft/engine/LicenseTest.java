@@ -1,7 +1,7 @@
 package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.platform.LoginException;
+import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.Test;
 

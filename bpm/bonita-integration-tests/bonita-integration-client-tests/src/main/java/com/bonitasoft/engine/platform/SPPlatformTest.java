@@ -8,11 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,21 +17,20 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.PageOutOfRangeException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
-import org.bonitasoft.engine.exception.platform.PlatformLoginException;
-import org.bonitasoft.engine.exception.platform.PlatformLogoutException;
-import org.bonitasoft.engine.exception.platform.PlatformNotFoundException;
-import org.bonitasoft.engine.exception.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.platform.Platform;
+import org.bonitasoft.engine.platform.PlatformLoginException;
+import org.bonitasoft.engine.platform.PlatformLogoutException;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
+import org.bonitasoft.engine.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 import org.junit.AfterClass;
@@ -51,9 +45,11 @@ import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.exception.TenantActivationException;
-import com.bonitasoft.engine.exception.TenantDeactivationException;
-import com.bonitasoft.engine.exception.TenantNotFoundException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SPPlatformTest {
 
@@ -641,12 +637,13 @@ public class SPPlatformTest {
         }
     }
 
-    @Test(expected = PageOutOfRangeException.class)
+    @Test
     public void getTenantsWithIndexPageOutOfRange() throws BonitaException {
-        platformAPI.getTenants(50, 100, TenantCriterion.NAME_ASC);
+        final List<Tenant> tenants = platformAPI.getTenants(50, 100, TenantCriterion.NAME_ASC);
+        assertTrue(tenants.isEmpty());
     }
 
-    @Test(expected = PageOutOfRangeException.class)
+    @Test
     public void getTenantsWithTotalPageOutOfRange() throws BonitaException {
         final long tenant1Id = platformAPI.createTenant(new TenantCreator("test1", "test", "testIconName", "testIconPath", "tenant_test1",
                 "tenant_test_password"));
@@ -661,7 +658,8 @@ public class SPPlatformTest {
         assertNotNull(platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()));
         assertEquals(5, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
         try {
-            platformAPI.getTenants(3, 2, TenantCriterion.NAME_ASC);
+            final List<Tenant> tenants = platformAPI.getTenants(20, 2, TenantCriterion.NAME_ASC);
+            assertTrue(tenants.isEmpty());
         } finally {
             platformAPI.deleteTenant(tenant1Id);
             platformAPI.deleteTenant(tenant2Id);

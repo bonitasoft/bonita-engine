@@ -18,9 +18,9 @@ import java.util.Set;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.model.Problem;
-import org.bonitasoft.engine.bpm.model.Problem.Level;
-import org.bonitasoft.engine.bpm.model.impl.ProblemImpl;
+import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.Problem.Level;
+import org.bonitasoft.engine.bpm.process.impl.ProblemImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -30,7 +30,7 @@ import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
-import com.bonitasoft.engine.exception.ParameterProcessNotFoundException;
+import com.bonitasoft.engine.bpm.parameter.ParameterProcessNotFoundException;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.manager.Features;
 

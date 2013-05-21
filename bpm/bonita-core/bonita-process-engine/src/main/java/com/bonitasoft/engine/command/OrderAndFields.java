@@ -11,7 +11,7 @@ package com.bonitasoft.engine.command;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByType;
 
-import com.bonitasoft.engine.bpm.model.breakpoint.BreakpointCriterion;
+import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilder;
 
 /**

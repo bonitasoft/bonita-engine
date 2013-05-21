@@ -10,7 +10,7 @@ package com.bonitasoft.engine.log;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.model.BonitaObject;
+import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * @author Lu Kai

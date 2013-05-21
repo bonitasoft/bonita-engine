@@ -18,7 +18,8 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
-import org.bonitasoft.engine.search.descriptor.TenantSearchDescriptor;
+
+import com.bonitasoft.engine.platform.TenantSearchDescriptor;
 
 /**
  * @author Zhao Na

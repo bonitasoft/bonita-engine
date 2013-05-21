@@ -12,8 +12,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.definition.impl.ConnectorDefinitionWithInputValues;
-import org.bonitasoft.engine.bpm.model.ActivationState;
+import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotEnabledException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -31,14 +33,12 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.OperationExecutionException;
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionNotEnabledException;
-import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationExecutionException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 

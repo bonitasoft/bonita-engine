@@ -11,7 +11,7 @@ package com.bonitasoft.engine.api.impl.transaction.connector;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
+import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;

@@ -35,24 +35,30 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.definition.TaskPriority;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceCriterion;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.connector.ConnectorState;
+import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
+import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
-import org.bonitasoft.engine.bpm.flownode.ActivityNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
-import org.bonitasoft.engine.bpm.instance.ConnectorInstance;
-import org.bonitasoft.engine.bpm.model.ConnectorEvent;
-import org.bonitasoft.engine.bpm.model.ConnectorState;
-import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
-import org.bonitasoft.engine.bpm.model.Index;
+import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -85,15 +91,8 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
-import org.bonitasoft.engine.exception.ProcessExportException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.exception.connector.ConnectorExecutionException;
-import org.bonitasoft.engine.exception.connector.ConnectorInstanceNotFoundException;
-import org.bonitasoft.engine.exception.connector.ConnectorNotFoundException;
-import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
-import org.bonitasoft.engine.exception.process.ProcessDeployException;
-import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
@@ -120,20 +119,21 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
 
-import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
 import com.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
-import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
-import com.bonitasoft.engine.bpm.model.ManualTaskCreator.ManualTaskField;
-import com.bonitasoft.engine.bpm.model.ParameterInstance;
-import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdater;
-import com.bonitasoft.engine.bpm.model.impl.ParameterImpl;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
+import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
+import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
+import com.bonitasoft.engine.bpm.process.Index;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
-import com.bonitasoft.engine.exception.ImportParameterException;
-import com.bonitasoft.engine.exception.ParameterNotFoundException;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
@@ -298,7 +298,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults, final ParameterSorting sort) {
+    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
+            final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -379,7 +380,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             transactionExecutor.execute(getActivityInstance);
             final SActivityInstance activityInstance = getActivityInstance.getResult();
             if (!(activityInstance instanceof SHumanTaskInstance)) {
-                throw new ActivityNotFoundException("The parent activity is not a Human task", humanTaskId);
+                throw new CreationException("The parent activity is not a Human task");
             }
             if (((SHumanTaskInstance) activityInstance).getAssigneeId() != userId) {
                 throw new CreationException("Unable to create a child task from this task, it's not assigned to you!");
@@ -595,13 +596,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void replayActivity(final long activityInstanceId) throws ActivityExecutionException, ActivityNotFoundException {
+    public void replayActivity(final long activityInstanceId) throws ActivityExecutionException, ActivityInstanceNotFoundException {
         replayActivity(activityInstanceId, null);
     }
 
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityExecutionException,
-            ActivityNotFoundException {
+            ActivityInstanceNotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -644,7 +645,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     containerType = SFlowElementsContainerType.FLOWNODE.name();
                 }
             } catch (final SActivityInstanceNotFoundException e) {
-                throw new ActivityNotFoundException(e);
+                throw new ActivityInstanceNotFoundException(e);
             } catch (final SBonitaException e) {
                 throw new ActivityExecutionException(e);
             } finally {

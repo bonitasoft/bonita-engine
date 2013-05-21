@@ -31,15 +31,15 @@ import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.model.ActivationState;
-import org.bonitasoft.engine.bpm.model.ConfigurationState;
-import org.bonitasoft.engine.bpm.model.ConnectorEvent;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -55,11 +55,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.api.ParameterSorting;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
-import com.bonitasoft.engine.bpm.model.ParameterInstance;
-import com.bonitasoft.engine.bpm.model.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.exception.ParameterNotFoundException;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class ProcessParameterTest extends CommonAPISPTest {
 
@@ -122,7 +122,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setProcessDefinition(processDefinition);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_DESC);
         assertEquals(0, parameters.size());
 
         getProcessAPI().deleteProcess(definition.getId());
@@ -143,7 +143,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_ASC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_ASC);
         assertEquals(2, parameters.size());
         final ParameterInstance firstParameter = parameters.get(0);
         assertEquals("key.2", firstParameter.getName());
@@ -282,7 +282,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "key.2", "bee");
 
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_ASC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_ASC);
         assertEquals(2, parameters.size());
         final ParameterInstance firstParameter = parameters.get(0);
         assertEquals("key.2", firstParameter.getName());
@@ -370,7 +370,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_ASC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_ASC);
         assertEquals(4, parameters.size());
         assertEquals("bear", parameters.get(0).getName());
         assertEquals("bee", parameters.get(1).getName());
@@ -397,7 +397,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_DESC);
         assertEquals(4, parameters.size());
         assertEquals("squirrel", parameters.get(0).getName());
         assertEquals("donkey", parameters.get(1).getName());
@@ -424,7 +424,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 2, ParameterSorting.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 2, ParameterCriterion.NAME_DESC);
         assertEquals(2, parameters.size());
         assertEquals("squirrel", parameters.get(0).getName());
         assertEquals("donkey", parameters.get(1).getName());
@@ -449,7 +449,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 2, 2, ParameterSorting.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 2, 2, ParameterCriterion.NAME_DESC);
         assertEquals(2, parameters.size());
         assertEquals("bee", parameters.get(0).getName());
         assertEquals("bear", parameters.get(1).getName());
@@ -474,7 +474,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        final List<ParameterInstance> parameterInstances = getProcessAPI().getParameterInstances(definition.getId(), 8, 8, ParameterSorting.NAME_ASC);
+        final List<ParameterInstance> parameterInstances = getProcessAPI().getParameterInstances(definition.getId(), 8, 8, ParameterCriterion.NAME_ASC);
         assertEquals(0, parameterInstances.size());
         getProcessAPI().deleteProcess(definition.getId());
     }
@@ -598,7 +598,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
-        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterSorting.NAME_DESC);
+        final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_DESC);
         assertEquals(2, parameters.size());
         final ParameterInstance parameter1 = parameters.get(0);
         assertEquals("bee", parameter1.getName());

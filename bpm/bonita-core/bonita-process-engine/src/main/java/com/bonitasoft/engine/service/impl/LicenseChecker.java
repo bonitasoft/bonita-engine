@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.platform.StopNodeException;
+import org.bonitasoft.engine.platform.StopNodeException;
 
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;

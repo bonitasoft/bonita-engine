@@ -17,8 +17,9 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
-import org.bonitasoft.engine.search.descriptor.LogSearchDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
+
+import com.bonitasoft.engine.log.LogSearchDescriptor;
 
 /**
  * @author Zhang Bole

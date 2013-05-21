@@ -11,19 +11,20 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceCriterion;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
+import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
-import org.bonitasoft.engine.bpm.flownode.ActivityNotFoundException;
-import org.bonitasoft.engine.bpm.instance.ConnectorInstance;
-import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
-import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.exception.connector.ConnectorInstanceNotFoundException;
-import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
-import com.bonitasoft.engine.bpm.model.ParameterInstance;
-import com.bonitasoft.engine.exception.ImportParameterException;
-import com.bonitasoft.engine.exception.ParameterNotFoundException;
+import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 
 /**
  * @author Matthieu Chaffotte
@@ -75,7 +76,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterSorting sort);
+    List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
     /**
      * Update an existing parameter of a process definition.
@@ -199,7 +200,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            Identifier of the activity instance
      * @param connectorsToReset
      *            Map of connectors to reset before retrying the task
-     * @throws ActivityNotFoundException
+     * @throws ActivityInstanceNotFoundException
      *             errors thrown if can't find corresponding activity
      * @throws ActivityExecutionException
      *             TODO
@@ -207,7 +208,8 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityNotFoundException, ActivityExecutionException;
+    void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityInstanceNotFoundException,
+            ActivityExecutionException;
 
     /**
      * Replay a task that was in failed state.
@@ -218,12 +220,12 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            the activity to replay
      * @throws ActivityExecutionException
      *             TODO
-     * @throws ActivityNotFoundException
+     * @throws ActivityInstanceNotFoundException
      *             TODO
      * @throws InvalidSessionException
      *             When the activity can't be modified
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId) throws ActivityExecutionException, ActivityNotFoundException;
+    void replayActivity(long activityInstanceId) throws ActivityExecutionException, ActivityInstanceNotFoundException;
 
 }

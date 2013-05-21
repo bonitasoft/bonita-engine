@@ -13,9 +13,9 @@ import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceSearchDescriptor;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
-import com.bonitasoft.engine.search.ProcessInstanceSearchDescriptor;
 
 /**
  * @author Celine Souchet

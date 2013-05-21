@@ -8,9 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
+import org.bonitasoft.engine.connector.ConnectorException;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.connector.ConnectorException;
-import org.bonitasoft.engine.exception.connector.ConnectorValidationException;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 

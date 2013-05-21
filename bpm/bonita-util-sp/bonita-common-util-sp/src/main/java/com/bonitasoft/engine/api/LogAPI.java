@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.LogCriterion;

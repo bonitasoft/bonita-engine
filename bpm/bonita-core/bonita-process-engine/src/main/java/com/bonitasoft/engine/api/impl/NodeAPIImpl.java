@@ -14,7 +14,7 @@ import java.util.Map;
 
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.platform.LicenseInfo;
-import com.bonitasoft.engine.platform.LicenseInfoImpl;
+import com.bonitasoft.engine.platform.impl.LicenseInfoImpl;
 import com.bonitasoft.manager.Manager;
 
 /**
