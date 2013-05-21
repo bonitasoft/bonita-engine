@@ -21,7 +21,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;

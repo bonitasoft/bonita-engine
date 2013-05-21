@@ -22,9 +22,9 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.descriptor.ProfileSearchDescriptor;
 import org.junit.After;
 import org.junit.Before;
 

@@ -23,7 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;

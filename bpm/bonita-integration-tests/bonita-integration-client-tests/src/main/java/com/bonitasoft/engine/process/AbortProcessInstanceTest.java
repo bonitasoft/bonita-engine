@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.model.StateCategory;
-import org.bonitasoft.engine.bpm.model.archive.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;

@@ -17,11 +17,11 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.model.Comment;
-import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
-import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidBusinessArchiveFormatException;

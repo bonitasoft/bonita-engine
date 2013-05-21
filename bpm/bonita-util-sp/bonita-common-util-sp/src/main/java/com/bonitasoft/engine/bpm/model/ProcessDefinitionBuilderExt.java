@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.model;
 
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 
 /**

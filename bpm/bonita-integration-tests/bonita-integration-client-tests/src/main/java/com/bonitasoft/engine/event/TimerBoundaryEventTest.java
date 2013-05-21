@@ -13,13 +13,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
-import org.bonitasoft.engine.bpm.model.TaskPriority;
-import org.bonitasoft.engine.bpm.model.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.bpm.model.archive.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.model.event.trigger.TimerType;
+import org.bonitasoft.engine.bpm.definition.TaskPriority;
+import org.bonitasoft.engine.bpm.definition.TimerType;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;

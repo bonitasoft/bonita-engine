@@ -12,16 +12,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.definition.impl.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.ActivationState;
-import org.bonitasoft.engine.bpm.model.ConnectorDefinitionWithInputValues;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.core.operation.Operation;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -39,6 +38,7 @@ import org.bonitasoft.engine.exception.process.ProcessDefinitionNotFoundExceptio
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
+import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 

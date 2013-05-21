@@ -12,10 +12,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.model.Index;
-import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
-import org.bonitasoft.engine.core.operation.Operation;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -25,6 +24,7 @@ import org.bonitasoft.engine.exception.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
 import org.bonitasoft.engine.exception.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.operation.Operation;
 
 import com.bonitasoft.engine.bpm.model.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.model.ProcessInstanceUpdater;

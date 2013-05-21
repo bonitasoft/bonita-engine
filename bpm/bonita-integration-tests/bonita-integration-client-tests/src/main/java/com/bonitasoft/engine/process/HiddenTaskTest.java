@@ -14,11 +14,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.model.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.model.ManualTaskInstance;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.TaskPriority;
+import org.bonitasoft.engine.bpm.definition.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;

@@ -14,9 +14,9 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.bpm.model.ActivityDefinitionBuilder;
-import org.bonitasoft.engine.bpm.model.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.model.TransitionDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.SearchException;

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.bpm.model.ConnectorDefinitionWithInputValues;
+import org.bonitasoft.engine.bpm.definition.impl.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;

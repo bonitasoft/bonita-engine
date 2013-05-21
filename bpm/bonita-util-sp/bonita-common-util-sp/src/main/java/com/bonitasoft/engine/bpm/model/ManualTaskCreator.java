@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.TaskPriority;
+import org.bonitasoft.engine.bpm.definition.TaskPriority;
 
 /**
  * @author Elias Ricken de Medeiros

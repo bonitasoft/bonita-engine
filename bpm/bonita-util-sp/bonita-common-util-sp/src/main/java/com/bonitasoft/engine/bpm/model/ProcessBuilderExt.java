@@ -8,8 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.model;
 
-import org.bonitasoft.engine.bpm.model.ProcessBuilder;
-import org.bonitasoft.engine.bpm.model.impl.DesignProcessDefinitionImpl;
+import org.bonitasoft.engine.bpm.definition.impl.DesignProcessDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.ProcessBuilder;
 
 /**
  * @author Baptiste Mesta

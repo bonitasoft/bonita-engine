@@ -18,20 +18,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.ActorSorting;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.bpm.model.ActivityInstance;
-import org.bonitasoft.engine.bpm.model.ActorInstance;
-import org.bonitasoft.engine.bpm.model.Category;
-import org.bonitasoft.engine.bpm.model.CategoryCriterion;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessDefinitionCriterion;
-import org.bonitasoft.engine.bpm.model.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
-import org.bonitasoft.engine.bpm.model.TaskPriority;
-import org.bonitasoft.engine.bpm.model.archive.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.actor.ActorCriterion;
+import org.bonitasoft.engine.bpm.actor.ActorInstance;
+import org.bonitasoft.engine.bpm.category.Category;
+import org.bonitasoft.engine.bpm.category.CategoryCriterion;
+import org.bonitasoft.engine.bpm.definition.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.CommandDescriptor;
+import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -44,7 +45,6 @@ import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.search.descriptor.CommandSearchDescriptor;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.TestStates;
@@ -254,7 +254,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
      * First actor means "first one in Alphanumerical order !"
      */
     protected void addUserToFirstActorOfProcess(final long userId, final ProcessDefinition processDefinition) throws BonitaException {
-        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorSorting.NAME_ASC);
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         final ActorInstance actor = actors.get(0);
         getProcessAPI().addUserToActor(actor.getId(), userId);
     }

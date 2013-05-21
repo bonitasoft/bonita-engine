@@ -18,13 +18,13 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.search.descriptor.ProfileEntrySearchDescriptor;
 
 /**
  * Update indexes for all elements having the same parent category

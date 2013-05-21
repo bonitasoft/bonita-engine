@@ -15,12 +15,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.ActivityInstance;
-import org.bonitasoft.engine.bpm.model.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.model.ProcessDefinition;
-import org.bonitasoft.engine.bpm.model.ProcessInstance;
-import org.bonitasoft.engine.bpm.model.archive.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.model.event.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.bonitasoft.engine.test.wait.WaitForEvent;

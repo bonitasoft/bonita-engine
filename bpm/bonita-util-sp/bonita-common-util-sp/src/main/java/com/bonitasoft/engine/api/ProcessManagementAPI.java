@@ -11,12 +11,12 @@ package com.bonitasoft.engine.api;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.ConnectorInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
+import org.bonitasoft.engine.bpm.flownode.ActivityNotFoundException;
+import org.bonitasoft.engine.bpm.instance.ConnectorInstance;
 import org.bonitasoft.engine.bpm.model.ConnectorStateReset;
 import org.bonitasoft.engine.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.exception.activity.ActivityExecutionException;
-import org.bonitasoft.engine.exception.activity.ActivityNotFoundException;
 import org.bonitasoft.engine.exception.connector.ConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.exception.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.exception.platform.InvalidSessionException;
