@@ -18,12 +18,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
         <property name="uniqueName" value="java:comp/env/bonitaDS" /> <!--  Is it really useful and/or used ?  --> 
         <property name="maxPoolSize" value="10" />
         <property name="allowLocalTransactions" value="true" /> <!--  For hibernate : see if we can set it to false --> 
-        <property name="driverProperties">
-            <props>
-                <prop key="user">${jdbc.user}</prop>  
-                <prop key="password">${jdbc.password}</prop>  
-                <prop key="URL">${jdbc.url}</prop>  
-            </props>
+        <property name="driverProperties" ref="driverProperties">
         </property>
     </bean>  
 
