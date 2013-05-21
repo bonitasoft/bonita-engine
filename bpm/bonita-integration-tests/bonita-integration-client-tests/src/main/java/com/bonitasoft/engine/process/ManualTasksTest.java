@@ -17,7 +17,7 @@ import org.bonitasoft.engine.bpm.model.ProcessInstance;
 import org.bonitasoft.engine.bpm.model.TaskPriority;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.task.UnreleasableTaskException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;
@@ -52,7 +52,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         return deployAndEnableWithActor(processBuilder.done(), "myActor", user1);
     }
 
-    @Test(expected = UnreleasableTaskException.class)
+    @Test(expected = UpdateException.class)
     public void unableToReleaseManualTask() throws Exception {
         final User user = createUser("login1", "password");
         final ProcessDefinition processDefinition = deployProcessWithUserTask(user);
