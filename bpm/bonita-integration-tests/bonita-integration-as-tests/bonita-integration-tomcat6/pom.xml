@@ -42,7 +42,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.bonitasoft.tomcat</groupId>
-                  <artifactId>bonita-h2-listener</artifactId>
+                  <artifactId>bonita-tomcat-h2-listener</artifactId>
                   <outputDirectory>${project.build.directory}/driver</outputDirectory>
                 </artifactItem>
                 <!-- http://docs.codehaus.org/display/BTM/Tomcat2x#Tomcat2x-Step1CopytheBTMjars -->
@@ -259,8 +259,8 @@
     </dependency>
     <dependency>
       <groupId>org.bonitasoft.tomcat</groupId>
-      <artifactId>bonita-h2-listener</artifactId>
-      <version>1.0.0</version>
+      <artifactId>bonita-tomcat-h2-listener</artifactId>
+      <version>1.0.1</version>
     </dependency>
     </dependencies>
 
