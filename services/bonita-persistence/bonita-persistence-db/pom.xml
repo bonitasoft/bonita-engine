@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-persistence</artifactId>
 		<groupId>com.bonitasoft.engine.persistence</groupId>
-		<version>6.0.0-beta-029-SNAPSHOT</version>
+		<version>6.0.0-beta-029</version>
 	</parent>
 
 	<artifactId>bonita-persistence-db</artifactId>
