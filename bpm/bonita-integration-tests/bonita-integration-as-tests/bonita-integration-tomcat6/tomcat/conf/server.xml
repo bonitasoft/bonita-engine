@@ -30,7 +30,11 @@
   <!-- JMX Support for the Tomcat server. Documentation at /docs/non-existent.html -->
   <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+
+  <Listener className="org.bonitasoft.tomcat.H2Listener" tcpPort="7172" baseDir="target" />
+
   <Listener className="bitronix.tm.integration.tomcat55.BTMLifecycleListener" />
+
 
   <!-- Global JNDI resources
        Documentation at /docs/jndi-resources-howto.html

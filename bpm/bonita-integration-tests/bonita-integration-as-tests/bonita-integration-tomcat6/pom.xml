@@ -40,6 +40,11 @@
             </goals>
             <configuration>
               <artifactItems>
+                <artifactItem>
+                  <groupId>org.bonitasoft.tomcat</groupId>
+                  <artifactId>bonita-h2-listener</artifactId>
+                  <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                </artifactItem>
                 <!-- http://docs.codehaus.org/display/BTM/Tomcat2x#Tomcat2x-Step1CopytheBTMjars -->
                 <artifactItem>
                   <groupId>org.codehaus.btm</groupId>
@@ -191,14 +196,14 @@
             <home>${tomcat.home}</home>
             <systemProperties>
               <bonita.home>${bonita.home}</bonita.home>
-              <!-- <sysprop.bonita.db.vendor>mysql</sysprop.bonita.db.vendor>souillac DO NOT COMMIT THIS LINE -->
+              <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+
               <file.encoding>${project.build.sourceEncoding}</file.encoding>
               <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
 
-              <sysprop.bonita.db.vendor>mysql</sysprop.bonita.db.vendor>
-                            <!-- Bitronix properties -->
-                            <btm.root>${tomcat.home}</btm.root>
-                            <bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties</bitronix.tm.configuration>
+              <!-- Bitronix properties -->
+              <btm.root>${tomcat.home}</btm.root>
+              <bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties</bitronix.tm.configuration>
             </systemProperties>
           </container>
                     <configuration>
@@ -252,5 +257,11 @@
       <artifactId>btm-tomcat55-lifecycle</artifactId>
       <version>${bitronix.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.bonitasoft.tomcat</groupId>
+      <artifactId>bonita-h2-listener</artifactId>
+      <version>1.0.0</version>
+    </dependency>
     </dependencies>
+
 </project>
