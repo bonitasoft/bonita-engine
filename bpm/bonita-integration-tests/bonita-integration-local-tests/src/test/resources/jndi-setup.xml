@@ -11,7 +11,7 @@
     <property name="logPart2Filename" value="target/btm2.tlog" />
 
     <property name="debugZeroResourceTransaction" value="false" />
-    <!-- property name="warnAboutZeroResourceTransaction" value="false" /-->
+    <property name="warnAboutZeroResourceTransaction" value="false" />
     <!-- property name="defaultTransactionTimeout" value="300" /-->
   </bean>
 
