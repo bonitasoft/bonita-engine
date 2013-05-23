@@ -8,16 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +55,15 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+
+import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Baptiste Mesta
@@ -1285,4 +1287,35 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addTransition("step1", "step2");
         return designProcessDefinition;
     }
+
+    @Cover(jira = "ENGINE-1265", classes = { Connector.class, ParameterInstance.class }, keywords = { "parameter", "connector", "input" }, concept = BPMNConcept.CONNECTOR)
+    @Test
+    public void useParameterAsInputOfTheConnector() throws Exception {
+        final Expression parameterExpression = new ExpressionBuilder().createParameterExpression("paramExpr", "key1", String.class.getName());
+        final String connectorId = CONNECTOR_WITH_OUTPUT_ID;
+        final String connectorVersion = "1.0";
+        final ProcessDefinitionBuilderExt definitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("parameter", "4.1");
+        definitionBuilder.addParameter("key1", String.class.getName());
+        final String processData = "finalValue";
+        definitionBuilder.addShortTextData(processData, new ExpressionBuilder().createConstantStringExpression("empty"));
+        final String actorName = "user";
+        definitionBuilder.addActor(actorName);
+        definitionBuilder
+                .addUserTask("step1", actorName)
+                .addConnector("paramConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
+                .addInput(CONNECOTR_INPUT_NAME, parameterExpression)
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(processData).done(), OperatorType.ASSIGNMENT, "=", "",
+                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
+
+        final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(actorName, johnUserId, definitionBuilder,
+                Collections.singletonMap("key1", "Hello world!"));
+        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step1", instance);
+
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(processData, instance.getId());
+        assertEquals("Hello world!", dataInstance.getValue());
+
+        disableAndDelete(processDefinition);
+    }
+
 }
