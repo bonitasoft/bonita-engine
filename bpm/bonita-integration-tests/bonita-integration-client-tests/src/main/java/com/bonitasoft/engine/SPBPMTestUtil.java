@@ -112,7 +112,7 @@ public class SPBPMTestUtil {
         final PlatformSession session = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.stopNode();
-        platformAPI.deletePlaftorm();
+        platformAPI.deletePlatform();
         logoutPlatform(session);
     }
 

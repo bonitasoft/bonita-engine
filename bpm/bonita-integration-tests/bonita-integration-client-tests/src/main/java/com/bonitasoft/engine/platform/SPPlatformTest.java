@@ -8,7 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
-import java.util.ArrayList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -17,23 +21,22 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformLoginException;
-import org.bonitasoft.engine.platform.PlatformLogoutException;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
-import org.bonitasoft.engine.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,16 +49,15 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class SPPlatformTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SPPlatformTest.class);
+    private static final String DEFAULT_TENANT_NAME = "default";
 
-    private static final String DEFAULT_TENANT_NAME = "lukai";
+    private static final String ACTIVATED = "ACTIVATED";
+
+    private static final String DEACTIVATED = "DEACTIVATED";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SPPlatformTest.class);
 
     private static PlatformAPI platformAPI;
 
@@ -63,16 +65,32 @@ public class SPPlatformTest {
 
     private static PlatformSession session;
 
+    private static final String tenantName1 = "test1";
+
+    private static final String tenantName2 = "test2";
+
+    private static long tenantId1;
+
+    private static long tenantId2;
+
     @BeforeClass
-    public static void beforeClass() throws BonitaException, BonitaHomeNotSetException {
+    public static void beforeClass() throws Exception {
         platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         logAsPlatformAdmin();
         try {
             platformAPI.initializePlatform();
+            assertEquals(PlatformState.STARTED, platformAPI.getPlatformState());
+            createTenants(); // create tenants in before class because this actions takes a lot of time
         } catch (final CreationException e) {
             // Platform already created
         }
-        platformAPI.startNode();
+    }
+
+    private static void createTenants() throws Exception {
+        tenantId1 = platformAPI.createTenant(new TenantCreator(tenantName1, "The tenant 1", "testIconName1", "testIconPath1", "username1", "testpassword1"));
+        Thread.sleep(10);// avoid conflict in creation date
+        tenantId2 = platformAPI.createTenant(new TenantCreator(tenantName2, "The tenant 2", "testIconName2", "testIconPath2", "username2", "testpassword2"));
+        // tenantId3 = platformAPI.createTenant(new TenantCreator(tenantName3, "", "testIconName", "testIconPath", "testname3", "testpassword3"));
     }
 
     private static void logAsPlatformAdmin() throws PlatformLoginException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
@@ -87,6 +105,15 @@ public class SPPlatformTest {
         }
         platformAPI.cleanPlatform();
         platformLoginAPI.logout(session);
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        if (!PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
+            platformAPI.initializePlatform();
+            platformAPI.startNode();
+            createTenants();
+        }
     }
 
     @Rule
@@ -139,7 +166,7 @@ public class SPPlatformTest {
         }
     }
 
-    @Test(expected = PlatformLogoutException.class)
+    @Test(expected = SessionNotFoundException.class)
     public void testLogoutWithWrongSession() throws Exception {
         try {
             platformLoginAPI.logout(new PlatformSessionImpl(123l, null, -1l, null, -1l));
@@ -152,153 +179,80 @@ public class SPPlatformTest {
     @Test
     public void testSearchTenants() throws Exception {
         // create tenant
-        final List<Tenant> listTenant = new ArrayList<Tenant>();
-        for (int i = 0; i < 10; i++) {
-            final long tenantID = platformAPI.createTenant(new TenantCreator("tenantName" + i, "test search tenant ", "testIconName" + i, "testIconPath" + i,
-                    "username" + i, "123"));
-            final Tenant tenant = platformAPI.getTenantById(tenantID);
-            listTenant.add(tenant);
-        }
+        // final List<Tenant> listTenant = new ArrayList<Tenant>();
+        // for (int i = 0; i < 10; i++) {
+        // final long tenantID = platformAPI.createTenant(new TenantCreator("tenantName" + i, "test search tenant ", "testIconName" + i, "testIconPath" + i,
+        // "username" + i, "123"));
+        // final Tenant tenant = platformAPI.getTenantById(tenantID);
+        // listTenant.add(tenant);
+        // }
 
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         // according to name sort
-        builder.sort("name", Order.ASC);
+        builder.sort(TenantSearchDescriptor.NAME, Order.ASC);
+        builder.filter(TenantSearchDescriptor.DEFAULT_TENANT, false);
         SearchResult<Tenant> searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(10, searchResult.getCount());
+        assertEquals(2, searchResult.getCount()); // two tenants created at before class
         List<Tenant> tenantList = searchResult.getResult();
-        assertNotNull(tenantList);
-        assertEquals(10, tenantList.size());
-        for (int j = 0; j < 10; j++) {
-            assertEquals(listTenant.get(j).getId(), tenantList.get(j).getId());
-        }
+        assertEquals(2, tenantList.size());
+        checkOrder(tenantList, tenantName1, tenantName2);
 
-        builder = new SearchOptionsBuilder(1, 5);
+        builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(TenantSearchDescriptor.DEFAULT_TENANT, false);
         builder.sort("name", Order.DESC);
         searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(10, searchResult.getCount());
+        assertEquals(2, searchResult.getCount());
         tenantList = searchResult.getResult();
         assertNotNull(tenantList);
-        assertEquals(5, tenantList.size());
-        for (int j = 0; j < 5; j++) {
-            assertEquals(listTenant.get(4 - j).getId(), tenantList.get(j).getId());
-        }
-
-        // according to state sort
-        builder = new SearchOptionsBuilder(0, 10);
-        builder.sort("status", Order.ASC);
-        searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(10, searchResult.getCount());
-        tenantList = searchResult.getResult();
-        assertNotNull(tenantList);
-        assertEquals(10, tenantList.size());
-        for (int j = 0; j < 10; j++) {
-            assertEquals(listTenant.get(j).getId(), tenantList.get(j).getId());
-        }
-
-        builder = new SearchOptionsBuilder(1, 5);
-        builder.sort("status", Order.DESC);
-        searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(10, searchResult.getCount());
-        tenantList = searchResult.getResult();
-        assertNotNull(tenantList);
-        assertEquals(5, tenantList.size());
-        for (int j = 0; j < 5; j++) {
-            assertEquals(listTenant.get(5 + j).getId(), tenantList.get(j).getId());
-        }
+        assertEquals(2, tenantList.size());
+        checkOrder(tenantList, tenantName2, tenantName1);
 
         builder = new SearchOptionsBuilder(0, 10);
-        builder.sort("created", Order.ASC);
+        builder.filter(TenantSearchDescriptor.DEFAULT_TENANT, false);
+        builder.sort(TenantSearchDescriptor.CREATION_DATE, Order.ASC);
         searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(10, searchResult.getCount());
+        assertEquals(2, searchResult.getCount());
         tenantList = searchResult.getResult();
         assertNotNull(tenantList);
-        assertEquals(10, tenantList.size());
-        for (int j = 0; j < 10; j++) {
-            assertEquals(listTenant.get(j).getId(), tenantList.get(j).getId());
-        }
+        assertEquals(2, tenantList.size());
+        checkOrder(tenantList, tenantName1, tenantName2);
 
-        builder = new SearchOptionsBuilder(1, 5);
-        builder.sort("created", Order.DESC);
+        builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(TenantSearchDescriptor.DEFAULT_TENANT, false);
+        builder.sort(TenantSearchDescriptor.CREATION_DATE, Order.DESC);
         searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(10, searchResult.getCount());
+        assertEquals(2, searchResult.getCount());
         tenantList = searchResult.getResult();
         assertNotNull(tenantList);
-        assertEquals(5, tenantList.size());
-        for (int j = 0; j < 5; j++) {
-            assertEquals(listTenant.get(4 - j).getId(), tenantList.get(j).getId());
-        }
+        assertEquals(2, tenantList.size());
+        checkOrder(tenantList, tenantName2, tenantName1);
 
         // according to name search
         builder = new SearchOptionsBuilder(0, 5);
-        builder.searchTerm("tenantName2");
+        builder.searchTerm(tenantName2);
         searchResult = platformAPI.searchTenants(builder.done());
         assertEquals(1, searchResult.getCount());
         tenantList = searchResult.getResult();
         assertNotNull(tenantList);
         assertEquals(1, tenantList.size());
-        assertEquals(listTenant.get(2).getId(), tenantList.get(0).getId());
+        assertEquals(tenantId2, tenantList.get(0).getId());
 
         // according to iconName search
         builder = new SearchOptionsBuilder(0, 5);
-        builder.searchTerm("testIconName2");
+        builder.searchTerm("testIconName1");
         searchResult = platformAPI.searchTenants(builder.done());
         assertEquals(1, searchResult.getCount());
         tenantList = searchResult.getResult();
         assertNotNull(tenantList);
         assertEquals(1, tenantList.size());
-        assertEquals(listTenant.get(2).getId(), tenantList.get(0).getId());
+        assertEquals(tenantId1, tenantList.get(0).getId());
+    }
 
-        // update some tenants
-        builder = new SearchOptionsBuilder(0, 10);
-        builder.filter("status", "DEACTIVATED");
-        searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(10, searchResult.getCount());
-        tenantList = searchResult.getResult();
-        assertNotNull(tenantList);
-        assertEquals(10, tenantList.size());
-        for (int j = 0; j < 10; j++) {
-            assertEquals("DEACTIVATED", tenantList.get(j).getState());
+    private void checkOrder(final List<Tenant> tenantList, final String... tenantNames) {
+        for (int i = 0; i < tenantNames.length; i++) {
+            assertEquals(tenantNames[i], tenantList.get(i).getName());
+
         }
-
-        for (int k = 0; k < 5; k++) {
-            final TenantUpdater udpateDescriptor = new TenantUpdater();
-            udpateDescriptor.setStatus("ACTIVATED");
-            platformAPI.updateTenant(listTenant.get(k).getId(), udpateDescriptor);
-        }
-
-        builder = new SearchOptionsBuilder(0, 5);
-        builder.filter("status", "ACTIVATED");
-        searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(5, searchResult.getCount());
-        tenantList = searchResult.getResult();
-        assertNotNull(tenantList);
-        assertEquals(5, tenantList.size());
-        for (int k = 0; k < 5; k++) {
-            assertEquals("ACTIVATED", tenantList.get(k).getState());
-        }
-
-        builder = new SearchOptionsBuilder(0, 5);
-        builder.filter("status", "DEACTIVATED");
-        searchResult = platformAPI.searchTenants(builder.done());
-        assertEquals(5, searchResult.getCount());
-        tenantList = searchResult.getResult();
-        assertNotNull(tenantList);
-        assertEquals(5, tenantList.size());
-        for (int k = 0; k < 5; k++) {
-            assertEquals("DEACTIVATED", tenantList.get(k).getState());
-        }
-
-        for (int k = 0; k < 5; k++) {
-            final TenantUpdater udpateDescriptor = new TenantUpdater();
-            udpateDescriptor.setStatus("DEACTIVATED");
-            platformAPI.updateTenant(listTenant.get(k).getId(), udpateDescriptor);
-        }
-
-        // delete all tenants
-        for (final Tenant t : listTenant) {
-            platformAPI.deleteTenant(t.getId());
-        }
-
     }
 
     @Test
@@ -309,31 +263,22 @@ public class SPPlatformTest {
     @Test(expected = CreationException.class)
     public void createPlatformException() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
-        platformAPI.createAndInitializePlatform();
+        platformAPI.createPlatform();
     }
 
     @Test(expected = TenantActivationException.class)
     public void activateTenantWhichIsAlreadyActivated() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
-        platformAPI.activateTenant(tenantId);
+        platformAPI.activateTenant(tenantId1);
         try {
-            platformAPI.activateTenant(tenantId);
+            platformAPI.activateTenant(tenantId1);
         } finally {
-            platformAPI.deactiveTenant(tenantId);
-            deleteATenant(tenantId);
+            platformAPI.deactiveTenant(tenantId1);
         }
     }
 
     @Test(expected = TenantDeactivationException.class)
-    public void activateTenantWhichIsAlreadyDeactivated() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
-        platformAPI.activateTenant(tenantId);
-        platformAPI.deactiveTenant(tenantId);
-        try {
-            platformAPI.deactiveTenant(tenantId);
-        } finally {
-            deleteATenant(tenantId);
-        }
+    public void deactivateTenantWhichIsAlreadyDeactivated() throws BonitaException {
+        platformAPI.deactiveTenant(tenantId1);
     }
 
     @Test
@@ -342,18 +287,6 @@ public class SPPlatformTest {
 
         assertNotNull("can't find the platform", platform);
         assertEquals("platformAdmin", platform.getCreatedBy());
-    }
-
-    @Test
-    public void createTenant() throws BonitaException {
-        final long testId = platformAPI.createTenant(new TenantCreator("test", "test create tenant", "testIconName", "testIconPath", "name", "123"));
-        final Tenant tenant = platformAPI.getTenantById(testId);
-        assertEquals("test", tenant.getName());
-        assertEquals("testIconName", tenant.getIconName());
-        assertEquals("testIconPath", tenant.getIconPath());
-
-        assertEquals(false, tenant.isDefaultTenant());
-        platformAPI.deleteTenant(testId);
     }
 
     @Test(expected = InvalidSessionException.class)
@@ -371,32 +304,22 @@ public class SPPlatformTest {
 
     @Test(expected = AlreadyExistsException.class)
     public void createExistedTenant() throws BonitaException {
-        final long tenantId = platformAPI.createTenant(new TenantCreator("tenantName", "it is a tenant", "testIconName", "testIconPath", "bole", "321"));
-        try {
-            platformAPI.createTenant(new TenantCreator("tenantName", "", "testIconName", "testIconPath", "", ""));
-        } finally {
-            platformAPI.deleteTenant(tenantId);
-        }
+        platformAPI.createTenant(new TenantCreator(tenantName1, "", "testIconName", "testIconPath", "", ""));
     }
 
     @Test
     public void getTenantByName() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
-
-        assertEquals(2, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
-        final Tenant tenant = platformAPI.getTenantByName("TENANT_1");
-
-        assertEquals("TENANT_1", tenant.getName());
-        assertEquals("DEACTIVATED", tenant.getState());
-        deleteATenant(tenantId);
+        final Tenant tenant = platformAPI.getTenantByName(tenantName1);
+        assertEquals(tenantId1, tenant.getId());
+        assertEquals(DEACTIVATED, tenant.getState());
     }
 
     @Test
     public void getDefaultTenant() throws BonitaException {
         final Tenant tenant = platformAPI.getDefaultTenant();
         assertNotNull(tenant);
-        assertEquals("default", tenant.getName());
-        assertEquals("default", tenant.getDescription());
+        assertEquals(DEFAULT_TENANT_NAME, tenant.getName());
+        assertEquals("Default tenant", tenant.getDescription());
     }
 
     @Test(expected = TenantNotFoundException.class)
@@ -411,15 +334,16 @@ public class SPPlatformTest {
 
     @Test
     public void getTenantById() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
+        final Tenant tenant = platformAPI.getTenantById(tenantId1);
+        assertEquals(tenantName1, tenant.getName());
+        assertEquals(tenantId1, tenant.getId());
+        assertEquals(DEACTIVATED, tenant.getState());
+    }
 
-        assertEquals(1, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
-        final Tenant tenant = platformAPI.getTenantById(tenantId);
-
-        assertEquals(DEFAULT_TENANT_NAME, tenant.getName());
-        assertEquals(tenantId, tenant.getId());
-        assertEquals("DEACTIVATED", tenant.getState());
-        deleteATenant(tenantId);
+    private SearchOptionsBuilder getOnlyNonDefaultTenantsSearchBuilder() {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1000);
+        builder.filter(TenantSearchDescriptor.DEFAULT_TENANT, false);
+        return builder;
     }
 
     @Test(expected = TenantNotFoundException.class)
@@ -433,34 +357,24 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void activateTenant() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
-        final Tenant tenantA = platformAPI.getTenantByName(DEFAULT_TENANT_NAME);
-        assertEquals("DEACTIVATED", tenantA.getState());
+    public void activateDeactivateTenant() throws BonitaException {
+        Tenant tenant = platformAPI.getTenantById(tenantId1);
+        assertEquals(DEACTIVATED, tenant.getState());
 
-        platformAPI.activateTenant(tenantId);
-        final Tenant tenantB = platformAPI.getTenantByName(DEFAULT_TENANT_NAME);
-        assertEquals("ACTIVATED", tenantB.getState());
-
-        platformAPI.deactiveTenant(tenantId);
-        deleteATenant(tenantId);
+        platformAPI.activateTenant(tenantId1);
+        try {
+            tenant = platformAPI.getTenantById(tenantId1);
+            assertEquals(ACTIVATED, tenant.getState());
+        } finally {
+            platformAPI.deactiveTenant(tenantId1);
+            tenant = platformAPI.getTenantById(tenantId1);
+            assertEquals(DEACTIVATED, tenant.getState());
+        }
     }
 
     @Test(expected = TenantNotFoundException.class)
     public void activeNotExistTenant() throws BonitaException {
         platformAPI.activateTenant(9999);
-    }
-
-    @Test
-    public void deactiveTenant() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
-        platformAPI.activateTenant(tenantId);
-        assertEquals("ACTIVATED", platformAPI.getTenantByName(DEFAULT_TENANT_NAME).getState());
-
-        platformAPI.deactiveTenant(tenantId);
-        assertEquals("DEACTIVATED", platformAPI.getTenantByName(DEFAULT_TENANT_NAME).getState());
-
-        deleteATenant(tenantId);
     }
 
     @Test(expected = TenantNotFoundException.class)
@@ -469,99 +383,63 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void deleteTenant() throws BonitaException {
+    public void createAndDeleteTenant() throws BonitaException {
         final String tenantNameA = "testA";
-        final String tenantNameB = "testB";
-        final long tenantA = platformAPI.createTenant(new TenantCreator(tenantNameA, "", "testIconName", "testIconPath", "nameA", "passwordA"));
-        final long tenantB = platformAPI.createTenant(new TenantCreator(tenantNameB, "", "testIconName", "testIconPath", "nameB", "passwordB"));
+        final long tenantAId = platformAPI.createTenant(new TenantCreator(tenantNameA, "", "testIconName", "testIconPath", "nameA", "passwordA"));
 
-        final List<Tenant> tenantsA = platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getResult();
-        assertEquals(2, tenantsA.size());
-        platformAPI.deleteTenant(tenantA);
+        final SearchOptionsBuilder builder = getOnlyNonDefaultTenantsSearchBuilder();
+        builder.filter(TenantSearchDescriptor.NAME, tenantNameA);
+        List<Tenant> tenants = platformAPI.searchTenants(builder.done()).getResult();
+        assertEquals(1, tenants.size());
+        assertEquals(tenantNameA, tenants.get(0).getName());
+        assertEquals("testIconName", tenants.get(0).getIconName());
+        assertEquals("testIconPath", tenants.get(0).getIconPath());
 
-        final List<Tenant> tenantsB = platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getResult();
-        assertEquals(1, tenantsB.size());
-        platformAPI.deleteTenant(tenantB);
+        platformAPI.deleteTenant(tenantAId);
+
+        tenants = platformAPI.searchTenants(builder.done()).getResult();
+        assertEquals(0, tenants.size());
     }
 
-    @Test(expected = TenantNotFoundException.class)
+    @Test(expected = DeletionException.class)
     public void deleteNotExistTenant() throws BonitaException {
-        platformAPI.deleteTenant(9999);
+        platformAPI.deleteTenant(-3);
     }
 
     @Test
     public void getTenantsWithOrderByName() throws BonitaException {
-        final String tenantName1 = "test1";
-        final String tenantName2 = "test2";
-        final String tenantName3 = "test3";
-        final String tenantName4 = "test4";
-        final String tenantName5 = "test5";
-        final String tenantName6 = "test6";
-        final String tenantName7 = "test7";
-        final String tenantName8 = "test8";
-        final String tenantName9 = "test9";
-        final long tenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "", "testIconName", "testIconPath", "testname1", "testpassword1"));
-        final long tenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "", "testIconName", "testIconPath", "testname2", "testpassword2"));
-        final long tenant3 = platformAPI.createTenant(new TenantCreator(tenantName3, "", "testIconName", "testIconPath", "testname3", "testpassword3"));
-        final long tenant4 = platformAPI.createTenant(new TenantCreator(tenantName4, "", "testIconName", "testIconPath", "testname4", "testpassword4"));
-        final long tenant5 = platformAPI.createTenant(new TenantCreator(tenantName5, "", "testIconName", "testIconPath", "testname5", "testpassword5"));
-        final long tenant6 = platformAPI.createTenant(new TenantCreator(tenantName6, "", "testIconName", "testIconPath", "testname6", "testpassword6"));
-        final long tenant7 = platformAPI.createTenant(new TenantCreator(tenantName7, "", "testIconName", "testIconPath", "testname7", "testpassword7"));
-        final long tenant8 = platformAPI.createTenant(new TenantCreator(tenantName8, "", "testIconName", "testIconPath", "testname8", "testpassword8"));
-        final long tenant9 = platformAPI.createTenant(new TenantCreator(tenantName9, "", "testIconName", "testIconPath", "testname9", "testpassword9"));
-
-        final List<Tenant> tenants1 = platformAPI.getTenants(0, 3, TenantCriterion.NAME_ASC);
-        final List<Tenant> tenants2 = platformAPI.getTenants(1, 3, TenantCriterion.NAME_ASC);
-        final List<Tenant> tenants3 = platformAPI.getTenants(2, 3, TenantCriterion.NAME_ASC);
+        final List<Tenant> tenants1 = platformAPI.getTenants(0, 2, TenantCriterion.NAME_ASC);
+        final List<Tenant> tenants2 = platformAPI.getTenants(2, 2, TenantCriterion.NAME_ASC);
+        final List<Tenant> tenants3 = platformAPI.getTenants(3, 2, TenantCriterion.NAME_ASC);
         final int count = platformAPI.getNumberOfTenants();
-        assertEquals(9, count);
+        assertEquals(3, count);
         assertNotNull(tenants1);
         assertNotNull(tenants2);
         assertNotNull(tenants3);
-        assertEquals(3, tenants1.size());
-        assertEquals(3, tenants2.size());
-        assertEquals(3, tenants3.size());
-        assertEquals("test1", tenants1.get(0).getName());
-        assertEquals("test2", tenants1.get(1).getName());
-        assertEquals("test3", tenants1.get(2).getName());
-        assertEquals("test4", tenants2.get(0).getName());
-        assertEquals("test5", tenants2.get(1).getName());
-        assertEquals("test6", tenants2.get(2).getName());
-        assertEquals("test7", tenants3.get(0).getName());
-        assertEquals("test8", tenants3.get(1).getName());
-        assertEquals("test9", tenants3.get(2).getName());
+        assertEquals(2, tenants1.size());
+        assertEquals(1, tenants2.size());
+        assertEquals(0, tenants3.size());
+        assertEquals(DEFAULT_TENANT_NAME, tenants1.get(0).getName());
+        assertEquals(tenantName1, tenants1.get(1).getName());
 
-        platformAPI.deleteTenant(tenant1);
-        platformAPI.deleteTenant(tenant2);
-        platformAPI.deleteTenant(tenant3);
-        platformAPI.deleteTenant(tenant4);
-        platformAPI.deleteTenant(tenant5);
-        platformAPI.deleteTenant(tenant6);
-        platformAPI.deleteTenant(tenant7);
-        platformAPI.deleteTenant(tenant8);
-        platformAPI.deleteTenant(tenant9);
+        assertEquals(tenantName2, tenants2.get(0).getName());
     }
 
     @Test
     public void getTenantsWithOrderByDescriptionAndCreationDate() throws BonitaException {
-        final String tenantName1 = "test1";
-        final String tenantName2 = "test2";
-        final String tenantName3 = "test3";
-        final long tenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "a", "testIconName", "testIconPath", "testname1", "testpassword1"));
-        final long tenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "c", "testIconName", "testIconPath", "testname2", "testpassword2"));
-        final long tenant3 = platformAPI.createTenant(new TenantCreator(tenantName3, "b", "testIconName", "testIconPath", "testname3", "testpassword3"));
-        final List<Tenant> tenantsDescAsc = platformAPI.getTenants(0, 3, TenantCriterion.DESC_ASC);
-        final List<Tenant> tenantsDescDesc = platformAPI.getTenants(0, 3, TenantCriterion.DESC_DESC);
+        final List<Tenant> tenantsDescAsc = platformAPI.getTenants(0, 3, TenantCriterion.DESCRIPTION_ASC);
+        final List<Tenant> tenantsDescDesc = platformAPI.getTenants(0, 3, TenantCriterion.DESCRIPTION_DESC);
         final int count = platformAPI.getNumberOfTenants();
         assertEquals(3, count);
         assertEquals(3, tenantsDescAsc.size());
         assertEquals(3, tenantsDescDesc.size());
-        assertEquals("test1", tenantsDescAsc.get(0).getName());
-        assertEquals("test3", tenantsDescAsc.get(1).getName());
-        assertEquals("test2", tenantsDescAsc.get(2).getName());
-        assertEquals("test2", tenantsDescDesc.get(0).getName());
-        assertEquals("test3", tenantsDescDesc.get(1).getName());
-        assertEquals("test1", tenantsDescDesc.get(2).getName());
+        assertEquals(DEFAULT_TENANT_NAME, tenantsDescAsc.get(0).getName());
+        assertEquals(tenantName1, tenantsDescAsc.get(1).getName());
+        assertEquals(tenantName2, tenantsDescAsc.get(2).getName());
+
+        assertEquals(tenantName2, tenantsDescDesc.get(0).getName());
+        assertEquals(tenantName1, tenantsDescDesc.get(1).getName());
+        assertEquals(DEFAULT_TENANT_NAME, tenantsDescDesc.get(2).getName());
         final List<Tenant> tenantsCreAsc = platformAPI.getTenants(0, 3, TenantCriterion.CREATION_ASC);
         final List<Tenant> tenantsCreDesc = platformAPI.getTenants(0, 3, TenantCriterion.CREATION_DESC);
         final List<Tenant> tenantsDefault = platformAPI.getTenants(0, 3, TenantCriterion.DEFAULT);
@@ -569,72 +447,56 @@ public class SPPlatformTest {
         assertEquals(3, tenantsCreAsc.size());
         assertEquals(3, tenantsCreDesc.size());
         assertEquals(3, tenantsDefault.size());
-        assertEquals("test1", tenantsCreAsc.get(0).getName());
-        assertEquals("test2", tenantsCreAsc.get(1).getName());
-        assertEquals("test3", tenantsCreAsc.get(2).getName());
-        assertEquals("test3", tenantsCreDesc.get(0).getName());
-        assertEquals("test2", tenantsCreDesc.get(1).getName());
-        assertEquals("test1", tenantsCreDesc.get(2).getName());
-        assertEquals("test3", tenantsDefault.get(0).getName());
-        assertEquals("test2", tenantsDefault.get(1).getName());
-        assertEquals("test1", tenantsDefault.get(2).getName());
-        platformAPI.deleteTenant(tenant1);
-        platformAPI.deleteTenant(tenant2);
-        platformAPI.deleteTenant(tenant3);
+        assertEquals(DEFAULT_TENANT_NAME, tenantsCreAsc.get(0).getName());
+        assertEquals(tenantName1, tenantsCreAsc.get(1).getName());
+        assertEquals(tenantName2, tenantsCreAsc.get(2).getName());
+        assertEquals(tenantName2, tenantsCreDesc.get(0).getName());
+        assertEquals(tenantName1, tenantsCreDesc.get(1).getName());
+        assertEquals(DEFAULT_TENANT_NAME, tenantsCreDesc.get(2).getName());
+        assertEquals(tenantName2, tenantsDefault.get(0).getName());
+        assertEquals(tenantName1, tenantsDefault.get(1).getName());
+        assertEquals(DEFAULT_TENANT_NAME, tenantsDefault.get(2).getName());
     }
 
     @Test
     public void getTenantsWithOrderByStatus() throws BonitaException {
-        final String tenantName1 = "test1";
-        final String tenantName2 = "test2";
-        final long tenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "a", "testIconName", "testIconPath", "testname1", "testpassword1"));
-        final long tenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "c", "testIconName", "testIconPath", "testname2", "testpassword2"));
-        platformAPI.activateTenant(tenant2);
-        final List<Tenant> tenantsDescAsc = platformAPI.getTenants(0, 2, TenantCriterion.STATE_ASC);
-        final List<Tenant> tenantsDescDesc = platformAPI.getTenants(0, 2, TenantCriterion.STATE_DESC);
-        final int count = platformAPI.getNumberOfTenants();
-        assertEquals(2, count);
-        assertEquals(2, tenantsDescAsc.size());
-        assertEquals(2, tenantsDescDesc.size());
-        assertEquals("test2", tenantsDescAsc.get(0).getName());
-        assertEquals("test1", tenantsDescAsc.get(1).getName());
-        assertEquals("test1", tenantsDescDesc.get(0).getName());
-        assertEquals("test2", tenantsDescDesc.get(1).getName());
-        platformAPI.deleteTenant(tenant1);
-        platformAPI.deactiveTenant(tenant2);
-        platformAPI.deleteTenant(tenant2);
+        platformAPI.activateTenant(tenantId1);
+        try {
+            final List<Tenant> tenantsAsc = platformAPI.getTenants(0, 10, TenantCriterion.STATE_ASC);
+            final List<Tenant> tenantsDesc = platformAPI.getTenants(0, 10, TenantCriterion.STATE_DESC);
+            final int count = platformAPI.getNumberOfTenants();
+            assertEquals(3, count);
+            assertEquals(3, tenantsAsc.size());
+            assertEquals(3, tenantsDesc.size());
+            assertEquals(DEFAULT_TENANT_NAME, tenantsAsc.get(0).getName());
+            assertEquals(tenantName1, tenantsAsc.get(1).getName());
+            assertEquals(tenantName2, tenantsAsc.get(2).getName());
+            assertEquals(tenantName2, tenantsDesc.get(0).getName());
+            assertEquals(DEFAULT_TENANT_NAME, tenantsDesc.get(1).getName());
+            assertEquals(tenantName1, tenantsDesc.get(2).getName());
+        } finally {
+            platformAPI.deactiveTenant(tenantId1);
+        }
     }
 
     @Test
     public void getTenantsWithPages() throws BonitaException {
-        final String tenantName1 = "test1";
-        final String tenantName2 = "test2";
-        final String tenantName3 = "test3";
-        final long createTenant1 = platformAPI.createTenant(new TenantCreator(tenantName1, "", "testIconName", "testIconPath", "testname1", "testpassword1"));
-        final long createTenant2 = platformAPI.createTenant(new TenantCreator(tenantName2, "", "testIconName", "testIconPath", "testname2", "testpassword2"));
-        final long createTenant3 = platformAPI.createTenant(new TenantCreator(tenantName3, "", "testIconName", "testIconPath", "testname3", "testpassword3"));
-        try {
-            final List<Tenant> testTenants = platformAPI.getTenants(0, 3, TenantCriterion.NAME_ASC);
-            assertNotNull(testTenants);
-            assertEquals(3, testTenants.size());
-            assertEquals(testTenants.get(0).getName(), "test1");
-            assertEquals(testTenants.get(1).getName(), "test2");
-            assertEquals(testTenants.get(2).getName(), "test3");
+        final List<Tenant> testTenants = platformAPI.getTenants(0, 2, TenantCriterion.NAME_ASC);
+        assertNotNull(testTenants);
+        assertEquals(2, testTenants.size());
+        assertEquals(DEFAULT_TENANT_NAME, testTenants.get(0).getName());
+        assertEquals(tenantName1, testTenants.get(1).getName());
 
-            final List<Tenant> tenants1 = platformAPI.getTenants(1, 2, TenantCriterion.NAME_ASC);
-            assertNotNull(tenants1);
-            assertEquals(1, tenants1.size());
-            assertEquals(tenants1.get(0).getName(), "test3");
+        final List<Tenant> tenants1 = platformAPI.getTenants(2, 10, TenantCriterion.NAME_ASC);
+        assertNotNull(tenants1);
+        assertEquals(1, tenants1.size());
+        assertEquals(tenantName2, tenants1.get(0).getName());
 
-            final List<Tenant> tenants2 = platformAPI.getTenants(1, 2, TenantCriterion.NAME_DESC);
-            assertNotNull(tenants2);
-            assertEquals(1, tenants2.size());
-            assertEquals(tenants2.get(0).getName(), "test1");
-        } finally {
-            platformAPI.deleteTenant(createTenant1);
-            platformAPI.deleteTenant(createTenant2);
-            platformAPI.deleteTenant(createTenant3);
-        }
+        final List<Tenant> tenants2 = platformAPI.getTenants(0, 2, TenantCriterion.NAME_DESC);
+        assertNotNull(tenants2);
+        assertEquals(2, tenants2.size());
+        assertEquals(tenantName2, tenants2.get(0).getName());
+        assertEquals(tenantName1, tenants2.get(1).getName());
     }
 
     @Test
@@ -643,154 +505,96 @@ public class SPPlatformTest {
         assertTrue(tenants.isEmpty());
     }
 
-    @Test
-    public void getTenantsWithTotalPageOutOfRange() throws BonitaException {
-        final long tenant1Id = platformAPI.createTenant(new TenantCreator("test1", "test", "testIconName", "testIconPath", "tenant_test1",
-                "tenant_test_password"));
-        final long tenant2Id = platformAPI.createTenant(new TenantCreator("test2", "test", "testIconName", "testIconPath", "tenant_test2",
-                "tenant_test_password"));
-        final long tenant3Id = platformAPI.createTenant(new TenantCreator("test3", "test", "testIconName", "testIconPath", "tenant_test3",
-                "tenant_test_password"));
-        final long tenant4Id = platformAPI.createTenant(new TenantCreator("test4", "test", "testIconName", "testIconPath", "tenant_test4",
-                "tenant_test_password"));
-        final long tenant5Id = platformAPI.createTenant(new TenantCreator("test5", "test", "testIconName", "testIconPath", "tenant_test5",
-                "tenant_test_password"));
-        assertNotNull(platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()));
-        assertEquals(5, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
-        try {
-            final List<Tenant> tenants = platformAPI.getTenants(20, 2, TenantCriterion.NAME_ASC);
-            assertTrue(tenants.isEmpty());
-        } finally {
-            platformAPI.deleteTenant(tenant1Id);
-            platformAPI.deleteTenant(tenant2Id);
-            platformAPI.deleteTenant(tenant3Id);
-            platformAPI.deleteTenant(tenant4Id);
-            platformAPI.deleteTenant(tenant5Id);
-        }
-    }
-
-    @Test
-    public void getAllTenants() throws BonitaException {
-        assertEquals(0, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
-        final long tenantId = createATenant("TENANT_1");
-        assertEquals(1, platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done()).getCount());
-        deleteATenant(tenantId);
-    }
-
     @Test(expected = PlatformNotFoundException.class)
     public void deletePlatform() throws BonitaException {
         try {
-            platformAPI.deletePlaftorm();
+            platformAPI.stopNode();
+            platformAPI.cleanPlatform();
+            platformAPI.deletePlatform();
             platformAPI.getPlatform();
         } finally {
-            platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-            logAsPlatformAdmin();
-            platformAPI.createAndInitializePlatform();
-            platformAPI.startNode();
+            platformAPI.createPlatform();
         }
     }
 
     @Test
-    public void methodsThatNeedPlatformToBeStarted() throws BonitaException {
+    public void actionsWithPlatformStopped() throws BonitaException {
+        platformAPI.stopNode();
         try {
-            platformAPI.stopNode();
-            try {
-                platformAPI.searchTenants(new SearchOptionsBuilder(0, 1000).done());
-                fail();
-            } catch (final SearchException e) {
-            }
-            try {
-                platformAPI.getTenantById(1l);
-                fail();
-            } catch (final PlatformNotStartedException e) {
-            }
-            try {
-                platformAPI.getDefaultTenant();
-                fail();
-            } catch (final PlatformNotStartedException e) {
-            }
+            final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1000);
+            builder.filter(TenantSearchDescriptor.DEFAULT_TENANT, true);
+            final SearchResult<Tenant> searchTenants = platformAPI.searchTenants(builder.done());
+            assertEquals(1, searchTenants.getCount());
+            final long defaultTenantId = searchTenants.getResult().get(0).getId();
+            final Tenant tenant = platformAPI.getTenantById(defaultTenantId);
+            assertEquals(defaultTenantId, tenant.getId());
+            final Tenant defaultTenant = platformAPI.getDefaultTenant();
+            assertEquals(defaultTenant.getId(), defaultTenantId);
         } finally {
             platformAPI.startNode();
         }
     }
 
     @Test(expected = DeletionException.class)
-    public void deletePlatformWithTenantExist() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
+    public void deletePlatformWithExistingTenants() throws BonitaException {
         try {
-            platformAPI.activateTenant(tenantId);
-            platformAPI.deletePlaftorm();
+            platformAPI.activateTenant(tenantId1);
+            platformAPI.deletePlatform();
         } finally {
-            platformAPI.deactiveTenant(tenantId);
-            deleteATenant(tenantId);
+            platformAPI.deactiveTenant(tenantId1);
         }
     }
 
     @Test
     public void getNumberOfTenants() throws BonitaException {
-        assertEquals(0, platformAPI.getNumberOfTenants());
-        final long createTenant = platformAPI.createTenant(new TenantCreator("test", "testDescription eeeeeeeeeeeeeeeeeeeeeee", "testIconName", "testIconPath",
-                "testname", "testpass"));
         final int numberOfTenants = platformAPI.getNumberOfTenants();
-        platformAPI.deleteTenant(createTenant);
-        assertEquals(1, numberOfTenants);
+        assertEquals(3, numberOfTenants);
     }
 
-    @Test(expected = PlatformNotStartedException.class)
-    public void platformStoppedCreateTenant() throws BonitaException {
+    @Test
+    public void canCreateTeantWithNodeStopped() throws BonitaException {
+        platformAPI.stopNode();
+        long tenantId = -1;
         try {
-            platformAPI.stopNode();
-            createATenant("TENANT_1");
+            tenantId = createATenant("TENANT_1");
+        } finally {
+            if (tenantId != -1) {
+                deleteATenant(tenantId);
+            }
+            platformAPI.startNode();
+        }
+    }
+
+    @Test
+    public void canGetTenantByNameWithNodeStopped() throws BonitaException {
+        platformAPI.stopNode();
+        try {
+            final Tenant tenant = platformAPI.getTenantByName(tenantName1);
+            assertEquals(tenantName1, tenant.getName());
         } finally {
             platformAPI.startNode();
         }
     }
 
-    @Test(expected = PlatformNotStartedException.class)
-    public void platformStoppedGetTenant() throws BonitaException {
+    @Test
+    public void canDeleteTenantWithStoppedNode() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
         try {
             platformAPI.stopNode();
-            platformAPI.getTenantByName(DEFAULT_TENANT_NAME);
+            platformAPI.deleteTenant(tenantId);
         } finally {
             platformAPI.startNode();
-            platformAPI.deleteTenant(tenantId);
         }
     }
 
-    @Test(expected = PlatformNotStartedException.class)
-    public void platformStoppedDeleteTenant() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
+    @Test
+    public void canActivatedDeactivateTenantWithNodeStopped() throws BonitaException {
+        platformAPI.stopNode();
         try {
-            platformAPI.stopNode();
-            platformAPI.deleteTenant(tenantId);
+            platformAPI.activateTenant(tenantId1);
+            platformAPI.deactiveTenant(tenantId1);
         } finally {
             platformAPI.startNode();
-            platformAPI.deleteTenant(tenantId);
-        }
-    }
-
-    @Test(expected = PlatformNotStartedException.class)
-    public void platformStoppedActivatedTenant() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
-        try {
-            platformAPI.stopNode();
-            platformAPI.activateTenant(tenantId);
-        } finally {
-            platformAPI.startNode();
-            platformAPI.deleteTenant(tenantId);
-        }
-    }
-
-    @Test(expected = PlatformNotStartedException.class)
-    public void platformStoppedDeactivatedTenant() throws BonitaException {
-        final long tenantId = createATenant("TENANT_1");
-        try {
-            platformAPI.stopNode();
-            platformAPI.deactiveTenant(tenantId);
-        } finally {
-            platformAPI.startNode();
-            platformAPI.deleteTenant(tenantId);
         }
     }
 
@@ -800,31 +604,22 @@ public class SPPlatformTest {
         PlatformState state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STARTED, state);
         // test stopped state
-        platformAPI.stopNode();
-        state = platformAPI.getPlatformState();
-        assertEquals(PlatformState.STOPPED, state);
-        // test exception:PlatformNotFoundException
-        platformAPI.deletePlaftorm();
         try {
+            platformAPI.stopNode();
+            state = platformAPI.getPlatformState();
+            assertEquals(PlatformState.STOPPED, state);
+            // test exception:PlatformNotFoundException
+            platformAPI.cleanPlatform();
+            platformAPI.deletePlatform();
             state = platformAPI.getPlatformState();
             fail();
         } catch (final PlatformNotFoundException e) {
-            platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-            logAsPlatformAdmin();
-            platformAPI.createAndInitializePlatform();
-            platformAPI.startNode();
+            platformAPI.createPlatform();
         }
     }
 
     @Test
     public void updateTenant() throws Exception {
-        // create tenant
-        final long tenantId = platformAPI
-                .createTenant(new TenantCreator("tenantName", "test update tenant", "testIconName", "testIconPath", "username", "123"));
-        final Tenant tenant = platformAPI.getTenantById(tenantId);
-        assertEquals("tenantName", tenant.getName());
-        assertEquals("testIconName", tenant.getIconName());
-        assertEquals("testIconPath", tenant.getIconPath());
         // TODO try to log in on tenant using username and password as there is no way to get username/password information from API.
         // We do not want to add in API methods to read password (for security reasons)
         // session = BPMTestUtil.loginDefaultTenant("username","123");
@@ -834,53 +629,47 @@ public class SPPlatformTest {
         udpateDescriptor.setIconName("updatedIconName");
         udpateDescriptor.setUsername("updatedUsername");
         udpateDescriptor.setPassword("updatedPassword");
-        final Tenant updatedTenant = platformAPI.updateTenant(tenantId, udpateDescriptor);
-        assertEquals(tenantId, updatedTenant.getId());
-        assertEquals("updatedTenantName", updatedTenant.getName());
-        assertEquals("updatedIconName", updatedTenant.getIconName());
-        // TODO check updated username and password by calling login API
-        // XXX with old password and old username ==> should not be allowed to login
-        // YYY with new password and new username ==> should be allowed to login
-        // clear-up
-        platformAPI.deleteTenant(tenantId);
+        try {
+            final Tenant updatedTenant = platformAPI.updateTenant(tenantId1, udpateDescriptor);
+            assertEquals(tenantId1, updatedTenant.getId());
+            assertEquals("updatedTenantName", updatedTenant.getName());
+            assertEquals("updatedIconName", updatedTenant.getIconName());
+            // TODO check updated username and password by calling login API
+            // XXX with old password and old username ==> should not be allowed to login
+            // YYY with new password and new username ==> should be allowed to login
+            // clear-up
+        } finally {
+            // reset default values
+            udpateDescriptor.setName(tenantName1);
+            udpateDescriptor.setIconName("IconName");
+            udpateDescriptor.setUsername("username1");
+            udpateDescriptor.setPassword("testpassword1");
+            platformAPI.updateTenant(tenantId1, udpateDescriptor);
+        }
     }
 
     @Test(expected = UpdateException.class)
     public void updateTenantWithTenantUpdateException() throws Exception {
-        // create tenant
-        final long tenantId = platformAPI
-                .createTenant(new TenantCreator("tenantName", "test update tenant", "testIconName", "testIconPath", "username", "123"));
-        platformAPI.getTenantById(tenantId);
         // update tenant
         final TenantUpdater udpateDescriptor = new TenantUpdater();
         udpateDescriptor.setName("updatedTenantName");
         udpateDescriptor.setIconName("updatedIconName");
-        try {
-            platformAPI.updateTenant(tenantId + 100, udpateDescriptor);
-        } finally {
-            // clear-up
-            platformAPI.deleteTenant(tenantId);
-        }
+        platformAPI.updateTenant(-10, udpateDescriptor);
     }
 
-    @Test(expected = PlatformNotStartedException.class)
-    public void updateTenantWithPlatformNotStartedException() throws Exception {
-        // create tenant
-        final long tenantId = platformAPI.createTenant(new TenantCreator("tenantName", "test update tenant with PlatformNotStartedException", "testIconName",
-                "testIconPath", "username", "123"));
-        platformAPI.getTenantById(tenantId);
+    @Test
+    public void canUpdateTenantWithNodeNotStarted() throws Exception {
         // stop platform
         platformAPI.stopNode();
         // update tenant
         final TenantUpdater udpateDescriptor = new TenantUpdater();
         udpateDescriptor.setName("updatedTenantName");
-        udpateDescriptor.setIconName("updatedIconName");
         try {
-            platformAPI.updateTenant(tenantId, udpateDescriptor);
+            platformAPI.updateTenant(tenantId1, udpateDescriptor);
         } finally {
-            // clear-up
+            udpateDescriptor.setName(tenantName1);
+            platformAPI.updateTenant(tenantId1, udpateDescriptor);
             platformAPI.startNode();
-            platformAPI.deleteTenant(tenantId);
         }
     }
 

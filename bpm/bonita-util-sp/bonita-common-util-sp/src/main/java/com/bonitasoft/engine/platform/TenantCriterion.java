@@ -21,7 +21,7 @@ public enum TenantCriterion {
     /**
      * Description ascending order
      */
-    DESC_ASC,
+    DESCRIPTION_ASC,
     /**
      * Creation Date ascending order
      */
@@ -37,7 +37,7 @@ public enum TenantCriterion {
     /**
      * Description descending order
      */
-    DESC_DESC,
+    DESCRIPTION_DESC,
     /**
      * Creation Date descending order
      */

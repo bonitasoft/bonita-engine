@@ -35,11 +35,11 @@ public class SearchTenantDescriptor extends SearchEntityDescriptor {
         tenantKeys.put(TenantSearchDescriptor.ID, new FieldDescriptor(STenant.class, tenantBuilder.getIdKey()));
         tenantKeys.put(TenantSearchDescriptor.STATUS, new FieldDescriptor(STenant.class, tenantBuilder.getStatusKey()));
         tenantKeys.put(TenantSearchDescriptor.NAME, new FieldDescriptor(STenant.class, tenantBuilder.getNameKey()));
-        tenantKeys.put(TenantSearchDescriptor.CREATED, new FieldDescriptor(STenant.class, tenantBuilder.getCreatedKey()));
-        tenantKeys.put(TenantSearchDescriptor.CREATEDBY, new FieldDescriptor(STenant.class, tenantBuilder.getCreatedByKey()));
-        tenantKeys.put(TenantSearchDescriptor.ICONNAME, new FieldDescriptor(STenant.class, tenantBuilder.getIconNameKey()));
-        tenantKeys.put(TenantSearchDescriptor.ICONPATH, new FieldDescriptor(STenant.class, tenantBuilder.getIconPathKey()));
-        tenantKeys.put(TenantSearchDescriptor.DEFAULTTENANT, new FieldDescriptor(STenant.class, tenantBuilder.getDefaultTenantKey()));
+        tenantKeys.put(TenantSearchDescriptor.CREATION_DATE, new FieldDescriptor(STenant.class, tenantBuilder.getCreatedKey()));
+        tenantKeys.put(TenantSearchDescriptor.CREATED_BY, new FieldDescriptor(STenant.class, tenantBuilder.getCreatedByKey()));
+        tenantKeys.put(TenantSearchDescriptor.ICON_NAME, new FieldDescriptor(STenant.class, tenantBuilder.getIconNameKey()));
+        tenantKeys.put(TenantSearchDescriptor.ICON_PATH, new FieldDescriptor(STenant.class, tenantBuilder.getIconPathKey()));
+        tenantKeys.put(TenantSearchDescriptor.DEFAULT_TENANT, new FieldDescriptor(STenant.class, tenantBuilder.getDefaultTenantKey()));
         tenantKeys.put(TenantSearchDescriptor.DESCRIPTION, new FieldDescriptor(STenant.class, tenantBuilder.getDescriptionKey()));
 
         tenantAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);

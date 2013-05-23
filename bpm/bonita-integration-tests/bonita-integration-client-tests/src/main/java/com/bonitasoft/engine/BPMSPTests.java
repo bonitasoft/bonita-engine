@@ -22,6 +22,7 @@ import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
 import com.bonitasoft.engine.platform.NodeAPITest;
+import com.bonitasoft.engine.platform.SPPlatformTest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
@@ -31,7 +32,7 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
 @RunWith(Suite.class)
 @SuiteClasses({
         SPIdentityTests.class,
-        // SPPlatformTest.class, JIRA-482
+        SPPlatformTest.class,
         SPProcessManagementTest.class,
         NodeAPITest.class,
         LogTest.class,

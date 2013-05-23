@@ -15,7 +15,6 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.platform.PlatformNotStartedException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -40,68 +39,58 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *            the creator object with the fields defining new Tenant to create
      * @return
      *         the tenant identifier of the newly created Tenant
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @throws CreationException
      *             occurs when an exception is thrown during tenant creation
      * @throws AlreadyExistsException
      *             occurs when a tenant with the same name already exists
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    long createTenant(final TenantCreator tenantCreator) throws PlatformNotStartedException, CreationException, AlreadyExistsException;
+    long createTenant(final TenantCreator tenantCreator) throws CreationException, AlreadyExistsException;
 
     /**
      * Delete a tenant.
      * 
      * @param tenantId
      *            the tenant identifier
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
-     * @throws TenantNotFoundException
-     *             occurs when the identifier does not refer to an existing tenant
      * @throws DeletionException
      *             occurs when an exception is thrown during tenant deletion
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    void deleteTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, DeletionException;
+    void deleteTenant(long tenantId) throws DeletionException;
 
     /**
      * Activate a tenant.
      * 
      * @param tenantId
      *            the tenant identifier
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
      * @throws TenantActivationException
      *             occurs when an exception is thrown during tenant activation
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    void activateTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, TenantActivationException;
+    void activateTenant(long tenantId) throws TenantNotFoundException, TenantActivationException;
 
     /**
      * De-activate a tenant.
      * 
      * @param tenantId
      *            the tenant identifier
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
      * @throws TenantDeactivationException
      *             occurs when an exception is thrown during tenant deactivation
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    void deactiveTenant(long tenantId) throws PlatformNotStartedException, TenantNotFoundException, TenantDeactivationException;
+    void deactiveTenant(long tenantId) throws TenantNotFoundException, TenantDeactivationException;
 
     /**
      * Get a list of tenants.
@@ -115,11 +104,9 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @return the list of Tenant objects
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @since 6.0
      */
-    List<Tenant> getTenants(int startIndex, int maxResults, TenantCriterion pagingCriterion) throws PlatformNotStartedException;
+    List<Tenant> getTenants(int startIndex, int maxResults, TenantCriterion pagingCriterion);
 
     /**
      * Get a tenant using its name.
@@ -127,29 +114,25 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @param tenantName
      *            the tenant name
      * @return Tenant object
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    Tenant getTenantByName(String tenantName) throws PlatformNotStartedException, TenantNotFoundException;
+    Tenant getTenantByName(String tenantName) throws TenantNotFoundException;
 
     /**
      * Get default tenant.
      * 
      * @return Tenant object
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    Tenant getDefaultTenant() throws PlatformNotStartedException, TenantNotFoundException;
+    Tenant getDefaultTenant() throws TenantNotFoundException;
 
     /**
      * get a tenant using its tenantId
@@ -157,15 +140,13 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @param tenantId
      *            the tenant identifier
      * @return Tenant object
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    Tenant getTenantById(long tenantId) throws PlatformNotStartedException, TenantNotFoundException;
+    Tenant getTenantById(long tenantId) throws TenantNotFoundException;
 
     /**
      * Return the total number of tenants.
@@ -173,11 +154,9 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @return the total number of tenants
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @since 6.0
      */
-    int getNumberOfTenants() throws PlatformNotStartedException;
+    int getNumberOfTenants();
 
     /**
      * Update a tenant with its tenantId and new content.
@@ -187,15 +166,13 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @param udpater
      *            the update descriptor
      * @return Tenant object
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws PlatformNotStartedException
-     *             occurs when an exception is thrown if the platform is not started
      * @throws UpdateException
      *             occurs when an exception is thrown during tenant updated
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    Tenant updateTenant(long tenantId, TenantUpdater udpater) throws PlatformNotStartedException, UpdateException;
+    Tenant updateTenant(long tenantId, TenantUpdater udpater) throws UpdateException;
 
     /**
      * Search tenant under the given condition, including pagination, term, filter, sort.

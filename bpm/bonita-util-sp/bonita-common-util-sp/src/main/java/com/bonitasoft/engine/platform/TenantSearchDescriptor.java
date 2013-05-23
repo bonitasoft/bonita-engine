@@ -24,16 +24,16 @@ public class TenantSearchDescriptor {
 
     public static final String DESCRIPTION = "description";
 
-    public static final String ICONNAME = "iconName";
+    public static final String ICON_NAME = "iconName";
 
-    public static final String ICONPATH = "iconPath";
+    public static final String ICON_PATH = "iconPath";
     
     public static final String STATUS = "status";
 
-    public static final String CREATED = "created";
+    public static final String CREATION_DATE = "created";
 
-    public static final String CREATEDBY = "createdBy";
+    public static final String CREATED_BY = "createdBy";
     
-    public static final String DEFAULTTENANT = "defaultTenant";
+    public static final String DEFAULT_TENANT = "defaultTenant";
 
 }
