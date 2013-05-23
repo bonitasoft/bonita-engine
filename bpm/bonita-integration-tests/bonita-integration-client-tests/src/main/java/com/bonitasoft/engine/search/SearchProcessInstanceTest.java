@@ -91,7 +91,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final List<ProcessInstance> instances = searchOpenProcessInstances.getResult();
         assertEquals(processInstance1, instances.get(0));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final List<ProcessInstance> instances = searchOpenProcessInstances.getResult();
         assertEquals(processInstance1, instances.get(0));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -159,7 +159,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final List<ProcessInstance> instances = searchOpenProcessInstances.getResult();
         assertEquals(processInstance1, instances.get(0));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -193,7 +193,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final List<ProcessInstance> instances = searchOpenProcessInstances.getResult();
         assertEquals(processInstance1, instances.get(0));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -227,7 +227,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final List<ProcessInstance> instances = searchOpenProcessInstances.getResult();
         assertEquals(processInstance1, instances.get(0));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class, ArchivedProcessInstancesSearchDescriptor.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Archived",

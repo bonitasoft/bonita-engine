@@ -8,12 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -60,6 +54,13 @@ import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+
+import static org.hamcrest.CoreMatchers.is;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 public class ProcessParameterTest extends CommonAPISPTest {
 
@@ -212,7 +213,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
         assertEquals(paramValue, dataInstance.getValue());
 
-        disableAndDelete(processDefinitionId);
+        disableAndDeleteProcess(processDefinitionId);
 
         deleteUser(user.getId());
     }
@@ -688,7 +689,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final byte[] resbytes = getProcessAPI().exportBarProcessContentUnderHome(proDefId);
         final ByteArrayInputStream baiStream = new ByteArrayInputStream(resbytes);
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
 
         final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(baiStream);
         final ProcessDefinition processDef = getProcessAPI().deploy(businessArchive);
@@ -704,7 +705,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertEquals(connectorVersion, connectorRedeploy.getVersion());
         assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(processDefinitionId).getConfigurationState());
 
-        disableAndDelete(processDef);
+        disableAndDeleteProcess(processDef);
         deleteUser(user.getId());
     }
 
@@ -780,7 +781,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isBooleanValueBoolean, inputValues, processDefinition.getId()), is(true));
         assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isDoubleValueDouble, inputValues, processDefinition.getId()), is(true));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
         deleteUser(jack.getId());
     }
 

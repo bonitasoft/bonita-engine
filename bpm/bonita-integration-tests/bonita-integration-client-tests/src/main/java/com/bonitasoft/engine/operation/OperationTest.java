@@ -135,7 +135,7 @@ public class OperationTest extends CommonAPITest {
         assertEquals("newValue3", processInstance.getStringIndex3());
         assertEquals("newValue4", processInstance.getStringIndex4());
         assertEquals("newValue5", processInstance.getStringIndex5());
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = StringIndex.class, concept = BPMNConcept.OTHERS, jira = "ENGINE-679", keywords = { "string index", "operation" }, story = "update a a string index using operation that use data expression")
@@ -165,7 +165,7 @@ public class OperationTest extends CommonAPITest {
         waitForPendingTasks(john.getId(), 1);
         processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
         assertEquals("changedData", processInstance.getStringIndex1());
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
@@ -288,7 +288,7 @@ public class OperationTest extends CommonAPITest {
             assertEquals("after execution of operation " + dataIndex.getKey(), valueAfter.get(dataIndex.getValue()),
                     getProcessAPI().getProcessDataInstance(dataIndex.getKey(), startProcess.getId()).getValue());
         }
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -382,7 +382,7 @@ public class OperationTest extends CommonAPITest {
 
         XMLUnit.setIgnoreWhitespace(true);
         assertTrue(XMLUnit.compareXML(expected, actual).identical());
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -406,7 +406,7 @@ public class OperationTest extends CommonAPITest {
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         assertEquals(numberOfUsers, getProcessAPI().getProcessDataInstance("users", startProcess.getId()).getValue());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -432,7 +432,7 @@ public class OperationTest extends CommonAPITest {
 
         assertEquals(john.getId(), getProcessAPI().getProcessDataInstance("userId", startProcess.getId()).getValue());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -463,7 +463,7 @@ public class OperationTest extends CommonAPITest {
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         assertEquals(numberOfUsers, getProcessAPI().getProcessDataInstance("users", startProcess.getId()).getValue());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -484,7 +484,7 @@ public class OperationTest extends CommonAPITest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForStep("step1", startProcess);
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Operation.class, concept = BPMNConcept.CONNECTOR, keywords = { "Operation", "JavaMethodOperationExecutorStrategy", "primitive type" }, story = "execution of an JavaMethod operation with primitive parameters", jira = "ENGINE-1067")
@@ -514,7 +514,7 @@ public class OperationTest extends CommonAPITest {
         assertEquals(StringBuilder.class, activityDataInstance.getValue().getClass());
         assertEquals("_55", activityDataInstance.getValue().toString());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "custom type", "java operation", "classloader" }, jira = "ENGINE-1067", story = "update a custom variable using a java operation")
@@ -538,6 +538,6 @@ public class OperationTest extends CommonAPITest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess, john.getId());
         waitForUserTask("step2", startProcess);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 }

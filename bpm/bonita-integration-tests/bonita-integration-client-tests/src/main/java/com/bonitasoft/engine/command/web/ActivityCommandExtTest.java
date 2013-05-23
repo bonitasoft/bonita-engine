@@ -8,10 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.command.web;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -63,6 +59,10 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ProcessAPI;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ruiheng Fan
@@ -120,7 +120,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @After
     public void after() throws BonitaException {
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
         deleteUser(businessUser.getId());
         logout();
     }

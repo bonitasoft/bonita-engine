@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +39,8 @@ import com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta
@@ -83,7 +83,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
             connectorExecutor.setTimeout(oldTimeout);
             final ProcessInstance process2 = getProcessAPI().startProcess(processDefinition.getId());
             waitForProcessToFinish(process2);
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         } finally {
             sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info cleaned by api call
             connectorExecutor.setTimeout(oldTimeout);
@@ -140,7 +140,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         assertEquals("value", updatedVariable.get("value"));
         designProcessDefinition.addUserTask("step1", delivery);
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
 }

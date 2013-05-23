@@ -70,7 +70,7 @@ public class ManualTasksTest extends CommonAPISPTest {
             getProcessAPI().releaseUserTask(manualUserTask.getId());
         } finally {
             deleteUser(user);
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 

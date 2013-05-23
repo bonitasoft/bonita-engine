@@ -8,10 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +31,10 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TaskOnDemandTest extends CommonAPISPTest {
 
@@ -95,7 +95,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertTrue("m11.getParentContainerId() should not be 1", 1 != m21.getParentContainerId());
         assertEquals(m2.getId(), m21.getParentContainerId());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertEquals("newTask21 should be canceled since its parent task has been executed", 1,
                 getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null).size());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, keywords = { "add subtask" })
@@ -197,7 +197,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertTrue(humanTaskInstance instanceof ManualTaskInstance);
         final HumanTaskInstance userTaskInstance = checkNbAssignedTaskOfJack.getAssingnedHumanTaskInstances().get(0);
         assertEquals("newTask1", userTaskInstance.getName());
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
@@ -229,7 +229,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         checkNbAssignedTaskOfJohn = new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, true, 1, john);
         assertTrue("no new activity found", checkNbAssignedTaskOfJohn.waitUntil());
         assertEquals("userTask1", checkNbAssignedTaskOfJohn.getAssingnedHumanTaskInstances().get(0).getName());
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
@@ -249,7 +249,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         try {
             getProcessAPI().deleteManualUserTask(humanTaskInstance.getId());
         } finally {
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -296,7 +296,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         final Date claimedDate = manualUserTask.getClaimedDate();
         assertNotNull(claimedDate);
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
 }

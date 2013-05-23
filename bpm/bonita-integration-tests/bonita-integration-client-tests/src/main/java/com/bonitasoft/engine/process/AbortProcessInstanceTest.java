@@ -111,8 +111,8 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         // the parent process instance must finish in normal state
         waitForProcessToFinish(parentProcessInstance);
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(parentProcess);
-        disableAndDelete(targetProcess);
+        disableAndDeleteProcess(parentProcess);
+        disableAndDeleteProcess(targetProcess);
     }
 
     @Test
@@ -176,8 +176,8 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         waitForProcessToFinish(parentProcessInstance);
 
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(parentProcess);
-        disableAndDelete(targetProcess);
+        disableAndDeleteProcess(parentProcess);
+        disableAndDeleteProcess(targetProcess);
     }
 
     @Test
@@ -243,8 +243,8 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         // the parent process instance must finish in normal state
         waitForProcessToFinish(parentProcessInstance);
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(parentProcess);
-        disableAndDelete(targetProcess);
+        disableAndDeleteProcess(parentProcess);
+        disableAndDeleteProcess(targetProcess);
     }
 
     @Test
@@ -308,8 +308,8 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         // the parent process instance must finish in normal state
         waitForProcessToFinish(parentProcessInstance);
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(parentProcess);
-        disableAndDelete(targetProcess);
+        disableAndDeleteProcess(parentProcess);
+        disableAndDeleteProcess(targetProcess);
     }
 
 }

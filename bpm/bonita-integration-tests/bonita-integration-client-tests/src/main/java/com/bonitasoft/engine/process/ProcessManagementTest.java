@@ -8,10 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +40,10 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProcessManagementTest extends CommonAPISPTest {
 
@@ -148,7 +148,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertTrue(aTask1 instanceof ArchivedManualTaskInstance);
         assertTrue(aTask2 instanceof ArchivedManualTaskInstance);
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -219,7 +219,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals("newTask'2", subTask2.getName());
         assertEquals(TaskPriority.LOWEST, subTask2.getPriority());
         assertTrue(subTask1 instanceof ManualTaskInstance);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
         deleteUser(jack.getUserName());
     }
 
@@ -274,7 +274,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         executeAssignedTaskUntilEnd(parentTask.getId());
         assertTrue(new WaitForCompletedArchivedStep(50, 1000, parentTask.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -352,7 +352,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals("Expecting 0 tasks as a result of searchHumanTasksInstances", 0, getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done())
                 .getCount());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -394,8 +394,8 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals("LabelBis3", processInstance.getStringIndexLabel(3));
         assertEquals("LabelBis4", processInstance.getStringIndexLabel(4));
         assertEquals("LabelBis5", processInstance.getStringIndexLabel(5));
-        disableAndDelete(process1);
-        disableAndDelete(process2);
+        disableAndDeleteProcess(process1);
+        disableAndDeleteProcess(process2);
         deleteUser(USERNAME);
     }
 
@@ -424,7 +424,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals(null, processInstance.getStringIndex3());
         assertEquals(null, processInstance.getStringIndex4());
         assertEquals(null, processInstance.getStringIndex5());
-        disableAndDelete(process1);
+        disableAndDeleteProcess(process1);
         deleteUser(USERNAME);
     }
 

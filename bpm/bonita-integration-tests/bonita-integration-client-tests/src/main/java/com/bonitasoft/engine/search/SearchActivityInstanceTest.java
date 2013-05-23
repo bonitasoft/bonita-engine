@@ -190,8 +190,7 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
 
         deleteUser(user.getId());
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(processDef1);
-        disableAndDelete(processDef2);
+        disableAndDeleteProcess(processDef1, processDef2);
     }
 
 }

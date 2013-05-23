@@ -104,7 +104,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
                 ConnectorInstanceCriterion.DEFAULT);
         assertThat(connectorInstances, nameAre("myConnector1", "myConnector2", "myConnector3", "myConnector4", "myConnector5", "myConnector6"));
         assertTrue(getProcessAPI().getConnectorInstancesOfActivity(step2.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT).isEmpty());
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfProcess(processInstance.getId(), 0, 10,
                 ConnectorInstanceCriterion.DEFAULT);
         assertThat(connectorInstances, nameAre("myConnector1", "myConnector2", "myConnector3", "myConnector4", "myConnector5", "myConnector6"));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -171,7 +171,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10, ConnectorInstanceCriterion.DEFAULT);
         failedConnector = connectorInstances.get(0);
         assertEquals(ConnectorState.SKIPPED, failedConnector.getState());
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state" })
@@ -217,7 +217,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
                 assertEquals(ConnectorState.TO_RE_EXECUTE, connectorInstance.getState());
             }
         } finally {
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -260,7 +260,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // should finish
         waitForProcessToFinish(processInstance);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
@@ -299,7 +299,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // should finish
         waitForProcessToFinish(processInstance);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -339,7 +339,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // should finish
         waitForProcessToFinish(processInstance);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -379,7 +379,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // should finish
         waitForProcessToFinish(processInstance);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
@@ -409,7 +409,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         try {
             getProcessAPI().replayActivity(waitForTaskToFail.getId());
         } finally {
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -462,7 +462,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals("John", res.get("externalDataConst"));
         assertEquals("Jack", getProcessAPI().getActivityDataInstance("valueOfInput3", step1.getId()).getValue());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation" }, story = "execute connector on completed activity instance and execute operations", jira = "ENGINE-1037")
@@ -507,7 +507,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation" }, story = "execute connector on activity instance and execute operations", jira = "ENGINE-1037")
@@ -561,7 +561,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals("welcome Lily and Lucy and Mett", res.get("externalData"));
         assertEquals("John", res.get("externalDataConst"));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation" }, story = "execute connector on activity instance and execute operations", jira = "ENGINE-1037")
@@ -611,7 +611,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals("John", res.get("externalDataConst"));
         assertEquals("Jack", getProcessAPI().getProcessDataInstance("valueOfInput3", processInstance.getId()).getValue());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "At process instanciation" }, story = "Execute connector at process instanciation.")
@@ -674,7 +674,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Map<String, Serializable> res2 = getProcessAPI().executeConnectorAtProcessInstantiation(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
         assertEquals(resContent, res2.get(mainInputName1));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance" }, story = "Execute connector on an activity instance.")
@@ -726,7 +726,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals(resContent, res.get(mainInputName1));
         assertTrue((Boolean) res.get("hasBeenValidated"));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance", "No serializable output" }, story = "Execute connector on an activity instance with no serializable output.", jira = "ENGINE-823")
@@ -777,7 +777,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                     ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, activity.getId());
         } finally {
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -833,7 +833,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, activity.getId());
         assertEquals(resContent, res.get(mainInputName1));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed activity", "No serializable output" }, story = "Execute connector on completed activity instance with no serializable output.", jira = "ENGINE-823")
@@ -890,7 +890,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             getProcessAPI().executeConnectorOnCompletedActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                     ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, activityId);
         } finally {
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -939,7 +939,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
         assertEquals(resContent, res.get(mainInputName1));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed process instance", "Process instance",
@@ -998,7 +998,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             getProcessAPI().executeConnectorOnCompletedProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                     ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
         } finally {
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -1048,7 +1048,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals(resContent, res.get(mainInputName1));
         assertTrue((Boolean) res.get("hasBeenValidated"));
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process instance", "No serializable output" }, story = "Execute connector on process instance with no serializable output.", jira = "ENGINE-823")
@@ -1095,7 +1095,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             getProcessAPI().executeConnectorOnProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                     ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
         } finally {
-            disableAndDelete(processDefinition);
+            disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -1144,7 +1144,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         waitForStep2AndCheckDataInstanceValue(valueOfInput + "->modified", dataName, procInstWithModifOuputConn);
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class, ConnectorImplementationDescriptor.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Set",
@@ -1178,7 +1178,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         } catch (final InvalidConnectorImplementationException e) {
             // ok
         } finally {
-            disableAndDelete(proDefId);
+            disableAndDeleteProcess(proDefId);
         }
     }
 
@@ -1211,7 +1211,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         } catch (final InvalidConnectorImplementationException e) {
             // ok
         } finally {
-            disableAndDelete(proDefId);
+            disableAndDeleteProcess(proDefId);
         }
     }
 
@@ -1261,7 +1261,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals(connectorId1, connectorImplementation.getDefinitionId());
         assertEquals(connectorImplementationClassName3, connectorImplementation.getImplementationClassName());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     private void waitForStep2AndCheckDataInstanceValue(final String exptectedValue, final String dataName, final ProcessInstance procInst) throws Exception,

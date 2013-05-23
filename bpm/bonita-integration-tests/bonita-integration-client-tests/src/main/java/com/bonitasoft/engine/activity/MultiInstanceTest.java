@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.activity;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +31,8 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertTrue;
 
 public class MultiInstanceTest extends CommonAPISPTest {
 
@@ -73,7 +73,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskWithChildrenInParallel(loopMax, 1, processInstance);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     private void checkPendingTaskWithChildrenInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessInstance processInstance)

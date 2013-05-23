@@ -76,7 +76,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId1));
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId2));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
 
     }
 
@@ -113,7 +113,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         // only start even must exist and its not an activity instance
         assertEquals(0, archivedActivityInstances.size());
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         waitForProcessToFinish(processInstance, TestStates.getCancelledState());
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         // verify that the execution does not pass through the activity after the intermediate event
         checkWasntExecuted(processInstance, "auto2");
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -200,7 +200,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         // verify that the execution does not pass through the activity after the gateway
         checkWasntExecuted(processInstance, "step4");
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
 
     }
 
@@ -229,7 +229,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         checkWasntExecuted(processInstance, "step2");
         checkWasntExecuted(processInstance, "step3");
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
 
     }
 
@@ -259,7 +259,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         checkWasntExecuted(processInstance, "step3");
         checkWasntExecuted(processInstance, "step4");
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
 }

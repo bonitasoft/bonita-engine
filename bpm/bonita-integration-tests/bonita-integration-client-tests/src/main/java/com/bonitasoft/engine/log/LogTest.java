@@ -310,8 +310,8 @@ public class LogTest extends CommonAPISPTest {
         final List<Log> logs = getLogAPI().getLogs(0, getLogAPI().getNumberOfLogs(), LogCriterion.CREATED_BY_DESC);
         assertFalse(containsLogWithActionType(logs, "JOB_EXECUTED", 1));
 
-        disableAndDelete(sendMessageProcess);
-        disableAndDelete(receiveMessageProcess);
+        disableAndDeleteProcess(sendMessageProcess);
+        disableAndDeleteProcess(receiveMessageProcess);
 
         deleteUser("john");
     }
@@ -475,7 +475,7 @@ public class LogTest extends CommonAPISPTest {
         assertEquals("addProfileCommandFromConnector", profile.getName());
 
         deleteUser(johnName);
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     private ProcessDefinition deployProcessWithDefaultTestConnector(final String delivery, final long userId,
