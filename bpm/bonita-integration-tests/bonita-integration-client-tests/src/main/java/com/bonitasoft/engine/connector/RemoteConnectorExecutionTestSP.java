@@ -59,6 +59,7 @@ import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -1315,7 +1316,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(processData, instance.getId());
         assertEquals("Hello world!", dataInstance.getValue());
 
-        disableAndDelete(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
