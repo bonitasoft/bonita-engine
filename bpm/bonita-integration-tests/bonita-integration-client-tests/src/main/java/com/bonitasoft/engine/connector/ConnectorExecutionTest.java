@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +36,8 @@ import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Baptiste Mesta
@@ -162,7 +162,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         return resources;
     }
 
-    protected ProcessDefinition deployProcessWithTestConnectorAndParameter(final String delivery, final long userId,
+    protected ProcessDefinition deployProcessWithTestConnectorAndParameter(final String actorName, final long userId,
             final ProcessDefinitionBuilderExt designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         if (parameters != null) {
@@ -180,7 +180,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         }
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, userId, processDefinition);
+        addMappingOfActorsForUser(actorName, userId, processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
