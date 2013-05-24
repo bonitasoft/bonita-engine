@@ -15,15 +15,11 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.MultiInstanceTest;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
-import com.bonitasoft.engine.event.TimerBoundaryEventTest;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
-import com.bonitasoft.engine.identity.SPIdentityTests;
 import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
 import com.bonitasoft.engine.platform.NodeAPITest;
-import com.bonitasoft.engine.platform.SPPlatformTest;
-import com.bonitasoft.engine.platform.SPProcessManagementTest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
@@ -31,9 +27,8 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        SPIdentityTests.class,
-        SPPlatformTest.class,
-        SPProcessManagementTest.class,
+        // SPIdentityTests.class, // slow execution test suite only
+        // SPProcessManagementTest.class, // slow execution test suite only
         NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
@@ -41,7 +36,6 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         MultiInstanceTest.class,
         ProcessTests.class,
         ProfileTests.class,
-        TimerBoundaryEventTest.class,
         RemoteConnectorExecutionTestSP.class,
         PlatformMonitoringAPITest.class,
         MonitoringAPITest.class,

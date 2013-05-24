@@ -6,3 +6,4 @@ FILEPATH.*.db
 dependency-reduced-pom.xml
 TemporaryLocalIntegrationTestsSP.java
 TemporaryAllBPMSPTestsWithJNDI.java
+TemporarySlowExecutionLocalIntegrationTestsSP.java

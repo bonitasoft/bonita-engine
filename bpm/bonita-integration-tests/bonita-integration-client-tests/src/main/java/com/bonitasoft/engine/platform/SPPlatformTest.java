@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
+@SuppressWarnings("javadoc")
 public class SPPlatformTest {
 
     private static final String DEFAULT_TENANT_NAME = "default";

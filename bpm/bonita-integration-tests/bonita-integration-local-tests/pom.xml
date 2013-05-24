@@ -97,24 +97,6 @@
 
 	</dependencies>
 
-	<profiles>
-		<profile>
-			<id>hibernate</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<bonita.home.classifier>performance</bonita.home.classifier>
-			</properties>
-		</profile>
-		<profile>
-			<id>mybatis</id>
-			<properties>
-				<bonita.home.classifier>performance-mybatis</bonita.home.classifier>
-			</properties>
-		</profile>
-	</profiles>
-
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -240,4 +222,50 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>hibernate</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<bonita.home.classifier>performance</bonita.home.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>mybatis</id>
+			<properties>
+				<bonita.home.classifier>performance-mybatis</bonita.home.classifier>
+			</properties>
+		</profile>
+		<profile>
+			<id>slow</id>
+			<properties>
+				<bonita.home.classifier>performance</bonita.home.classifier>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
+							<properties>
+								<property>
+									<name>listener</name>
+									<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
+								</property>
+							</properties>
+							<systemPropertyVariables>
+								<bonita.home>${bonita.home}</bonita.home>
+							</systemPropertyVariables>
+							<includes>
+								<include>com/bonitasoft/engine/SlowExecutionLocalIntegrationTestsSP.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
