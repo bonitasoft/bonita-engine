@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
 		<artifactId>services</artifactId>
-		<version>6.0.0-beta-030</version>
+		<version>6.0.0-beta-031-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-delete-batch</artifactId>
