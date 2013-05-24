@@ -172,7 +172,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
         @Override
         public void execute() throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-            processDefinitionDI = processDefinitionService.getProcessDefinitionDeployInfo(processDefinitionUUID);
+            processDefinitionDI = processDefinitionService.getProcessDeploymentInfo(processDefinitionUUID);
         }
 
         @Override

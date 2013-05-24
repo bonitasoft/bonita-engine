@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,8 +27,8 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
@@ -67,6 +65,8 @@ import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.platform.Tenant;
+
+import static org.junit.Assert.assertTrue;
 
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
@@ -145,7 +145,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             }
 
             final ProcessManagementAPI processManagementAPI = TenantAPIAccessor.getProcessAPI(apiSession);
-            final List<ProcessDeploymentInfo> processes = processManagementAPI.getProcesses(0, 200, ProcessDefinitionCriterion.DEFAULT);
+            final List<ProcessDeploymentInfo> processes = processManagementAPI.getProcessDeploymentInfos(0, 200, ProcessDeploymentInfoCriterion.DEFAULT);
             if (processes.size() > 0) {
                 final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
                 for (final ProcessDeploymentInfo processDeploymentInfo : processes) {

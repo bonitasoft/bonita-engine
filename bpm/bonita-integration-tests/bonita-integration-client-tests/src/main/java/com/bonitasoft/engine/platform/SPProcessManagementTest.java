@@ -19,10 +19,10 @@ import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -86,37 +86,37 @@ public class SPProcessManagementTest extends CommonAPISPTest {
 
         login();
 
-        assertEquals(0, getProcessAPI().getNumberOfProcesses());
+        assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
         List<Long> ids = createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(10);
 
-        assertEquals(10, getProcessAPI().getNumberOfProcesses());
-        List<ProcessDeploymentInfo> processes = getProcessAPI().getProcesses(0, 10, ProcessDefinitionCriterion.NAME_DESC);
+        assertEquals(10, getProcessAPI().getNumberOfProcessDeploymentInfos());
+        List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 10, ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(10, processes.size());
         assertEquals("ProcessManagementTest09", processes.get(0).getName());
         assertEquals("ProcessManagementTest00", processes.get(9).getName());
 
         logoutThenloginAs("default_tenant_name", "default_tenant_password", tenantId);
 
-        assertEquals(0, getProcessAPI().getNumberOfProcesses());
+        assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
         ids = createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(10);
 
-        assertEquals(10, getProcessAPI().getNumberOfProcesses());
-        processes = getProcessAPI().getProcesses(0, 10, ProcessDefinitionCriterion.NAME_DESC);
+        assertEquals(10, getProcessAPI().getNumberOfProcessDeploymentInfos());
+        processes = getProcessAPI().getProcessDeploymentInfos(0, 10, ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(10, processes.size());
         assertEquals("ProcessManagementTest09", processes.get(0).getName());
         assertEquals("ProcessManagementTest00", processes.get(9).getName());
         getProcessAPI().deleteProcesses(ids);
-        assertEquals(0, getProcessAPI().getNumberOfProcesses());
+        assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
 
         logoutThenlogin();
         ids = new ArrayList<Long>();
-        assertNotSame(0, getProcessAPI().getNumberOfProcesses());
-        processes = getProcessAPI().getProcesses(0, 10, ProcessDefinitionCriterion.DEFAULT);
+        assertNotSame(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
+        processes = getProcessAPI().getProcessDeploymentInfos(0, 10, ProcessDeploymentInfoCriterion.DEFAULT);
         for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
             ids.add(processDeploymentInfo.getProcessId());
         }
         getProcessAPI().deleteProcesses(ids);
-        assertEquals(0, getProcessAPI().getNumberOfProcesses());
+        assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
 
         logout();
         platformSession = APITestUtil.loginPlatform();
