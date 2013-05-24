@@ -19,7 +19,6 @@ import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -50,20 +49,20 @@ public class DeleteBatchJob implements StatelessJob {
     }
 
     /*
-     try {
-            transactionService.begin();
-            platformLoginService.logout(session.getId());
-        } catch (final SSessionNotFoundException e) {
-            throw new SessionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new PlatformLogoutException(e.getMessage());
-        } finally {
-            try {
-                transactionService.complete();
-            } catch (final SBonitaException e) {
-                throw new PlatformLogoutException(e.getMessage());
-            }
-        }
+     * try {
+     * transactionService.begin();
+     * platformLoginService.logout(session.getId());
+     * } catch (final SSessionNotFoundException e) {
+     * throw new SessionNotFoundException(e);
+     * } catch (final SBonitaException e) {
+     * throw new PlatformLogoutException(e.getMessage());
+     * } finally {
+     * try {
+     * transactionService.complete();
+     * } catch (final SBonitaException e) {
+     * throw new PlatformLogoutException(e.getMessage());
+     * }
+     * }
      */
     @Override
     public void execute() throws JobExecutionException, FireEventException {
@@ -75,7 +74,7 @@ public class DeleteBatchJob implements StatelessJob {
                 try {
                     transactionService.setRollbackOnly();
                 } catch (final STransactionException e1) {
-                    //ignore
+                    // ignore
                 }
                 throw new JobExecutionException(e);
             } finally {
