@@ -21,16 +21,6 @@
 		<constructor-arg name="filter" value="journal" />
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/instance/model/impl/db/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="16" />
-		<property name="sqlTransformers">
-			<map>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceSQLTransformer" />
-				</entry>
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl">
-					<bean class="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceSQLTransformer" />
-				</entry>
-			</map>
-		</property>
 	</bean>
 
 	<bean id="db-bonita-process-instance-model-arch" class="org.bonitasoft.engine.persistence.DBConfiguration">

@@ -3,7 +3,6 @@
 
 	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="platform" />
-		<constructor-arg name="txService" ref="transactionService" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
@@ -15,7 +14,6 @@
 
 	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="journal" />
-		<constructor-arg name="txService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />

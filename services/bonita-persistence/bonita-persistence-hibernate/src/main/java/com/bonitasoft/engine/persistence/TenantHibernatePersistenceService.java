@@ -13,22 +13,21 @@ import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 public class TenantHibernatePersistenceService extends org.bonitasoft.engine.persistence.TenantHibernatePersistenceService {
 
     private static final String DELETED_KEY = "deleted";
-    
-    public TenantHibernatePersistenceService(final String name, final TransactionService txService, final ReadSessionAccessor sessionAccessor,
+
+    public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
-            final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource)
-            throws SPersistenceException {
-        super(name, txService, sessionAccessor, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
-                sequenceManager, datasource);
+            final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
+            final DataSource datasource) throws SPersistenceException {
+        super(name, sessionAccessor, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager,
+                datasource);
     }
-    
+
     @Override
-    public void delete(PersistentObject entity) throws SPersistenceException {
+    public void delete(final PersistentObject entity) throws SPersistenceException {
         if (entity instanceof PersistentObjectWithFlag) {
             final UpdateDescriptor buildSetField = UpdateDescriptor.buildSetField(entity, DELETED_KEY, true);
             super.update(buildSetField);
@@ -37,9 +36,9 @@ public class TenantHibernatePersistenceService extends org.bonitasoft.engine.per
             super.delete(entity);
         }
     }
-    
+
     @Override
-    public <T extends PersistentObject> T selectById(SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
+    public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
         final T entity = super.selectById(selectDescriptor);
         if (entity instanceof PersistentObjectWithFlag) {
             final PersistentObjectWithFlag entityWithFlag = (PersistentObjectWithFlag) entity;

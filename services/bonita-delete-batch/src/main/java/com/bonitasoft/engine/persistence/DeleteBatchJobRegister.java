@@ -47,6 +47,8 @@ public class DeleteBatchJobRegister implements JobRegister {
      * @param persistenceService
      * @param schedulerService
      * @param loggerService
+     * @param transactionService
+     * @param classesToPurge
      * @param repeat
      *            cron expression to tell when the job must be run
      *            e.g. * *\/2 * * * ? to run it every 2 minutes
