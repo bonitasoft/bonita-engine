@@ -9,9 +9,7 @@
 
 	<groupId>com.bonitasoft.engine.work</groupId>
 	<artifactId>bonita-work</artifactId>
-	<version>6.0.0-beta-031-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
 
 	<modules>
 		<module>bonita-work-parallel</module>
