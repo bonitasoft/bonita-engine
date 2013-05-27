@@ -14,8 +14,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    SPUserTest.class,
-    SPRoleTest.class
+        SPUserTest.class,
+        SPRoleTest.class,
+        SPOrganizationTest.class
 })
 public class SPIdentityTests {
 

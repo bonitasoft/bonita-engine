@@ -35,6 +35,7 @@ import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.impl.CommandAPIExt;
+import com.bonitasoft.engine.api.impl.IdentityAPIExt;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
@@ -63,6 +64,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(LoginAPI.class.getName(), new LoginAPIExt());
         apis.put(com.bonitasoft.engine.api.LoginAPI.class.getName(), new LoginAPIExt());
         apis.put(IdentityAPI.class.getName(), new IdentityAPIImpl());
+        apis.put(com.bonitasoft.engine.api.IdentityAPI.class.getName(), new IdentityAPIExt());
         apis.put(MonitoringAPI.class.getName(), new MonitoringAPIImpl());
         apis.put(ProcessAPI.class.getName(), new ProcessAPIExt());
         apis.put(com.bonitasoft.engine.api.ProcessAPI.class.getName(), new ProcessAPIExt());

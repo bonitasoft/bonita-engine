@@ -16,7 +16,6 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EJB2ServerAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
@@ -80,6 +79,11 @@ public final class TenantAPIAccessor {
     public static MonitoringAPI getMonitoringAPI(final APISession session) throws BonitaHomeNotSetException, UnableToReadBonitaClientConfiguration,
             UnknownAPITypeException, ServerAPIException {
         return getAPI(MonitoringAPI.class, session);
+    }
+
+    public static PlatformMonitoringAPI getPlatformMonitoringAPI(final APISession session) throws BonitaHomeNotSetException,
+            UnableToReadBonitaClientConfiguration, UnknownAPITypeException, ServerAPIException {
+        return getAPI(PlatformMonitoringAPI.class, session);
     }
 
     public static LogAPI getLogAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {

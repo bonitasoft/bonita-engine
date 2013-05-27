@@ -18,9 +18,11 @@ import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
+import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
+
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -67,6 +69,11 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     @Override
     public ProfileAPI getProfileAPI() {
         return new ProfileAPIExt();
+    }
+
+    @Override
+    public PlatformMonitoringAPI getPlatformMonitoringAPI() {
+        return new PlatformMonitoringAPIImpl();
     }
 
 }

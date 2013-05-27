@@ -9,7 +9,6 @@
 package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -25,14 +24,14 @@ public class BPMSPTestsForServers {
     @BeforeClass
     public static void beforeClass() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.beforeClass()");
-        APITestUtil.createPlatformStructure();
+        APITestSPUtil.createPlatformStructure();
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.afterClass()");
-        APITestUtil.deletePlatformStructure();
+        APITestSPUtil.deletePlatformStructure();
     }
 
 }

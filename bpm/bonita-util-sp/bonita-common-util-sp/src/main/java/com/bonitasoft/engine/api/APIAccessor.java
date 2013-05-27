@@ -25,6 +25,8 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
     MonitoringAPI getMonitoringAPI();
 
+    PlatformMonitoringAPI getPlatformMonitoringAPI();
+
     LogAPI getLogAPI();
 
     NodeAPI getNodeAPI();
@@ -35,6 +37,7 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
     @Override
     ReportingAPI getReportingAPI();
 
+    @Override
     ProfileAPI getProfileAPI();
 
 }

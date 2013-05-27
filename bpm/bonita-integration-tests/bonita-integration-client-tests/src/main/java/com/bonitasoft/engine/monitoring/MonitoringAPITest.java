@@ -1,98 +1,78 @@
 package com.bonitasoft.engine.monitoring;
 
-import static org.junit.Assert.assertEquals;
-
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.MonitoringAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class MonitoringAPITest {
+public class MonitoringAPITest extends CommonAPISPTest {
 
-    private static MonitoringAPI monitoringAPI;
-
-    private static APISession session;
-
-    private static IdentityAPI identityAPI;
-
-    @BeforeClass
-    public static void beforeClass() throws BonitaException {
-        APITestUtil.initializeAndStartPlatformWithDefaultTenant(true);
-        session = APITestUtil.loginDefaultTenant();
-        monitoringAPI = TenantAPIAccessor.getMonitoringAPI(session);
-        identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+    @After
+    public void afterTest() throws BonitaException {
+        logout();
     }
 
-    @AfterClass
-    public static void afterClass() throws BonitaException {
-        if (session != null) {
-            APITestUtil.logoutTenant(session);
-        }
-        APITestUtil.stopAndCleanPlatformAndTenant(true);
-    }
-
-    public MonitoringAPITest() throws BonitaException {
-        session = APITestUtil.loginDefaultTenant();
-        monitoringAPI = TenantAPIAccessor.getMonitoringAPI(session);
+    @Before
+    public void beforeTest() throws BonitaException {
+        login();
     }
 
     @Cover(classes = MonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "User" }, story = "Get number of users.")
     @Test
-    public void testGetNumberOfUsers() throws Exception {
-        long numberOfUsers = monitoringAPI.getNumberOfUsers();
+    public void getNumberOfUsers() throws Exception {
+        long numberOfUsers = getMonitoringAPI().getNumberOfUsers();
         assertEquals(0L, numberOfUsers);
 
-        identityAPI.createUser("user", "pwsd");
-        numberOfUsers = monitoringAPI.getNumberOfUsers();
+        getIdentityAPI().createUser("user", "pwsd");
+        numberOfUsers = getMonitoringAPI().getNumberOfUsers();
         assertEquals(1L, numberOfUsers);
 
-        identityAPI.deleteUser("user");
+        getIdentityAPI().deleteUser("user");
 
-        numberOfUsers = monitoringAPI.getNumberOfUsers();
+        numberOfUsers = getMonitoringAPI().getNumberOfUsers();
         assertEquals(0L, numberOfUsers);
     }
 
     // FIXME: add this test when APIs use multi-tenancy
     // @Test
     // public void testGetNumberOfUsersMultiTenancy() throws Exception {
-    // long numberOfUsers = monitoringAPI.getNumberOfUsers();
+    // long numberOfUsers = getMonitoringAPI().getNumberOfUsers();
     // long t2NumberOfUsers = t2MonitoringAPI.getNumberOfUsers();
     // assertEquals(0L, numberOfUsers);
     // assertEquals(0L, t2NumberOfUsers);
     //
     // identityAPI.createUser("user", "pwsd");
-    // numberOfUsers = monitoringAPI.getNumberOfUsers();
+    // numberOfUsers = getMonitoringAPI().getNumberOfUsers();
     // t2NumberOfUsers = t2MonitoringAPI.getNumberOfUsers();
     // assertEquals(1L, numberOfUsers);
     // assertEquals(0L, t2NumberOfUsers);
     //
     // t2identityAPI.createUser("usert2", "pswd");
-    // numberOfUsers = monitoringAPI.getNumberOfUsers();
+    // numberOfUsers = getMonitoringAPI().getNumberOfUsers();
     // t2NumberOfUsers = t2MonitoringAPI.getNumberOfUsers();
     // assertEquals(1L, numberOfUsers);
     // assertEquals(1L, t2NumberOfUsers);
     //
     // identityAPI.deleteUser("user");
     //
-    // numberOfUsers = monitoringAPI.getNumberOfUsers();
+    // numberOfUsers = getMonitoringAPI().getNumberOfUsers();
     // t2NumberOfUsers = t2MonitoringAPI.getNumberOfUsers();
     // assertEquals(0L, numberOfUsers);
     // assertEquals(1L, t2NumberOfUsers);
     //
     // t2identityAPI.deleteUser("usert2");
     //
-    // numberOfUsers = monitoringAPI.getNumberOfUsers();
+    // numberOfUsers = getMonitoringAPI().getNumberOfUsers();
     // t2NumberOfUsers = t2MonitoringAPI.getNumberOfUsers();
     // assertEquals(0L, numberOfUsers);
     // assertEquals(0L, t2NumberOfUsers);
@@ -101,14 +81,14 @@ public class MonitoringAPITest {
     @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Executing process" }, story = "Get number of executing processes.")
     @Test
     public void getNumberOfExecutingProcesses() throws BonitaException {
-        final long numberOfActiveTransactions = monitoringAPI.getNumberOfExecutingProcesses();
+        final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfExecutingProcesses();
         assertEquals(0, numberOfActiveTransactions);
     }
 
     @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Active transaction" }, story = "Get number of active transaction.")
     @Test
     public void getNumberOfActiveTransaction() throws BonitaException {
-        final long numberOfActiveTransactions = monitoringAPI.getNumberOfActiveTransactions();
+        final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
         assertEquals(0L, numberOfActiveTransactions);
     }
 

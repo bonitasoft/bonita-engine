@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.identity.ExportedUser;
+import org.bonitasoft.engine.identity.ExportedUserBuilder;
+import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.monitoring.SGcInfo;
 import org.bonitasoft.engine.monitoring.SMemoryUsage;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -206,4 +210,28 @@ public final class SPModelConvertor extends ModelConvertor {
         return new MemoryUsageImpl(committed, max, init, used);
     }
 
+    public static ExportedUser toExportedUser(final SUser sUser, final SContactInfo persoInfo, final SContactInfo proInfo, final String managerUserName) {
+        final ExportedUserBuilder clientUserbuilder = new ExportedUserBuilder().createNewInstance(sUser.getUserName(), sUser.getPassword());
+        // Do not export dates and id
+        clientUserbuilder.setPasswordEncrypted(true);
+        clientUserbuilder.setFirstName(sUser.getFirstName());
+        clientUserbuilder.setLastName(sUser.getLastName());
+        clientUserbuilder.setTitle(sUser.getTitle());
+        clientUserbuilder.setJobTitle(sUser.getJobTitle());
+        clientUserbuilder.setCreatedBy(sUser.getCreatedBy());
+        clientUserbuilder.setIconName(sUser.getIconName());
+        clientUserbuilder.setIconPath(sUser.getIconPath());
+        clientUserbuilder.setEnabled(sUser.isEnabled());
+
+        final long managerUserId = sUser.getManagerUserId();
+        clientUserbuilder.setManagerUserId(managerUserId);
+        clientUserbuilder.setManagerUserName(managerUserName);
+        if (persoInfo != null) {
+            clientUserbuilder.setPersonalData(toUserContactData(persoInfo));
+        }
+        if (proInfo != null) {
+            clientUserbuilder.setProfessionalData(toUserContactData(proInfo));
+        }
+        return clientUserbuilder.done();
+    }
 }

@@ -11,7 +11,6 @@ package com.bonitasoft.engine;
 import javax.naming.Context;
 
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -39,7 +38,7 @@ public class LocalIntegrationTestsSP {
         System.err.println("=================== LocalIntegrationTestsSP.beforeClass()");
 
         setupSpringContext();
-        APITestUtil.createPlatformStructure();
+        APITestSPUtil.createPlatformStructure();
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
 
@@ -47,7 +46,7 @@ public class LocalIntegrationTestsSP {
     public static void afterClass() throws BonitaException {
         System.err.println("=================== LocalIntegrationTestsSP.afterClass()");
 
-        APITestUtil.deletePlatformStructure();
+        APITestSPUtil.deletePlatformStructure();
         closeSpringContext();
     }
 

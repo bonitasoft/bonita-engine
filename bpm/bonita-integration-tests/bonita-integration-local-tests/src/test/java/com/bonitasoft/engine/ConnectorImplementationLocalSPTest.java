@@ -13,8 +13,6 @@
  **/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +37,8 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Emmanuel Duchastenier
  */
@@ -55,7 +55,7 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
     }
 
     @Test
-    public void testSetConnectorImplementationCleansOldDependencies() throws Exception {
+    public void setConnectorImplementationCleansOldDependencies() throws Exception {
         final String connectorId = "org.bonitasoft.connector.testConnector";
         final String connectorVersion = "1.0";
         final ProcessDefinitionBuilderExt processDesign = new ProcessDefinitionBuilderExt().createNewInstance(

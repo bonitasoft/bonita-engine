@@ -24,7 +24,10 @@ import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
@@ -39,30 +42,48 @@ public class APITestSPUtil extends APITestUtil {
 
     private LogAPI logAPI;
 
-    private ProfileAPI profileAPI;
+    private MonitoringAPI monitoringAPI;
 
-    private ReportingAPI reportingAPI;
+    private PlatformMonitoringAPI platformMonitoringAPI;
 
     public static int DEFAULT_REPEAT = 50;
 
     public static int DEFAULT_TIMEOUT = 2000;
 
-    @Override
-    public ProfileAPI getProfileAPI() {
-        return profileAPI;
+    protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
+        return platformMonitoringAPI;
     }
 
-    private void setProfileAPI(final ProfileAPI profileAPI) {
-        this.profileAPI = profileAPI;
+    protected void setPlatformMonitoringAPI(final PlatformMonitoringAPI platformMonitoringAPI) {
+        this.platformMonitoringAPI = platformMonitoringAPI;
+    }
+
+    protected MonitoringAPI getMonitoringAPI() {
+        return monitoringAPI;
+    }
+
+    protected void setMonitoringAPI(final MonitoringAPI monitoringAPI) {
+        this.monitoringAPI = monitoringAPI;
+    }
+
+    @Override
+    public ProcessAPI getProcessAPI() {
+        return (ProcessAPI) super.getProcessAPI();
+    }
+
+    @Override
+    public IdentityAPI getIdentityAPI() {
+        return (IdentityAPI) super.getIdentityAPI();
+    }
+
+    @Override
+    public ProfileAPI getProfileAPI() {
+        return (ProfileAPI) super.getProfileAPI();
     }
 
     @Override
     public ReportingAPI getReportingAPI() {
-        return reportingAPI;
-    }
-
-    private void setReportingAPI(final ReportingAPI reportingAPI) {
-        this.reportingAPI = reportingAPI;
+        return (ReportingAPI) super.getReportingAPI();
     }
 
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
@@ -72,6 +93,8 @@ public class APITestSPUtil extends APITestUtil {
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
+        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
     }
 
     @Override
@@ -82,6 +105,8 @@ public class APITestSPUtil extends APITestUtil {
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
+        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -93,6 +118,8 @@ public class APITestSPUtil extends APITestUtil {
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
+        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -103,6 +130,8 @@ public class APITestSPUtil extends APITestUtil {
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
+        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
     }
 
     @Override
@@ -112,6 +141,9 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(null);
         setProcessAPI(null);
         setProfileAPI(null);
+        setMonitoringAPI(null);
+        setPlatformMonitoringAPI(null);
+        setReportingAPI(null);
         setCommandAPI(null);
     }
 
@@ -145,11 +177,6 @@ public class APITestSPUtil extends APITestUtil {
         final Map<String, Serializable> deleteParameters = new HashMap<String, Serializable>();
         deleteParameters.put(SUPERVISOR_ID_KEY, id);
         getCommandAPI().execute("deleteSupervisor", deleteParameters);
-    }
-
-    @Override
-    public ProcessAPI getProcessAPI() {
-        return (ProcessAPI) super.getProcessAPI();
     }
 
 }
