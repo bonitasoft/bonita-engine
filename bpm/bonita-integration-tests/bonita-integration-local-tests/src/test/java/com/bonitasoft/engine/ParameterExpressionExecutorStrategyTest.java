@@ -20,9 +20,6 @@ import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.parameter.ParameterService;
-import org.bonitasoft.engine.parameter.SParameter;
-import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +28,10 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.bonitasoft.engine.parameter.ParameterService;
+import com.bonitasoft.engine.parameter.SParameter;
+import com.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 
 /**
  * @author Zhao Na
