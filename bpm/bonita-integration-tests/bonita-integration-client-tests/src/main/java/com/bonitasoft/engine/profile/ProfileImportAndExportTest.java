@@ -1,5 +1,9 @@
 package com.bonitasoft.engine.profile;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,10 +32,6 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.ProfileAPI;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ProfileImportAndExportTest extends AbstractProfileTest {
 
@@ -154,9 +154,9 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final ProfileEntry profileEntry0 = searchedProfileEntriesRes2ig.get(0);
 
         assertEquals(11, searchedProfileEntriesRes2ig.size());
-        assertEquals(" Monitoring dashboard", profileEntry0.getName());
-        assertEquals("Monitoring dashboard", profileEntry0.getDescription());
-        assertEquals("link", profileEntry0.getType());
+        assertEquals("Activity", profileEntry0.getName());
+        assertEquals("Activity", profileEntry0.getDescription());
+        assertEquals("folder", profileEntry0.getType());
 
         // check older profile entry unmodified
         builder = new SearchOptionsBuilder(0, 25);
@@ -237,8 +237,8 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final List<ProfileEntry> searchedProfileEntriesRes2rl = getProfileAPI().searchProfileEntries(builderNewId1.done()).getResult();
         assertNotNull(searchedProfileEntriesRes2rl);
         assertEquals(17, searchedProfileEntriesRes2rl.size());
-        assertEquals(" Monitoring dashboard", searchedProfileEntriesRes2rl.get(0).getName());
-        assertEquals("Monitoring dashboard", searchedProfileEntriesRes2rl.get(0).getDescription());
+        assertEquals("All", searchedProfileEntriesRes2rl.get(0).getName());
+        assertEquals("Processes current user can run", searchedProfileEntriesRes2rl.get(0).getDescription());
         assertEquals("link", searchedProfileEntriesRes2rl.get(0).getType());
 
         // check older profile entry replaced with new id

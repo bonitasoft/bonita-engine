@@ -267,7 +267,7 @@
 						<type>link</type>
 						<page>ListAndRunCurrentUserTeamReports</page>
 					</profileEntry>
-					<profileEntry name=" Monitoring dashboard">
+					<profileEntry name="Monitoring dashboard">
 						<parentName>Activity</parentName>
 						<index>10</index>
 						<description>Monitoring dashboard</description>
@@ -519,7 +519,7 @@
 						<type>link</type>
 						<page>ListAndRunCurrentUserReports</page>
 					</profileEntry>
-					<profileEntry name=" Monitoring dashboard">
+					<profileEntry name="Monitoring dashboard">
 						<parentName>My activity</parentName>
 						<index>4</index>
 						<description>Monitoring dashboard</description>
