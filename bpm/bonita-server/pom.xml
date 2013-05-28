@@ -34,17 +34,6 @@
 		<!-- API -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-server-api</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine</groupId>
-					<artifactId>bonita-common</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-server-api-http</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -718,7 +707,6 @@
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl-hibernate</include>
 									<!-- API -->
-									<include>org.bonitasoft.engine.api:bonita-server-api</include>
 									<include>org.bonitasoft.engine.api:bonita-server-api-http</include>
 									<!-- Archive -->
 									<include>org.bonitasoft.engine.archive:bonita-archive-api</include>
