@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.bonitasoft.engine.identity.Group;
@@ -29,12 +32,8 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.IdentityAPI;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Celine Souchet
- * 
  */
 public class SPOrganizationTest extends CommonAPISPTest {
 
@@ -97,9 +96,11 @@ public class SPOrganizationTest extends CommonAPISPTest {
     @Test
     public void exportAndImportOrganization() throws Exception {
         // create records for user role, group and membership
-        final User persistedUser1 = getIdentityAPI().createUser("liuyanyan", "bpm");
+        final String username = "liuyanyan";
+        final String password = "bpm";
+        final User persistedUser1 = getIdentityAPI().createUser(username, password);
 
-        final UserCreator creator = new UserCreator("anthony.birembault", "bpm");
+        final UserCreator creator = new UserCreator("anthony.birembault", password);
         creator.setJobTitle("Web Team Manager");
         final User persistedUser2 = getIdentityAPI().createUser(creator);
 
@@ -153,6 +154,37 @@ public class SPOrganizationTest extends CommonAPISPTest {
         for (final Group group : groups) {
             getIdentityAPI().deleteGroup(group.getId());
         }
+    }
+
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Encrypted password" }, jira = "ENGINE-1371")
+    @Test
+    public void canLoginAfterMerge() throws Exception {
+        final String username = "jane";
+        final String password = "mySecretP@ssw0rd";
+        createUser(username, password);
+        final String organization = getIdentityAPI().exportOrganization();
+        getIdentityAPI().importOrganization(organization);
+        logoutThenloginAs(username, password);
+        logoutThenlogin();
+        getIdentityAPI().deleteUser(username);
+    }
+
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Encrypted password" }, jira = "ENGINE-1371")
+    @Test
+    public void canLoginAfterImportEncryptedPassword() throws Exception {
+        final String username = "jane";
+        final String password = "mySecretP@ssw0rd";
+        createUser(username, password);
+        final String organization = getIdentityAPI().exportOrganization();
+
+        // delete organization in order to create a new user
+        getIdentityAPI().deleteOrganization();
+
+        // import the organization and try to login
+        getIdentityAPI().importOrganization(organization);
+        logoutThenloginAs(username, password);
+        logoutThenlogin();
+        getIdentityAPI().deleteUser(username);
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Export", "Organization", "Disabled", "User" }, jira = "ENGINE-577")
