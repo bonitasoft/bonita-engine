@@ -144,7 +144,7 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
     @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Transaction", "Active" }, story = "Get number of active transactions.")
     @Test
     public void testGetNumberOfActiveTransactions() throws Exception {
-        Thread.sleep(500);// wait for potentiel work to finish
+        Thread.sleep(500);// wait for potential work to finish
         assertEquals(0, getPlatformMonitoringAPI().getNumberOfActiveTransactions());
     }
 
