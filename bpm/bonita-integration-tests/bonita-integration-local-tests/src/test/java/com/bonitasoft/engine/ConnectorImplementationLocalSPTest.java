@@ -65,7 +65,7 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(processDesign.done());
         final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, "/org/bonitasoft/engine/connectors/OldConnector.impl", "OldConnector.impl");
+        addResource(resources, "/com/bonitasoft/engine/connectors/OldConnector.impl", "OldConnector.impl");
         businessArchiveBuilder.addConnectorImplementation(resources.get(0));
 
         final List<BarResource> barResources = new ArrayList<BarResource>(2);
@@ -92,7 +92,7 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         assertEquals(2, dependencyMappings.size());
 
         // prepare zip byte array of connector implementation
-        final String implSourchFile = "/org/bonitasoft/engine/connectors/NewConnector.impl";
+        final String implSourchFile = "/com/bonitasoft/engine/connectors/NewConnector.impl";
         final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;
         final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
         getProcessAPI().setConnectorImplementation(processDefinition.getId(), connectorId, connectorVersion, connectorImplementationArchive);

@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+	<bean class="com.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
 			<map>
 				<entry key="command" value="org.bonitasoft.engine.command.model.SCommandImpl" />
@@ -9,7 +9,7 @@
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-				<value>org/bonitasoft/engine/command/model/impl/mybatis/CommandMapper.xml</value>
+				<value>com/bonitasoft/engine/command/model/impl/mybatis/CommandMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">

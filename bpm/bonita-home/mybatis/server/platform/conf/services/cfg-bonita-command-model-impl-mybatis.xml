@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="db-bos-command-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
+	<bean id="db-bos-command-model" class="com.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-cleanTables.sql" />
@@ -19,7 +19,7 @@
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-				<value>org/bonitasoft/engine/command/model/impl/mybatis/CommandMapper.xml</value>
+				<value>com/bonitasoft/engine/command/model/impl/mybatis/CommandMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">

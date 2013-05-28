@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+	<bean class="com.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
 			<map>
 				<entry key="dependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
@@ -10,8 +10,8 @@
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-				<value>org/bonitasoft/engine/dependency/model/impl/mybatis/DependencyMapper.xml</value>
-				<value>org/bonitasoft/engine/dependency/model/impl/mybatis/DependencyMappingMapper.xml</value>
+				<value>com/bonitasoft/engine/dependency/model/impl/mybatis/DependencyMapper.xml</value>
+				<value>com/bonitasoft/engine/dependency/model/impl/mybatis/DependencyMappingMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">

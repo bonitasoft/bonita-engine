@@ -9,11 +9,11 @@
 package com.bonitasoft.engine.bpm.test;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
-import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;

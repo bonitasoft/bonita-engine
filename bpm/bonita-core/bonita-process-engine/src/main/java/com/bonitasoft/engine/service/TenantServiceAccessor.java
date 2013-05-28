@@ -8,10 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service;
 
-import org.bonitasoft.engine.parameter.ParameterService;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 
 /**

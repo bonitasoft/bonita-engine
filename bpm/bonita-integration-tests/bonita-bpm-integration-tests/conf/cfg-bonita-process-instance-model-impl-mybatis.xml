@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<!-- Non-archived objects -->
-	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+	<bean class="com.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
 			<map>
 				<entry key="process_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
@@ -43,18 +43,18 @@
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/TokenMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/FlowNodeInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/TransitionInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ConnectorInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/EventTriggerInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/MessageInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/WaitingEventMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/MessageEventCoupleMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/PendingActivityMappingMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/BreakpointMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/HiddenTaskMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/ProcessInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/TokenMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/FlowNodeInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/TransitionInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/ConnectorInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/EventTriggerInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/MessageInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/WaitingEventMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/MessageEventCoupleMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/PendingActivityMappingMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/BreakpointMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/HiddenTaskMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
@@ -1209,7 +1209,7 @@
 
 
 	<!-- Archived objects -->
-	<bean class="org.bonitasoft.engine.persistence.MyBatisConfiguration">
+	<bean class="com.bonitasoft.engine.persistence.MyBatisConfiguration">
 		<constructor-arg name="typeAliases">
 			<map>
 				<entry key="arch_process_instance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
@@ -1229,9 +1229,9 @@
 		</constructor-arg>
 		<constructor-arg name="mappers">
 			<list>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedProcessInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedFlowNodeInstanceMapper.xml</value>
-				<value>org/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedTransitionInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedProcessInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedFlowNodeInstanceMapper.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/mybatis/ArchivedTransitionInstanceMapper.xml</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="classAliasMappings">
