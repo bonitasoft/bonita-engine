@@ -72,7 +72,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
     protected Role role3;
 
     @Before
-    public void before() throws Exception {
+    public void beforeTest() throws Exception {
         login();
 
         createUsers();
@@ -114,7 +114,7 @@ public abstract class AbstractProfileTest extends CommonAPISPTest {
     }
 
     @After
-    public void after() throws BonitaException, IOException {
+    public void afterTest() throws BonitaException, IOException {
         deleteUsers(user1, user2, user3, user4, user5);
         deleteGroups(group1, group2, group3);
         deleteRoles(role1, role2, role3);

@@ -22,6 +22,8 @@ import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -35,6 +37,16 @@ import static org.junit.Assert.assertTrue;
  * 
  */
 public class SPOrganizationTest extends CommonAPISPTest {
+
+    @After
+    public void afterTest() throws Exception {
+        logout();
+    }
+
+    @Before
+    public void beforeTest() throws Exception {
+        login();
+    }
 
     @Test
     public void exportOrganization() throws Exception {

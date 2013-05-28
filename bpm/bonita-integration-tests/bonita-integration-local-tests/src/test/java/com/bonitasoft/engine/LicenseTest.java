@@ -9,8 +9,6 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.platform.TenantCreator;
 
-// @RunWith(PowerMockRunner.class)
-// @PrepareForTest(Manager.class)
 public class LicenseTest extends CommonAPISPTest {
 
     @Test

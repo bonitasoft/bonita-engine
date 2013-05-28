@@ -47,12 +47,12 @@ import static org.junit.Assert.assertNotSame;
 public class SPProcessManagementTest extends CommonAPISPTest {
 
     @After
-    public void afterTest() throws BonitaException {
+    public void afterTest() throws Exception {
         logout();
     }
 
     @Before
-    public void beforeTest() throws BonitaException {
+    public void beforeTest() throws Exception {
         login();
     }
 
@@ -81,8 +81,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         assertEquals(10, getProcessAPI().getNumberOfProcessDeploymentInfos());
         List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 10, ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(10, processes.size());
-        assertEquals("ProcessManagementTest09", processes.get(0).getName());
-        assertEquals("ProcessManagementTest00", processes.get(9).getName());
+        assertEquals(PROCESS_NAME + "09", processes.get(0).getName());
+        assertEquals(PROCESS_NAME + "00", processes.get(9).getName());
 
         logoutThenloginAs("default_tenant_name", "default_tenant_password", tenantId);
 
@@ -92,8 +92,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         assertEquals(10, getProcessAPI().getNumberOfProcessDeploymentInfos());
         processes = getProcessAPI().getProcessDeploymentInfos(0, 10, ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(10, processes.size());
-        assertEquals("ProcessManagementTest09", processes.get(0).getName());
-        assertEquals("ProcessManagementTest00", processes.get(9).getName());
+        assertEquals(PROCESS_NAME + "09", processes.get(0).getName());
+        assertEquals(PROCESS_NAME + "00", processes.get(9).getName());
         getProcessAPI().deleteProcesses(ids);
         assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
 

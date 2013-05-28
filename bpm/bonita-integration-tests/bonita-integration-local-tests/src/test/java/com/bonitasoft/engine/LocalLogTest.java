@@ -8,27 +8,24 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertEquals;
-
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import static org.junit.Assert.assertEquals;
 
 public class LocalLogTest extends CommonAPISPTest {
 
-    @Before
-    public void setUp() throws BonitaException {
-        login();
+    @After
+    public void afterTest() throws Exception {
+        logout();
     }
 
-    @After
-    public void tearDown() throws BonitaException {
-        logout();
+    @Before
+    public void beforeTest() throws Exception {
+        login();
     }
 
     // run this test in local test suite only, otherwise it's necessary to use a command to set the system property on the server side

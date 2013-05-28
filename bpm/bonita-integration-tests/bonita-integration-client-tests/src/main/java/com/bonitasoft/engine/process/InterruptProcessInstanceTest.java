@@ -17,13 +17,13 @@ public class InterruptProcessInstanceTest extends CommonAPISPTest {
     protected User pedro;
 
     @Before
-    public void before() throws Exception {
+    public void beforeTest() throws Exception {
         login();
         pedro = createUser("pedro", "secreto");
     }
 
     @After
-    public void after() throws Exception {
+    public void afterTest() throws Exception {
         deleteUser(pedro);
         logout();
     }

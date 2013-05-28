@@ -111,7 +111,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     private final String delivery = "Delivery men";
 
     @Before
-    public void before() throws Exception {
+    public void beforeTest() throws Exception {
         login();
         businessUser = createUser(USERNAME, PASSWORD);
         logout();
@@ -119,7 +119,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     }
 
     @After
-    public void after() throws BonitaException {
+    public void afterTest() throws BonitaException {
         disableAndDeleteProcess(processDefinition);
         deleteUser(businessUser.getId());
         logout();

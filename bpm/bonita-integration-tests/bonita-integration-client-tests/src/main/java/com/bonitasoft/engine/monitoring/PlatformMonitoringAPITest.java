@@ -26,12 +26,12 @@ import static org.junit.Assert.fail;
 public class PlatformMonitoringAPITest extends CommonAPISPTest {
 
     @After
-    public void afterTest() throws BonitaException {
+    public void afterTest() throws Exception {
         logout();
     }
 
     @Before
-    public void beforeTest() throws BonitaException {
+    public void beforeTest() throws Exception {
         login();
     }
 

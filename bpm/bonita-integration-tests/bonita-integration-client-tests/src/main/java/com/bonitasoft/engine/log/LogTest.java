@@ -67,14 +67,14 @@ import static org.junit.Assert.assertTrue;
 
 public class LogTest extends CommonAPISPTest {
 
-    @Before
-    public void setUp() throws BonitaException {
-        login();
+    @After
+    public void afterTest() throws Exception {
+        logout();
     }
 
-    @After
-    public void tearDown() throws BonitaException {
-        logout();
+    @Before
+    public void beforeTest() throws Exception {
+        login();
     }
 
     @Test(expected = LogNotFoundException.class)
