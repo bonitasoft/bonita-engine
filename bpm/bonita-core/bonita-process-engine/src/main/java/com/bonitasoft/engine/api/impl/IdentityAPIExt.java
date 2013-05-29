@@ -18,8 +18,10 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.identity.xml.ExportOrganization;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Celine Souchet
@@ -40,6 +42,8 @@ public class IdentityAPIExt extends IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public String exportOrganization() throws OrganizationExportException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.WEB_ORGANIZATION_EXCHANGE);
+
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService());
