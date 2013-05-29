@@ -1,0 +1,78 @@
+package com.bonitasoft.engine.api;
+
+import java.lang.reflect.Method;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * @author Matthieu Chaffotte
+ */
+public class APIAccessorTest {
+
+    private Method getAPIMethod(final String methodName) {
+        final Method[] declaredMethods = APIAccessor.class.getDeclaredMethods();
+        for (final Method method : declaredMethods) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    @Test
+    public void checkIdentyAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getIdentityAPI");
+        assertEquals("com.bonitasoft.engine.api.IdentityAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkgetProcessAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getProcessAPI");
+        assertEquals("com.bonitasoft.engine.api.ProcessAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkMonitoringAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getMonitoringAPI");
+        assertEquals("com.bonitasoft.engine.api.MonitoringAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkPlatformMonitoringAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getPlatformMonitoringAPI");
+        assertEquals("com.bonitasoft.engine.api.PlatformMonitoringAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkgetLogAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getLogAPI");
+        assertEquals("com.bonitasoft.engine.api.LogAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkNodeAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getNodeAPI");
+        assertEquals("com.bonitasoft.engine.api.NodeAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkCommandAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getCommandAPI");
+        assertEquals("org.bonitasoft.engine.api.CommandAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkReportingAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getReportingAPI");
+        assertEquals("com.bonitasoft.engine.api.ReportingAPI", method.getReturnType().getName());
+    }
+
+    @Test
+    public void checkProfileAPI() throws SecurityException, NoSuchMethodException {
+        final Method method = getAPIMethod("getProfileAPI");
+        assertEquals("com.bonitasoft.engine.api.ProfileAPI", method.getReturnType().getName());
+    }
+
+}

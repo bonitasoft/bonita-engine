@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
 
 /**
  * @author Matthieu Chaffotte
