@@ -8,45 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.bpm.actor.ActorCriterion;
-import org.bonitasoft.engine.bpm.actor.ActorInstance;
-import org.bonitasoft.engine.bpm.category.Category;
-import org.bonitasoft.engine.bpm.category.CategoryCriterion;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.command.CommandDescriptor;
-import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupCriterion;
-import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleCriterion;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -58,15 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.ProcessManagementAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
-import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.platform.Tenant;
-
-import static org.junit.Assert.assertTrue;
 
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
@@ -127,148 +87,21 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         final List<Tenant> tenants = platformAPI.searchTenants(new SearchOptionsBuilder(0, 100).done()).getResult();
         SPBPMTestUtil.logoutPlatform(platformSession);
+
         for (final Tenant tenant : tenants) {
-            final APISession apiSession = SPBPMTestUtil.loginTenant(tenant.getId());
-
-            final CommandAPI commandAPI = TenantAPIAccessor.getCommandAPI(apiSession);
-            final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
-            searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
-            final SearchResult<CommandDescriptor> searchCommands = commandAPI.searchCommands(searchOptionsBuilder.done());
-            final List<CommandDescriptor> commands = searchCommands.getResult();
-            if (searchCommands.getCount() > 0) {
-                final StringBuilder commandBuilder = new StringBuilder("Commands are still present: ");
-                for (final CommandDescriptor command : commands) {
-                    commandBuilder.append(command.getName()).append(", ");
-                    commandAPI.unregister(command.getName());
-                }
-                messages.add(commandBuilder.toString());
-            }
-
-            final ProcessManagementAPI processManagementAPI = TenantAPIAccessor.getProcessAPI(apiSession);
-            final List<ProcessDeploymentInfo> processes = processManagementAPI.getProcessDeploymentInfos(0, 200, ProcessDeploymentInfoCriterion.DEFAULT);
-            if (processes.size() > 0) {
-                final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
-                for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
-                    processBuilder.append(processDeploymentInfo.getId()).append(", ");
-                    if (TestStates.getProcessDepInfoEnabledState().equals(processDeploymentInfo.getActivationState())) {
-                        processManagementAPI.disableProcess(processDeploymentInfo.getProcessId());
-                    }
-                    processManagementAPI.deleteProcess(processDeploymentInfo.getProcessId());
-                }
-                messages.add(processBuilder.toString());
-            }
-
-            final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
-            final long numberOfUsers = identityAPI.getNumberOfUsers();
-            if (numberOfUsers > 0) {
-                final List<User> users = identityAPI.getUsers(0, Long.valueOf(numberOfUsers).intValue(), UserCriterion.USER_NAME_ASC);
-                final StringBuilder userBuilder = new StringBuilder("Users are still present: ");
-                for (final User user : users) {
-                    userBuilder.append(user.getId()).append(", ");
-                    identityAPI.deleteUser(user.getId());
-                }
-                messages.add(userBuilder.toString());
-            }
-
-            final long numberOfGroups = identityAPI.getNumberOfGroups();
-            if (numberOfGroups > 0) {
-                final List<Group> groups = identityAPI.getGroups(0, Long.valueOf(numberOfGroups).intValue(), GroupCriterion.NAME_ASC);
-                final StringBuilder groupBuilder = new StringBuilder("Groups are still present: ");
-                for (final Group group : groups) {
-                    groupBuilder.append(group.getId()).append(", ");
-                    identityAPI.deleteGroup(group.getId());
-                }
-                messages.add(groupBuilder.toString());
-            }
-
-            final long numberOfRoles = identityAPI.getNumberOfRoles();
-            if (numberOfRoles > 0) {
-                final List<Role> roles = identityAPI.getRoles(0, Long.valueOf(numberOfRoles).intValue(), RoleCriterion.NAME_ASC);
-                final StringBuilder roleBuilder = new StringBuilder("Roles are still present: ");
-                for (final Role role : roles) {
-                    roleBuilder.append(role.getId()).append(", ");
-                    identityAPI.deleteRole(role.getId());
-                }
-                messages.add(roleBuilder.toString());
-            }
-
-            final ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
-            final long numberOfCategories = processAPI.getNumberOfCategories();
-            if (numberOfCategories > 0) {
-                final List<Category> categories = processAPI.getCategories(0, 5000, CategoryCriterion.NAME_ASC);
-                final StringBuilder categoryBuilder = new StringBuilder("Categories are still present: ");
-                for (final Category category : categories) {
-                    categoryBuilder.append(category.getName()).append(", ");
-                    processAPI.deleteCategory(category.getId());
-                }
-                messages.add(categoryBuilder.toString());
-            }
-
-            final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-            parameters.put("startIndex", 0);
-            parameters.put("maxResults", 10000);
-            parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
-            final List<Breakpoint> breakpoints = (List<Breakpoint>) commandAPI.execute("getBreakpoints", parameters);
-            if (breakpoints.size() > 0) {
-                final StringBuilder bpBuilder = new StringBuilder("Breakpoints are still present: ");
-                for (final Breakpoint breakpoint : breakpoints) {
-                    bpBuilder.append(breakpoint.getElementName()).append(", ");
-                    commandAPI.execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpoint.getId()));
-                }
-                messages.add(bpBuilder.toString());
-            }
-            // final int numberOfArchivedProcessInstances = processAPI.getNumberOfArchivedProcessInstances();
-            // if (numberOfArchivedProcessInstances > 0) {
-            // final List<ArchivedProcessInstance> archivedProcessInstances = processAPI.getArchivedProcessInstances(0, numberOfArchivedProcessInstances,
-            // ProcessInstanceCriterion.NAME_ASC);
-            // final StringBuilder categoryBuilder = new StringBuilder("Archived processes are still present: ");
-            // for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
-            // categoryBuilder.append(archivedProcessInstance.getName()).append(", ");
-            // processAPI.
-            // }
-            // messages.add(categoryBuilder.toString());
-            // }
-
-            SPBPMTestUtil.logoutTenant(apiSession);
+            login(tenant.getId());
+            messages.addAll(checkExistenceOfCommands());
+            messages.addAll(checkExistenceOfUsers());
+            messages.addAll(checkExistenceOfGroups());
+            messages.addAll(checkExistenceOfRoles());
+            messages.addAll(checkExistenceOfProcessDefinitions());
+            messages.addAll(checkExistenceOfProcessIntances());
+            messages.addAll(checkExistenceOfFlowNodes());
+            messages.addAll(checkExistenceOfCategories());
+            messages.addAll(checkExistenceOfBreakpoints());
+            logout();
         }
         return messages;
-    }
-
-    protected ActivityInstance waitForTaskToFail(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
-        final CheckNbOfActivities waitForStep1 = new CheckNbOfActivities(getProcessAPI(), repeatEach, timeout, false, processInstance, 1,
-                TestStates.getFailedState());
-        assertTrue(waitForStep1.waitUntil());
-        final ActivityInstance next = waitForStep1.getResult().iterator().next();
-        return next;
-    }
-
-    protected void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws SearchException {
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
-        searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, parentProcessInstance.getId());
-        searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, flowNodeName);
-        final SearchResult<ArchivedFlowNodeInstance> searchArchivedActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchOptionsBuilder.done());
-        assertTrue(searchArchivedActivities.getCount() == 0);
-    }
-
-    /**
-     * First actor means "first one in Alphanumerical order !"
-     */
-    protected void addUserToFirstActorOfProcess(final long userId, final ProcessDefinition processDefinition) throws BonitaException {
-        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
-        final ActorInstance actor = actors.get(0);
-        getProcessAPI().addUserToActor(actor.getId(), userId);
-    }
-
-    protected ManualTaskCreator buildManualUserTaskCreator(final long parentTaskId, final String taskName, final String displayName, final long assignTo,
-            final String description, final Date dueDate, final TaskPriority priority) {
-        final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTaskId, taskName);
-        taskCreator.setDisplayName(displayName);
-        taskCreator.setAssignTo(assignTo);
-        taskCreator.setDescription(description);
-        taskCreator.setDueDate(dueDate);
-        taskCreator.setPriority(priority);
-        return taskCreator;
-
     }
 
 }

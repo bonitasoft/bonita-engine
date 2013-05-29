@@ -9,6 +9,9 @@
 package com.bonitasoft.engine;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +19,10 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -32,6 +39,9 @@ import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
+import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.log.Log;
 
 import static org.junit.Assert.assertTrue;
@@ -177,6 +187,36 @@ public class APITestSPUtil extends APITestUtil {
         final Map<String, Serializable> deleteParameters = new HashMap<String, Serializable>();
         deleteParameters.put(SUPERVISOR_ID_KEY, id);
         getCommandAPI().execute("deleteSupervisor", deleteParameters);
+    }
+
+    protected ManualTaskCreator buildManualTaskCreator(final long parentTaskId, final String taskName, final String displayName, final long assignTo,
+            final String description, final Date dueDate, final TaskPriority priority) {
+        final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTaskId, taskName);
+        taskCreator.setDisplayName(displayName);
+        taskCreator.setAssignTo(assignTo);
+        taskCreator.setDescription(description);
+        taskCreator.setDueDate(dueDate);
+        taskCreator.setPriority(priority);
+        return taskCreator;
+    }
+
+    public List<String> checkExistenceOfBreakpoints() throws CommandNotFoundException, CommandExecutionException,
+            CommandParameterizationException {
+        final List<String> messages = new ArrayList<String>();
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("startIndex", 0);
+        parameters.put("maxResults", 10000);
+        parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
+        final List<Breakpoint> breakpoints = (List<Breakpoint>) getCommandAPI().execute("getBreakpoints", parameters);
+        if (breakpoints.size() > 0) {
+            final StringBuilder bpBuilder = new StringBuilder("Breakpoints are still present: ");
+            for (final Breakpoint breakpoint : breakpoints) {
+                bpBuilder.append(breakpoint.getElementName()).append(", ");
+                getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpoint.getId()));
+            }
+            messages.add(bpBuilder.toString());
+        }
+        return messages;
     }
 
 }

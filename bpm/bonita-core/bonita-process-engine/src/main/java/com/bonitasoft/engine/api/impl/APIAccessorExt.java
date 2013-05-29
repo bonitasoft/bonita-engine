@@ -9,12 +9,11 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
-import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 
 import com.bonitasoft.engine.api.APIAccessor;
+import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
@@ -33,7 +32,7 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
 
     @Override
     public IdentityAPI getIdentityAPI() {
-        return new IdentityAPIImpl();
+        return new IdentityAPIExt();
     }
 
     @Override

@@ -98,10 +98,10 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final Date dueDate = new Date(System.currentTimeMillis());
         final TaskPriority newPriority = TaskPriority.ABOVE_NORMAL;
         final String description1 = "add new manual user task 1";
-        ManualTaskCreator taskCreator = buildManualUserTaskCreator(parentTask.getId(), subtask1, subtask1, john.getId(), description1, dueDate, newPriority);
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), subtask1, subtask1, john.getId(), description1, dueDate, newPriority);
         final ManualTaskInstance manualUserTask1 = getProcessAPI().addManualUserTask(taskCreator);
 
-        taskCreator = buildManualUserTaskCreator(parentTask.getId(), subtask2, subtask2, john.getId(), "add new manual user task 2", dueDate, newPriority);
+        taskCreator = buildManualTaskCreator(parentTask.getId(), subtask2, subtask2, john.getId(), "add new manual user task 2", dueDate, newPriority);
         final ManualTaskInstance manualUserTask2 = getProcessAPI().addManualUserTask(taskCreator);
         assertEquals(description1, manualUserTask1.getDisplayDescription());
         assertEquals(dueDate, manualUserTask2.getExpectedEndDate());
@@ -183,11 +183,11 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals(parentTask.getName(), toDoTasks.get(0).getName());
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());
-        ManualTaskCreator taskCreator = buildManualUserTaskCreator(parentTask.getId(), "newTask'1", "newTask'1", jack.getId(), "add new manual user task",
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask'1", "newTask'1", jack.getId(), "add new manual user task",
                 dueDate, TaskPriority.HIGHEST);
         getProcessAPI().addManualUserTask(taskCreator);
 
-        taskCreator = buildManualUserTaskCreator(parentTask.getId(), "newTask'2", "newTask'2", john.getId(), "add new manual user task", dueDate,
+        taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask'2", "newTask'2", john.getId(), "add new manual user task", dueDate,
                 TaskPriority.LOWEST);
         getProcessAPI().addManualUserTask(taskCreator);
         assertTrue("no new activity found", new WaitUntil(20, 500) {
@@ -249,11 +249,11 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final String subtask1 = "newManualTask1";
         final String subtask2 = "newManualTask2";
         final Date dueDate = new Date(System.currentTimeMillis());
-        ManualTaskCreator taskCreator = buildManualUserTaskCreator(parentTask.getId(), subtask1, subtask1, john.getId(), "add new manual user task", dueDate,
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), subtask1, subtask1, john.getId(), "add new manual user task", dueDate,
                 TaskPriority.NORMAL);
         final ManualTaskInstance manualUserTask1 = getProcessAPI().addManualUserTask(taskCreator);
 
-        taskCreator = buildManualUserTaskCreator(parentTask.getId(), subtask2, subtask2, john.getId(), "add new manual user task", dueDate,
+        taskCreator = buildManualTaskCreator(parentTask.getId(), subtask2, subtask2, john.getId(), "add new manual user task", dueDate,
                 TaskPriority.ABOVE_NORMAL);
         final ManualTaskInstance manualUserTask2 = getProcessAPI().addManualUserTask(taskCreator);
 
@@ -302,9 +302,9 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final Date dueDate = new Date(System.currentTimeMillis());
         final TaskPriority newPriority = TaskPriority.ABOVE_NORMAL;
         final String description1 = "add new manual user task 1";
-        ManualTaskCreator taskCreator = buildManualUserTaskCreator(parentTask.getId(), subtask1, subtask1, john.getId(), description1, dueDate, newPriority);
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), subtask1, subtask1, john.getId(), description1, dueDate, newPriority);
         getProcessAPI().addManualUserTask(taskCreator);
-        taskCreator = buildManualUserTaskCreator(parentTask.getId(), subtask2, subtask2, john.getId(), "add new manual user task 2", dueDate, newPriority);
+        taskCreator = buildManualTaskCreator(parentTask.getId(), subtask2, subtask2, john.getId(), "add new manual user task 2", dueDate, newPriority);
         getProcessAPI().addManualUserTask(taskCreator);
         assertTrue("Expecting 3 assigned task for Jack", new WaitUntil(20, 500) {
 
