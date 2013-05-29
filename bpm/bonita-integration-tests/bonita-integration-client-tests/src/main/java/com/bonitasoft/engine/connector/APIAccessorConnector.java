@@ -33,7 +33,7 @@ public class APIAccessorConnector extends AbstractConnector {
             numberOfUsers = getAPIAccessor().getIdentityAPI().getNumberOfUsers();
             setOutputParameter("numberOfUsers", numberOfUsers);
 
-            setOutputParameter("procInstId", getExecutionContext().getParentProcessInstanceId());
+            setOutputParameter("procInstId", getExecutionContext().getProcessInstanceId());
 
             final LogAPI logAPI = getAPIAccessor().getLogAPI();
             final int numberOfLogs = logAPI.getNumberOfLogs();
