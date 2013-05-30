@@ -135,7 +135,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         assertEquals(m2.getId(), m21.getParentContainerId());
 
         assertEquals(2, getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null).size());
-        getProcessAPI().executeActivity(m2.getId());
+        getProcessAPI().executeFlowNode(m2.getId());
         waitForFinalArchivedActivity("newTask2", pInstance);
 
         // m21 should be canceled, so only newTask1 should remain among the tasks assigned to Jack

@@ -262,13 +262,13 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
         // archive sub task:
         // archive first children tasks:
-        getProcessAPI().executeActivity(manualUserTask1.getId());
+        getProcessAPI().executeFlowNode(manualUserTask1.getId());
         // assertTrue(new WaitForCompletedArchivedStep(50, 2000, manualUserTask1.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
 
         checkNbAssignedTaskOf = new CheckNbAssignedTaskOf(getProcessAPI(), 50, 1000, true, 2, john);
         assertTrue("Expecting 2 assigned task for Jack", checkNbAssignedTaskOf.waitUntil());
 
-        getProcessAPI().executeActivity(manualUserTask2.getId());
+        getProcessAPI().executeFlowNode(manualUserTask2.getId());
         // assertTrue(new WaitForCompletedArchivedStep(50, 1000, manualUserTask2.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
 
         executeAssignedTaskUntilEnd(parentTask.getId());

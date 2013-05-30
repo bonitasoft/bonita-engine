@@ -391,7 +391,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     (Date) fields.get(ManualTaskField.DUE_DATE), STaskPriority.valueOf(prio.name()));
             transactionExecutor.execute(createManualUserTask);
             final long id = createManualUserTask.getResult().getId();
-            executeActivity(id);// put it in ready
+            executeFlowNode(id);// put it in ready
             final AddActivityInstanceTokenCount addActivityInstanceTokenCount = new AddActivityInstanceTokenCount(activityInstanceService, humanTaskId, 1);
             transactionExecutor.execute(addActivityInstanceTokenCount);
             return ModelConvertor.toManualTask(createManualUserTask.getResult(), flowNodeStateManager);
