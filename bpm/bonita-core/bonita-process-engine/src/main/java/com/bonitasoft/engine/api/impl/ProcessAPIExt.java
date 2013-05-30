@@ -73,6 +73,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -91,6 +92,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.NotSerializableException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
@@ -179,14 +181,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
             final File processeFolder = new File(file, String.valueOf(serverProcessDefinition.getId()));
             IOUtil.deleteDir(processeFolder);
+        } catch (final SProcessInstanceHierarchicalDeletionException e) {
+            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final BonitaException e) {
-            log(tenantAccessor, e);
             throw new BonitaRuntimeException(e);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
             throw new DeletionException(e);
         } catch (final IOException e) {
-            log(tenantAccessor, e);
             throw new DeletionException(e);
         }
     }
