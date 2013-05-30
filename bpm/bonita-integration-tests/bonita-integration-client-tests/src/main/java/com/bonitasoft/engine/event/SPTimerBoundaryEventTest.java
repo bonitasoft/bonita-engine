@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -27,17 +30,14 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class SPTimerEventTest extends CommonAPISPTest {
+@SuppressWarnings("javadoc")
+public class SPTimerBoundaryEventTest extends CommonAPISPTest {
 
     private User donaBenta;
 
@@ -85,13 +85,11 @@ public class SPTimerEventTest extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore
     public void timerEventTriggered() throws Exception {
         executeProcessWithTimerBoundary(false);
     }
 
     @Test
-    @Ignore
     public void timerEventTriggeredSubtasks() throws Exception {
         executeProcessWithTimerBoundary(true);
     }
@@ -107,8 +105,8 @@ public class SPTimerEventTest extends CommonAPISPTest {
             ManualTaskInstance manualUserTask = null;
             if (addChild) {
                 getProcessAPI().assignUserTask(step1.getId(), donaBenta.getId());
-                final ManualTaskCreator taskCreator = buildManualTaskCreator(step1.getId(), "childOfStep1", "childOfStep1", donaBenta.getId(),
-                        "child task", new Date(), TaskPriority.NORMAL);
+                final ManualTaskCreator taskCreator = buildManualTaskCreator(step1.getId(), "childOfStep1", "childOfStep1", donaBenta.getId(), "child task",
+                        new Date(), TaskPriority.NORMAL);
                 manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
             }
 

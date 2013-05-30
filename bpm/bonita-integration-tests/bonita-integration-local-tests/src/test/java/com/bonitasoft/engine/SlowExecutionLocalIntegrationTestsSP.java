@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.event.SPTimerEventTest;
+import com.bonitasoft.engine.event.SPTimerBoundaryEventTest;
 import com.bonitasoft.engine.identity.SPIdentityTests;
 import com.bonitasoft.engine.platform.SPPlatformTest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
@@ -41,7 +41,7 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
 
         // SP specific slow test suites:
         SPPlatformTest.class,
-        SPTimerEventTest.class,
+        SPTimerBoundaryEventTest.class,
         SPIdentityTests.class,
         SPProcessManagementTest.class
 })
