@@ -100,7 +100,7 @@ public class RetryTransactionExecutor implements TransactionExecutor {
                 transactionService.begin();
                 return true;
             } catch (final STransactionCreationException e) {
-                throw new STransactionException("Unable to open transaction", e);
+                throw new STransactionException("Unable to open transaction, transaction state is " + transactionService.getState(), e);
             }
         }
     }
