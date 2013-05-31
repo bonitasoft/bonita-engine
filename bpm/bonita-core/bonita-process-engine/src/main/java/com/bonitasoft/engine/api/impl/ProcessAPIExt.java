@@ -624,7 +624,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     }
                 }
 
-                // Then replay activity:
+                // Check if no connector remains in FAILED state:
                 final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
                 List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId,
                         SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
@@ -638,6 +638,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     throw new ActivityExecutionException("There is at least one connector in failed on ON_FINISH of the activity: "
                             + connectorInstances.get(0).getName());
                 }
+
+                // Then replay activity:
                 // can change state and call execute
                 activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
                 activityInstanceService.setExecuting(activityInstance);
