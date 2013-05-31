@@ -107,7 +107,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl implements ProcessEx
             throws SProcessInstanceCreationException {
         try {
             // Create SDataInstances
-            bpmInstancesCreator.createDataInstances(sInstance, processContainer.getDataDefinitions(), expressionContext, operations, context);
+            bpmInstancesCreator.createDataInstances(sInstance, processContainer, sDefinition, expressionContext, operations, context);
             try {
                 initializeStringIndexes(sInstance, sDefinition);
             } catch (final SBonitaException e) {
