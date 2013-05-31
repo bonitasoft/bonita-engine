@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,8 +38,6 @@ import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Baptiste Mesta
@@ -186,6 +186,10 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
     }
 
     protected byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass) throws IOException {
+        return generateZipByteArrayForConnector(implSourceFile, implClass, "classpath/");
+    }
+
+    protected byte[] generateZipByteArrayForConnector(final String implSourceFile, final Class<?> implClass, final String connectorFolder) throws IOException {
         // generate byte arrays of .impl and .jar files
         InputStream stream = null;
         ByteArrayOutputStream baos = null;
@@ -204,7 +208,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
             zos.putNextEntry(entry);
             zos.write(byteArray);
             zos.closeEntry();
-            entry = new ZipEntry(baseName + ".jar");
+            entry = new ZipEntry(connectorFolder + baseName + ".jar");
             entry.setSize(data.length);
             zos.putNextEntry(entry);
             zos.write(data);

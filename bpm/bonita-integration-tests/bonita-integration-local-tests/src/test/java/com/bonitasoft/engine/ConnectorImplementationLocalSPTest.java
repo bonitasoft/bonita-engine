@@ -13,6 +13,8 @@
  **/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,11 +39,10 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Emmanuel Duchastenier
  */
+@SuppressWarnings("javadoc")
 public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
 
     protected TenantServiceAccessor getTenantAccessor() throws InvalidSessionException {
