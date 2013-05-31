@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="profileService" class="org.bonitasoft.engine.profile.impl.ProfileServiceImpl">
-		<constructor-arg name="persistence" ref="persistenceService" />
+		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />

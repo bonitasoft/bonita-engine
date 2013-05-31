@@ -4,7 +4,7 @@
 	<bean id="dataService" class="org.bonitasoft.engine.data.DataServiceImpl">
 		<constructor-arg name="modelBuilder" ref="dataSourceModelBuilder" />
 		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="persistence" ref="persistenceService" />
+		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="dataSourceConfigurations">

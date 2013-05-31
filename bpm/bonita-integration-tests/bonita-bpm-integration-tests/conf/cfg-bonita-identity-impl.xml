@@ -3,7 +3,7 @@
 
 	<bean id="identityService" class="org.bonitasoft.engine.identity.impl.IdentityServiceImpl">
 		<constructor-arg name="eventSvc" ref="eventService" />
-		<constructor-arg name="persistence" ref="persistenceService" />
+		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
