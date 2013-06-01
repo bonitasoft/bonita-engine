@@ -145,7 +145,7 @@
 									<fileset dir="${user.home}/lic" includes="*.lic" />
 								</copy>
 
-                                <copy file="${basedir}/client/bonita-client.xml" todir="${bonita.home}/client/conf" overwrite="true" />
+                                <copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
 
                                 <waitfor maxwait="1" maxwaitunit="minute">
                                     <socket server="localhost" port="${provider.port}" />
