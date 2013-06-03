@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-api</artifactId>
 		<groupId>org.bonitasoft.engine.api</groupId>
-		<version>6.0.0-rc-07</version>
+		<version>6.0.0-rc-08-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-client-api-ejb2</artifactId>
