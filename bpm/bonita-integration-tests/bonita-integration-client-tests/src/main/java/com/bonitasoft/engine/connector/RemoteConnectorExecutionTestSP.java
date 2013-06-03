@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -59,7 +58,6 @@ import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -713,8 +711,8 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // get activityInstanceId
-        final Set<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
-        final ActivityInstance activity = (ActivityInstance) activities.toArray()[0];
+        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
+        final ActivityInstance activity = activities.get(0);
 
         waitForUserTask("step0", processInstance.getId());
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
@@ -763,8 +761,8 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // get activityInstanceId
-        final Set<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
-        final ActivityInstance activity = (ActivityInstance) activities.toArray()[0];
+        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
+        final ActivityInstance activity = activities.get(0);
 
         waitForStep("step0", processInstance);
 
