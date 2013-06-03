@@ -201,7 +201,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public void shutdown() throws SSchedulerException {
         try {
             checkSchedulerState();
-            this.scheduler.shutdown(true);
+            this.scheduler.shutdown(false);
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         }
