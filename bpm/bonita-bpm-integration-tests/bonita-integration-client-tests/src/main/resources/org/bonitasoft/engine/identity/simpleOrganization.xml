@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+  <users>
+    <user userName="anthony.birembault">
+      <password encrypted="false">bpm</password>
+      <jobTitle>Web Team Manager</jobTitle>
+      <enabled>false</enabled>
+      <personalData/>
+      <professionalData/>
+    </user>
+    <user userName="liuyanyan">
+      <password encrypted="false">bpm</password>
+      <enabled>true</enabled>
+      <personalData/>
+      <professionalData/>
+    </user>
+  </users>
+  <roles>
+    <role name="Developer">
+      <displayName>Bonita developer</displayName>
+    </role>
+    <role name="Manager">
+      <displayName>Bonita Manager</displayName>
+    </role>
+  </roles>
+  <groups>
+    <group name="Engine">
+      <displayName>engine team</displayName>
+    </group>
+    <group name="Web">
+      <displayName>web team</displayName>
+    </group>
+  </groups>
+  <memberships>
+    <membership>
+      <userName>liuyanyan</userName>
+      <roleName>Developer</roleName>
+      <groupName>Engine</groupName>
+    </membership>
+    <membership>
+      <userName>anthony.birembault</userName>
+      <roleName>Manager</roleName>
+      <groupName>Web</groupName>
+    </membership>
+  </memberships>
+</organization:Organization>

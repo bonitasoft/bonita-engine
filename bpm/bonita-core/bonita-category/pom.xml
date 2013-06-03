@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-core</artifactId>
+		<groupId>org.bonitasoft.engine.core</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.core.category</groupId>
+	<artifactId>bonita-category</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Category</name>
+
+	<modules>
+		<module>bonita-category-api</module>
+		<module>bonita-category-api-impl</module>
+		<module>bonita-category-model</module>
+		<module>bonita-category-model-impl</module>
+		<module>bonita-category-model-impl-hibernate</module>
+	</modules>
+</project>

@@ -1,0 +1,1071 @@
+/**
+ * Copyright (C) 2012 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.core.process.instance.impl;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.bonitasoft.engine.commons.CollectionUtil;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
+import org.bonitasoft.engine.events.EventActionType;
+import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SDeleteEvent;
+import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
+import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.services.QueriableLoggerService;
+
+/**
+ * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
+ * @author Hongwen Zang
+ * @author Emmanuel Duchastenier
+ * @author Yanyan Liu
+ * @author Baptiste Mesta
+ * @author Celine Souchet
+ */
+public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl implements ActivityInstanceService {
+
+    private static final String SUPERVISED_BY = "SupervisedBy";
+
+    private static final String MANAGED_BY = "ManagedBy";
+
+    private static final String PENDING_MANAGED_BY = "PendingManagedBy";
+
+    private static final String PENDING_SUPERVISED_BY = "PendingSupervisedBy";
+
+    private static final String PENDING_HIDDEN_FOR_USER = "PendingHiddenForUser";
+
+    private static final String PENDING_FOR_USER = "PendingForUser";
+
+    private static final String PENDING_OR_ASSIGNED = "PendingOrAssigned";
+
+    private static final String ACTIVITYINSTANCE_ASSIGNEE = "ACTIVITYINSTANCE_ASSIGNEE";
+
+    private static final int BATCH_SIZE = 100;
+
+    private final SUserTaskInstanceBuilder activityInstanceKeyProvider;
+
+    private final SMultiInstanceActivityInstanceBuilder multiInstanceActivityInstanceKeyProvider;
+
+    private final QueriableLoggerService queriableLoggerService;
+
+    public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
+            final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger) {
+        super(recorder, persistenceRead, eventService, instanceBuilders, queriableLoggerService, logger);
+        this.queriableLoggerService = queriableLoggerService;
+        activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
+        multiInstanceActivityInstanceKeyProvider = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
+    }
+
+    @Override
+    public void createActivityInstance(final SActivityInstance activityInstance) throws SActivityCreationException {
+        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new activity instance", activityInstance);
+        try {
+            final InsertRecord insertRecord = new InsertRecord(activityInstance);
+            SInsertEvent insertEvent = null;
+            if (getEventService().hasHandlers(ACTIVITYINSTANCE, EventActionType.CREATED)) {
+                final SEventBuilder eventBuilder = getEventService().getEventBuilder();
+                insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(ACTIVITYINSTANCE).setObject(activityInstance).done();
+            }
+            getRecorder().recordInsert(insertRecord, insertEvent);
+            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createActivityInstance");
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createActivityInstance");
+            throw new SActivityCreationException(e);
+        }
+    }
+
+    protected SPendingActivityMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SPendingActivityMapping mapping) {
+        final SPendingActivityMappingLogBuilder logBuilder = instanceBuilders.getPendingActivityMappingLogBuilder();
+        this.initializeLogBuilder(logBuilder, message);
+        this.updateLog(actionType, logBuilder);
+        logBuilder.activityInstanceId(mapping.getActivityId());
+        return logBuilder;
+    }
+
+    @Override
+    public void addPendingActivityMappings(final SPendingActivityMapping mapping) throws SActivityCreationException {
+        final SPendingActivityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new pending activity mapping", mapping);
+        final InsertRecord insertRecord = new InsertRecord(mapping);
+        final EventService eventService = getEventService();
+        SInsertEvent insertEvent = null;
+        if (eventService.hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.CREATED)) {
+            final SEventBuilder eventBuilder = getEventService().getEventBuilder();
+            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
+        }
+        try {
+            getRecorder().recordInsert(insertRecord, insertEvent);
+            initiateLogBuilder(mapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "addPendingActivityMappings");
+
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(mapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addPendingActivityMappings");
+
+            throw new SActivityCreationException(e);
+        }
+    }
+
+    @Override
+    public void deletePendingMappings(final long humanTaskInstanceId) throws SActivityModificationException {
+        final SEventBuilder eventBuilder = getEventService().getEventBuilder();
+        List<SPendingActivityMapping> mappings = null;
+        final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
+        try {
+            while ((mappings = getPendingMappings(humanTaskInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
+                for (final SPendingActivityMapping mapping : mappings) {
+                    final SPendingActivityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new pending activity mapping", mapping);
+                    SDeleteEvent deleteEvent = null;
+                    if (createEvents) {
+                        deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
+                    }
+                    try {
+                        getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
+                        initiateLogBuilder(humanTaskInstanceId, SQueriableLog.STATUS_OK, logBuilder, "deletePendingMappings");
+                    } catch (final SRecorderException e) {
+                        initiateLogBuilder(humanTaskInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "deletePendingMappings");
+                        throw new SActivityModificationException(e);
+                    }
+                }
+            }
+        } catch (final SActivityReadException e) {
+            throw new SActivityModificationException(e);
+        }
+    }
+
+    /**
+     * @param humanTaskInstanceId
+     * @param queryOptions
+     * @return
+     */
+    @Override
+    public List<SPendingActivityMapping> getPendingMappings(final long humanTaskInstanceId, final QueryOptions queryOptions) throws SActivityReadException {
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("activityId", humanTaskInstanceId);
+        try {
+            return getPersistenceRead().selectList(
+                    new SelectListDescriptor<SPendingActivityMapping>("getPendingMappingsOfTask", parameters, SPendingActivityMapping.class, queryOptions));
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public SActivityInstance getActivityInstance(final long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
+        try {
+            final SActivityInstance activity = getPersistenceRead().selectById(
+                    SelectDescriptorBuilder.getElementById(SActivityInstance.class, "SActivityInstance", activityInstanceId));
+            if (activity == null) {
+                throw new SActivityInstanceNotFoundException(activityInstanceId);
+            }
+            return activity;
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public SHumanTaskInstance getHumanTaskInstance(final long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
+        final SelectByIdDescriptor<SHumanTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SHumanTaskInstance.class, "SHumanTaskInstance",
+                activityInstanceId);
+        try {
+            final SHumanTaskInstance humanTask = getPersistenceRead().selectById(descriptor);
+            if (humanTask == null) {
+                throw new SActivityInstanceNotFoundException(activityInstanceId);
+            }
+            return humanTask;
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public List<SActivityInstance> getActivitiesWithStates(final long rootContainerId, final Set<Integer> stateIds) throws SActivityReadException {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("rootContainerId", rootContainerId);
+        parameters.put("stateIds", stateIds);
+        final SelectListDescriptor<SActivityInstance> descriptor = new SelectListDescriptor<SActivityInstance>("getActivitiesWithStates", parameters,
+                SActivityInstance.class);
+        try {
+            // FIXME: this method must be paginated
+            return getPersistenceRead().selectList(descriptor);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public List<SActivityInstance> getActivitiesWithStates(final long rootContainerId, final int fromIndex, final int maxResults, final String sortingField,
+            final OrderByType sortingOrder, final Set<Integer> stateIds) throws SActivityReadException {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("rootContainerId", rootContainerId);
+        parameters.put("stateIds", stateIds);
+        final SelectListDescriptor<SActivityInstance> elements = SelectDescriptorBuilder.getSpecificQueryWithParameters(SActivityInstance.class,
+                "getActivitiesWithStates", parameters, new QueryOptions(fromIndex, maxResults, SActivityInstance.class, sortingField, sortingOrder));
+        try {
+            return getPersistenceRead().selectList(elements);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public List<SActivityInstance> getOpenActivityInstances(final long rootContainerId, final int pageIndex, final int maxResults, final String sortingField,
+            final OrderByType orderbyType) throws SActivityReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final QueryOptions queryOptions = new QueryOptions(pageIndex * maxResults, maxResults, SActivityInstance.class, sortingField, orderbyType);
+        final SelectListDescriptor<SActivityInstance> elements = SelectDescriptorBuilder.getSpecificQueryWithParameters(SActivityInstance.class,
+                "getOpenActivitiesFromProcessInstance", parameters, queryOptions);
+        try {
+            return getPersistenceRead().selectList(elements);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final ReadPersistenceService persistenceService)
+            throws SActivityReadException, SActivityInstanceNotFoundException {
+        final SelectListDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityId(activityInstanceId);
+        try {
+            final List<SAActivityInstance> activities = persistenceService.selectList(descriptor);
+            if (activities == null || activities.isEmpty()) {
+                throw new SActivityInstanceNotFoundException(activityInstanceId);
+            }
+            return activities.get(0);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public List<SAActivityInstance> getArchivedActivityInstances(final long rootContainerId, final ReadPersistenceService persistenceService,
+            final QueryOptions queryOptions) throws SActivityReadException {
+        try {
+            final List<SAActivityInstance> activities = persistenceService.selectList(SelectDescriptorBuilder.getArchivedActivitiesFromProcessInstance(
+                    rootContainerId, queryOptions));
+            return getUnmodifiableList(activities);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> getPendingTasks(final long userId, final Set<Long> actorIds, final int fromIndex, final int maxResults,
+            final String sortFieldName, final OrderByType order) throws SActivityReadException {
+        try {
+            final SelectListDescriptor<SHumanTaskInstance> selectListDescriptor;
+            if (actorIds.isEmpty()) {
+                selectListDescriptor = SelectDescriptorBuilder.getPendingUserTasks(userId, fromIndex, maxResults, sortFieldName, order);
+            } else {
+                selectListDescriptor = SelectDescriptorBuilder.getPendingUserTasks(userId, actorIds, fromIndex, maxResults, sortFieldName, order);
+            }
+            return getPersistenceRead().selectList(selectListDescriptor);
+        } catch (final SBonitaReadException bre) {
+            throw new SActivityReadException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> getAssignedUserTasks(final long assigneeId, final int fromIndex, final int maxResults, final String sortFieldName,
+            final OrderByType order) throws SActivityReadException {
+        try {
+            final SelectListDescriptor<SHumanTaskInstance> selectListDescriptor = SelectDescriptorBuilder.getAssignedUserTasks(assigneeId, fromIndex,
+                    maxResults, sortFieldName, order);
+            return getPersistenceRead().selectList(selectListDescriptor);
+        } catch (final SBonitaReadException bre) {
+            throw new SActivityReadException(bre);
+        }
+    }
+
+    @Override
+    public int getNumberOfOpenActivityInstances(final long rootContainerId) throws SActivityReadException {
+        try {
+            return getPersistenceRead().selectOne(SelectDescriptorBuilder.getNumberOfOpenActivities(rootContainerId)).intValue();
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public List<SActivityInstance> getActivityInstances(final long rootContainerId, final int fromIndex, final int numberOfResults, final String sortingField,
+            final OrderByType orderbyType) throws SActivityReadException {
+        final SelectListDescriptor<SActivityInstance> descriptor = SelectDescriptorBuilder.getActivitiesFromProcessInstance(rootContainerId, fromIndex,
+                numberOfResults, sortingField, orderbyType);
+        try {
+            final List<SActivityInstance> selectList = getPersistenceRead().selectList(descriptor);
+            return getUnmodifiableList(selectList);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public int getNumberOfActivityInstances(final long rootContainerId) throws SActivityReadException {
+        try {
+            return getPersistenceRead().selectOne(SelectDescriptorBuilder.getNumberOfActivitiesFromProcessInstance(rootContainerId)).intValue();
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public SManualTaskInstance createManualUserTask(final long userTaskId, final String name, final long flowNodeDefinitionId, final String displayName,
+            final long userId, final String description, final long dueDate, final STaskPriority priority) throws SActivityCreationException,
+            SFlowNodeNotFoundException, SFlowNodeReadException {
+        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) getFlowNodeInstance(userTaskId);
+        final SManualTaskInstanceBuilder manualTaskInstanceBuilder = getInstanceBuilders().getSManualTaskInstanceBuilder();
+        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getProcessDefinitionIndex());
+        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getRootProcessInstanceIndex());
+        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getParentProcessInstanceIndex());
+        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilder.createNewManualTaskInstance(name, flowNodeDefinitionId,
+                parentUserTask.getRootContainerId(), userTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
+                parentProcessInstanceId);
+        createNewManualTaskInstance.setParentContainerId(userTaskId);
+        createNewManualTaskInstance.setParentActivityInstanceId(userTaskId);
+        createNewManualTaskInstance.setAssigneeId(userId);
+        createNewManualTaskInstance.setExpectedEndDate(dueDate);
+        createNewManualTaskInstance.setDescription(description);
+        createNewManualTaskInstance.setDisplayDescription(description);
+        createNewManualTaskInstance.setDisplayName(displayName);
+        createNewManualTaskInstance.setPriority(priority);
+        final SActivityInstance sActivityInstance = createNewManualTaskInstance.done();
+        createActivityInstance(sActivityInstance);
+        return (SManualTaskInstance) sActivityInstance;
+    }
+
+    @Override
+    public void assignHumanTask(final long userTaskId, final long userId) throws SFlowNodeNotFoundException, SFlowNodeReadException,
+            SActivityModificationException {
+        final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance(userTaskId);
+        if (flowNodeInstance instanceof SHumanTaskInstance) {
+            final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
+            final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+            descriptor.addField(activityInstanceKeyProvider.getAssigneeIdKey(), userId);
+            if (userId > 0) {
+                // if this action is a Assign action:
+                descriptor.addField(activityInstanceKeyProvider.getClaimedDateKey(), System.currentTimeMillis());
+            } else {
+                // if this action is a Release action:
+                descriptor.addField(activityInstanceKeyProvider.getClaimedDateKey(), 0);
+            }
+
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
+
+            SUpdateEvent updateEvent = null;
+            if (getEventService().hasHandlers(ACTIVITYINSTANCE_ASSIGNEE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_ASSIGNEE).setObject(flowNodeInstance)
+                        .done();
+            }
+            try {
+                getRecorder().recordUpdate(updateRecord, updateEvent);
+                initiateLogBuilder(userTaskId, SQueriableLog.STATUS_OK, logBuilder, "assignHumanTask");
+
+            } catch (final SRecorderException e) {
+                initiateLogBuilder(userTaskId, SQueriableLog.STATUS_FAIL, logBuilder, "assignHumanTask");
+                throw new SActivityModificationException(e);
+            }
+        } else {
+            throw new SActivityReadException("the activity with id " + userTaskId + " is not a user task");
+        }
+    }
+
+    @Override
+    public long getNumberOfAssignedHumanTaskInstances(final long userId) throws SActivityReadException {
+        try {
+            return getPersistenceRead().selectOne(SelectDescriptorBuilder.getNumberOfAssignedHumanTaskInstances(userId));
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final int stateId, final ReadPersistenceService persistenceService)
+            throws SActivityReadException, SActivityInstanceNotFoundException {
+        SAActivityInstance selectOne;
+        try {
+            selectOne = persistenceService.selectOne(SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityIdAndStateId(activityInstanceId, stateId));
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+        if (selectOne == null) {
+            throw new SActivityInstanceNotFoundException(activityInstanceId);
+        }
+        return selectOne;
+    }
+
+    @Override
+    public long getNumberOfArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
+            throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+            return persistenceService.getNumberOfEntities(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SAHumanTaskInstance> searchArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions,
+            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+            return getPersistenceRead().searchEntity(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            return getPersistenceRead().getNumberOfEntities(SAHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfAssignedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfHumanTasks(final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, queryOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchHumanTasks(final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, queryOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SAHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            return getPersistenceRead().searchEntity(SAHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SAHumanTaskInstance> searchArchivedTasks(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
+            throws SBonitaSearchException {
+        try {
+            return persistenceService.searchEntity(SAHumanTaskInstance.class, searchOptions, null);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @Override
+    public long getNumberOfArchivedTasks(final QueryOptions searchOptions, final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+        try {
+            return persistenceService.getNumberOfEntities(SAHumanTaskInstance.class, searchOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfAssignedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchAssignedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchPendingTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) supervisorId);
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, PENDING_SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfPendingTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) supervisorId);
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, PENDING_SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public Map<Long, Long> getNumberOfOpenTasksForUsers(final List<Long> userIds) throws SBonitaSearchException {
+        if (userIds == null || userIds.size() == 0) {
+            return Collections.emptyMap();
+        }
+        try {
+            // get assigned tasks for each user
+            final List<Map<String, Long>> result = getPersistenceRead().selectList(SelectDescriptorBuilder.getNumbersOfAssignedOpenTasks(userIds));
+            final Map<Long, Long> userTaskNumbermap = new HashMap<Long, Long>();
+            for (final Map<String, Long> record : result) {
+                userTaskNumbermap.put(record.get("userId"), record.get("numberOfTasks")); // "userId" and "numberOfTasks" are embed in mybatis/hibernate query
+                                                                                          // statements named "getNumbersOfOpenTasksForUsers"
+            }
+            // get number of pending tasks for each user
+            for (final Long userId : userIds) {
+                final long pendingCount = getNumberOfPendingTasksForUser(userId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+                if (!userTaskNumbermap.containsKey(userId)) {
+                    userTaskNumbermap.put(userId, pendingCount);
+                } else {
+                    userTaskNumbermap.put(userId, userTaskNumbermap.get(userId) + pendingCount);
+                }
+            }
+            return userTaskNumbermap;
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @Override
+    public long searchNumberOfPendingTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, PENDING_MANAGED_BY, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchPendingTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, PENDING_MANAGED_BY, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    // FIXME synchronized on the object
+    @Override
+    public void incrementLoopCounter(final SLoopActivityInstance loopInstance) throws SActivityModificationException {
+        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating loop instance", loopInstance);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField("loopCounter", loopInstance.getLoopCounter() + 1);
+
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(loopInstance, descriptor);
+        SUpdateEvent updateEvent = null;
+        if (getEventService().hasHandlers(ACTIVITYINSTANCE_STATE, EventActionType.UPDATED)) {
+            updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(loopInstance).done();
+        }
+        try {
+            getRecorder().recordUpdate(updateRecord, updateEvent);
+            initiateLogBuilder(loopInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "assignHumanTask");
+
+        } catch (final SRecorderException sre) {
+            initiateLogBuilder(loopInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "assignHumanTask");
+            throw new SActivityModificationException(sre);
+        }
+    }
+
+    @Override
+    public Map<Long, Long> getNumberOfOverdueOpenTasksForUsers(final List<Long> userIds) throws SBonitaSearchException {
+        if (userIds == null || userIds.size() == 0) {
+            return Collections.emptyMap();
+        }
+        try {
+            // get assigned overdue open tasks for each user
+            final List<Map<String, Long>> result = getPersistenceRead().selectList(SelectDescriptorBuilder.getNumbersOfAssignedOverdueOpenTasks(userIds));
+            final Map<Long, Long> userTaskNumbermap = new HashMap<Long, Long>();
+            for (final Map<String, Long> record : result) {
+                userTaskNumbermap.put(record.get("userId"), record.get("numberOfTasks")); // "userId" and "numberOfTasks" are embed in mybatis/hibernate query
+                                                                                          // statements named "getNumbersOfOpenTasksForUsers"
+            }
+            // get number of pending overdue open tasks for each user
+            for (final Long userId : userIds) {
+                final long pendingCount = getPersistenceRead().selectOne(SelectDescriptorBuilder.getNumberOfPendingOverdueOpenTasksForUser(userId));
+                if (!userTaskNumbermap.containsKey(userId)) {
+                    userTaskNumbermap.put(userId, pendingCount);
+                } else {
+                    userTaskNumbermap.put(userId, userTaskNumbermap.get(userId) + pendingCount);
+                }
+            }
+            return userTaskNumbermap;
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @Override
+    public List<SActivityInstance> getChildrenOfAnActivity(final long parentActivityInstanceId, final int fromIndex, final int numberOfResults)
+            throws SActivityReadException {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("parentActivityInstanceId", parentActivityInstanceId);
+        final SelectListDescriptor<SActivityInstance> descriptor = new SelectListDescriptor<SActivityInstance>("getChildrenOfAnActivity", parameters,
+                SActivityInstance.class, new QueryOptions(fromIndex, numberOfResults));
+        try {
+            return getPersistenceRead().selectList(descriptor);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
+    @Override
+    public void setLoopMax(final SLoopActivityInstance loopActivity, final Integer loopMap) throws SActivityModificationException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField("loopMax", loopMap);
+        updateActivity(loopActivity, LOOPINSTANCE_LOOPMAX_MODIFIED, descriptor);
+    }
+
+    @Override
+    public void setLoopCardinality(final SFlowNodeInstance flowNodeInstance, final int intLoopCardinality) throws SActivityModificationException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getLoopCardinalityKey(), intLoopCardinality);
+        updateActivity(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
+    }
+
+    @Override
+    public void addMultiInstanceNumberOfActiveActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
+            throws SActivityModificationException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
+        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+    }
+
+    @Override
+    public void addMultiInstanceNumberOfTerminatedActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
+            throws SActivityModificationException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
+        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfTerminatedInstancesKey(), flowNodeInstance.getNumberOfTerminatedInstances()
+                + number);
+        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+    }
+
+    @Override
+    public void addMultiInstanceNumberOfCompletedActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
+            throws SActivityModificationException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
+        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
+                + number);
+        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+    }
+
+    @Override
+    public long getNumberOfActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
+        try {
+            return getPersistenceRead().getNumberOfEntities(entityClass, searchOptions, null);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<SActivityInstance> searchActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
+        try {
+            return (List<SActivityInstance>) getPersistenceRead().searchEntity(entityClass, searchOptions, null);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @Override
+    public long getNumberOfArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions,
+            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+        try {
+            return persistenceService.getNumberOfEntities(entityClass, searchOptions, null);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<SAActivityInstance> searchArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions,
+            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+        try {
+            return (List<SAActivityInstance>) persistenceService.searchEntity(entityClass, searchOptions, null);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
+
+    @Override
+    public void setTokenCount(final SActivityInstance activityInstance, final int tokenCount) throws SFlowNodeModificationException {
+        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance token count", activityInstance);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(activityInstanceKeyProvider.getTokenCountKey(), tokenCount);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
+
+        SUpdateEvent updateEvent = null;
+        if (getEventService().hasHandlers(ACTIVITY_INSTANCE_TOKEN_COUNT, EventActionType.UPDATED)) {
+            updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(ACTIVITY_INSTANCE_TOKEN_COUNT).setObject(activityInstance)
+                    .done();
+        }
+        try {
+            getRecorder().recordUpdate(updateRecord, updateEvent);
+            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setTokenCount");
+
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setTokenCount");
+
+            throw new SFlowNodeModificationException(e);
+        }
+
+    }
+
+    @Override
+    public void hideTasks(final long userId, final Long... activityInstanceId) throws SActivityInstanceNotFoundException, STaskVisibilityException {
+        for (final long id : activityInstanceId) {
+            hideTask(userId, id);
+        }
+    }
+
+    private void hideTask(final long userId, final long activityInstanceId) throws SActivityInstanceNotFoundException, STaskVisibilityException {
+        // Check that task exists:
+        try {
+            // final SHumanTaskInstance humanTaskInstance =
+            getHumanTaskInstance(activityInstanceId);
+            // if (SFlowNodeType.MANUAL_TASK.equals(humanTaskInstance.getType())) {
+            // throw new SUnhideableTaskException("The activity with id " + activityInstanceId + " can't be hidden because it is a manual sub task");
+            // }
+        } catch (final SActivityReadException e) {
+            throw new SActivityInstanceNotFoundException(activityInstanceId);
+        }
+
+        final SHiddenTaskInstanceBuilder hiddenTaskBuilder = instanceBuilders.getSHiddenTaskInstanceBuilder();
+        final SHiddenTaskInstance hiddenTask = hiddenTaskBuilder.createNewInstance(activityInstanceId, userId).done();
+        final SHiddenTaskInstanceLogBuilder logBuilder = getHiddenTaskQueriableLog(ActionType.CREATED, "Creating a new Hidden task <-> User association",
+                hiddenTask);
+        final InsertRecord insertRecord = new InsertRecord(hiddenTask);
+        final EventService eventService = getEventService();
+        SInsertEvent insertEvent = null;
+        if (eventService.hasHandlers(HIDDEN_TASK, EventActionType.CREATED)) {
+            final SEventBuilder eventBuilder = eventService.getEventBuilder();
+            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(HIDDEN_TASK).setObject(hiddenTask).done();
+        }
+
+        try {
+
+            getRecorder().recordInsert(insertRecord, insertEvent);
+            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_OK, logBuilder, "hideTask");
+
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "hideTask");
+
+            throw new STaskVisibilityException(activityInstanceId, userId, "Creation");
+        }
+    }
+
+    @Override
+    public void unhideTasks(final long userId, final Long... activityInstanceId) throws STaskVisibilityException {
+        for (final Long actId : activityInstanceId) {
+            unhideTask(userId, actId);
+        }
+    }
+
+    @Override
+    public void unhideTask(final long userId, final long activityInstanceId) throws STaskVisibilityException {
+        final SHiddenTaskInstance hiddenTask = getHiddenTask(userId, activityInstanceId);
+        final SHiddenTaskInstanceLogBuilder logBuilder = getHiddenTaskQueriableLog(ActionType.DELETED, "Deleting a Hidden task <-> User association ",
+                hiddenTask);
+        try {
+            final DeleteRecord deleteRecord = new DeleteRecord(hiddenTask);
+            SDeleteEvent deleteEvent = null;
+            if (getEventService().hasHandlers(HIDDEN_TASK, EventActionType.DELETED)) {
+                final SEventBuilder eventBuilder = getEventService().getEventBuilder();
+                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(HIDDEN_TASK).setObject(hiddenTask).done();
+            }
+            getRecorder().recordDelete(deleteRecord, deleteEvent);
+            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_OK, logBuilder, "unhideTask");
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "unhideTask");
+
+            throw new STaskVisibilityException(hiddenTask.getActivityId(), hiddenTask.getUserId(), "deletion", e);
+        }
+    }
+
+    @Override
+    public SHiddenTaskInstance getHiddenTask(final long userId, final long activityInstanceId) throws STaskVisibilityException {
+        try {
+            final SHiddenTaskInstance hiddenTask = getPersistenceRead().selectOne(SelectDescriptorBuilder.getSHiddenTask(userId, activityInstanceId));
+            if (hiddenTask == null) {
+                throw new STaskVisibilityException("SHiddenTaskInstance not found with user id " + userId + " and activity id " + activityInstanceId);
+            }
+            return hiddenTask;
+        } catch (final SBonitaReadException e) {
+            throw new STaskVisibilityException("SHiddenTaskInstance not found with user id " + userId + " and activity id " + activityInstanceId, e);
+        }
+    }
+
+    @Override
+    public SHiddenTaskInstance getHiddenTask(final long id) throws STaskVisibilityException, SBonitaReadException {
+        final SHiddenTaskInstance hiddenTask = getPersistenceRead().selectById(
+                SelectDescriptorBuilder.getElementById(SHiddenTaskInstance.class, "SHiddenTaskInstance", id));
+        if (hiddenTask == null) {
+            throw new STaskVisibilityException("SHiddenTaskInstance not found with id " + id);
+        }
+        return hiddenTask;
+    }
+
+    @Override
+    public List<SHiddenTaskInstance> searchHiddenTasksForActivity(final long activityInstanceId, final QueryOptions searchOptions)
+            throws STaskVisibilityException {
+        try {
+            return getPersistenceRead().selectList(SelectDescriptorBuilder.getSHiddenTasksForActivity(activityInstanceId));
+        } catch (final SBonitaReadException e) {
+            throw new STaskVisibilityException("Error searching for hidden tasks for activity with id " + activityInstanceId, e);
+        }
+    }
+
+    @Override
+    public void deleteHiddenTasksForActivity(final long activityInstanceId) throws STaskVisibilityException {
+        List<SHiddenTaskInstance> hiddenTasks;
+        while ((hiddenTasks = searchHiddenTasksForActivity(activityInstanceId, new QueryOptions(0, 500))).size() > 0) {
+            for (final SHiddenTaskInstance sHiddenTask : hiddenTasks) {
+                unhideTasks(sHiddenTask.getUserId(), activityInstanceId);
+            }
+        }
+    }
+
+    // @Override
+    // public List<SHiddenTaskInstance> getAllSHiddenTasks() throws STaskVisibilityException {
+    // try {
+    // return getPersistenceRead().selectList(SelectDescriptorBuilder.getAllSHiddenTasks());
+    // } catch (SBonitaReadException e) {
+    // throw new STaskVisibilityException("Error listing all hidden tasks", e);
+    // }
+    // }
+
+    @Override
+    public long getNumberOfPendingHiddenTasks(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, PENDING_HIDDEN_FOR_USER, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchPendingHiddenTasks(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, PENDING_HIDDEN_FOR_USER, queryOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    protected SHiddenTaskInstanceLogBuilder getHiddenTaskQueriableLog(final ActionType actionType, final String message, final SHiddenTaskInstance hiddenTask) {
+        final SHiddenTaskInstanceLogBuilder logBuilder = instanceBuilders.getHiddenTaskInstanceLogBuilder();
+        this.initializeLogBuilder(logBuilder, message);
+        this.updateLog(actionType, logBuilder);
+        logBuilder.activityInstanceId(hiddenTask.getActivityId());
+        logBuilder.userId(hiddenTask.getUserId());
+        return logBuilder;
+    }
+
+    @Override
+    public long getNumberOfPendingTasksForUser(final long userId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, PENDING_FOR_USER, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchPendingTasksForUser(final long userId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, PENDING_FOR_USER, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfPendingOrAssignedTasks(final long userId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+            return getPersistenceRead().getNumberOfEntities(SHumanTaskInstance.class, PENDING_OR_ASSIGNED, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public List<SHumanTaskInstance> searchPendingOrAssignedTasks(final long userId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+            return getPersistenceRead().searchEntity(SHumanTaskInstance.class, PENDING_OR_ASSIGNED, searchOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public boolean isTaskHidden(final long userId, final long activityInstanceId) throws SBonitaReadException {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("activityId", activityInstanceId);
+        parameters.put("userId", userId);
+
+        Long selectOne;
+        selectOne = getPersistenceRead().selectOne(new SelectOneDescriptor<Long>("isTaskHidden", parameters, SHiddenTaskInstance.class, Long.class));
+        return selectOne == 1l;
+    }
+
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+        logBuilder.actionScope(String.valueOf(objectId));
+        logBuilder.actionStatus(sQueriableLogStatus);
+        logBuilder.objectId(objectId);
+        final SQueriableLog log = logBuilder.done();
+        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
+            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
+        }
+    }
+
+    @Override
+    public void deleteArchivedPendingMappings(final long flowNodeInstanceId) throws SActivityModificationException {
+        // TODO archived pending mapping... first we need to have archived pending mapping and so on
+        // final SEventBuilder eventBuilder = getEventService().getEventBuilder();
+        // List<SPendingActivityMapping> mappings = null;
+        // try {
+        // while ((mappings = getPendingMappings(flowNodeInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
+        // for (final SPendingActivityMapping mapping : mappings) {
+        // final SPendingActivityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new pending activity mapping", mapping);
+        // final SDeleteEvent deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
+        // try {
+        // getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
+        // initiateLogBuilder(flowNodeInstanceId, SQueriableLog.STATUS_OK, logBuilder, "deletePendingMappings");
+        // } catch (final SRecorderException e) {
+        // initiateLogBuilder(flowNodeInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "deletePendingMappings");
+        // throw new SActivityModificationException(e);
+        // }
+        // }
+        // }
+        // } catch (final SActivityReadException e) {
+        // throw new SActivityModificationException(e);
+        // }
+    }
+
+    @Override
+    public void setAbortedByBoundaryEvent(final SActivityInstance activityInstance, final long boundaryEventId) throws SActivityModificationException {
+        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "update aborted by boundary", activityInstance);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(activityInstanceKeyProvider.getAbortedByBoundaryEventIdKey(), boundaryEventId);
+
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
+        final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(STATE_CATEGORY).setObject(activityInstance)
+                .done();
+        try {
+            getRecorder().recordUpdate(updateRecord, updateEvent);
+            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setAbortedByBoundaryEvent");
+
+        } catch (final SRecorderException sre) {
+            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setAbortedByBoundaryEvent");
+            throw new SActivityModificationException(sre);
+        }
+
+    }
+}

@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>services</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.persistence</groupId>
+	<artifactId>bonita-persistence</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Persistence</name>
+
+	<modules>
+		<module>bonita-persistence-read</module>
+		<module>bonita-persistence-api</module>
+		<module>bonita-persistence-hibernate</module>
+		<module>bonita-persistence-db</module>
+		<module>bonita-persistence-hibernate-test</module>
+		<module>bonita-delete-api</module>
+		<module>bonita-delete-impl</module>
+		<module>bonita-sequence-api</module>
+		<module>bonita-sequence-impl</module>
+	</modules>
+</project>

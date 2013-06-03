@@ -1,0 +1,461 @@
+/**
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.bonitasoft.engine.core.process.document.api.impl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.api.SProcessDocumentContentNotFoundException;
+import org.bonitasoft.engine.core.process.document.api.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.process.document.api.SProcessDocumentDeletionException;
+import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
+import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingDeletionException;
+import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingException;
+import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingNotFoundException;
+import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
+import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
+import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.process.document.model.builder.SAProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.document.DocumentService;
+import org.bonitasoft.engine.document.SDocumentException;
+import org.bonitasoft.engine.document.SDocumentNotFoundException;
+import org.bonitasoft.engine.document.model.SDocument;
+import org.bonitasoft.engine.document.model.SDocumentBuilder;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
+
+/**
+ * @author Nicolas Chabanoles
+ * @author Matthieu Chaffotte
+ * @author Celine Souchet
+ */
+public class ProcessDocumentServiceImpl implements ProcessDocumentService {
+
+    private final SProcessDocumentBuilder processDocumentBuilder;
+
+    private final SAProcessDocumentBuilder archivedProcessDocumentBuilder;
+
+    private final DocumentService documentService;
+
+    private final DocumentMappingService documentMappingService;
+
+    private final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor;
+
+    private final SDocumentBuilder documentBuilder;
+
+    private final SDocumentDownloadURLProvider urlProvider;
+
+    public ProcessDocumentServiceImpl(final SProcessDocumentBuilder processDocumentBuilder, final DocumentService documentService,
+            final DocumentMappingService documentMappingService, final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor,
+            final SDocumentBuilder documentBuilder, final SDocumentDownloadURLProvider urlProvider,
+            final SAProcessDocumentBuilder archivedProcessDocumentBuilder) {
+        this.processDocumentBuilder = processDocumentBuilder;
+        this.documentService = documentService;
+        this.documentMappingService = documentMappingService;
+        this.documentMappingBuilderAccessor = documentMappingBuilderAccessor;
+        this.documentBuilder = documentBuilder;
+        this.urlProvider = urlProvider;
+        this.archivedProcessDocumentBuilder = archivedProcessDocumentBuilder;
+    }
+
+    @Override
+    public SProcessDocument attachDocumentToProcessInstance(final SProcessDocument document) throws SProcessDocumentCreationException {
+        try {
+            SDocumentMapping docMapping = toDocumentMapping(document);
+            docMapping = documentMappingService.create(docMapping);
+            return toProcessDocument(docMapping);
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentCreationException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeDocuments(final List<SProcessDocument> sProcessDocuments) throws SProcessDocumentDeletionException {
+        try {
+            for (final SProcessDocument sProcessDocument : sProcessDocuments) {
+                removeDocument(sProcessDocument);
+            }
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentDeletionException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeDocument(final SProcessDocument sProcessDocument) throws SProcessDocumentDeletionException {
+        try {
+            // Delete document content, if has
+            if (sProcessDocument.hasContent()) {
+                documentService.deleteDocumentContent(sProcessDocument.getContentStorageId());
+            }
+
+            // Remove Mapping between process instance and document
+            documentMappingService.delete(sProcessDocument.getId());
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentDeletionException(e.getMessage(), e);
+        }
+    }
+
+    private SProcessDocument toProcessDocument(final SDocumentMapping docMapping) {
+        final SProcessDocumentBuilder builder = processDocumentBuilder.createNewInstance();
+        builder.setAuthor(docMapping.getDocumentAuthor());
+        builder.setContentMimeType(docMapping.getDocumentContentMimeType());
+        builder.setCreationDate(docMapping.getDocumentCreationDate());
+        builder.setFileName(docMapping.getDocumentContentFileName());
+        builder.setHasContent(docMapping.documentHasContent());
+        builder.setId(docMapping.getId());
+        builder.setName(docMapping.getDocumentName());
+        builder.setProcessInstanceId(docMapping.getProcessInstanceId());
+        builder.setURL(docMapping.getDocumentURL());
+        builder.setContentStorageId(docMapping.getContentStorageId());
+        return builder.done();
+    }
+
+    private SProcessDocument toProcessDocument(final SADocumentMapping docMapping) {
+        final SProcessDocumentBuilder builder = processDocumentBuilder.createNewInstance();
+        builder.setAuthor(docMapping.getDocumentAuthor());
+        builder.setContentMimeType(docMapping.getDocumentContentMimeType());
+        builder.setCreationDate(docMapping.getDocumentCreationDate());
+        builder.setFileName(docMapping.getDocumentContentFileName());
+        builder.setHasContent(docMapping.documentHasContent());
+        builder.setId(docMapping.getSourceObjectId());
+        builder.setName(docMapping.getDocumentName());
+        builder.setProcessInstanceId(docMapping.getProcessInstanceId());
+        builder.setURL(docMapping.getDocumentURL());
+        builder.setContentStorageId(docMapping.getContentStorageId());
+        return builder.done();
+    }
+
+    private SAProcessDocument toAProcessDocument(final SADocumentMapping docMapping) {
+        final SAProcessDocumentBuilder builder = archivedProcessDocumentBuilder.createNewInstance();
+        builder.setAuthor(docMapping.getDocumentAuthor());
+        builder.setContentMimeType(docMapping.getDocumentContentMimeType());
+        builder.setCreationDate(docMapping.getDocumentCreationDate());
+        builder.setFileName(docMapping.getDocumentContentFileName());
+        builder.setHasContent(docMapping.documentHasContent());
+        builder.setId(docMapping.getId());
+        builder.setName(docMapping.getDocumentName());
+        builder.setProcessInstanceId(docMapping.getProcessInstanceId());
+        builder.setURL(docMapping.getDocumentURL());
+        builder.setContentStorageId(docMapping.getContentStorageId());
+        builder.setArchiveDate(docMapping.getArchiveDate());
+        builder.setSourceObjectId(docMapping.getSourceObjectId());
+        return builder.done();
+    }
+
+    private SDocumentMapping toDocumentMapping(final SProcessDocument document) {
+        final SDocumentMappingBuilder builder = initDocumentMappingBuilder(document);
+        builder.setDocumentURL(document.getURL());
+        return builder.done();
+    }
+
+    private SDocumentMappingBuilder initDocumentMappingBuilder(final SProcessDocument document) {
+        final SDocumentMappingBuilder builder = documentMappingBuilderAccessor.getSDocumentMappingBuilder().createNewInstance();
+        builder.setProcessInstanceId(document.getProcessInstanceId());
+        builder.setDocumentName(document.getName());
+        builder.setDocumentAuthor(document.getAuthor());
+        builder.setDocumentCreationDate(document.getCreationDate());
+        builder.setHasContent(document.hasContent());
+        builder.setDocumentContentFileName(document.getContentFileName());
+        builder.setDocumentContentMimeType(document.getContentMimeType());
+        builder.setDocumentStorageId(document.getContentStorageId());
+        return builder;
+    }
+
+    @Override
+    public SProcessDocument attachDocumentToProcessInstance(final SProcessDocument document, final byte[] documentContent)
+            throws SProcessDocumentCreationException {
+        try {
+            SDocument sDocument = toSDocument(document);
+            sDocument = documentService.storeDocumentContent(sDocument, documentContent);
+            SDocumentMapping docMapping = buildDocumentMapping(document, sDocument);
+            docMapping = documentMappingService.create(docMapping);
+            return toProcessDocument(docMapping);
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentCreationException(e.getMessage(), e);
+        }
+    }
+
+    private SDocumentMapping buildDocumentMapping(final SProcessDocument document, final SDocument sDocument) {
+        final SDocumentMappingBuilder builder = initDocumentMappingBuilder(document);
+        builder.setDocumentStorageId(sDocument.getStorageId());
+        builder.setDocumentURL(generateURL(document, sDocument));
+        builder.setHasContent(true);
+        return builder.done();
+    }
+
+    private String generateURL(final SProcessDocument document, final SDocument sDocument) {
+        return urlProvider.generateURL(document, sDocument);
+    }
+
+    private SDocument toSDocument(final SProcessDocument document) {
+        final SDocumentBuilder builder = documentBuilder.createNewInstance();
+        builder.setAuthor(document.getAuthor());
+        builder.setContentFileName(document.getContentFileName());
+        builder.setContentMimeType(document.getContentMimeType());
+        builder.setContentSize(document.getContentSize());
+        builder.setCreationDate(document.getCreationDate());
+        builder.setDocumentId(document.getContentStorageId());
+        return builder.done();
+    }
+
+    @Override
+    public byte[] getDocumentContent(final String documentStorageId) throws SProcessDocumentContentNotFoundException {
+        try {
+            return documentService.getContent(documentStorageId);
+        } catch (final Exception e) {
+            throw new SProcessDocumentContentNotFoundException(e.getMessage());
+        }
+    }
+
+    @Override
+    public SProcessDocument getDocument(final long documentId) throws SDocumentNotFoundException {
+        SDocumentMapping docMapping;
+        try {
+            docMapping = documentMappingService.get(documentId);
+            return toProcessDocument(docMapping);
+        } catch (final SDocumentMappingNotFoundException e) {
+            throw new SDocumentNotFoundException("Document not found: " + documentId, e);
+        }
+    }
+
+    @Override
+    public SProcessDocument getDocument(final long processInstanceId, final String documentName) throws SDocumentNotFoundException {
+        SDocumentMapping docMapping;
+        try {
+            docMapping = documentMappingService.get(processInstanceId, documentName);
+            return toProcessDocument(docMapping);
+        } catch (final SDocumentMappingNotFoundException e) {
+            throw new SDocumentNotFoundException("Document not found: " + documentName + " for process instance: " + processInstanceId, e);
+        }
+    }
+
+    @Override
+    public SProcessDocument getDocument(final long processInstanceId, final String documentName, final long time,
+            final ReadPersistenceService readPersistenceService) throws SDocumentNotFoundException {
+        SADocumentMapping archDocMapping;
+        try {
+            try {
+                archDocMapping = documentMappingService.get(processInstanceId, documentName, time, readPersistenceService);
+            } catch (final SDocumentMappingNotFoundException e) {
+                archDocMapping = null;
+            }
+            final SProcessDocument processDocument;
+            if (archDocMapping == null) {// no archive = still the current element
+                final SDocumentMapping docMapping = documentMappingService.get(processInstanceId, documentName);
+                processDocument = toProcessDocument(docMapping);
+            } else {
+                processDocument = toProcessDocument(archDocMapping);
+            }
+            return processDocument;
+        } catch (final SDocumentMappingNotFoundException e) {
+            throw new SDocumentNotFoundException("Document not found: " + documentName + " for process instance: " + processInstanceId, e);
+        }
+    }
+
+    @Override
+    public List<SProcessDocument> getDocumentsOfProcessInstance(final long processInstanceId, final int fromIndex, final int numberPerPage, final String field,
+            final OrderByType order) throws SDocumentException {
+        try {
+            final List<SDocumentMapping> docMappings = documentMappingService.getDocumentMappingsForProcessInstance(processInstanceId, fromIndex,
+                    numberPerPage, field, order);
+            if (docMappings != null && !docMappings.isEmpty()) {
+                final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
+                for (final SDocumentMapping docMapping : docMappings) {
+                    result.add(toProcessDocument(docMapping));
+                }
+                return result;
+            } else {
+                return Collections.emptyList();
+            }
+
+        } catch (final SBonitaException e) {
+            throw new SDocumentException("Unable to list documents of process instance: " + processInstanceId, e);
+        }
+    }
+
+    @Override
+    public long getNumberOfDocumentsOfProcessInstance(final long processInstanceId) throws SDocumentException {
+        try {
+            return documentMappingService.getNumberOfDocumentMappingsForProcessInstance(processInstanceId);
+        } catch (final SBonitaException e) {
+            throw new SDocumentException("Unable to count documents of process instance: " + processInstanceId, e);
+        }
+    }
+
+    @Override
+    public SProcessDocument updateDocumentOfProcessInstance(final SProcessDocument document) throws SProcessDocumentCreationException {
+        try {
+            SDocumentMapping docMapping = toDocumentMapping(document);
+            docMapping = documentMappingService.update(docMapping);
+            return toProcessDocument(docMapping);
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentCreationException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeCurrentVersion(final long processInstanceId, final String documentName) throws SDocumentNotFoundException, SObjectModificationException {
+
+        try {
+            final SDocumentMapping docMapping = documentMappingService.get(processInstanceId, documentName);
+            documentMappingService.archive(docMapping, System.currentTimeMillis());
+        } catch (final SDocumentMappingNotFoundException e) {
+            throw new SDocumentNotFoundException(e);
+        } catch (final SDocumentMappingException e) {
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
+    public SProcessDocument updateDocumentOfProcessInstance(final SProcessDocument document, final byte[] documentContent)
+            throws SProcessDocumentCreationException {
+        try {
+            // will update documentBuilder, contentFileName, contentMimeType, author, documentContent, hasContent
+            // based on processInstanceId, documentName
+            SDocument sDocument = toSDocument(document);
+            sDocument = documentService.storeDocumentContent(sDocument, documentContent);
+            // we have the new document id (in the storage)
+            SDocumentMapping docMapping = buildDocumentMapping(document, sDocument);
+            docMapping = documentMappingService.update(docMapping);
+            return toProcessDocument(docMapping);
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentCreationException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public long getNumberOfDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
+        return documentMappingService.getNumberOfDocuments(queryOptions);
+    }
+
+    @Override
+    public List<SProcessDocument> searchDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
+        final List<SDocumentMapping> docMappings = documentMappingService.searchDocuments(queryOptions);
+        final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
+        if (!docMappings.isEmpty()) {
+            for (final SDocumentMapping docMapping : docMappings) {
+                result.add(toProcessDocument(docMapping));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public long getNumberOfDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        return documentMappingService.getNumberOfDocumentsSupervisedBy(userId, queryOptions);
+    }
+
+    @Override
+    public List<SProcessDocument> searchDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        final List<SDocumentMapping> docMappings = documentMappingService.searchDocumentsSupervisedBy(userId, queryOptions);
+        final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
+        if (!docMappings.isEmpty()) {
+            for (final SDocumentMapping docMapping : docMappings) {
+                result.add(toProcessDocument(docMapping));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public long getNumberOfArchivedDocuments(final QueryOptions queryOptions, final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+        return documentMappingService.getNumberOfArchivedDocuments(queryOptions, persistenceService);
+    }
+
+    @Override
+    public List<SAProcessDocument> searchArchivedDocuments(final QueryOptions queryOptions, final ReadPersistenceService persistenceService)
+            throws SBonitaSearchException {
+        final List<SADocumentMapping> docMappings = documentMappingService.searchArchivedDocuments(queryOptions, persistenceService);
+        final List<SAProcessDocument> result = new ArrayList<SAProcessDocument>(docMappings.size());
+        if (!docMappings.isEmpty()) {
+            for (final SADocumentMapping docMapping : docMappings) {
+                result.add(toAProcessDocument(docMapping));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions, final ReadPersistenceService persistenceService)
+            throws SBonitaSearchException {
+        return documentMappingService.getNumberOfArchivedDocumentsSupervisedBy(userId, queryOptions, persistenceService);
+    }
+
+    @Override
+    public List<SAProcessDocument> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions,
+            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+        final List<SADocumentMapping> docMappings = documentMappingService.searchArchivedDocumentsSupervisedBy(userId, queryOptions, persistenceService);
+        final List<SAProcessDocument> result = new ArrayList<SAProcessDocument>(docMappings.size());
+        if (!docMappings.isEmpty()) {
+            for (final SADocumentMapping docMapping : docMappings) {
+                result.add(toAProcessDocument(docMapping));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public SAProcessDocument getArchivedVersionOfProcessDocument(final long documentId, final ReadPersistenceService persistenceService)
+            throws SDocumentNotFoundException {
+        SADocumentMapping aDocMapping;
+        try {
+            aDocMapping = documentMappingService.getArchivedVersionOfDocument(documentId, persistenceService);
+            return toAProcessDocument(aDocMapping);
+        } catch (final SDocumentMappingNotFoundException e) {
+            throw new SDocumentNotFoundException("Document not found with identifer: " + documentId, e);
+        }
+    }
+
+    @Override
+    public SAProcessDocument getArchivedDocument(final long archivedProcessDocumentId, final ReadPersistenceService persistenceService)
+            throws SDocumentNotFoundException {
+        SADocumentMapping aDocMapping;
+        try {
+            aDocMapping = documentMappingService.getArchivedDocument(archivedProcessDocumentId, persistenceService);
+            return toAProcessDocument(aDocMapping);
+        } catch (final SDocumentMappingNotFoundException e) {
+            throw new SDocumentNotFoundException("Document not found with identifer: " + archivedProcessDocumentId, e);
+        }
+    }
+
+    @Override
+    public void deleteArchivedDocuments(final long instanceId, final ReadPersistenceService persistenceService) throws SDocumentMappingDeletionException {
+        final FilterOption filterOption = new FilterOption(SADocumentMapping.class, "processInstanceId", instanceId);
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(filterOption);
+        final QueryOptions queryOptions = new QueryOptions(filters, null);
+        List<SADocumentMapping> documents;
+        try {
+            documents = documentMappingService.searchArchivedDocuments(queryOptions, persistenceService);
+        } catch (final SBonitaSearchException e) {
+            throw new SDocumentMappingDeletionException(e);
+        }
+        for (final SADocumentMapping document : documents) {
+            documentMappingService.delete(document);
+        }
+    }
+
+}

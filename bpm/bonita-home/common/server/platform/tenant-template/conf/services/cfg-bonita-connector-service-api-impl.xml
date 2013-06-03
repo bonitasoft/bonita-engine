@@ -1,0 +1,29 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="connectorServiceSub" class="org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl">
+		<constructor-arg name="cacheService" ref="cacheService" />
+		<constructor-arg name="connectorExecutor" ref="connectorExecutor" />
+		<constructor-arg name="parserFactory" ref="parserFactory" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+		<constructor-arg name="operationService" ref="operationService" />
+		<constructor-arg name="dependencyBuilderAccessor" ref="dependencyBuilderAccessor" />
+		<constructor-arg name="dependencyService" ref="dependencyService" />
+    </bean>
+	
+	<bean id="connectorService" class="org.bonitasoft.engine.connector.ConnectorServiceDecorator">
+		<constructor-arg name="connectorService" ref="connectorServiceSub" />
+		<constructor-arg name="expressionbuilders" ref="sExpressionBuilders" />
+	</bean>
+
+	<bean id="connectorInstanceService" class="org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+    </bean>
+    
+</beans>

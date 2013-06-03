@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.command.model">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SCommandImpl" table="command">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<property name="name" type="java.lang.String" column="name" />
+		<property name="description" type="java.lang.String" column="description" />
+		<property name="implementation" type="java.lang.String" column="implementation" />
+		<property name="system" type="boolean" column="system" />
+		<filter name="tenantFilter" />
+	</class>
+</hibernate-mapping>

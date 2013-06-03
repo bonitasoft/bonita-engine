@@ -1,0 +1,6 @@
+ALTER TABLE human DROP CONSTRAINT  fk_car
+GO
+DROP TABLE car 
+GO
+DROP TABLE human 
+GO

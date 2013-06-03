@@ -1,0 +1,16 @@
+<project name="bonita-engine-home" default="cleanhome">
+
+  <target name="cleanhome">
+    <delete dir="${basedir}/target/home"/>
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/common" excludes="**/.svn" />
+    </copy>
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/base"  excludes="**/.svn"/>
+    </copy>
+    <copy todir="${basedir}/target/home">
+      <fileset dir="${basedir}/hibernate"  excludes="**/.svn"/>
+    </copy>
+  </target>
+
+</project>

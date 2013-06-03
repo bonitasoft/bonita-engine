@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>services</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.platform.command</groupId>
+	<artifactId>bonita-platform-command</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Platform Command</name>
+
+	<modules>
+		<module>bonita-platform-command-api</module>
+		<module>bonita-platform-command-api-impl</module>
+		<module>bonita-platform-command-model</module>
+		<module>bonita-platform-command-model-impl</module>
+		<module>bonita-platform-command-model-impl-hibernate</module>
+	</modules>
+</project>

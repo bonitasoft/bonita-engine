@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>services</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.log</groupId>
+	<artifactId>bonita-log</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Log</name>
+
+	<modules>
+		<module>bonita-log-model</module>
+		<module>bonita-log-model-impl</module>
+		<module>bonita-log-api</module>
+		<module>bonita-log-impl</module>
+		<module>bonita-log-model-impl-hibernate</module>
+		<module>bonita-log-technical-api</module>
+		<module>bonita-log-technical-slf4j</module>
+	</modules>
+</project>

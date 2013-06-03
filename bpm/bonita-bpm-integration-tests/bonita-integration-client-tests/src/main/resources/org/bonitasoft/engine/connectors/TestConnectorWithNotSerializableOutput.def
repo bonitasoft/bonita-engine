@@ -1,0 +1,16 @@
+<connectorDefinition>
+	<version>1.0</version>
+	<connectorId>org.bonitasoft.connector.testConnectorWithNotSerializableOutput</connectorId>
+	<icon>xxx.png</icon>
+	<categories>
+		<category>
+			<name>other</name>
+			<icon>org/bonitasoft/engine/connectors/TestConnectorWithNotSerializableOutput.png</icon>
+		</category>
+	</categories>
+	<inputs>
+	</inputs>
+	<outputs>
+		<output name="output1" type="java.lang.Object" />
+	</outputs>
+</connectorDefinition>

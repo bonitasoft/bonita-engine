@@ -1,0 +1,188 @@
+/**
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.session.impl;
+
+import java.util.Date;
+
+import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.model.SPlatform;
+import org.bonitasoft.engine.session.SSessionException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.session.model.builder.SSessionBuilders;
+
+/**
+ * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
+ */
+public class SessionServiceImpl implements SessionService {
+
+    private final long DEFAULT_SESSION_DURATION = 3600000;
+
+    private long sessionDuration = DEFAULT_SESSION_DURATION;
+
+    private final SSessionBuilders sessionModelBuilder;
+
+    private final SessionProvider sessionProvider;
+
+    private final PlatformService platformService;
+
+    private final String applicationName;
+
+    private final TechnicalLoggerService logger;
+
+    public SessionServiceImpl(final SSessionBuilders sessionModelBuilder, final PlatformService platformService, final String applicationName,
+            final TechnicalLoggerService logger) {
+        this.sessionModelBuilder = sessionModelBuilder;
+        sessionProvider = SessionProvider.getInstance();
+        this.platformService = platformService;
+        this.applicationName = applicationName;
+        this.logger = logger;
+    }
+
+    @Override
+    public SSession createSession(final long tenantId, final String userName) throws SSessionException {
+        return this.createSession(tenantId, -1, userName, false);
+    }
+
+    @Override
+    public SSession createSession(final long tenantId, final long userId, final String userName, final boolean technicalUser) throws SSessionException {
+        final long id = SessionIdGenerator.getNextId();
+        final long duration = getSessionDuration();
+        final String platformVersion = getPlatformVersion();
+
+        final SSession session = sessionModelBuilder.getSessionBuilder()
+                .createNewInstance(id, tenantId, duration, userName, platformVersion, applicationName, userId).technicalUser(technicalUser).done();
+        sessionProvider.addSession(session);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "createSession with tenantId=" + tenantId + " username = " + userName + " Id = " + id);
+        }
+        return session;
+    }
+
+    private String getPlatformVersion() throws SSessionException {
+        try {
+            final SPlatform platform = platformService.getPlatform();
+            return platform.getVersion();
+        } catch (final SPlatformNotFoundException e) {
+            e.printStackTrace();
+
+            throw new SSessionException("Unable to retrieve the platform");
+        }
+    }
+
+    @Override
+    public void deleteSession(final long sessionId) throws SSessionNotFoundException {
+        sessionProvider.removeSession(sessionId);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "deleteSession with sessionId=" + sessionId);
+        }
+    }
+
+    @Override
+    public boolean isValid(final long sessionId) throws SSessionNotFoundException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "isValid"));
+        }
+        final SSession session = sessionProvider.getSession(sessionId);
+        final Date now = new Date();
+        final boolean isValid = session.getExpirationDate().getTime() > now.getTime();
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "isValid"));
+        }
+        return isValid;
+    }
+
+    @Override
+    public boolean isAllowed(final long sessionId, final String actionKey) {
+        // FIXME
+        return true;
+    }
+
+    @Override
+    public SSession getSession(final long sessionId) throws SSessionNotFoundException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getSession"));
+        }
+        final SSession session = sessionProvider.getSession(sessionId);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
+        }
+        return sessionModelBuilder.getSessionBuilder().copy(session);
+    }
+
+    @Override
+    public void setSessionDuration(final long duration) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "setSessionDuration"));
+        }
+        if (duration <= 0) {
+            throw new IllegalArgumentException("The duration must be greater then 0");
+        }
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "setSessionDuration"));
+        }
+        sessionDuration = duration;
+    }
+
+    @Override
+    public long getDefaultSessionDuration() {
+        return DEFAULT_SESSION_DURATION;
+    }
+
+    @Override
+    public long getSessionDuration() {
+        return sessionDuration;
+    }
+
+    @Override
+    public void renewSession(final long sessionId) throws SSessionException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "renewSession"));
+        }
+        final SSession session = getSession(sessionId);
+        try {
+            ClassReflector.invokeSetter(session, "setLastRenewDate", Date.class, new Date());
+            sessionProvider.updateSession(session);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "renewSession"));
+            }
+        } catch (final Exception e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "renewSession", e));
+            }
+            throw new SSessionException(e);
+        }
+    }
+
+    @Override
+    public void cleanInvalidSessions() {
+        sessionProvider.cleanInvalidSessions();
+    }
+
+    @Override
+    public void deleteSessions() {
+        sessionProvider.removeSessions();
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Sessions were deleted.");
+        }
+    }
+
+}

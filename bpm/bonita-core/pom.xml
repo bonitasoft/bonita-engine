@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bpm</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.core</groupId>
+	<artifactId>bonita-core</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Engine Core Services</name>
+
+	<modules>
+		<module>bonita-process-definition</module>
+		<module>bonita-process-instance</module>
+		<module>bonita-login</module>
+		<module>bonita-platform-login</module>
+		<module>bonita-process-engine</module>
+		<module>bonita-home-server</module>
+		<module>bonita-actor-mapping</module>
+		<module>bonita-bpm-monitoring</module>
+		<module>bonita-core-data</module>
+		<module>bonita-category</module>
+		<module>bonita-operation</module>
+		<module>bonita-process-document-mapping</module>
+		<module>bonita-process-document</module>
+		<module>bonita-supervisor-mapping</module>
+		<module>bonita-process-comment</module>
+		<module>bonita-user-filter</module>
+		<module>bonita-instance-migration</module>
+		<module>bonita-reporting</module>
+	</modules>
+</project>

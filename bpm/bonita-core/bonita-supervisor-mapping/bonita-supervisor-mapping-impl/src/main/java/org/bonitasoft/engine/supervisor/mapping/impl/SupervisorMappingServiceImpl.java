@@ -1,0 +1,181 @@
+/**
+ * Copyright (C) 2012 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.supervisor.mapping.impl;
+
+import java.util.List;
+
+import org.bonitasoft.engine.events.EventActionType;
+import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SDeleteEvent;
+import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
+import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
+import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorAlreadyExistsException;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorCreationException;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorDeletionException;
+import org.bonitasoft.engine.supervisor.mapping.SSupervisorNotFoundException;
+import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorLogBuilder;
+
+/**
+ * @author Yanyan Liu
+ * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
+ */
+public class SupervisorMappingServiceImpl implements SupervisorMappingService {
+
+    private final ReadPersistenceService persistenceService;
+
+    private final Recorder recorder;
+
+    private final EventService eventService;
+
+    private final SProcessSupervisorBuilders sSupervisorBuilders;
+
+    private final QueriableLoggerService queriableLoggerService;
+
+    public SupervisorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+            final SProcessSupervisorBuilders sSupervisorBuilders, final QueriableLoggerService queriableLoggerService) {
+        this.persistenceService = persistenceService;
+        this.recorder = recorder;
+        this.eventService = eventService;
+        this.sSupervisorBuilders = sSupervisorBuilders;
+        this.queriableLoggerService = queriableLoggerService;
+    }
+
+    @Override
+    public SProcessSupervisor createSupervisor(final SProcessSupervisor supervisor) throws SSupervisorAlreadyExistsException, SSupervisorCreationException {
+        final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new supervisor");
+        final InsertRecord insertRecord = new InsertRecord(supervisor);
+        SInsertEvent insertEvent = null;
+        if (eventService.hasHandlers(SUPERVISOR, EventActionType.CREATED)) {
+            final SEventBuilder eventBuilder = eventService.getEventBuilder();
+            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(SUPERVISOR).setObject(supervisor).done();
+        }
+        try {
+            recorder.recordInsert(insertRecord, insertEvent);
+            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
+            return supervisor;
+        } catch (final SRecorderException re) {
+            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");
+            throw new SSupervisorCreationException(re);
+        }
+    }
+
+    @Override
+    public SProcessSupervisor getSupervisor(final long supervisorId) throws SSupervisorNotFoundException {
+        final SelectByIdDescriptor<SProcessSupervisor> selectByIdDescriptor = SelectDescriptorBuilder.getSupervisor(supervisorId);
+        try {
+            final SProcessSupervisor supervisor = persistenceService.selectById(selectByIdDescriptor);
+            if (supervisor == null) {
+                throw new SSupervisorNotFoundException(supervisorId + " does not refer to any supervisor");
+            }
+            return supervisor;
+        } catch (final SBonitaReadException bre) {
+            throw new SSupervisorNotFoundException(bre);
+        }
+    }
+
+    @Override
+    public void deleteSupervisor(final long supervisorId) throws SSupervisorNotFoundException, SSupervisorDeletionException {
+        final SProcessSupervisor sSupervisor = getSupervisor(supervisorId);
+        deleteSupervisor(sSupervisor);
+    }
+
+    @Override
+    public void deleteSupervisor(final SProcessSupervisor supervisor) throws SSupervisorDeletionException {
+        SDeleteEvent deleteEvent = null;
+        if (eventService.hasHandlers(SUPERVISOR, EventActionType.DELETED)) {
+            final SEventBuilder eventBuilder = eventService.getEventBuilder();
+            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(SUPERVISOR).setObject(supervisor).done();
+        }
+        final DeleteRecord record = new DeleteRecord(supervisor);
+        final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting supervisor");
+        try {
+            recorder.recordDelete(record, deleteEvent);
+            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");
+            throw new SSupervisorDeletionException("Can't delete process supervisor " + supervisor, e);
+        }
+    }
+
+    private SProcessSupervisorLogBuilder getQueriableLog(final ActionType actionType, final String message) {
+        final SProcessSupervisorLogBuilder logBuilder = sSupervisorBuilders.getSSupervisorLogBuilder();
+        this.initializeLogBuilder(logBuilder, message);
+        this.updateLog(actionType, logBuilder);
+        return logBuilder;
+    }
+
+    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
+        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+    }
+
+    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
+        logBuilder.setActionType(actionType);
+    }
+
+    @Override
+    public Boolean isProcessSupervisor(final long processDefinitionId, final long userId) throws SBonitaReadException {
+        final SelectOneDescriptor<SProcessSupervisor> descriptor = SelectDescriptorBuilder.getSupervisor(processDefinitionId, userId);
+        final SProcessSupervisor supervisor = persistenceService.selectOne(descriptor);
+        return supervisor != null;
+    }
+
+    @Override
+    public List<SProcessSupervisor> searchProcessDefSupervisors(final QueryOptions queryOptions) throws SBonitaSearchException {
+        try {
+            return persistenceService.searchEntity(SProcessSupervisor.class, null, queryOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    @Override
+    public long getNumberOfProcessDefSupervisors(final QueryOptions searchOptions) throws SBonitaSearchException {
+        try {
+            return persistenceService.getNumberOfEntities(SProcessSupervisor.class, null, searchOptions, null);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaSearchException(bre);
+        }
+    }
+
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+        logBuilder.actionScope(String.valueOf(objectId));
+        logBuilder.actionStatus(sQueriableLogStatus);
+        logBuilder.objectId(objectId);
+        final SQueriableLog log = logBuilder.done();
+        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
+            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
+        }
+    }
+}

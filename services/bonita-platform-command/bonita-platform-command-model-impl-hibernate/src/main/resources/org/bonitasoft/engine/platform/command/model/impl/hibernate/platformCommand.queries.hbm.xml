@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+	<query name="getPlatformCommandByName">
+		SELECT platformCommand
+		FROM org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl AS platformCommand
+		WHERE platformCommand.name = :name
+	</query>
+
+	<query name="getPlatformCommands">
+		SELECT platformCommand
+		FROM org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl AS platformCommand
+	</query>
+
+</hibernate-mapping>

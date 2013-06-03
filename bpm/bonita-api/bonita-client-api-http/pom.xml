@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-api</artifactId>
+		<groupId>org.bonitasoft.engine.api</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<artifactId>bonita-client-api-http</artifactId>
+
+	<name>Bonita Client API: HTTP</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-client-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${httpclient.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>${xstream.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>${httpclient.version}</version>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.apache.httpcomponents</groupId> -->
+<!-- 			<artifactId>httpnio</artifactId> -->
+<!-- 			<version>${httpclient.version}</version> -->
+<!-- 		</dependency> -->
+	</dependencies>
+</project>

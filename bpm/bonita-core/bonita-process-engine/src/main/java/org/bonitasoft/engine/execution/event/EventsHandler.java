@@ -1,0 +1,434 @@
+/**
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.execution.event;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.TokenService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.work.InstantiateProcessWork;
+import org.bonitasoft.engine.expression.exception.SExpressionException;
+import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.WorkService;
+
+/**
+ * Handle event depending on its type
+ * TODO
+ * * Move all code that instantiate process/execute flow node after a event was triggered here + make it call reachedCatchEvent
+ * * For event sub process: the instantiate process must cancel all activities then instantiate the process
+ * * the instantiate event subprocess method is like the start of the process executor but with less things: factorise it
+ * * check that there is no execution issues with event sub proces (add more test)
+ * * add test for each kind of start event in event sub process
+ * * try to trigger event subprocess with multiple events
+ * 
+ * @author Baptiste Mesta
+ * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
+ */
+public class EventsHandler {
+
+    private final Map<SEventTriggerType, EventHandlerStrategy> handlers;
+
+    private final TransactionExecutor transactionExecutor;
+
+    private final ContainerRegistry containerRegistry;
+
+    private final WorkService workService;
+
+    private final ProcessDefinitionService processDefinitionService;
+
+    private final TokenService tokenService;
+
+    private ProcessExecutor processExecutor;
+
+    private final EventInstanceService eventInstanceService;
+
+    private final BPMInstancesCreator bpmInstancesCreator;
+
+    private final ProcessInstanceService processInstanceService;
+
+    private final LockService lockService;
+
+    private final TechnicalLoggerService logger;
+
+    private final BPMDefinitionBuilders bpmDefinitionBuilders;
+
+    public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
+            final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders, final BPMDefinitionBuilders bpmDefinitionBuilders,
+            final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
+            final TransactionExecutor transactionExecutor, final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
+            final WorkService workService, final ProcessInstanceService processInstanceService, final LockService lockService, final TokenService tokenService,
+            final TechnicalLoggerService logger) {
+        this.bpmDefinitionBuilders = bpmDefinitionBuilders;
+        this.eventInstanceService = eventInstanceService;
+        this.transactionExecutor = transactionExecutor;
+        this.processDefinitionService = processDefinitionService;
+        this.containerRegistry = containerRegistry;
+        this.workService = workService;
+        this.bpmInstancesCreator = bpmInstancesCreator;
+        this.processInstanceService = processInstanceService;
+        this.lockService = lockService;
+        this.tokenService = tokenService;
+        this.logger = logger;
+        handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
+        handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, logger));
+        handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, instanceBuilders, eventInstanceService,
+                bpmInstancesCreator, dataInstanceService, sDataInstanceBuilders, processDefinitionService));
+        handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, instanceBuilders, eventInstanceService));
+        handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(instanceBuilders, processInstanceService, eventInstanceService,
+                containerRegistry, lockService, logger));
+        handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(instanceBuilders, eventInstanceService, processInstanceService, containerRegistry,
+                lockService, processDefinitionService, this, logger));
+    }
+
+    /**
+     * @param processExecutor
+     *            the processExecutor to set
+     */
+    public void setProcessExecutor(final ProcessExecutor processExecutor) {
+        this.processExecutor = processExecutor;
+    }
+
+    /**
+     * called when a catchEvent is reached
+     * e.g. we are going on a catch event in the flow of a process
+     * This is different of trigger catch event:
+     * e.g. for a message handleCatchEvent will create the waiting event and triggerCatchEvent is called when the message is received
+     * 
+     * @param processDefinition
+     * @param eventDefinition
+     * @param eventInstance
+     * @throws SBonitaException
+     */
+    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SEventInstance eventInstance)
+            throws SBonitaException {
+        final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
+        for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
+            final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
+            eventHandlerStrategy.handleCatchEvent(processDefinition, eventDefinition, (SCatchEventInstance) eventInstance, sEventTriggerDefinition);
+        }
+    }
+
+    public void handleCatchMessage(final SProcessDefinition processDefinition, final SReceiveTaskDefinition receiveTaskDefinition,
+            final SReceiveTaskInstance receiveTaskInstance) throws SBonitaException {
+        final SEventTriggerDefinition eventTrigger = receiveTaskDefinition.getTrigger();
+        final MessageEventHandlerStrategy messageEventHandlerStrategy = (MessageEventHandlerStrategy) handlers.get(SEventTriggerType.MESSAGE);
+        messageEventHandlerStrategy.handleCatchEvent(processDefinition, receiveTaskDefinition, receiveTaskInstance, eventTrigger);
+    }
+
+    /**
+     * called when a star subprocess is reached
+     * e.g. we are going on a catch event in the flow of a process
+     * This is different of trigger catch event:
+     * e.g. for a message handleCatchEvent will create the waiting event and triggerCatchEvent is called when the message is received
+     * 
+     * @param processDefinition
+     * @param eventDefinition
+     * @param eventInstance
+     * @param subProcessName
+     * @param parentProcessInstance
+     * @throws SBonitaException
+     */
+    private void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final long subProcessId,
+            final SProcessInstance parentProcessInstance) throws SBonitaException {
+        final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
+        for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
+            final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
+            eventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefinition, sEventTriggerDefinition, subProcessId, parentProcessInstance);
+        }
+    }
+
+    public void handleEventSubProcess(final SProcessDefinition sDefinition, final SProcessInstance parentProcessInstance) throws SBonitaException {
+        final Set<SActivityDefinition> activities = sDefinition.getProcessContainer().getActivities();
+        for (final SActivityDefinition activity : activities) {
+            if (SFlowNodeType.SUB_PROCESS.equals(activity.getType()) && ((SSubProcessDefinition) activity).isTriggeredByEvent()) {
+                final SSubProcessDefinition eventSubProcess = (SSubProcessDefinition) activity;
+                final SStartEventDefinition sStartEventDefinition = eventSubProcess.getSubProcessContainer().getStartEvents().get(0);
+                handleEventSubProcess(sDefinition, sStartEventDefinition, activity.getId(), parentProcessInstance);
+            }
+        }
+    }
+
+    private void unregisterEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final long subProcessId,
+            final SProcessInstance parentProcessInstance) throws SBonitaException {
+        final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
+        for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
+            final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
+            eventHandlerStrategy.unregisterCatchEvent(processDefinition, eventDefinition, sEventTriggerDefinition, subProcessId, parentProcessInstance);
+        }
+    }
+
+    public void unregisterEventSubProcess(final SProcessDefinition sDefinition, final SProcessInstance parentProcessInstance) throws SBonitaException {
+        final Set<SActivityDefinition> activities = sDefinition.getProcessContainer().getActivities();
+        for (final SActivityDefinition activity : activities) {
+            if (SFlowNodeType.SUB_PROCESS.equals(activity.getType()) && ((SSubProcessDefinition) activity).isTriggeredByEvent()) {
+                final SSubProcessDefinition eventSubProcess = (SSubProcessDefinition) activity;
+                final SStartEventDefinition sStartEventDefinition = eventSubProcess.getSubProcessContainer().getStartEvents().get(0);
+                unregisterEventSubProcess(sDefinition, sStartEventDefinition, activity.getId(), parentProcessInstance);
+            }
+        }
+    }
+
+    /**
+     * called when we reach a throw event in the flow of a process
+     * 
+     * @param processDefinition
+     * @param eventDefinition
+     * @param eventInstance
+     * @throws SBonitaException
+     */
+    public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SEventInstance eventInstance)
+            throws SBonitaException {
+        final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
+        for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
+            final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
+            if (eventHandlerStrategy != null) {
+                eventHandlerStrategy.handleThrowEvent(processDefinition, eventDefinition, (SThrowEventInstance) eventInstance, sEventTriggerDefinition);
+            }
+        }
+    }
+
+    public void handleThrowMessage(final SProcessDefinition processDefinition, final SSendTaskDefinition sendTaskDefinition,
+            final SSendTaskInstance sendTaskInstance) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException, SDataInstanceException,
+            SExpressionException {
+        final SThrowMessageEventTriggerDefinition eventTrigger = sendTaskDefinition.getMessageTrigger();
+        final MessageEventHandlerStrategy messageEventHandlerStrategy = (MessageEventHandlerStrategy) handlers.get(SEventTriggerType.MESSAGE);
+        messageEventHandlerStrategy.handleThrowEvent(processDefinition, sendTaskDefinition, sendTaskInstance, eventTrigger);
+    }
+
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition eventDefinition,
+            final SThrowEventInstance eventInstance, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
+
+        boolean hasActionsToExecute = false;
+        if (eventDefinition == null) {
+            /*
+             * If the eventDefinition is not set that mean that the event was
+             * triggered by a connector and that it's an error event
+             * ...yep that's a lot of assumptions
+             */
+            final String errorCode = eventInstance.getName();
+
+            final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders
+                    .getThrowErrorEventTriggerDefinitionBuilder();
+            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(errorCode).done();
+            hasActionsToExecute = handlers.get(SEventTriggerType.ERROR).handlePostThrowEvent(processDefinition, null, eventInstance,
+                    errorEventTriggerDefinition, flowNodeInstance);
+        } else {
+            final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
+            for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
+                final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
+                if (eventHandlerStrategy != null) {
+                    hasActionsToExecute = hasActionsToExecute
+                            || eventHandlerStrategy.handlePostThrowEvent(processDefinition, eventDefinition, eventInstance, sEventTriggerDefinition,
+                                    flowNodeInstance);
+                }
+            }
+        }
+        return hasActionsToExecute;
+    }
+
+    /**
+     * called when a BPM event is triggered by the API
+     * 
+     * @param sEventTriggerDefinition
+     * @throws SBonitaException
+     */
+    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+        final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
+        if (eventHandlerStrategy != null) {
+            eventHandlerStrategy.handleThrowEvent(sEventTriggerDefinition);
+        }
+    }
+
+    /**
+     * When a trigger is 'launched' the catch event is reached and is waken up/created using its waiting event
+     * Depending on the type it will execute the catch event of instantiate the process/subprocess
+     * 
+     * @param waitingEvent
+     * @param triggeringElementID
+     * @throws SBonitaException
+     */
+    public void triggerCatchEvent(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
+        final SBPMEventType eventType = waitingEvent.getEventType();
+        final long processDefinitionId = waitingEvent.getProcessDefinitionId();
+        final long flowNodeInstanceId = waitingEvent.getFlowNodeInstanceId();
+        final OperationsWithContext operations = handlers.get(waitingEvent.getEventTriggerType()).getOperations(waitingEvent, triggeringElementID);
+        if (SBPMEventType.EVENT_SUB_PROCESS.equals(waitingEvent.getEventType())) {
+            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            final SStartEventDefinition startEvent = (SStartEventDefinition) processDefinition.getProcessContainer().getFlowNode(
+                    waitingEvent.getFlowNodeDefinitionId());
+            triggerCatchStartEventSubProcess(waitingEvent.getEventTriggerType(), processDefinitionId, operations, waitingEvent.getSubProcessId(),
+                    waitingEvent.getParentProcessInstanceId(), waitingEvent.getRootProcessInstanceId(), startEvent.isInterrupting());
+        } else {
+            triggerCatchEvent(waitingEvent, eventType, processDefinitionId, flowNodeInstanceId, operations);
+        }
+    }
+
+    private void triggerInTransaction(final SWaitingEvent waitingEvent, final SBPMEventType eventType, final Long processDefinitionId,
+            final Long flowNodeInstanceId, final OperationsWithContext operations) throws SBonitaException {
+        final TransactionContent transactionContent = new TransactionContent() {
+
+            @Override
+            public void execute() throws SBonitaException {
+                triggerCatchEvent(waitingEvent, eventType, processDefinitionId, flowNodeInstanceId, operations);
+            }
+        };
+        transactionExecutor.execute(transactionContent);
+    }
+
+    private void triggerInTransaction(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final OperationsWithContext operations,
+            final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId, final Boolean isInterrupting)
+            throws SBonitaException {
+        final TransactionContent transactionContent = new TransactionContent() {
+
+            @Override
+            public void execute() throws SBonitaException {
+                triggerCatchStartEventSubProcess(eventTriggerType, processDefinitionId, operations, subProcessId, parentProcessInstanceId,
+                        rootProcessInstanceId, isInterrupting);
+            }
+        };
+        transactionExecutor.execute(transactionContent);
+    }
+
+    private void triggerCatchEvent(final SWaitingEvent waitingEvent, final SBPMEventType eventType, final Long processDefinitionId,
+            final Long flowNodeInstanceId, final OperationsWithContext operations) throws SBonitaException {
+        switch (eventType) {
+            case START_EVENT:
+                instantiate(processDefinitionId, operations);
+                break;
+            default:
+                if (waitingEvent != null) { // is null if it's a timer
+                    eventInstanceService.deleteWaitingEvent(waitingEvent);
+                }
+                executeFlowNode(flowNodeInstanceId, operations);
+                break;
+        }
+    }
+
+    private void triggerCatchStartEventSubProcess(final SEventTriggerType triggerType, final Long processDefinitionId, final OperationsWithContext operations,
+            final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId, final Boolean isInterrupting)
+            throws SBonitaException {
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(subProcessId);
+        final SFlowNodeInstance subProcflowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinition, rootProcessInstanceId,
+                parentProcessInstanceId, SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0,
+                SStateCategory.NORMAL, -1, processDefinition.getId());
+        // FIXME: the token count will be inconsistent if a ProcessExecutor.childReachedState is called at same time.
+        final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
+        tokenService.createToken(parentProcessInstanceId, parentProcessInstance.getProcessDefinitionId(), null);
+        final InstantiateProcessWork work;
+        work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations, processExecutor,
+                processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator, transactionExecutor);
+        if (triggerType.equals(SEventTriggerType.ERROR)) {
+            // if error interrupt directly.
+            final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
+                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, eventInstanceService, containerRegistry, lockService, logger);
+            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
+        } else if (isInterrupting) {
+            // other interrupting catch
+            work.setIdOfTheProcessToInterrupt(parentProcessInstanceId);
+            work.setSubProcflowNodeInstance(subProcflowNodeInstance);
+        }
+        work.setCallerId(subProcflowNodeInstance.getId());
+        work.setSubProcessId(subProcessId);
+        unregisterEventSubProcess(processDefinition, parentProcessInstance);
+        workService.registerWork(work);
+    }
+
+    public void triggerCatchEvent(final String eventType, final Long processDefinitionId, final Long flowNodeInstanceId, final String containerType)
+            throws SBonitaException {
+        final SBPMEventType type = SBPMEventType.valueOf(eventType);
+        triggerInTransaction(null, type, processDefinitionId, flowNodeInstanceId, new OperationsWithContext(null, null, containerType));
+    }
+
+    public void triggerCatchEvent(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final String containerType,
+            final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId, final Boolean isInterrupting)
+            throws SBonitaException {
+        triggerInTransaction(eventTriggerType, processDefinitionId, new OperationsWithContext(null, null, containerType), subProcessId,
+                parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
+    }
+
+    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations) throws SActivityReadException,
+            SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException, WorkRegisterException {
+        containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(), null);// FIXME
+        // operations
+    }
+
+    private void instantiate(final long processDefinitionId, final OperationsWithContext operations) throws WorkRegisterException,
+            SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+        final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations,
+                processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator, transactionExecutor);
+        workService.registerWork(work);
+    }
+
+    public EventHandlerStrategy getHandler(final SEventTriggerType triggerType) {
+        return handlers.get(triggerType);
+    }
+
+}

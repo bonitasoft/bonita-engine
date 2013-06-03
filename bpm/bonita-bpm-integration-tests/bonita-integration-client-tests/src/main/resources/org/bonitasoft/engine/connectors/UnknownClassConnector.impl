@@ -1,0 +1,9 @@
+<connectorImplementation>
+
+	<definitionId>unkownClassConnectorDef</definitionId>
+	<definitionVersion>1.0.0</definitionVersion>
+	<implementationClassname>org.unknown.MyUnknownClass</implementationClassname>
+	<implementationId>unkownClassConnectorId</implementationId>
+	<implementationVersion>1.0.0</implementationVersion>
+
+</connectorImplementation>

@@ -1,0 +1,2 @@
+DROP TABLE sequence
+GO

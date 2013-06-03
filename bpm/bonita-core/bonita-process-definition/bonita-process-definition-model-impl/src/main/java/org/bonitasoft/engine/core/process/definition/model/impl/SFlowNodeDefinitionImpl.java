@@ -1,0 +1,317 @@
+/**
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.core.process.definition.model.impl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
+import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+
+/**
+ * @author Feng Hui
+ * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
+ * @author Celine Souchet
+ */
+public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implements SFlowNodeDefinition {
+
+    private static final long serialVersionUID = 7475429470423228259L;
+
+    private final List<STransitionDefinition> incomings;
+
+    private final List<STransitionDefinition> outgoings;
+
+    private STransitionDefinition defaultTransition;
+
+    private final List<SConnectorDefinition> connectors;
+
+    private String description;
+
+    private SExpression displayDescription;
+
+    private SExpression displayDescriptionAfterCompletion;
+
+    private SExpression displayName;
+
+    private SFlowElementContainerDefinition parentContainer;
+
+    private final Map<ConnectorEvent, List<SConnectorDefinition>> connectorsMap;
+
+    public SFlowNodeDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final FlowNodeDefinition flowNodeDefinition,
+            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
+            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
+        super(flowNodeDefinition.getName());
+        incomings = buildIncomingTransitions(flowNodeDefinition, sExpressionBuilders, transitionsMap);
+        outgoings = buildOutGoingTransitions(flowNodeDefinition, sExpressionBuilders, transitionsMap);
+        if (flowNodeDefinition.getDefaultTransition() != null) {
+            defaultTransition = transitionsMap.get(flowNodeDefinition.getDefaultTransition().getName());
+        }
+        final List<ConnectorDefinition> connectors2 = flowNodeDefinition.getConnectors();
+        final ArrayList<SConnectorDefinition> mConnectors = new ArrayList<SConnectorDefinition>(connectors2.size());
+        connectorsMap = new HashMap<ConnectorEvent, List<SConnectorDefinition>>(2);
+        connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
+        connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
+        for (final ConnectorDefinition connector : connectors2) {
+            final SConnectorDefinitionImpl e = new SConnectorDefinitionImpl(connector, sExpressionBuilders, sOperationBuilders);
+            mConnectors.add(e);
+            connectorsMap.get(e.getActivationEvent()).add(e);
+        }
+        connectors = Collections.unmodifiableList(mConnectors);
+
+        description = flowNodeDefinition.getDescription();
+        displayDescription = ServerModelConvertor.convertExpression(sExpressionBuilders, flowNodeDefinition.getDisplayDescription());
+        displayDescriptionAfterCompletion = ServerModelConvertor.convertExpression(sExpressionBuilders,
+                flowNodeDefinition.getDisplayDescriptionAfterCompletion());
+        displayName = ServerModelConvertor.convertExpression(sExpressionBuilders, flowNodeDefinition.getDisplayName());
+        setId(flowNodeDefinition.getId());
+    }
+
+    public SFlowNodeDefinitionImpl(final long id, final String name) {
+        super(name);
+        setId(id);
+        incomings = new ArrayList<STransitionDefinition>();
+        outgoings = new ArrayList<STransitionDefinition>();
+        connectors = new ArrayList<SConnectorDefinition>();
+        connectorsMap = new HashMap<ConnectorEvent, List<SConnectorDefinition>>(2);
+        connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
+        connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
+    }
+
+    @Override
+    public SFlowElementContainerDefinition getParentContainer() {
+        return parentContainer;
+    }
+
+    public void setParentContainer(final SFlowElementContainerDefinition parentContainer) {
+        this.parentContainer = parentContainer;
+    }
+
+    private List<STransitionDefinition> buildOutGoingTransitions(final FlowNodeDefinition nodeDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        Iterator<TransitionDefinition> iterator;
+        final List<TransitionDefinition> outgoingTransitions = nodeDefinition.getOutgoingTransitions();
+        final List<STransitionDefinition> outgoings = new ArrayList<STransitionDefinition>();
+        iterator = outgoingTransitions.iterator();
+        while (iterator.hasNext()) {
+            final TransitionDefinition transition = iterator.next();
+            final STransitionDefinition outgoing = transitionsMap.get(transition.getName());
+            outgoings.add(outgoing);
+        }
+        return outgoings;
+    }
+
+    private List<STransitionDefinition> buildIncomingTransitions(final FlowNodeDefinition nodeDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        final List<TransitionDefinition> incomingTransitions = nodeDefinition.getIncomingTransitions();
+        final List<STransitionDefinition> incomings = new ArrayList<STransitionDefinition>();
+        final Iterator<TransitionDefinition> iterator = incomingTransitions.iterator();
+        while (iterator.hasNext()) {
+            final TransitionDefinition transition = iterator.next();
+            final STransitionDefinition incoming = transitionsMap.get(transition.getName());
+            incomings.add(incoming);
+        }
+        return incomings;
+    }
+
+    @Override
+    public List<STransitionDefinition> getOutgoingTransitions() {
+        return outgoings;
+    }
+
+    @Override
+    public List<STransitionDefinition> getIncomingTransitions() {
+        return incomings;
+    }
+
+    @Override
+    public STransitionDefinition getDefaultTransition() {
+        return defaultTransition;
+    }
+
+    public void setDefaultTransition(final STransitionDefinition transition) {
+        defaultTransition = transition;
+    }
+
+    @Override
+    public boolean hasIncomingTransitions() {
+        return !incomings.isEmpty();
+    }
+
+    @Override
+    public boolean hasOutgoingTransitions() {
+        return !outgoings.isEmpty();
+    }
+
+    @Override
+    public List<SConnectorDefinition> getConnectors() {
+        return connectors;
+    }
+
+    @Override
+    public List<SConnectorDefinition> getConnectors(final ConnectorEvent connectorEvent) {
+        return connectorsMap.get(connectorEvent);
+    }
+
+    public void addOutgoingTransition(final STransitionDefinition transition) {
+        outgoings.add(transition);
+    }
+
+    public void addIncomingTransition(final STransitionDefinition transition) {
+        incomings.add(transition);
+    }
+
+    public void addConnector(final SConnectorDefinition connector) {
+        connectors.add(connector);
+        connectorsMap.get(connector.getActivationEvent()).add(connector);
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    @Override
+    public SExpression getDisplayDescription() {
+        return displayDescription;
+    }
+
+    public void setDisplayDescription(final SExpression displayDescription) {
+        this.displayDescription = displayDescription;
+    }
+
+    @Override
+    public SExpression getDisplayDescriptionAfterCompletion() {
+        return displayDescriptionAfterCompletion;
+    }
+
+    public void setDisplayDescriptionAfterCompletion(final SExpression displayDescriptionAfterCompletion) {
+        this.displayDescriptionAfterCompletion = displayDescriptionAfterCompletion;
+    }
+
+    @Override
+    public SExpression getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(final SExpression displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (connectors == null ? 0 : connectors.hashCode());
+        result = prime * result + (defaultTransition == null ? 0 : defaultTransition.hashCode());
+        result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
+        result = prime * result + (displayDescriptionAfterCompletion == null ? 0 : displayDescriptionAfterCompletion.hashCode());
+        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
+        result = prime * result + (incomings == null ? 0 : incomings.hashCode());
+        result = prime * result + (outgoings == null ? 0 : outgoings.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SFlowNodeDefinitionImpl other = (SFlowNodeDefinitionImpl) obj;
+        if (connectors == null) {
+            if (other.connectors != null) {
+                return false;
+            }
+        } else if (!connectors.equals(other.connectors)) {
+            return false;
+        }
+        if (defaultTransition == null) {
+            if (other.defaultTransition != null) {
+                return false;
+            }
+        } else if (!defaultTransition.equals(other.defaultTransition)) {
+            return false;
+        }
+        if (description == null) {
+            if (other.description != null) {
+                return false;
+            }
+        } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (displayDescription == null) {
+            if (other.displayDescription != null) {
+                return false;
+            }
+        } else if (!displayDescription.equals(other.displayDescription)) {
+            return false;
+        }
+        if (displayDescriptionAfterCompletion == null) {
+            if (other.displayDescriptionAfterCompletion != null) {
+                return false;
+            }
+        } else if (!displayDescriptionAfterCompletion.equals(other.displayDescriptionAfterCompletion)) {
+            return false;
+        }
+        if (displayName == null) {
+            if (other.displayName != null) {
+                return false;
+            }
+        } else if (!displayName.equals(other.displayName)) {
+            return false;
+        }
+        if (incomings == null) {
+            if (other.incomings != null) {
+                return false;
+            }
+        } else if (!incomings.equals(other.incomings)) {
+            return false;
+        }
+        if (outgoings == null) {
+            if (other.outgoings != null) {
+                return false;
+            }
+        } else if (!outgoings.equals(other.outgoings)) {
+            return false;
+        }
+        return true;
+    }
+
+}

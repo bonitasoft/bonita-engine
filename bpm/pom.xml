@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-engine</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<artifactId>bpm</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita BPM modules</name>
+
+	<modules>
+		<module>bonita-core</module>
+		<module>bonita-api</module>
+		<module>bonita-common</module>
+		<module>bonita-client</module>
+		<module>bonita-server</module>
+		<module>bonita-home</module>
+		<module>bonita-deploy</module>
+		<module>bonita-connector-service</module>
+		<module>bonita-expression-resolver</module>
+		<module>bonita-external</module>
+		<module>bonita-util</module>
+	</modules>
+
+	<profiles>
+		<profile>
+			<id>tests</id>
+			<properties>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+			<modules>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>sonar</id>
+			<properties>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
+			<modules>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>all</id>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+			</properties>
+			<modules>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

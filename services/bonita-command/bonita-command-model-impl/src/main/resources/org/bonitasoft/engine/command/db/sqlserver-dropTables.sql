@@ -1,0 +1,2 @@
+DROP TABLE command
+GO

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+	<query name="getCommandByName">
+		SELECT command
+		FROM org.bonitasoft.engine.command.model.SCommandImpl AS command
+		WHERE command.name = :name
+	</query>
+
+	<query name="getCommands">
+		SELECT command
+		FROM org.bonitasoft.engine.command.model.SCommandImpl AS command
+	</query>
+
+	<query name="getUserCommands">
+		SELECT command
+		FROM org.bonitasoft.engine.command.model.SCommandImpl AS command
+		WHERE command.system = :system
+	</query>
+	
+	<query name="getNumberOfSCommand">
+		SELECT COUNT(*)
+		FROM org.bonitasoft.engine.command.model.SCommandImpl AS command
+	</query>
+	
+	<query name="searchSCommand">
+		SELECT command
+		FROM org.bonitasoft.engine.command.model.SCommandImpl AS command
+	</query>
+	
+</hibernate-mapping>

@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.bonitasoft.engine</groupId>
+		<artifactId>bonita-bpm-integration-tests</artifactId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<artifactId>bonita-client-test-util</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
+
+<!-- works only for maven... :( -->
+
+<!-- 	<build> -->
+<!-- 		<plugins> -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-dependency-plugin</artifactId> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>copy</id> -->
+<!-- 						<goals> -->
+<!-- 							<goal>copy</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<artifactItems> -->
+<!-- 								<artifactItem> -->
+<!-- 									<groupId>org.bonitasoft.engine</groupId> -->
+<!-- 									<version>${project.version}</version> -->
+<!-- 									<artifactId>bonita-synchro-server</artifactId> -->
+<!-- 									<type>jar</type> -->
+<!-- 									<overWrite>false</overWrite> -->
+<!-- 									<outputDirectory>${project.build.directory}/classes</outputDirectory> -->
+<!-- 									<destFileName>server-command.bak</destFileName> -->
+<!-- 								</artifactItem> -->
+<!-- 							</artifactItems> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+<!-- 		</plugins> -->
+<!-- 	</build> -->
+</project>

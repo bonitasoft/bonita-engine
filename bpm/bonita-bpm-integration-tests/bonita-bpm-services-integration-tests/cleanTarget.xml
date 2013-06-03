@@ -1,0 +1,12 @@
+<project name="bpm-services" default="cleantarget">
+
+    <target name="cleantarget">
+        <delete dir="${basedir}/target" includes="*.db"/>
+    	  <delete dir="${basedir}/target/server"/>
+      	<delete dir="${basedir}/target/home"/>
+    	<copy todir="${basedir}/target/home">
+      		<fileset dir="${basedir}/home"  excludes="**/.svn"/>
+     	</copy>
+    </target>
+
+</project>

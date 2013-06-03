@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+
+	<query name="getSJobParameterImplByJobId">
+		SELECT jp
+		FROM org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl AS jp
+		WHERE jp.jobDescriptorId = :jobDescriptorId
+	</query>
+  
+
+</hibernate-mapping>

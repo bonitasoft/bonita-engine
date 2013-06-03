@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-user-filter</artifactId>
+		<groupId>org.bonitasoft.engine.core.filter</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<artifactId>bonita-user-filter-impl</artifactId>
+
+	<name>Bonita User Filter: Service Implementation</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.filter</groupId>
+			<artifactId>bonita-user-filter-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.connector</groupId>
+			<artifactId>bonita-connector-executor-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.cache</groupId>
+			<artifactId>bonita-cache-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
+			<artifactId>bonita-session-accessor-read</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-home-server</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.xml</groupId>
+			<artifactId>bonita-xml-parse-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.xml</groupId>
+			<artifactId>bonita-xml-write-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.xml</groupId>
+			<artifactId>bonita-xml-validate-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>

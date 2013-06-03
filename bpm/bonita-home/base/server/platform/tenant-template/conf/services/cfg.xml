@@ -1,0 +1,189 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
+		<constructor-arg name="sessionService" ref="sessionService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="technicalLoggerService" ref="technicalLoggerService" />
+	</bean>
+
+	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="eventService" ref="eventService" />
+	</bean>
+
+	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="eventService" ref="eventService" />
+	</bean>
+
+	<bean id="searchEntitiesDescriptor" class="org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
+		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
+		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+		<constructor-arg name="sSupervisorBuilders" ref="sSupervisorBuilders" />
+		<constructor-arg name="definitionBuilders" ref="bpmDefinitionBuilders" />
+		<constructor-arg name="commentBuilders" ref="commentBuilders" />
+		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
+		<constructor-arg name="sDocumentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
+		<constructor-arg name="sExternalIdentityMappingBuilders" ref="sExternalIdentityMappingBuilders" />
+		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
+	</bean>
+
+	<bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
+		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+		<constructor-arg name="activityInstanceManager" ref="activityInstanceService" />
+		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
+		<constructor-arg name="operationService" ref="operationService" />
+		<constructor-arg name="archiveService" ref="archiveService" />
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
+		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />		
+		<constructor-arg name="containerRegistry" ref="containerRegistry" />		
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+		<constructor-arg name="commentService" ref="commentService" />
+		<constructor-arg name="processInstanceService" ref="processInstanceService" />
+		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+		<constructor-arg name="classLoaderService" ref="classLoaderService" />
+	</bean>
+
+	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
+		<constructor-arg name="workService" ref="workService" />
+	</bean>
+
+	<bean id="bpmInstancesCreator" class="org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator">
+		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="actorMappingService" ref="actorMappingService" />
+		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
+		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+	</bean>
+
+	<bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
+		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+		<constructor-arg name="connectorService" ref="connectorService" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+		<constructor-arg name="processInstanceService" ref="processInstanceService" />
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+		<constructor-arg name="classLoaderService" ref="classLoaderService" />
+		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="operationService" ref="operationService" />
+		<constructor-arg name="containerRegistry" ref="containerRegistry" />
+		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+		<constructor-arg name="archiveService" ref="archiveService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="documentMappingService" ref="documentMappingService" />
+		<constructor-arg name="commentService" ref="commentService" />
+		<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />		
+		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="eventsHandler" ref="eventsHandler" />
+		<constructor-arg name="userFilterService" ref="userFilterService" />
+		<constructor-arg name="actorMappingService" ref="actorMappingService" />
+		<constructor-arg name="identityService" ref="identityService" />
+		<constructor-arg name="workService" ref="workService"/>
+		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
+	</bean>
+
+	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
+		<constructor-arg name="schedulerService" ref="scheduler"/>
+		<constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
+		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders"/>
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders"/>
+		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService"/>
+		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
+		<constructor-arg name="transactionExecutor" ref="transactionExecutor"/>
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
+		<constructor-arg name="containerRegistry" ref="containerRegistry"/>
+		<constructor-arg name="workService" ref="workService"/>
+		<constructor-arg name="processInstanceService" ref="processInstanceService"/>
+		<constructor-arg name="tokenService" ref="tokenService"/>
+		<constructor-arg name="lockService" ref="lockService"/>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+	</bean>
+	
+	<bean id="processExecutor" class="org.bonitasoft.engine.execution.ProcessExecutorImpl">
+		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+		<constructor-arg name="processInstanceService" ref="processInstanceService" />
+		<constructor-arg name="tokenService" ref="tokenService"/>
+		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor" />
+		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
+		<constructor-arg name="workService" ref="workService" />
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
+		<constructor-arg name="transitionService" ref="transitionService" />
+		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+		<constructor-arg name="connectorService" ref="connectorService" />
+		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+		<constructor-arg name="classLoaderService" ref="classLoaderService" />
+		<constructor-arg name="operationService" ref="operationService" />
+		<constructor-arg name="expressionBuilders" ref="sExpressionBuilders" />
+		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="handlers">
+			<map>
+				<entry key="PROCESSINSTANCE_STATE_UPDATED">
+                    <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
+						<constructor-arg name="archiveService" ref="archiveService" />
+						<constructor-arg name="instancesBuilders" ref="bpmInstanceBuilders" />
+						<constructor-arg name="logger" ref="technicalLoggerService" />
+						<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+						<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
+						<constructor-arg name="documentMappingService" ref="documentMappingService" />
+						<constructor-arg name="commentService" ref="commentService" />
+						<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
+						<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+						<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+					</bean>
+				</entry>
+			</map>
+		</constructor-arg>
+		<constructor-arg name="processDocumentService" ref="processDocumentService" />
+		<constructor-arg name="documentBuilder" ref="processDocumentBuilder" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="containerRegistry" ref="containerRegistry" />
+		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+		<constructor-arg name="archiveService" ref="archiveService" />
+		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="eventsHandler" ref="eventsHandler" />
+		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
+		<constructor-arg name="operationBuilders" ref="sOperationBuilders"/>
+	</bean>
+	
+	<bean id="documentReferenceExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DocumentReferenceExpressionExecutorStrategy">
+		<constructor-arg name="processDocumentService" ref="processDocumentService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+	</bean>
+	
+	<bean id="dependencyResolver" class="org.bonitasoft.engine.api.impl.resolver.DependencyResolver">
+		<constructor-arg name="dependencyResolvers">
+			<list>
+				<bean class="org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver" />
+				<bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver" />
+				<bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+</beans>

@@ -1,0 +1,202 @@
+CREATE TABLE process_instance (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  name VARCHAR(75) NOT NULL,
+  processDefinitionId BIGINT NOT NULL,
+  description VARCHAR(255),
+  startDate BIGINT NOT NULL,
+  startedBy BIGINT NULL,
+  endDate BIGINT NOT NULL,
+  stateId INT NOT NULL,
+  stateCategory VARCHAR(50) NOT NULL,
+  lastUpdate BIGINT NOT NULL,
+  containerId BIGINT,
+  rootProcessInstanceId BIGINT,
+  callerId BIGINT,
+  callerType VARCHAR(50),
+  interruptingEventId BIGINT,
+  migration_plan BIGINT,
+  stringIndex1 VARCHAR(50),
+  stringIndex2 VARCHAR(50),
+  stringIndex3 VARCHAR(50),
+  stringIndex4 VARCHAR(50),
+  stringIndex5 VARCHAR(50),
+  PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE token (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  processInstanceId BIGINT NOT NULL,
+  ref_id BIGINT NOT NULL,
+  parent_ref_id BIGINT NULL,
+  PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE flownode_instance (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  flownodeDefinitionId BIGINT NOT NULL,
+  kind VARCHAR(25) NOT NULL,
+  rootContainerId BIGINT NOT NULL,
+  parentContainerId BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  displayName VARCHAR(75),
+  displayDescription VARCHAR(255),
+  stateId INT NOT NULL,
+  stateName VARCHAR(50),
+  prev_state_id INT NOT NULL,
+  terminal BOOLEAN NOT NULL,
+  stable BOOLEAN ,
+  actorId BIGINT NULL,
+  assigneeId BIGINT DEFAULT 0 NOT NULL,
+  reachedStateDate BIGINT,
+  lastUpdateDate BIGINT,
+  expectedEndDate BIGINT,
+  claimedDate BIGINT,
+  priority BIGINT,
+  gatewayType VARCHAR(50),
+  hitBys VARCHAR(255),
+  stateCategory VARCHAR(50) NOT NULL,
+  logicalGroup1 BIGINT NOT NULL,
+  logicalGroup2 BIGINT NOT NULL,
+  logicalGroup3 BIGINT,
+  logicalGroup4 BIGINT NOT NULL,
+  loop_counter INT,
+  loop_max INT,
+  description VARCHAR(255),
+  sequential BOOLEAN,
+  loopDataInputRef VARCHAR(255),
+  loopDataOutputRef VARCHAR(255),
+  dataInputItemRef VARCHAR(255),
+  dataOutputItemRef VARCHAR(255),
+  loopCardinality INT,
+  nbActiveInst INT,
+  nbCompletedInst INT,
+  nbTerminatedInst INT,
+  executedBy BIGINT,
+  activityInstanceId BIGINT,
+  state_executing BOOLEAN DEFAULT FALSE,
+  abortedByBoundary BIGINT,
+  triggeredByEvent BOOLEAN,
+  interrupting BOOLEAN,
+  deleted BOOLEAN DEFAULT FALSE,
+  tokenCount INT NOT NULL,
+  token_ref_id BIGINT NULL,
+  PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
+CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
+
+CREATE TABLE transition_instance (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  rootContainerId BIGINT NOT NULL,
+  parentContainerId BIGINT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  source BIGINT,
+  terminal BOOLEAN NOT NULL,
+  stable BOOLEAN ,
+  stateCategory VARCHAR(50) NOT NULL,
+  logicalGroup1 BIGINT NOT NULL,
+  logicalGroup2 BIGINT NOT NULL,
+  logicalGroup3 BIGINT,
+  logicalGroup4 BIGINT NOT NULL,
+  description VARCHAR(255),
+  deleted BOOLEAN DEFAULT FALSE,
+  token_ref_id BIGINT NULL,
+  PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE connector_instance (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  containerId BIGINT NOT NULL,
+  containerType VARCHAR(10) NOT NULL,
+  connectorId VARCHAR(255) NOT NULL,
+  version VARCHAR(10) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  activationEvent VARCHAR(30),
+  state VARCHAR(50),
+  executionOrder INT,
+  PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE event_trigger_instance (
+	tenantid BIGINT NOT NULL,
+  	id BIGINT NOT NULL,
+  	eventInstanceId BIGINT NOT NULL,
+  	kind VARCHAR(15) NOT NULL,
+  	timerType VARCHAR(10),
+  	timerValue BIGINT,
+  	messageName VARCHAR(255),
+  	targetProcess VARCHAR(255),
+  	targetFlowNode VARCHAR(255),
+  	signalName VARCHAR(255),
+  	errorCode VARCHAR(255),
+  	PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE waiting_event (
+	tenantid BIGINT NOT NULL,
+  	id BIGINT NOT NULL,
+  	kind VARCHAR(15) NOT NULL,
+  	eventType VARCHAR(50),
+  	messageName VARCHAR(255),
+  	signalName VARCHAR(255),
+  	errorCode VARCHAR(255),
+  	processName VARCHAR(150),
+  	flowNodeName VARCHAR(50),
+  	flowNodeDefinitionId BIGINT,
+  	subProcessId BIGINT,
+  	processDefinitionId BIGINT,
+  	rootProcessInstanceId BIGINT,
+  	parentProcessInstanceId BIGINT,
+  	flowNodeInstanceId BIGINT,
+  	relatedActivityInstanceId BIGINT,
+  	locked BOOLEAN,
+  	active BOOLEAN,
+  	correlation1 VARCHAR(128),
+  	correlation2 VARCHAR(128),
+  	correlation3 VARCHAR(128),
+  	correlation4 VARCHAR(128),
+  	correlation5 VARCHAR(128),
+  	PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE message_instance (
+	tenantid BIGINT NOT NULL,
+  	id BIGINT NOT NULL,
+  	messageName VARCHAR(255) NOT NULL,
+  	targetProcess VARCHAR(255) NOT NULL,
+  	targetFlowNode VARCHAR(255) NULL,
+  	locked BOOLEAN NOT NULL,
+  	handled BOOLEAN NOT NULL,
+  	processDefinitionId BIGINT NOT NULL,
+  	flowNodeName VARCHAR(255),
+  	correlation1 VARCHAR(128),
+  	correlation2 VARCHAR(128),
+  	correlation3 VARCHAR(128),
+  	correlation4 VARCHAR(128),
+  	correlation5 VARCHAR(128),
+  	PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE pending_mapping (
+	tenantid BIGINT NOT NULL,
+  	id BIGINT NOT NULL,
+  	activityId BIGINT NOT NULL,
+  	actorId BIGINT,
+  	userId BIGINT,
+  	PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE hidden_activity (
+	tenantid BIGINT NOT NULL,
+  	id BIGINT NOT NULL,
+  	activityId BIGINT NOT NULL,
+  	userId BIGINT NOT NULL,
+  	UNIQUE (tenantid, activityId, userId),
+  	PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;

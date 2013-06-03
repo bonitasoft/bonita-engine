@@ -1,0 +1,230 @@
+package org.bonitasoft.engine.event;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import ch.qos.logback.core.joran.event.EndEvent;
+
+public class EndEventTest extends CommonAPITest {
+
+    private User user;
+
+    @After
+    public void afterTest() throws BonitaException {
+        deleteUser(user);
+        logout();
+    }
+
+    @Before
+    public void beforeTest() throws BonitaException {
+        login();
+        user = createUser("john", "bpm");
+    }
+
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start event", "End event" }, story = "Execute process with start and end events.")
+    @Test
+    public void testExecuteStartAndEndEvents() throws Exception {
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0")
+                .addStartEvent("startEvent").addAutomaticTask("step1").addEndEvent("endEvent").addTransition("startEvent", "step1")
+                .addTransition("step1", "endEvent").getProcess();
+
+        final ProcessDefinition definition = deployAndEnableProcess(designProcessDefinition);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+
+        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, processInstance, getProcessAPI()));
+        // final List<String> expectedEvents = getList("endEvent", "startEvent");
+        // List<EventInstance> eventInstances = processAPI.getEventInstances(processInstance.getId(), 0, 5, EventSorting.NAME_ASC);
+        // assertEquals(expectedEvents.size(), eventInstances.size());
+        // assertEquals(expectedEvents.get(0), eventInstances.get(0).getName());
+        // assertEquals(expectedEvents.get(1), eventInstances.get(1).getName());
+
+        disableAndDeleteProcess(definition);
+    }
+
+    @Cover(classes = EventInstance.class, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = { "Event",
+            "Start event", "Incoming transition" }, story = "Check that a start event can't have an incoming transition.")
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void testStartEventCannotHaveIncomingTransition() throws BonitaException {
+        new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addStartEvent("startEvent").addAutomaticTask("step1")
+                .addTransition("step1", "startEvent").getProcess();
+    }
+
+    @Cover(classes = EventInstance.class, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = { "Event",
+            "End event", "Outgoing transition" }, story = "Check that an end event can't have an outgoing transition.")
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void testEndEventCannotHaveOutgoingTransition() throws BonitaException {
+        new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addAutomaticTask("step1").addEndEvent("endEvent")
+                .addTransition("endEvent", "step1").getProcess();
+    }
+
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event" }, story = "Execute process with only a terminate end event.")
+    @Test
+    public void terminateEndEventAlone() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
+        builder.addEndEvent("stop").addTerminateEventTrigger();
+
+        final ProcessDefinition process = deployAndEnableProcess(builder.done());
+
+        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
+        waitForProcessToFinish(startProcess);
+        disableAndDeleteProcess(process);
+    }
+
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "Start event", "End event", "Automatic task" }, story = "Execute a process with start event, terminate end event and automatic task.")
+    @Test
+    public void testExecuteStartAndEndEventWithTask() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeStartAndEndEventWithTask", "1.0");
+        builder.addStartEvent("start").addAutomaticTask("step1").addEndEvent("stop").addTerminateEventTrigger().addTransition("start", "step1")
+                .addTransition("step1", "stop");
+        final ProcessDefinition process = deployAndEnableProcess(builder.done());
+        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
+        waitForProcessToFinish(startProcess);
+        disableAndDeleteProcess(process);
+    }
+
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "User task" }, story = "Execute a process with a terminate end event and user task.")
+    @Test
+    public void terminateEndEventWithTasks() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
+        final String actorName = "actor";
+        builder.addActor(actorName);
+        builder.addUserTask("step1", actorName);
+        builder.addEndEvent("stop").addTerminateEventTrigger();
+        builder.addTransition("step1", "stop");
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        waitForProcessToFinish(startProcess);
+        disableAndDeleteProcess(process);
+    }
+
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "Branch not finished" }, story = "Execute a process with terminate end event and a branch not finished.")
+    @Test
+    public void terminateEndEventWithNotFinishedBranch() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
+        final String actorName = "actor";
+        builder.addActor(actorName);
+        builder.addUserTask("step1", actorName);
+        builder.addUserTask("step2", actorName);
+        builder.addEndEvent("stop").addTerminateEventTrigger();
+        builder.addTransition("step1", "stop");
+        builder.addTransition("step2", "stop");
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
+        final ActivityInstance userTask = waitForUserTask("step2", startProcess);
+        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        // should finish even if we don't execute step2
+        waitForProcessToFinish(startProcess);
+        waitForArchivedActivity(userTask.getId(), TestStates.getAbortedState());
+        disableAndDeleteProcess(process);
+    }
+
+    @Cover(classes = EndEvent.class, concept = BPMNConcept.EVENTS, keywords = { "terminate", "branch" }, jira = "ENGINE-236", story = "terminate end event abort all active activity and does not trigger new one")
+    @Test
+    public void terminateEndEvendWithNotFinishedBranch2() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
+        final String actorName = "actor";
+        builder.addActor(actorName);
+        builder.addUserTask("step1", actorName);
+        builder.addUserTask("step2", actorName);
+        builder.addUserTask("step3", actorName);
+        builder.addEndEvent("stop").addTerminateEventTrigger();
+        builder.addTransition("step1", "stop");
+        builder.addTransition("step2", "step3");
+        builder.addTransition("step3", "stop");
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
+        final ActivityInstance userTask = waitForUserTask("step2", startProcess);
+        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        // should finish even if we don't execute step2
+        waitForProcessToFinish(startProcess);
+        waitForArchivedActivity(userTask.getId(), TestStates.getAbortedState());
+        disableAndDeleteProcess(process);
+    }
+
+    // @Ignore("Currently ignored because it cause timeout lock on data base: need to refactor transactions and so on")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "Multiple branches not finished" }, story = "Execute a process with terminate end event and multiple branches not finished.")
+    @Test
+    public void terminateEndEvendWithNotFinishedMultipleBranch() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
+        final String actorName = "actor";
+        builder.addActor(actorName);
+        builder.addUserTask("step1", actorName);
+        builder.addEndEvent("stop").addTerminateEventTrigger();
+        builder.addTransition("step1", "stop");
+        for (int i = 2; i < 15; i++) {
+            builder.addUserTask("step" + i, actorName);
+            builder.addTransition("step" + i, "stop");
+        }
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
+        checkNbOfHumanTasks(40, 30000, 14);
+        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        // should finish even if we don't execute step2
+        waitForProcessToFinish(startProcess);
+        disableAndDeleteProcess(process);
+    }
+
+    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Multi-instance",
+            "End event", "Terminate event", "Parallel" }, story = "Execute a process with a terminate end event and parallel multi-instance.")
+    @Test
+    public void testTerminateEventWithMultiInstanceParallel() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
+        builder.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
+        builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
+
+        final ProcessDefinition process = deployAndEnableProcess(builder.done());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+
+        waitForProcessToFinish(processInstance);
+        disableAndDeleteProcess(process);
+
+    }
+
+    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Multi-instance",
+            "End event", "Terminate event", "Sequential", "User task" }, story = "Execute a process with a terminate end event and sequential multi-instance.")
+    @Test
+    public void testTerminateEventWithMultiInstanceSequential() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
+        final String actorName = "actor";
+
+        builder.addActor(actorName).addUserTask("step1", actorName).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
+        builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
+
+        final long userId = getIdentityAPI().getUserByUserName(user.getUserName()).getId();
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+
+        for (int i = 0; i < 3; i++) {
+            final ActivityInstance task = waitForUserTask("step1", processInstance);
+            assignAndExecuteStep(task, userId);
+        }
+
+        waitForProcessToFinish(processInstance);
+        disableAndDeleteProcess(process);
+    }
+}

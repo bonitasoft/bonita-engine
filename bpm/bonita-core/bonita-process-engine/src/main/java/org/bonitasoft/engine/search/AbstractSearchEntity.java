@@ -1,0 +1,134 @@
+/**
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.search;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SearchFields;
+import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
+import org.bonitasoft.engine.search.impl.SearchFilter;
+import org.bonitasoft.engine.search.impl.SearchResultImpl;
+
+/**
+ * Abstract class to allow to search server object and convert them to client object
+ * first generic C is the client object
+ * second generic S is the server object
+ * 
+ * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
+ */
+public abstract class AbstractSearchEntity<C extends Serializable, S extends PersistentObject> implements TransactionContentWithResult<SearchResult<C>> {
+
+    private final SearchOptions options;
+
+    private final SearchEntityDescriptor searchDescriptor;
+
+    private long count;
+
+    private List<C> clientObjects;
+
+    public AbstractSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+        this.searchDescriptor = searchDescriptor;
+        this.options = options;
+    }
+
+    @Override
+    public void execute() throws SBonitaException {
+        List<S> serverObjects;
+        if (options == null) {
+            throw new SBonitaSearchException("SearchOptions cannot be null");
+        }
+        final int numberOfResults = options.getMaxResults();
+        final int fromIndex = options.getStartIndex();
+        final List<SearchFilter> filters = options.getFilters();
+        final List<FilterOption> filterOptions = new ArrayList<FilterOption>(filters.size());
+        for (final SearchFilter filter : filters) {
+            final FilterOption option = searchDescriptor.getEntityFilter(filter);
+            if (option != null) {// in case of a unknown filter on state
+                filterOptions.add(option);
+            }
+        }
+        final String searchTerm = options.getSearchTerm();
+        SearchFields userSearchTerm = null;
+        if (searchTerm != null) {
+            userSearchTerm = searchDescriptor.getEntitySearchTerm(searchTerm);
+        }
+        final List<OrderByOption> orderOptions = new ArrayList<OrderByOption>();
+        final List<Sort> sorts = options.getSorts();
+        for (final Sort sort : sorts) {
+            final OrderByOption order = searchDescriptor.getEntityOrder(sort);
+            orderOptions.add(order);
+        }
+        final QueryOptions countOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, filterOptions, userSearchTerm);
+        count = executeCount(countOptions);
+        if (count > 0 && numberOfResults != 0) {
+            if (fromIndex >= count) {
+                // If out of range, no results. No more OutofBound exception:
+                serverObjects = Collections.emptyList();
+            }
+            final QueryOptions searchOptions = new QueryOptions(fromIndex, numberOfResults, orderOptions, filterOptions, userSearchTerm);
+            serverObjects = executeSearch(searchOptions);
+        } else {
+            serverObjects = Collections.emptyList();
+        }
+        clientObjects = convertToClientObjects(serverObjects);
+    }
+
+    /**
+     * execute the count here
+     * 
+     * @param queryOptions
+     *            query options to execute the count with
+     * @return
+     *         the number of result on the server
+     * @throws SBonitaSearchException
+     */
+    public abstract long executeCount(QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * execute the search here
+     * 
+     * @param queryOptions
+     *            query options to execute the search with
+     * @return
+     *         the search result
+     * @throws SBonitaSearchException
+     */
+    public abstract List<S> executeSearch(QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * Must convert server objects in client objects here
+     * 
+     * @param serverObjects
+     *            server object to convert
+     * @return
+     */
+    public abstract List<C> convertToClientObjects(List<S> serverObjects);
+
+    @Override
+    public SearchResult<C> getResult() {
+        return new SearchResultImpl<C>(count, clientObjects);
+    }
+
+}

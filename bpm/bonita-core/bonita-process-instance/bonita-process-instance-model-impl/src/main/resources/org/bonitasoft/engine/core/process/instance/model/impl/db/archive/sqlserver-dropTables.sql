@@ -1,0 +1,6 @@
+DROP TABLE arch_activity_instance
+GO
+DROP TABLE arch_process_instance
+GO
+DROP TABLE arch_event_trigger_instance
+GO

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+  <users>
+    <user userName="james">
+      <password encrypted="false">passwordOfJames</password>
+      <personalData/>
+      <professionalData/>
+    </user>
+    <user userName="john">
+      <password encrypted="false">bpm</password>
+      <firstname>NotJohn</firstname>
+      <personalData/>
+      <professionalData/>
+    </user>
+  </users>
+  <roles/>
+  <groups/>
+  <memberships/>
+</organization:Organization>

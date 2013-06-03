@@ -1,0 +1,55 @@
+/**
+ * Copyright (C) 2012 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.bpm.process;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Emmanuel Duchastenier
+ * @author Zhang Bole
+ * @author Celine Souchet
+ */
+public class ProcessDeploymentInfoUpdater implements Serializable {
+
+    private static final long serialVersionUID = 8000868488852784706L;
+
+    public enum ProcessDeploymentInfoField {
+        DISPLAY_NAME, DISPLAY_DESCRIPTION, ICONPATH
+    }
+
+    private final Map<ProcessDeploymentInfoField, Serializable> fields;
+
+    public ProcessDeploymentInfoUpdater() {
+        fields = new HashMap<ProcessDeploymentInfoField, Serializable>(ProcessDeploymentInfoField.values().length);
+    }
+
+    public void setDisplayName(final String name) {
+        fields.put(ProcessDeploymentInfoField.DISPLAY_NAME, name);
+    }
+
+    public void setDisplayDescription(final String description) {
+        fields.put(ProcessDeploymentInfoField.DISPLAY_DESCRIPTION, description);
+    }
+
+    public void setIconPath(final String iconPath) {
+        fields.put(ProcessDeploymentInfoField.ICONPATH, iconPath);
+    }
+
+    public Map<ProcessDeploymentInfoField, Serializable> getFields() {
+        return fields;
+    }
+
+}

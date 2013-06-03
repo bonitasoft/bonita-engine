@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+  <query name="getPlatform">
+    SELECT platform
+    FROM org.bonitasoft.engine.platform.model.impl.SPlatformImpl AS platform
+  </query>
+
+  <query name="getTenantById">
+    SELECT tenant
+    FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+    WHERE tenant.id = :id
+  </query>
+
+  <query name="getTenantByName">
+    SELECT tenant
+    FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+    WHERE tenant.name = :name
+  </query>
+  
+  <query name="getDefaultTenant">
+    SELECT tenant
+    FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+    WHERE tenant.defaultTenant = true
+  </query>  
+  
+  <query name="getTenants">
+    SELECT tenant
+    FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+  </query>
+  
+  <query name="getTenantsByIds">
+    SELECT tenant
+    FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+    WHERE tenant.id IN (:ids)
+  </query>
+
+  <query name="getNumberOfTenants">
+    SELECT COUNT(tenant)
+    FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+  </query>
+  
+  <query name="searchSTenant">
+		SELECT tenant
+		FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+  </query>
+	
+  <query name="getNumberOfSTenant">
+    SELECT COUNT(tenant)
+    FROM org.bonitasoft.engine.platform.model.impl.STenantImpl AS tenant
+  </query>
+</hibernate-mapping>

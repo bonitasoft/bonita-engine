@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>services</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.platform.session</groupId>
+	<artifactId>bonita-platform-session</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Platform Session</name>
+
+	<modules>
+		<module>bonita-platform-session-model</module>
+		<module>bonita-platform-session-model-impl</module>
+		<module>bonita-platform-session-api</module>
+		<module>bonita-platform-session-api-impl</module>
+	</modules>
+</project>

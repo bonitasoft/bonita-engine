@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Organization Schema 1.0 for Bonita Open Solution.
+			Copyright (C) 2012, 2013 BonitaSoft S.A.
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="Organization" type="Organization" />
+
+	<xsd:complexType name="Organization">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="users" type="Users" />
+			<xsd:element minOccurs="0" name="roles" type="Roles" />
+			<xsd:element minOccurs="0" name="groups" type="Groups" />
+			<xsd:element minOccurs="0" name="memberships" type="Memberships" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Users">
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" name="user" type="User" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Roles">
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" minOccurs="0" name="role" type="Role" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Groups">
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" minOccurs="0" name="group" type="Group" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Memberships">
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" minOccurs="0" name="membership" type="Membership" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="User">
+		<xsd:all>
+			<xsd:element name="password">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="encrypted" use="required" type="xsd:boolean" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="firstName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="lastName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="iconName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="iconPath" type="xsd:string" />
+			<xsd:element minOccurs="0" name="title" type="xsd:string" />
+			<xsd:element minOccurs="0" name="jobTitle" type="xsd:string" />
+			<xsd:element minOccurs="0" name="manager" type="xsd:string" />
+			<xsd:element minOccurs="0" name="enabled" type="xsd:boolean" />
+			<xsd:element minOccurs="0" name="personalData" type="ContactData" />
+			<xsd:element minOccurs="0" name="professionalData" type="ContactData" />
+			<xsd:element minOccurs="0" name="metaDatas">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element maxOccurs="unbounded" minOccurs="0" name="metaData" type="Metadata" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:all>
+		<xsd:attribute name="userName" type="xsd:string" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="ContactData">
+		<xsd:all>
+			<xsd:element minOccurs="0" name="email" type="xsd:string" />
+			<xsd:element minOccurs="0" name="phoneNumber" type="xsd:string" />
+			<xsd:element minOccurs="0" name="mobileNumber" type="xsd:string" />
+			<xsd:element minOccurs="0" name="faxNumber" type="xsd:string" />
+			<xsd:element minOccurs="0" name="building" type="xsd:string" />
+			<xsd:element minOccurs="0" name="room" type="xsd:string" />
+			<xsd:element minOccurs="0" name="address" type="xsd:string" />
+			<xsd:element minOccurs="0" name="zipCode" type="xsd:string" />
+			<xsd:element minOccurs="0" name="city" type="xsd:string" />
+			<xsd:element minOccurs="0" name="state" type="xsd:string" />
+			<xsd:element minOccurs="0" name="country" type="xsd:string" />
+			<xsd:element minOccurs="0" name="website" type="xsd:string" />
+		</xsd:all>
+	</xsd:complexType>
+
+	<xsd:complexType name="Metadata">
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="value" type="xsd:string" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Role">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="displayName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="description" type="xsd:string" />
+			<xsd:element minOccurs="0" name="iconName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="iconPath" type="xsd:string" />
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Group">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="displayName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="description" type="xsd:string" />
+			<xsd:element minOccurs="0" name="iconName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="iconPath" type="xsd:string" />
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="parentPath" type="xsd:string" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Membership">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="userName" type="xsd:string" />
+			<xsd:element name="roleName" type="xsd:string" />
+			<xsd:element name="groupName" type="xsd:string" />
+			<xsd:element minOccurs="0" name="groupParentPath" type="xsd:string" />
+			<xsd:element minOccurs="0" name="assignedBy" type="xsd:string" />
+			<xsd:element minOccurs="0" name="assignedDate" type="xsd:long" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

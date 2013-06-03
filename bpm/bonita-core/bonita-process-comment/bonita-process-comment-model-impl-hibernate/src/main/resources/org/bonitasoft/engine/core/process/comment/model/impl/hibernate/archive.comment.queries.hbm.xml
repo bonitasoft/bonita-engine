@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+  <query name="getNumberOfSAComment">
+	SELECT COUNT(DISTINCT saComment)
+	FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+	WHERE saComment.archiveDate = (
+			SELECT MAX(sac.archiveDate) FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS sac
+			WHERE sac.sourceObjectId = saComment.sourceObjectId
+	)
+  </query>
+  
+  <query name="searchSAComment">
+	SELECT saComment
+	FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+	WHERE saComment.archiveDate = (
+			SELECT MAX(sac.archiveDate) FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS sac
+			WHERE sac.sourceObjectId = saComment.sourceObjectId
+	)
+  </query>
+  
+  <query name="getArchivedCommentById">
+	SELECT saComment
+	FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+	WHERE saComment.id = :id
+  </query>
+</hibernate-mapping>

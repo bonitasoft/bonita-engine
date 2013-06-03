@@ -1,0 +1,9 @@
+<connectorImplementation>
+	
+	<definitionId>testConnectorLongToExecute</definitionId>
+	<definitionVersion>1.0.0</definitionVersion>
+	<implementationClassname>org.bonitasoft.engine.connectors.TestConnectorLongToExecute</implementationClassname>
+	<implementationId>testConnectorLongToExecuteImpl</implementationId>
+	<implementationVersion>1.0.0</implementationVersion>
+	
+</connectorImplementation>

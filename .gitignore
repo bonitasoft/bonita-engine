@@ -1,0 +1,8 @@
+.project
+.settings
+target
+.classpath
+FILEPATH.*.db
+dependency-reduced-pom.xml
+TemporaryLocalIntegrationTests.java
+bpm/bonita-bpm-integration-tests/bonita-integration-local-tests/src/test/java/org/bonitasoft/engine/DeployBarTest.java

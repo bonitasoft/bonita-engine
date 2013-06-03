@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+  <users>
+    <user userName="johnnyfootball">
+      <password encrypted="false">bpm</password>
+      <jobTitle>QA Analyst</jobTitle>
+      <enabled>false</enabled>
+      <personalData/>
+      <professionalData/>
+    </user>
+    <user userName="liuyanyan">
+      <password encrypted="false">bpm2</password>
+      <enabled>true</enabled>
+      <personalData/>
+      <professionalData/>
+    </user>
+  </users>
+  <roles>
+    <role name="Developer">
+      <displayName>Bonitasoft developer</displayName>
+    </role>
+    <role name="Tester">
+      <displayName>Bonita tester</displayName>
+    </role>
+  </roles>
+  <groups>
+    <group name="Engine">
+      <displayName>RD engine team</displayName>
+    </group>
+    <group name="QA">
+      <displayName>QA team</displayName>
+    </group>
+  </groups>
+  <memberships>
+    <membership>
+      <userName>liuyanyan</userName>
+      <roleName>Developer</roleName>
+      <groupName>Engine</groupName>
+    </membership>
+    <membership>
+      <userName>johnnyfootball</userName>
+      <roleName>Tester</roleName>
+      <groupName>QA</groupName>
+    </membership>
+  </memberships>
+</organization:Organization>

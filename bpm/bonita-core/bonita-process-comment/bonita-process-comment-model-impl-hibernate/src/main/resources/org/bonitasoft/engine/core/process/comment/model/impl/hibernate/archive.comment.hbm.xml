@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field"
+	package="org.bonitasoft.engine.core.process.comment.model.archive.impl">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SACommentImpl" table="arch_process_comment">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="userId" column="userId" />
+		<property name="sourceObjectId" type="long" column="sourceObjectId" />
+		<property name="processInstanceId" column="processInstanceId" />
+		<property name="postDate" column="postDate" />
+		<property name="content" column="content" />
+		<property name="archiveDate" type="long" column="archiveDate" />
+		<filter name="tenantFilter" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,19 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="hbm-bonita-data-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>org/bonitasoft/engine/data/model/impl/hibernate/data.hbm.xml</value>
+				<value>org/bonitasoft/engine/data/model/impl/hibernate/data.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.data.model.SDataSource" value="datasource" />
+				<entry key="org.bonitasoft.engine.data.model.SDataSourceParameter" value="datasourceparameter" />
+			</map>
+		</property>
+	</bean>
+
+</beans>

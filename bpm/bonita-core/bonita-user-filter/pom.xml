@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-core</artifactId>
+		<groupId>org.bonitasoft.engine.core</groupId>
+		<version>6.0.0-rc-07</version>
+	</parent>
+
+	<artifactId>bonita-user-filter</artifactId>
+	<groupId>org.bonitasoft.engine.core.filter</groupId>
+	<packaging>pom</packaging>
+
+	<name>Bonita User Filter</name>
+
+	<modules>
+		<module>bonita-user-filter-api</module>
+		<module>bonita-user-filter-impl</module>
+	</modules>
+</project>
