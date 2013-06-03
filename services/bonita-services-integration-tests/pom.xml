@@ -79,8 +79,8 @@
 
 		<!-- Connector -->
 		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-connector-executor-timedout</artifactId>
+			<groupId>org.bonitasoft.engine.connector</groupId>
+			<artifactId>bonita-connector-executor-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
