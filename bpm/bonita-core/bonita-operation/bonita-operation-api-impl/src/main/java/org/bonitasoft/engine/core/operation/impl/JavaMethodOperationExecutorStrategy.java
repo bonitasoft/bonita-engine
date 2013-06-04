@@ -82,11 +82,13 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
 
     private void invokeJavaMethod(final Map<String, Object> map, final SOperation operation, final Object expressionResult) throws SOperationExecutionException {
         final String dataName = operation.getLeftOperand().getName();
-        Serializable objectToUpdate = dataName;
         final String[] split = operation.getOperator().split(":", 2);
         final String operator = split[0];
+        final Serializable objectToUpdate = (Serializable) map.get(dataName);
+        if (objectToUpdate == null) {
+            throw new SOperationExecutionException("Unknown data with name " + dataName);
+        }
         try {
-            objectToUpdate = (Serializable) map.get(dataName);
             Method method;
             if (split.length > 1) {
                 method = objectToUpdate.getClass().getDeclaredMethod(operator, Class.forName(split[1]));
@@ -96,7 +98,7 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
 
             method.invoke(objectToUpdate, expressionResult);
         } catch (final Exception e) {
-            throw new SOperationExecutionException("Problem invoking Java method " + operator + " on object " + objectToUpdate.toString());
+            throw new SOperationExecutionException("Problem invoking Java method " + operator + " on object " + dataName, e);
         }
     }
 
