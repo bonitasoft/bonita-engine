@@ -13,6 +13,7 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 
@@ -25,9 +26,9 @@ public class GetTenantsWithOrder implements TransactionContentWithResult<List<ST
 
     private final int startIndex;
 
-    private final OrderByType orderContent;
+    private final OrderByType order;
 
-    private final String fieldContent;
+    private final String field;
 
     private final int maxResults;
 
@@ -37,14 +38,20 @@ public class GetTenantsWithOrder implements TransactionContentWithResult<List<ST
             final String fieldContent) {
         this.platformService = platformService;
         this.startIndex = startIndex;
-        this.orderContent = orderContent;
-        this.fieldContent = fieldContent;
+        this.order = orderContent;
+        this.field = fieldContent;
         this.maxResults = maxResults;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        tenantList = platformService.getTenants(startIndex, maxResults, fieldContent, orderContent);
+        final QueryOptions queryOptions;
+        if (field == null) {
+            queryOptions = new QueryOptions(startIndex, maxResults);
+        } else {
+            queryOptions = new QueryOptions(startIndex, maxResults, STenant.class, field, order);
+        }
+        tenantList = platformService.getTenants(queryOptions);
     }
 
     @Override
