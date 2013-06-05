@@ -37,10 +37,10 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
@@ -72,6 +72,7 @@ import org.bonitasoft.engine.transaction.STransactionException;
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
@@ -191,7 +192,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState stepForward(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Long executedBy, Long processInstanceId) throws SActivityExecutionException {
+            final Long executedBy, Long processInstanceId) throws SFlowNodeExecutionException {
         boolean sharedLockCreated = false;
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         boolean txOpened = false;
@@ -203,7 +204,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             }
             txOpened = transactionExecutor.openTransaction();
         } catch (final SBonitaException e) {
-            throw new SActivityExecutionException(e);
+            throw new SFlowNodeExecutionException(e);
         }
         FlowNodeState state = null;
         boolean failed = false;
@@ -266,13 +267,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     try {
                         releaseSharedLock(objectType, sharedLockCreated, processInstanceId);
                     } catch (final SLockException e1) {
-                        throw new SActivityExecutionException(e1);
+                        throw new SFlowNodeExecutionException(e1);
                     }
                 } catch (final SLockException e) {
-                    throw new SActivityExecutionException(e);
+                    throw new SFlowNodeExecutionException(e);
                 }
                 if (failed) {
-                    setActivityFailedInTransaction(fFlowNodeInstance, processDefinition, failedException);
+                    setFlowNodeFailedInTransaction(fFlowNodeInstance, processDefinition, failedException);
                 }
             }
             // notify the parent container the state changed
@@ -285,28 +286,28 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     /**
-     * Rollbacks transaction and throws SActivityExecutionException
+     * Rollbacks transaction and throws SFlowNodeExecutionException
      * 
-     * @throws SActivityExecutionException
+     * @throws SFlowNodeExecutionException
      */
-    protected void handleExecutionException(final SBonitaException e) throws SActivityExecutionException {
+    protected void handleExecutionException(final SBonitaException e) throws SFlowNodeExecutionException {
         try {
             transactionExecutor.setTransactionRollback();
         } catch (final STransactionException e1) {
-            throw new SActivityExecutionException(e1);
+            throw new SFlowNodeExecutionException(e1);
         }
-        throw new SActivityExecutionException(e);
+        throw new SFlowNodeExecutionException(e);
     }
 
     private void notifyParentStateIsFinished(final SProcessDefinition processDefinition, final SFlowNodeInstance fFlowNodeInstance, final FlowNodeState state)
-            throws SActivityExecutionException {
+            throws SFlowNodeExecutionException {
         if (!fFlowNodeInstance.isStateExecuting()) {// the state is still executing
             try {
                 containerRegistry.nodeReachedState(processDefinition, fFlowNodeInstance, state, fFlowNodeInstance.getParentContainerId(), fFlowNodeInstance
                         .getParentContainerType().name());
             } catch (final SBonitaException e) {
-                setActivityFailedInTransaction(fFlowNodeInstance, processDefinition, e);
-                throw new SActivityExecutionException("error while finishing element", e);
+                setFlowNodeFailedInTransaction(fFlowNodeInstance, processDefinition, e);
+                throw new SFlowNodeExecutionException("Error while finishing element", e);
             }
         }
     }
@@ -317,45 +318,45 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         }
     }
 
-    private void setActivityFailedInTransaction(final SFlowNodeInstance fFlowNodeInstance, final SProcessDefinition processDefinition,
-            final SBonitaException sbe) throws SActivityExecutionException {
+    private void setFlowNodeFailedInTransaction(final SFlowNodeInstance fFlowNodeInstance, final SProcessDefinition processDefinition,
+            final SBonitaException sbe) throws SFlowNodeExecutionException {
         long flowNodeInstanceId = fFlowNodeInstance.getId();
         // we put the step in failed if the boundary attached to it fails
         if (SFlowNodeType.BOUNDARY_EVENT.equals(fFlowNodeInstance.getType())) {
             flowNodeInstanceId = fFlowNodeInstance.getParentContainerId();
         }
         // we do that is an other thread to avoid issues with nested transactions
-        SetActivityInFailedThread setInFailedThread;
+        SetFlowNodeInFailedThread setInFailedThread;
         try {
-            setInFailedThread = new SetActivityInFailedThread(flowNodeInstanceId, processDefinition, this);
+            setInFailedThread = new SetFlowNodeInFailedThread(flowNodeInstanceId, processDefinition, this);
         } catch (final Exception e) {
-            throw new SActivityExecutionException("unable to put the failed state on flow node instance with id " + fFlowNodeInstance, e);
+            throw new SFlowNodeExecutionException("Unable to put the failed state on flow node instance with id " + fFlowNodeInstance, e);
         }
         setInFailedThread.start();
-        final StringBuilder msg = new StringBuilder("Activity with id " + fFlowNodeInstance + " named '" + setInFailedThread.getFlowNodeInstanceName()
+        final StringBuilder msg = new StringBuilder("Flownode with id " + fFlowNodeInstance + " named '" + setInFailedThread.getFlowNodeInstanceName()
                 + "' on process instance with id " + setInFailedThread.getParentFlowNodeInstanceId() + " has failed: " + sbe.getMessage());
         logger.log(this.getClass(), TechnicalLogSeverity.ERROR, msg.toString());
 
         try {
             setInFailedThread.join(setInFailThreadTimeout);
         } catch (final InterruptedException e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The thread that set in fail flow node was interrupted: " + e.getMessage());
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The thread that set in fail flownode was interrupted: " + e.getMessage());
         }
 
         if (!setInFailedThread.isFinished()) {
             setInFailedThread.interrupt();
-            throw new SActivityExecutionException("unable to put the failed state on flow node instance with id " + fFlowNodeInstance
+            throw new SFlowNodeExecutionException("Unable to put the failed state on flownode instance with id " + fFlowNodeInstance
                     + ": execution not finished", setInFailedThread.getThrowable());
         }
         if (setInFailedThread.getThrowable() != null) {
-            throw new SActivityExecutionException("unable to put the failed state on flow node instance with id " + fFlowNodeInstance + ": "
+            throw new SFlowNodeExecutionException("Unable to put the failed state on flownode instance with id " + fFlowNodeInstance + ": "
                     + setInFailedThread.getThrowable());
         }
     }
 
     @Override
     public FlowNodeState gotoNextStableState(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Long executedBy, final Long processInstanceId) throws SActivityExecutionException, SActivityInterruptedException {
+            final Long executedBy, final Long processInstanceId) throws SFlowNodeExecutionException, SActivityInterruptedException {
         FlowNodeState state = stepForward(flowNodeInstanceId, expressionContext, operations, executedBy, processInstanceId);
         if (state != null) {// state did not change
             handleInterruption(state);
@@ -482,8 +483,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final Long processInstanceId) throws SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException,
-            SActivityReadException {
+            final Long processInstanceId) throws SFlowNodeExecutionException, SActivityInterruptedException, SActivityReadException {
         gotoNextStableState(flowNodeInstanceId, null, null, null, processInstanceId);
     }
 

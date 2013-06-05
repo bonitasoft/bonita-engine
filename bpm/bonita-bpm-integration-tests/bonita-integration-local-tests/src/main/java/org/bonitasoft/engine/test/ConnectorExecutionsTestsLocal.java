@@ -13,11 +13,6 @@
  **/
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -64,6 +59,11 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
@@ -83,7 +83,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Data input", "Automatic activity" }, story = "Test connector on finish of an automatic activity with data input.")
     @Test
-    public void testExecuteConnectorOnFinishOfAnAutomaticActivityWithDataAsInput() throws Exception {
+    public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsInput() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -111,7 +111,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On start, User task" }, jira = "ENGINE-472", story = "Test of several connectors on start of an user task.")
     @Test
-    public void testExecuteSeveralConnectorsOnUserTaskOnStart() throws Exception {
+    public void executeSeveralConnectorsOnUserTaskOnStart() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -158,7 +158,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On start, Automatic task" }, jira = "ENGINE-472", story = "Test of several connectors on start of an automatic task.")
     @Test
-    public void testExecuteSeveralConnectorsOnAutomaticTaskOnStart() throws Exception {
+    public void executeSeveralConnectorsOnAutomaticTaskOnStart() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -202,7 +202,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On finish, User task" }, jira = "ENGINE-472", story = "Test of several connectors on finish of an user task.")
     @Test
-    public void testExecuteSeveralConnectorsOnUserTaskOnFinish() throws Exception {
+    public void executeSeveralConnectorsOnUserTaskOnFinish() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -252,7 +252,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On finish, Automatic task" }, jira = "ENGINE-472", story = "Test of several connectors on finish of an automatic task.")
     @Test
-    public void testExecuteSeveralConnectorsOnAutomaticTaskOnFinish() throws Exception {
+    public void executeSeveralConnectorsOnAutomaticTaskOnFinish() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -295,7 +295,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On start, On finish" }, jira = "ENGINE-472", story = "Test of several connectors on start and finish of an user task.")
     @Test
-    public void testExecuteSeveralConnectorsOnStartAndOnFinishWithDataInput() throws Exception {
+    public void executeSeveralConnectorsOnStartAndOnFinishWithDataInput() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -366,7 +366,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Automatic activity" }, story = "Test connector on finish of an automatic activity.")
     @Test
-    public void testExecuteConnectorOnFinishOfAnAutomaticActivity() throws Exception {
+    public void executeConnectorOnFinishOfAnAutomaticActivity() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -391,7 +391,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "User task" }, story = "Test connector on start of an user task.")
     @Test
-    public void testExecuteConnectorOnEnterOfAnUserTask() throws Exception {
+    public void executeConnectorOnEnterOfAnUserTask() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -414,7 +414,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Connector deletion", "On enter", "User task", }, story = "Test connectors are deleted when the task is completed.")
     @Test
-    public void testConnectorsAreDeletedAfterTaskCompletion() throws Exception {
+    public void connectorsAreDeletedAfterTaskCompletion() throws Exception {
         // deploy process
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
         final String taskName = "step1";
@@ -458,7 +458,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
     @Cover(classes = { Connector.class, HumanTaskInstance.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "User task",
             "Starting State" }, story = "Test connector on finish on starting state of an user task.", jira = "ENGINE-604")
     @Test
-    public void testExecuteConnectorOnFinishOfAnUserTask() throws Exception {
+    public void executeConnectorOnFinishOfAnUserTask() throws Exception {
         final String delivery = "Delivery men";
 
         final String inputName = "input1";
@@ -507,7 +507,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
     @Cover(classes = { Connector.class, HumanTaskInstance.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "User task",
             "Boundary event", "Timer event", "Starting State" }, story = "Test connector on finish on starting state of an user task, with a boundary timer evnet.", jira = "ENGINE-604")
     @Test
-    public void testExecuteConnectorOnFinishStateOfAnUserTaskWithTimerEvent() throws Exception {
+    public void executeConnectorOnFinishStateOfAnUserTaskWithTimerEvent() throws Exception {
         final String inputName = "input1";
         final String valueOfInput1 = "valueOfInput1";
         final String actorName = "Delivery men";
@@ -573,7 +573,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Process" }, story = "Test connector on start of a process.")
     @Test
-    public void testExecuteConnectorOnEnterOfProcess() throws Exception {
+    public void executeConnectorOnEnterOfProcess() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -602,7 +602,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Process" }, story = "Test connector on finish of a process.")
     @Test
-    public void testExecuteConnectorOnFinishOfAProcess() throws Exception {
+    public void executeConnectorOnFinishOfAProcess() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -633,7 +633,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Connector deletion", "On finish", "Process" }, story = "Test connectors attached to a process are deleted when the process completes.")
     @Test
-    public void testConnectorsAreDeletedAfterProcessCompletion() throws Exception {
+    public void connectorsAreDeletedAfterProcessCompletion() throws Exception {
         // deploy the a process with a connector
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
         final String delivery = "Delivery men";
@@ -667,7 +667,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Automatic activity" }, story = "Test connector on start of an automatic activity.")
     @Test
-    public void testExecuteConnectorOnEnterOfAnAutomaticActivity() throws Exception {
+    public void executeConnectorOnEnterOfAnAutomaticActivity() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -695,7 +695,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Missing implementation", "Process instance" }, story = "Execute connector with missing implementation on process instance.")
     @Test
-    public void testExecuteMissingImplConnectorOnProcessInstance() throws Exception {
+    public void executeMissingImplConnectorOnProcessInstance() throws Exception {
         final String delivery = "Delivery men";
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
@@ -715,7 +715,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Missing class connector", "Process instance" }, story = "Execute connector with missing class on process instance.")
     @Test
-    public void testExecuteMissingClassConnectorOnProcessInstance() throws Exception {
+    public void executeMissingClassConnectorOnProcessInstance() throws Exception {
         final PrintStream stdout = System.out;
         final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
         System.setOut(new PrintStream(myOut));
@@ -749,7 +749,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Multi-instance" }, story = "Execute connector on multi-instance.")
     @Test
-    public void testExecuteConnectorOnMultiInstance() throws Exception {
+    public void executeConnectorOnMultiInstance() throws Exception {
         final String delivery = "Delivery men";
 
         final String valueOfInput1 = "valueOfInput1";
@@ -796,7 +796,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-773")
     @Test
-    public void testExecuteConnectorWithCustomOutputTypeOnActivity() throws Exception {
+    public void executeConnectorWithCustomOutputTypeOnActivity() throws Exception {
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
@@ -834,7 +834,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-773")
     @Test
-    public void testExecuteConnectorWithCustomOutputTypeOnProcess() throws Exception {
+    public void executeConnectorWithCustomOutputTypeOnProcess() throws Exception {
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
@@ -905,17 +905,17 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed", "Database", "Connector", "On enter", "Automatic activity" }, jira = "ENGINE-936")
     @Test
-    public void testExecuteFailedNonSerializableOutputConnectorOnEnterOfAnAutomaticActivity() throws Exception {
-        testExecuteFailedNonSerializableOutputConnectorOfAnAutomaticActivity(ConnectorEvent.ON_ENTER);
+    public void executeFailedNonSerializableOutputConnectorOnEnterOfAnAutomaticActivity() throws Exception {
+        executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(ConnectorEvent.ON_ENTER);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed", "Database", "Connector", "On finish", "Automatic activity" }, jira = "ENGINE-936")
     @Test
-    public void testExecuteFailedNonSerializableOutputConnectorOnFinishOfAnAutomaticActivity() throws Exception {
-        testExecuteFailedNonSerializableOutputConnectorOfAnAutomaticActivity(ConnectorEvent.ON_FINISH);
+    public void executeFailedNonSerializableOutputConnectorOnFinishOfAnAutomaticActivity() throws Exception {
+        executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(ConnectorEvent.ON_FINISH);
     }
 
-    protected void testExecuteFailedNonSerializableOutputConnectorOfAnAutomaticActivity(final ConnectorEvent connectorEvent) throws Exception {
+    protected void executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(final ConnectorEvent connectorEvent) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithNonSerializableOutputConnector", "1.0");
         processBuilder.addStartEvent("start").addEndEvent("end");
         final String actorName = "Employee";

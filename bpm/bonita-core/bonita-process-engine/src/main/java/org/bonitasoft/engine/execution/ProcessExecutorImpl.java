@@ -83,6 +83,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecu
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
@@ -260,8 +261,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Long processInstanceId) throws SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException,
-            SActivityReadException {
+            final Long processInstanceId) throws SFlowNodeExecutionException, SActivityInterruptedException, SActivityReadException {
         flowNodeExecutor.gotoNextStableState(flowNodeInstanceId, expressionContext, operations, null, processInstanceId);
     }
 
@@ -784,7 +784,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public void executeActivity(final long flowNodeInstanceId, final Long executedBy) throws SActivityExecutionException, SActivityInterruptedException,
+    public void executeActivity(final long flowNodeInstanceId, final Long executedBy) throws SFlowNodeExecutionException, SActivityInterruptedException,
             SActivityReadException {
         flowNodeExecutor.gotoNextStableState(flowNodeInstanceId, null, null, executedBy, null);
     }

@@ -23,6 +23,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -32,14 +33,15 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  * @author Baptiste Mesta
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public interface FlowNodeExecutor extends ContainerExecutor {
 
     FlowNodeState stepForward(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, Long executedBy,
-            Long processInstanceId) throws SActivityExecutionException;
+            Long processInstanceId) throws SFlowNodeExecutionException;
 
     FlowNodeState gotoNextStableState(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, Long executedBy,
-            Long processInstanceId) throws SActivityExecutionException, SActivityInterruptedException;
+            Long processInstanceId) throws SActivityInterruptedException, SFlowNodeExecutionException;
 
     void setStateByStateId(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, int stateId) throws SActivityStateExecutionException;
 

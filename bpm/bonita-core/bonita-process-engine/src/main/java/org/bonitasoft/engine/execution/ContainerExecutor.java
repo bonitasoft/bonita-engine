@@ -19,16 +19,16 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public interface ContainerExecutor {
 
@@ -46,7 +46,7 @@ public interface ContainerExecutor {
      * @param operations
      */
     void executeFlowNode(long flowNodeInstanceId, SExpressionContext contextDependency, List<SOperation> operations, Long processInstanceId)
-            throws SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException, SActivityReadException;
+            throws SActivityInterruptedException, SActivityReadException, SFlowNodeExecutionException;
 
     /**
      * execute a transition in the context of this container executor

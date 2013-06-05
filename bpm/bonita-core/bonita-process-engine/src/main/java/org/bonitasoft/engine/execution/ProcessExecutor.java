@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecu
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 
@@ -63,7 +64,7 @@ public interface ProcessExecutor extends ContainerExecutor {
             List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SActivityReadException, SActivityExecutionFailedException,
             SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
 
-    void executeActivity(long flownNodeInstanceId, Long executedBy) throws SActivityExecutionException, SActivityInterruptedException, SActivityReadException;
+    void executeActivity(long flownNodeInstanceId, Long executedBy) throws SActivityInterruptedException, SActivityReadException, SFlowNodeExecutionException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
             ConnectorService connectorService) throws SBonitaException;

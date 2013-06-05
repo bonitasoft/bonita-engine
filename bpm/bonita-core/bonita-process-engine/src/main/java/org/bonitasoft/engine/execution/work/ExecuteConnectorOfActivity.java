@@ -35,10 +35,9 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -58,6 +57,7 @@ import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
@@ -110,8 +110,8 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void continueFlow(final ClassLoader classLoader) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
-            SActivityInterruptedException, WorkRegisterException {
+    protected void continueFlow(final ClassLoader classLoader) throws SFlowNodeExecutionException, SActivityReadException, SActivityInterruptedException,
+            WorkRegisterException {
         String containerType = SFlowElementsContainerType.PROCESS.name();
         if (flowNodeInstance.getLogicalGroup(2) > 0) {
             containerType = SFlowElementsContainerType.FLOWNODE.name();

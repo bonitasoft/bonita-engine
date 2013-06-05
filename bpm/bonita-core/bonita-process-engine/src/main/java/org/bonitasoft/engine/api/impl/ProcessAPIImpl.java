@@ -270,10 +270,10 @@ import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumen
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
@@ -862,8 +862,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         try {
             processExecutor.executeActivity(flownodeInstanceId, getUserIdFromSession());
-        } catch (final SActivityExecutionException e) {
-            throw new ActivityExecutionException(e);
+        } catch (final SFlowNodeExecutionException e) {
+            throw new FlowNodeExecutionException(e);
         } catch (final SActivityInterruptedException e) {
             throw new ActivityExecutionException(e);
         } catch (final SActivityReadException e) {

@@ -27,7 +27,7 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 /**
  * @author Charles Souillard
  */
-public class SetActivityInFailedThread extends AbstractSetInFailedThread {
+public class SetFlowNodeInFailedThread extends AbstractSetInFailedThread {
 
     // local parameters
     private final long flowNodeInstanceId;
@@ -41,7 +41,7 @@ public class SetActivityInFailedThread extends AbstractSetInFailedThread {
 
     private String flowNodeInstanceName;
 
-    public SetActivityInFailedThread(final long flowNodeInstanceId, final SProcessDefinition processDefinition, final FlowNodeExecutor flowNodeExecutor)
+    public SetFlowNodeInFailedThread(final long flowNodeInstanceId, final SProcessDefinition processDefinition, final FlowNodeExecutor flowNodeExecutor)
             throws TenantIdNotSetException, BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException {
         super();
