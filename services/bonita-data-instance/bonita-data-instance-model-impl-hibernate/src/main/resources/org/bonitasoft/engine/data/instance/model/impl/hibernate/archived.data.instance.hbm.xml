@@ -22,13 +22,14 @@
 		<property name="sourceObjectId" column="sourceObjectId" type="long" />
 		<filter name="tenantFilter" />
 	</class>
+
 	<class name="SADataInstanceVisibilityMappingImpl" table="arch_data_mapping">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
-		<property name="containerId" column="containerId" type="long"/>
-		<property name="containerType" column="containerType"  type="string" />
+		<property name="containerId" column="containerId" type="long" />
+		<property name="containerType" column="containerType" type="string" />
 		<property name="dataName" column="dataName" type="string" />
 		<property name="dataInstanceId" column="dataInstanceId" type="long" />
 		<property name="archiveDate" column="archiveDate" type="long" />
@@ -47,7 +48,7 @@
 	<subclass name="SADoubleDataInstanceImpl" abstract="false" discriminator-value="SADoubleDataInstanceImpl" extends="SADataInstanceImpl">
 		<property name="value" column="doubleValue" />
 	</subclass>
-	
+
 	<subclass name="SAFloatDataInstanceImpl" abstract="false" discriminator-value="SAFloatDataInstanceImpl" extends="SADataInstanceImpl">
 		<property name="value" column="floatValue" />
 	</subclass>
@@ -70,6 +71,10 @@
 		<property name="element" column="element" type="string" />
 	</subclass>
 
+	<subclass name="SAXMLObjectDataInstanceImpl" abstract="false" discriminator-value="SAXMLObjectDataInstanceImpl" extends="SADataInstanceImpl">
+		<property name="value" column="clobValue" type="text" />
+	</subclass>
+
 	<subclass name="SABlobDataInstanceImpl" abstract="false" discriminator-value="SABlobDataInstanceImpl" extends="SADataInstanceImpl">
 		<property name="value" column="blobValue" />
 	</subclass>
@@ -77,4 +82,5 @@
 	<subclass name="SADateDataInstanceImpl" abstract="false" discriminator-value="SADateDataInstanceImpl" extends="SADataInstanceImpl">
 		<property name="value" column="longValue" />
 	</subclass>
+
 </hibernate-mapping>

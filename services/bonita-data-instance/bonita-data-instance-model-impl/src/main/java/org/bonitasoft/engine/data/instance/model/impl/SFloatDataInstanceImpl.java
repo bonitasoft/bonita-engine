@@ -35,11 +35,6 @@ public class SFloatDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SFloatDataInstanceImpl(final SDataDefinition dataDefinition, final Float value) {
-        super(dataDefinition);
-        this.value = value;
-    }
-
     @Override
     public void setValue(final Serializable value) {
         this.value = (Float) value;

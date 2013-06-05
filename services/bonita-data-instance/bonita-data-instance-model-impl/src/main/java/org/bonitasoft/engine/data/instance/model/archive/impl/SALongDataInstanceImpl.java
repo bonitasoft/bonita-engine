@@ -16,7 +16,6 @@ package org.bonitasoft.engine.data.instance.model.archive.impl;
 import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Feng Hui
@@ -50,11 +49,6 @@ public class SALongDataInstanceImpl extends SADataInstanceImpl {
     @Override
     public void setValue(final Serializable value) {
         this.value = (Long) value;
-    }
-
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SDataInstance.class;
     }
 
 }

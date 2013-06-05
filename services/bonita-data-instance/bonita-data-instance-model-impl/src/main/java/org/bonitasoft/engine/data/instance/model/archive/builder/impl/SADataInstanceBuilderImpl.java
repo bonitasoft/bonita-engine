@@ -25,11 +25,13 @@ import org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstance
 import org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl;
@@ -53,6 +55,8 @@ public class SADataInstanceBuilderImpl implements SADataInstanceBuilder {
             saDataInstanceImpl = new SAXMLDataInstanceImpl(sDataInstance);
         } else if (sDataInstance instanceof SBlobDataInstanceImpl) {
             saDataInstanceImpl = new SABlobDataInstanceImpl(sDataInstance);
+        } else if (sDataInstance instanceof SXMLObjectDataInstanceImpl) {
+            saDataInstanceImpl = new SAXMLObjectDataInstanceImpl(sDataInstance);
         } else {
             if (Integer.class.getName().equals(className)) {
                 saDataInstanceImpl = new SAIntegerDataInstanceImpl(sDataInstance);

@@ -6,11 +6,11 @@ public class LightEmployee implements Serializable {
 
     private static final long serialVersionUID = 3544356825663515645L;
 
-    private String firstName;
+    private final String firstName;
 
-    private String lastName;
+    private final String lastName;
 
-    private int age;
+    private final int age;
 
     public LightEmployee(final String firstName, final String lastName, final int age) {
         super();
@@ -42,26 +42,34 @@ public class LightEmployee implements Serializable {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        LightEmployee other = (LightEmployee) obj;
-        if (age != other.age)
+        }
+        final LightEmployee other = (LightEmployee) obj;
+        if (age != other.age) {
             return false;
+        }
         if (firstName == null) {
-            if (other.firstName != null)
+            if (other.firstName != null) {
                 return false;
-        } else if (!firstName.equals(other.firstName))
+            }
+        } else if (!firstName.equals(other.firstName)) {
             return false;
+        }
         if (lastName == null) {
-            if (other.lastName != null)
+            if (other.lastName != null) {
                 return false;
-        } else if (!lastName.equals(other.lastName))
+            }
+        } else if (!lastName.equals(other.lastName)) {
             return false;
+        }
         return true;
     }
 

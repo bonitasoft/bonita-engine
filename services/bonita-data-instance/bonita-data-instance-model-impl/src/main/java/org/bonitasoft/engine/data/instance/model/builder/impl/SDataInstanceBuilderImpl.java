@@ -23,6 +23,7 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl;
@@ -66,8 +67,10 @@ public class SDataInstanceBuilderImpl implements SDataInstanceBuilder {
                 dataInstanceImpl = new SDoubleDataInstanceImpl(dataDefinition);
             } else if (Float.class.getName().equals(className)) {
                 dataInstanceImpl = new SFloatDataInstanceImpl(dataDefinition);
-            } else {
+            } else if (byte[].class.getName().equals(className)) {
                 dataInstanceImpl = new SBlobDataInstanceImpl(dataDefinition);
+            } else {
+                dataInstanceImpl = new SXMLObjectDataInstanceImpl(dataDefinition);
             }
         }
         return this;

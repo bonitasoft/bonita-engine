@@ -35,11 +35,6 @@ public class SBooleanDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SBooleanDataInstanceImpl(final SDataDefinition dataDefinition, final Boolean value) {
-        super(dataDefinition);
-        this.value = value;
-    }
-
     @Override
     public void setValue(final Serializable value) {
         this.value = (Boolean) value;

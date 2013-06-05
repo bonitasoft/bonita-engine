@@ -16,7 +16,6 @@ package org.bonitasoft.engine.data.instance.model.archive.impl;
 import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Feng Hui
@@ -70,11 +69,6 @@ public class SAXMLDataInstanceImpl extends SADataInstanceImpl {
 
     public void setElement(final String element) {
         this.element = element;
-    }
-
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SDataInstance.class;
     }
 
 }

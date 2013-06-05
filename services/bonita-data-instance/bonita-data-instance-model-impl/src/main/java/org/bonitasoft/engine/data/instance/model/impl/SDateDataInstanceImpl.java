@@ -36,11 +36,6 @@ public class SDateDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SDateDataInstanceImpl(final SDataDefinition dataDefinition, final Date value) {
-        super(dataDefinition);
-        this.value = value;
-    }
-
     @Override
     public Date getValue() {
         return value;

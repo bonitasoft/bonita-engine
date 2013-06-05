@@ -86,6 +86,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="10020" />
+				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="10021" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />
 				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="10090" />
@@ -101,6 +102,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="20050" />
+				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="20051" />
 			</map>
 		</constructor-arg>

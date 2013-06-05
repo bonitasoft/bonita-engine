@@ -20,7 +20,7 @@
 		<property name="containerType" column="containerType"  type="string" />
 		<filter name="tenantFilter" />
 	</class>
-	
+
 	<class name="SDataInstanceVisibilityMappingImpl" table="data_mapping">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
@@ -36,41 +36,45 @@
 	<subclass name="SIntegerDataInstanceImpl" abstract="false" discriminator-value="SIntegerDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="intValue" />
 	</subclass>
-	
+
 	<subclass name="SLongDataInstanceImpl" abstract="false" discriminator-value="SLongDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="longValue" />
 	</subclass>
-	
+
 	<subclass name="SDoubleDataInstanceImpl" abstract="false" discriminator-value="SDoubleDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="doubleValue" />
 	</subclass>
-	
+
 	<subclass name="SFloatDataInstanceImpl" abstract="false" discriminator-value="SFloatDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="floatValue" />
 	</subclass>
-	
+
 	<subclass name="SShortTextDataInstanceImpl" abstract="false" discriminator-value="SShortTextDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="shortTextValue" type="string" />
 	</subclass>
-	
+
 	<subclass name="SBooleanDataInstanceImpl" discriminator-value="SBooleanDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="booleanValue" />
 	</subclass>
-	
+
 	<subclass name="SLongTextDataInstanceImpl" abstract="false" discriminator-value="SLongTextDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="clobValue" type="text" />
 	</subclass>
-	
+
 	<subclass name="SXMLDataInstanceImpl" abstract="false" discriminator-value="SXMLDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="clobValue" type="text" />
 		<property name="namespace" column="namespace" type="string" />
 		<property name="element" column="element" type="string" />
 	</subclass>
-	
+
 	<subclass name="SBlobDataInstanceImpl" abstract="false" discriminator-value="SBlobDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="blobValue" />
 	</subclass>
-	
+
+	<subclass name="SXMLObjectDataInstanceImpl" abstract="false" discriminator-value="SXMLObjectDataInstanceImpl" extends="SDataInstanceImpl">
+		<property name="value" column="clobValue" type="text" />
+	</subclass>
+
 	<subclass name="SDateDataInstanceImpl" abstract="false" discriminator-value="SDateDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="longValue" />
 	</subclass>

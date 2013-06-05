@@ -35,11 +35,6 @@ public class SDoubleDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SDoubleDataInstanceImpl(final SDataDefinition dataDefinition, final Double value) {
-        super(dataDefinition);
-        this.value = value;
-    }
-
     @Override
     public void setValue(final Serializable value) {
         this.value = (Double) value;

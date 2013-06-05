@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,38 +17,41 @@ import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+
 /**
- * @author Feng Hui
  * @author Matthieu Chaffotte
  */
-public class SAIntegerDataInstanceImpl extends SADataInstanceImpl {
+public final class SAXMLObjectDataInstanceImpl extends SADataInstanceImpl {
 
-    private static final long serialVersionUID = 1339182108197167117L;
+    private static final long serialVersionUID = -6828749783941071011L;
 
-    private Integer value;
+    private String value;
 
-    public SAIntegerDataInstanceImpl() {
+    public SAXMLObjectDataInstanceImpl() {
         super();
     }
 
-    public SAIntegerDataInstanceImpl(final SDataInstance sDataInstance) {
+    public SAXMLObjectDataInstanceImpl(final SDataInstance sDataInstance) {
         super(sDataInstance);
-        value = (Integer) sDataInstance.getValue();
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAIntegerDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
+    public Serializable getValue() {
+        final XStream xstream = new XStream(new StaxDriver());
+        return (Serializable) xstream.fromXML(value);
     }
 
     @Override
     public void setValue(final Serializable value) {
-        this.value = (Integer) value;
+        final XStream xStream = new XStream(new StaxDriver());
+        this.value = xStream.toXML(value);
+    }
+
+    @Override
+    public String getDiscriminator() {
+        return SAXMLObjectDataInstanceImpl.class.getSimpleName();
     }
 
 }

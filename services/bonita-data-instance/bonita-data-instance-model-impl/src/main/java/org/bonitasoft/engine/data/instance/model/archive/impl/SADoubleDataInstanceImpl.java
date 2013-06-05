@@ -17,7 +17,6 @@ import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADoubleDataInstance;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Feng Hui
@@ -51,11 +50,6 @@ public class SADoubleDataInstanceImpl extends SADataInstanceImpl implements SADo
     @Override
     public void setValue(final Serializable value) {
         this.value = (Double) value;
-    }
-
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SDataInstance.class;
     }
 
 }

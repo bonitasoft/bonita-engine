@@ -74,22 +74,12 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void evaluateOutput(final ClassLoader processClassloader, final ConnectorResult result) throws SBonitaException {
-        evaluateOutput(processClassloader, result, processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+    protected void evaluateOutput(final ConnectorResult result) throws SBonitaException {
+        evaluateOutput(result, processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
     }
 
     @Override
-    protected void continueFlow(final ClassLoader classLoader) throws SBonitaException {
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(classLoader);
-            continueFlowInClassLoader();
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
-        }
-    }
-
-    private void continueFlowInClassLoader() throws SBonitaException {
+    protected void continueFlow() throws SBonitaException {
         boolean txOpened = false;
         try {
             txOpened = transactionExecutor.openTransaction();

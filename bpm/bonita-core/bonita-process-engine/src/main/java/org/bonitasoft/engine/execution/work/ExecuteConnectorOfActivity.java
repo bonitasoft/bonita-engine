@@ -105,12 +105,12 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void evaluateOutput(final ClassLoader processClassloader, final ConnectorResult result) throws STransactionException, SBonitaException {
-        evaluateOutput(processClassloader, result, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name());
+    protected void evaluateOutput(final ConnectorResult result) throws STransactionException, SBonitaException {
+        evaluateOutput(result, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name());
     }
 
     @Override
-    protected void continueFlow(final ClassLoader classLoader) throws SFlowNodeExecutionException, SActivityReadException, SActivityInterruptedException,
+    protected void continueFlow() throws SActivityReadException, SFlowNodeExecutionException, SActivityReadException, SActivityInterruptedException,
             WorkRegisterException {
         String containerType = SFlowElementsContainerType.PROCESS.name();
         if (flowNodeInstance.getLogicalGroup(2) > 0) {

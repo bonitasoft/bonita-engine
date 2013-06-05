@@ -21,11 +21,11 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
-public class SBlobDataInstanceImpl extends SDataInstanceImpl {
+public final class SBlobDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = 3477539801307784883L;
+    private static final long serialVersionUID = 6913692949855819795L;
 
-    private Serializable value;
+    private byte[] value;
 
     public SBlobDataInstanceImpl() {
         super();
@@ -35,11 +35,6 @@ public class SBlobDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SBlobDataInstanceImpl(final SDataDefinition dataDefinition, final Serializable value) {
-        super(dataDefinition);
-        this.value = value;
-    }
-
     @Override
     public Serializable getValue() {
         return value;
@@ -47,7 +42,7 @@ public class SBlobDataInstanceImpl extends SDataInstanceImpl {
 
     @Override
     public void setValue(final Serializable value) {
-        this.value = value;
+        this.value = (byte[]) value;
     }
 
     @Override

@@ -35,11 +35,6 @@ public class SIntegerDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SIntegerDataInstanceImpl(final SDataDefinition dataDefinition, final Integer value) {
-        super(dataDefinition);
-        this.value = value;
-    }
-
     @Override
     public Integer getValue() {
         return value;

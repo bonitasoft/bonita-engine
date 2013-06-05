@@ -35,11 +35,6 @@ public class SLongDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SLongDataInstanceImpl(final SDataDefinition dataDefinition, final Long value) {
-        super(dataDefinition);
-        this.value = value;
-    }
-
     @Override
     public Long getValue() {
         return value;

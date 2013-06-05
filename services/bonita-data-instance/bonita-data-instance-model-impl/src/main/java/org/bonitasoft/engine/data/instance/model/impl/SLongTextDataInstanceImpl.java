@@ -35,11 +35,6 @@ public class SLongTextDataInstanceImpl extends SDataInstanceImpl {
         super(dataDefinition);
     }
 
-    public SLongTextDataInstanceImpl(final SDataDefinition dataDefinition, final Serializable value) {
-        super(dataDefinition);
-        this.value = (String) value;
-    }
-
     @Override
     public Serializable getValue() {
         return value;

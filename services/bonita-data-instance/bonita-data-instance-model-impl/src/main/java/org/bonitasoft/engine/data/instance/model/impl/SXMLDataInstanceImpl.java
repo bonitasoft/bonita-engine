@@ -15,7 +15,6 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
 
@@ -42,11 +41,6 @@ public class SXMLDataInstanceImpl extends SDataInstanceImpl implements SXMLDataI
         super(dataDefinition);
         namespace = dataDefinition.getNamespace();
         element = dataDefinition.getElement();
-    }
-
-    public SXMLDataInstanceImpl(final SDataDefinition dataDefinition, final Serializable value) {
-        super(dataDefinition);
-        this.value = (String) value;
     }
 
     @Override

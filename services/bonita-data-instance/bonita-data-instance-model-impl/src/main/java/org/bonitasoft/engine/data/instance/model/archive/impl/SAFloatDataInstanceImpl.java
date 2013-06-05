@@ -17,7 +17,6 @@ import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SAFloatDataInstance;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Celine Souchet
@@ -51,11 +50,6 @@ public class SAFloatDataInstanceImpl extends SADataInstanceImpl implements SAFlo
     @Override
     public void setValue(final Serializable value) {
         this.value = (Float) value;
-    }
-
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SDataInstance.class;
     }
 
 }

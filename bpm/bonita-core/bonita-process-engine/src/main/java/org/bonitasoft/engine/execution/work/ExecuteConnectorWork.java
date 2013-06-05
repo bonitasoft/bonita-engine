@@ -123,7 +123,6 @@ public abstract class ExecuteConnectorWork extends BonitaWork {
     protected abstract SThrowEventInstance createThrowErrorEventInstance(SEndEventDefinition eventDefinition) throws SBonitaException;
 
     protected ConnectorResult executeConnector(final ClassLoader processClassloader) throws SBonitaException {
-
         ConnectorResult result = null;
         try {
             result = connectorService.executeConnector(processDefinition.getId(), connector, processClassloader, inputParameters);
@@ -171,22 +170,15 @@ public abstract class ExecuteConnectorWork extends BonitaWork {
         }
     }
 
-    protected abstract void continueFlow(ClassLoader classLoader) throws SBonitaException;
+    protected abstract void continueFlow() throws SBonitaException;
 
-    protected void evaluateOutput(final ClassLoader processClassloader, final ConnectorResult result, final Long id, final String containerType)
-            throws SBonitaException {
+    protected void evaluateOutput(final ConnectorResult result, final Long id, final String containerType) throws SBonitaException {
         if (result != null) {
             final List<SOperation> outputs = sConnectorDefinition.getOutputs();
             final boolean txOpened = transactionExecutor.openTransaction();
             final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinition.getId());
             try {
-                final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-                try {
-                    Thread.currentThread().setContextClassLoader(processClassloader);
-                    connectorService.executeOutputOperation(outputs, sExpressionContext, result);
-                } finally {
-                    Thread.currentThread().setContextClassLoader(contextClassLoader);
-                }
+                connectorService.executeOutputOperation(outputs, sExpressionContext, result);
                 connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connector.getId()), ConnectorService.DONE);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
@@ -209,22 +201,28 @@ public abstract class ExecuteConnectorWork extends BonitaWork {
         return errorThrownWhenEvaluationOfInputParameters;
     }
 
-    protected abstract void evaluateOutput(ClassLoader processClassloader, ConnectorResult result) throws SBonitaException;
+    protected abstract void evaluateOutput(ConnectorResult result) throws SBonitaException;
 
     @Override
     protected void work() throws SBonitaException {
         final ClassLoader processClassloader = getClassLoader();
-        if (getErrorThrownWhenEvaluationOfInputParameters() != null) {
-            onFail(getErrorThrownWhenEvaluationOfInputParameters());
-        } else {
-            final ConnectorResult result = executeConnector(processClassloader);
-            try {
-                evaluateOutput(processClassloader, result);
-            } catch (final SBonitaException e) {
-                onFail(e);
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(processClassloader);
+            if (getErrorThrownWhenEvaluationOfInputParameters() != null) {
+                onFail(getErrorThrownWhenEvaluationOfInputParameters());
+            } else {
+                final ConnectorResult result = executeConnector(processClassloader);
+                try {
+                    evaluateOutput(result);
+                } catch (final SBonitaException e) {
+                    onFail(e);
+                }
             }
+            continueFlow();
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        continueFlow(processClassloader);
     }
 
 }

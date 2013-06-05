@@ -17,9 +17,11 @@ import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Feng Hui
+ * @author Matthieu Chaffotte
  */
 public abstract class SADataInstanceImpl implements SADataInstance {
 
@@ -154,6 +156,11 @@ public abstract class SADataInstanceImpl implements SADataInstance {
 
     public void setSourceObjectId(final long sourceObjectId) {
         this.sourceObjectId = sourceObjectId;
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SDataInstance.class;
     }
 
     @Override

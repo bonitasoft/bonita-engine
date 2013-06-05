@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,48 +16,50 @@ package org.bonitasoft.engine.data.instance.model.impl;
 import java.io.Serializable;
 
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
- * @author Zhao Na
  * @author Matthieu Chaffotte
  */
-public class SShortTextDataInstanceImpl extends SDataInstanceImpl {
+public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = -6988236601472065025L;
-
-    public static final int MAX_LENGTH = 255;
+    private static final long serialVersionUID = 3477539801307784883L;
 
     private String value;
 
-    public SShortTextDataInstanceImpl() {
+    public SXMLObjectDataInstanceImpl() {
         super();
     }
 
-    public SShortTextDataInstanceImpl(final SDataDefinition dataDefinition) {
+    public SXMLObjectDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
     }
 
     @Override
-    public void setValue(final Serializable value) {
-        this.value = (String) value;
+    public Serializable getValue() {
+        return revert(value);
     }
 
     @Override
-    public String getValue() {
-        return value;
+    public void setValue(final Serializable value) {
+        this.value = convert(value);
     }
 
     @Override
     public String getDiscriminator() {
-        return SShortTextDataInstanceImpl.class.getSimpleName();
+        return SXMLObjectDataInstanceImpl.class.getSimpleName();
     }
 
-    @Override
-    public void validate() throws SDataInstanceNotWellFormedException {
-        if (getValue() != null && getValue().length() > MAX_LENGTH) {
-            throw new SDataInstanceNotWellFormedException("Data " + getName() + " must not be longer than " + MAX_LENGTH + " characters");
-        }
+    private String convert(final Serializable value) {
+        final XStream xStream = new XStream(new StaxDriver());
+        return xStream.toXML(value);
+    }
+
+    private Serializable revert(final String value) {
+        final XStream xstream = new XStream(new StaxDriver());
+        return (Serializable) xstream.fromXML(value);
     }
 
 }

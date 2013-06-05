@@ -13,8 +13,15 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
@@ -22,11 +29,11 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
-public class SABlobDataInstanceImpl extends SADataInstanceImpl {
+public final class SABlobDataInstanceImpl extends SADataInstanceImpl {
 
     private static final long serialVersionUID = 2420374967139131312L;
 
-    private Serializable value;
+    private byte[] value;
 
     public SABlobDataInstanceImpl() {
         super();
@@ -34,7 +41,7 @@ public class SABlobDataInstanceImpl extends SADataInstanceImpl {
 
     public SABlobDataInstanceImpl(final SDataInstance sDataInstance) {
         super(sDataInstance);
-        value = sDataInstance.getValue();
+        setValue(sDataInstance.getValue());
     }
 
     @Override
@@ -44,17 +51,70 @@ public class SABlobDataInstanceImpl extends SADataInstanceImpl {
 
     @Override
     public Serializable getValue() {
-        return value;
+        return revert(value);
     }
 
     @Override
     public void setValue(final Serializable value) {
-        this.value = value;
+        this.value = convert(value);
     }
 
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SDataInstance.class;
+    }
+
+    private byte[] convert(final Serializable value) {
+        ObjectOutputStream oos = null;
+        try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(value);
+            oos.flush();
+            return baos.toByteArray();
+        } catch (final IOException ioe) {
+            throw new SBonitaRuntimeException(ioe);
+        } finally {
+            try {
+                if (oos != null) {
+                    oos.close();
+                }
+            } catch (final IOException ioe) {
+                throw new SBonitaRuntimeException(ioe);
+            }
+        }
+    }
+
+    private Serializable revert(final byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        ObjectInputStream ois = null;
+        try {
+            final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            ois = new ObjectInputStream(bais) {
+
+                @Override
+                protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                    final String className = desc.getName();
+                    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                    return Class.forName(className, true, classLoader);
+                }
+            };
+            return (Serializable) ois.readObject();
+        } catch (final IOException ioe) {
+            throw new SBonitaRuntimeException(ioe);
+        } catch (final ClassNotFoundException cnfe) {
+            throw new SBonitaRuntimeException(cnfe);
+        } finally {
+            if (ois != null) {
+                try {
+                    ois.close();
+                } catch (final IOException ioe) {
+                    throw new SBonitaRuntimeException(ioe);
+                }
+            }
+        }
     }
 
 }

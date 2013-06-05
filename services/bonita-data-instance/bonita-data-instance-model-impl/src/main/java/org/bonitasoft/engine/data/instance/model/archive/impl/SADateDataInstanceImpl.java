@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Feng Hui
@@ -51,11 +50,6 @@ public class SADateDataInstanceImpl extends SADataInstanceImpl {
     @Override
     public void setValue(final Serializable value) {
         this.value = (Date) value;
-    }
-
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SDataInstance.class;
     }
 
 }
