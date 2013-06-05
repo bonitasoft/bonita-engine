@@ -18,9 +18,10 @@ import java.util.List;
 import org.bonitasoft.engine.command.CommandCriterion;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandCriterion;
 
 /**
  * @author Zhang Bole
@@ -47,16 +48,17 @@ public class GetSPlatformCommands implements TransactionContentWithResult<List<S
 
     @Override
     public void execute() throws SBonitaException {
-        SPlatformCommandCriterion sPlatformCommandCriterion = null;
+        final QueryOptions queryOptions;
         switch (sort) {
             case NAME_ASC:
-                sPlatformCommandCriterion = SPlatformCommandCriterion.NAME_ASC;
+                queryOptions = new QueryOptions(startIndex, maxResults, SPlatformCommand.class, "name", OrderByType.ASC);
                 break;
             case NAME_DESC:
-                sPlatformCommandCriterion = SPlatformCommandCriterion.NAME_DESC;
+            default:
+                queryOptions = new QueryOptions(startIndex, maxResults, SPlatformCommand.class, "name", OrderByType.DESC);
                 break;
         }
-        platformCommands = platformCommandService.getPlatformCommands(startIndex, maxResults, sPlatformCommandCriterion);
+        platformCommands = platformCommandService.getPlatformCommands(queryOptions);
     }
 
     @Override

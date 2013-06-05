@@ -24,7 +24,6 @@ import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -436,10 +435,8 @@ public class PlatformServiceImpl implements PlatformService {
         }
         boolean flag = false;
         try {
-            final SPlatform sPlatform = getPlatform();
-            if (sPlatform != null) {
-                flag = true;
-            }
+            getPlatform();
+            flag = true;
         } catch (final SPlatformNotFoundException e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "isPlatformCreated", e));
@@ -494,23 +491,6 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDefaultTenant"));
         }
         return tenant;
-    }
-
-    @Override
-    public List<STenant> getTenants(final QueryOptions queryOptions) throws STenantException {
-        if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getTenants"));
-        }
-        List<STenant> tenants;
-        try {
-            tenants = platformPersistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw new STenantException("Problem getting list of tenants: " + e.getMessage(), e);
-        }
-        if (trace) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getTenants"));
-        }
-        return tenants;
     }
 
     @Override
@@ -586,7 +566,7 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "activateTenant"));
         }
         final STenant tenant = getTenant(tenantId);
-        if (!ACTIVATED.equals(tenant.getStatus())) {
+        if (!isTenantActivated(tenant)) {
             final UpdateDescriptor desc = new UpdateDescriptor(tenant);
             desc.addField(tenantBuilder.getStatusKey(), ACTIVATED);
             try {
@@ -636,22 +616,15 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public List<STenant> getTenants(final int fromIndex, final int numberOfResults, final String field, final OrderByType order) throws STenantException {
+    public List<STenant> getTenants(final QueryOptions queryOptions) throws STenantException {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getTenants"));
         }
-        List<STenant> tenants = null;
-        final QueryOptions queryOptions;
-        if (field == null) {
-            queryOptions = new QueryOptions(fromIndex, numberOfResults);
-        } else {
-            queryOptions = new QueryOptions(fromIndex, numberOfResults, STenant.class, field, order);
-        }
-
+        List<STenant> tenants;
         try {
             tenants = platformPersistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, queryOptions));
         } catch (final SBonitaReadException e) {
-            throw new STenantException(e);
+            throw new STenantException("Problem getting list of tenants: " + e.getMessage(), e);
         }
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getTenants"));

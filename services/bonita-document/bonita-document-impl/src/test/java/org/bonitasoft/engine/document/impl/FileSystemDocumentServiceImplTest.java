@@ -33,7 +33,7 @@ public class FileSystemDocumentServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.document.impl.FileSystemDocumentServiceImpl#getContent(java.lang.String)}.
      */
     @Test
-    public final void testGetContent() {
+    public final void getContent() {
         // TODO : Not yet implemented
     }
 
@@ -42,7 +42,7 @@ public class FileSystemDocumentServiceImplTest {
      * {@link org.bonitasoft.engine.document.impl.FileSystemDocumentServiceImpl#storeDocumentContent(org.bonitasoft.engine.document.model.SDocument, byte[])}.
      */
     @Test
-    public final void testStoreDocumentContent() {
+    public final void storeDocumentContent() {
         // TODO : Not yet implemented
     }
 
@@ -50,7 +50,7 @@ public class FileSystemDocumentServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.document.impl.FileSystemDocumentServiceImpl#deleteDocumentContent(java.lang.String)}.
      */
     @Test
-    public final void testDeleteDocumentContent() {
+    public final void deleteDocumentContent() {
         // TODO : Not yet implemented
     }
 

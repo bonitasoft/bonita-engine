@@ -63,13 +63,13 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public SSession createSession(final long tenantId, final long userId, final String userName, final boolean technicalUser) throws SSessionException {
+    public SSession createSession(final long tenantId, final long userId, final String userName, final boolean isTechnicalUser) throws SSessionException {
         final long id = SessionIdGenerator.getNextId();
         final long duration = getSessionDuration();
         final String platformVersion = getPlatformVersion();
 
         final SSession session = sessionModelBuilder.getSessionBuilder()
-                .createNewInstance(id, tenantId, duration, userName, platformVersion, applicationName, userId).technicalUser(technicalUser).done();
+                .createNewInstance(id, tenantId, duration, userName, platformVersion, applicationName, userId).technicalUser(isTechnicalUser).done();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "createSession with tenantId=" + tenantId + " username = " + userName + " Id = " + id);

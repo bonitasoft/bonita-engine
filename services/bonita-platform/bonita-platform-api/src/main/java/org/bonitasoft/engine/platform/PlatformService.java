@@ -16,7 +16,6 @@ package org.bonitasoft.engine.platform;
 import java.util.Collection;
 import java.util.List;
 
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.platform.model.SPlatform;
@@ -182,17 +181,6 @@ public interface PlatformService {
     STenant getDefaultTenant() throws STenantNotFoundException;
 
     /**
-     * Get all tenants
-     * 
-     * @param queryOptions
-     *            The criterion used to search tenants
-     * @return a list of sTenant
-     * @throws STenantException
-     * @since 6.0
-     */
-    List<STenant> getTenants(QueryOptions queryOptions) throws STenantException;
-
-    /**
      * Get tenants which ids belong to given collection
      * 
      * @param ids
@@ -233,21 +221,6 @@ public interface PlatformService {
     void deactiveTenant(long tenantId) throws STenantNotFoundException, STenantDeactivationException;
 
     /**
-     * Get the sTenants having the given value for the given int index
-     * 
-     * @param fromIndex
-     *            index of the first element
-     * @param numberOfResults
-     *            number of result max returned
-     * @param field
-     * @param order
-     * @return the sTenants having the given value for the given int index
-     * @throws STenantException
-     * @since 6.0
-     */
-    List<STenant> getTenants(int fromIndex, int numberOfResults, String field, OrderByType order) throws STenantException;
-
-    /**
      * Get the total number of sTenants
      * 
      * @return the total number of sTenants
@@ -281,6 +254,17 @@ public interface PlatformService {
      * @throws SBonitaSearchException
      */
     List<STenant> searchTenants(QueryOptions options) throws SBonitaSearchException;
+
+    /**
+     * Get all tenants
+     * 
+     * @param queryOptions
+     *            The criterion used to search tenants
+     * @return a list of sTenant
+     * @throws STenantException
+     * @since 6.0
+     */
+    List<STenant> getTenants(QueryOptions queryOptions) throws STenantException;
 
     /**
      * Return a number of tenants by the given conditions, as one part of SearchResult that is search method's return value in platformApi

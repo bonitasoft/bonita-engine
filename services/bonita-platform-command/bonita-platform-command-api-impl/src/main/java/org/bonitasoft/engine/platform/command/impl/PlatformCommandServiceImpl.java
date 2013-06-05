@@ -21,7 +21,6 @@ import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -34,8 +33,6 @@ import org.bonitasoft.engine.platform.command.SPlatformCommandGettingException;
 import org.bonitasoft.engine.platform.command.SPlatformCommandNotFoundException;
 import org.bonitasoft.engine.platform.command.SPlatformCommandUpdateException;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandCriterion;
-import org.bonitasoft.engine.platform.command.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -144,6 +141,7 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
         }
     }
 
+    @Override
     public List<SPlatformCommand> getPlatformCommands(final QueryOptions queryOptions) throws SPlatformCommandGettingException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getPlatformCommands"));
@@ -185,40 +183,6 @@ public class PlatformCommandServiceImpl implements PlatformCommandService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPlatformCommand", bre));
             }
             throw new SPlatformCommandGettingException(bre);
-        }
-    }
-
-    @Override
-    public List<SPlatformCommand> getPlatformCommands(final int startIndex, final int maxResults, final SPlatformCommandCriterion sort)
-            throws SPlatformCommandGettingException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "get"));
-        }
-        String field = null;
-        OrderByType orderByType = null;
-        switch (sort) {
-            case NAME_ASC:
-                orderByType = OrderByType.ASC;
-                field = "name";
-                break;
-            case NAME_DESC:
-                orderByType = OrderByType.DESC;
-                field = "name";
-                break;
-        }
-        try {
-            final SelectListDescriptor<SPlatformCommand> selectDescriptor = SelectDescriptorBuilder.getPlatformCommands(field, orderByType, startIndex,
-                    maxResults);
-            final List<SPlatformCommand> listsPlatformCommands = platformPersistenceService.selectList(selectDescriptor);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "get"));
-            }
-            return listsPlatformCommands;
-        } catch (final SBonitaReadException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "get", e));
-            }
-            throw new SPlatformCommandGettingException("can't get platformCommands", e);
         }
     }
 

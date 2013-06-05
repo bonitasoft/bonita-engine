@@ -13,12 +13,6 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -35,6 +29,12 @@ import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -60,7 +60,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test
-    public void getNumberOfProfilesWithQueryOptions() throws Exception {
+    public void getNumberOfProfilesWithOptions() throws Exception {
         final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistence.getNumberOfEntities(SProfile.class, options, Collections.<String, Object> emptyMap())).thenReturn(1L);
@@ -69,7 +69,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public void getNumberOfProfilesWithQueryOptionsWithException() throws Exception {
+    public void getNumberOfProfilesWithOptionsThrowException() throws Exception {
         final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistence.getNumberOfEntities(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
@@ -78,7 +78,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test
-    public void searchProfilesWithQueryOptions() throws Exception {
+    public void searchProfilesWithOptions() throws Exception {
         final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistence.searchEntity(SProfile.class, options, Collections.<String, Object> emptyMap())).thenReturn(new ArrayList<SProfile>());
@@ -87,7 +87,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public void searchProfilesWithQueryOptionsWithException() throws Exception {
+    public void searchProfilesWithOptionsThrowException() throws Exception {
         final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistence.searchEntity(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
@@ -114,7 +114,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test(expected = SProfileNotFoundException.class)
-    public void getProfileWithException() throws Exception {
+    public void getProfileThrowException() throws Exception {
         final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         when(persistence.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
@@ -140,7 +140,7 @@ public class ProfileServiceImplForProfileTest {
     }
 
     @Test(expected = SProfileNotFoundException.class)
-    public void getProfileByNameWithException() throws Exception {
+    public void getProfileByNameThrowException() throws Exception {
         final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 

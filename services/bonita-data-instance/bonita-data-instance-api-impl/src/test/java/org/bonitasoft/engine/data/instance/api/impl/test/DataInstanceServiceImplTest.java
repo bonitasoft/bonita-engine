@@ -104,7 +104,7 @@ public class DataInstanceServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstance(java.lang.String, long, java.lang.String)}.
      */
     @Test
-    public final void getDataInstanceStringLongString() {
+    public final void getDataInstanceByNameAndContainerIdAndType() {
         // TODO : Not yet implemented
     }
 
@@ -112,7 +112,7 @@ public class DataInstanceServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstances(long, java.lang.String, int, int)}.
      */
     @Test
-    public final void getDataInstancesLongStringIntInt() {
+    public final void getPaginatedDataInstancesByContainerIdAndType() {
         // TODO : Not yet implemented
     }
 
@@ -181,7 +181,7 @@ public class DataInstanceServiceImplTest {
      * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstance(long, java.lang.String, java.lang.String, long)}.
      */
     @Test
-    public final void getSADataInstanceLongStringStringLong() {
+    public final void getSADataInstanceByContainerIdAndTypeAndNameAndTime() {
         // TODO : Not yet implemented
     }
 
@@ -189,7 +189,7 @@ public class DataInstanceServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstance(long, long)}.
      */
     @Test
-    public final void getSADataInstanceLongLong() {
+    public final void getSADataInstanceBySourceObjectIdAndTime() {
         // TODO : Not yet implemented
     }
 
@@ -197,7 +197,7 @@ public class DataInstanceServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstances(long)}.
      */
     @Test
-    public final void getSADataInstancesLong() {
+    public final void getSADataInstancesByDataInstanceId() {
         // TODO : Not yet implemented
     }
 
@@ -232,7 +232,7 @@ public class DataInstanceServiceImplTest {
      * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstances(long, java.lang.String, java.util.List, long)}.
      */
     @Test
-    public final void getSADataInstancesLongStringListOfStringLong() {
+    public final void getSADataInstancesByContainerIdAndTypeAndNamesAndTime() {
         // TODO : Not yet implemented
     }
 

@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.document.impl;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.bonitasoft.engine.document.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentException;
 import org.bonitasoft.engine.document.model.SDocumentBuilders;
@@ -31,6 +27,10 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -84,7 +84,7 @@ public class DocumentServiceImplTest {
     }
 
     @Test(expected = SDocumentException.class)
-    public final void getContentWithException() throws SBonitaReadException, SDocumentContentNotFoundException, SDocumentException {
+    public final void getContentThrowException() throws SBonitaReadException, SDocumentContentNotFoundException, SDocumentException {
         when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         documentServiceImpl.getContent("documentId");

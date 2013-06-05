@@ -54,12 +54,12 @@ public class PlatformLoginServiceImpl implements PlatformLoginService {
     }
 
     @Override
-    public void logout(final long sessionId) throws SPlatformLoginException, SSessionNotFoundException {
+    public void logout(final long sessionId) throws SSessionNotFoundException {
         sessionService.deleteSession(sessionId);
     }
 
     @Override
-    public boolean isValid(final long sessionId) throws SPlatformLoginException {
+    public boolean isValid(final long sessionId) {
         try {
             return sessionService.isValid(sessionId);
         } catch (final SSessionNotFoundException ssnfe) {

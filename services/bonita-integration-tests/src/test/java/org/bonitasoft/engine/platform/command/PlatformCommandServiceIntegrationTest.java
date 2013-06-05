@@ -7,10 +7,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilder;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderAccessor;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandCriterion;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
@@ -96,11 +96,12 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
         platformCommandService.create(command1);
         platformCommandService.create(command2);
         platformCommandService.create(command3);
-        final List<SPlatformCommand> commands1 = platformCommandService.getPlatformCommands(0, 500, SPlatformCommandCriterion.NAME_ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 500, SPlatformCommand.class, "name", OrderByType.ASC);
+        final List<SPlatformCommand> commands1 = platformCommandService.getPlatformCommands(queryOptions);
         assertEquals(3, commands1.size());
 
         platformCommandService.deleteAll();
-        final List<SPlatformCommand> commands2 = platformCommandService.getPlatformCommands(0, 500, SPlatformCommandCriterion.NAME_ASC);
+        final List<SPlatformCommand> commands2 = platformCommandService.getPlatformCommands(queryOptions);
         assertTrue(commands2.isEmpty());
         getTransactionService().complete();
     }
@@ -151,7 +152,8 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
         platformCommandService.create(sPlatformCommand2);
         platformCommandService.create(sPlatformCommand3);
 
-        final List<SPlatformCommand> commands = platformCommandService.getPlatformCommands(0, 5, SPlatformCommandCriterion.NAME_ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 5, SPlatformCommand.class, "name", OrderByType.ASC);
+        final List<SPlatformCommand> commands = platformCommandService.getPlatformCommands(queryOptions);
         assertEquals(3, commands.size());
         assertEquals("commandA", commands.get(0).getName());
         assertEquals("commandB", commands.get(1).getName());

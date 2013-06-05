@@ -16,10 +16,6 @@ package org.bonitasoft.engine.actor.mapping.impl.test;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,6 +38,10 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -120,7 +120,7 @@ public class ActorMappingServiceImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public final void getNumberOfUsersOfActorWithException() throws SBonitaReadException {
+    public final void getNumberOfUsersOfActorThrowException() throws SBonitaReadException {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfUsersOfActor(456L);
@@ -140,7 +140,7 @@ public class ActorMappingServiceImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public final void getNumberOfRolesOfActorWithException() throws SBonitaReadException {
+    public final void getNumberOfRolesOfActorThrowException() throws SBonitaReadException {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfRolesOfActor(456L);
@@ -160,7 +160,7 @@ public class ActorMappingServiceImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public final void getNumberOfGroupsOfActorWithException() throws SBonitaReadException {
+    public final void getNumberOfGroupsOfActorThrowException() throws SBonitaReadException {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfGroupsOfActor(456L);
@@ -180,7 +180,7 @@ public class ActorMappingServiceImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public final void getNumberOfMembershipsOfActorWithException() throws SBonitaReadException {
+    public final void getNumberOfMembershipsOfActorThrowException() throws SBonitaReadException {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getNumberOfMembershipsOfActor(456L);
@@ -208,7 +208,7 @@ public class ActorMappingServiceImplTest {
     }
 
     @Test(expected = SActorNotFoundException.class)
-    public final void getActorByNameAndScopeIdWithException() throws SActorNotFoundException, SBonitaReadException {
+    public final void getActorByNameAndScopeIdThrowException() throws SActorNotFoundException, SBonitaReadException {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         actorMappingServiceImpl.getActor("actorName", 69L);

@@ -13,13 +13,6 @@
  **/
 package org.bonitasoft.engine.identity.impl.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +34,19 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.stubbing.answers.Returns;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Matthieu Chaffotte
@@ -49,334 +54,382 @@ import org.mockito.internal.stubbing.answers.Returns;
  */
 public class IdentityServiceImplForUserTest {
 
+    @Mock
     private Recorder recorder;
 
-    private ReadPersistenceService persistence;
+    @Mock
+    private ReadPersistenceService persistenceService;
 
+    @Mock
     private EventService eventService;
 
+    @Mock
     private TechnicalLoggerService logger;
 
+    @InjectMocks
     private IdentityServiceImpl identityServiceImpl;
 
     @Before
-    public void setup() {
-        recorder = mock(Recorder.class);
-        persistence = mock(ReadPersistenceService.class);
-        eventService = mock(EventService.class);
-        logger = mock(TechnicalLoggerService.class, new Returns(true));
-        identityServiceImpl = new IdentityServiceImpl(persistence, recorder, eventService, null, logger, null, null);
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsers()}.
+     */
     @Test
     public void getNumberOfUsers() throws Exception {
-        when(persistence.selectOne(any(SelectOneDescriptor.class))).thenReturn(1L);
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(1L);
         Assert.assertEquals(1L, identityServiceImpl.getNumberOfUsers());
 
         verifyZeroInteractions(recorder);
     }
 
     @Test(expected = SIdentityException.class)
-    public void getNumberOfUsersWithException() throws Exception {
-        when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public void getNumberOfUsersThrowException() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsers();
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
+     */
     @Test
-    public void getNumberOfUsersWithQueryOptions() throws Exception {
+    public void getNumberOfUsersWithOptions() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
 
-        when(persistence.getNumberOfEntities(SUser.class, options, null)).thenReturn(1L);
+        when(persistenceService.getNumberOfEntities(SUser.class, options, null)).thenReturn(1L);
         Assert.assertEquals(1L, identityServiceImpl.getNumberOfUsers(options));
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public void getNumberOfUsersWithQueryOptionsWithException() throws Exception {
+    public void getNumberOfUsersWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
 
-        when(persistence.getNumberOfEntities(SUser.class, options, null)).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.getNumberOfEntities(SUser.class, options, null)).thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsers(options);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByGroup(long)}.
+     */
     @Test
     public void getNumberOfUsersByGroup() throws Exception {
         final long groupId = 1;
 
-        when(persistence.selectOne(SelectDescriptorBuilder.getNumberOfUsersByGroup(groupId))).thenReturn(3L);
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByGroup(groupId))).thenReturn(3L);
         Assert.assertEquals(3L, identityServiceImpl.getNumberOfUsersByGroup(groupId));
     }
 
     @Test(expected = SIdentityException.class)
-    public void getNumberOfUsersByGroupWithException() throws Exception {
+    public void getNumberOfUsersByGroupThrowException() throws Exception {
         final long groupId = 1;
 
-        when(persistence.selectOne(SelectDescriptorBuilder.getNumberOfUsersByGroup(groupId))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByGroup(groupId))).thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsersByGroup(groupId);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByMembership(long, long)}.
+     */
     @Test
     public void getNumberOfUsersByMembership() throws Exception {
         final long groupId = 1;
         final long roleId = 2;
 
-        when(persistence.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId))).thenReturn(3L);
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId))).thenReturn(3L);
         Assert.assertEquals(3L, identityServiceImpl.getNumberOfUsersByMembership(groupId, roleId));
     }
 
     @Test(expected = SIdentityException.class)
-    public void getNumberOfUsersByMembershipWithException() throws Exception {
+    public void getNumberOfUsersByMembershipThrowException() throws Exception {
         final long groupId = 1;
         final long roleId = 2;
 
-        when(persistence.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId))).thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsersByMembership(groupId, roleId);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByRole(long)}.
+     */
     @Test
     public void getNumberOfUsersByRole() throws Exception {
         final long roleId = 2;
 
-        when(persistence.selectOne(SelectDescriptorBuilder.getNumberOfUsersByRole(roleId))).thenReturn(3L);
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByRole(roleId))).thenReturn(3L);
         Assert.assertEquals(3L, identityServiceImpl.getNumberOfUsersByRole(roleId));
     }
 
     @Test(expected = SIdentityException.class)
-    public void getNumberOfUsersByRoleWithException() throws Exception {
+    public void getNumberOfUsersByRoleThrowException() throws Exception {
         final long roleId = 2;
 
-        when(persistence.selectOne(SelectDescriptorBuilder.getNumberOfUsersByRole(roleId))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByRole(roleId))).thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsersByRole(roleId);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUser(long)}.
+     */
     @Test
-    public void getUser() throws Exception {
+    public void getUserById() throws SBonitaReadException, SUserNotFoundException {
         final long userId = 1;
-
         final SUser sUser = mock(SUser.class);
-        when(persistence.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId))).thenReturn(sUser);
+        when(persistenceService.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId))).thenReturn(sUser);
+
         Assert.assertEquals(sUser, identityServiceImpl.getUser(userId));
     }
 
+    @Test(expected = SUserNotFoundException.class)
+    public void getUserByIdNotExist() throws SBonitaReadException, SUserNotFoundException {
+        final long userId = 455;
+        doReturn(null).when(persistenceService).selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
+
+        identityServiceImpl.getUser(userId);
+    }
+
+    @Test(expected = SUserNotFoundException.class)
+    public void getUserByIdThrowException() throws SBonitaReadException, SUserNotFoundException {
+        final long userId = 1;
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
+
+        identityServiceImpl.getUser(userId);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsers(java.util.List)}.
+     */
     @Test
-    public void getUsers() throws Exception {
+    public void getUsersByIds() throws Exception {
         final SUser sUser1 = mock(SUser.class);
         final SUser sUser2 = mock(SUser.class);
         final SUser sUser3 = mock(SUser.class);
         final List<SUser> users = Arrays.asList(sUser1, sUser2, sUser3);
         final List<Long> ids = Arrays.asList(1l, 2l, 3l);
-        when(persistence.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", ids))).thenReturn(users);
+        when(persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", ids))).thenReturn(users);
+
         Assert.assertEquals(users, identityServiceImpl.getUsers(ids));
     }
 
     @Test
-    public void getUsersNullIds() throws Exception {
+    public void getUsersByNullIds() throws Exception {
         assertTrue(identityServiceImpl.getUsers(null).isEmpty());
     }
 
     @Test
-    public void getUsersEmptyIds() throws Exception {
+    public void getUsersByEmptyIds() throws Exception {
         assertTrue(identityServiceImpl.getUsers(Collections.<Long> emptyList()).isEmpty());
     }
 
     @SuppressWarnings("unchecked")
     @Test(expected = SUserNotFoundException.class)
-    public void getUsersThrowException() throws Exception {
-        when(persistence.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", any(Collection.class))))
+    public void getUsersByIdsThrowException() throws Exception {
+        when(persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", any(Collection.class))))
                 .thenThrow(SBonitaReadException.class);
+
         assertTrue(identityServiceImpl.getUsers(Arrays.asList(1l)).isEmpty());
     }
 
-    @Test(expected = SUserNotFoundException.class)
-    public void getUserWithReadException() throws Exception {
-        final long userId = 1;
-
-        when(persistence.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId))).thenThrow(new SBonitaReadException("Brinnggg !"));
-        identityServiceImpl.getUser(userId);
-    }
-
-    @Test(expected = SUserNotFoundException.class)
-    public void getUserWithWrongId() throws Exception {
-        final long userId = 1;
-
-        when(persistence.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId))).thenReturn(null);
-        identityServiceImpl.getUser(userId);
-    }
-
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#searchUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
+     */
     @Test
     public void searchUsers() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         final SUser user = mock(SUser.class);
-        when(persistence.searchEntity(SUser.class, options, null)).thenReturn(Collections.singletonList(user));
+        when(persistenceService.searchEntity(SUser.class, options, null)).thenReturn(Collections.singletonList(user));
 
         assertEquals(user, identityServiceImpl.searchUsers(options).get(0));
     }
 
-    // @Test
-    // public void createUserWithUserImpl() throws Exception {
-    // final IdentityServiceImpl identityServiceImpl = new IdentityServiceImpl(persistence, recorder, eventService, new IdentityModelBuilderImpl(), logger,
-    // queriableLoggerService, credentialsEncrypter);
-    //
-    // SUser baseUser = new SUserImpl();
-    //
-    // when(credentialsEncrypter.hash(anyString())).thenReturn("hashedPassword");
-    // SUserImpl userFromRecorder = new SUserImpl();
-    // userFromRecorder.setId(123456789l);
-    // when(recorder.recordInsert(any(InsertRecord.class), any(SInsertEvent.class))).thenReturn(userFromRecorder);
-    // final SUser returnedUser = identityServiceImpl.createUser(baseUser);
-    // assertEquals("hashedPassword", returnedUser.getPassword());
-    // }
+    @Test(expected = SBonitaSearchException.class)
+    public void searchUsersThrowException() throws SBonitaSearchException, SBonitaReadException {
+        final QueryOptions options = new QueryOptions(0, 10);
+        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(SUser.class, options, null);
 
-    // public void createUser() throws Exception {
-    // final SUser sUser = buildEnabledSUser("firstname", "lastname", "pwd", 0);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // final SUser result = identityService.createUser(sUser);
-    // tx.complete();
-    // assertEquals(sUser.getCreatedBy(), result.getCreatedBy());
-    // assertEquals(sUser.getCreationDate(), result.getCreationDate());
-    // assertEquals(sUser.getDelegeeUserName(), result.getDelegeeUserName());
-    // assertEquals(sUser.isEnabled(), result.isEnabled());
-    // assertEquals(sUser.getFirstName(), result.getFirstName());
-    // assertEquals(sUser.getIconName(), result.getIconName());
-    // assertEquals(sUser.getIconPath(), result.getIconPath());
-    // assertEquals(sUser.getJobTitle(), result.getJobTitle());
-    // assertEquals(sUser.getLastConnection(), result.getLastConnection());
-    // assertEquals(sUser.getLastName(), result.getLastName());
-    // assertEquals(sUser.getLastUpdate(), result.getLastUpdate());
-    // assertEquals(sUser.getManagerUserId(), result.getManagerUserId());
-    // // assertEquals(sUser.getPassword(), result.getPassword());
-    // assertEquals(sUser.getTitle(), result.getTitle());
-    // assertEquals(sUser.getUserName(), result.getUserName());
-    //
-    // // clean-up
-    // deleteSUser(result);
-    // }
+        identityServiceImpl.searchUsers(options).get(0);
+    }
 
-    // public void chechCredentials() throws Exception {
-    // final SUser sUser = createEnabledSUser("firstname", "lastname", "pwd", 0);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // final boolean result = identityService.chechCredentials(sUser, "pwd");
-    // tx.complete();
-    // assertTrue(result);
-    //
-    // // clean-up
-    // deleteSUser(sUser);
-    // }
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#chechCredentials(org.bonitasoft.engine.identity.model.SUser, java.lang.String)}.
+     */
+    @Test
+    public final void chechCredentials() {
+        // TODO : Not yet implemented
+    }
 
-    // public void chechCredentialsWithWrongPassword() throws Exception {
-    // final SUser sUser = createEnabledSUser("firstname", "lastname", "pwd", 0);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // final boolean result = identityService.chechCredentials(sUser, "plop");
-    // tx.complete();
-    // assertFalse(result);
-    //
-    // // clean-up
-    // deleteSUser(sUser);
-    // }
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#createUserWithoutEncryptingPassword(org.bonitasoft.engine.identity.model.SUser)}.
+     */
+    @Test
+    public final void createUserWithoutEncryptingPassword() {
+        // TODO : Not yet implemented
+    }
 
-    // @Test(expected = STransactionPrepareException.class)
-    // public void cannotCreateTwoUserWithTheSameUserName() throws Exception {
-    // final SUser sUser1 = buildEnabledSUser("firstname", "lastname", "pwd", 0);
-    // final SUser sUser2 = buildEnabledSUser("firstname", "lastname", "pwd", 0);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // identityService.createUser(sUser1);
-    // try {
-    // identityService.createUser(sUser2);
-    // } finally {
-    // tx.complete();
-    // }
-    // }
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#updateUser(org.bonitasoft.engine.identity.model.SUser, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
+     * .
+     */
+    @Test
+    public final void updateUser() {
+        // TODO : Not yet implemented
+    }
 
-    // @Test(expected = STransactionPrepareException.class)
-    // public void cannotCreateAUserWithANullUserName() throws Exception {
-    // final SUser sUser = buildEnabledSUser(null, "lastname", "pwd", 0);
-    //
-    // tx.begin();
-    // try {
-    // identityService.createUser(sUser);
-    // } finally {
-    // tx.complete();
-    // }
-    // }
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#updateUser(org.bonitasoft.engine.identity.model.SUser, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor, boolean)}
+     * .
+     */
+    @Test
+    public final void updateUserAndEncryptPassword() {
+        // TODO : Not yet implemented
+    }
 
-    // @Test(expected = NullPointerException.class)
-    // public void cannotCreateAUserWithANullPassword() throws Exception {
-    // final SUser sUser = buildEnabledSUser("firstname", "lastname", null, 0);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // try {
-    // identityService.createUser(sUser);
-    // } finally {
-    // tx.complete();
-    // }
-    // }
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#updateUserContactInfo(org.bonitasoft.engine.identity.model.SContactInfo, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
+     * .
+     */
+    @Test
+    public final void updateUserContactInfo() {
+        // TODO : Not yet implemented
+    }
 
-    // @Cover(classes = { IdentityService.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Create", "Get", "UserContactInfo" })
-    // @Test
-    // public void createAndGetUserContactInfo() throws Exception {
-    // final SUser sUser = createEnabledSUser("firstname", "lastname", "pwd", 0);
-    // final SContactInfo sContactInfo = buildSContactInfo(sUser.getId(), true);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // identityService.createUserContactInfo(sContactInfo);
-    //
-    // final SContactInfo result = identityService.getUserContactInfo(sUser.getId(), true);
-    // tx.complete();
-    // assertEquals(sContactInfo.getAddress(), result.getAddress());
-    // assertEquals(sContactInfo.getBuilding(), result.getBuilding());
-    // assertEquals(sContactInfo.getCity(), result.getCity());
-    // assertEquals(sContactInfo.getCountry(), result.getCountry());
-    // assertEquals(sContactInfo.getDiscriminator(), result.getDiscriminator());
-    // assertEquals(sContactInfo.getEmail(), result.getEmail());
-    // assertEquals(sContactInfo.getFaxNumber(), result.getFaxNumber());
-    // assertEquals(sContactInfo.getMobileNumber(), result.getMobileNumber());
-    // assertEquals(sContactInfo.getPhoneNumber(), result.getPhoneNumber());
-    // assertEquals(sContactInfo.getRoom(), result.getRoom());
-    // assertEquals(sContactInfo.getState(), result.getState());
-    // assertEquals(sContactInfo.getUserId(), result.getUserId());
-    // assertEquals(sContactInfo.getWebsite(), result.getWebsite());
-    // assertEquals(sContactInfo.getZipCode(), result.getZipCode());
-    //
-    // // clean-up
-    // // deleteSUser(sContactInfo);
-    // deleteSUser(sUser);
-    // }
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsers(int, int)}.
+     */
+    @Test
+    public final void getUsersPaginated() {
+        // TODO : Not yet implemented
+    }
 
-    // @Test(expected = SUserNotFoundException.class)
-    // public void getUserByUsernameWithException() throws Exception {
-    // final SUser sUser = createEnabledSUser("firstname", "lastname", "pwd", 0);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // try {
-    // identityService.getUserByUserName("blabla");
-    // } finally {
-    // tx.complete();
-    //
-    // // clean-up
-    // deleteSUser(sUser);
-    // }
-    // }
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsers(int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}.
+     */
+    @Test
+    public final void getUsersPaginatedWithOrder() {
+        // TODO : Not yet implemented
+    }
 
-    // public void getUserByUsername() throws Exception {
-    // final SUser sUser = createEnabledSUser("firstname", "lastname", "pwd", 0);
-    //
-    // final BusinessTransaction tx = bpmServicesBuilder.getTransactionService().createTransaction();
-    // tx.begin();
-    // final SUser result = identityService.getUserByUserName("firstname");
-    // tx.complete();
-    // assertEquals(sUser.getUserName(), result.getUserName());
-    //
-    // // clean-up
-    // deleteSUser(sUser);
-    // }
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByDelegee(long)}.
+     */
+    @Test
+    public final void getUsersByDelegee() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByGroup(long)}.
+     */
+    @Test
+    public final void getUsersByGroup() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByGroup(long, int, int)}.
+     */
+    @Test
+    public final void getUsersByGroupPaginated() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByGroup(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
+     * .
+     */
+    @Test
+    public final void getUsersByGroupPaginatedWithOrder() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByManager(long)}.
+     */
+    @Test
+    public final void getUsersByManager() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserContactInfo(long, boolean)}.
+     */
+    @Test
+    public final void getUserContactInfo() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserByUserName(java.lang.String)}.
+     */
+    @Test
+    public final void getUserByUserName() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByRole(long)}.
+     */
+    @Test
+    public final void getUsersByRole() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByRole(long, int, int)}.
+     */
+    @Test
+    public final void getUsersByRolePaginated() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsersByRole(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
+     * .
+     */
+    @Test
+    public final void getUsersByRolePaginatedWithOrder() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteUser(long)}.
+     */
+    @Test
+    public final void deleteUserById() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteUser(org.bonitasoft.engine.identity.model.SUser)}.
+     */
+    @Test
+    public final void deleteUserByObject() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#createUser(org.bonitasoft.engine.identity.model.SUser)}.
+     */
+    @Test
+    public final void createUser() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#createUserContactInfo(org.bonitasoft.engine.identity.model.SContactInfo)}.
+     */
+    @Test
+    public final void createUserContactInfo() {
+        // TODO : Not yet implemented
+    }
+
 }

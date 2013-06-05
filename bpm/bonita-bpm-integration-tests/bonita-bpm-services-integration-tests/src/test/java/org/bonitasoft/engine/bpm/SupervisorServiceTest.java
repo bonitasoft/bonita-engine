@@ -1,9 +1,5 @@
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +24,10 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Yanyan Liu
@@ -134,7 +134,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SSupervisorNotFoundException.class)
-    public void testGetSupervisorWithException() throws Exception {
+    public void testGetSupervisorThrowException() throws Exception {
         this.transactionService.begin();
         supervisorService.getSupervisor(-1);
         this.transactionService.complete();
@@ -158,7 +158,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SSupervisorNotFoundException.class)
-    public void testDeleteSupervisorWithException() throws Exception {
+    public void testDeleteSupervisorThrowException() throws Exception {
         this.transactionService.begin();
         supervisorService.deleteSupervisor(-1);
         this.transactionService.complete();
@@ -235,7 +235,8 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         this.transactionService.begin();
         final List<OrderByOption> oderByOptions = Collections.singletonList(new OrderByOption(SProcessSupervisor.class, this.sSupervisorBuilder.getUserIdKey(),
                 OrderByType.DESC));
-        final List<FilterOption> filterOptions = Collections.singletonList(new FilterOption(SProcessSupervisor.class, this.sSupervisorBuilder.getProcessDefIdKey(),
+        final List<FilterOption> filterOptions = Collections.singletonList(new FilterOption(SProcessSupervisor.class, this.sSupervisorBuilder
+                .getProcessDefIdKey(),
                 this.processDefId));
 
         // test ASC

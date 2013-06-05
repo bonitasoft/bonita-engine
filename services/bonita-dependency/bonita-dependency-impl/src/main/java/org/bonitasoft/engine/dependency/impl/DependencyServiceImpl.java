@@ -153,7 +153,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createDependency", e));
             }
-            throw new SDependencyCreationException("can't create dependency " + dependency, e);
+            throw new SDependencyCreationException("Can't create dependency " + dependency, e);
         }
     }
 
@@ -183,7 +183,7 @@ public class DependencyServiceImpl implements DependencyService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createDependencyMapping", e));
             }
             initiateLogBuilder(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createDependencyMapping");
-            throw new SDependencyException("can't create dependency mapping" + dependencyMapping, e);
+            throw new SDependencyException("Can't create dependency mapping" + dependencyMapping, e);
         }
     }
 
@@ -250,7 +250,7 @@ public class DependencyServiceImpl implements DependencyService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
             }
             initiateLogBuilder(dependency.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteDependency");
-            throw new SDependencyDeletionException("can't delete dependency" + dependency, e);
+            throw new SDependencyDeletionException("Can't delete dependency" + dependency, e);
         }
     }
 
@@ -283,7 +283,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
             }
-            throw new SDependencyNotFoundException("can't get dependency with name: " + name, e);
+            throw new SDependencyNotFoundException("Can't get dependency with name: " + name, e);
         }
     }
 
@@ -325,7 +325,7 @@ public class DependencyServiceImpl implements DependencyService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependencyMapping", e));
             }
             initiateLogBuilder(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteDependencyMapping");
-            throw new SDependencyException("can't delete dependency mapping" + dependencyMapping, e);
+            throw new SDependencyException("Can't delete dependency mapping" + dependencyMapping, e);
         }
     }
 
@@ -336,7 +336,8 @@ public class DependencyServiceImpl implements DependencyService {
         }
         NullCheckingUtil.checkArgsNotNull(queryOptions);
         try {
-            final List<SDependency> listSDependency = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null, SDependency.class,
+            final List<SDependency> listSDependency = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null,
+                    SDependency.class,
                     queryOptions));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencies"));
@@ -346,7 +347,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencies", e));
             }
-            throw new SDependencyException("can't get dependencies", e);
+            throw new SDependencyException("Can't get dependencies", e);
         }
     }
 
@@ -368,7 +369,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencies", e));
             }
-            throw new SDependencyException("can't get dependencies", e);
+            throw new SDependencyException("Can't get dependencies", e);
         }
     }
 
@@ -385,14 +386,14 @@ public class DependencyServiceImpl implements DependencyService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependency"));
             }
             if (sDependency == null) {
-                throw new SDependencyNotFoundException("can't get dependency with id: " + id);
+                throw new SDependencyNotFoundException("Can't get dependency with id: " + id);
             }
             return sDependency;
         } catch (final SBonitaReadException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependency", e));
             }
-            throw new SDependencyNotFoundException("can't get dependency with id: " + id, e);
+            throw new SDependencyNotFoundException("Can't get dependency with id: " + id, e);
         }
     }
 
@@ -416,7 +417,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyIds", e));
             }
-            throw new SDependencyException("can't get dependencies", e);
+            throw new SDependencyException("Can't get dependencies", e);
         }
     }
 
@@ -433,12 +434,15 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencyMapping"));
             }
+            if (sDependencyMapping == null) {
+                throw new SDependencyMappingNotFoundException("Can't get dependency mapping with id: " + id);
+            }
             return sDependencyMapping;
         } catch (final SBonitaReadException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMapping", e));
             }
-            throw new SDependencyMappingNotFoundException("can't get dependency mapping with id: " + id, e);
+            throw new SDependencyMappingNotFoundException("Can't get dependency mapping with id: " + id, e);
         }
     }
 
@@ -459,7 +463,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMappings", e));
             }
-            throw new SDependencyException("can't get dependency mappings", e);
+            throw new SDependencyException("Can't get dependency mappings", e);
         }
     }
 
@@ -485,7 +489,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMappings", e));
             }
-            throw new SDependencyException("can't get dependency mappings by artifact: " + artifactType + ", " + artifactId, e);
+            throw new SDependencyException("Can't get dependency mappings by artifact: " + artifactType + ", " + artifactId, e);
         }
     }
 
@@ -509,7 +513,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMappings", e));
             }
-            throw new SDependencyException("can't get dependency mappings by dependencyId: " + dependencyId, e);
+            throw new SDependencyException("Can't get dependency mappings by dependencyId: " + dependencyId, e);
         }
     }
 
@@ -566,7 +570,7 @@ public class DependencyServiceImpl implements DependencyService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateDependency", e));
             }
             initiateLogBuilder(dependency.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateDependency");
-            throw new SDependencyException("can't update dependency " + dependency, e);
+            throw new SDependencyException("Can't update dependency " + dependency, e);
         }
     }
 
@@ -595,7 +599,7 @@ public class DependencyServiceImpl implements DependencyService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateDependencyMapping", e));
             }
             initiateLogBuilder(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateDependencyMapping");
-            throw new SDependencyException("can't update dependency mapping " + dependencyMapping, e);
+            throw new SDependencyException("Can't update dependency mapping " + dependencyMapping, e);
         }
     }
 
@@ -629,11 +633,14 @@ public class DependencyServiceImpl implements DependencyService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDisconnectedDependencyMappings"));
         }
-        QueryOptions loopQueryOptions = new QueryOptions(queryOptions.getFromIndex(), queryOptions.getNumberOfResults(), queryOptions.getOrderByOptions());
+
         List<SDependencyMapping> dependencyMappings;
         final List<SDependencyMapping> result = new ArrayList<SDependencyMapping>();
         int numberOfResultsFound = 0;
         final int startIndex = queryOptions.getFromIndex();
+        final int numberOfResults = queryOptions.getNumberOfResults();
+
+        QueryOptions loopQueryOptions = new QueryOptions(queryOptions);
         do {
             dependencyMappings = getDependencyMappings(loopQueryOptions);
             for (final SDependencyMapping dependencyMapping : dependencyMappings) {
@@ -643,14 +650,14 @@ public class DependencyServiceImpl implements DependencyService {
                         // add it in the results
                         result.add(dependencyMapping);
                     }
-                    if (result.size() == queryOptions.getNumberOfResults()) {
+                    if (result.size() == numberOfResults) {
                         // stop the for iteration, we have the number of results we want
                         break;
                     }
                 }
             }
             loopQueryOptions = QueryOptions.getNextPage(loopQueryOptions);
-        } while (dependencyMappings.size() == loopQueryOptions.getNumberOfResults() && result.size() < queryOptions.getNumberOfResults());
+        } while (dependencyMappings.size() == numberOfResults && result.size() < numberOfResults);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDisconnectedDependencyMappings"));
         }
@@ -720,6 +727,6 @@ public class DependencyServiceImpl implements DependencyService {
         } catch (final ClassLoaderException e) {
             throw new SDependencyException("Cannot refresh classLoader with type'" + type + "' and id " + id, e);
         }
-    } 
+    }
 
 }

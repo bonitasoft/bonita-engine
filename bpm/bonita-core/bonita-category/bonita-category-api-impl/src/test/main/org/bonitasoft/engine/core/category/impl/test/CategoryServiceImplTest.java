@@ -16,10 +16,6 @@ package org.bonitasoft.engine.core.category.impl.test;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,39 +39,48 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.any;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 /**
  * @author Celine Souchet
  * 
  */
 public class CategoryServiceImplTest {
 
+    @Mock
     private Recorder recorder;
 
+    @Mock
     private ReadPersistenceService persistenceService;
 
+    @Mock
     private EventService eventService;
 
+    @Mock
     private QueriableLoggerService queriableLoggerService;
 
+    @Mock
     private SessionService sessionService;
 
+    @Mock
     private ReadSessionAccessor sessionAccessor;
 
+    @Mock
     private SCategoryBuilderAccessor categoryBuilderAccessor;
 
+    @InjectMocks
     private CategoryServiceImpl categoryServiceImpl;
 
     @Before
     public void setUp() throws Exception {
-        recorder = mock(Recorder.class);
-        persistenceService = mock(ReadPersistenceService.class);
-        eventService = mock(EventService.class);
-        queriableLoggerService = mock(QueriableLoggerService.class);
-        sessionService = mock(SessionService.class);
-        sessionAccessor = mock(ReadSessionAccessor.class);
-        categoryBuilderAccessor = mock(SCategoryBuilderAccessor.class);
-        categoryServiceImpl = new CategoryServiceImpl(persistenceService, recorder, eventService, sessionService, sessionAccessor, categoryBuilderAccessor,
-                queriableLoggerService);
+        MockitoAnnotations.initMocks(this);
     }
 
     /**
@@ -87,21 +92,21 @@ public class CategoryServiceImplTest {
     @Test
     public final void getCategoryById() throws SCategoryNotFoundException, SBonitaReadException {
         final SCategory sCategory = mock(SCategory.class);
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(sCategory);
+        doReturn(sCategory).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
 
         Assert.assertEquals(sCategory, categoryServiceImpl.getCategory(456L));
     }
 
     @Test(expected = SCategoryNotFoundException.class)
     public final void getCategoryByIdNotExists() throws SBonitaReadException, SCategoryNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+        doReturn(null).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
 
         categoryServiceImpl.getCategory(456L);
     }
 
     @Test(expected = SCategoryNotFoundException.class)
-    public final void getCategoryByIdWithException() throws SBonitaReadException, SCategoryNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getCategoryByIdThrowException() throws SBonitaReadException, SCategoryNotFoundException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
 
         categoryServiceImpl.getCategory(456L);
     }
@@ -117,14 +122,14 @@ public class CategoryServiceImplTest {
     @Test
     public final void getCategories() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sCategories);
+        doReturn(sCategories).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         Assert.assertEquals(sCategories, categoryServiceImpl.getCategories(0, 1, "field", OrderByType.ASC));
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getCategoriesWithException() throws SBonitaReadException, SCategoryException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getCategoriesThrowException() throws SBonitaReadException, SCategoryException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         categoryServiceImpl.getCategories(0, 1, "field", OrderByType.ASC);
     }
@@ -140,14 +145,14 @@ public class CategoryServiceImplTest {
     @Test
     public final void getCategoriesOfProcessDefinition() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sCategories);
+        doReturn(sCategories).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         Assert.assertEquals(sCategories, categoryServiceImpl.getCategoriesOfProcessDefinition(2L, 0, 1, OrderByType.ASC));
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getCategoriesOfProcessDefinitionWithException() throws SBonitaReadException, SCategoryException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getCategoriesOfProcessDefinitionThrowException() throws SBonitaReadException, SCategoryException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         categoryServiceImpl.getCategoriesOfProcessDefinition(2L, 0, 1, OrderByType.ASC);
     }
@@ -161,7 +166,7 @@ public class CategoryServiceImplTest {
     @Test
     public final void getCategorizedProcessIds() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sCategories);
+        doReturn(sCategories).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         final List<Long> processIds = new ArrayList<Long>();
         processIds.add(14654L);
@@ -179,8 +184,8 @@ public class CategoryServiceImplTest {
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getCategorizedProcessIdsWithException() throws SBonitaReadException, SCategoryException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getCategorizedProcessIdsThrowException() throws SBonitaReadException, SCategoryException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         final List<Long> processIds = new ArrayList<Long>();
         processIds.add(14654L);
@@ -196,21 +201,21 @@ public class CategoryServiceImplTest {
     @Test
     public final void getCategoryByName() throws SCategoryNotFoundException, SBonitaReadException {
         final SCategory sCategory = mock(SCategory.class);
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(sCategory);
+        doReturn(sCategory).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         Assert.assertEquals(sCategory, categoryServiceImpl.getCategoryByName("name"));
     }
 
     @Test(expected = SCategoryNotFoundException.class)
     public final void getCategoryByNameNotExists() throws SBonitaReadException, SCategoryNotFoundException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+        doReturn(null).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         categoryServiceImpl.getCategoryByName("name");
     }
 
     @Test(expected = SCategoryNotFoundException.class)
-    public final void getCategoryByNameWithException() throws SBonitaReadException, SCategoryNotFoundException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getCategoryByNameThrowException() throws SBonitaReadException, SCategoryNotFoundException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         categoryServiceImpl.getCategoryByName("name");
     }
@@ -224,14 +229,14 @@ public class CategoryServiceImplTest {
     @Test
     public final void getNumberOfCategories() throws SBonitaReadException, SCategoryException {
         final long numberOfCategories = 3L;
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(numberOfCategories);
+        doReturn(numberOfCategories).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         Assert.assertEquals(numberOfCategories, categoryServiceImpl.getNumberOfCategories());
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getNumberOfCategoriesWithException() throws SCategoryException, SBonitaReadException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getNumberOfCategoriesThrowException() throws SCategoryException, SBonitaReadException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         categoryServiceImpl.getNumberOfCategories();
     }
@@ -245,14 +250,14 @@ public class CategoryServiceImplTest {
     @Test
     public final void getNumberOfCategoriesOfProcess() throws SCategoryException, SBonitaReadException {
         final long numberOfCategories = 3L;
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(numberOfCategories);
+        doReturn(numberOfCategories).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         Assert.assertEquals(numberOfCategories, categoryServiceImpl.getNumberOfCategoriesOfProcess(1589L));
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getNumberOfCategoriesOfProcessWithException() throws SCategoryException, SBonitaReadException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getNumberOfCategoriesOfProcessThrowException() throws SCategoryException, SBonitaReadException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         categoryServiceImpl.getNumberOfCategoriesOfProcess(1589L);
     }
@@ -266,14 +271,14 @@ public class CategoryServiceImplTest {
     @Test
     public final void getNumberOfCategoriesUnrelatedToProcess() throws SCategoryException, SBonitaReadException {
         final long numberOfCategories = 3L;
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(numberOfCategories);
+        doReturn(numberOfCategories).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         Assert.assertEquals(numberOfCategories, categoryServiceImpl.getNumberOfCategoriesUnrelatedToProcess(1589L));
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getNumberOfCategoriesUnrelatedToProcessWithException() throws SCategoryException, SBonitaReadException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getNumberOfCategoriesUnrelatedToProcessThrowException() throws SCategoryException, SBonitaReadException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         categoryServiceImpl.getNumberOfCategoriesUnrelatedToProcess(1589L);
     }
@@ -287,7 +292,7 @@ public class CategoryServiceImplTest {
     @Test
     public final void getNumberOfCategorizedProcessIds() throws SCategoryException, SBonitaReadException {
         final long numberOfCategories = 3L;
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(numberOfCategories);
+        doReturn(numberOfCategories).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         final List<Long> processIds = new ArrayList<Long>();
         processIds.add(14654L);
@@ -305,8 +310,8 @@ public class CategoryServiceImplTest {
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getNumberOfCategorizedProcessIdsWithException() throws SBonitaReadException, SCategoryException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getNumberOfCategorizedProcessIdsThrowException() throws SBonitaReadException, SCategoryException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         final List<Long> processIds = new ArrayList<Long>();
         processIds.add(14654L);
@@ -322,14 +327,14 @@ public class CategoryServiceImplTest {
     @Test
     public final void getProcessDefinitionIdsOfCategory() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sCategories);
+        doReturn(sCategories).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         Assert.assertEquals(sCategories, categoryServiceImpl.getProcessDefinitionIdsOfCategory(54894L));
     }
 
     @Test(expected = SCategoryException.class)
-    public final void getProcessDefinitionIdsOfCategoryWithException() throws SBonitaReadException, SCategoryException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getProcessDefinitionIdsOfCategoryThrowException() throws SBonitaReadException, SCategoryException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         categoryServiceImpl.getProcessDefinitionIdsOfCategory(54894L);
     }
@@ -340,8 +345,18 @@ public class CategoryServiceImplTest {
      * .
      */
     @Test
-    public final void getCategoriesUnrelatedToProcessDefinition() {
-        // TODO : Not yet implemented
+    public final void getCategoriesUnrelatedToProcessDefinition() throws SBonitaReadException, SCategoryException {
+        final List<SCategory> sCategories = new ArrayList<SCategory>();
+        doReturn(sCategories).when(persistenceService).selectList(any(SelectListDescriptor.class));
+
+        Assert.assertEquals(sCategories, categoryServiceImpl.getCategoriesUnrelatedToProcessDefinition(54894L, 0, 10, OrderByType.ASC));
+    }
+
+    @Test(expected = SCategoryException.class)
+    public final void getCategoriesUnrelatedToProcessDefinitionThrowException() throws SBonitaReadException, SCategoryException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
+
+        categoryServiceImpl.getCategoriesUnrelatedToProcessDefinition(54894L, 0, 10, OrderByType.ASC);
     }
 
     /**

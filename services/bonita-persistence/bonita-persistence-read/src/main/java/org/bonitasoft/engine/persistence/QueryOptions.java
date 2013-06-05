@@ -45,6 +45,15 @@ public class QueryOptions implements Serializable {
 
     private static final QueryOptions ALL_RESULTS_QUERY_OPTIONS = new QueryOptions(0, UNLIMITED_NUMBER_OF_RESULTS);
 
+    public QueryOptions(final QueryOptions queryOptions) {
+        super();
+        fromIndex = queryOptions.getFromIndex();
+        numberOfResults = queryOptions.getNumberOfResults();
+        orderByOptions = queryOptions.getOrderByOptions();
+        filters = queryOptions.getFilters();
+        multipleFilter = queryOptions.getMultipleFilter();
+    }
+
     public QueryOptions(final int fromIndex, final int numberOfResults, final List<OrderByOption> orderByOptions) {
         super();
         this.fromIndex = fromIndex;
@@ -61,7 +70,7 @@ public class QueryOptions implements Serializable {
         this.numberOfResults = numberOfResults;
         this.orderByOptions = orderByOptions;
         this.filters = filters;
-        this.multipleFilter = multipleFilter; 
+        this.multipleFilter = multipleFilter;
     }
 
     public QueryOptions(final List<FilterOption> filters, final SearchFields multipleFilter) {

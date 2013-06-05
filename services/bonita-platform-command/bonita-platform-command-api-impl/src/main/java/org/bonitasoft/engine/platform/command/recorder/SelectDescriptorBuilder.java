@@ -16,9 +16,6 @@ package org.bonitasoft.engine.platform.command.recorder;
 import java.util.Collections;
 import java.util.Map;
 
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
 
@@ -30,13 +27,6 @@ public class SelectDescriptorBuilder {
     public static SelectOneDescriptor<SPlatformCommand> getPlatformCommandByName(final String platformCommandName) {
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) platformCommandName);
         return new SelectOneDescriptor<SPlatformCommand>("getPlatformCommandByName", parameters, SPlatformCommand.class);
-    }
-
-    public static SelectListDescriptor<SPlatformCommand> getPlatformCommands(final String field, final OrderByType order, final int fromIndex,
-            final int numberOfElements) {
-        final Map<String, Object> parameters = Collections.emptyMap();
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SPlatformCommand.class, field, order);
-        return new SelectListDescriptor<SPlatformCommand>("getPlatformCommands", parameters, SPlatformCommand.class, queryOptions);
     }
 
 }

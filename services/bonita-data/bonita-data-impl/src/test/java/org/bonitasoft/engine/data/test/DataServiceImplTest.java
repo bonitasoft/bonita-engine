@@ -17,10 +17,6 @@
 
 package org.bonitasoft.engine.data.test;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +42,10 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -107,7 +107,7 @@ public class DataServiceImplTest {
     }
 
     @Test(expected = SDataSourceNotFoundException.class)
-    public final void getByIdWithException() throws SBonitaReadException, SDataSourceNotFoundException {
+    public final void getByIdThrowException() throws SBonitaReadException, SDataSourceNotFoundException {
         when(persistence.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         dataServiceImpl.getDataSource(456L);
@@ -135,7 +135,7 @@ public class DataServiceImplTest {
     }
 
     @Test(expected = SDataSourceNotFoundException.class)
-    public final void getDataSourceByNameAndVersionWithException() throws SBonitaReadException, SDataSourceNotFoundException {
+    public final void getDataSourceByNameAndVersionThrowException() throws SBonitaReadException, SDataSourceNotFoundException {
         when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         dataServiceImpl.getDataSource("name", "version");
@@ -163,7 +163,7 @@ public class DataServiceImplTest {
     }
 
     @Test(expected = SDataSourceParameterNotFoundException.class)
-    public final void getDataSourceParameterByIdWithException() throws SBonitaReadException, SDataSourceParameterNotFoundException {
+    public final void getDataSourceParameterByIdThrowException() throws SBonitaReadException, SDataSourceParameterNotFoundException {
         when(persistence.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         dataServiceImpl.getDataSourceParameter(456L);
@@ -191,7 +191,7 @@ public class DataServiceImplTest {
     }
 
     @Test(expected = SDataSourceParameterNotFoundException.class)
-    public final void getDataSourceParameterByNameAndDataSourceIdWithException() throws SDataSourceParameterNotFoundException, SBonitaReadException {
+    public final void getDataSourceParameterByNameAndDataSourceIdThrowException() throws SDataSourceParameterNotFoundException, SBonitaReadException {
         when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         dataServiceImpl.getDataSourceParameter("name", 546L);
@@ -213,7 +213,7 @@ public class DataServiceImplTest {
     }
 
     @Test(expected = SDataException.class)
-    public final void getDataSourceParametersWithException() throws SDataException, SBonitaReadException {
+    public final void getDataSourceParametersThrowException() throws SDataException, SBonitaReadException {
         when(persistence.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions option = mock(QueryOptions.class);
@@ -236,7 +236,7 @@ public class DataServiceImplTest {
     }
 
     @Test(expected = SDataException.class)
-    public final void getDataSourcesWithException() throws SDataException, SBonitaReadException {
+    public final void getDataSourcesThrowException() throws SDataException, SBonitaReadException {
         when(persistence.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions option = mock(QueryOptions.class);
@@ -279,7 +279,7 @@ public class DataServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSource(org.bonitasoft.engine.data.model.SDataSource)}.
      */
     @Test
-    public final void removeDataSourceSDataSource() {
+    public final void removeDataSourceByObject() {
         // TODO : Not yet implemented
     }
 
@@ -287,7 +287,7 @@ public class DataServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSource(long)}.
      */
     @Test
-    public final void removeDataSourceLong() {
+    public final void removeDataSourceById() {
         // TODO : Not yet implemented
     }
 
@@ -295,7 +295,7 @@ public class DataServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSourceParameter(long)}.
      */
     @Test
-    public final void removeDataSourceParameterLong() {
+    public final void removeDataSourceParameterById() {
         // TODO : Not yet implemented
     }
 
@@ -303,7 +303,7 @@ public class DataServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSourceParameter(org.bonitasoft.engine.data.model.SDataSourceParameter)}.
      */
     @Test
-    public final void removeDataSourceParameterSDataSourceParameter() {
+    public final void removeDataSourceParameterByObject() {
         // TODO : Not yet implemented
     }
 
@@ -311,7 +311,7 @@ public class DataServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSourceParameters(long)}.
      */
     @Test
-    public final void removeDataSourceParametersLong() {
+    public final void removeDataSourceParametersByDataSourceId() {
         // TODO : Not yet implemented
     }
 
@@ -319,7 +319,7 @@ public class DataServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSourceParameters(java.util.Collection)}.
      */
     @Test
-    public final void removeDataSourceParametersCollectionOfLong() {
+    public final void removeDataSourceParametersByIds() {
         // TODO : Not yet implemented
     }
 

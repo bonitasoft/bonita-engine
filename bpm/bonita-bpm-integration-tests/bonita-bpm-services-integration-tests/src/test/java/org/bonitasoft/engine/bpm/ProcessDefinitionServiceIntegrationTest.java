@@ -1,9 +1,5 @@
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,6 +25,10 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Celine Souchet
  */
@@ -37,8 +37,9 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
     private static BPMServicesBuilder bpmServicesBuilder;
 
     private final static ProcessDefinitionService processDefinitionService;
+
     private final static ActorMappingService actorMappingService;
-    
+
     static {
         bpmServicesBuilder = new BPMServicesBuilder();
         processDefinitionService = bpmServicesBuilder.getProcessDefinitionService();
@@ -102,7 +103,7 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
     }
 
     @Test(expected = SProcessDefinitionNotFoundException.class)
-    public void updateProcessDefinitionDeployInfoWithException() throws Exception {
+    public void updateProcessDefinitionDeployInfoThrowException() throws Exception {
         final String updatedDisplayName = "updateDisplayName";
 
         // create process definition

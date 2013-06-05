@@ -16,10 +16,6 @@
  */
 package org.bonitasoft.engine.command.api.impl.test;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +39,10 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -91,7 +91,7 @@ public class CommandServiceImplTest {
     }
 
     @Test(expected = SCommandGettingException.class)
-    public final void getAllCommandsWithException() throws SCommandGettingException, SBonitaReadException {
+    public final void getAllCommandsThrowException() throws SCommandGettingException, SBonitaReadException {
         when(persistence.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         commandServiceImpl.getAllCommands(0, 1, SCommandCriterion.NAME_DESC);
@@ -119,7 +119,7 @@ public class CommandServiceImplTest {
     }
 
     @Test(expected = SCommandNotFoundException.class)
-    public final void getByIdWithException() throws SBonitaReadException, SCommandNotFoundException {
+    public final void getByIdThrowException() throws SBonitaReadException, SCommandNotFoundException {
         when(persistence.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         commandServiceImpl.get(456L);
@@ -147,7 +147,7 @@ public class CommandServiceImplTest {
     }
 
     @Test(expected = SCommandNotFoundException.class)
-    public final void getByNameWithException() throws SBonitaReadException, SCommandNotFoundException {
+    public final void getByNameThrowException() throws SBonitaReadException, SCommandNotFoundException {
         when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         commandServiceImpl.get("name");
@@ -169,7 +169,7 @@ public class CommandServiceImplTest {
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public final void getNumberOfCommandsWithException() throws SBonitaSearchException, SBonitaReadException {
+    public final void getNumberOfCommandsThrowException() throws SBonitaSearchException, SBonitaReadException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.getNumberOfEntities(SCommand.class, options, null)).thenThrow(new SBonitaReadException(""));
 
@@ -192,7 +192,7 @@ public class CommandServiceImplTest {
     }
 
     @Test(expected = SCommandGettingException.class)
-    public final void getUserCommandsWithException() throws SCommandGettingException, SBonitaReadException {
+    public final void getUserCommandsThrowException() throws SCommandGettingException, SBonitaReadException {
         when(persistence.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         commandServiceImpl.getUserCommands(0, 1, SCommandCriterion.NAME_DESC);
@@ -214,7 +214,7 @@ public class CommandServiceImplTest {
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public final void searchCommandsWithException() throws SBonitaSearchException, SBonitaReadException {
+    public final void searchCommandsThrowException() throws SBonitaSearchException, SBonitaReadException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.searchEntity(SCommand.class, options, null)).thenThrow(new SBonitaReadException(""));
 
@@ -230,10 +230,18 @@ public class CommandServiceImplTest {
     }
 
     /**
+     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#delete(long)}.
+     */
+    @Test
+    public final void deleteById() {
+        // TODO : Not yet implemented
+    }
+
+    /**
      * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#delete(java.lang.String)}.
      */
     @Test
-    public final void deleteString() {
+    public final void deleteByName() {
         // TODO : Not yet implemented
     }
 
@@ -252,14 +260,6 @@ public class CommandServiceImplTest {
      */
     @Test
     public final void update() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#delete(long)}.
-     */
-    @Test
-    public final void deleteById() {
         // TODO : Not yet implemented
     }
 

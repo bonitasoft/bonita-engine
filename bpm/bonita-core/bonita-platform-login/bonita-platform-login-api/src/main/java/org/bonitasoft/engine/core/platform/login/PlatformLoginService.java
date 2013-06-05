@@ -41,9 +41,9 @@ public interface PlatformLoginService {
      * 
      * @param sessionId
      *            identifier of platform session
-     * @throws SPlatformLoginException
+     * @throws SSessionNotFoundException
      */
-    void logout(final long sessionId) throws SPlatformLoginException, SSessionNotFoundException;
+    void logout(final long sessionId) throws SSessionNotFoundException;
 
     /**
      * Verify if a session is valid
@@ -51,8 +51,7 @@ public interface PlatformLoginService {
      * @param sessionId
      *            identifier of platform session
      * @return true if session is valid, false otherwise.
-     * @throws SPlatformLoginException
      */
-    boolean isValid(final long sessionId) throws SPlatformLoginException;
+    boolean isValid(final long sessionId);
 
 }

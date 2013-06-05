@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.identity.impl.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -33,10 +29,23 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.stubbing.answers.Returns;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Matthieu Chaffotte
@@ -44,32 +53,276 @@ import org.mockito.internal.stubbing.answers.Returns;
  */
 public class IdentityServiceImplForUserMembershipTest {
 
-    Recorder recorder;
+    @Mock
+    private Recorder recorder;
 
-    ReadPersistenceService persistence;
+    @Mock
+    private ReadPersistenceService persistenceService;
 
-    EventService eventService;
+    @Mock
+    private EventService eventService;
 
-    TechnicalLoggerService logger;
+    @Mock
+    private TechnicalLoggerService logger;
 
+    @InjectMocks
     private IdentityServiceImpl identityServiceImpl;
 
     @Before
-    public void setup() {
-        recorder = mock(Recorder.class);
-        persistence = mock(ReadPersistenceService.class);
-        eventService = mock(EventService.class);
-        logger = mock(TechnicalLoggerService.class, new Returns(true));
-        identityServiceImpl = new IdentityServiceImpl(persistence, recorder, eventService, null, logger, null, null);
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getLightUserMembership(long)}.
+     */
     @Test
-    public void getUserMemberships() throws Exception {
+    public final void getLightUserMembershipById() throws SBonitaReadException, SIdentityException {
+        final SUserMembership userMembership = mock(SUserMembership.class);
+        doReturn(userMembership).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        assertEquals(userMembership, identityServiceImpl.getLightUserMembership(546L));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getLightUserMembershipByIdNotExist() throws SBonitaReadException, SIdentityException {
+        doReturn(null).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        identityServiceImpl.getLightUserMembership(546L);
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getLightUserMembershipByIdThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
+
+        identityServiceImpl.getLightUserMembership(546L);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getLightUserMembership(long, long, long)}.
+     */
+    @Test
+    public final void getLightUserMembershipByUserAndGroupAndRole() throws SBonitaReadException, SIdentityException {
+        final SUserMembership userMembership = mock(SUserMembership.class);
+        doReturn(userMembership).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        assertEquals(userMembership, identityServiceImpl.getLightUserMembership(546L, 565L, 54L));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getLightUserMembershipByUserAndGroupAndRoleNotExist() throws SBonitaReadException, SIdentityException {
+        doReturn(null).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getLightUserMembership(546L, 565L, 54L);
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getLightUserMembershipByUserAndGroupAndRoleThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getLightUserMembership(546L, 565L, 54L);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getLightUserMemberships(int, int)}.
+     */
+    @Test
+    public final void getLightUserMembershipsPaginated() throws SBonitaReadException, SIdentityException {
+        final SUserMembership userMembership = mock(SUserMembership.class);
+        final List<SUserMembership> userMemberships = Collections.singletonList(userMembership);
+        doReturn(userMemberships).when(persistenceService).selectList(any(SelectListDescriptor.class));
+
+        assertEquals(userMemberships, identityServiceImpl.getLightUserMemberships(546, 565));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getLightUserMembershipsPaginatedThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
+
+        identityServiceImpl.getLightUserMemberships(546, 565);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUserMemberships()}.
+     */
+    @Test
+    public final void getNumberOfUserMemberships() throws SBonitaReadException, SIdentityException {
+        final long numberOfUserMemberships = 3;
+        doReturn(numberOfUserMemberships).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        assertEquals(numberOfUserMemberships, identityServiceImpl.getNumberOfUserMemberships());
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getNumberOfUserMembershipsThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getNumberOfUserMemberships();
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUserMembershipsOfUser(long)}.
+     */
+    @Test
+    public final void getNumberOfUserMembershipsOfUser() throws SBonitaReadException, SIdentityException {
+        final long numberOfUserMemberships = 3;
+        doReturn(numberOfUserMemberships).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        assertEquals(numberOfUserMemberships, identityServiceImpl.getNumberOfUserMembershipsOfUser(554L));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getNumberOfUserMembershipsOfUserThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getNumberOfUserMembershipsOfUser(4854L);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembership(long)}.
+     */
+    @Test
+    public final void getUserMembershipById() throws SBonitaReadException, SIdentityException {
+        final SUserMembership userMembership = mock(SUserMembership.class);
+        doReturn(userMembership).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        assertEquals(userMembership, identityServiceImpl.getUserMembership(546L));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getUserMembershipByIdNotExist() throws SBonitaReadException, SIdentityException {
+        doReturn(null).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getUserMembership(546L);
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getUserMembershipByIdThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getUserMembership(546L);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembership(long, long, long)}.
+     */
+    @Test
+    public final void getUserMembershipByUserAndGroupAndRole() throws SBonitaReadException, SIdentityException {
+        final SUserMembership userMembership = mock(SUserMembership.class);
+        doReturn(userMembership).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        assertEquals(userMembership, identityServiceImpl.getUserMembership(546L, 565L, 54L));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getUserMembershipByUserAndGroupAndRoleNotExist() throws SBonitaReadException, SIdentityException {
+        doReturn(null).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getUserMembership(546L, 565L, 54L);
+    }
+
+    @Test(expected = SIdentityException.class)
+    public final void getUserMembershipByUserAndGroupAndRoleThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        identityServiceImpl.getUserMembership(546L, 565L, 54L);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMemberships(java.util.List)}.
+     */
+    @Test
+    public final void getUserMembershipsByIds() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfGroup(long)}.
+     */
+    @Test
+    public void getUserMembershipsOfGroup() throws Exception {
+        final SUserMembership userMembership = mock(SUserMembership.class);
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l))).thenReturn(Collections.singletonList(userMembership));
+
+        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfGroup(1l);
+
+        assertEquals(userMembership, userMemberships.get(0));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public void getUserMembershipsOfGroupThrowException() throws Exception {
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l))).thenThrow(new SBonitaReadException(""));
+
+        identityServiceImpl.getUserMembershipsOfGroup(1l);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfRole(long)}.
+     */
+    @Test
+    public void getUserMembershipsOfRole() throws Exception {
+        final SUserMembership userMembership = mock(SUserMembership.class);
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l))).thenReturn(Collections.singletonList(userMembership));
+
+        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfRole(1l);
+
+        assertEquals(userMembership, userMemberships.get(0));
+    }
+
+    @Test(expected = SIdentityException.class)
+    public void getUserMembershipsOfRoleThrowException() throws Exception {
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l))).thenThrow(new SBonitaReadException(""));
+
+        identityServiceImpl.getUserMembershipsOfRole(1l);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long)}.
+     */
+    @Test
+    public final void getUserMembershipsOfUser() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long, int, int)}.
+     */
+    @Test
+    public final void getUserMembershipsOfUserPaginated() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
+     * .
+     */
+    @Test
+    public final void getUserMembershipsOfUserPaginatedWithOrder() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long, int, int, org.bonitasoft.engine.persistence.OrderByOption)}
+     * .
+     */
+    @Test
+    public final void getUserMembershipsOfUserPaginatedWithOrderByOption() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMemberships(int, int, org.bonitasoft.engine.persistence.OrderByOption)}.
+     */
+    @Test
+    public void getUserMembershipsPaginatedWithOrder() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
         final OrderByOption orderByOption = new OrderByOption(SUserMembership.class, "username", OrderByType.ASC);
-        when(
-                persistence.selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
-                        new QueryOptions(0, 10, Collections.singletonList(orderByOption))))).thenReturn(Collections.singletonList(userMembership));
+        doReturn(Collections.singletonList(userMembership)).when(persistenceService).selectList(
+                SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
+                        new QueryOptions(0, 10, Collections.singletonList(orderByOption))));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
 
@@ -77,10 +330,10 @@ public class IdentityServiceImplForUserMembershipTest {
     }
 
     @Test(expected = SIdentityException.class)
-    public void getUserMembershipsThrowExceptions() throws Exception {
+    public void getUserMembershipsPaginatedWithOrderThrowException() throws Exception {
         final OrderByOption orderByOption = new OrderByOption(SUserMembership.class, "username", OrderByType.ASC);
         when(
-                persistence.selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
+                persistenceService.selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
                         new QueryOptions(0, 10, Collections.singletonList(orderByOption))))).thenThrow(new SBonitaReadException(""));
 
         identityServiceImpl.getUserMemberships(0, 10, orderByOption);
@@ -90,7 +343,9 @@ public class IdentityServiceImplForUserMembershipTest {
     public void getUserMembershipsOrderByRole() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
         final OrderByOption orderByOption = new OrderByOption(SRole.class, "name", OrderByType.ASC);
-        when(persistence.selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(0, 10, Collections.singletonList(orderByOption)))))
+        when(
+                persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(0, 10, Collections
+                        .singletonList(orderByOption)))))
                 .thenReturn(Collections.singletonList(userMembership));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
@@ -102,7 +357,9 @@ public class IdentityServiceImplForUserMembershipTest {
     public void getUserMembershipsOrderByGroup() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
         final OrderByOption orderByOption = new OrderByOption(SGroup.class, "name", OrderByType.ASC);
-        when(persistence.selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(0, 10, Collections.singletonList(orderByOption)))))
+        when(
+                persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(0, 10, Collections
+                        .singletonList(orderByOption)))))
                 .thenReturn(Collections.singletonList(userMembership));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
@@ -110,38 +367,59 @@ public class IdentityServiceImplForUserMembershipTest {
         assertEquals(userMembership, userMemberships.get(0));
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMemberships(int, int)}.
+     */
     @Test
-    public void getUserMembershipsOfGroup() throws Exception {
+    public final void getUserMembershipsPaginated() throws SBonitaReadException, SIdentityException {
         final SUserMembership userMembership = mock(SUserMembership.class);
-        when(persistence.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l))).thenReturn(Collections.singletonList(userMembership));
+        final List<SUserMembership> userMemberships = Collections.singletonList(userMembership);
+        doReturn(userMemberships).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
-        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfGroup(1l);
-
-        assertEquals(userMembership, userMemberships.get(0));
+        assertEquals(userMemberships, identityServiceImpl.getUserMemberships(0, 10));
     }
 
     @Test(expected = SIdentityException.class)
-    public void getUserMembershipsOfGroupThrowExceptions() throws Exception {
-        when(persistence.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l))).thenThrow(new SBonitaReadException(""));
+    public final void getUserMembershipsPaginatedThrowException() throws SBonitaReadException, SIdentityException {
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
-        identityServiceImpl.getUserMembershipsOfGroup(1l);
+        identityServiceImpl.getUserMemberships(0, 10);
     }
 
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#updateUserMembership(org.bonitasoft.engine.identity.model.SUserMembership, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
+     * .
+     */
     @Test
-    public void getUserMembershipsOfRole() throws Exception {
-        final SUserMembership userMembership = mock(SUserMembership.class);
-        when(persistence.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l))).thenReturn(Collections.singletonList(userMembership));
-
-        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfRole(1l);
-
-        assertEquals(userMembership, userMemberships.get(0));
+    public final void updateUserMembership() {
+        // TODO : Not yet implemented
     }
 
-    @Test(expected = SIdentityException.class)
-    public void getUserMembershipsOfRoleThrowExceptions() throws Exception {
-        when(persistence.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l))).thenThrow(new SBonitaReadException(""));
+    /**
+     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteUserMembership(long)}.
+     */
+    @Test
+    public final void deleteUserMembershipById() {
+        // TODO : Not yet implemented
+    }
 
-        identityServiceImpl.getUserMembershipsOfRole(1l);
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteUserMembership(org.bonitasoft.engine.identity.model.SUserMembership)}.
+     */
+    @Test
+    public final void deleteUserMembershipByObject() {
+        // TODO : Not yet implemented
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#createUserMembership(org.bonitasoft.engine.identity.model.SUserMembership)}.
+     */
+    @Test
+    public final void createUserMembership() {
+        // TODO : Not yet implemented
     }
 
 }

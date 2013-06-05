@@ -185,7 +185,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createProfileMetadataDefinition", e));
             }
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProfileMetadataDefinition");
-            throw new SIdentityException("can't add profile metadata " + metadata, e);
+            throw new SIdentityException("Can't add profile metadata " + metadata, e);
         }
     }
 
@@ -205,7 +205,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createProfileMetadataValue", e));
             }
-            throw new SIdentityException("can't add metadata value " + metadataValue, e);
+            throw new SIdentityException("Can't add metadata value " + metadataValue, e);
         }
     }
 
@@ -228,7 +228,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createRole", e));
             }
             initiateLogBuilder(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createRole");
-            throw new SIdentityException("can't add role " + role, e);
+            throw new SIdentityException("Can't add role " + role, e);
         }
     }
 
@@ -450,7 +450,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteProfileMetadataDefinition", e));
             }
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfileMetadataDefinition");
-            throw new SIdentityException("can't delete profile metadata " + metadata, e);
+            throw new SIdentityException("Can't delete profile metadata " + metadata, e);
         }
     }
 
@@ -475,7 +475,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteProfileMetadataValue", e));
             }
-            throw new SIdentityException("can't delete membership " + metadataValue, e);
+            throw new SIdentityException("Can't delete membership " + metadataValue, e);
         }
     }
 
@@ -554,10 +554,11 @@ public class IdentityServiceImpl implements IdentityService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLightUserMembership"));
         }
         try {
-            final SUserMembership selectOne = persistenceService.selectById(SelectDescriptorBuilder.getLightElementById(SUserMembership.class, "SUserMembership",
+            final SUserMembership selectOne = persistenceService.selectById(SelectDescriptorBuilder.getLightElementById(SUserMembership.class,
+                    "SUserMembership",
                     userMembershipId));
             if (selectOne == null) {
-                throw new SIdentityException("can't get the userMembership with id " + userMembershipId, null);
+                throw new SIdentityException("Can't get the userMembership with id " + userMembershipId, null);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLightUserMembership"));
@@ -567,7 +568,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getLightUserMembership", e));
             }
-            throw new SIdentityException("can't get the user membership with id " + userMembershipId, e);
+            throw new SIdentityException("Can't get the user membership with id " + userMembershipId, e);
         }
     }
 
@@ -596,7 +597,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteUserMembership", e));
             }
             initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteUserMembership");
-            throw new SIdentityException("can't delete membership " + userMembership, e);
+            throw new SIdentityException("Can't delete membership " + userMembership, e);
         }
     }
 
@@ -638,7 +639,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getGroupChildren", e));
             }
-            throw new SIdentityException("can't get the children of the group", e);
+            throw new SIdentityException("Can't get the children of the group", e);
         }
     }
 
@@ -658,7 +659,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getGroupChildren", e));
             }
-            throw new SIdentityException("can't get the children of the group", e);
+            throw new SIdentityException("Can't get the children of the group", e);
         }
     }
 
@@ -670,7 +671,8 @@ public class IdentityServiceImpl implements IdentityService {
         }
         try {
             final SGroup group = getGroup(groupId);
-            final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, field, order, fromIndex, numberOfGroups));
+            final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, field, order, fromIndex,
+                    numberOfGroups));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getGroupChildren"));
             }
@@ -679,7 +681,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getGroupChildren", e));
             }
-            throw new SIdentityException("can't get the children of the group", e);
+            throw new SIdentityException("Can't get the children of the group", e);
         }
     }
 
@@ -689,7 +691,8 @@ public class IdentityServiceImpl implements IdentityService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroups"));
         }
         try {
-            final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", fromIndex, numberOfGroups));
+            final List<SGroup> listGroups = persistenceService
+                    .selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", fromIndex, numberOfGroups));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getGroups"));
             }
@@ -698,7 +701,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getGroups", e));
             }
-            throw new SIdentityException("can't get the groups", e);
+            throw new SIdentityException("Can't get the groups", e);
         }
     }
 
@@ -718,7 +721,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getGroups", e));
             }
-            throw new SIdentityException("can't get the groups", e);
+            throw new SIdentityException("Can't get the groups", e);
         }
     }
 
@@ -772,14 +775,17 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             List<SUserMembership> listSUserMembership;
             if (orderByOption.getClazz() == SRole.class) {
-                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(fromIndex, numberOfResult,
+                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(fromIndex,
+                        numberOfResult,
                         Collections.singletonList(orderByOption))));
             } else if (orderByOption.getClazz() == SGroup.class) {
-                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(fromIndex, numberOfResult,
+                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(fromIndex,
+                        numberOfResult,
                         Collections.singletonList(orderByOption))));
             } else {
-                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership", new QueryOptions(
-                        fromIndex, numberOfResult, Collections.singletonList(orderByOption))));
+                listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
+                        new QueryOptions(
+                                fromIndex, numberOfResult, Collections.singletonList(orderByOption))));
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserMemberships"));
@@ -789,7 +795,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMemberships", e));
             }
-            throw new SIdentityException("can't get the memberships", e);
+            throw new SIdentityException("Can't get the memberships", e);
         }
     }
 
@@ -808,7 +814,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembershipsOfGroup", e));
             }
-            throw new SIdentityException("can't get the users memberships the group " + groupId, e);
+            throw new SIdentityException("Can't get the users memberships the group " + groupId, e);
         }
     }
 
@@ -827,7 +833,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembershipsOfRole", e));
             }
-            throw new SIdentityException("can't get the memberships having the role " + roleId, e);
+            throw new SIdentityException("Can't get the memberships having the role " + roleId, e);
         }
     }
 
@@ -847,7 +853,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfGroupChildren", e));
             }
-            throw new SIdentityException("can't get the number children of group", e);
+            throw new SIdentityException("Can't get the number children of group", e);
         }
     }
 
@@ -866,7 +872,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfGroups", e));
             }
-            throw new SIdentityException("can't get the number of group", e);
+            throw new SIdentityException("Can't get the number of group", e);
         }
     }
 
@@ -886,7 +892,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                         LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfProfileMetadataDefinition", e));
             }
-            throw new SIdentityException("can't get the number of profile metadata", e);
+            throw new SIdentityException("Can't get the number of profile metadata", e);
         }
     }
 
@@ -905,7 +911,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfRoles", e));
             }
-            throw new SIdentityException("can't get the number of role", e);
+            throw new SIdentityException("Can't get the number of role", e);
         }
     }
 
@@ -924,7 +930,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfUsers", e));
             }
-            throw new SIdentityException("can't get the number of user", e);
+            throw new SIdentityException("Can't get the number of user", e);
         }
     }
 
@@ -943,7 +949,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfUserMembershipsOfUser", e));
             }
-            throw new SIdentityException("can't get the number of usermemberships having the user " + userId, e);
+            throw new SIdentityException("Can't get the number of usermemberships having the user " + userId, e);
         }
     }
 
@@ -962,7 +968,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfUsersByGroup", e));
             }
-            throw new SIdentityException("can't get the number of users having the group " + groupId, e);
+            throw new SIdentityException("Can't get the number of users having the group " + groupId, e);
         }
     }
 
@@ -981,7 +987,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfUsersByRole", e));
             }
-            throw new SIdentityException("can't get the number of users having the role " + roleId, e);
+            throw new SIdentityException("Can't get the number of users having the role " + roleId, e);
         }
     }
 
@@ -1000,7 +1006,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfUsersByMembership", e));
             }
-            throw new SIdentityException("can't get the number of users having the membership with group:" + groupId + " and role:" + roleId, e);
+            throw new SIdentityException("Can't get the number of users having the membership with group:" + groupId + " and role:" + roleId, e);
         }
     }
 
@@ -1019,7 +1025,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMetadataByName", e));
             }
-            throw new SIdentityException("can't get the metadata with name " + metadataName, e);
+            throw new SIdentityException("Can't get the metadata with name " + metadataName, e);
         }
     }
 
@@ -1039,7 +1045,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMetadataDefinition", e));
             }
-            throw new SIdentityException("can't get the profile metadata", e);
+            throw new SIdentityException("Can't get the profile metadata", e);
         }
     }
 
@@ -1052,7 +1058,7 @@ public class IdentityServiceImpl implements IdentityService {
             final SProfileMetadataDefinition selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SProfileMetadataDefinition.class,
                     "ProfileMetadata", profileMetadataId));
             if (selectOne == null) {
-                throw new SIdentityException("can't get the profile metadata with id " + profileMetadataId, null);
+                throw new SIdentityException("Can't get the profile metadata with id " + profileMetadataId, null);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfileMetadataDefinition"));
@@ -1062,7 +1068,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMetadataDefinition", e));
             }
-            throw new SIdentityException("can't get the profile metadata with id " + profileMetadataId, e);
+            throw new SIdentityException("Can't get the profile metadata with id " + profileMetadataId, e);
         }
     }
 
@@ -1085,7 +1091,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMetadataDefinitions", e));
             }
-            throw new SIdentityException("can't get profiles metadata with ids " + Arrays.toString(profileMetadataDefinitionIds.toArray()), e);
+            throw new SIdentityException("Can't get profiles metadata with ids " + Arrays.toString(profileMetadataDefinitionIds.toArray()), e);
         }
     }
 
@@ -1098,7 +1104,7 @@ public class IdentityServiceImpl implements IdentityService {
             final SProfileMetadataValue selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SProfileMetadataValue.class,
                     "SProfileMetadataValue", profileMetadataValueId));
             if (selectOne == null) {
-                throw new SIdentityException("can't get the profile metadata value with id " + profileMetadataValueId, null);
+                throw new SIdentityException("Can't get the profile metadata value with id " + profileMetadataValueId, null);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfileMetadataValue"));
@@ -1108,7 +1114,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMetadataValue", e));
             }
-            throw new SIdentityException("can't get the profile metadata value with id " + profileMetadataValueId, e);
+            throw new SIdentityException("Can't get the profile metadata value with id " + profileMetadataValueId, e);
         }
     }
 
@@ -1130,7 +1136,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMetadataValues", e));
             }
-            throw new SIdentityException("can't get profiles metadata values with ids " + Arrays.toString(profileMetadataValueIds.toArray()), e);
+            throw new SIdentityException("Can't get profiles metadata values with ids " + Arrays.toString(profileMetadataValueIds.toArray()), e);
         }
     }
 
@@ -1227,7 +1233,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getRoles", e));
             }
-            throw new SIdentityException("can't get the roles", e);
+            throw new SIdentityException("Can't get the roles", e);
         }
     }
 
@@ -1247,7 +1253,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getRoles", e));
             }
-            throw new SIdentityException("can't get the roles", e);
+            throw new SIdentityException("Can't get the roles", e);
         }
     }
 
@@ -1347,7 +1353,7 @@ public class IdentityServiceImpl implements IdentityService {
                     SUserMembership.class);
             final SUserMembership selectOne = persistenceService.selectOne(desc);
             if (selectOne == null) {
-                throw new SIdentityException("can't get the userMembership with id " + userMembershipId, null);
+                throw new SIdentityException("Can't get the userMembership with id " + userMembershipId, null);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserMembership"));
@@ -1357,7 +1363,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembership", e));
             }
-            throw new SIdentityException("can't get the user membership with id " + userMembershipId, e);
+            throw new SIdentityException("Can't get the user membership with id " + userMembershipId, e);
         }
     }
 
@@ -1376,7 +1382,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembershipsOfUser", e));
             }
-            throw new SIdentityException("can't get memberships of user: " + userId, e);
+            throw new SIdentityException("Can't get memberships of user: " + userId, e);
         }
     }
 
@@ -1400,7 +1406,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMemberships", e));
             }
-            throw new SIdentityException("can't get users memberships with ids " + Arrays.toString(localUserMembershipIds.toArray()), e);
+            throw new SIdentityException("Can't get users memberships with ids " + Arrays.toString(localUserMembershipIds.toArray()), e);
         }
     }
 
@@ -1419,7 +1425,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsers", e));
             }
-            throw new SIdentityException("can't get the users", e);
+            throw new SIdentityException("Can't get the users", e);
         }
     }
 
@@ -1439,7 +1445,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsers", e));
             }
-            throw new SIdentityException("can't get the users", e);
+            throw new SIdentityException("Can't get the users", e);
         }
     }
 
@@ -1481,7 +1487,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByDelegee", e));
             }
-            throw new SIdentityException("can't get the users having the delegee " + delegateId, e);
+            throw new SIdentityException("Can't get the users having the delegee " + delegateId, e);
         }
     }
 
@@ -1500,7 +1506,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByGroup", e));
             }
-            throw new SIdentityException("can't get the users having the group " + groupId, e);
+            throw new SIdentityException("Can't get the users having the group " + groupId, e);
         }
     }
 
@@ -1519,7 +1525,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByGroup", e));
             }
-            throw new SIdentityException("can't get the users having the group " + groupId, e);
+            throw new SIdentityException("Can't get the users having the group " + groupId, e);
         }
     }
 
@@ -1530,7 +1536,8 @@ public class IdentityServiceImpl implements IdentityService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByGroup"));
         }
         try {
-            final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, field, order, fromIndex, numberOfUsers));
+            final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, field, order, fromIndex,
+                    numberOfUsers));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUsersByGroup"));
             }
@@ -1539,7 +1546,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByGroup", e));
             }
-            throw new SIdentityException("can't get the users having the group " + groupId, e);
+            throw new SIdentityException("Can't get the users having the group " + groupId, e);
         }
     }
 
@@ -1558,7 +1565,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByManager", e));
             }
-            throw new SIdentityException("can't get the users having the manager " + managerId, e);
+            throw new SIdentityException("Can't get the users having the manager " + managerId, e);
         }
     }
 
@@ -1577,7 +1584,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByRole", e));
             }
-            throw new SIdentityException("can't get the users having the role " + roleId, e);
+            throw new SIdentityException("Can't get the users having the role " + roleId, e);
         }
     }
 
@@ -1596,7 +1603,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByRole", e));
             }
-            throw new SIdentityException("can't get the users having the role " + roleId, e);
+            throw new SIdentityException("Can't get the users having the role " + roleId, e);
         }
     }
 
@@ -1607,7 +1614,8 @@ public class IdentityServiceImpl implements IdentityService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByRole"));
         }
         try {
-            final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByRole(roleId, field, order, fromIndex, numberOfUsers));
+            final List<SUser> listsUsers = persistenceService
+                    .selectList(SelectDescriptorBuilder.getUsersByRole(roleId, field, order, fromIndex, numberOfUsers));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUsersByRole"));
             }
@@ -1616,7 +1624,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByRole", e));
             }
-            throw new SIdentityException("can't get the users having the role " + roleId, e);
+            throw new SIdentityException("Can't get the users having the role " + roleId, e);
         }
     }
 
@@ -1642,7 +1650,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateGroup", e));
             }
             initiateLogBuilder(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateGroup");
-            throw new SIdentityException("can't update group " + group, e);
+            throw new SIdentityException("Can't update group " + group, e);
         }
     }
 
@@ -1669,7 +1677,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateProfileMetadataDefinition", e));
             }
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfileMetadataDefinition");
-            throw new SIdentityException("can't update profile metadata definition " + metadata, e);
+            throw new SIdentityException("Can't update profile metadata definition " + metadata, e);
         }
     }
 
@@ -1692,7 +1700,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateProfileMetadataValue", e));
             }
-            throw new SIdentityException("can't update profile metadata definition " + metadataValue, e);
+            throw new SIdentityException("Can't update profile metadata definition " + metadataValue, e);
         }
     }
 
@@ -1718,7 +1726,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateRole", e));
             }
             initiateLogBuilder(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateRole");
-            throw new SIdentityException("can't update role " + role, e);
+            throw new SIdentityException("Can't update role " + role, e);
         }
     }
 
@@ -1831,7 +1839,7 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateUserMembership", e));
             }
             initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateUserMembership");
-            throw new SIdentityException("can't update user membership " + userMembership, e);
+            throw new SIdentityException("Can't update user membership " + userMembership, e);
         }
     }
 
@@ -1852,7 +1860,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMemberships", e));
             }
-            throw new SIdentityException("can't get the user memberships", e);
+            throw new SIdentityException("Can't get the user memberships", e);
         }
     }
 
@@ -1872,7 +1880,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembershipsOfUser", e));
             }
-            throw new SIdentityException("can't get the memberships having the user " + userId, e);
+            throw new SIdentityException("Can't get the memberships having the user " + userId, e);
         }
     }
 
@@ -1894,7 +1902,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembershipsOfUser", e));
             }
-            throw new SIdentityException("can't get the memberships having the user" + userId, e);
+            throw new SIdentityException("Can't get the memberships having the user" + userId, e);
         }
     }
 
@@ -1916,7 +1924,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembershipsOfUser", e));
             }
-            throw new SIdentityException("can't get the memberships having the user" + userId, e);
+            throw new SIdentityException("Can't get the memberships having the user" + userId, e);
         }
     }
 
@@ -1928,6 +1936,9 @@ public class IdentityServiceImpl implements IdentityService {
         final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembership(userId, groupId, roleId);
         try {
             final SUserMembership sUserMembership = persistenceService.selectOne(descriptor);
+            if (sUserMembership == null) {
+                throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId);
+            }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserMembership"));
             }
@@ -1936,7 +1947,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUserMembership", e));
             }
-            throw new SIdentityException("can't get the user memberships", e);
+            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId, e);
         }
     }
 
@@ -1948,6 +1959,9 @@ public class IdentityServiceImpl implements IdentityService {
         final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getLightUserMembership(userId, groupId, roleId);
         try {
             final SUserMembership sUserMembership = persistenceService.selectOne(descriptor);
+            if (sUserMembership == null) {
+                throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId);
+            }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLightUserMembership"));
             }
@@ -1956,7 +1970,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getLightUserMembership", e));
             }
-            throw new SIdentityException("can't get the user memberships", e);
+            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId, e);
         }
     }
 
@@ -1975,7 +1989,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfUserMemberships", e));
             }
-            throw new SIdentityException("can't get the number of user membership", e);
+            throw new SIdentityException("Can't get the number of user membership", e);
         }
     }
 
@@ -1996,7 +2010,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getLightUserMemberships", e));
             }
-            throw new SIdentityException("can't get the user memberships", e);
+            throw new SIdentityException("Can't get the user memberships", e);
         }
     }
 

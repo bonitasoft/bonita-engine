@@ -15,8 +15,8 @@ package org.bonitasoft.engine.platform.command;
 
 import java.util.List;
 
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandCriterion;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -79,17 +79,14 @@ public interface PlatformCommandService {
     /**
      * Get the sPlatformCommand having the given value for the given int index
      * 
-     * @param startIndex
-     *            first result to be considered(>=0)
-     * @param maxResults
-     *            the max number of platform commands to be returned (>=0)
-     * @param sort
+     * @param queryOptions
+     *            criteria
      * @return a list of sPlatformCommand
      * @throws SPlatformCommandGettingException
      *             occurs when an exception is thrown during getting sPlatformCommand
      * @since 6.0
      */
-    List<SPlatformCommand> getPlatformCommands(int startIndex, int maxResults, SPlatformCommandCriterion sort) throws SPlatformCommandGettingException;
+    List<SPlatformCommand> getPlatformCommands(QueryOptions queryOptions) throws SPlatformCommandGettingException;
 
     /**
      * Update a sPlatformCommand with given sPlatformCommand and new content.
