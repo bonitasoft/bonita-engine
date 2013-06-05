@@ -119,7 +119,7 @@
 					<properties>
 						<property>
 							<name>listener</name>
-							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
+							<value>org.bonitasoft.engine.jasper.annotation.CustomListener</value>
 						</property>
 					</properties>
 					<systemPropertyVariables>
