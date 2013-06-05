@@ -8,12 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -24,6 +21,8 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.home.BonitaHome;
+import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
@@ -48,6 +47,11 @@ import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @SuppressWarnings("javadoc")
 public class SPPlatformTest {
@@ -146,7 +150,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = PlatformLoginException.class)
-    public void testWrongLogin() throws Exception {
+    public void wrongLogin() throws Exception {
         try {
             platformLoginAPI.logout(session);
             platformLoginAPI.login("titi", "toto");
@@ -168,7 +172,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = SessionNotFoundException.class)
-    public void testLogoutWithWrongSession() throws Exception {
+    public void logoutWithWrongSession() throws Exception {
         try {
             platformLoginAPI.logout(new PlatformSessionImpl(123l, null, -1l, null, -1l));
         } finally {
@@ -178,7 +182,7 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void testSearchTenants() throws Exception {
+    public void searchTenants() throws Exception {
         // create tenant
         // final List<Tenant> listTenant = new ArrayList<Tenant>();
         // for (int i = 0; i < 10; i++) {
@@ -640,6 +644,44 @@ public class SPPlatformTest {
             // YYY with new password and new username ==> should be allowed to login
             // clear-up
         } finally {
+            // reset default values
+            udpateDescriptor.setName(tenantName1);
+            udpateDescriptor.setIconName("IconName");
+            udpateDescriptor.setUsername("username1");
+            udpateDescriptor.setPassword("testpassword1");
+            platformAPI.updateTenant(tenantId1, udpateDescriptor);
+        }
+    }
+
+    @Test
+    public void updatePasswordTenantWithSpecialCharacters() throws Exception {
+        // update tenant
+        final TenantUpdater udpateDescriptor = new TenantUpdater();
+        udpateDescriptor.setPassword("@\\[||sfgf23465");
+        try {
+            final Tenant updatedTenant = platformAPI.updateTenant(tenantId1, udpateDescriptor);
+            assertEquals(tenantId1, updatedTenant.getId());
+
+            final StringBuilder path = new StringBuilder(new BonitaHome() {
+
+                @Override
+                protected void refresh() {
+                }
+            }.getBonitaHomeFolder());
+            path.append(File.separatorChar);
+            path.append("server");
+            path.append(File.separatorChar);
+            path.append("tenants");
+            path.append(File.separatorChar);
+            path.append(tenantId1);
+            path.append(File.separatorChar);
+            path.append("conf");
+            final String tenantPath = path.toString() + File.separator + "bonita-server.properties";
+            final File file = new File(tenantPath);
+            final Properties properties = PropertiesManager.getProperties(file);
+            assertEquals("@\\[||sfgf23465", properties.getProperty("userPassword"));
+        } finally {
+            // clear-up
             // reset default values
             udpateDescriptor.setName(tenantName1);
             udpateDescriptor.setIconName("IconName");
