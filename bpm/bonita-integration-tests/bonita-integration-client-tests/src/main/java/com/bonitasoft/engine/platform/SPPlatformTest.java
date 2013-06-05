@@ -34,6 +34,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -653,6 +655,7 @@ public class SPPlatformTest {
         }
     }
 
+    @Cover(classes = { PlatformAPI.class }, concept = BPMNConcept.NONE, keywords = { "Technical user", "password", "Special characters" }, jira = "ENGINE-1224")
     @Test
     public void updatePasswordTenantWithSpecialCharacters() throws Exception {
         // update tenant
