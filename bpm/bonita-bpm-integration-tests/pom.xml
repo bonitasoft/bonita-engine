@@ -25,6 +25,14 @@
 
 	<profiles>
 		<profile>
+			<id>package-all</id>
+			<modules>
+				<module>bonita-bpm-services-integration-tests</module>
+				<module>bonita-integration-as-tests</module>
+				<module>bonita-synchro-register</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>tests</id>
 			<modules>
 				<module>bonita-bpm-services-integration-tests</module>
@@ -49,6 +57,12 @@
 			<id>sonar</id>
 			<modules>
 				<module>bonita-bpm-services-integration-tests</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>as-tests</id>
+			<modules>
+				<module>bonita-integration-as-tests</module>
 			</modules>
 		</profile>
 		<profile>

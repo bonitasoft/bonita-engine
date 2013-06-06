@@ -19,125 +19,137 @@
 		<bonita.home>${jonas.home}/bonita</bonita.home>
 	</properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>JOnAS installation</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>pre-integration-test</phase>
-						<inherited>false</inherited>
+	<profiles>
+		<profile>
+	      <id>tests</id>
+	      <activation>
+	      	<activeByDefault>true</activeByDefault>
+	      </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>JOnAS installation</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+										<untar src="${env.HOME}/${jonas.version}.tgz" dest="${project.build.directory}" compression="gzip" />
+		
+										<propertyfile file="${jonas.home}/conf/carol.properties">
+											<entry key="carol.jrmp.url" value="rmi://localhost:${provider.port}" />
+											<entry key="carol.jrmp.server.port" value="0" />
+										</propertyfile>
+		
+										<delete file="${jonas.home}/rars/autoload/joram_for_jonas_ra.rar" />
+		
+										<propertyfile file="${jonas.home}/conf/jonas.properties">
+											<entry key="jonas.services" value="registry,jmx,jtm,security,resource,ejb,ear,web" />
+										</propertyfile>
+		
+										<copy todir="${jonas.home}/apps/autoload" file="${distrib.dir}/ear/ejb2/bonita-deploy-ear2${bonita.version}-${project.version}.ear" />
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run JOnAS tests</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+										<path id="jasper.path">
+											<pathelement path="${env.CLASSPATH}" />
+											<path refid="maven.jasper.classpath" />
+											<pathelement path="${test_classpath}" />
+										</path>
+										<path id="jonas.path">
+											<pathelement path="${env.CLASSPATH}" />
+											<fileset dir="${jonas.home}/lib">
+												<include name="client.jar" />
+											</fileset>
+										</path>
+		
+										<!-- Create default bonita.home folder -->
+										<copy todir="${bonita.home}" verbose="true">
+											<fileset dir="${distrib.dir}/resources/home/" />
+										</copy>
+		
+										<copy file="${basedir}/client/bonita-client.xml" todir="${bonita.home}/client/conf" overwrite="true" />
+		
+										<waitfor maxwait="1" maxwaitunit="minute">
+											<socket server="localhost" port="${provider.port}" />
+										</waitfor>
+		
+										<mkdir dir="${report.xml}" />
+										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true">
+											<classpath refid="jasper.path" />
+											<classpath refid="jonas.path" />
+											<sysproperty key="bonita.home" value="${bonita.home}" />
+											<formatter type="xml" />
+											<test todir="${report.xml}" name="${test.class}" />
+										</junit>
+										<junitreport todir="${report.xml}">
+											<fileset dir="${report.xml}" includes="TEST-*.xml" />
+											<report todir="${report.results}" />
+										</junitreport>
+										<copy todir="${surefire.reports}">
+											<fileset dir="${report.xml}" />
+										</copy>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+		
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start-container</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-container</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
 						<configuration>
-							<target>
-								<untar src="${env.HOME}/${jonas.version}.tgz" dest="${project.build.directory}" compression="gzip" />
-
-								<propertyfile file="${jonas.home}/conf/carol.properties">
-									<entry key="carol.jrmp.url" value="rmi://localhost:${provider.port}" />
-									<entry key="carol.jrmp.server.port" value="0" />
-								</propertyfile>
-
-								<delete file="${jonas.home}/rars/autoload/joram_for_jonas_ra.rar" />
-
-								<propertyfile file="${jonas.home}/conf/jonas.properties">
-									<entry key="jonas.services" value="registry,jmx,jtm,security,resource,ejb,ear,web" />
-								</propertyfile>
-
-								<copy todir="${jonas.home}/apps/autoload" file="${distrib.dir}/ear/ejb2/bonita-deploy-ear2${bonita.version}-${project.version}.ear" />
-							</target>
+							<container>
+								<containerId>jonas4x</containerId>
+								<home>${jonas.home}</home>
+								<systemProperties>
+									<bonita.home>${bonita.home}</bonita.home>
+								</systemProperties>
+							</container>
+							<configuration>
+								<type>existing</type>
+								<home>${jonas.home}</home>
+							</configuration>
+							<wait>false</wait>
 						</configuration>
-					</execution>
-					<execution>
-						<id>run JOnAS tests</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>integration-test</phase>
-						<inherited>false</inherited>
-						<configuration>
-							<target>
-								<path id="jasper.path">
-									<pathelement path="${env.CLASSPATH}" />
-									<path refid="maven.jasper.classpath" />
-									<pathelement path="${test_classpath}" />
-								</path>
-								<path id="jonas.path">
-									<pathelement path="${env.CLASSPATH}" />
-									<fileset dir="${jonas.home}/lib">
-										<include name="client.jar" />
-									</fileset>
-								</path>
-
-								<!-- Create default bonita.home folder -->
-								<copy todir="${bonita.home}" verbose="true">
-									<fileset dir="${distrib.dir}/resources/home/" />
-								</copy>
-
-								<copy file="${basedir}/client/bonita-client.xml" todir="${bonita.home}/client/conf" overwrite="true" />
-
-								<waitfor maxwait="1" maxwaitunit="minute">
-									<socket server="localhost" port="${provider.port}" />
-								</waitfor>
-
-								<mkdir dir="${report.xml}" />
-								<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true">
-									<classpath refid="jasper.path" />
-									<classpath refid="jonas.path" />
-									<sysproperty key="bonita.home" value="${bonita.home}" />
-									<formatter type="xml" />
-									<test todir="${report.xml}" name="${test.class}" />
-								</junit>
-								<junitreport todir="${report.xml}">
-									<fileset dir="${report.xml}" includes="TEST-*.xml" />
-									<report todir="${report.results}" />
-								</junitreport>
-								<copy todir="${surefire.reports}">
-									<fileset dir="${report.xml}" />
-								</copy>
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>start-container</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>stop-container</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<container>
-						<containerId>jonas4x</containerId>
-						<home>${jonas.home}</home>
-						<systemProperties>
-							<bonita.home>${bonita.home}</bonita.home>
-						</systemProperties>
-					</container>
-					<configuration>
-						<type>existing</type>
-						<home>${jonas.home}</home>
-					</configuration>
-					<wait>false</wait>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- the profile package-all is declared here only to deactivate the profile tests (active by default) -->
+		<profile>
+	      <id>package-all</id>
+	    </profile>
+	</profiles>
 </project>

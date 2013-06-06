@@ -26,132 +26,144 @@
 		<bonita.home>${jboss.home}/bonita</bonita.home>
 	</properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>JBoss AS installation</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>package</phase>
-						<inherited>false</inherited>
+	<profiles>
+		<profile>
+	      <id>tests</id>
+	      <activation>
+	      	<activeByDefault>true</activeByDefault>
+	      </activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>JBoss AS installation</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>package</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+										<unzip dest="${project.build.directory}" src="${env.HOME}/${jboss.version}.zip" />
+		
+										<property name="service.xml" location="${jboss.conf.dir}/jboss-service.xml" />
+										<replace file="${service.xml}" token="&lt;attribute name=&quot;Port&quot;&gt;1099&lt;/attribute&gt;" value="&lt;attribute name=&quot;Port&quot;&gt;${provider.port}&lt;/attribute&gt;" />
+										<replace file="${service.xml}" token="&lt;attribute name=&quot;RMIObjectPort&quot;&gt;4444&lt;/attribute&gt;" value="&lt;attribute name=&quot;RMIObjectPort&quot;&gt;0&lt;/attribute&gt;" />
+										<replace file="${service.xml}" token="&lt;attribute name=&quot;RmiPort&quot;&gt;1098&lt;/attribute&gt;" value="&lt;attribute name=&quot;RmiPort&quot;&gt;0&lt;/attribute&gt;" />
+										<replace file="${service.xml}" token="&lt;attribute name=&quot;serverBindPort&quot;&gt;4446&lt;/attribute&gt;" value="&lt;attribute name=&quot;serverBindPort&quot;&gt;${serverBindPort}&lt;/attribute&gt;" />
+										<replace file="${service.xml}" token="&lt;attribute name=&quot;ServerBindPort&quot;&gt;4445&lt;/attribute&gt;" value="&lt;attribute name=&quot;ServerBindPort&quot;&gt;0&lt;/attribute&gt;" />
+										<replace file="${service.xml}" token="&lt;depends optional-attribute-name=&quot;WebServiceName&quot;&gt;jboss:service=WebService&lt;/depends&gt;"
+											value="" />
+										<replace file="${jboss.deploy.dir}/ejb-deployer.xml" token="&lt;depends optional-attribute-name=&quot;WebServiceName&quot;&gt;jboss:service=WebService&lt;/depends&gt;"
+											value="" />
+										<replace file="${jboss.conf.dir}/jboss-service.xml" token="&lt;attribute name=&quot;Port&quot;&gt;8083&lt;/attribute&gt;" value="&lt;attribute name=&quot;Port&quot;&gt;0&lt;/attribute&gt;" />
+										<replace file="${jboss.deploy.dir}/jboss-web.deployer/server.xml" token="port=&quot;8080&quot;" value="port=&quot;${jboss.web.port}&quot;" />
+		
+										<copy todir="${jboss.deploy.dir}" file="${distrib.dir}/ear/ejb3/bonita-deploy-ear3${bonita.version}-${project.version}.ear" />
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run JBoss tests</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+										<path id="jasper.path">
+											<pathelement path="${env.CLASSPATH}" />
+											<path refid="maven.jasper.classpath" />
+											<pathelement path="${test_classpath}" />
+										</path>
+										<path id="jboss.path">
+											<pathelement path="${env.CLASSPATH}" />
+											<fileset dir="${jboss.home}/client">
+												<include name="jbossall-client.jar" />
+											</fileset>
+										</path>
+		
+										<!-- Create default bonita.home folder -->
+										<copy todir="${bonita.home}" verbose="true">
+											<fileset dir="${distrib.dir}/resources/home/" />
+										</copy>
+		
+										<copy file="${basedir}/client/bonita-client.xml" todir="${bonita.home}/client/conf" overwrite="true" />
+		
+										<waitfor maxwait="1" maxwaitunit="minute">
+											<socket server="localhost" port="${provider.port}" />
+										</waitfor>
+		
+										<mkdir dir="${report.xml}" />
+										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
+											<classpath refid="jasper.path" />
+											<classpath refid="jboss.path" />
+											<sysproperty key="bonita.home" value="${bonita.home}" />
+											<formatter type="xml" />
+											<test todir="${report.xml}" name="${test.class}" />
+										</junit>
+										<junitreport todir="${report.xml}">
+											<fileset dir="${report.xml}" includes="TEST-*.xml" />
+											<report todir="${report.results}" />
+										</junitreport>
+		
+										<copy todir="${surefire.reports}">
+											<fileset dir="${report.xml}" />
+										</copy>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start-container</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-container</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
 						<configuration>
-							<target>
-								<unzip dest="${project.build.directory}" src="${env.HOME}/${jboss.version}.zip" />
-
-								<property name="service.xml" location="${jboss.conf.dir}/jboss-service.xml" />
-								<replace file="${service.xml}" token="&lt;attribute name=&quot;Port&quot;&gt;1099&lt;/attribute&gt;" value="&lt;attribute name=&quot;Port&quot;&gt;${provider.port}&lt;/attribute&gt;" />
-								<replace file="${service.xml}" token="&lt;attribute name=&quot;RMIObjectPort&quot;&gt;4444&lt;/attribute&gt;" value="&lt;attribute name=&quot;RMIObjectPort&quot;&gt;0&lt;/attribute&gt;" />
-								<replace file="${service.xml}" token="&lt;attribute name=&quot;RmiPort&quot;&gt;1098&lt;/attribute&gt;" value="&lt;attribute name=&quot;RmiPort&quot;&gt;0&lt;/attribute&gt;" />
-								<replace file="${service.xml}" token="&lt;attribute name=&quot;serverBindPort&quot;&gt;4446&lt;/attribute&gt;" value="&lt;attribute name=&quot;serverBindPort&quot;&gt;${serverBindPort}&lt;/attribute&gt;" />
-								<replace file="${service.xml}" token="&lt;attribute name=&quot;ServerBindPort&quot;&gt;4445&lt;/attribute&gt;" value="&lt;attribute name=&quot;ServerBindPort&quot;&gt;0&lt;/attribute&gt;" />
-								<replace file="${service.xml}" token="&lt;depends optional-attribute-name=&quot;WebServiceName&quot;&gt;jboss:service=WebService&lt;/depends&gt;"
-									value="" />
-								<replace file="${jboss.deploy.dir}/ejb-deployer.xml" token="&lt;depends optional-attribute-name=&quot;WebServiceName&quot;&gt;jboss:service=WebService&lt;/depends&gt;"
-									value="" />
-								<replace file="${jboss.conf.dir}/jboss-service.xml" token="&lt;attribute name=&quot;Port&quot;&gt;8083&lt;/attribute&gt;" value="&lt;attribute name=&quot;Port&quot;&gt;0&lt;/attribute&gt;" />
-								<replace file="${jboss.deploy.dir}/jboss-web.deployer/server.xml" token="port=&quot;8080&quot;" value="port=&quot;${jboss.web.port}&quot;" />
-
-								<copy todir="${jboss.deploy.dir}" file="${distrib.dir}/ear/ejb3/bonita-deploy-ear3${bonita.version}-${project.version}.ear" />
-							</target>
+							<container>
+								<containerId>jboss42x</containerId>
+								<home>${jboss.home}</home>
+								<systemProperties>
+									<bonita.home>${bonita.home}</bonita.home>
+								</systemProperties>
+							</container>
+							<configuration>
+								<type>existing</type>
+								<home>${jboss.home}/server/default</home>
+								<properties>
+									<cargo.jboss.configuration>default</cargo.jboss.configuration>
+									<cargo.servlet.port>${jboss.web.port}</cargo.servlet.port>
+									<cargo.rmi.port>${provider.port}</cargo.rmi.port>
+								</properties>
+							</configuration>
+							<wait>false</wait>
 						</configuration>
-					</execution>
-					<execution>
-						<id>run JBoss tests</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>integration-test</phase>
-						<inherited>false</inherited>
-						<configuration>
-							<target>
-								<path id="jasper.path">
-									<pathelement path="${env.CLASSPATH}" />
-									<path refid="maven.jasper.classpath" />
-									<pathelement path="${test_classpath}" />
-								</path>
-								<path id="jboss.path">
-									<pathelement path="${env.CLASSPATH}" />
-									<fileset dir="${jboss.home}/client">
-										<include name="jbossall-client.jar" />
-									</fileset>
-								</path>
-
-								<!-- Create default bonita.home folder -->
-								<copy todir="${bonita.home}" verbose="true">
-									<fileset dir="${distrib.dir}/resources/home/" />
-								</copy>
-
-								<copy file="${basedir}/client/bonita-client.xml" todir="${bonita.home}/client/conf" overwrite="true" />
-
-								<waitfor maxwait="1" maxwaitunit="minute">
-									<socket server="localhost" port="${provider.port}" />
-								</waitfor>
-
-								<mkdir dir="${report.xml}" />
-								<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
-									<classpath refid="jasper.path" />
-									<classpath refid="jboss.path" />
-									<sysproperty key="bonita.home" value="${bonita.home}" />
-									<formatter type="xml" />
-									<test todir="${report.xml}" name="${test.class}" />
-								</junit>
-								<junitreport todir="${report.xml}">
-									<fileset dir="${report.xml}" includes="TEST-*.xml" />
-									<report todir="${report.results}" />
-								</junitreport>
-
-								<copy todir="${surefire.reports}">
-									<fileset dir="${report.xml}" />
-								</copy>
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>start-container</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>stop-container</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<container>
-						<containerId>jboss42x</containerId>
-						<home>${jboss.home}</home>
-						<systemProperties>
-							<bonita.home>${bonita.home}</bonita.home>
-						</systemProperties>
-					</container>
-					<configuration>
-						<type>existing</type>
-						<home>${jboss.home}/server/default</home>
-						<properties>
-							<cargo.jboss.configuration>default</cargo.jboss.configuration>
-							<cargo.servlet.port>${jboss.web.port}</cargo.servlet.port>
-							<cargo.rmi.port>${provider.port}</cargo.rmi.port>
-						</properties>
-					</configuration>
-					<wait>false</wait>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- the profile package-all is declared here only to deactivate the profile tests (active by default) -->
+		<profile>
+	      <id>package-all</id>
+	    </profile>
+	</profiles>
 </project>

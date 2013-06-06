@@ -17,4 +17,14 @@
 		<module>bonita-exceptions-api</module>
 		<module>bonita-exceptions-api-impl</module>
 	</modules>
+	
+	<profiles>
+		<profile>
+			<id>package-all</id>
+			<modules>
+				<module>bonita-exceptions-test</module>
+			</modules>
+		</profile>
+	</profiles>
+	
 </project>

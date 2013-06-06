@@ -84,5 +84,11 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>package-all</id>
+			<modules>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+		</profile>
 	</profiles>
 </project>

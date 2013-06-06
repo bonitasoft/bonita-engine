@@ -26,178 +26,190 @@
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
 	</properties>
 
-	<build>
-		<plugins>
-		  <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <!-- http://docs.codehaus.org/display/BTM/Tomcat2x#Tomcat2x-Step1CopytheBTMjars -->
-                <artifactItem>
-                  <groupId>org.codehaus.btm</groupId>
-                  <artifactId>btm</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>javax.transaction</groupId>
-                  <artifactId>jta</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-api</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-jdk14</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.codehaus.btm</groupId>
-                  <artifactId>btm-tomcat55-lifecycle</artifactId>
-                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-						<id>Tomcat installation</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>pre-integration-test</phase>
-						<inherited>false</inherited>
+	<profiles>
+		<profile>
+	      <id>tests</id>
+	      <activation>
+	      	<activeByDefault>true</activeByDefault>
+	      </activation>
+			<build>
+				<plugins>
+				  <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-dependency-plugin</artifactId>
+		        <executions>
+		          <execution>
+		            <id>copy</id>
+		            <phase>package</phase>
+		            <goals>
+		              <goal>copy</goal>
+		            </goals>
+		            <configuration>
+		              <artifactItems>
+		                <!-- http://docs.codehaus.org/display/BTM/Tomcat2x#Tomcat2x-Step1CopytheBTMjars -->
+		                <artifactItem>
+		                  <groupId>org.codehaus.btm</groupId>
+		                  <artifactId>btm</artifactId>
+		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+		                </artifactItem>
+		                <artifactItem>
+		                  <groupId>javax.transaction</groupId>
+		                  <artifactId>jta</artifactId>
+		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+		                </artifactItem>
+		                <artifactItem>
+		                  <groupId>org.slf4j</groupId>
+		                  <artifactId>slf4j-api</artifactId>
+		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+		                </artifactItem>
+		                <artifactItem>
+		                  <groupId>org.slf4j</groupId>
+		                  <artifactId>slf4j-jdk14</artifactId>
+		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+		                </artifactItem>
+		                <artifactItem>
+		                  <groupId>org.codehaus.btm</groupId>
+		                  <artifactId>btm-tomcat55-lifecycle</artifactId>
+		                  <outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+		                </artifactItem>
+		              </artifactItems>
+		            </configuration>
+		          </execution>
+		        </executions>
+		      </plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+		                <executions>
+		                    <execution>
+								<id>Tomcat installation</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+		                                <taskdef name="if" classname="${if.task}" classpathref="maven.runtime.classpath"/>
+		                                <available property="tomcat.present" file="${tomcat.zip.folder}/${tomcat.name}.zip"/>
+		                                <if>
+		                                    <not>
+		                                        <isset property="tomcat.present"/>
+		                                    </not>
+		                                    <then>
+		                                        <get src="${tomcat.url}" dest="${tomcat.zip.folder}/${tomcat.name}.zip" />
+		                                    </then>
+		                                </if>
+		                                <unzip dest="${project.build.directory}" src="${tomcat.zip.folder}/${tomcat.name}.zip" />
+										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
+										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
+										<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
+		                                <!-- override global context XML file in order to declare the datasources -->
+		                                <copy todir="${tomcat.conf.dir}">
+		                                	<fileset dir="tomcat/conf"/>
+		                                </copy>
+		                                <copy todir="${tomcat.home}/lib">
+		                                    <fileset dir="target/driver">
+		                                        <include name="*jar"/>
+		                                    </fileset>
+		                                </copy>
+		                                <copy tofile="${tomcat.deploy.dir}/bonita.war" file="${distrib.dir}/war/bonita-deploy-war-${project.version}.war" />
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run Tomcat tests</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+										<path id="jasper.path">
+											<pathelement path="${env.CLASSPATH}" />
+											<path refid="maven.jasper.classpath" />
+											<pathelement path="${test_classpath}" />
+										</path>
+		
+										<!-- Create default bonita.home folder -->
+										<copy todir="${bonita.home}" verbose="true">
+											<fileset dir="${distrib.dir}/resources/home/" />
+										</copy>
+										
+										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
+		
+										<waitfor maxwait="1" maxwaitunit="minute">
+											<socket server="localhost" port="${provider.port}" />
+										</waitfor>
+		
+										<mkdir dir="${report.xml}" />
+										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
+											<classpath refid="jasper.path" />
+											<sysproperty key="bonita.home" value="${bonita.home}" />
+											<formatter type="xml" />
+											<test todir="${report.xml}" name="${test.class}" />
+										</junit>
+										<junitreport todir="${report.xml}">
+											<fileset dir="${report.xml}" includes="TEST-*.xml" />
+											<report todir="${report.results}" />
+										</junitreport>
+		
+										<copy todir="${surefire.reports}">
+											<fileset dir="${report.xml}" />
+										</copy>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start-container</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-container</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
 						<configuration>
-							<target>
-                                <taskdef name="if" classname="${if.task}" classpathref="maven.runtime.classpath"/>
-                                <available property="tomcat.present" file="${tomcat.zip.folder}/${tomcat.name}.zip"/>
-                                <if>
-                                    <not>
-                                        <isset property="tomcat.present"/>
-                                    </not>
-                                    <then>
-                                        <get src="${tomcat.url}" dest="${tomcat.zip.folder}/${tomcat.name}.zip" />
-                                    </then>
-                                </if>
-                                <unzip dest="${project.build.directory}" src="${tomcat.zip.folder}/${tomcat.name}.zip" />
-								<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
-								<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
-								<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
-                                <!-- override global context XML file in order to declare the datasources -->
-                                <copy todir="${tomcat.conf.dir}">
-                                	<fileset dir="tomcat/conf"/>
-                                </copy>
-                                <copy todir="${tomcat.home}/lib">
-                                    <fileset dir="target/driver">
-                                        <include name="*jar"/>
-                                    </fileset>
-                                </copy>
-                                <copy tofile="${tomcat.deploy.dir}/bonita.war" file="${distrib.dir}/war/bonita-deploy-war-${project.version}.war" />
-							</target>
+							<container>
+								<containerId>tomcat7x</containerId>
+								<home>${tomcat.home}</home>
+								<systemProperties>
+									<bonita.home>${bonita.home}</bonita.home>
+									<file.encoding>${project.build.sourceEncoding}</file.encoding>
+									<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+								</systemProperties>
+							</container>
+							<configuration>
+								<type>existing</type>
+								<home>${tomcat.home}</home>
+								<properties>
+									<cargo.servlet.port>${provider.port}</cargo.servlet.port>
+								</properties>
+							</configuration>
+							<wait>false</wait>
 						</configuration>
-					</execution>
-					<execution>
-						<id>run Tomcat tests</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>integration-test</phase>
-						<inherited>false</inherited>
-						<configuration>
-							<target>
-								<path id="jasper.path">
-									<pathelement path="${env.CLASSPATH}" />
-									<path refid="maven.jasper.classpath" />
-									<pathelement path="${test_classpath}" />
-								</path>
-
-								<!-- Create default bonita.home folder -->
-								<copy todir="${bonita.home}" verbose="true">
-									<fileset dir="${distrib.dir}/resources/home/" />
-								</copy>
-								
-								<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
-
-								<waitfor maxwait="1" maxwaitunit="minute">
-									<socket server="localhost" port="${provider.port}" />
-								</waitfor>
-
-								<mkdir dir="${report.xml}" />
-								<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
-									<classpath refid="jasper.path" />
-									<sysproperty key="bonita.home" value="${bonita.home}" />
-									<formatter type="xml" />
-									<test todir="${report.xml}" name="${test.class}" />
-								</junit>
-								<junitreport todir="${report.xml}">
-									<fileset dir="${report.xml}" includes="TEST-*.xml" />
-									<report todir="${report.results}" />
-								</junitreport>
-
-								<copy todir="${surefire.reports}">
-									<fileset dir="${report.xml}" />
-								</copy>
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>start-container</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>stop-container</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<container>
-						<containerId>tomcat7x</containerId>
-						<home>${tomcat.home}</home>
-						<systemProperties>
-							<bonita.home>${bonita.home}</bonita.home>
-							<file.encoding>${project.build.sourceEncoding}</file.encoding>
-							<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
-						</systemProperties>
-					</container>
-					<configuration>
-						<type>existing</type>
-						<home>${tomcat.home}</home>
-						<properties>
-							<cargo.servlet.port>${provider.port}</cargo.servlet.port>
-						</properties>
-					</configuration>
-					<wait>false</wait>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- the profile package-all is declared here only to deactivate the profile tests (active by default) -->
+		<profile>
+	      <id>package-all</id>
+	    </profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
