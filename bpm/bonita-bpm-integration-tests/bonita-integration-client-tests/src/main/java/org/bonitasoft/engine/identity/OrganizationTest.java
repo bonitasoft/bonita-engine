@@ -1,16 +1,5 @@
 package org.bonitasoft.engine.identity;
 
-import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.managersAre;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.usernamesAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,6 +25,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.managersAre;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.usernamesAre;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class OrganizationTest extends CommonAPITest {
 
     @Before
@@ -48,10 +48,10 @@ public class OrganizationTest extends CommonAPITest {
         logout();
     }
 
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" }, jira = "ENGINE-1363")
     @Test
     public void importOrganization() throws Exception {
         // create XML file
-
         final String userName = "anthony.birembault";
         final String jobTitle = "Web Team Manager";
         final String roleName = "Manager";
@@ -96,14 +96,11 @@ public class OrganizationTest extends CommonAPITest {
         assertNotNull(persistedRole1);
         final Group persistedGroup1 = getIdentityAPI().getGroupByPath(groupName1);
         assertNotNull(persistedGroup1);
-        // clean-up
-        getIdentityAPI().deleteUser(persistedUser.getId());
-        getIdentityAPI().deleteRole(persistedRole.getId());
-        getIdentityAPI().deleteGroup(persistedGroup.getId());
+        assertEquals(1, getIdentityAPI().getNumberOfUsersInGroup(persistedGroup1.getId()));
+        assertEquals(persistedUser1, getIdentityAPI().getUsersInGroup(persistedGroup1.getId(), 0, 1, UserCriterion.FIRST_NAME_ASC).get(0));
 
-        getIdentityAPI().deleteUser(persistedUser1.getId());
-        getIdentityAPI().deleteRole(persistedRole1.getId());
-        getIdentityAPI().deleteGroup(persistedGroup1.getId());
+        // clean-up
+        getIdentityAPI().deleteOrganization();
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Enabled", "Disabled",
@@ -155,7 +152,6 @@ public class OrganizationTest extends CommonAPITest {
     @Test
     public void importComplexOrganization() throws Exception {
         // create XML file
-
         final InputStream xmlStream = OrganizationTest.class.getResourceAsStream("complexOrganization.xml");
         try {
             final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
