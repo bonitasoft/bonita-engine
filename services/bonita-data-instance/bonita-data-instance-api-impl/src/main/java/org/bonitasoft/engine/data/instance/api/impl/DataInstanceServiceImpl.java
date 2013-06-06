@@ -391,14 +391,18 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
         NullCheckingUtil.checkArgsNotNull(containerType);
         final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
+        final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
         try {
-            return transientDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex, numberOfResults);
+            final List<SDataInstance> transientDataInstances = transientDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex,
+                    numberOfResults);
+            final List<SDataInstance> dataInstances = defaultDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex, numberOfResults);
+            dataInstances.addAll(transientDataInstances);
+            return dataInstances;
         } catch (final SDataInstanceException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getLocalDataInstances", e));
             }
-            final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-            return defaultDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex, numberOfResults);
+            throw e;
         } finally {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLocalDataInstances"));
@@ -760,6 +764,9 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throws SDataInstanceException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getSADataInstances"));
+        }
+        if (dataNames.isEmpty()) {
+            return Collections.emptyList();
         }
         try {
             final List<Long> dataInstanceIds = getSADataInstanceDataVisibilityMapping(dataNames, containerId, containerType);

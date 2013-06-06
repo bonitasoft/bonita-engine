@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.data.instance;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -218,14 +219,18 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
         try {
             return persistenceRead.selectList(new SelectListDescriptor<SDataInstance>("getDataInstancesByContainer", paraMap, SDataInstance.class,
                     SDataInstance.class, new QueryOptions(fromIndex, numberOfResults)));
-        } catch (final Throwable e) {
-            throw new SDataInstanceException("Unable to check if a data instance already exists: " + e.getMessage(), e);
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceException("Unable to check if a data instance already exists for the data container of type " + containerType + " with id "
+                    + containerId + " for reason: " + e.getMessage(), e);
         }
     }
 
     @Override
     public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstanceIds);
+        if (dataInstanceIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         try {
             final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", dataInstanceIds);
             final SelectListDescriptor<SDataInstance> selectDescriptor = new SelectListDescriptor<SDataInstance>("getDataInstanceByIds", parameters,

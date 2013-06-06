@@ -1,13 +1,16 @@
 package org.bonitasoft.engine.data.instance;
 
+import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +51,7 @@ import org.junit.Test;
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
  */
+@SuppressWarnings("javadoc")
 public class DataInstanceServiceTest extends CommonServiceTest {
 
     private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Object> emptyMap();
@@ -340,6 +344,41 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     private void verifyCreateAndRetrieveFloatDataInstance(final boolean isTransient) throws Exception {
         verifyCreateAndRetrieveDataInstance("createFloat1", Float.class.getName(), "testCreateDescriptionForFloat1", "new Float(5.0)", 6L, "process",
                 isTransient, 5.0F);
+    }
+
+    @Test
+    public void getDataInstancesWithTransientAndNonTransientData() throws Exception {
+        final long containerId = 4444L;
+        final String containerType = "ActivityScope";
+        final String instance1Name = "non-transient";
+        final SDataInstance data1Instance = buildDataInstance(instance1Name, Integer.class.getName(), "some non transient data", null, containerId,
+                containerType, false);
+        insertDataInstance(data1Instance);
+        final String instance2Name = "transient";
+        final SDataInstance data2Instance = buildDataInstance(instance2Name, Integer.class.getName(), "some transient data", null, containerId, containerType,
+                true);
+        insertDataInstance(data2Instance);
+        getTransactionService().begin();
+        dataInstanceService.createDataContainer(containerId, containerType);
+        getTransactionService().complete();
+
+        List<String> dataNames = new ArrayList<String>(2);
+        dataNames.add(instance1Name);
+        dataNames.add(instance2Name);
+        getTransactionService().begin();
+        final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType);
+        getTransactionService().complete();
+        assertEquals(2, dataInstances.size());
+        assertThat("Not all data instances have been found", Arrays.asList(dataInstances.get(0), dataInstances.get(1)),
+                namesContain(instance1Name, instance2Name));
+    }
+
+    @Test
+    public void getSADataInstancesWithEmptyList() throws Exception {
+        getTransactionService().begin();
+        final List<SADataInstance> dataInstances = dataInstanceService.getSADataInstances(13544L, "dummyContainerType", Arrays.<String> asList(), 1111111L);
+        getTransactionService().complete();
+        assertEquals(0, dataInstances.size());
     }
 
     @Test
@@ -993,7 +1032,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         final SDataInstance dataInstance = buildDataInstance("updateInteger", classType, "testUpdateDescription", "new Integer(5)", 111l, "miniTask", false);
         insertDataInstance(dataInstance);
         Thread.sleep(10);
-        
+
         final long beforeUpdateDate = System.currentTimeMillis();
         Thread.sleep(10);
         updateDataInstance(dataInstance.getName(), dataInstance.getContainerId(), dataInstance.getContainerType(), "testUpdateDescription2", 8);
@@ -1002,7 +1041,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         checkDataInstance(dataInstanceRes, "updateInteger", "testUpdateDescription2", false, classType, 8, 111l, "miniTask");
         deleteDataInstance(dataInstanceRes);
         final long dataInstanceId = dataInstance.getId();
-        
+
         getTransactionService().begin();
         try {
             final SADataInstance beforeUpdate = dataInstanceService.getSADataInstance(dataInstanceId, beforeUpdateDate);

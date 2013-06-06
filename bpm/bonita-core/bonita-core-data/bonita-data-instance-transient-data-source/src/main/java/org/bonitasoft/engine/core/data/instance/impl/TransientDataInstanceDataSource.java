@@ -213,7 +213,8 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
             if (!dataInstances.isEmpty()) {
                 return dataInstances;
             } else {
-                throw new SDataInstanceException("No data instance found for container type " + containerType + " and container id " + containerId);
+                return Collections.emptyList();
+                // throw new SDataInstanceException("No data instance found for container type " + containerType + " and container id " + containerId);
             }
         } catch (final CacheException e) {
             throw new SDataInstanceException("Impossible to get transient data: ", e);
