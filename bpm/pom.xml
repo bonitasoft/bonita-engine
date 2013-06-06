@@ -49,5 +49,11 @@
 				<module>bonita-integration-tests</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>package-all</id>
+			<modules>
+				<module>bonita-integration-tests</module>
+			</modules>
+		</profile>
 	</profiles>
 </project>
