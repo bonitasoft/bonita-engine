@@ -62,7 +62,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     public ServerAPIImpl() {
         try {
-            this.accessResolver = ServiceAccessorFactory.getInstance().createAPIAccessResolver();
+            accessResolver = ServiceAccessorFactory.getInstance().createAPIAccessResolver();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -72,7 +72,7 @@ public class ServerAPIImpl implements ServerAPI {
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
-        SessionAccessor sessionAccessor = null; 
+        SessionAccessor sessionAccessor = null;
         try {
             sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
             return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues);
@@ -91,7 +91,7 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private SessionAccessor beforeInvokeMethod(final Map<String, Serializable> options, final String apiInterfaceName) throws ServerWrappedException {
-        //boolean hasSetSessionAccessor = false;
+        // boolean hasSetSessionAccessor = false;
         SessionAccessor sessionAccessor = null;
         TransactionService txService = null;
 
@@ -133,7 +133,7 @@ public class ServerAPIImpl implements ServerAPI {
                         throw new ServerWrappedException(new InvalidSessionException("Unknown session type: " + session.getClass().getName()));
                 }
             } else {
-                if (this.accessResolver.needSession(apiInterfaceName)) {
+                if (accessResolver.needSession(apiInterfaceName)) {
                     throw new ServerWrappedException(new InvalidSessionException("Session is null!"));
                 }
             }
@@ -151,59 +151,12 @@ public class ServerAPIImpl implements ServerAPI {
                 if (txService != null && txService.isTransactionActive()) {
                     txService.complete();
                 }
-            } catch (STransactionException e) {
+            } catch (final STransactionException e) {
                 throw new ServerWrappedException(e);
             }
         }
     }
 
-    /*
-    private final int retries = 5;
-    private final long delay = 50;
-    private final double delayFactor = 2;
-    
-    private void executeIntransaction(final TechnicalLoggerService loggerService, final TransactionService txService, final ServerContent serverContent) throws ServerWrappedException {
-        int attempt = 0;
-        long sleepTime = this.delay;
-        while (attempt <= this.retries) {
-            try {
-                try {   
-                    txService.begin();
-                    serverContent.execute();
-                    attempt = this.retries + 1;
-                } catch (final SRetryableException sre) {
-                    txService.setRollbackOnly();
-                    attempt++;
-                    if (loggerService.isLoggable(TransactionExecutor.class, TechnicalLogSeverity.INFO)) {
-                        loggerService.log(TransactionExecutor.class, TechnicalLogSeverity.INFO, "Transaction failed", sre);
-                        loggerService.log(TransactionExecutor.class, TechnicalLogSeverity.INFO, "Retring(# " + attempt + ") in " + sleepTime + " ms");
-                    }
-                    try {
-                        Thread.sleep(sleepTime);
-                    } catch (final InterruptedException ie) {
-                        if (loggerService.isLoggable(TransactionExecutor.class, TechnicalLogSeverity.TRACE)) {
-                            loggerService.log(TransactionExecutor.class, TechnicalLogSeverity.TRACE, "Retry Sleeping was interrupted!");
-                        }
-                    }
-                    sleepTime *= this.delayFactor;
-                } catch (ServerWrappedException e) {
-                    txService.setRollbackOnly();
-                    throw e;
-                } finally {
-                    if (txService.isTransactionActive()) {
-                        txService.complete();
-                    }
-                }
-            } catch (STransactionException e) {
-                throw new ServerWrappedException(e);
-            }
-        }
-    }
-
-    private interface ServerContent {
-        void execute() throws ServerWrappedException;
-    }
-*/
     private SessionType getSessionType(final Session session) throws ServerWrappedException {
         SessionType sessionType = null;
         if (session instanceof PlatformSession) {
@@ -235,7 +188,7 @@ public class ServerAPIImpl implements ServerAPI {
                     parameterTypes[i] = classType;
                 }
             }
-            final Object api = this.accessResolver.getAPIImplementation(apiInterfaceName);
+            final Object api = accessResolver.getAPIImplementation(apiInterfaceName);
             return ClassReflector.invokeMethod(api, methodName, parameterTypes, parametersValues);
         } catch (final InvocationTargetException ite) {
             throw new ServerWrappedException(ite.getCause());

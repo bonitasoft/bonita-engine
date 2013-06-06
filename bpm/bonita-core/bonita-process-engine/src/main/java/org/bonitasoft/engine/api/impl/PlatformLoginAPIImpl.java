@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -46,10 +46,8 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
             e.printStackTrace();// no logger available yet
             throw new PlatformLoginException(e.getMessage());
         }
-//        final TransactionService transactionService = platformAccessor.getTransactionService();
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
         try {
-//            transactionService.begin();
             final SPlatformSession platformSession = platformLoginService.login(userName, password);
             final long id = platformSession.getId();
             final Date creationDate = platformSession.getCreationDate();
@@ -62,12 +60,6 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
                 technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
             }
             throw new PlatformLoginException(e.getMessage());
-        } finally {
-//            try {
-//                transactionService.complete();
-//            } catch (final SBonitaException e) {
-//                throw new PlatformLoginException(e.getMessage());
-//            }
         }
     }
 

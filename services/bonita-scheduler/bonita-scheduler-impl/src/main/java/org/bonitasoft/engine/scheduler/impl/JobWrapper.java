@@ -133,7 +133,7 @@ public class JobWrapper implements StatelessJob {
             if (wrapInTransaction) {
                 try {
                     transactionService.setRollbackOnly();
-                } catch (STransactionException te) {
+                } catch (final STransactionException te) {
                     throw new JobExecutionException(te);
                 }
             }

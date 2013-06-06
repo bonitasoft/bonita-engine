@@ -115,8 +115,10 @@ public class JTATransactionServiceImpl implements TransactionService {
                     eventService.fireEvent(tr_rolledback);
                 }
             } else {
+                String eventName = TRANSACTION_ROLLEDBACK_EVT;
                 try {
                     txManager.commit();
+                    eventName = TRANSACTION_COMMITED_EVT;
                 } catch (final SecurityException e) {
                     throw new STransactionCommitException("", e);
                 } catch (final IllegalStateException e) {
@@ -127,11 +129,12 @@ public class JTATransactionServiceImpl implements TransactionService {
                     throw new STransactionCommitException("", e);
                 } catch (final HeuristicRollbackException e) {
                     throw new STransactionCommitException("", e);
-                }
-                if (eventService.hasHandlers(TRANSACTION_COMMITED_EVT, null)) {
-                    // trigger the right event
-                    final SEvent tr_commited = eventService.getEventBuilder().createNewInstance(TRANSACTION_COMMITED_EVT).done();
-                    eventService.fireEvent(tr_commited);
+                } finally {
+                    if (eventService.hasHandlers(eventName, null)) {
+                        // trigger the right event
+                        final SEvent tr_commited = eventService.getEventBuilder().createNewInstance(eventName).done();
+                        eventService.fireEvent(tr_commited);
+                    }
                 }
             }
         } catch (final SystemException e) {

@@ -119,9 +119,9 @@ public class SchedulerImpl implements SchedulerService {
         this.readPersistenceService = readPersistenceService;
         this.sessionService = sessionService;
         this.jobTruster = jobTruster;
-        this.schedulStarted = eventService.getEventBuilder().createNewInstance(SCHEDULER_STARTED).done();
-        this.schedulStopped = eventService.getEventBuilder().createNewInstance(SCHEDULER_STOPPED).done();
-        this.jobFailed = eventService.getEventBuilder().createNewInstance(JOB_FAILED).done();
+        schedulStarted = eventService.getEventBuilder().createNewInstance(SCHEDULER_STARTED).done();
+        schedulStopped = eventService.getEventBuilder().createNewInstance(SCHEDULER_STOPPED).done();
+        jobFailed = eventService.getEventBuilder().createNewInstance(JOB_FAILED).done();
         this.eventService = eventService;
         this.recorder = recorder;
         this.transactionService = transactionService;
@@ -166,7 +166,7 @@ public class SchedulerImpl implements SchedulerService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "schedule"));
         }
-        schedule(jobDescriptor, Collections.<SJobParameter>emptyList(), trigger);
+        schedule(jobDescriptor, Collections.<SJobParameter> emptyList(), trigger);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "schedule"));
         }
@@ -182,7 +182,7 @@ public class SchedulerImpl implements SchedulerService {
     }
 
     private void internalSchedule(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters, final Trigger trigger) throws SSchedulerException,
-    FireEventException {
+            FireEventException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "schedule"));
         }
@@ -191,7 +191,7 @@ public class SchedulerImpl implements SchedulerService {
         } else if (jobDescriptor.getJobName() == null) {
             throw new SSchedulerException("The job name is null");
         }
-        SEventBuilder eventBuilder = eventService.getEventBuilder();
+        final SEventBuilder eventBuilder = eventService.getEventBuilder();
         final long tenantId = getTenantId();
         final SJobDescriptorImpl sJobDescriptorImpl = new SJobDescriptorImpl(jobDescriptor.getJobClassName(), jobDescriptor.getJobName(),
                 jobDescriptor.getDescription());
@@ -208,9 +208,11 @@ public class SchedulerImpl implements SchedulerService {
 
             if (parameters != null) {
                 for (final SJobParameter sJobParameter : parameters) {
-                    final SJobParameterImpl sJobParameter2 = (SJobParameterImpl) getJobParameterBuilder().createNewInstance(sJobParameter.getKey(), sJobParameter.getValue()).setJobDescriptorId(sJobDescriptorImpl.getId()).done();
+                    final SJobParameterImpl sJobParameter2 = (SJobParameterImpl) getJobParameterBuilder()
+                            .createNewInstance(sJobParameter.getKey(), sJobParameter.getValue()).setJobDescriptorId(sJobDescriptorImpl.getId()).done();
                     sJobParameter2.setTenantId(tenantId);// set the tenant manually on the object because it will be serialized
-                    final JobParameterLogBuilder jobParameterLogBuilder = getJobParameterLogBuilder(ActionType.CREATED, "Adding a parameter to the job", sJobParameter2);
+                    final JobParameterLogBuilder jobParameterLogBuilder = getJobParameterLogBuilder(ActionType.CREATED, "Adding a parameter to the job",
+                            sJobParameter2);
 
                     insertRecord = new InsertRecord(sJobParameter2);
                     insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(JOB_PARAMETER).setObject(sJobParameter2).done();

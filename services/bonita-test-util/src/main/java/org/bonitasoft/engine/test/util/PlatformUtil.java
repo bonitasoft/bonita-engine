@@ -60,10 +60,9 @@ public class PlatformUtil {
         return tenant.getId();
     }
 
-    public static boolean isPlatformCreated(final TransactionService transactionService, final PlatformService platformService)
-            throws Exception {
-        transactionService.begin();
+    public static boolean isPlatformCreated(final TransactionService transactionService, final PlatformService platformService) throws Exception {
         try {
+            transactionService.begin();
             return platformService.isPlatformCreated();
         } finally {
             transactionService.complete();
@@ -91,10 +90,10 @@ public class PlatformUtil {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-//        transactionService.begin();
+        // transactionService.begin();
         platformService.createPlatformTables();
         platformService.createTenantTables();
-//        transactionService.complete();
+        // transactionService.complete();
 
         transactionService.begin();
         platformService.initializePlatformStructure();
@@ -113,8 +112,8 @@ public class PlatformUtil {
             List<STenant> existingTenants;
             existingTenants = platformService.getTenants(QueryOptions.defaultQueryOptions());
             if (existingTenants.size() > 0) {
-                for (STenant sTenant : existingTenants) {
-                    long tenantId = sTenant.getId();
+                for (final STenant sTenant : existingTenants) {
+                    final long tenantId = sTenant.getId();
                     platformService.deactiveTenant(tenantId);
                     platformService.deleteTenant(tenantId);
                 }
@@ -123,12 +122,12 @@ public class PlatformUtil {
         } finally {
             transactionService.complete();
         }
-        //transactionService.begin();
+        // transactionService.begin();
         try {
             platformService.deleteTenantTables();
             platformService.deletePlatformTables();
         } finally {
-            //transactionService.complete();
+            // transactionService.complete();
         }
     }
 
