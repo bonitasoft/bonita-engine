@@ -32,14 +32,20 @@ public class GetUserMembershipsOfRole implements TransactionContentWithResult<Li
 
     private List<SUserMembership> sMembership;
 
-    public GetUserMembershipsOfRole(final long roleId, final IdentityService identityService) {
+    private final int startIndex;
+
+    private final int maxResults;
+
+    public GetUserMembershipsOfRole(final long roleId, final IdentityService identityService, final int startIndex, final int maxResults) {
         this.roleId = roleId;
         this.identityService = identityService;
+        this.startIndex = startIndex;
+        this.maxResults = maxResults;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        sMembership = identityService.getUserMembershipsOfRole(roleId);
+        sMembership = identityService.getUserMembershipsOfRole(roleId, startIndex, maxResults);
     }
 
     @Override

@@ -13,6 +13,13 @@
  **/
 package org.bonitasoft.engine.identity.impl.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -35,14 +42,6 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -242,18 +241,18 @@ public class IdentityServiceImplForUserMembershipTest {
     @Test
     public void getUserMembershipsOfGroup() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
-        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l))).thenReturn(Collections.singletonList(userMembership));
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l, 0, 20))).thenReturn(Collections.singletonList(userMembership));
 
-        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfGroup(1l);
+        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfGroup(1l, 0, 20);
 
         assertEquals(userMembership, userMemberships.get(0));
     }
 
     @Test(expected = SIdentityException.class)
     public void getUserMembershipsOfGroupThrowException() throws Exception {
-        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(1l, 0, 20))).thenThrow(new SBonitaReadException(""));
 
-        identityServiceImpl.getUserMembershipsOfGroup(1l);
+        identityServiceImpl.getUserMembershipsOfGroup(1l, 0, 20);
     }
 
     /**
@@ -262,18 +261,18 @@ public class IdentityServiceImplForUserMembershipTest {
     @Test
     public void getUserMembershipsOfRole() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
-        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l))).thenReturn(Collections.singletonList(userMembership));
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l, 0, 20))).thenReturn(Collections.singletonList(userMembership));
 
-        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfRole(1l);
+        final List<SUserMembership> userMemberships = identityServiceImpl.getUserMembershipsOfRole(1l, 0, 20);
 
         assertEquals(userMembership, userMemberships.get(0));
     }
 
     @Test(expected = SIdentityException.class)
     public void getUserMembershipsOfRoleThrowException() throws Exception {
-        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l, 0, 20))).thenThrow(new SBonitaReadException(""));
 
-        identityServiceImpl.getUserMembershipsOfRole(1l);
+        identityServiceImpl.getUserMembershipsOfRole(1l, 0, 20);
     }
 
     /**
@@ -320,9 +319,10 @@ public class IdentityServiceImplForUserMembershipTest {
     public void getUserMembershipsPaginatedWithOrder() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
         final OrderByOption orderByOption = new OrderByOption(SUserMembership.class, "username", OrderByType.ASC);
-        doReturn(Collections.singletonList(userMembership)).when(persistenceService).selectList(
-                SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
-                        new QueryOptions(0, 10, Collections.singletonList(orderByOption))));
+        doReturn(Collections.singletonList(userMembership)).when(persistenceService)
+                .selectList(
+                        SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
+                                new QueryOptions(0, 10, Collections.singletonList(orderByOption))));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
 
@@ -345,8 +345,7 @@ public class IdentityServiceImplForUserMembershipTest {
         final OrderByOption orderByOption = new OrderByOption(SRole.class, "name", OrderByType.ASC);
         when(
                 persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(0, 10, Collections
-                        .singletonList(orderByOption)))))
-                .thenReturn(Collections.singletonList(userMembership));
+                        .singletonList(orderByOption))))).thenReturn(Collections.singletonList(userMembership));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
 
@@ -359,8 +358,7 @@ public class IdentityServiceImplForUserMembershipTest {
         final OrderByOption orderByOption = new OrderByOption(SGroup.class, "name", OrderByType.ASC);
         when(
                 persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(0, 10, Collections
-                        .singletonList(orderByOption)))))
-                .thenReturn(Collections.singletonList(userMembership));
+                        .singletonList(orderByOption))))).thenReturn(Collections.singletonList(userMembership));
 
         final List<SUserMembership> userMemberships = identityServiceImpl.getUserMemberships(0, 10, orderByOption);
 

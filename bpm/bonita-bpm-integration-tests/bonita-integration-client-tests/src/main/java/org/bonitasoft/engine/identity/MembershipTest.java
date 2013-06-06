@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.List;
 
@@ -13,10 +17,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Bole Zhang
@@ -249,14 +249,31 @@ public class MembershipTest extends CommonAPITest {
 
     @Test
     public void getUserMembershipsByRole() throws BonitaException {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMembershipsByRole(role1.getId(), 0, 500);
+        List<UserMembership> userMemberships = getIdentityAPI().getUserMembershipsByRole(role1.getId(), 0, 500);
         assertEquals(2, userMemberships.size());
+
+        userMemberships = getIdentityAPI().getUserMembershipsByRole(role1.getId(), 0, 1);
+        assertEquals(1, userMemberships.size());
+
+        userMemberships = getIdentityAPI().getUserMembershipsByRole(role1.getId(), 1, 1);
+        assertEquals(1, userMemberships.size());
+
+        userMemberships = getIdentityAPI().getUserMembershipsByRole(role1.getId(), 20, 500);
+        assertEquals(0, userMemberships.size());
     }
 
     @Test
     public void getUserMembershipsByGroup() throws BonitaException {
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMembershipsByGroup(group1.getId(), 0, 500);
+        List<UserMembership> userMemberships = getIdentityAPI().getUserMembershipsByGroup(group1.getId(), 0, 500);
         assertEquals(1, userMemberships.size());
+        userMemberships = getIdentityAPI().getUserMembershipsByGroup(group3.getId(), 0, 500);
+        assertEquals(3, userMemberships.size());
+        userMemberships = getIdentityAPI().getUserMembershipsByGroup(group3.getId(), 0, 2);
+        assertEquals(2, userMemberships.size());
+        userMemberships = getIdentityAPI().getUserMembershipsByGroup(group3.getId(), 1, 2);
+        assertEquals(2, userMemberships.size());
+        userMemberships = getIdentityAPI().getUserMembershipsByGroup(group3.getId(), 20, 2);
+        assertEquals(0, userMemberships.size());
     }
 
     @Test

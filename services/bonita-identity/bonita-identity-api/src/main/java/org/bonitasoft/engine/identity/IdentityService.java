@@ -460,10 +460,12 @@ public interface IdentityService {
      * 
      * @param groupId
      *            Identifier of the group
+     * @param maxResults
+     * @param startIndex
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
-    List<SUserMembership> getUserMembershipsOfGroup(long groupId) throws SIdentityException;
+    List<SUserMembership> getUserMembershipsOfGroup(long groupId, int startIndex, int maxResults) throws SIdentityException;
 
     /**
      * Get user memberships for given role
@@ -473,7 +475,7 @@ public interface IdentityService {
      * @return a list of SUserMembership objects
      * @throws SIdentityException
      */
-    List<SUserMembership> getUserMembershipsOfRole(long roleId) throws SIdentityException;
+    List<SUserMembership> getUserMembershipsOfRole(long roleId, int startIndex, int maxResults) throws SIdentityException;
 
     /**
      * Get userMembership by given id

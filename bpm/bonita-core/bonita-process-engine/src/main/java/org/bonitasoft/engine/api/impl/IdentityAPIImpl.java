@@ -1402,7 +1402,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final GetUserMembershipsOfGroup transactionContentWithResult = new GetUserMembershipsOfGroup(groupId, identityService);
+        final GetUserMembershipsOfGroup transactionContentWithResult = new GetUserMembershipsOfGroup(groupId, identityService, startIndex, maxResults);
         try {
             transactionExecutor.execute(transactionContentWithResult);
             return ModelConvertor.toUserMembership(transactionContentWithResult.getResult());
@@ -1417,7 +1417,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final GetUserMembershipsOfRole transactionContentWithResult = new GetUserMembershipsOfRole(roleId, identityService);
+            final GetUserMembershipsOfRole transactionContentWithResult = new GetUserMembershipsOfRole(roleId, identityService, startIndex, maxResults);
             transactionExecutor.execute(transactionContentWithResult);
             return ModelConvertor.toUserMembership(transactionContentWithResult.getResult());
         } catch (final SBonitaException sbe) {

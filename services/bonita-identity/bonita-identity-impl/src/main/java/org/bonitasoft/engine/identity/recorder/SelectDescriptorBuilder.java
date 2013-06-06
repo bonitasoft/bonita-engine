@@ -90,15 +90,17 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SGroup>("getGroupsByName", parameters, SGroup.class);
     }
 
-    public static SelectListDescriptor<SUserMembership> getUserMembershipsByGroup(final long groupId) {
+    public static SelectListDescriptor<SUserMembership> getUserMembershipsByGroup(final long groupId, final int startIndex, final int maxResults) {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("groupId", groupId);
-        return new SelectListDescriptor<SUserMembership>("getUserMembershipsByGroup", parameters, SUserMembership.class);
+        return new SelectListDescriptor<SUserMembership>("getUserMembershipsByGroup", parameters, SUserMembership.class, new QueryOptions(startIndex,
+                maxResults));
     }
 
-    public static SelectListDescriptor<SUserMembership> getUserMembershipsByRole(final long roleId) {
+    public static SelectListDescriptor<SUserMembership> getUserMembershipsByRole(final long roleId, final int startIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("roleId", (Object) roleId);
-        return new SelectListDescriptor<SUserMembership>("getUserMembershipsByRole", parameters, SUserMembership.class);
+        return new SelectListDescriptor<SUserMembership>("getUserMembershipsByRole", parameters, SUserMembership.class,
+                new QueryOptions(startIndex, maxResults));
     }
 
     public static SelectOneDescriptor<SProfileMetadataDefinition> getMetadataByName(final String metadataName) {

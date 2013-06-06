@@ -24,6 +24,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -87,9 +88,14 @@ public class DeleteRoles extends DeleteWithActorMembers implements TransactionCo
     }
 
     private void deleteMembershipsByRole(final long roleId) throws SBonitaException {
-        final List<SUserMembership> memberships = identityService.getUserMembershipsOfRole(roleId);
-        for (final SUserMembership sUserMembership : memberships) {
-            identityService.deleteUserMembership(sUserMembership.getId());
-        }
+        int i = 0;
+        List<SUserMembership> memberships;
+        do {
+            memberships = identityService.getUserMembershipsOfRole(roleId, i, i + QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            i += QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
+            for (final SUserMembership sUserMembership : memberships) {
+                identityService.deleteUserMembership(sUserMembership.getId());
+            }
+        } while (memberships.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
     }
 }

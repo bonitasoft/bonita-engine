@@ -111,10 +111,15 @@ public class DeleteGroup extends DeleteWithActorMembers implements TransactionCo
     }
 
     private void deleteMembershipsByGroup(final long groupId) throws SBonitaException {
-        final List<SUserMembership> memberships = identityService.getUserMembershipsOfGroup(groupId);
-        for (final SUserMembership sUserMembership : memberships) {
-            identityService.deleteUserMembership(sUserMembership.getId());
-        }
+        int i = 0;
+        List<SUserMembership> memberships;
+        do {
+            memberships = identityService.getUserMembershipsOfGroup(groupId, i, i + QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            i += QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
+            for (final SUserMembership sUserMembership : memberships) {
+                identityService.deleteUserMembership(sUserMembership.getId());
+            }
+        } while (memberships.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
     }
 
 }

@@ -514,7 +514,7 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             user = getUser(userId);
             deleteUser(user);
-        } catch (SUserNotFoundException e) {
+        } catch (final SUserNotFoundException e) {
             // ignored, let's switch to the next one
         }
     }
@@ -555,8 +555,7 @@ public class IdentityServiceImpl implements IdentityService {
         }
         try {
             final SUserMembership selectOne = persistenceService.selectById(SelectDescriptorBuilder.getLightElementById(SUserMembership.class,
-                    "SUserMembership",
-                    userMembershipId));
+                    "SUserMembership", userMembershipId));
             if (selectOne == null) {
                 throw new SIdentityException("Can't get the userMembership with id " + userMembershipId, null);
             }
@@ -776,16 +775,13 @@ public class IdentityServiceImpl implements IdentityService {
             List<SUserMembership> listSUserMembership;
             if (orderByOption.getClazz() == SRole.class) {
                 listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithRole(new QueryOptions(fromIndex,
-                        numberOfResult,
-                        Collections.singletonList(orderByOption))));
+                        numberOfResult, Collections.singletonList(orderByOption))));
             } else if (orderByOption.getClazz() == SGroup.class) {
                 listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsWithGroup(new QueryOptions(fromIndex,
-                        numberOfResult,
-                        Collections.singletonList(orderByOption))));
+                        numberOfResult, Collections.singletonList(orderByOption))));
             } else {
                 listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership",
-                        new QueryOptions(
-                                fromIndex, numberOfResult, Collections.singletonList(orderByOption))));
+                        new QueryOptions(fromIndex, numberOfResult, Collections.singletonList(orderByOption))));
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserMemberships"));
@@ -800,12 +796,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfGroup(final long groupId) throws SIdentityException {
+    public List<SUserMembership> getUserMembershipsOfGroup(final long groupId, final int startIndex, final int maxResults) throws SIdentityException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfGroup"));
         }
         try {
-            final List<SUserMembership> selectList = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(groupId));
+            final List<SUserMembership> selectList = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(groupId, startIndex,
+                    maxResults));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserMembershipsOfGroup"));
             }
@@ -819,12 +816,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUserMembership> getUserMembershipsOfRole(final long roleId) throws SIdentityException {
+    public List<SUserMembership> getUserMembershipsOfRole(final long roleId, final int startIndex, final int maxResults) throws SIdentityException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfRole"));
         }
         try {
-            final List<SUserMembership> memberships = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(roleId));
+            final List<SUserMembership> memberships = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(roleId, startIndex,
+                    maxResults));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserMembershipsOfRole"));
             }
