@@ -130,9 +130,9 @@
                         <inherited>false</inherited>
                         <configuration>
                             <target>
-                                <path id="jasper.path">
+                                <path id="test.path">
                                     <pathelement path="${env.CLASSPATH}" />
-                                    <path refid="maven.jasper.classpath" />
+                                    <path refid="maven.test.classpath" />
                                     <pathelement path="${test_classpath}" />
                                 </path>
 
@@ -153,7 +153,7 @@
 
                                 <mkdir dir="${report.xml}" />
                                 <junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
-                                    <classpath refid="jasper.path" />
+                                    <classpath refid="test.path" />
                                     <sysproperty key="bonita.home" value="${bonita.home}" />
                                     <formatter type="xml" />
                                     <test todir="${report.xml}" name="${test.class}" />
