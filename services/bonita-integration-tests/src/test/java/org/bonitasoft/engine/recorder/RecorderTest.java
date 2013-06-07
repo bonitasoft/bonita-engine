@@ -1,10 +1,5 @@
 package org.bonitasoft.engine.recorder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +35,11 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Elias Ricken de Medeiros, Yanyan Liu
@@ -87,6 +87,7 @@ public class RecorderTest extends CommonServiceTest {
         TestUtil.startScheduler(scheduler);
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         TestUtil.closeTransactionIfOpen(getTransactionService());
@@ -132,119 +133,142 @@ public class RecorderTest extends CommonServiceTest {
     }
 
     private static class Foo {
+
         boolean insertCompleted = false;
+
         boolean readCompleted = false;
+
         boolean foundUser = false;
     }
-    
+
     @Test
     public void testReadNotCommittedInsert() throws Exception {
-        
-        
-        final Foo foo = new Foo(); 
+
+        final Foo foo = new Foo();
 
         final String firstName = "Laurent";
-        Runnable insert = new Runnable() {
-            
-            @Override
-            public void run() {
-                TransactionService txService = getTransactionService();
+        final Runnable insert = new Runnable() {
+
+            private void setSessionInfo() {
+                final TransactionService txService = getTransactionService();
                 try {
                     txService.begin();
                     final SSession session = getSessionService().createSession(1, "install");
-                    txService.complete();
                     getSessionAccessor().setSessionInfo(session.getId(), 1);
-                    
-                    
-                    txService.begin();
+                } catch (final Exception e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    try {
+                        txService.complete();
+                    } catch (final Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
 
+            @Override
+            public void run() {
+                final TransactionService txService = getTransactionService();
+
+                setSessionInfo();
+                try {
+                    txService.begin();
                     final Human human = buildHuman(firstName, "Vaills", 20);
                     final SInsertEvent insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(HUMAN).setObject(human).done();
                     recorder.recordInsert(new InsertRecord(human), insertEvent);
                     foo.insertCompleted = true;
-                    
+
                     while (!foo.readCompleted) {
                         Thread.sleep(500);
                     }
                     // set rollback
                     getTransactionService().setRollbackOnly();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new RuntimeException(e);
                 } finally {
                     try {
                         txService.complete();
-                    } catch (STransactionCommitException e) {
-                        // TODO Auto-generated catch block
+                    } catch (final STransactionCommitException e) {
                         e.printStackTrace();
-                    } catch (STransactionRollbackException e) {
-                        // TODO Auto-generated catch block
+                    } catch (final STransactionRollbackException e) {
                         e.printStackTrace();
-                    }                
+                    }
                 }
             }
         };
-        
-        Runnable read = new Runnable() {
-            
+
+        final Runnable read = new Runnable() {
+
+            private void setSessionInfo() {
+                final TransactionService txService = getTransactionService();
+                try {
+                    txService.begin();
+                    final SSession session = getSessionService().createSession(1, "install");
+                    getSessionAccessor().setSessionInfo(session.getId(), 1);
+                } catch (final Exception e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    try {
+                        txService.complete();
+                    } catch (final Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
             @Override
             public void run() {
-                TransactionService txService = getTransactionService();
+                final TransactionService txService = getTransactionService();
+                final long start = System.currentTimeMillis();
                 try {
-                    long start = System.currentTimeMillis();
                     while (!foo.insertCompleted) {
                         Thread.sleep(500);
                         if ((System.currentTimeMillis() - start) > 3000) {
                             throw new RuntimeException("timeout");
                         }
                     }
-                    
+                } catch (final InterruptedException ie) {
+                    throw new RuntimeException(ie);
+                }
+                setSessionInfo();
+                try {
                     txService.begin();
-                    final SSession session = getSessionService().createSession(1, "install");
-                    txService.complete();
-                    getSessionAccessor().setSessionInfo(session.getId(), 1);
-                    
-                    txService.begin();
-
                     final Human retrievedHuman = getHumanByFirstName(firstName);
                     foo.foundUser = retrievedHuman != null;
-
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new RuntimeException(e);
                 } finally {
                     foo.readCompleted = true;
                     try {
                         txService.complete();
-                    } catch (STransactionCommitException e) {
-                        // TODO Auto-generated catch block
+                    } catch (final STransactionCommitException e) {
                         e.printStackTrace();
-                    } catch (STransactionRollbackException e) {
-                        // TODO Auto-generated catch block
+                    } catch (final STransactionRollbackException e) {
                         e.printStackTrace();
                     }
                 }
             }
         };
-        
-        Thread insertThread = new Thread(insert);
-        Thread readThread = new Thread(read); 
+
+        final Thread insertThread = new Thread(insert);
+        final Thread readThread = new Thread(read);
         insertThread.start();
         readThread.start();
-        
+
         insertThread.join();
         readThread.join();
-        
+
         Thread.sleep(8000);
-        
+
         assertFalse(foo.foundUser);
     }
-    
+
     @Test
     public void testNotLogOnInsertRecordWhenBTXRolledBack() throws Exception {
         System.out.println(getTransactionService());
         getTransactionService().begin();
-        SelectOneDescriptor<Human> selectDescriptor = new SelectOneDescriptor<Human>("getHumanByFirstName", getMap("firstName", "firstName"), Human.class);
-        Human retrievedHuman = getPersistenceService().selectOne(
-                selectDescriptor);
+        final SelectOneDescriptor<Human> selectDescriptor = new SelectOneDescriptor<Human>("getHumanByFirstName", getMap("firstName", "firstName"), Human.class);
+        Human retrievedHuman = getPersistenceService().selectOne(selectDescriptor);
         assertNull("Should not have any Human in DB before test", retrievedHuman);
 
         final String firstName = "Laurent";
@@ -261,8 +285,7 @@ public class RecorderTest extends CommonServiceTest {
         // The transaction has been rolled back no Human nor log should have been inserted.
         getTransactionService().begin();
 
-        retrievedHuman = getPersistenceService().selectOne(
-                selectDescriptor);
+        retrievedHuman = getPersistenceService().selectOne(selectDescriptor);
         assertNull(retrievedHuman);
 
         final List<SQueriableLog> retrievedLogs = getLogs(TEST_CREATED);

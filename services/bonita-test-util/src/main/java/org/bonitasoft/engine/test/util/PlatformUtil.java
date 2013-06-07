@@ -36,28 +36,34 @@ public class PlatformUtil {
 
     public static long createTenant(final TransactionService transactionService, final PlatformService platformService, final STenantBuilder tenantBuilder,
             final String tenantName, final String createdBy, final String status) throws Exception {
-        transactionService.begin();
-        final long created = System.currentTimeMillis();
+        try {
+            transactionService.begin();
+            final long created = System.currentTimeMillis();
 
-        tenantBuilder.createNewInstance(tenantName, createdBy, created, status, false);
-        final STenant tenant = tenantBuilder.done();
-        platformService.createTenant(tenant);
-        platformService.activateTenant(tenant.getId());
-        transactionService.complete();
-        return tenant.getId();
+            tenantBuilder.createNewInstance(tenantName, createdBy, created, status, false);
+            final STenant tenant = tenantBuilder.done();
+            platformService.createTenant(tenant);
+            platformService.activateTenant(tenant.getId());
+            return tenant.getId();
+        } finally {
+            transactionService.complete();
+        }
     }
 
     public static long createDefaultTenant(final TransactionService transactionService, final PlatformService platformService,
             final STenantBuilder tenantBuilder, final String tenantName, final String createdBy, final String status) throws Exception {
-        transactionService.begin();
-        final long created = System.currentTimeMillis();
+        try {
+            transactionService.begin();
+            final long created = System.currentTimeMillis();
 
-        tenantBuilder.createNewInstance(tenantName, createdBy, created, status, true);
-        final STenant tenant = tenantBuilder.done();
-        platformService.createTenant(tenant);
-        platformService.activateTenant(tenant.getId());
-        transactionService.complete();
-        return tenant.getId();
+            tenantBuilder.createNewInstance(tenantName, createdBy, created, status, true);
+            final STenant tenant = tenantBuilder.done();
+            platformService.createTenant(tenant);
+            platformService.activateTenant(tenant.getId());
+            return tenant.getId();
+        } finally {
+            transactionService.complete();
+        }
     }
 
     public static boolean isPlatformCreated(final TransactionService transactionService, final PlatformService platformService) throws Exception {
@@ -72,14 +78,19 @@ public class PlatformUtil {
     public static void deleteTenant(final TransactionService transactionService, final PlatformService platformService, final long tenantId) throws Exception {
         transactionService.begin();
         // delete tenant objects
-        platformService.deactiveTenant(tenantId);
-        platformService.deleteTenantObjects(tenantId);
-        transactionService.complete();
-
+        try {
+            platformService.deactiveTenant(tenantId);
+            platformService.deleteTenantObjects(tenantId);
+        } finally {
+            transactionService.complete();
+        }
         // delete tenant
-        transactionService.begin();
-        platformService.deleteTenant(tenantId);
-        transactionService.complete();
+        try {
+            transactionService.begin();
+            platformService.deleteTenant(tenantId);
+        } finally {
+            transactionService.complete();
+        }
     }
 
     public static void createPlatform(final TransactionService transactionService, final PlatformService platformService, final SPlatformBuilder platformBuilder)
@@ -95,20 +106,26 @@ public class PlatformUtil {
         platformService.createTenantTables();
         // transactionService.complete();
 
-        transactionService.begin();
-        platformService.initializePlatformStructure();
-        transactionService.complete();
+        try {
+            transactionService.begin();
+            platformService.initializePlatformStructure();
+        } finally {
+            transactionService.complete();
+        }
 
         platformBuilder.createNewInstance(version, previousVersion, initialVersion, createdBy, created);
         final SPlatform platform = platformBuilder.done();
-        transactionService.begin();
-        platformService.createPlatform(platform);
-        transactionService.complete();
+        try {
+            transactionService.begin();
+            platformService.createPlatform(platform);
+        } finally {
+            transactionService.complete();
+        }
     }
 
     public static void deletePlatform(final TransactionService transactionService, final PlatformService platformService) throws Exception {
-        transactionService.begin();
         try {
+            transactionService.begin();
             List<STenant> existingTenants;
             existingTenants = platformService.getTenants(QueryOptions.defaultQueryOptions());
             if (existingTenants.size() > 0) {
@@ -122,12 +139,12 @@ public class PlatformUtil {
         } finally {
             transactionService.complete();
         }
-        // transactionService.begin();
+        transactionService.begin();
         try {
             platformService.deleteTenantTables();
             platformService.deletePlatformTables();
         } finally {
-            // transactionService.complete();
+            transactionService.complete();
         }
     }
 
@@ -150,18 +167,25 @@ public class PlatformUtil {
 
     public static void deleteDefaultTenant(final TransactionService transactionService, final PlatformService platformService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) throws Exception {
-        transactionService.begin();
-        final long tenantId = platformService.getTenantByName(DEFAULT_TENANT_NAME).getId();
-        TestUtil.createSessionOn(sessionAccessor, sessionService, tenantId);
+        long tenantId = 0;
+        try {
+            transactionService.begin();
+            tenantId = platformService.getTenantByName(DEFAULT_TENANT_NAME).getId();
+            TestUtil.createSessionOn(sessionAccessor, sessionService, tenantId);
 
-        // delete tenant objects
-        platformService.deactiveTenant(tenantId);
-        platformService.deleteTenantObjects(tenantId);
-        transactionService.complete();
+            // delete tenant objects
+            platformService.deactiveTenant(tenantId);
+            platformService.deleteTenantObjects(tenantId);
+        } finally {
+            transactionService.complete();
+        }
 
         // delete tenant
-        transactionService.begin();
-        platformService.deleteTenant(tenantId);
-        transactionService.complete();
+        try {
+            transactionService.begin();
+            platformService.deleteTenant(tenantId);
+        } finally {
+            transactionService.complete();
+        }
     }
 }

@@ -53,7 +53,7 @@ public class TestUtil {
         }
     }
 
-    public static void stopScheduler(final SchedulerService scheduler, TransactionService txService) throws SSchedulerException, FireEventException {
+    public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService) throws SSchedulerException, FireEventException {
         if (scheduler.isStarted() && !scheduler.isShutdown()) {
             try {
                 try {// FIXME will only delete jobs of the current tenant
@@ -65,7 +65,7 @@ public class TestUtil {
                 } finally {
                     txService.complete();
                 }
-            } catch (STransactionException txException) {
+            } catch (final STransactionException txException) {
                 throw new SSchedulerException(txException);
             }
             scheduler.shutdown();
@@ -90,17 +90,16 @@ public class TestUtil {
         return defaultTenantId;
     }
 
-    public static void createPlatform(final TransactionService txService, final PlatformService platformService,
-            final SPlatformBuilder platformBuilder) throws Exception {
+    public static void createPlatform(final TransactionService txService, final PlatformService platformService, final SPlatformBuilder platformBuilder)
+            throws Exception {
         if (PlatformUtil.isPlatformCreated(txService, platformService)) {
             PlatformUtil.deletePlatform(txService, platformService);
         }
         PlatformUtil.createPlatform(txService, platformService, platformBuilder);
     }
 
-    public static long createDefaultTenant(final TransactionService txService, final PlatformService platformService,
-            final SessionAccessor sessionAccessor, final STenantBuilder tenantBuilder, final SessionService sessionService, SPlatformBuilder platformBuilder)
-            throws Exception {
+    public static long createDefaultTenant(final TransactionService txService, final PlatformService platformService, final SessionAccessor sessionAccessor,
+            final STenantBuilder tenantBuilder, final SessionService sessionService, final SPlatformBuilder platformBuilder) throws Exception {
         if (!PlatformUtil.isPlatformCreated(txService, platformService)) {
             PlatformUtil.createPlatform(txService, platformService, platformBuilder);
         }
@@ -110,8 +109,8 @@ public class TestUtil {
         return defaultTenantId;
     }
 
-    public static void deleteDefaultTenant(final TransactionService txService, final PlatformService platformService,
-            final SessionAccessor sessionAccessor, final SessionService sessionService) throws Exception {
+    public static void deleteDefaultTenant(final TransactionService txService, final PlatformService platformService, final SessionAccessor sessionAccessor,
+            final SessionService sessionService) throws Exception {
         PlatformUtil.deleteDefaultTenant(txService, platformService, sessionAccessor, sessionService);
     }
 

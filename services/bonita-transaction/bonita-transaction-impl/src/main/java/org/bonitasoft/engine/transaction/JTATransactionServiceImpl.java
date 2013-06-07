@@ -108,11 +108,12 @@ public class JTATransactionServiceImpl implements TransactionService {
                     throw new STransactionRollbackException("", e);
                 } catch (final SecurityException e) {
                     throw new STransactionRollbackException("", e);
-                }
-                if (eventService.hasHandlers(TRANSACTION_ROLLEDBACK_EVT, null)) {
-                    // trigger the right event
-                    final SEvent tr_rolledback = eventService.getEventBuilder().createNewInstance(TRANSACTION_ROLLEDBACK_EVT).done();
-                    eventService.fireEvent(tr_rolledback);
+                } finally {
+                    if (eventService.hasHandlers(TRANSACTION_ROLLEDBACK_EVT, null)) {
+                        // trigger the right event
+                        final SEvent tr_rolledback = eventService.getEventBuilder().createNewInstance(TRANSACTION_ROLLEDBACK_EVT).done();
+                        eventService.fireEvent(tr_rolledback);
+                    }
                 }
             } else {
                 String eventName = TRANSACTION_ROLLEDBACK_EVT;

@@ -44,8 +44,8 @@ public class ProfileServiceTest extends CommonServiceTest {
 
     @Test(expected = SProfileNotFoundException.class)
     public void cannotGetAnUnknownProfile() throws SBonitaException {
-        getTransactionService().begin();
         try {
+            getTransactionService().begin();
             profileService.getProfile(10);
             Assert.fail();
         } finally {
@@ -98,8 +98,8 @@ public class ProfileServiceTest extends CommonServiceTest {
         final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1").done());
 
         final List<OrderByOption> orderByOptions = getOrderByOptions();
-        final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions, Collections.singletonList(new FilterOption(SProfileMember.class,
-                "profileId", profile.getId())), null);
+        final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId",
+                profile.getId())), null);
 
         List<SProfileMember> profileMembers = profileService.searchProfileMembers("ForUser", queryOptions);
         Assert.assertEquals(0, profileMembers.size());
@@ -159,8 +159,8 @@ public class ProfileServiceTest extends CommonServiceTest {
         profilesOfUser = profileService.getProfilesOfUser(john.getId());
         Assert.assertEquals(1, profilesOfUser.size());
 
-        final QueryOptions countOptions = new QueryOptions(0, 10, null, Collections.singletonList(new FilterOption(SProfileMember.class,
-                "profileId", profile.getId())), null);
+        final QueryOptions countOptions = new QueryOptions(0, 10, null, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId", profile
+                .getId())), null);
 
         Assert.assertEquals(2, profileService.getNumberOfProfileMembers("ForUser", countOptions));
 

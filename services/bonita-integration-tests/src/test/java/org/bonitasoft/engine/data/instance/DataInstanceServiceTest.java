@@ -1,12 +1,5 @@
 package org.bonitasoft.engine.data.instance;
 
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +36,13 @@ import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Zhao Na
@@ -127,8 +127,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         // create data instance
         final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
-        final SDataInstance dataInstance = dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
-        return dataInstance;
+        return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }
 
     private SDataInstance buildDataInstanceConstant(final String instanceName, final String className, final String description, final String content,
@@ -141,8 +140,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         // create datainstance
         final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
-        final SDataInstance dataInstance = dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
-        return dataInstance;
+        return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }
 
     private void evaluateDefaultValueOf(final SDataDefinition dataDefinition, final SDataInstanceBuilder dataInstanceBuilder) throws SBonitaException {
@@ -164,8 +162,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
                 .setContainerId(containerId).setContainerType(containerType);
         // create data instance
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
-        final SDataInstance dataInstance = dataInstanceBuilder.done();
-        return dataInstance;
+        return dataInstanceBuilder.done();
     }
 
     private SDataInstance buildXMLDataInstance(final String instanceName, final String description, final String namespace, final String xmlElement,
@@ -177,8 +174,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition)
                 .setContainerId(containerId).setContainerType(containerType);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
-        final SDataInstance dataInstance = dataInstanceBuilder.done();
-        return dataInstance;
+        return dataInstanceBuilder.done();
     }
 
     private SDataDefinition buildDataDefinition(final String instanceName, final String description, final String namespace, final String xmlElement,
@@ -291,8 +287,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         for (int i = 0; i < 255; i++) {
             stb.append(i);
         }
-        final String longText = stb.toString();
-        return longText;
+        return stb.toString();
     }
 
     private void deleteDataInstance(final SDataInstance dataInstance) throws SBonitaException {
@@ -362,7 +357,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         dataInstanceService.createDataContainer(containerId, containerType);
         getTransactionService().complete();
 
-        List<String> dataNames = new ArrayList<String>(2);
+        final List<String> dataNames = new ArrayList<String>(2);
         dataNames.add(instance1Name);
         dataNames.add(instance2Name);
         getTransactionService().begin();

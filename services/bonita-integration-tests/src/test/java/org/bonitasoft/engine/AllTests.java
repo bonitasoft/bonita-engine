@@ -42,7 +42,6 @@ import org.junit.runners.Suite.SuiteClasses;
     IdentityServiceTest.class,
     ExceptionManagerIntegrationTests.class,
     EventServiceTest.class,
-    MonitoringTests.class,
     AuthenticationServiceTest.class,
     PlatformAuthenticationServiceTest.class,
     SessionServiceTest.class,
@@ -61,7 +60,9 @@ import org.junit.runners.Suite.SuiteClasses;
     PlatformCommandServiceIntegrationTest.class,
     ProfileServiceTest.class,
     ParserTest.class,
-    ExceptionsManagerTests.class
+    ExceptionsManagerTests.class,
+    // Last test suite in order to check the correct begin/complete transactions
+    MonitoringTests.class
  })
 /**
  * Do not run this test suite alone. Use AllTestsWithJNDI instead.
