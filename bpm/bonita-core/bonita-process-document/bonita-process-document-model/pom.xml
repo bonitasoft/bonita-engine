@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-process-document</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.document</groupId>
-		<version>6.0.1-rc-01</version>
+		<version>6.0.1-rc-02-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-document-model</artifactId>
