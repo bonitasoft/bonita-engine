@@ -26,7 +26,8 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
- * Evaluate a list of SExpression, represented by the {@link SExpression#getDepencies} method. The result is a {@link java.util.List} of Serializable objects.
+ * Evaluate a list of SExpression, represented by the {@link SExpression#getDependencies()} method. The result is a {@link java.util.List} of Serializable
+ * objects.
  * 
  * @author Emmanuel Duchastenier
  */

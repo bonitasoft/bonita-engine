@@ -73,6 +73,9 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
             expressionConstant = ExpressionConstants.API_ACCESSOR;// just to make the expressionConstantsResolver load constants
             expressionConstant = ExpressionConstantsResolver.getExpressionConstantsFromName(expression.getContent());
         }
+        if (expressionConstant == null) {
+            throw new SExpressionEvaluationException(expression.getContent() + " is not a valid Engine-provided variable");
+        }
         switch (expressionConstant) {
             case API_ACCESSOR:
                 return getApiAccessor();
@@ -268,7 +271,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (ExpressionConstantsResolver.getExpressionConstantsFromName(expression.getContent()) == null) {
-            throw new SInvalidExpressionException("Unable to get constant for content: " + expression.getContent() + " in expression: " + expression);
+            throw new SInvalidExpressionException("Unable to get Engine Constant '" + expression.getContent() + "' in expression: " + expression);
         }
     }
 

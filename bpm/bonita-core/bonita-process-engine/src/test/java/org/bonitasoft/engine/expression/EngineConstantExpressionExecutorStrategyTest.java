@@ -39,6 +39,7 @@ import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.junit.Before;
 import org.junit.Test;
@@ -187,8 +188,6 @@ public class EngineConstantExpressionExecutorStrategyTest {
         when(expression.getContent()).thenReturn(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName());
 
         final long processInstanceId = 799451L;
-        final EngineExecutionContext engineExecutionContext = new EngineExecutionContext();
-        engineExecutionContext.setProcessInstanceId(processInstanceId);
         final Map<String, Object> dependencies = new HashMap<String, Object>(0);
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(null, null, null, null);
@@ -196,4 +195,25 @@ public class EngineConstantExpressionExecutorStrategyTest {
         assertFalse(("" + processInstanceId).equals(String.valueOf(noValue)));
 
     }
+
+    @Test(expected = SExpressionEvaluationException.class)
+    public void engineConstantNotFound() throws Exception {
+        final SExpression expression = mock(SExpression.class);
+
+        when(expression.getContent()).thenReturn("unexisting_constant_value");
+
+        final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(null, null, null, null);
+        strategy.evaluate(expression, defaultDependencyValues, Collections.<Integer, Object> emptyMap());
+    }
+
+    @Test(expected = SInvalidExpressionException.class)
+    public void engineConstantWithValidationException() throws Exception {
+        final SExpression expression = mock(SExpression.class);
+
+        when(expression.getContent()).thenReturn("unexisting_constant_value");
+
+        final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(null, null, null, null);
+        strategy.validate(expression);
+    }
+
 }
