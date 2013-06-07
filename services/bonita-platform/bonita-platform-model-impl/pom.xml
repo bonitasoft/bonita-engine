@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-platform</artifactId>
 		<groupId>org.bonitasoft.engine.platform</groupId>
-		<version>6.0.1-SNAPSHOT</version>
+		<version>6.0.1-rc-01</version>
 	</parent>
 
 	<artifactId>bonita-platform-model-impl</artifactId>

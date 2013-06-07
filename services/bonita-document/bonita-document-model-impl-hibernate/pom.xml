@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-document</artifactId>
 		<groupId>org.bonitasoft.engine.document</groupId>
-		<version>6.0.1-SNAPSHOT</version>
+		<version>6.0.1-rc-01</version>
 	</parent>
 
 	<artifactId>bonita-document-model-impl-hibernate</artifactId>
