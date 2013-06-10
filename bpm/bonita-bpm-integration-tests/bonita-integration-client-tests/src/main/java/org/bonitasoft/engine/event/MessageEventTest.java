@@ -1,15 +1,5 @@
 package org.bonitasoft.engine.event;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeNotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +31,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -65,7 +56,31 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeNotNull;
+
 public class MessageEventTest extends CommonAPITest {
+
+    private static final String MESSAGE = "message";
+
+    private static final String START_WITH_MESSAGE_STEP1_NAME = "userStart1";
+
+    private static final String START_WITH_MESSAGE_PROCESS_NAME = "Start from message";
+
+    private static final String CATCH_EVENT_NAME = "waitForMessage";
+
+    private static final String CATCH_MESSAGE_PROCESS_NAME = "Catch a message";
+
+    private static final String CATCH_MESSAGE_STEP1_NAME = "step1";
+
+    private static final String SEND_MESSAGE_PROCESS_NAME = "Send a message";
 
     private User user = null;
 
@@ -83,11 +98,27 @@ public class MessageEventTest extends CommonAPITest {
         logout();
     }
 
+    private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String targetProcess, final String targetFlowNode) throws BonitaException {
+        return deployAndEnableProcessWithEndMessageEvent(targetProcess, targetFlowNode, null, null, null, null);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithEndMessageEventWithCorrelations(final String targetProcess, final String targetFlowNode,
+            final List<BEntry<Expression, Expression>> correlations) throws BonitaException {
+        return deployAndEnableProcessWithEndMessageEvent(targetProcess, targetFlowNode, correlations, null, null, null);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String targetProcess, final String targetFlowNode,
+            final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData, final Map<String, String> messageData,
+            final Map<String, String> dataInputMapping) throws BonitaException {
+        return deployAndEnableProcessWithEndMessageEvent("Send message in the end", MESSAGE, targetProcess, targetFlowNode, correlations, processData,
+                messageData, dataInputMapping);
+    }
+
     private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName, final String messageName, final String targetProcess,
             final String targetFlowNode, final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData,
             final Map<String, String> messageData, final Map<String, String> dataInputMapping) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        processBuilder.createNewInstance(processName, "1.0");
+        processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(processData, processBuilder);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addAutomaticTask("auto1");
@@ -147,16 +178,27 @@ public class MessageEventTest extends CommonAPITest {
         }
     }
 
-    private ProcessDefinition deployAndEnableProcessWithIntermediateThrowMessageEvent(final String processName, final String messageName,
-            final String targetProcess, final String targetFlowNode) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithIntermediateThrowMessageEvent(final String targetProcess, final String targetFlowNode)
+            throws BonitaException {
+        return deployAndEnableProcessWithIntermediateThrowMessageEvent(Collections.singletonList(MESSAGE), Collections.singletonList(targetProcess),
+                Collections.singletonList(targetFlowNode));
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithIntermediateThrowMessageEvent(final List<String> messageNames, final List<String> targetProcesses,
+            final List<String> targetFlowNodes) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        // create expression for target process/flowNode
-        final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
-        final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression(targetFlowNode);
-        processBuilder.createNewInstance(processName, "1.0");
+        processBuilder.createNewInstance(SEND_MESSAGE_PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addAutomaticTask("auto1");
-        processBuilder.addIntermediateThrowEvent("sendMessage").addMessageEventTrigger(messageName, targetProcessExpression, targetFlowNodeExpression);
+
+        final IntermediateThrowEventDefinitionBuilder intermediateThrowEvent = processBuilder.addIntermediateThrowEvent("sendMessage");
+        for (final String targetProcess : targetProcesses) {
+            // create expression for target process/flowNode
+            final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
+            final int indexOfTargetProcess = targetProcesses.indexOf(targetProcess);
+            final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression(targetFlowNodes.get(indexOfTargetProcess));
+            intermediateThrowEvent.addMessageEventTrigger(messageNames.get(indexOfTargetProcess), targetProcessExpression, targetFlowNodeExpression);
+        }
         processBuilder.addEndEvent("endEvent");
         processBuilder.addTransition("startEvent", "auto1");
         processBuilder.addTransition("auto1", "sendMessage");
@@ -170,18 +212,23 @@ public class MessageEventTest extends CommonAPITest {
         return sendMessageProcess;
     }
 
-    private ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final String processName, final String userTaskName, final String actorName,
-            final User user, final String messageName, final Map<String, String> data, final List<Operation> catchMessageOperations) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final Map<String, String> data, final List<Operation> catchMessageOperations)
+            throws BonitaException {
+        return deployAndEnableProcessWithStartMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, MESSAGE, data, catchMessageOperations);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final String processName, final String messageName, final Map<String, String> data,
+            final List<Operation> catchMessageOperations) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        processBuilder.createNewInstance(processName, "1.0");
+        processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(data, processBuilder);
         final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger = processBuilder.addStartEvent("startEvent").addMessageEventTrigger(messageName);
         addCatchMessageOperations(catchMessageOperations, messageEventTrigger);
-        processBuilder.addActor(actorName);
-        processBuilder.addUserTask(userTaskName, actorName);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask(START_WITH_MESSAGE_STEP1_NAME, ACTOR_NAME);
         processBuilder.addEndEvent("endEvent");
-        processBuilder.addTransition("startEvent", userTaskName);
-        processBuilder.addTransition(userTaskName, "endEvent");
+        processBuilder.addTransition("startEvent", START_WITH_MESSAGE_STEP1_NAME);
+        processBuilder.addTransition(START_WITH_MESSAGE_STEP1_NAME, "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
@@ -208,38 +255,43 @@ public class MessageEventTest extends CommonAPITest {
         }
     }
 
-    private ProcessDefinition deployAndEnableProcessWithMessageIntermediateCatchEvent(final String processName, final String intermediateCatchEventName,
-            final String userTaskName, final String actorName, final User user, final String messageName,
+    private ProcessDefinition deployAndEnableProcessWithMessageIntermediateCatchEvent(final List<BEntry<Expression, Expression>> correlations,
+            final Map<String, String> processData, final List<Operation> operations) throws BonitaException {
+        return deployAndEnableProcessWithMessageIntermediateCatchEvent(CATCH_MESSAGE_PROCESS_NAME, MESSAGE, correlations, processData, operations);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithMessageIntermediateCatchEvent(final String processName, final String messageName,
             final List<BEntry<Expression, Expression>> correlations, final Map<String, String> processData, final List<Operation> operations)
             throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        processBuilder.createNewInstance(processName, "1.0");
+        processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(processData, processBuilder);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addAutomaticTask("auto1");
         final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processBuilder.addIntermediateCatchEvent(
-                intermediateCatchEventName).addMessageEventTrigger(messageName);
+                CATCH_EVENT_NAME).addMessageEventTrigger(messageName);
         addCorrelations(correlations, catchMessageEventTriggerDefinitionBuilder);
         addCatchMessageOperations(operations, catchMessageEventTriggerDefinitionBuilder);
-        processBuilder.addActor(actorName);
-        processBuilder.addUserTask(userTaskName, actorName);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask(CATCH_MESSAGE_STEP1_NAME, ACTOR_NAME);
         processBuilder.addEndEvent("endEvent");
         processBuilder.addTransition("startEvent", "auto1");
-        processBuilder.addTransition("auto1", intermediateCatchEventName);
-        processBuilder.addTransition(intermediateCatchEventName, userTaskName);
-        processBuilder.addTransition(userTaskName, "endEvent");
+        processBuilder.addTransition("auto1", CATCH_EVENT_NAME);
+        processBuilder.addTransition(CATCH_EVENT_NAME, CATCH_MESSAGE_STEP1_NAME);
+        processBuilder.addTransition(CATCH_MESSAGE_STEP1_NAME, "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
         final BusinessArchive receiveMessaceArchive = archiveBuilder.done();
-        final ProcessDefinition receiveMessageProcess = getProcessAPI().deploy(receiveMessaceArchive);
+        // final ProcessDefinition receiveMessageProcess = getProcessAPI().deploy(receiveMessaceArchive);
+        //
+        // final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1, ActorCriterion.NAME_ASC);
+        // getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
+        //
+        // getProcessAPI().enableProcess(receiveMessageProcess.getId());
 
-        final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1, ActorCriterion.NAME_ASC);
-        getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
-
-        getProcessAPI().enableProcess(receiveMessageProcess.getId());
-
+        final ProcessDefinition receiveMessageProcess = deployAndEnableWithActor(receiveMessaceArchive, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(receiveMessageProcess.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -263,10 +315,8 @@ public class MessageEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )")
     @Test
     public void messageStartEventMessageSentAfterEnable() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m1", "receiveMessageProcess",
-                "startEvent", null, null, null, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m1",
-                null, null);
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
@@ -277,7 +327,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -291,10 +341,8 @@ public class MessageEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )")
     @Test
     public void messageStartEventMessageSentAfterEnableWithNoTargetFlowNode() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m1", "receiveMessageProcess", null, null,
-                null, null, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m1",
-                null, null);
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
@@ -305,7 +353,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -318,14 +366,12 @@ public class MessageEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> start send process -> deploy receive process)")
     @Test
     public void messageStartEventMessageSentBeforeEnable() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m1", "receiveMessageProcess",
-                "startEvent", null, null, null, null);
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
         // the message will be send before the target process is deployed
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 6000, sendMessageProcessInstance, getProcessAPI()));
 
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m1",
-                null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
         assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
@@ -333,7 +379,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -349,13 +395,11 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in an intermediate event of an other process.")
     @Test
     public void messageIntermediateCatchEventMessageSentAfterCatch() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m13", "receiveMessageProcess",
-                "waitForMessage", null, null, null, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "userTask1", "delivery", user, "m13", null, null, null);
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, "waitForMessage");
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
@@ -366,7 +410,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("userTask1", taskInstance.getName());
+        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -390,9 +434,10 @@ public class MessageEventTest extends CommonAPITest {
         final Expression docCorrelationValue = new ExpressionBuilder().createDataExpression("docNumber", Integer.class.getName());
         correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
 
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m7", "receiveMessageProcess",
-                "waitForMessage", correlations, data, null, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageInterCatchEventAnd1Correlation(user, "userTask1", "m7");
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, correlations,
+                data,
+                null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageInterCatchEventAnd1Correlation();
 
         // start two instances of a receive message process
         final ProcessInstance receiveMessageProcessInstance1 = getProcessAPI().startProcess(receiveMessageProcess.getId(),
@@ -401,8 +446,8 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docRef", "2", Integer.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, "waitForMessage", TestStates.getWaitingState());
-        waitForEvent(50, 6000, receiveMessageProcessInstance2, "waitForMessage", TestStates.getWaitingState());
+        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(50, 6000, receiveMessageProcessInstance2, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance1
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(
@@ -411,8 +456,8 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
 
-        assertNotNull(waitForUserTask("userTask1", receiveMessageProcessInstance1));
-        waitForEventInWaitingState(receiveMessageProcessInstance2, "waitForMessage");
+        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1));
+        waitForEventInWaitingState(receiveMessageProcessInstance2, CATCH_EVENT_NAME);
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance2
         final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(
@@ -421,7 +466,7 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(isProcessInstanceFinishedAndArchived(20, 3000, sendMessageProcessInstance2, getProcessAPI()));
 
-        assertNotNull(waitForUserTask("userTask1", receiveMessageProcessInstance2));
+        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2));
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -438,25 +483,23 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that if a send process has for targets two instances of the same ProcessDefinition and no correlation key is defined (equivalent to matching keys), exactly one of the receive process catches the message.")
     @Test
     public void messageIntermediateCatchEventWithoutCorrelations() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m8", "receiveMessageProcess",
-                "waitForMessage", null, null, null, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "userTask1", "delivery", user, "m8", null, null, null);
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
         // start two instances of a receive message process
         final ProcessInstance receiveMessageProcessInstance1 = getProcessAPI().startProcess(receiveMessageProcess.getId());
         final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, "waitForMessage", TestStates.getWaitingState());
-        waitForEvent(50, 6000, receiveMessageProcessInstance2, "waitForMessage", TestStates.getWaitingState());
+        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(50, 6000, receiveMessageProcessInstance2, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // instantiate a process containing whom the targetProcess is of the ProcessDefinition receiveMessageProcess
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
 
-        final Boolean gotMessage1 = doesUserTaskExist("userTask1", receiveMessageProcessInstance1);
-        final Boolean gotMessage2 = doesUserTaskExist("userTask1", receiveMessageProcessInstance2);
+        final Boolean gotMessage1 = doesUserTaskExist(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
+        final Boolean gotMessage2 = doesUserTaskExist(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2);
 
         if (gotMessage1 && gotMessage2) {
             fail("Only one of the process should receive the message");
@@ -498,8 +541,8 @@ public class MessageEventTest extends CommonAPITest {
         correlations.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
                 .createConstantStringExpression("value2")));
 
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m9", "receiveMessageProcess",
-                "waitForMessage", correlations, null, null, null);
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEventWithCorrelations(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME,
+                correlations);
 
         final ArrayList<BEntry<Expression, Expression>> correlationsReceive = new ArrayList<BEntry<Expression, Expression>>(2);
         correlationsReceive.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
@@ -507,20 +550,19 @@ public class MessageEventTest extends CommonAPITest {
         correlationsReceive.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
                 .createConstantStringExpression("value1")));
 
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "userTask1", "delivery", user, "m9", correlationsReceive, null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(correlationsReceive, null, null);
 
         // start two instances of a receive message process
         final ProcessInstance receiveMessageProcessInstance1 = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, "waitForMessage", TestStates.getWaitingState());
+        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance1
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
 
-        waitForUserTask("userTask1", receiveMessageProcessInstance1);
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
         // waitForStep(100, 5000, "userTask1", receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -537,8 +579,8 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that a send process must have at least all correlation keys of the receive process for the message to be transmitted.")
     @Test
     public void multipleCorrelationsKeys() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithMessageEndEventAndCorrelation("m11");
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageInterCatchEventAnd2Correlations(user, "userTask1", "m11");
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithMessageEndEventAndCorrelation();
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageInterCatchEventAnd2Correlations();
 
         // start a instance of a receive message process
         final ProcessInstance receiveMessageProcessInstance1 = getProcessAPI().startProcess(
@@ -547,7 +589,7 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("name", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, "waitForMessage", TestStates.getWaitingState());
+        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         checkUserHasNoPendingTasks();
 
@@ -557,7 +599,7 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe 2", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(isProcessInstanceFinishedAndArchived(20, 3000, sendMessageProcessInstance1, getProcessAPI()));
-        assertFalse(new WaitForStep(50, 6000, "userTask1", receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
+        assertFalse(new WaitForStep(50, 6000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
 
         // instantiate a process having both two correlation keys matching, the process must go further
         final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(
@@ -565,26 +607,23 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(isProcessInstanceFinishedAndArchived(20, 3000, sendMessageProcessInstance2, getProcessAPI()));
-        waitForStep(50, 11000, "userTask1", receiveMessageProcessInstance1);
+        waitForStep(50, 11000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithMessageInterCatchEventAnd1Correlation(final User user, final String userTaskName,
-            final String messageName) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithMessageInterCatchEventAnd1Correlation() throws BonitaException {
         final Map<String, String> data = new HashMap<String, String>();
         data.put("docRef", Integer.class.getName());
         final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(1);
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
         final Expression docCorrelationValue = new ExpressionBuilder().createDataExpression("docRef", Integer.class.getName());
         correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
-        return deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage", userTaskName, "delivery", user, messageName,
-                correlations, data, null);
+        return deployAndEnableProcessWithMessageIntermediateCatchEvent(correlations, data, null);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithMessageInterCatchEventAnd2Correlations(final User user, final String userTaskName,
-            final String mesageName) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithMessageInterCatchEventAnd2Correlations() throws BonitaException {
         final Map<String, String> data = new HashMap<String, String>();
         data.put("docRef", Integer.class.getName());
         data.put("name", String.class.getName());
@@ -595,11 +634,10 @@ public class MessageEventTest extends CommonAPITest {
         final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(2);
         correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
         correlations.add(new BEntry<Expression, Expression>(nameCorrelationKey, nameCorrelationValue));
-        return deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage", userTaskName, "delivery", user, mesageName,
-                correlations, data, null);
+        return deployAndEnableProcessWithMessageIntermediateCatchEvent(correlations, data, null);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithMessageEndEventAndCorrelation(final String messageName) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithMessageEndEventAndCorrelation() throws BonitaException {
         final Map<String, String> data = new HashMap<String, String>();
         data.put("docNumber", Integer.class.getName());
         data.put("lastName", String.class.getName());
@@ -612,8 +650,7 @@ public class MessageEventTest extends CommonAPITest {
         correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
         correlations.add(new BEntry<Expression, Expression>(nameCorrelationKey, nameCorrelationValue));
 
-        return deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", messageName, "receiveMessageProcess", "waitForMessage", correlations, data,
-                null, null);
+        return deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, correlations, data, null, null);
     }
 
     private Operation buildAssignOperation(final String dataInstanceName, final String newConstantValue, final String className,
@@ -636,10 +673,8 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.")
     @Test
     public void messageIntermediateThrowEventMessageSentAfterEnable() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent("sendMessageProcess", "m10",
-                "receiveMessageProcess", "startEvent");
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m10",
-                null, null);
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
@@ -650,10 +685,48 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
+    }
+
+    @Cover(classes = { EventInstance.class, ThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
+            "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.")
+    @Test
+    public void messageIntermediateThrow2EventMessages() throws Exception {
+        final List<String> messages = new ArrayList<String>();
+        messages.add("catchMessage");
+        messages.add("startMessage");
+        final List<String> targetProcesses = new ArrayList<String>();
+        targetProcesses.add(CATCH_MESSAGE_PROCESS_NAME);
+        targetProcesses.add(START_WITH_MESSAGE_PROCESS_NAME);
+        final List<String> targetFlowNodes = new ArrayList<String>();
+        targetFlowNodes.add(CATCH_EVENT_NAME);
+        targetFlowNodes.add("startEvent");
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(messages, targetProcesses, targetFlowNodes);
+
+        final ProcessDefinition startWithMessageProcess = deployAndEnableProcessWithStartMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startMessage", null,
+                null);
+        final ProcessDefinition catchMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(CATCH_MESSAGE_PROCESS_NAME, "catchMessage", null,
+                null, null);
+
+        final ProcessInstance catchMessageProcessInstance = getProcessAPI().startProcess(catchMessageProcess.getId());
+        waitForEventInWaitingState(catchMessageProcessInstance, CATCH_EVENT_NAME);
+
+        final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
+        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+
+        checkNbPendingTaskOf(2, user);
+
+        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        assertEquals(2, taskInstances.size());
+        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstances.get(0).getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstances.get(1).getName());
+
+        disableAndDeleteProcess(sendMessageProcess);
+        disableAndDeleteProcess(startWithMessageProcess);
+        disableAndDeleteProcess(catchMessageProcess);
     }
 
     /*
@@ -665,13 +738,13 @@ public class MessageEventTest extends CommonAPITest {
             "Send", "Receive" }, story = "Send a message with data from an end event of a process to a start event of an other process.")
     @Test
     public void dataTransferFromMessageEndEventToStartMessageEvent() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m1", "receiveMessageProcess",
-                "startEvent", null, Collections.singletonMap("lastName", String.class.getName()), Collections.singletonMap("lName", String.class.getName()),
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null,
+                Collections.singletonMap("lastName", String.class.getName()), Collections.singletonMap("lName", String.class.getName()),
                 Collections.singletonMap("lName", "lastName"));
         final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
                 ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m1",
-                Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.singletonMap("name", String.class.getName()),
+                catchMessageOperations);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
@@ -684,7 +757,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", taskInstance.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
@@ -703,20 +776,20 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.")
     @Test
     public void dataTransferFromMessageEndEventToMessageIntermediateCatchEvent() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m14", "receiveMessageProcess",
-                "waitForMessage", null, Collections.singletonMap("lastName", String.class.getName()),
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, null,
+                Collections.singletonMap("lastName", String.class.getName()),
                 Collections.singletonMap("lName", String.class.getName()), Collections.singletonMap("lName", "lastName"));
 
         final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
                 ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "step1", "delivery", user, "m14", null, Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null,
+                Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
 
         // start a instance of a receive message process
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
-        waitForEventInWaitingState(receiveMessageProcessInstance, "waitForMessage");
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertNull("Data is not null", dataInstance.getValue());
@@ -725,7 +798,7 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
 
-        waitForUserTask("step1", receiveMessageProcessInstance);
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
         // waitForStep(50, 6000, "step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
@@ -745,48 +818,49 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate throw event", "Send", "Receive" }, story = "Verify receive process receive message targeting it, even if the message is sent before its existence.")
     @Test
     public void messageSentProcessFinishBeforeReceiveProcessIsEnabled() throws Exception {
-        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent("sendMessageProcess", "m11",
-                "receiveMessageProcess", "waitForMessage");
-
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
 
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "step1", "delivery", user, "m11", null, null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, "waitForMessage");
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
-        waitForStep(50, 6000, "step1", receiveMessageProcessInstance);
+        waitForStep(50, 6000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
+    private ProcessDefinition deployAndEnableProcessWithIntraMessageEvent(final String targetProcess, final String targetFlowNode) throws BonitaException {
+        return deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", MESSAGE, targetProcess, targetFlowNode);
+    }
+
     private ProcessDefinition deployAndEnableProcessWithIntraMessageEvent(final String processName, final String messageName, final String targetProcess,
-            final String targetFlowNode, final String userTaskName, final String actorName, final User user) throws BonitaException {
+            final String targetFlowNode) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         // create expression for target process/flowNode
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
         final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression(targetFlowNode);
-        processBuilder.createNewInstance(processName, "1.0");
+        processBuilder.createNewInstance(processName, PROCESS_VERSION);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addAutomaticTask("auto1");
         processBuilder.addGateway("gateway1", GatewayType.PARALLEL);
         processBuilder.addIntermediateThrowEvent("sendMessage").addMessageEventTrigger(messageName, targetProcessExpression, targetFlowNodeExpression);
         processBuilder.addIntermediateCatchEvent(targetFlowNode).addMessageEventTrigger(messageName);
         processBuilder.addGateway("gateway2", GatewayType.PARALLEL);
-        processBuilder.addActor(actorName);
-        processBuilder.addUserTask(userTaskName, actorName);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask("userTask1", ACTOR_NAME);
         processBuilder.addEndEvent("endEvent");
         processBuilder.addTransition("startEvent", "auto1");
         processBuilder.addTransition("auto1", "gateway1");
         processBuilder.addTransition("gateway1", "sendMessage");
-        processBuilder.addTransition("gateway1", targetFlowNode);
+        processBuilder.addTransition("gateway1", "userTask1");
         processBuilder.addTransition("sendMessage", "gateway2");
-        processBuilder.addTransition(targetFlowNode, "gateway2");
-        processBuilder.addTransition("gateway2", userTaskName);
-        processBuilder.addTransition(userTaskName, "endEvent");
+        processBuilder.addTransition("userTask1", "gateway2");
+        processBuilder.addTransition("gateway2", "userTask1");
+        processBuilder.addTransition("userTask1", "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
@@ -814,13 +888,10 @@ public class MessageEventTest extends CommonAPITest {
             "Event", "Message event", "Throw event", "Catch event", "Send", "Receive" }, story = "Message goes from a throw event to a catch event belonging to the same process hence the same pool (forbidden by BPMN 2.0).")
     @Test
     public void messageEventIntraProcess() throws Exception {
-        final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", "m12",
-                "sendAndReceiveMessageProcess", "waitForMessage", "userTask1", "delivery", user);
-
+        final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", CATCH_EVENT_NAME);
         final ProcessInstance sendAndReceiveMessageProcessInstance = getProcessAPI().startProcess(sendAndReceiveMessageProcess.getId());
 
-        waitForEventInWaitingState(sendAndReceiveMessageProcessInstance, "waitForMessage");
-
+        waitForEventInWaitingState(sendAndReceiveMessageProcessInstance, CATCH_EVENT_NAME);
         waitForStep(50, 11000, "userTask1", sendAndReceiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendAndReceiveMessageProcess);
@@ -835,16 +906,15 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate catch event", "Send", "Receive" }, story = "Send a message from an end event to an intermediate event. Check send process is finished, receive process reaches catch event and continue.")
     @Test
     public void messageIntermediateCatchEventMessageMultiSend() throws Exception {
-        final ProcessDefinition sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", "m12", "receiveMessageProcess",
-                "waitForMessage", null, null, null, null);
-        final ProcessDefinition sendMessageProcess2 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess2", "m12", "receiveMessageProcess",
-                "waitForMessage", null, null, null, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "userTask1", "delivery", user, "m12", null, null, null);
+        final ProcessDefinition sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", MESSAGE, CATCH_MESSAGE_PROCESS_NAME,
+                CATCH_EVENT_NAME, null, null, null, null);
+        final ProcessDefinition sendMessageProcess2 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess2", MESSAGE, CATCH_MESSAGE_PROCESS_NAME,
+                CATCH_EVENT_NAME, null, null, null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
-        waitForEventInWaitingState(receiveMessageProcessInstance, "waitForMessage");
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
         assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
@@ -855,7 +925,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("userTask1", taskInstance.getName());
+        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(sendMessageProcess1);
         disableAndDeleteProcess(sendMessageProcess2);
@@ -866,17 +936,16 @@ public class MessageEventTest extends CommonAPITest {
             "Intermediate catch event", "Delete" }, story = "Check that delete process instance should delete waiting events.")
     @Test
     public void deleteProcessInstanceShouldDeleteWaitingEvents() throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithMessageIntermediateCatchEvent("processWithIntermediateCatchEvent",
-                "waitForMessage", "a task", "actorName", user, "messageName", null, null, null);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assumeNotNull(processInstance);
 
-        waitForEventInWaitingState(processInstance, "waitForMessage");
+        waitForEventInWaitingState(processInstance, CATCH_EVENT_NAME);
 
         final long processInstanceId = processInstance.getId();
         getProcessAPI().deleteProcessInstance(processInstanceId);
-        assertThat(new WaitForEvent(50, 5000, "waitForMessage", processInstanceId, getProcessAPI()).waitUntil(), is(false));
+        assertThat(new WaitForEvent(50, 5000, CATCH_EVENT_NAME, processInstanceId, getProcessAPI()).waitUntil(), is(false));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -884,11 +953,10 @@ public class MessageEventTest extends CommonAPITest {
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "throw event", "send message", "start event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageViaAPIToStartMessageEvent() throws Exception {
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m1",
-                null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         // send message
-        sendMessage("m1", "receiveMessageProcess", "startEvent", null);
+        sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null);
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
@@ -896,7 +964,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -919,16 +987,15 @@ public class MessageEventTest extends CommonAPITest {
             "intermediate catch event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageViaAPIToIntermediateMessageEvent() throws Exception {
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "userTask1", "delivery", user, "m6", null, null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, "waitForMessage");
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         checkUserHasNoPendingTasks();
 
         // send message
-        sendMessage("m6", "receiveMessageProcess", "waitForMessage", null);
+        sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, null);
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
         assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
@@ -936,7 +1003,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("userTask1", taskInstance.getName());
+        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -950,12 +1017,12 @@ public class MessageEventTest extends CommonAPITest {
 
         final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
                 ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m1",
-                Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.singletonMap("name", String.class.getName()),
+                catchMessageOperations);
 
         checkUserHasNoPendingTasks();
 
-        sendMessage("m1", "receiveMessageProcess", "startEvent", Collections.singletonMap(lastNameDisplay, lastNameValue));
+        sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.singletonMap(lastNameDisplay, lastNameValue));
 
         // at the first test some time the cron job time some time before executing
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 11 * 1000, true, 1, user);
@@ -964,7 +1031,7 @@ public class MessageEventTest extends CommonAPITest {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
         final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", taskInstance.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
@@ -995,7 +1062,7 @@ public class MessageEventTest extends CommonAPITest {
         correlations2.put(docCorrelationKey, docCorrelationValue);
         correlations2.put(nameCorrelationKey, nameCorrelationValue2);
 
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageInterCatchEventAnd2Correlations(user, "userTask1", "m12");
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageInterCatchEventAnd2Correlations();
 
         // start a instance of a receive message process
         final ProcessInstance receiveMessageProcessInstance1 = getProcessAPI().startProcess(
@@ -1004,15 +1071,15 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("name", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, "waitForMessage", TestStates.getWaitingState());
+        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // send a message having only one correlation key matching, the process must not go further
-        sendMessage("m12", "receiveMessageProcess", "waitForMessage", Collections.<Expression, Expression> emptyMap(), correlations1);
+        sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.<Expression, Expression> emptyMap(), correlations1);
         assertFalse(new WaitForStep(50, 10000, "userTask1", receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
 
         // send a message having both two correlations keys matching, the process must go further
-        sendMessage("m12", "receiveMessageProcess", "waitForMessage", Collections.<Expression, Expression> emptyMap(), correlations2);
-        waitForStep(50, 9000, "userTask1", receiveMessageProcessInstance1);
+        sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.<Expression, Expression> emptyMap(), correlations2);
+        waitForStep(50, 9000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -1023,23 +1090,23 @@ public class MessageEventTest extends CommonAPITest {
     public void sendMessageWithDataViaAPIToIntermediateCatchMessageEvent() throws Exception {
         final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
                 ExpressionType.TYPE_VARIABLE));
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent("receiveMessageProcess", "waitForMessage",
-                "step1", "delivery", user, "m1", null, Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null,
+                Collections.singletonMap("name", String.class.getName()), catchMessageOperations);
 
         // start a instance of a receive message process
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
-        waitForEventInWaitingState(receiveMessageProcessInstance, "waitForMessage");
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertNull("Data is not null", dataInstance.getValue());
 
         final Expression lastNameDisplay = new ExpressionBuilder().createConstantStringExpression("lName");
         final Expression lastNameValue = new ExpressionBuilder().createConstantStringExpression("Doe");
-        sendMessage("m1", "receiveMessageProcess", "waitForMessage", Collections.singletonMap(lastNameDisplay, lastNameValue));
+        sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.singletonMap(lastNameDisplay, lastNameValue));
 
-        waitForStep(50, 10000, "step1", receiveMessageProcessInstance);
+        waitForStep(50, 10000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -1061,7 +1128,7 @@ public class MessageEventTest extends CommonAPITest {
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression("p1");
         final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression("step1");
 
-        getProcessAPI().sendMessage("m1", targetProcessExpression, targetFlowNodeExpression, null, correlations);
+        getProcessAPI().sendMessage(MESSAGE, targetProcessExpression, targetFlowNodeExpression, null, correlations);
     }
 
 }
