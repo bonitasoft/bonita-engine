@@ -61,13 +61,15 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     private final boolean useOptimization;
 
     private Field quartzSchedulerField;
+
     private QuartzScheduler quartzScheduler;
 
-    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final ReadSessionAccessor sessionAccessor, final TransactionService transactionService, final boolean useOptimization) {
+    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final ReadSessionAccessor sessionAccessor,
+            final TransactionService transactionService, final boolean useOptimization) {
         this.sessionAccessor = sessionAccessor;
         this.schedulerFactory = schedulerFactory;
         this.transactionService = transactionService;
-        this.useOptimization = useOptimization; 
+        this.useOptimization = useOptimization;
     }
 
     @Override
@@ -77,9 +79,9 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             final JobDetail jobDetail = getJobDetail(jobIdentifier);
             final JobKey jobKey = jobDetail.getKey();
             final org.quartz.Trigger quartzTrigger = getQuartzTrigger(trigger, jobKey.getName(), jobKey.getGroup());
-            this.scheduler.scheduleJob(jobDetail, quartzTrigger);
-            if (this.useOptimization) {
-                this.transactionService.registerBonitaSynchronization(new NotifyQuartzOfNewTrigger(trigger.getStartDate().getTime(), this.quartzScheduler));
+            scheduler.scheduleJob(jobDetail, quartzTrigger);
+            if (useOptimization) {
+                transactionService.registerBonitaSynchronization(new NotifyQuartzOfNewTrigger(trigger.getStartDate().getTime(), quartzScheduler));
             }
         } catch (final Exception e) {
             throw new SSchedulerException(e);
@@ -89,6 +91,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     private final class NotifyQuartzOfNewTrigger implements BonitaTransactionSynchronization {
 
         private final long time;
+
         private final QuartzScheduler quartzScheduler;
 
         public NotifyQuartzOfNewTrigger(final long time, final QuartzScheduler quartzScheduler) {
@@ -99,14 +102,14 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
         @Override
         public void beforeCommit() {
-            //NOTHING
+            // NOTHING
         }
 
         @Override
         public void afterCompletion(final TransactionState txState) {
             if (TransactionState.COMMITTED.equals(txState)) {
-                if (this.quartzScheduler != null) {
-                    this.quartzScheduler.getSchedulerSignaler().signalSchedulingChange(this.time);
+                if (quartzScheduler != null) {
+                    quartzScheduler.getSchedulerSignaler().signalSchedulingChange(time);
                 }
             }
         }
@@ -125,8 +128,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final JobDetail jobDetail = getJobDetail(jobIdentifier);
-            this.scheduler.addJob(jobDetail, true);
-            this.scheduler.triggerJob(jobDetail.getKey());
+            scheduler.addJob(jobDetail, true);
+            scheduler.triggerJob(jobDetail.getKey());
         } catch (final Exception e) {
             throw new SSchedulerException(e);
         }
@@ -134,7 +137,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     private org.quartz.Trigger getQuartzTrigger(final Trigger trigger, final String jobName, final String tenantId) throws ParseException, SSchedulerException {
         final TriggerBuilder<? extends org.quartz.Trigger> triggerBuilder;
-        final TriggerBuilder<org.quartz.Trigger> base = TriggerBuilder.newTrigger().forJob(jobName, tenantId).withIdentity(trigger.getName(), tenantId).startNow();
+        final TriggerBuilder<org.quartz.Trigger> base = TriggerBuilder.newTrigger().forJob(jobName, tenantId).withIdentity(trigger.getName(), tenantId)
+                .startNow();
         if (trigger instanceof CronTrigger) {
             final CronTrigger cronTrigger = (CronTrigger) trigger;
             final CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronTrigger.getExpression());
@@ -153,7 +157,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public boolean isStarted() throws SSchedulerException {
         try {
-            return this.scheduler != null && this.scheduler.isStarted() && !this.scheduler.isShutdown();
+            return scheduler != null && scheduler.isStarted() && !scheduler.isShutdown();
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         }
@@ -162,7 +166,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public boolean isShutdown() throws SSchedulerException {
         try {
-            return this.scheduler != null && this.scheduler.isShutdown();
+            return scheduler != null && scheduler.isShutdown();
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         }
@@ -177,20 +181,19 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 }
                 // shutdown();
             }
-            this.scheduler = this.schedulerFactory.getScheduler();
-            this.scheduler.start();
+            scheduler = schedulerFactory.getScheduler();
+            scheduler.start();
 
             try {
-                if (this.useOptimization) {
-                    this.quartzSchedulerField = this.scheduler.getClass().getDeclaredField("sched");
-                    this.quartzSchedulerField.setAccessible(true);
-                    this.quartzScheduler = (QuartzScheduler) this.quartzSchedulerField.get(this.scheduler);
+                if (useOptimization) {
+                    quartzSchedulerField = scheduler.getClass().getDeclaredField("sched");
+                    quartzSchedulerField.setAccessible(true);
+                    quartzScheduler = (QuartzScheduler) quartzSchedulerField.get(scheduler);
                 }
             } catch (Throwable t) {
-                //this is an optimization, we do not want it to make the system failing
+                // this is an optimization, we do not want it to make the system failing
                 t.printStackTrace();
             }
-
 
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
@@ -201,14 +204,14 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public void shutdown() throws SSchedulerException {
         try {
             checkSchedulerState();
-            this.scheduler.shutdown(false);
+            scheduler.shutdown(true);
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }
 
     private void checkSchedulerState() throws SSchedulerException {
-        if (this.scheduler == null) {
+        if (scheduler == null) {
             throw new SSchedulerException("The scheduler is not started");
         }
     }
@@ -224,11 +227,11 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             }
             checkSchedulerState();
             final org.quartz.Trigger quartzTrigger = getQuartzTrigger(newTrigger, triggerName, tenantId);
-            final org.quartz.Trigger trigger = this.scheduler.getTrigger(triggerKey(triggerName, tenantId));
+            final org.quartz.Trigger trigger = scheduler.getTrigger(triggerKey(triggerName, tenantId));
             if (trigger == null) {
                 throw new SSchedulerException("No trigger found with name: " + triggerName + " and tenant: " + tenantId);
             }
-            this.scheduler.rescheduleJob(trigger.getKey(), quartzTrigger);
+            scheduler.rescheduleJob(trigger.getKey(), quartzTrigger);
         } catch (final Exception e) {
             throw new SSchedulerException(e);
         }
@@ -239,7 +242,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
-            this.scheduler.resumeJob(jobKey(jobName, tenantId));
+            scheduler.resumeJob(jobKey(jobName, tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
@@ -253,7 +256,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
             final GroupMatcher<JobKey> jobGroupEquals = jobGroupEquals(tenantId);
-            this.scheduler.resumeJobs(jobGroupEquals);
+            scheduler.resumeJobs(jobGroupEquals);
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
@@ -266,7 +269,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
-            this.scheduler.pauseJob(jobKey(jobName, tenantId));
+            scheduler.pauseJob(jobKey(jobName, tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
@@ -279,7 +282,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
-            this.scheduler.pauseJobs(jobGroupEquals(tenantId));
+            scheduler.pauseJobs(jobGroupEquals(tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
@@ -292,7 +295,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
-            return this.scheduler.deleteJob(jobKey(jobName, tenantId));
+            return scheduler.deleteJob(jobKey(jobName, tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
@@ -305,7 +308,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
-            final Set<JobKey> jobNames = this.scheduler.getJobKeys(jobGroupEquals(tenantId));
+            final Set<JobKey> jobNames = scheduler.getJobKeys(jobGroupEquals(tenantId));
             for (final JobKey jobKey : jobNames) {
                 delete(jobKey.getName());
             }
@@ -321,7 +324,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
-            final Set<JobKey> jobKeys = this.scheduler.getJobKeys(jobGroupEquals(tenantId));
+            final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(tenantId));
             final List<String> jobsNames = new ArrayList<String>(jobKeys.size());
             for (final JobKey jobKey : jobKeys) {
                 jobsNames.add(jobKey.getName());
@@ -338,7 +341,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public List<String> getAllJobs() throws SSchedulerException {
         try {
             checkSchedulerState();
-            final Set<JobKey> jobKeys = this.scheduler.getJobKeys(GroupMatcher.jobGroupStartsWith(""));
+            final Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.jobGroupStartsWith(""));
             final List<String> jobsNames = new ArrayList<String>(jobKeys.size());
             for (final JobKey jobKey : jobKeys) {
                 jobsNames.add(jobKey.getName());
@@ -351,11 +354,11 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     @Override
     public void setBOSSchedulerService(final SchedulerImpl schedulerService) {
-        this.schedulerFactory.setBOSSchedulerService(schedulerService);
+        schedulerFactory.setBOSSchedulerService(schedulerService);
     }
 
     private long getTenantIdFromSession() throws TenantIdNotSetException {
-        return this.sessionAccessor.getTenantId();
+        return sessionAccessor.getTenantId();
     }
 
 }
