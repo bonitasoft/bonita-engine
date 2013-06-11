@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.process.data;
 
+import static org.bonitasoft.engine.matchers.NameMatcher.nameIs;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +22,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -30,6 +37,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -39,12 +47,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.bonitasoft.engine.matchers.NameMatcher.nameIs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class DataInstanceIntegrationTest extends CommonAPITest {
 
@@ -917,4 +919,45 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         }
         return processDefinitionBuilder;
     }
+
+    @Cover(classes = { DataInstance.class }, concept = BPMNConcept.DATA, keywords = { "data instance", "transient data", "persisted data" }, jira = "ENGINE-1447", story = "It's possible to evaluate a data expression in a task containing transient data and persisted data")
+    @Test
+    public void canGetDataInstanceWhenThereAreTranseintData() throws Exception {
+        final String userTaskName = "task1";
+        final ProcessDefinition processDefinition = deployAndEnableProcWithPersistedAndTransientVariable(userTaskName);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
+
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());
+        final Expression transientVariableExpression = new ExpressionBuilder().createDataExpression("transientVariable", String.class.getName());
+        expressions.put(persistedVariableExpression, (Map<String, Serializable>) null);
+        expressions.put(transientVariableExpression, (Map<String, Serializable>) null);
+
+        final Map<String, Serializable> expressionResult = getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);
+        assertEquals("default", expressionResult.get(persistedVariableExpression.getName()));
+        assertEquals("default", expressionResult.get(transientVariableExpression.getName()));
+
+        disableAndDeleteProcess(processDefinition.getId());
+    }
+
+    private ProcessDefinition deployAndEnableProcWithPersistedAndTransientVariable(final String userTaskName) throws InvalidExpressionException,
+            BonitaException, InvalidProcessDefinitionException {
+        final String startName = "start";
+        final String endName = "end";
+        final Expression defaultValue = new ExpressionBuilder().createConstantStringExpression("default");
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
+        builder.addActor(ACTOR_NAME);
+        builder.addStartEvent(startName);
+        final UserTaskDefinitionBuilder taskBuilder = builder.addUserTask(userTaskName, ACTOR_NAME);
+        taskBuilder.addShortTextData("persistedVariable", defaultValue);
+        taskBuilder.addShortTextData("transientVariable", defaultValue).isTransient();
+        builder.addEndEvent(endName);
+        builder.addTransition(startName, userTaskName);
+        builder.addTransition(userTaskName, endName);
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
+        return processDefinition;
+    }
+
 }
