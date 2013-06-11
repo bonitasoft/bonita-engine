@@ -95,7 +95,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
         }
 
         for (int i = 0; i < numberOfTaskToCompleteMI; i++) {
-            executeAssignedTaskUntilEnd(pendingTasks.get(i).getId());
+            executeFlowNodeUntilEnd(pendingTasks.get(i).getId());
         }
         Thread.sleep(200);
         assertTrue("There was still pending task but no more was expected", new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 0, john).waitUntil());

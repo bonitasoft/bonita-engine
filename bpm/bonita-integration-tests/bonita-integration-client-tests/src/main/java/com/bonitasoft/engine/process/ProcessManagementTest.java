@@ -271,7 +271,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         getProcessAPI().executeFlowNode(manualUserTask2.getId());
         // assertTrue(new WaitForCompletedArchivedStep(50, 1000, manualUserTask2.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
 
-        executeAssignedTaskUntilEnd(parentTask.getId());
+        executeFlowNodeUntilEnd(parentTask.getId());
         assertTrue(new WaitForCompletedArchivedStep(50, 1000, parentTask.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
 
         disableAndDeleteProcess(processDefinition);
