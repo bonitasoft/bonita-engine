@@ -56,7 +56,7 @@ public class SFlowElementBinding extends ElementBinding {
 
     private final List<SIntermediateThrowEventDefinitionImpl> intermediateThrowEvents = new ArrayList<SIntermediateThrowEventDefinitionImpl>();
 
-    private final List<STransitionDefinition> transitions = new ArrayList<STransitionDefinition>();
+    private final List<STransitionDefinition> sTransitions = new ArrayList<STransitionDefinition>();
 
     private final List<SDataDefinition> dataDefinitions = new ArrayList<SDataDefinition>();
 
@@ -94,7 +94,7 @@ public class SFlowElementBinding extends ElementBinding {
         } else if (XMLSProcessDefinition.GATEWAY_NODE.equals(name)) {
             gateways.add((SGatewayDefinitionImpl) value);
         } else if (XMLSProcessDefinition.TRANSITION_NODE.equals(name)) {
-            transitions.add((STransitionDefinition) value);
+            sTransitions.add((STransitionDefinition) value);
         } else if (XMLSProcessDefinition.START_EVENT_NODE.equals(name)) {
             startEvents.add((SStartEventDefinitionImpl) value);
         } else if (XMLSProcessDefinition.INTERMEDIATE_CATCH_EVENT_NODE.equals(name)) {
@@ -109,7 +109,7 @@ public class SFlowElementBinding extends ElementBinding {
     @Override
     public Object getObject() {
         final SFlowElementContainerDefinitionImpl container = new SFlowElementContainerDefinitionImpl();
-        for (final STransitionDefinition transition : transitions) {
+        for (final STransitionDefinition transition : sTransitions) {
             container.addTransition(transition);
         }
         for (final SActivityDefinitionImpl activity : activities) {
@@ -166,32 +166,38 @@ public class SFlowElementBinding extends ElementBinding {
     }
 
     private void addTransitionOnFlowNodes(final Map<Long, SFlowNodeDefinitionImpl> allFlowNodes) {
-        for (final STransitionDefinition transition : transitions) {
-            final long source = transition.getSource();
+        for (final STransitionDefinition sTransition : sTransitions) {
+            final long source = sTransition.getSource();
             final SFlowNodeDefinitionImpl sourceNode = allFlowNodes.get(source);
             if (sourceNode != null) {
-                if (sourceNode.getDefaultTransition() != null
-                        && ((STransitionDefinitionImpl) sourceNode.getDefaultTransition()).getId().equals(((STransitionDefinitionImpl) transition).getId())) {
-                    sourceNode.setDefaultTransition(transition);
+                final STransitionDefinition defaultTransition = sourceNode.getDefaultTransition();
+                if (defaultTransition != null
+                        && ((STransitionDefinitionImpl) defaultTransition).getId().equals(((STransitionDefinitionImpl) sTransition).getId())) {
+                    sourceNode.setDefaultTransition(sTransition);
                 } else {
-                    replaceTransitionRef(transition, sourceNode.getOutgoingTransitions());
+                    final List<STransitionDefinition> outgoingTransitionsForSourceNode = sourceNode.getOutgoingTransitions();
+                    for (final STransitionDefinition sTransitionRef : outgoingTransitionsForSourceNode) {
+                        if (sTransitionRef.getId().equals(sTransition.getId())) {
+                            final int indexOfSTransitionRef = outgoingTransitionsForSourceNode.indexOf(sTransitionRef);
+                            sourceNode.removeOutgoingTransition(sTransitionRef);
+                            sourceNode.addOutgoingTransition(indexOfSTransitionRef, sTransition);
+                            break;
+                        }
+                    }
                 }
             }
-            final long target = transition.getTarget();
+            final long target = sTransition.getTarget();
             final SFlowNodeDefinitionImpl targetNode = allFlowNodes.get(target);
             if (targetNode != null) {
-                replaceTransitionRef(transition, targetNode.getIncomingTransitions());
-            }
-        }
-    }
-
-    private void replaceTransitionRef(final STransitionDefinition transition, final List<STransitionDefinition> transitions) {
-        for (int i = 0; i < transitions.size(); i++) {
-            final STransitionDefinition transitionRef = transitions.get(i);
-            if (transitionRef.getId().equals(transition.getId())) {
-                transitions.remove(i);
-                transitions.add(i, transition);
-                break;
+                final List<STransitionDefinition> incomingTransitionsForTargetNode = targetNode.getIncomingTransitions();
+                for (final STransitionDefinition sTransitionRef : incomingTransitionsForTargetNode) {
+                    if (sTransitionRef.getId().equals(sTransition.getId())) {
+                        final int indexOfSTransitionRef = incomingTransitionsForTargetNode.indexOf(sTransitionRef);
+                        targetNode.removeIncomingTransition(sTransitionRef);
+                        targetNode.addIncomingTransition(indexOfSTransitionRef, sTransition);
+                        break;
+                    }
+                }
             }
         }
     }

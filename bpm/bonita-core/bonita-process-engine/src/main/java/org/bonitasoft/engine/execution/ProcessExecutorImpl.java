@@ -394,7 +394,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         + " but no outgoing transition had a valid condition");
             }
             chosenTransitions.add(defaultTransition);
-            outgoingTransitionDefinitions.add(defaultTransition);
         }
         return chosenTransitions;
     }
@@ -904,7 +903,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             allOutgoingTransitionDefinitions = Collections.emptyList();
         } else {
             inputTransitionsSize = flowNode.getIncomingTransitions().size();
-            allOutgoingTransitionDefinitions = flowNode.getOutgoingTransitions();
+            allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>(flowNode.getOutgoingTransitions());
         }
         // Evaluate all outgoing transitions, and retrieve valid outgoing transitions
         final List<STransitionDefinition> validOutgoingTransitionDefinitions = evaluateOutgoingTransitions(allOutgoingTransitionDefinitions,

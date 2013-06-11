@@ -65,13 +65,13 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     private final Map<ConnectorEvent, List<SConnectorDefinition>> connectorsMap;
 
     public SFlowNodeDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final FlowNodeDefinition flowNodeDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
+            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> sTransitionsMap,
             final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
         super(flowNodeDefinition.getName());
-        incomings = buildIncomingTransitions(flowNodeDefinition, sExpressionBuilders, transitionsMap);
-        outgoings = buildOutGoingTransitions(flowNodeDefinition, sExpressionBuilders, transitionsMap);
+        incomings = buildIncomingTransitions(flowNodeDefinition, sExpressionBuilders, sTransitionsMap);
+        outgoings = buildOutGoingTransitions(flowNodeDefinition, sExpressionBuilders, sTransitionsMap);
         if (flowNodeDefinition.getDefaultTransition() != null) {
-            defaultTransition = transitionsMap.get(flowNodeDefinition.getDefaultTransition().getName());
+            defaultTransition = sTransitionsMap.get(flowNodeDefinition.getDefaultTransition().getName());
         }
         final List<ConnectorDefinition> connectors2 = flowNodeDefinition.getConnectors();
         final ArrayList<SConnectorDefinition> mConnectors = new ArrayList<SConnectorDefinition>(connectors2.size());
@@ -114,27 +114,27 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     }
 
     private List<STransitionDefinition> buildOutGoingTransitions(final FlowNodeDefinition nodeDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap) {
+            final Map<String, STransitionDefinition> sTransitionsMap) {
         Iterator<TransitionDefinition> iterator;
         final List<TransitionDefinition> outgoingTransitions = nodeDefinition.getOutgoingTransitions();
         final List<STransitionDefinition> outgoings = new ArrayList<STransitionDefinition>();
         iterator = outgoingTransitions.iterator();
         while (iterator.hasNext()) {
-            final TransitionDefinition transition = iterator.next();
-            final STransitionDefinition outgoing = transitionsMap.get(transition.getName());
+            final TransitionDefinition sTransition = iterator.next();
+            final STransitionDefinition outgoing = sTransitionsMap.get(sTransition.getName());
             outgoings.add(outgoing);
         }
         return outgoings;
     }
 
     private List<STransitionDefinition> buildIncomingTransitions(final FlowNodeDefinition nodeDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap) {
+            final Map<String, STransitionDefinition> sTransitionsMap) {
         final List<TransitionDefinition> incomingTransitions = nodeDefinition.getIncomingTransitions();
         final List<STransitionDefinition> incomings = new ArrayList<STransitionDefinition>();
         final Iterator<TransitionDefinition> iterator = incomingTransitions.iterator();
         while (iterator.hasNext()) {
-            final TransitionDefinition transition = iterator.next();
-            final STransitionDefinition incoming = transitionsMap.get(transition.getName());
+            final TransitionDefinition sTransition = iterator.next();
+            final STransitionDefinition incoming = sTransitionsMap.get(sTransition.getName());
             incomings.add(incoming);
         }
         return incomings;
@@ -142,12 +142,17 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
 
     @Override
     public List<STransitionDefinition> getOutgoingTransitions() {
-        return outgoings;
+        return Collections.unmodifiableList(outgoings);
     }
 
     @Override
     public List<STransitionDefinition> getIncomingTransitions() {
-        return incomings;
+        return Collections.unmodifiableList(incomings);
+    }
+
+    @Override
+    public List<SConnectorDefinition> getConnectors() {
+        return Collections.unmodifiableList(connectors);
     }
 
     @Override
@@ -155,8 +160,8 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         return defaultTransition;
     }
 
-    public void setDefaultTransition(final STransitionDefinition transition) {
-        defaultTransition = transition;
+    public void setDefaultTransition(final STransitionDefinition sTransition) {
+        defaultTransition = sTransition;
     }
 
     @Override
@@ -170,21 +175,40 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     }
 
     @Override
-    public List<SConnectorDefinition> getConnectors() {
-        return connectors;
-    }
-
-    @Override
     public List<SConnectorDefinition> getConnectors(final ConnectorEvent connectorEvent) {
         return connectorsMap.get(connectorEvent);
     }
 
-    public void addOutgoingTransition(final STransitionDefinition transition) {
-        outgoings.add(transition);
+    public void addOutgoingTransition(final STransitionDefinition sTransition) {
+        if (!outgoings.contains(sTransition)) {
+            outgoings.add(sTransition);
+        }
     }
 
-    public void addIncomingTransition(final STransitionDefinition transition) {
-        incomings.add(transition);
+    public void addOutgoingTransition(final int index, final STransitionDefinition sTransition) {
+        if (!outgoings.contains(sTransition)) {
+            outgoings.add(index, sTransition);
+        }
+    }
+
+    public void removeOutgoingTransition(final STransitionDefinition sTransition) {
+        outgoings.remove(sTransition);
+    }
+
+    public void addIncomingTransition(final STransitionDefinition sTransition) {
+        if (!incomings.contains(sTransition)) {
+            incomings.add(sTransition);
+        }
+    }
+
+    public void addIncomingTransition(int index, STransitionDefinition sTransition) {
+        if (!incomings.contains(sTransition)) {
+            incomings.add(index, sTransition);
+        }
+    }
+
+    public void removeIncomingTransition(final STransitionDefinition sTransition) {
+        incomings.remove(sTransition);
     }
 
     public void addConnector(final SConnectorDefinition connector) {

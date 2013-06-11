@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,13 +71,18 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
     }
 
     @Override
-    public List<TransitionDefinition> getIncomingTransitions() {
-        return incomings;
+    public List<TransitionDefinition> getOutgoingTransitions() {
+        return Collections.unmodifiableList(outgoings);
     }
 
     @Override
-    public List<TransitionDefinition> getOutgoingTransitions() {
-        return outgoings;
+    public List<TransitionDefinition> getIncomingTransitions() {
+        return Collections.unmodifiableList(incomings);
+    }
+
+    @Override
+    public List<ConnectorDefinition> getConnectors() {
+        return Collections.unmodifiableList(connectors);
     }
 
     public void addIncomingTransition(final TransitionDefinition transition) {
@@ -85,20 +91,35 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
         }
     }
 
+    public void addIncomingTransition(int index, TransitionDefinition transition) {
+        if (!incomings.contains(transition)) {
+            incomings.add(index, transition);
+        }
+    }
+
+    public void removeIncomingTransition(final TransitionDefinition transition) {
+        incomings.remove(transition);
+    }
+
     public void addOutgoingTransition(final TransitionDefinition transition) {
         if (!outgoings.contains(transition)) {
             outgoings.add(transition);
         }
     }
 
-    @Override
-    public void addConnector(final ConnectorDefinition connectorDefinition) {
-        connectors.add(connectorDefinition);
+    public void addOutgoingTransition(final int index, final TransitionDefinition transition) {
+        if (!outgoings.contains(transition)) {
+            outgoings.add(index, transition);
+        }
+    }
+
+    public void removeOutgoingTransition(final TransitionDefinition transition) {
+        outgoings.remove(transition);
     }
 
     @Override
-    public List<ConnectorDefinition> getConnectors() {
-        return connectors;
+    public void addConnector(final ConnectorDefinition connectorDefinition) {
+        connectors.add(connectorDefinition);
     }
 
     public void setDescription(final String description) {

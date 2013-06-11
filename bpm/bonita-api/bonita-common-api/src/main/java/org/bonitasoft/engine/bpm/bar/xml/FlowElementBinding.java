@@ -139,28 +139,34 @@ public class FlowElementBinding extends ElementBinding {
             final long source = transition.getSource();
             final FlowNodeDefinitionImpl sourceNode = (FlowNodeDefinitionImpl) container.getFlowNode(source);
             if (sourceNode != null) {
-                if (sourceNode.getDefaultTransition() != null
-                        && ((TransitionDefinitionImpl) sourceNode.getDefaultTransition()).getId() == ((TransitionDefinitionImpl) transition).getId()) {
+                final TransitionDefinition defaultTransition = sourceNode.getDefaultTransition();
+                if (defaultTransition != null
+                        && ((TransitionDefinitionImpl) defaultTransition).getId() == ((TransitionDefinitionImpl) transition).getId()) {
                     sourceNode.setDefaultTransition(transition);
                 } else {
-                    replaceTransitionRef(transition, sourceNode.getOutgoingTransitions());
+                    final List<TransitionDefinition> outgoingTransitionsForSourceNode = sourceNode.getOutgoingTransitions();
+                    for (final TransitionDefinition transitionRef : outgoingTransitionsForSourceNode) {
+                        if (((TransitionDefinitionImpl) transitionRef).getId() == ((TransitionDefinitionImpl) transition).getId()) {
+                            final int indexOfSTransitionRef = outgoingTransitionsForSourceNode.indexOf(transitionRef);
+                            sourceNode.removeOutgoingTransition(transitionRef);
+                            sourceNode.addOutgoingTransition(indexOfSTransitionRef, transition);
+                            break;
+                        }
+                    }
                 }
             }
             final long target = transition.getTarget();
             final FlowNodeDefinitionImpl targetNode = (FlowNodeDefinitionImpl) container.getFlowNode(target);
             if (targetNode != null) {
-                replaceTransitionRef(transition, targetNode.getIncomingTransitions());
-            }
-        }
-    }
-
-    private void replaceTransitionRef(final TransitionDefinition transition, final List<TransitionDefinition> transitions) {
-        for (int i = 0; i < transitions.size(); i++) {
-            final TransitionDefinitionImpl transitionRef = (TransitionDefinitionImpl) transitions.get(i);
-            if (transitionRef.getId() == ((TransitionDefinitionImpl) transition).getId()) {
-                transitions.remove(i);
-                transitions.add(i, transition);
-                break;
+                final List<TransitionDefinition> incomingTransitionsForTargetNode = targetNode.getIncomingTransitions();
+                for (final TransitionDefinition transitionRef : incomingTransitionsForTargetNode) {
+                    if (((TransitionDefinitionImpl) transitionRef).getId() == ((TransitionDefinitionImpl) transition).getId()) {
+                        final int indexOfSTransitionRef = incomingTransitionsForTargetNode.indexOf(transitionRef);
+                        targetNode.removeIncomingTransition(transitionRef);
+                        targetNode.addIncomingTransition(indexOfSTransitionRef, transition);
+                        break;
+                    }
+                }
             }
         }
     }

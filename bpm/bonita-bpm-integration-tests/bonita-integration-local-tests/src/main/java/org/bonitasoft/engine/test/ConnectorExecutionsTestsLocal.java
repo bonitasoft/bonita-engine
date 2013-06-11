@@ -494,7 +494,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         assertFalse(waitUntil.waitUntil());
 
         // Run Started state of the human task
-        executeAssignedTaskUntilEnd(activityInstanceId);
+        executeFlowNodeUntilEnd(activityInstanceId);
         waitForArchivedActivity(activityInstanceId, TestStates.getNormalFinalState(null));
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task

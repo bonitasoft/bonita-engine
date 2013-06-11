@@ -666,11 +666,11 @@ public class APITestUtil {
 
     public void assignAndExecuteStep(final long activityInstanceId, final long userId) throws BonitaException {
         getProcessAPI().assignUserTask(activityInstanceId, userId);
-        executeAssignedTaskUntilEnd(activityInstanceId);
+        executeFlowNodeUntilEnd(activityInstanceId);
     }
 
-    protected void executeAssignedTaskUntilEnd(final long activityInstanceId) throws FlowNodeExecutionException {
-        getProcessAPI().executeFlowNode(activityInstanceId);
+    protected void executeFlowNodeUntilEnd(final long flowNodeId) throws FlowNodeExecutionException {
+        getProcessAPI().executeFlowNode(flowNodeId);
     }
 
     protected ActivityInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws TimeoutException, Exception {

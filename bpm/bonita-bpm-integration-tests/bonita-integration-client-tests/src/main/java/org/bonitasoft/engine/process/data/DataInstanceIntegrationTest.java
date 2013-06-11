@@ -1,11 +1,5 @@
 package org.bonitasoft.engine.process.data;
 
-import static org.bonitasoft.engine.matchers.NameMatcher.nameIs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +41,12 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.bonitasoft.engine.matchers.NameMatcher.nameIs;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class DataInstanceIntegrationTest extends CommonAPITest {
 
@@ -204,7 +204,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final DesignProcessDefinition processDef = processDefinitionBuilder.addActor(delivery).addDescription("Delivery all day and night long")
                 .addUserTask("step1", delivery).getProcess();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -217,7 +217,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(delivery)
                 .addDescription("Delivery all day and night long").addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1))
                 .addUserTask("step1", delivery).getProcess();
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -286,7 +286,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
                 .addDescription("Delivery all day and night long").addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1))
                 .addUserTask("step1", delivery).getProcess();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -306,7 +306,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.get(0);
         assignAndExecuteStep(activityInstance, user.getId());
-        assertTrue("process was not completed", this.isProcessInstanceFinishedAndArchived(20, 1000, processInstance, getProcessAPI()));
+        assertTrue("process was not completed", isProcessInstanceFinishedAndArchived(20, 1000, processInstance, getProcessAPI()));
 
         // retrieve data after process has finished
         try {
@@ -347,7 +347,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     }
 
     private void assertDataOnActivityIs(final String actorName, final DesignProcessDefinition processDef, final int expectedNumber) throws Exception {
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(processDef, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, actorName, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -388,7 +388,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
             throw new Exception("This test does not support data type different from (boolean, integer)");
         }
         final DesignProcessDefinition processDef = addUserTask.getProcess();
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForStep waitForStep = waitForStep("step1", processInstance);
         final long activityInstanceId = waitForStep.getStepId();
@@ -500,7 +500,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(delivery)
                 .addDescription("Delivery all day and night long").addUserTask("step1", delivery)
                 .addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1)).getProcess();
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(processDef, delivery, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDef, delivery, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -519,7 +519,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.iterator().next();
         assignAndExecuteStep(activityInstance, user.getId());
-        assertTrue("process was not completed", this.isProcessInstanceFinishedAndArchived(20, 3000, processInstance, getProcessAPI()));
+        assertTrue("process was not completed", isProcessInstanceFinishedAndArchived(20, 3000, processInstance, getProcessAPI()));
 
         // retrieve data after process has finished
         try {
@@ -531,8 +531,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test
     public void getProcessDataDefinitions() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
 
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
@@ -541,13 +540,13 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final String actorName = "Actor1";
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         processDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         final List<DataDefinition> dataDefList = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0, 5);
         assertEquals(2, dataDefList.size());
 
@@ -566,21 +565,21 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test
     public void getProcessDataDefinitionsPaginated() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
+
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
         final String strDataName = "color";
         final Expression strDefaultExp = new ExpressionBuilder().createConstantStringExpression("blue");
         final String actorName = "Actor1";
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         for (int i = 1; i <= 10; i++) {
             processDefinitionBuilder.addShortTextData(strDataName + i, strDefaultExp);
         }
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         List<DataDefinition> processDataDefinitions = getProcessAPI().getProcessDataDefinitions(processDefinition.getId(), 0, 5);
         assertEquals(5, processDataDefinitions.size());
         assertThat(processDataDefinitions.get(0), nameIs("luckyNum"));
@@ -603,22 +602,22 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test
     public void getDataDefinitionsHavingComplexeInitialValue() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
+
         final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("a+b", "a+b", String.class.getName(),
                 new ExpressionBuilder().createDataExpression("a", String.class.getName()),
                 new ExpressionBuilder().createDataExpression("b", String.class.getName()));
 
         final String actorName = "Actor1";
 
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         processDefinitionBuilder.addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("avalue"));
         processDefinitionBuilder.addShortTextData("b", new ExpressionBuilder().createConstantStringExpression("bvalue"));
         processDefinitionBuilder.addUserTask("step1", actorName).addData("myData", String.class.getName(), scriptExpression);
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), "step1", 0, 10);
         assertEquals(1, dataDefList.size());
         assertEquals(2, dataDefList.get(0).getDefaultValueExpression().getDependencies().size());
@@ -627,8 +626,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test
     public void getNumberOfProcessDataDefinitions() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
 
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
@@ -639,14 +637,14 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         processDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         final int i = getProcessAPI().getNumberOfProcessDataDefinitions(processDefinition.getId());
         assertEquals(2, i);
 
@@ -655,8 +653,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test
     public void getNumberOfActivityDataDefinitions() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
 
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
@@ -668,7 +665,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         // activity level
         final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
@@ -677,7 +674,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
 
         final int number = getProcessAPI().getNumberOfActivityDataDefinitions(processDefinition.getId(), taskName);
         assertEquals(2, number);
@@ -687,8 +684,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test(expected = ProcessDefinitionNotFoundException.class)
     public void getProcessDataDefinitionsWithException() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
 
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
@@ -699,14 +695,14 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         processDefinitionBuilder.addIntegerData(intDataName, intDefaultExp);
         processDefinitionBuilder.addShortTextData(strDataName, strDefaultExp);
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         try {
             getProcessAPI().getProcessDataDefinitions(processDefinition.getId() + 1, 0, 5);
         } finally {
@@ -716,8 +712,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test(expected = ActivityDefinitionNotFoundException.class)
     public void getActivityDataDefinitionsWithException() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
 
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
@@ -729,7 +724,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         // activity level
         final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
@@ -738,7 +733,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         try {
             getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName + "qwer", 0, 5);
         } finally {
@@ -748,8 +743,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test
     public void getActivityDataDefinitions() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
 
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
@@ -761,7 +755,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         // activity level
         final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
@@ -770,7 +764,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
 
         final List<DataDefinition> dataDefList = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName, 0, 5);
         assertEquals(2, dataDefList.size());
@@ -790,8 +784,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Test
     public void getActivityDataDefinitionsPaginated() throws Exception {
-        final String processName = "myProcessName";
-        final String version = "1.0";
+        final String PROCESS_NAME = "myProcessName";
 
         final String intDataName = "luckyNum";
         final Expression intDefaultExp = new ExpressionBuilder().createConstantIntegerExpression(10);
@@ -803,7 +796,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final DesignProcessDefinition designProcessDefinition;
         // process level
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(actorName);
         // activity level
         final AutomaticTaskDefinitionBuilder activityDefinitionBuilder = processDefinitionBuilder.addAutomaticTask(taskName);
@@ -813,7 +806,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         }
         designProcessDefinition = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = this.deployAndEnableWithActor(designProcessDefinition, actorName, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         List<DataDefinition> processDataDefinitions = getProcessAPI().getActivityDataDefinitions(processDefinition.getId(), taskName, 0, 5);
         assertEquals(5, processDataDefinitions.size());
         assertThat(processDataDefinitions.get(0), nameIs("luckyNum"));
@@ -836,11 +829,8 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     }
 
     @Test
-    public void deployProcessWithNotInitializedData() throws Exception {
-        final String processName = "processWithNonInitData";
-        final String version = "1.0";
-
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+    public void executeProcessWithNotInitializedData() throws Exception {
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addAutomaticTask("step1");
         processDefinitionBuilder.addIntegerData("intdata", null);
         processDefinitionBuilder.addShortTextData("stringData", null);
@@ -860,8 +850,53 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         assertEquals(10, dataDefList.size());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        this.waitForProcessToFinish(processInstance);
+        waitForProcessToFinish(processInstance);
 
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "3 Process instances", "Data", "Boolean", "Transition", "Condition",
+            "Default", "Update" }, jira = "ENGINE-1459")
+    @Test
+    public void executeProcess3TimesWithNotInitializedData() throws Exception {
+        final Expression dataExpr = new ExpressionBuilder().createDataExpression("booleanData", Boolean.class.getName());
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addBooleanData("booleanData", null);
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2", dataExpr).addDefaultTransition("step1", "step3");
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
+
+        // Start first process, and wait the first step
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance step1_1 = waitForUserTask("step1", processInstance1.getId());
+        // Set data to true, for the first instance
+        getProcessAPI().updateActivityDataInstance("booleanData", step1_1.getId(), true);
+
+        // Start second process, and wait the first step
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance step1_2 = waitForUserTask("step1", processInstance2.getId());
+        // Set data to false, for the second instance
+        getProcessAPI().updateActivityDataInstance("booleanData", step1_2.getId(), false);
+
+        // Start third process, and wait the first step
+        final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance step1_3 = waitForUserTask("step1", processInstance3.getId());
+        // Set data to true, for the third instance
+        getProcessAPI().updateActivityDataInstance("booleanData", step1_3.getId(), true);
+
+        // Execute all step1
+        assignAndExecuteStep(step1_1, user.getId());
+        waitForUserTask("step2", processInstance1.getId());
+        assignAndExecuteStep(step1_2, user.getId());
+        waitForUserTask("step3", processInstance2.getId());
+        assignAndExecuteStep(step1_3, user.getId());
+        waitForUserTask("step2", processInstance3.getId());
+
+        // Check that only these 3 steps are pending
+        assertEquals(3, getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()));
+
+        // Clean-up
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -882,9 +917,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
     @Cover(classes = DataInstance.class, concept = BPMNConcept.DATA, jira = "ENGINE-679", keywords = { "data", "container" }, story = "process with data having same name in different container")
     @Test
     public void processWithDataHavingSameNameInTwoContainer() throws Exception {
-        final String processName = "processWithDataHavingSameName";
-        final String version = "1.0";
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, version);
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor("actor");
         processDefinitionBuilder.addUserTask("step1", "actor").addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("step1"));
         processDefinitionBuilder.addUserTask("step2", "actor").addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("step2"));
