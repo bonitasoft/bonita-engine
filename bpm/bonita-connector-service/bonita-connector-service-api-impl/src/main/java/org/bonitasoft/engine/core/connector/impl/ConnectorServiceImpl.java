@@ -424,6 +424,8 @@ public class ConnectorServiceImpl implements ConnectorService {
                     entryName = handleEntryName(connectorsFolder, entryName);
                 }
                 final File newFile = new File(entryName);
+                // if File already exists and is any other file than .impl, then skip it, because we already deleted the old implementation jars, so better not
+                // overwrite existing common global process jar files:
                 if (newFile.exists() && !entryName.endsWith(".impl")) {
                     zipEntry = zipInputstream.getNextEntry();
                     continue;
