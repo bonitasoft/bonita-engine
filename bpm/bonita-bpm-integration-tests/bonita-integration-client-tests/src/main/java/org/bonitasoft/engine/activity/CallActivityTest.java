@@ -103,6 +103,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addActor(actorName);
         processDefBuilder.addShortTextData("firstName", null);
         processDefBuilder.addShortTextData("lastName", null);
+        processDefBuilder.addShortTextData("calledProcessData", null);
         processDefBuilder.addIntegerData("clientNumber", clientNumberExpr);
         processDefBuilder.addIntegerData("protocolNumber", protocolNumberExpr);
         processDefBuilder.addStartEvent("tStart");
@@ -138,6 +139,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addStartEvent("start");
         final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
         addDataInputOperationsIfNeed(addInputOperations, callActivityBuilder);
+        callActivityBuilder.addShortTextData("callActivityData", new ExpressionBuilder().createConstantStringExpression("defaultValue"));
         if (loopNb > 0) {
             callActivityBuilder.addLoop(false, expressionTrue, new ExpressionBuilder().createConstantIntegerExpression(loopNb));
         }
@@ -168,8 +170,11 @@ public class CallActivityTest extends CommonAPITest {
         if (addInputOperations) {
             final Operation setFirstName = buildAssignOperation("firstName", "fName", ExpressionType.TYPE_VARIABLE, String.class.getName());
             final Operation setLastName = buildAssignOperation("lastName", "lName", ExpressionType.TYPE_VARIABLE, String.class.getName());
+            final Operation mapFromCallActivity = buildAssignOperation("calledProcessData", "callActivityData", ExpressionType.TYPE_VARIABLE,
+                    String.class.getName());
             callActivityBuilder.addDataInputOperation(setFirstName);
             callActivityBuilder.addDataInputOperation(setLastName);
+            callActivityBuilder.addDataInputOperation(mapFromCallActivity);
         }
     }
 
@@ -371,8 +376,10 @@ public class CallActivityTest extends CommonAPITest {
         if (addInputOperations) {
             final DataInstance firstNameData = getProcessAPI().getProcessDataInstance("firstName", targetPI.getId());
             final DataInstance lastNameData = getProcessAPI().getProcessDataInstance("lastName", targetPI.getId());
+            final DataInstance calledProcessData = getProcessAPI().getProcessDataInstance("calledProcessData", targetPI.getId());
             assertEquals("Fulano", firstNameData.getValue());
             assertEquals("de Tal", lastNameData.getValue());
+            assertEquals("defaultValue", calledProcessData.getValue());
         }
     }
 
