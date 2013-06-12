@@ -4,7 +4,6 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
-import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -28,7 +27,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class DataInstanceIntegrationLocalTest extends CommonAPITest {
+public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws BonitaException {

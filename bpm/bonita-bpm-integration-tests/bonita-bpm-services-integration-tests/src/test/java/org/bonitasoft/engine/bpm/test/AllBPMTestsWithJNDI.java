@@ -12,7 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    AllBPMTests.class
+        AllBPMTests.class
 })
 public class AllBPMTestsWithJNDI {
 
@@ -35,8 +35,8 @@ public class AllBPMTestsWithJNDI {
         setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
         // Force these system properties
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
 
         springContext = new ClassPathXmlApplicationContext("datasource.xml", "jndi-setup.xml");
     }
