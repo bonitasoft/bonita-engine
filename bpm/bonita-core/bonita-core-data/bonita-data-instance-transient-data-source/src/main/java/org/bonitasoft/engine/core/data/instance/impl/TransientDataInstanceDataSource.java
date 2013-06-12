@@ -206,7 +206,9 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
                 final Object key = cacheKeys.get(i);
                 if (((String) key).contains(matchingKey)) {
                     final SDataInstance dataInstance = getDataInstance(((String) key).substring(0, ((String) key).indexOf(":")), containerId, containerType);
-                    dataInstances.add(dataInstance);
+                    if (dataInstance != null) {
+                        dataInstances.add(dataInstance);
+                    }
                 }
             }
 
