@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -43,12 +49,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class ProcessExecutionTest extends CommonAPITest {
 
@@ -140,7 +140,6 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
-        System.out.println("Step class " + step1.getClass().getSimpleName() + " id=" + step1.getId());
         assertEquals("step1", step1.getName());
         assertEquals(TestStates.getReadyState(step1), step1.getState());
         assignAndExecuteStep(step1, getSession().getUserId());

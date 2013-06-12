@@ -543,7 +543,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return sInstance;
     }
 
-    private SProcessInstance createProcessInstance(final long userId, final SProcessDefinition processDefinition, final long callerId)
+    protected SProcessInstance createProcessInstance(final long userId, final SProcessDefinition processDefinition, final long callerId)
             throws SProcessInstanceCreationException {
         final SActivityInstance callerInstance = getCaller(callerId);
         final SProcessInstance sInstance;
