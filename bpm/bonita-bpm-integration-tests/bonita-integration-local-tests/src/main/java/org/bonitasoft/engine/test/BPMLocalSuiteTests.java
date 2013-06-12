@@ -11,7 +11,10 @@ import org.junit.runners.Suite.SuiteClasses;
         ConnectorExecutionsTestsLocal.class,
         ProcessWithExpressionTestLocal.class,
         ProcessArchiveTest.class,
-        LocalTimerEventTest.class
+        LocalTimerEventTest.class,
+        DataInstanceIntegrationLocalTest.class,
+        GatewayExecutionLocalTest.class,
+        NoAPITest.class
 })
 public class BPMLocalSuiteTests {
 

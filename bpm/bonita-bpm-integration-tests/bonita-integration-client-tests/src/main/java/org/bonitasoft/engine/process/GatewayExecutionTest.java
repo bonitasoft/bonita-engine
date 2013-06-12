@@ -1,12 +1,9 @@
 package org.bonitasoft.engine.process;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -37,8 +34,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
@@ -230,39 +225,6 @@ public class GatewayExecutionTest extends CommonAPITest {
                 .addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1").addTransition("gateway1", "step2")
                 .addTransition("gateway1", "step3").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2");
-    }
-
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.GATEWAY, keywords = { "Log", "Gateway", "Failed", "Exception" }, jira = "ENGINE-1451")
-    @Test
-    public void exclusiveGatewayFailed() throws Exception {
-        final PrintStream stdout = System.out;
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
-        try {
-            final Expression scriptExpression = new ExpressionBuilder()
-                    .createGroovyScriptExpression("mycondition", "fzdfsdfsdfsdfsdf", Boolean.class.getName());
-            final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
-                    .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION)
-                    .addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME)
-                    .addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
-                    .addTransition("gateway1", "step2", scriptExpression).addDefaultTransition("gateway1", "step3")
-                    .getProcess();
-
-            final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-            final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-            assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-
-            final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-            final FlowNodeInstance failFlowNodeInstance = waitForFlowNodeToFail(processInstance);
-            assertEquals("gateway1", failFlowNodeInstance.getName());
-            disableAndDeleteProcess(processDefinition);
-        } finally {
-            System.setOut(stdout);
-        }
-        final String logs = myOut.toString();
-        System.out.println(logs);
-        assertTrue("Should have written in logs : SFlowNodeExecutionException", logs.contains("SFlowNodeExecutionException"));
-        assertTrue("Should have written in logs : Error while finishing element", logs.contains("Error while finishing element"));
     }
 
     /*

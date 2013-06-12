@@ -39,7 +39,7 @@ public class SpringBeanTest {
     final BidiMap beansMap = new DualHashBidiMap();
 
     @Test
-    public void checkUniquenessOfSpringbeans() throws DocumentException, Exception {
+    public void checkUniquenessOfSpringBeans() throws DocumentException, Exception {
         final String bonitaHome = System.getProperty(BONITA_HOME);
 
         // Browse bonitaHome, and check that all spring beans are unique.
