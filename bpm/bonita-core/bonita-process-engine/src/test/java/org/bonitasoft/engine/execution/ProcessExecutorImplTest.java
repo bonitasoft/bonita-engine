@@ -1,16 +1,5 @@
 package org.bonitasoft.engine.execution;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +42,18 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -157,56 +158,58 @@ public class ProcessExecutorImplTest {
     @InjectMocks
     private ProcessExecutorImpl processExecutorImpl;
 
-    // @Test
-    // public void startProcessWithOperationsAndContext() throws Exception {
-    // long userId = 1L;
-    // List<SOperation> operations = new ArrayList<SOperation>(1);
-    // operations.add(mock(SOperation.class));
-    // Map<String, Object> context = new HashMap<String, Object>(1);
-    // context.put("input", "value");
-    //
-    // ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
-    // SProcessDefinition sDefinition = mock(SProcessDefinition.class, RETURNS_MOCKS);
-    // when(mockedProcessExecutorImpl.start(userId, sDefinition, operations, context)).then();
-    // SProcessInstance processInstance = mockedProcessExecutorImpl.start(userId, sDefinition, operations, context);
-    //
-    // start(userId, sDefinition, null, operations, context, null, -1, -1);
-    // assertNotNull(processInstance);
-    // }
-
     @Test
-    public void startProcessWithOperationsAndContext2() throws Exception {
-        long userId = 1L;
-        List<SOperation> operations = new ArrayList<SOperation>(1);
+    public void startProcessWithOperationsAndContext() throws Exception {
+        final long userId = 1L;
+        final List<SOperation> operations = new ArrayList<SOperation>(1);
         operations.add(mock(SOperation.class));
-        Map<String, Object> context = new HashMap<String, Object>(1);
+        final Map<String, Object> context = new HashMap<String, Object>(1);
         context.put("input", "value");
 
-        SExpressionContext expressionContext = mock(SExpressionContext.class);
-        List<ConnectorDefinitionWithInputValues> connectors = new ArrayList<ConnectorDefinitionWithInputValues>();
-        connectors.add(mock(ConnectorDefinitionWithInputValues.class));
-        long callerId = 1L;
-        long subProcessDefinitionId = 1L;
-
-        ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
-        SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
-        SProcessInstance sInstance = mock(SProcessInstance.class);
-        when(mockedProcessExecutorImpl.startElements(sProcessDefinition, sInstance, subProcessDefinitionId)).thenReturn(sInstance);
-        when(mockedProcessExecutorImpl.createProcessInstance(userId, sProcessDefinition, callerId)).thenReturn(sInstance);
-
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(userId, sProcessDefinition, expressionContext, operations, context, connectors, callerId,
-                subProcessDefinitionId);
+        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
+        final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
+        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
+        when(mockedProcessExecutorImpl.start(userId, sProcessDefinition, null, operations, context, null, -1, -1)).thenReturn(sProcessInstance);
 
         // Let's call it for real:
-        SProcessInstance processInstance = mockedProcessExecutorImpl.start(userId, sProcessDefinition, expressionContext, operations, context, connectors,
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(userId, sProcessDefinition, operations, context);
+        final SProcessInstance result = mockedProcessExecutorImpl.start(userId, sProcessDefinition, operations, context);
+
+        assertNotNull(result);
+        assertEquals(sProcessInstance, result);
+    }
+
+    @Test
+    public void startProcessWithOperationsAndContextAndExpressionContextAndConnectors() throws Exception {
+        final long userId = 1L;
+        final List<SOperation> operations = new ArrayList<SOperation>(1);
+        operations.add(mock(SOperation.class));
+        final Map<String, Object> context = new HashMap<String, Object>(1);
+        context.put("input", "value");
+        final SExpressionContext expressionContext = mock(SExpressionContext.class);
+        final List<ConnectorDefinitionWithInputValues> connectors = new ArrayList<ConnectorDefinitionWithInputValues>();
+        connectors.add(mock(ConnectorDefinitionWithInputValues.class));
+        final long callerId = 1L;
+        final long subProcessDefinitionId = 1L;
+
+        final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
+        final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
+        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
+        when(mockedProcessExecutorImpl.startElements(sProcessDefinition, sProcessInstance, subProcessDefinitionId)).thenReturn(sProcessInstance);
+        when(mockedProcessExecutorImpl.createProcessInstance(userId, sProcessDefinition, callerId)).thenReturn(sProcessInstance);
+
+        // Let's call it for real:
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(userId, sProcessDefinition, expressionContext, operations, context, connectors, callerId,
+                subProcessDefinitionId);
+        final SProcessInstance result = mockedProcessExecutorImpl.start(userId, sProcessDefinition, expressionContext, operations, context, connectors,
                 callerId, subProcessDefinitionId);
 
         // and check methods are called:
         verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessDefinition.class), any(SProcessInstance.class), anyLong());
         verify(mockedProcessExecutorImpl).createProcessInstance(userId, sProcessDefinition, callerId);
 
-        assertNotNull(processInstance);
-        assertEquals(sInstance, processInstance);
+        assertNotNull(result);
+        assertEquals(sProcessInstance, result);
     }
 
 }
