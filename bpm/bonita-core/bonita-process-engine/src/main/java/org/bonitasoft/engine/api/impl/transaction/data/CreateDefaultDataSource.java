@@ -52,14 +52,14 @@ public class CreateDefaultDataSource implements TransactionContent {
         // pass -1 because the user is the technical user, which is inexistant in DB:
         final SSession session = sessionService.createSession(tenantId, username);
         final SDataSource bonitaDataSource = sDataSourceModelBuilder.getDataSourceBuilder()
-                .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl")
+                .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.test.data.instance.DataInstanceDataSourceImpl")
                 .done();
         dataService.createDataSource(bonitaDataSource);
 
         final SDataSource transientDataSource = sDataSourceModelBuilder
                 .getDataSourceBuilder()
                 .createNewInstance("bonita_transient_data_source", "6.0", SDataSourceState.ACTIVE,
-                        "org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource").done();
+                        "org.bonitasoft.engine.test.core.data.instance.impl.TransientDataInstanceDataSource").done();
         dataService.createDataSource(transientDataSource);
         sessionService.deleteSession(session.getId());
     }

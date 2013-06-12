@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.home;
+package org.bonitasoft.engine.test.home;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,6 +6,8 @@ import java.io.File;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHome;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.junit.Test;
 
 /**

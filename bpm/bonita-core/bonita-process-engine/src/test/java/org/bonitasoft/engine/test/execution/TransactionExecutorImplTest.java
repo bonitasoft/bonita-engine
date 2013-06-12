@@ -1,25 +1,25 @@
-package org.bonitasoft.engine.execution;
+package org.bonitasoft.engine.test.execution;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.execution.TransactionExecutorImpl;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
 /**
  * @author Matthieu Chaffotte
  */
-@SuppressWarnings("javadoc")
 public class TransactionExecutorImplTest {
 
     @Test(expected = SBonitaException.class)

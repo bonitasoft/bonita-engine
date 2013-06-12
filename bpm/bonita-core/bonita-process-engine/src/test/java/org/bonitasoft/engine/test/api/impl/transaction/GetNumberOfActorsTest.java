@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.api.impl.transaction;
+package org.bonitasoft.engine.test.api.impl.transaction;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;

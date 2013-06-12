@@ -11,15 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.expression;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+package org.bonitasoft.engine.test.expression;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -37,19 +29,29 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy;
+import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyLong;
+
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-@SuppressWarnings("javadoc")
 public class EngineConstantExpressionExecutorStrategyTest {
 
     private final long containerId = 1L;

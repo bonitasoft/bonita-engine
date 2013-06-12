@@ -1,13 +1,10 @@
 package org.bonitasoft.engine.test;
 
 import java.io.InputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -18,23 +15,12 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
-import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
+public class DataInstanceIntegrationLocalTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
@@ -77,40 +63,18 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
         // check value at end of the activity
         final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(Arrays.asList("s1_2", "p1_1", "p2_2"),
-                getDataValues(processDefinitionId, archivedActivityInstance, "step1Data", "processData1", "processData2"));
+        assertEquals("s1_2", getProcessAPI().getActivityDataInstance("step1Data", archivedActivityInstance.getId()));
+        assertEquals("p1_1", getProcessAPI().getProcessDataInstance("processData1", processDefinitionId));
+        assertEquals("p2_2", getProcessAPI().getProcessDataInstance("processData2", processDefinitionId));
         assignAndExecuteStep(step2, user.getId());
         waitForProcessToFinish(processInstance);
         // after archived same value
-        assertEquals(Arrays.asList("s1_2", "p1_1", "p2_2"),
-                getDataValues(processDefinitionId, archivedActivityInstance, "step1Data", "processData1", "processData2"));
+        assertEquals("s1_2", getProcessAPI().getActivityDataInstance("step1Data", archivedActivityInstance.getId()));
+        assertEquals("p1_1", getProcessAPI().getProcessDataInstance("processData1", processDefinitionId));
+        assertEquals("p2_2", getProcessAPI().getProcessDataInstance("processData2", processDefinitionId));
 
         this.disableAndDeleteProcess(processDefinition);
         deleteUser(user);
-    }
-
-    private List<Serializable> getDataValues(final long processDefinitionId, final ArchivedActivityInstance archivedActivityInstance, final String... dataNames)
-            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
-            STransactionException {
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
-        transactionExecutor.openTransaction();
-        final SExpressionContext context = new SExpressionContext();
-        context.setContainerId(archivedActivityInstance.getSourceObjectId());
-        context.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
-        context.setProcessDefinitionId(processDefinitionId);
-        context.setTime(archivedActivityInstance.getArchiveDate().getTime());
-        final ArrayList<SExpression> expressions = new ArrayList<SExpression>(dataNames.length);
-        for (final String dataName : dataNames) {
-            expressions.add(new SExpressionImpl(dataName, dataName, SExpression.TYPE_VARIABLE, String.class.getName(), null, null));
-        }
-        final ExpressionResolverService expressionResolverService = getTenantAccessor().getExpressionResolverService();
-        final ArrayList<Serializable> results = new ArrayList<Serializable>();
-        for (final SExpression exp : expressions) {
-            final Serializable res = (Serializable) expressionResolverService.evaluate(exp, context);
-            results.add(res);
-        }
-        transactionExecutor.completeTransaction(true);
-        return results;
     }
 
     @Test
