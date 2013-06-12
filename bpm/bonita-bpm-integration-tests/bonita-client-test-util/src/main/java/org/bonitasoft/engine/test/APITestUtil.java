@@ -1138,7 +1138,7 @@ public class APITestUtil {
     }
 
     public CheckNbPendingTaskOf checkNbPendingTaskOf(final int nbOfPendingTasks, final User user) throws Exception {
-        return checkNbPendingTaskOf(50, 500, false, nbOfPendingTasks, user);
+        return checkNbPendingTaskOf(50, 5000, false, nbOfPendingTasks, user);
     }
 
     public CheckNbPendingTaskOf checkNbPendingTaskOf(final int repeatEach, final int timeout, final boolean throwExceptions, final int nbOfPendingTasks,
