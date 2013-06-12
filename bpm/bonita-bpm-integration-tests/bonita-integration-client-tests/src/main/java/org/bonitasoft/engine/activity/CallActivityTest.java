@@ -74,6 +74,7 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros
  */
+@SuppressWarnings("javadoc")
 public class CallActivityTest extends CommonAPITest {
 
     private User cebolinha;
@@ -563,24 +564,14 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" })
     @Test
     public void callActivityUsingInexistingVersion() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef1 = getSimpleProcess(actorName, "targetProcess", "1.0", false);
+        final ProcessDefinition callingProcessDef = getProcessWithCallActivity("delivery", false, false, "callingProcess", "targetProcess", 0,
+                "unexisting_version_4.0");
 
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(actorName, false, false, "callingProcess", "targetProcess", 0, "4.0");
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
-        assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
+        final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
+        assertEquals("callActivity", failedTask.getName());
 
-        final List<Operation> operations = getStartOperations();
-        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
-
-        new CheckNbOfProcessInstances(50, 5000, 2, ProcessInstanceCriterion.NAME_DESC, getProcessAPI()).waitUntil();
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
-        assertEquals(1, processInstances.size());
-        final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
-        final ActivityInstance callActivityInstance = waitForActivity.getResult();
-        assertEquals(TestStates.getFailedState(), callActivityInstance.getState());
-
-        disableAndDeleteProcess(targetProcessDef1);
         disableAndDeleteProcess(callingProcessDef);
 
     }
