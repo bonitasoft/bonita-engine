@@ -55,7 +55,7 @@ public class EhCacheCacheService implements CacheService {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.cacheConfigurations = new HashMap<String, CacheConfiguration>(cacheConfigurations.size());
-        for (Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : cacheConfigurations.entrySet()) {
+        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : cacheConfigurations.entrySet()) {
             this.cacheConfigurations.put(cacheConfig.getKey(), getEhCacheConfiguration(cacheConfig.getValue()));
 
         }
@@ -67,18 +67,19 @@ public class EhCacheCacheService implements CacheService {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.cacheConfigurations = new HashMap<String, CacheConfiguration>(cacheConfigurations.size());
-        for (Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : cacheConfigurations.entrySet()) {
+        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : cacheConfigurations.entrySet()) {
             this.cacheConfigurations.put(cacheConfig.getKey(), getEhCacheConfiguration(cacheConfig.getValue()));
         }
         cacheManager = CacheManager.create(configFile);
     }
 
     private CacheConfiguration getEhCacheConfiguration(final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig) {
-        CacheConfiguration ehCacheConfig = new CacheConfiguration();
+        final CacheConfiguration ehCacheConfig = new CacheConfiguration();
         ehCacheConfig.setMaxElementsInMemory(cacheConfig.getMaxElementsInMemory());
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
         ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
+        ehCacheConfig.setEternal(cacheConfig.isEternal());
         return ehCacheConfig;
     }
 
@@ -132,7 +133,7 @@ public class EhCacheCacheService implements CacheService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "store", e));
             }
             throw new CacheException(e);
-        } catch (net.sf.ehcache.CacheException ce) {
+        } catch (final net.sf.ehcache.CacheException ce) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "store", ce));
             }

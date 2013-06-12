@@ -9,15 +9,23 @@
 				<entry key="GROOVY_SCRIPT_CACHE_NAME">
 					<ref bean="groovyScriptCacheConfig" />
 				</entry>
+				<entry key="transient_data">
+					<ref bean="transientDataCacheConfig" />
+				</entry>
 			</map>
 		</constructor-arg>
 	</bean>
 	
 	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-		<constructor-arg name="timeToLiveSeconds" value="3600" />
-		<constructor-arg name="maxElementsInMemory" value="10000" />
-		<constructor-arg name="maxElementsOnDisk" value="20000" />
-		<constructor-arg name="inMemoryOnly" value="true" />
+		<property name="timeToLiveSeconds" value="3600" />
+		<property name="maxElementsInMemory" value="10000" />
+		<property name="inMemoryOnly" value="true" />
+	</bean>
+	
+	<bean id="transientDataCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="maxElementsInMemory" value="10000" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="eternal" value="true" />
 	</bean>
 
 </beans>

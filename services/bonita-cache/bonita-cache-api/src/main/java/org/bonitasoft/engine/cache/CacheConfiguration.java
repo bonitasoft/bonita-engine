@@ -26,21 +26,29 @@ public class CacheConfiguration {
 
     protected boolean inMemoryOnly = false;
 
+    protected boolean eternal = false;
+
     /**
-     * @param timeToLiveSeconds
-     * @param maxElementsInMemory
-     * @param maxElementsOnDisk
-     * @param inMemoryOnly
+     * true if the elements are never evicted automatically
+     * 
+     * @return the eternal
      */
-    public CacheConfiguration(final long timeToLiveSeconds, final int maxElementsInMemory, final int maxElementsOnDisk, final boolean inMemoryOnly) {
-        super();
-        this.timeToLiveSeconds = timeToLiveSeconds;
-        this.maxElementsInMemory = maxElementsInMemory;
-        this.maxElementsOnDisk = maxElementsOnDisk;
-        this.inMemoryOnly = inMemoryOnly;
+    public boolean isEternal() {
+        return eternal;
     }
 
     /**
+     * @param eternal
+     *            the eternal to set
+     */
+    public void setEternal(final boolean eternal) {
+        this.eternal = eternal;
+    }
+
+    /**
+     * The time to live is the time elements from this cache will be kept.
+     * After this time the element can be evicted
+     * 
      * @return the timeToLiveSeconds
      */
     public long getTimeToLiveSeconds() {
@@ -48,6 +56,8 @@ public class CacheConfiguration {
     }
 
     /**
+     * the maximum number of element the cache will keep in memory
+     * 
      * @return the maxElementsInMemory
      */
     public int getMaxElementsInMemory() {
@@ -55,6 +65,8 @@ public class CacheConfiguration {
     }
 
     /**
+     * the maximum number of element the cache will keep on disk after the limite of element in memory is reached
+     * 
      * @return the maxElementsOnDisk
      */
     public int getMaxElementsOnDisk() {
@@ -62,10 +74,44 @@ public class CacheConfiguration {
     }
 
     /**
+     * if true nothing is stored on disk
+     * 
      * @return the inMemoryOnly
      */
     public boolean isInMemoryOnly() {
         return inMemoryOnly;
+    }
+
+    /**
+     * @param timeToLiveSeconds
+     *            the timeToLiveSeconds to set
+     */
+    public void setTimeToLiveSeconds(final long timeToLiveSeconds) {
+        this.timeToLiveSeconds = timeToLiveSeconds;
+    }
+
+    /**
+     * @param maxElementsInMemory
+     *            the maxElementsInMemory to set
+     */
+    public void setMaxElementsInMemory(final int maxElementsInMemory) {
+        this.maxElementsInMemory = maxElementsInMemory;
+    }
+
+    /**
+     * @param maxElementsOnDisk
+     *            the maxElementsOnDisk to set
+     */
+    public void setMaxElementsOnDisk(final int maxElementsOnDisk) {
+        this.maxElementsOnDisk = maxElementsOnDisk;
+    }
+
+    /**
+     * @param inMemoryOnly
+     *            the inMemoryOnly to set
+     */
+    public void setInMemoryOnly(final boolean inMemoryOnly) {
+        this.inMemoryOnly = inMemoryOnly;
     }
 
 }

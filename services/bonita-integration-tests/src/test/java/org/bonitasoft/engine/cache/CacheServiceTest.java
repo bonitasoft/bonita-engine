@@ -30,6 +30,8 @@ public class CacheServiceTest {
 
     protected static final String SOME_DEFAULT_CACHE_NAME = "SOME_DEFAULT_CACHE_NAME";
 
+    protected static final String ETERNAL_CACHE = "ETERNAL_CACHE";
+
     private static final String TEST1 = "test1";// with copy
 
     private static final String TEST2 = "test2";// without copy
@@ -56,7 +58,20 @@ public class CacheServiceTest {
 
     protected CacheService getCacheService() throws CacheException {
         final HashMap<String, CacheConfiguration> cacheConfigurations = new HashMap<String, CacheConfiguration>(1);
-        cacheConfigurations.put(SOME_DEFAULT_CACHE_NAME, new CacheConfiguration(1, 100, 2000, true));
+        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+        cacheConfiguration.setTimeToLiveSeconds(1);
+        cacheConfiguration.setMaxElementsInMemory(100);
+        cacheConfiguration.setMaxElementsInMemory(200);
+        cacheConfiguration.setInMemoryOnly(true);
+        cacheConfigurations.put(SOME_DEFAULT_CACHE_NAME, cacheConfiguration);
+        cacheConfiguration = new CacheConfiguration();
+        cacheConfiguration.setTimeToLiveSeconds(1);
+        cacheConfiguration.setMaxElementsInMemory(100);
+        cacheConfiguration.setMaxElementsInMemory(200);
+        cacheConfiguration.setInMemoryOnly(true);
+        cacheConfiguration.setEternal(true);
+        cacheConfigurations.put(ETERNAL_CACHE, cacheConfiguration);
+
         return new EhCacheCacheService(new TechnicalLoggerService() {
 
             @Override
@@ -98,6 +113,18 @@ public class CacheServiceTest {
         Thread.sleep(1020);
         object = cacheService.get(SOME_DEFAULT_CACHE_NAME, key);
         assertNull("Object should not be in cache any longer", object);
+    }
+
+    @Test
+    public void eternalCacheTest() throws Exception {
+        final String key = "eternalCacheTest";
+        final Object value = new Object();
+        cacheService.store(ETERNAL_CACHE, key, value);
+        Object object = cacheService.get(ETERNAL_CACHE, key);
+        assertNotNull("Object should be in cache", object);
+        Thread.sleep(1020);
+        object = cacheService.get(ETERNAL_CACHE, key);
+        assertEquals("Object should still be in cache", value, object);
     }
 
     @Test

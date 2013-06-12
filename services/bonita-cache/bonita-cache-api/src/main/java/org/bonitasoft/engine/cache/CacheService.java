@@ -27,7 +27,7 @@ import java.util.List;
 public interface CacheService {
 
     /**
-     * Store an object in the cache.
+     * Store an object in the cache. If the cache don't exists it will be created.
      * 
      * @param cacheName
      *            The name of the cache in which the object must be stored
