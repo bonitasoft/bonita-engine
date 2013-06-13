@@ -22,10 +22,12 @@ import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 /**
  * Builder for SearchOptions objects. Defines 'pagination'.
  * When several filters are added, implicit AND operators are used if not specified.
+ * See {@link SearchOptions} for deeper details on search mechanism options.
  * 
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
+ * @see SearchOptions
  */
 public class SearchOptionsBuilder {
 

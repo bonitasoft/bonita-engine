@@ -17,25 +17,33 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * Represents the result of a Search. For details on 'Search mechanism', see {@link SearchOptionsBuilder} and {@link SearchOptions}.
+ * A <code>SearchResult</code> is composed of a result list {@link #getResult()} that is the paginated list of results matching the provided criteria, and a
+ * result count {@link #getCount()} that is the total number of results matching the provided criteria.
+ * 
+ * @param <T>
+ *            the type of the objects being returned by the search.
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @see SearchOptions
+ * @see SearchOptionsBuilder
  */
 public interface SearchResult<T extends Serializable> extends Serializable {
 
     /**
-     * Get the total number of matching result in the data base. This number can be greater then the number of elements retrieve in the search depending on
+     * Get the total number of matching result in the data base. This number can be greater than the number of elements retrieved in the search depending on
      * paging criterion.
      * 
-     * @return The total number of matching result in the data base
+     * @return The total number of matching result in the data base.
      * @since 6.0
      */
     long getCount();
 
     /**
-     * Get the list of elements retrieved by a search.
+     * Get the list of elements retrieved by the search.
      * 
-     * @return The list of elements retrieved by a search.
+     * @return The list of elements retrieved by the search.
      * @since 6.0
      */
     List<T> getResult();

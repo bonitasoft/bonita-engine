@@ -19,18 +19,35 @@ import java.util.List;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 
 /**
- * a <code>SearchOptions</code> heps define the generic options of the search mechanism.
- * Use SearchOptionsBuilder to build a SearchOptions object.
+ * A <code>SearchOptions</code> object helps define the generic options of the search mechanism.
+ * A <code>SearchOptions</code> has a 'start index' field and a 'max results' field that define where to start and where to stop to return results that match
+ * the provided search criteria.
+ * It is composed of a list of <code>SearchFilter</code> objects defining the restrictive criteria that a result must match to fulfill the search.
+ * It is also composed of a 'search term', which is a free text that can be search for in a certain amount of fields, depending on what object is the search
+ * applied on.
+ * Finally, a search can define a list of {@link Sort} options to define the order in which the matching results will be returned.
+ * Use {@link SearchOptionsBuilder} to build a SearchOptions object.
  * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
  * @see SearchOptionsBuilder
+ * @see SearchResult
  */
 public interface SearchOptions extends Serializable {
 
+    /**
+     * Gets the list of <code>SearchFilter</code> objects defining the restrictive criteria that a result must match to fulfill the search.
+     * 
+     * @return the list of <code>SearchFilter</code> objects
+     */
     List<SearchFilter> getFilters();
 
+    /**
+     * Gets the search term (free text that can be search for in a certain amount of properties, depending on what object is the search applied on)
+     * 
+     * @return the search term (as a String) that will be searched for.
+     */
     String getSearchTerm();
 
     /**
@@ -47,6 +64,11 @@ public interface SearchOptions extends Serializable {
      */
     int getMaxResults();
 
+    /**
+     * Gets the list of sort criteria
+     * 
+     * @return the list of <code>Sort</code> to order the results
+     */
     List<Sort> getSorts();
 
 }
