@@ -27,9 +27,9 @@ import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.ImportPolicy;
+import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.RoleCreator.RoleField;
-import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
@@ -114,61 +114,110 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             final List<GroupCreator> groups = organization.getGroups();
             final List<UserMembership> memberships = organization.getMemberships();
 
-            final Map<String, Long> userNameToIdMap = new HashMap<String, Long>(users.size());
-            final Map<String, SUser> userNameToSUsers = new HashMap<String, SUser>((int) Math.min(Integer.MAX_VALUE, identityService.getNumberOfUsers()));
-            final Map<String, Long> roleNameToIdMap = new HashMap<String, Long>(roles.size());
-            final Map<String, Long> groupPathToIdMap = new HashMap<String, Long>(groups.size());
-
             // Users
-            importUsers(users, userNameToIdMap, userNameToSUsers);
-            updateManagerId(users, userNameToIdMap, userNameToSUsers);
+            final Map<String, SUser> userNameToSUsers = importUsers(users);
+            updateManagerId(users, userNameToSUsers);
 
             // Roles
-            importRoles(roles, roleNameToIdMap);
+            final Map<String, Long> roleNameToIdMap = importRoles(roles);
 
             // Groups
-            importGroups(groups, groupPathToIdMap);
+            final Map<String, Long> groupPathToIdMap = importGroups(groups);
 
             // UserMemberships
-            importMemberships(memberships, userNameToIdMap, roleNameToIdMap, groupPathToIdMap);
+            importMemberships(memberships, userNameToSUsers, roleNameToIdMap, groupPathToIdMap);
         } catch (final Exception e) {
             throw new ImportDuplicateInOrganizationException(e);
         }
     }
 
-    private void importMemberships(final List<UserMembership> memberships, final Map<String, Long> userNameToIdMap, final Map<String, Long> roleNameToIdMap,
+    private void importMemberships(final List<UserMembership> memberships, final Map<String, SUser> userNameToSUsers, final Map<String, Long> roleNameToIdMap,
             final Map<String, Long> groupPathToIdMap) throws SIdentityException, ImportDuplicateInOrganizationException {
         for (final UserMembership newMembership : memberships) {
-            SUserMembership existingMembership = null;
-            final List<SUserMembership> oldUserMemberships = identityService.getUserMemberships(0, (int) identityService.getNumberOfUserMemberships());
-            for (final SUserMembership oldMembership : oldUserMemberships) {
-                if (oldMembership.getUsername().equals(newMembership.getUsername()) && oldMembership.getRoleName().equals(newMembership.getRoleName())
-                        && oldMembership.getGroupName().equals(newMembership.getGroupName())) {
-                    existingMembership = oldMembership;
-                    break;
+            final Long userId = getUserId(userNameToSUsers, newMembership);
+            final Long groupId = getGroupId(groupPathToIdMap, newMembership);
+            final Long roleId = getRoleId(roleNameToIdMap, newMembership);
+            if (userId != null && groupId != null && roleId != null) {
+                try {
+                    final SUserMembership sUserMembership = identityService.getUserMembership(userId, groupId, roleId);
+                    strategy.foundExistingMembership(sUserMembership);
+                } catch (final SIdentityException e) {
+                    final Long assignedBy = getAssignedBy(userNameToSUsers, newMembership);
+                    addMembership(newMembership, userId, groupId, roleId, assignedBy);
                 }
-
-            }
-            if (existingMembership != null) {
-                strategy.foundExistingMembership(existingMembership);
             } else {
-                addMembership(newMembership, userNameToIdMap, roleNameToIdMap, groupPathToIdMap);
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                    logger.log(getClass(), TechnicalLogSeverity.WARNING, "The membership " + newMembership
+                            + " because the user group or role can't be found\n userId=" + userId + " groupId=" + groupId + " roleId=" + roleId);
+                }
             }
         }
     }
 
-    private void importGroups(final List<GroupCreator> groups, final Map<String, Long> groupPathToIdMap) throws ImportDuplicateInOrganizationException,
-            SIdentityException {
-        for (final GroupCreator group : groups) {
-            SGroup existingGroup;
-            try {
-                final String groupPath = getGroupPath(group);
-                existingGroup = identityService.getGroupByPath(groupPath);
-                strategy.foundExistingGroup(existingGroup, group);
-            } catch (final SGroupNotFoundException e) {
-                addGroup(group, groupPathToIdMap);
+    private Long getUserId(final Map<String, SUser> userNameToSUsers, final UserMembership newMembership) {
+        final String username = newMembership.getUsername();
+        if (username == null || username.isEmpty()) {
+            return -1L;
+        } else {
+            final SUser sUser = userNameToSUsers.get(username);
+            if (sUser != null) {
+                return sUser.getId();
+            } else {
+                return null;
             }
         }
+
+    }
+
+    private Long getGroupId(final Map<String, Long> groupPathToIdMap, final UserMembership newMembership) {
+        final String groupParentPath = newMembership.getGroupParentPath();
+        final String groupFullPath = (groupParentPath == null ? '/' : groupParentPath + '/') + newMembership.getGroupName();
+        return groupPathToIdMap.get(groupFullPath);
+    }
+
+    private Long getRoleId(final Map<String, Long> roleNameToIdMap, final UserMembership newMembership) {
+        final String roleName = newMembership.getRoleName();
+        if (roleName == null || roleName.isEmpty()) {
+            return -1L;
+        } else {
+            final Long roleId = roleNameToIdMap.get(roleName);
+            if (roleId != null) {
+                return roleId;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private Long getAssignedBy(final Map<String, SUser> userNameToSUsers, final UserMembership newMembership) {
+        final String assignedByName = newMembership.getAssignedByName();
+        if (assignedByName == null || assignedByName.isEmpty()) {
+            return -1L;
+        } else {
+            final SUser sUserAssigned = userNameToSUsers.get(assignedByName);
+            if (sUserAssigned != null) {
+                return sUserAssigned.getId();
+            } else {
+                return -1L;
+            }
+        }
+    }
+
+    private Map<String, Long> importGroups(final List<GroupCreator> groupCreators) throws ImportDuplicateInOrganizationException,
+            SIdentityException {
+        final Map<String, Long> groupPathToIdMap = new HashMap<String, Long>(groupCreators.size());
+        for (final GroupCreator groupCreator : groupCreators) {
+            SGroup sGroup;
+            try {
+                final String groupPath = getGroupPath(groupCreator);
+                sGroup = identityService.getGroupByPath(groupPath);
+                strategy.foundExistingGroup(sGroup, groupCreator);
+            } catch (final SGroupNotFoundException e) {
+                sGroup = addGroup(groupCreator);
+            }
+            groupPathToIdMap.put(sGroup.getPath(), sGroup.getId());
+        }
+        return groupPathToIdMap;
     }
 
     private String getGroupPath(final GroupCreator creator) {
@@ -182,30 +231,29 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private void importRoles(final List<RoleCreator> roles, final Map<String, Long> roleNameToIdMap) throws ImportDuplicateInOrganizationException,
+    private Map<String, Long> importRoles(final List<RoleCreator> roleCreators) throws ImportDuplicateInOrganizationException,
             SIdentityException {
-        for (final RoleCreator role : roles) {
-            SRole existingRole;
+        final Map<String, Long> roleNameToIdMap = new HashMap<String, Long>(roleCreators.size());
+        for (final RoleCreator roleCreator : roleCreators) {
+            SRole sRole;
             try {
-                existingRole = identityService.getRoleByName((String) role.getFields().get(RoleField.NAME));
+                sRole = identityService.getRoleByName((String) roleCreator.getFields().get(RoleField.NAME));
+                strategy.foundExistingRole(sRole, roleCreator);
             } catch (final SRoleNotFoundException e) {
-                existingRole = null;
+                sRole = addRole(roleCreator);
             }
-            if (existingRole != null) {
-                strategy.foundExistingRole(existingRole, role);
-            } else {
-                addRole(role, roleNameToIdMap);
-            }
+            roleNameToIdMap.put(sRole.getName(), sRole.getId());
         }
+        return roleNameToIdMap;
     }
 
-    private void updateManagerId(final List<ExportedUser> users, final Map<String, Long> userNameToIdMap, final Map<String, SUser> userNameToSUsers)
+    private void updateManagerId(final List<ExportedUser> users, final Map<String, SUser> userNameToSUsers)
             throws SUserUpdateException {
         for (final ExportedUser user : users) {
             final String managerUserName = user.getManagerUserName();
-            if (managerUserName != null && managerUserName.trim().length() > 0 && userNameToIdMap.get(managerUserName) != null) {
+            if (managerUserName != null && managerUserName.trim().length() > 0 && userNameToSUsers.get(managerUserName) != null) {
                 final SUser sUser = userNameToSUsers.get(user.getUserName());
-                final Long managerId = userNameToIdMap.get(managerUserName);
+                final Long managerId = userNameToSUsers.get(managerUserName).getId();
                 if (managerId != null) {
                     final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
                     identityService.updateUser(sUser, userUpdateBuilder.updateManagerUserId(managerId).done());
@@ -219,73 +267,49 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private void importUsers(final List<ExportedUser> users, final Map<String, Long> userNameToIdMap, final Map<String, SUser> userNameToSUsers)
+    private Map<String, SUser> importUsers(final List<ExportedUser> users)
             throws ImportDuplicateInOrganizationException, SIdentityException {
+        final Map<String, SUser> userNameToSUsers = new HashMap<String, SUser>((int) Math.min(Integer.MAX_VALUE, identityService.getNumberOfUsers()));
         for (final ExportedUser user : users) {
-            SUser existingUser;
+            SUser sUser;
             try {
-                existingUser = identityService.getUserByUserName(user.getUserName());
+                sUser = identityService.getUserByUserName(user.getUserName());
+                strategy.foundExistingUser(sUser, user);
             } catch (final SUserNotFoundException e) {
-                existingUser = null;
+                sUser = addUser(user);
             }
-            SUser newUser;
-            if (existingUser != null) {
-                newUser = existingUser;
-                strategy.foundExistingUser(existingUser, user);
-            } else {
-                newUser = addUser(user);
-            }
-            userNameToIdMap.put(user.getUserName(), newUser.getId());
-            userNameToSUsers.put(user.getUserName(), newUser);
+            userNameToSUsers.put(sUser.getUserName(), sUser);
         }
+        return userNameToSUsers;
     }
 
-    private void addMembership(final UserMembership newMembership, final Map<String, Long> userNameToIdMap, final Map<String, Long> roleNameToIdMap,
-            final Map<String, Long> groupPathToIdMap) throws SUserMembershipCreationException {
-        final String username = newMembership.getUsername();
-        final String roleName = newMembership.getRoleName();
-        final String groupParentPath = newMembership.getGroupParentPath();
-        final String groupFullPath = (groupParentPath == null ? '/' : groupParentPath + '/') + newMembership.getGroupName();
+    private void addMembership(final UserMembership newMembership, final Long userId, final Long groupId, final Long roleId, final Long assignedBy)
+            throws SUserMembershipCreationException {
+        final long assignedDateAsLong = getAssignedDate(newMembership);
+        final SUserMembership sUserMembership = identityModelBuilder.getUserMembershipBuilder().createNewInstance(userId, groupId, roleId)
+                .setAssignedBy(assignedBy).setAssignedDate(assignedDateAsLong).done();
+        identityService.createUserMembership(sUserMembership);
+    }
 
-        final String assignedByName = newMembership.getAssignedByName();
-        final long assignedBy;
-        if (assignedByName == null || assignedByName.isEmpty()) {
-            assignedBy = -1;
-        } else {
-            assignedBy = userNameToIdMap.get(assignedByName);
-        }
+    private long getAssignedDate(final UserMembership newMembership) {
         final Date assignedDate = newMembership.getAssignedDate();
-        final long assignedDateAsLong;
         if (assignedDate != null) {
-            assignedDateAsLong = assignedDate.getTime();
+            return assignedDate.getTime();
         } else {
-            assignedDateAsLong = 0;
-        }
-        final Long userId = userNameToIdMap.get(username);
-        final Long groupId = groupPathToIdMap.get(groupFullPath);
-        final Long roldeId = roleNameToIdMap.get(roleName);
-        if (userId != null && groupId != null && roldeId != null) {
-            final SUserMembership sUserMembership = identityModelBuilder.getUserMembershipBuilder().createNewInstance(userId, groupId, roldeId)
-                    .setAssignedBy(assignedBy).setAssignedDate(assignedDateAsLong).done();
-            identityService.createUserMembership(sUserMembership);
-        } else {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(getClass(), TechnicalLogSeverity.WARNING, "The membership " + newMembership
-                        + " because the user group or role can't be found\n userId=" + userId + " groupId=" + groupId + " roleId=" + roldeId);
-            }
+            return 0;
         }
     }
 
-    private void addGroup(final GroupCreator creator, final Map<String, Long> groupPathToIdMap) throws SGroupCreationException {
+    private SGroup addGroup(final GroupCreator creator) throws SGroupCreationException {
         final SGroup sGroup = ModelConvertor.constructSGroup(creator, identityModelBuilder);
         identityService.createGroup(sGroup);
-        groupPathToIdMap.put(sGroup.getPath(), sGroup.getId());
+        return sGroup;
     }
 
-    private void addRole(final RoleCreator creator, final Map<String, Long> roleNameToIdMap) throws SIdentityException {
+    private SRole addRole(final RoleCreator creator) throws SIdentityException {
         final SRole sRole = ModelConvertor.constructSRole(creator, identityModelBuilder);
         identityService.createRole(sRole);
-        roleNameToIdMap.put(sRole.getName(), sRole.getId());
+        return sRole;
     }
 
     private SUser addUser(final ExportedUser user) throws SUserCreationException, SUserUpdateException {

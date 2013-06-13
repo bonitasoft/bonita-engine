@@ -48,7 +48,7 @@ public class OrganizationTest extends CommonAPITest {
         logout();
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" }, jira = "ENGINE-1363")
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" })
     @Test
     public void importOrganization() throws Exception {
         // create XML file
@@ -63,13 +63,7 @@ public class OrganizationTest extends CommonAPITest {
         final String roleName1 = "Developer";
         final String groupName1 = "Engine";
 
-        final InputStream xmlStream = OrganizationTest.class.getResourceAsStream("simpleOrganization.xml");
-        try {
-            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
-            getIdentityAPI().importOrganization(new String(organisationContent));
-        } finally {
-            xmlStream.close();
-        }
+        importOrganization("simpleOrganization.xml");
         final User persistedUser = getIdentityAPI().getUserByUserName(userName);
         assertEquals(jobTitle, persistedUser.getJobTitle());
         // check createdBy for user
@@ -103,6 +97,40 @@ public class OrganizationTest extends CommonAPITest {
         getIdentityAPI().deleteOrganization();
     }
 
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "UserMembership", "Deleted" }, jira = "ENGINE-1363")
+    @Test
+    public void reImportUserMembershipDeleted() throws Exception {
+        final String userName = "anthony.birembault";
+
+        importOrganization("simpleOrganization.xml");
+        final User persistedUser = getIdentityAPI().getUserByUserName(userName);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(persistedUser.getId(), 0, 10,
+                UserMembershipCriterion.ASSIGNED_DATE_ASC);
+        assertEquals(1, userMemberships.size());
+
+        getIdentityAPI().deleteUserMembership(userMemberships.get(0).getId());
+
+        // Re-import organization
+        importOrganization("simpleOrganization.xml");
+        final User persistedUser2 = getIdentityAPI().getUserByUserName(userName);
+        final List<UserMembership> userMemberships2 = getIdentityAPI().getUserMemberships(persistedUser2.getId(), 0, 10,
+                UserMembershipCriterion.ASSIGNED_DATE_ASC);
+        assertEquals(1, userMemberships2.size());
+
+        // clean-up
+        getIdentityAPI().deleteOrganization();
+    }
+
+    private void importOrganization(final String fileName) throws IOException, OrganizationImportException {
+        final InputStream xmlStream = OrganizationTest.class.getResourceAsStream(fileName);
+        try {
+            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
+            getIdentityAPI().importOrganization(new String(organisationContent));
+        } finally {
+            xmlStream.close();
+        }
+    }
+
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Enabled", "Disabled",
             "User" }, jira = "ENGINE-577")
     @Test
@@ -112,13 +140,7 @@ public class OrganizationTest extends CommonAPITest {
         final String userName = "anthony.birembault";
         final String userName1 = "liuyanyan";
 
-        final InputStream xmlStream = OrganizationTest.class.getResourceAsStream("simpleOrganization.xml");
-        try {
-            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
-            getIdentityAPI().importOrganization(new String(organisationContent));
-        } finally {
-            xmlStream.close();
-        }
+        importOrganization("simpleOrganization.xml");
 
         final User persistedUser = getIdentityAPI().getUserByUserName(userName);
         assertEquals(jobTitle, persistedUser.getJobTitle());
@@ -300,6 +322,7 @@ public class OrganizationTest extends CommonAPITest {
         } finally {
             xmlStream.close();
         }
+
         // clear organization
         getIdentityAPI().deleteOrganization();
 
@@ -440,7 +463,7 @@ public class OrganizationTest extends CommonAPITest {
         updateDescriptor.setEnabled(true);
         getIdentityAPI().updateUser(userToDisable.getId(), updateDescriptor);
         try {
-            importSecondSimpleOrganization("simpleOrganizationDuplicates2.xml", policy);
+            importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", policy);
         } catch (final OrganizationImportException e) {
 
             assertEquals(2, getIdentityAPI().getNumberOfUsers());
@@ -520,7 +543,7 @@ public class OrganizationTest extends CommonAPITest {
         final String groupName2 = "QA";
 
         importFirstSimpleOrganization();
-        importSecondSimpleOrganization("simpleOrganizationNoDuplicates.xml", policy);
+        importOrganizationWithPolicy("simpleOrganizationNoDuplicates.xml", policy);
 
         assertEquals(3, getIdentityAPI().getNumberOfUsers());
         assertEquals(3, getIdentityAPI().getNumberOfGroups());
@@ -615,7 +638,7 @@ public class OrganizationTest extends CommonAPITest {
         final String groupName2 = "QA";
 
         importFirstSimpleOrganization();
-        importSecondSimpleOrganization("simpleOrganizationDuplicates2.xml", policy);
+        importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", policy);
 
         assertEquals(3, getIdentityAPI().getNumberOfUsers());
         assertEquals(3, getIdentityAPI().getNumberOfGroups());
@@ -691,7 +714,7 @@ public class OrganizationTest extends CommonAPITest {
     public void importOrganizationMergeDuplicatesWithEnabledAndDisabledUsers() throws Exception {
         // create XML file
         importFirstSimpleOrganization();
-        importSecondSimpleOrganization("simpleOrganizationDuplicates2.xml", ImportPolicy.MERGE_DUPLICATES);
+        importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", ImportPolicy.MERGE_DUPLICATES);
 
         assertEquals(3, getIdentityAPI().getNumberOfUsers());
         assertEquals(3, getIdentityAPI().getNumberOfGroups());
@@ -744,7 +767,7 @@ public class OrganizationTest extends CommonAPITest {
         final String groupName2 = "QA";
 
         importFirstSimpleOrganization();
-        importSecondSimpleOrganization("simpleOrganizationDuplicates2.xml", policy);
+        importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", policy);
 
         assertEquals(3, getIdentityAPI().getNumberOfUsers());
         assertEquals(3, getIdentityAPI().getNumberOfGroups());
@@ -820,7 +843,7 @@ public class OrganizationTest extends CommonAPITest {
     public void importOrganizationIgnoreDuplicatesWithEnabledAndDisabledUsers() throws Exception {
         // create XML file
         importFirstSimpleOrganization();
-        importSecondSimpleOrganization("simpleOrganizationDuplicates2.xml", ImportPolicy.IGNORE_DUPLICATES);
+        importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", ImportPolicy.IGNORE_DUPLICATES);
 
         assertEquals(3, getIdentityAPI().getNumberOfUsers());
         assertEquals(3, getIdentityAPI().getNumberOfGroups());
@@ -849,20 +872,17 @@ public class OrganizationTest extends CommonAPITest {
         getIdentityAPI().deleteGroup(getIdentityAPI().getGroupByPath("Web").getId());
     }
 
-    private void importSecondSimpleOrganization(final String xmlFile, final ImportPolicy policy) throws Exception {
+    private void importOrganizationWithPolicy(final String xmlFile, final ImportPolicy policy) throws Exception {
         final InputStream xmlStream = OrganizationTest.class.getResourceAsStream(xmlFile);
         try {
             final String organizationContent = IOUtils.toString(xmlStream);
             getIdentityAPI().importOrganization(organizationContent, policy);
-            // getIdentityAPI().importOrganization(new String(organizationContent));
         } finally {
             xmlStream.close();
         }
     }
 
     private void importFirstSimpleOrganization() throws Exception {
-        // create XML file
-
         final String userName = "anthony.birembault";
         final String jobTitle = "Web Team Manager";
         final String roleName = "Manager";
@@ -874,13 +894,7 @@ public class OrganizationTest extends CommonAPITest {
         final String roleName1 = "Developer";
         final String groupName1 = "Engine";
 
-        final InputStream xmlStream = OrganizationTest.class.getResourceAsStream("simpleOrganizationDuplicates1.xml");
-        try {
-            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
-            getIdentityAPI().importOrganization(new String(organisationContent));
-        } finally {
-            xmlStream.close();
-        }
+        importOrganization("simpleOrganizationDuplicates1.xml");
         final User persistedUser = getIdentityAPI().getUserByUserName(userName);
         assertEquals(jobTitle, persistedUser.getJobTitle());
         // check createdBy for user
@@ -912,8 +926,7 @@ public class OrganizationTest extends CommonAPITest {
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Password", "Encryption" }, jira = "ENGINE-661")
     @Test
     public void importACMEOrganizationAndCheckEncryptedPassword() throws Exception {
-        final String organization = getOrganization("ACME.xml");
-        getIdentityAPI().importOrganization(organization);
+        importOrganization("ACME.xml");
         final User norio = getIdentityAPI().getUserByUserName("norio.yamazaki");
         assertFalse(norio.getPassword().trim().isEmpty());
         assertNotSame("bpm", norio.getPassword());
@@ -924,8 +937,7 @@ public class OrganizationTest extends CommonAPITest {
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Password", "Encryption" }, jira = "ENGINE-661")
     @Test
     public void importOrganizationWithSomeEncryptedPassword() throws Exception {
-        final String organization = getOrganization("mixOrganization.xml");
-        getIdentityAPI().importOrganization(organization);
+        importOrganization("mixOrganization.xml");
         final User matti = getIdentityAPI().getUserByUserName("matti");
         final User petteri = getIdentityAPI().getUserByUserName("petteri");
         assertFalse(matti.getPassword().trim().isEmpty());
@@ -934,16 +946,6 @@ public class OrganizationTest extends CommonAPITest {
         assertNotSame("bpm", petteri.getPassword());
 
         getIdentityAPI().deleteOrganization();
-    }
-
-    private String getOrganization(final String fileName) throws IOException {
-        final InputStream xmlStream = OrganizationTest.class.getResourceAsStream(fileName);
-        try {
-            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
-            return new String(organisationContent);
-        } finally {
-            xmlStream.close();
-        }
     }
 
 }
