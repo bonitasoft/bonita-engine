@@ -90,10 +90,6 @@ public final class TenantAPIAccessor {
         return getAPI(CommandAPI.class, session);
     }
 
-    public static ReportingAPI getReportingAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return getAPI(ReportingAPI.class, session);
-    }
-
     public static ProfileAPI getProfileAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProfileAPI.class, session);
     }

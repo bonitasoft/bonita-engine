@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +23,6 @@ import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.ReportingAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -113,12 +118,6 @@ import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Emmanuel Duchastenier
  * @author Frederic Bouquet
@@ -145,8 +144,6 @@ public class APITestUtil {
     private CommandAPI commandAPI;
 
     private ProfileAPI profileAPI;
-
-    private ReportingAPI reportingAPI;
 
     public static final String DEFAULT_TENANT = "default";
 
@@ -192,7 +189,6 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
     }
 
     protected void login() throws BonitaException {
@@ -201,7 +197,6 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
     }
 
     protected void logout() throws BonitaException {
@@ -384,10 +379,6 @@ public class APITestUtil {
 
     public CommandAPI getCommandAPI() {
         return commandAPI;
-    }
-
-    public ReportingAPI getReportingAPI() {
-        return reportingAPI;
     }
 
     protected ProcessSupervisor createSupervisor(final long processDefID, final long userId) throws BonitaException {
@@ -1108,10 +1099,6 @@ public class APITestUtil {
 
     protected void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
-    }
-
-    protected void setReportingAPI(final ReportingAPI reportingAPI) {
-        this.reportingAPI = reportingAPI;
     }
 
     protected void setIdentityAPI(final IdentityAPI identityAPI) {

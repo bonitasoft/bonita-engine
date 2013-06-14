@@ -1,5 +1,7 @@
 package org.bonitasoft.engine;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -18,8 +20,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertNotNull;
 
 public abstract class CommonAPITest extends APITestUtil {
 
