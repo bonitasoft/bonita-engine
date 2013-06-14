@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,8 +46,6 @@ import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.log.Log;
 
-import static org.junit.Assert.assertTrue;
-
 public class APITestSPUtil extends APITestUtil {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(APITestSPUtil.class);
@@ -56,12 +56,18 @@ public class APITestSPUtil extends APITestUtil {
 
     private PlatformMonitoringAPI platformMonitoringAPI;
 
+    private ReportingAPI reportingAPI;
+
     public static int DEFAULT_REPEAT = 50;
 
     public static int DEFAULT_TIMEOUT = 2000;
 
     protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return platformMonitoringAPI;
+    }
+
+    protected void setReportingAPI(final ReportingAPI reportingAPI) {
+        this.reportingAPI = reportingAPI;
     }
 
     protected void setPlatformMonitoringAPI(final PlatformMonitoringAPI platformMonitoringAPI) {
@@ -91,9 +97,8 @@ public class APITestSPUtil extends APITestUtil {
         return (ProfileAPI) super.getProfileAPI();
     }
 
-    @Override
     public ReportingAPI getReportingAPI() {
-        return (ReportingAPI) super.getReportingAPI();
+        return reportingAPI;
     }
 
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
@@ -200,8 +205,7 @@ public class APITestSPUtil extends APITestUtil {
         return taskCreator;
     }
 
-    public List<String> checkExistenceOfBreakpoints() throws CommandNotFoundException, CommandExecutionException,
-            CommandParameterizationException {
+    public List<String> checkExistenceOfBreakpoints() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
         final List<String> messages = new ArrayList<String>();
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("startIndex", 0);
