@@ -59,7 +59,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.reporting.ReportingService;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -247,8 +246,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private DependencyResolver dependencyResolver;
 
     private DefaultCommandProvider commandProvider;
-
-    private ReportingService reportingService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -849,14 +846,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             commandProvider = beanAccessor.getService(DefaultCommandProvider.class);
         }
         return commandProvider;
-    }
-
-    @Override
-    public ReportingService getReportingService() {
-        if (reportingService == null) {
-            reportingService = beanAccessor.getService(ReportingService.class);
-        }
-        return reportingService;
     }
 
 }

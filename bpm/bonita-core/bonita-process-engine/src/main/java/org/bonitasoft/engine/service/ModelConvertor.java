@@ -189,7 +189,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.reporting.SReport;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -251,8 +250,6 @@ import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
-import org.bonitasoft.engine.reporting.Report;
-import org.bonitasoft.engine.reporting.impl.ReportImpl;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -1917,21 +1914,6 @@ public class ModelConvertor {
             newSProfileMemberBuilder.setUserId(userId);
         }
         return newSProfileMemberBuilder.done();
-    }
-
-    public static Report toReport(final SReport sReport) {
-        final ReportImpl report = new ReportImpl(sReport.getId(), sReport.getName(), sReport.getInstallationDate(), sReport.getInstalledBy());
-        report.setDescription(sReport.getDescription());
-        report.setProvided(sReport.isProvided());
-        return report;
-    }
-
-    public static List<Report> toReports(final List<SReport> sReports) {
-        final List<Report> reports = new ArrayList<Report>(sReports.size());
-        for (final SReport sReport : sReports) {
-            reports.add(toReport(sReport));
-        }
-        return reports;
     }
 
 }

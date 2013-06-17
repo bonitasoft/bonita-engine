@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.reporting.SReportBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
@@ -220,10 +219,6 @@ public class SearchEntitiesDescriptor {
 
     public SearchProfileMemberRoleAndGroupDescriptor getProfileMemberRoleAndGroupDescriptor() {
         return profileMemberRoleAndGroupDescriptor;
-    }
-
-    public SearchReportDescriptor getReportDescriptor(final SReportBuilder reportBuilder) {
-        return new SearchReportDescriptor(reportBuilder);
     }
 
 }
