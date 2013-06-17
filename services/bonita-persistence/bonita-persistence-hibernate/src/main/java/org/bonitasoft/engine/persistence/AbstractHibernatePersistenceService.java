@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -53,6 +49,10 @@ import org.hibernate.StaleStateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.stat.Statistics;
+
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PARENTHESIS;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
 
 /**
  * Hibernate implementation of the persistence service
@@ -313,7 +313,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final String setterName = "set" + StringUtil.firstCharToUpperCase(fieldName);
             ClassReflector.invokeMethodByName(entity, setterName, parameterValue);
         } catch (final Exception e) {
-            throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id, e);
+            throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id + " and fieldName : " + fieldName, e);
         }
     }
 
