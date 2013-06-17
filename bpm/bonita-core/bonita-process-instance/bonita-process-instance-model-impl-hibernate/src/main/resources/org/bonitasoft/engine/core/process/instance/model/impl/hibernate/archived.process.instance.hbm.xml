@@ -17,6 +17,7 @@
 		<property name="description" column="description" />
 		<property name="startDate" column="startDate" />
 		<property name="startedBy" column="startedBy" />
+		<property name="startedByDelegate" column="startedByDelegate" />
 		<property name="endDate" column="endDate" />
 		<property name="archiveDate" column="archiveDate" />
 		<property name="sourceObjectId" column="sourceObjectId" type="long" />

@@ -5,6 +5,7 @@ CREATE TABLE process_instance (
   processDefinitionId NUMERIC(19, 0) NOT NULL,
   startDate NUMERIC(19, 0) NOT NULL,
   startedBy NUMERIC(19, 0) NOT NULL,
+  startedByDelegate NUMERIC(19, 0) NOT NULL,
   endDate NUMERIC(19, 0) NOT NULL,
   lastUpdate NUMERIC(19, 0) NOT NULL,
   containerId NUMERIC(19, 0),

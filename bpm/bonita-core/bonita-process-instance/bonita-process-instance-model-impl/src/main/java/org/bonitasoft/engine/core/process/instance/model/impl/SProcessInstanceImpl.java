@@ -39,6 +39,8 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
 
     private long startedBy;
 
+    private long startedByDelegate;
+
     private long endDate;
 
     private long lastUpdate;
@@ -133,6 +135,15 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
 
     public void setStartedBy(final long startedBy) {
         this.startedBy = startedBy;
+    }
+
+    @Override
+    public long getStartedByDelegate() {
+        return startedByDelegate;
+    }
+
+    public void setStartedByDelegate(final long startedByDelegate) {
+        this.startedByDelegate = startedByDelegate;
     }
 
     @Override
@@ -278,7 +289,8 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
         result = prime * result + (stateCategory == null ? 0 : stateCategory.hashCode());
         result = prime * result + (int) (rootProcessInstanceId ^ rootProcessInstanceId >>> 32);
         result = prime * result + (int) (startDate ^ startDate >>> 32);
-        result = prime * result + (int) (startedBy ^ startDate >>> 32);
+        result = prime * result + (int) (startedBy ^ startedBy >>> 32);
+        result = prime * result + (int) (startedByDelegate ^ startedByDelegate >>> 32);
         result = prime * result + stateId;
         result = prime * result + (stringIndex1 == null ? 0 : stringIndex1.hashCode());
         result = prime * result + (stringIndex2 == null ? 0 : stringIndex2.hashCode());
@@ -327,6 +339,9 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
         if (startedBy != other.startedBy) {
             return false;
         }
+        if (startedByDelegate != other.startedByDelegate) {
+            return false;
+        }
         if (stateId != other.stateId) {
             return false;
         }
@@ -367,4 +382,5 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
         }
         return true;
     }
+
 }

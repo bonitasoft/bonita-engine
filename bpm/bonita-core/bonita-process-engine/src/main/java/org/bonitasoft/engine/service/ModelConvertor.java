@@ -539,6 +539,7 @@ public class ModelConvertor {
             clientProcessInstanceBuilder.setStartDate(sInstance.getStartDate());
         }
         clientProcessInstanceBuilder.setStartedBy(sInstance.getStartedBy());
+        clientProcessInstanceBuilder.setStartedByDelegate(sInstance.getStartedByDelegate());
         if (sInstance.getEndDate() > 0) {
             clientProcessInstanceBuilder.setEndDate(sInstance.getEndDate());
         }
