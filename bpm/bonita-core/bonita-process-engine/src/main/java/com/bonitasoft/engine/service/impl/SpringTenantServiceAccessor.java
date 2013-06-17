@@ -11,6 +11,7 @@ package com.bonitasoft.engine.service.impl;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -23,6 +24,8 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     private ParameterService parameterService;
 
     private BreakpointService breakpointService;
+
+    private ReportingService reportingService;
 
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
 
@@ -62,6 +65,14 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
             bpmInstanceBuilders = getBeanAccessor().getService(BPMInstanceBuilders.class);
         }
         return bpmInstanceBuilders;
+    }
+
+    @Override
+    public ReportingService getReportingService() {
+        if (reportingService == null) {
+            reportingService = getBeanAccessor().getService(ReportingService.class);
+        }
+        return reportingService;
     }
 
 }

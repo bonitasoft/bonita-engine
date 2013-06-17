@@ -21,6 +21,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBui
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.core.reporting.SReportBuilder;
 
 /**
  * @author Emmanuel Duchastenier
@@ -60,6 +61,10 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
     @Override
     public SearchProcessInstanceDescriptorExt getProcessInstanceDescriptor() {
         return processInstanceDescriptorExt;
+    }
+
+    public SearchReportDescriptor getReportDescriptor(final SReportBuilder reportBuilder) {
+        return new SearchReportDescriptor(reportBuilder);
     }
 
 }

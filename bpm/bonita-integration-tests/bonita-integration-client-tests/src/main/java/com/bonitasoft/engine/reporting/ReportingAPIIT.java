@@ -4,8 +4,6 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.reporting.Report;
-import org.bonitasoft.engine.reporting.ReportSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
@@ -15,6 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 
 @SuppressWarnings("javadoc")
 public class ReportingAPIIT extends CommonAPISPTest {

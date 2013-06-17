@@ -23,6 +23,7 @@
 		<module>bonita-process-document-mapping</module>
 		<module>bonita-process-instance</module>
 		<module>bonita-supervisor-mapping</module>
+		<module>bonita-reporting</module>
 		<module>bonita-process-engine</module>
 	</modules>
 

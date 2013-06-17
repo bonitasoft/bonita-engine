@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -11,15 +11,8 @@ package com.bonitasoft.engine.api.impl;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.transaction.reporting.GetReport;
-import org.bonitasoft.engine.api.impl.transaction.reporting.GetReportContent;
-import org.bonitasoft.engine.api.impl.transaction.reporting.SearchReports;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.core.reporting.ReportingService;
-import org.bonitasoft.engine.core.reporting.SReport;
-import org.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
-import org.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -27,21 +20,28 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.reporting.Report;
-import org.bonitasoft.engine.reporting.ReportNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReport;
 import com.bonitasoft.engine.api.impl.transaction.reporting.DeleteReports;
+import com.bonitasoft.engine.api.impl.transaction.reporting.GetReport;
+import com.bonitasoft.engine.api.impl.transaction.reporting.GetReportContent;
+import com.bonitasoft.engine.api.impl.transaction.reporting.SearchReports;
+import com.bonitasoft.engine.core.reporting.ReportingService;
+import com.bonitasoft.engine.core.reporting.SReport;
+import com.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
+import com.bonitasoft.engine.core.reporting.SReportNotFoundException;
+import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportNotFoundException;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
  * @author Matthieu Chaffotte
@@ -57,7 +57,7 @@ public class ReportingAPIExt implements ReportingAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
             transactionExecutor.execute(addReport);
-            return ModelConvertor.toReport(addReport.getResult());
+            return SPModelConvertor.toReport(addReport.getResult());
         } catch (final SReportAlreadyExistsException sraee) {
             throw new AlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
@@ -89,7 +89,7 @@ public class ReportingAPIExt implements ReportingAPI {
         }
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    private static TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -118,7 +118,7 @@ public class ReportingAPIExt implements ReportingAPI {
         try {
             transactionExecutor.execute(getReport);
             final SReport report = getReport.getResult();
-            return ModelConvertor.toReport(report);
+            return SPModelConvertor.toReport(report);
         } catch (final SReportNotFoundException srnfe) {
             throw new ReportNotFoundException(srnfe);
         } catch (final SBonitaException sbe) {
