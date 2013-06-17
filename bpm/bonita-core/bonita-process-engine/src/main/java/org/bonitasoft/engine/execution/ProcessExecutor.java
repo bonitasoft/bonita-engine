@@ -65,7 +65,8 @@ public interface ProcessExecutor extends ContainerExecutor {
             Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SActivityReadException,
             SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
 
-    void executeActivity(long flownNodeInstanceId, Long executedBy) throws SActivityInterruptedException, SActivityReadException, SFlowNodeExecutionException;
+    void executeActivity(long flownNodeInstanceId, long executerId, long executerDelegateId) throws SActivityInterruptedException, SActivityReadException,
+            SFlowNodeExecutionException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
             ConnectorService connectorService) throws SBonitaException;

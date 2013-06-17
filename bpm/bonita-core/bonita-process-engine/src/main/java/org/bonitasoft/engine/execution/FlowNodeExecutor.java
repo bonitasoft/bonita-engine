@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -37,11 +37,11 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  */
 public interface FlowNodeExecutor extends ContainerExecutor {
 
-    FlowNodeState stepForward(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, Long executedBy,
-            Long processInstanceId) throws SFlowNodeExecutionException;
+    FlowNodeState stepForward(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, Long executerId,
+            Long executerDelegateId, Long processInstanceId) throws SFlowNodeExecutionException;
 
-    FlowNodeState gotoNextStableState(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, Long executedBy,
-            Long processInstanceId) throws SActivityInterruptedException, SFlowNodeExecutionException;
+    FlowNodeState gotoNextStableState(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, Long executerId,
+            Long executerDelegateId, Long processInstanceId) throws SActivityInterruptedException, SFlowNodeExecutionException;
 
     void setStateByStateId(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, int stateId) throws SActivityStateExecutionException;
 

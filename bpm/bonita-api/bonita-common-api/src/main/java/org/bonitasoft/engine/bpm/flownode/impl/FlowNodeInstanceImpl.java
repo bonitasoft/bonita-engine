@@ -46,6 +46,8 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
 
     private long executedBy;
 
+    private long executedByDelegate;
+
     private long flownodeDefinitionId;
 
     public FlowNodeInstanceImpl(final String name, final long flownodeDefinitionId) {
@@ -55,11 +57,20 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
     }
 
     @Override
+    public long getParentContainerId() {
+        return parentContainerId;
+    }
+
+    public void setParentContainerId(long parentContainerId) {
+        this.parentContainerId = parentContainerId;
+    }
+
+    @Override
     public String getState() {
         return state;
     }
 
-    public void setState(final String state) {
+    public void setState(String state) {
         this.state = state;
     }
 
@@ -68,17 +79,8 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return stateCategory;
     }
 
-    public void setStateCategory(final StateCategory stateCategory) {
+    public void setStateCategory(StateCategory stateCategory) {
         this.stateCategory = stateCategory;
-    }
-
-    @Override
-    public long getParentContainerId() {
-        return parentContainerId;
-    }
-
-    public void setParentContainerId(final long parentContainerId) {
-        this.parentContainerId = parentContainerId;
     }
 
     @Override
@@ -86,7 +88,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return rootContainerId;
     }
 
-    public void setRootContainerId(final long rootContainerId) {
+    public void setRootContainerId(long rootContainerId) {
         this.rootContainerId = rootContainerId;
     }
 
@@ -95,7 +97,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return processDefinitionId;
     }
 
-    public void setProcessDefinitionId(final long processDefinitionId) {
+    public void setProcessDefinitionId(long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
@@ -104,16 +106,8 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return parentProcessInstanceId;
     }
 
-    public void setParentProcessInstanceId(final long parentProcessInstanceId) {
+    public void setParentProcessInstanceId(long parentProcessInstanceId) {
         this.parentProcessInstanceId = parentProcessInstanceId;
-    }
-
-    public void setDisplayName(final String displayName) {
-        this.displayName = displayName;
-    }
-
-    public void setDisplayDescription(final String displayDescription) {
-        this.displayDescription = displayDescription;
     }
 
     @Override
@@ -121,9 +115,17 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return displayDescription;
     }
 
+    public void setDisplayDescription(String displayDescription) {
+        this.displayDescription = displayDescription;
+    }
+
     @Override
     public String getDisplayName() {
         return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     @Override
@@ -131,7 +133,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return description;
     }
 
-    public void setDescription(final String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -140,8 +142,17 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return executedBy;
     }
 
-    public void setExecutedBy(final long executedBy) {
+    public void setExecutedBy(long executedBy) {
         this.executedBy = executedBy;
+    }
+
+    @Override
+    public long getExecutedByDelegate() {
+        return executedByDelegate;
+    }
+
+    public void setExecutedByDelegate(long executedByDelegate) {
+        this.executedByDelegate = executedByDelegate;
     }
 
     @Override
@@ -149,7 +160,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         return flownodeDefinitionId;
     }
 
-    public void setFlownodeDefinitionId(final long flownodeDefinitionId) {
+    public void setFlownodeDefinitionId(long flownodeDefinitionId) {
         this.flownodeDefinitionId = flownodeDefinitionId;
     }
 
@@ -161,6 +172,7 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
+        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
         result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
         result = prime * result + (int) (parentProcessInstanceId ^ parentProcessInstanceId >>> 32);
         result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
@@ -205,6 +217,9 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
             return false;
         }
         if (executedBy != other.executedBy) {
+            return false;
+        }
+        if (executedByDelegate != other.executedByDelegate) {
             return false;
         }
         if (parentContainerId != other.parentContainerId) {

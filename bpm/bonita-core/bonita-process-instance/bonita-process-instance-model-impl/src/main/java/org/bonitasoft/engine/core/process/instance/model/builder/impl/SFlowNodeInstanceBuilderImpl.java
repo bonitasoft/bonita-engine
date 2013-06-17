@@ -39,32 +39,9 @@ public abstract class SFlowNodeInstanceBuilderImpl extends SFlowElementInstanceB
 
     private static final String EXECUTE_BY_KEY = "executedBy";
 
+    private static final String EXECUTE_BY_DELEGATE_KEY = "executedByDelegate";
+
     private static final String STATE_EXECUTING_KEY = "stateExecuting";
-
-    @Override
-    public String getStateIdKey() {
-        return STATE_ID_KEY;
-    }
-
-    @Override
-    public String getStateNameKey() {
-        return STATE_NAME_KEY;
-    }
-
-    @Override
-    public String getPreviousStateIdKey() {
-        return PREVIOUS_STATE_ID_KEY;
-    }
-
-    @Override
-    public String getLastUpdateDateKey() {
-        return LAST_UPDATE_KEY;
-    }
-
-    @Override
-    public String getReachStateDateKey() {
-        return REACHED_STATE_DATE_KEY;
-    }
 
     protected abstract SFlowNodeInstanceImpl getEntity();
 
@@ -132,6 +109,23 @@ public abstract class SFlowNodeInstanceBuilderImpl extends SFlowElementInstanceB
     }
 
     @Override
+    public SFlowNodeInstanceBuilder setLoopCounter(final int loopCounter) {
+        getEntity().setLoopCounter(loopCounter);
+        return this;
+    }
+
+    @Override
+    public SFlowNodeInstanceBuilder setStateCategory(final SStateCategory stateCategory) {
+        getEntity().setStateCategory(stateCategory);
+        return this;
+    }
+
+    @Override
+    public SFlowNodeType getFlowNodeType() {
+        return getEntity().getType();
+    }
+
+    @Override
     public String getDisplayDescriptionKey() {
         return DISPLAY_DESCRIPTION;
     }
@@ -152,19 +146,32 @@ public abstract class SFlowNodeInstanceBuilderImpl extends SFlowElementInstanceB
     }
 
     @Override
-    public SFlowNodeInstanceBuilder setLoopCounter(final int loopCounter) {
-        getEntity().setLoopCounter(loopCounter);
-        return this;
+    public String getExecutedByDelegate() {
+        return EXECUTE_BY_DELEGATE_KEY;
     }
 
     @Override
-    public SFlowNodeInstanceBuilder setStateCategory(final SStateCategory stateCategory) {
-        getEntity().setStateCategory(stateCategory);
-        return this;
+    public String getStateIdKey() {
+        return STATE_ID_KEY;
     }
 
     @Override
-    public SFlowNodeType getFlowNodeType() {
-        return getEntity().getType();
+    public String getStateNameKey() {
+        return STATE_NAME_KEY;
+    }
+
+    @Override
+    public String getPreviousStateIdKey() {
+        return PREVIOUS_STATE_ID_KEY;
+    }
+
+    @Override
+    public String getLastUpdateDateKey() {
+        return LAST_UPDATE_KEY;
+    }
+
+    @Override
+    public String getReachStateDateKey() {
+        return REACHED_STATE_DATE_KEY;
     }
 }

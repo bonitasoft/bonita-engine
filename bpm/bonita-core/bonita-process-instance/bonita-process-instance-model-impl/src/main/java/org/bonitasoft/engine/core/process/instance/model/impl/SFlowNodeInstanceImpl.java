@@ -51,11 +51,13 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
 
     private long executedBy;
 
+    private long executedByDelegate;
+
     private boolean deleted;
 
     private boolean stateExecuting;
 
-    private long flownodeDefinitionId;
+    private long flowNodeDefinitionId;
 
     public SFlowNodeInstanceImpl() {
         super();
@@ -64,7 +66,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     public SFlowNodeInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {
         super(name, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
-        this.flownodeDefinitionId = flowNodeDefinitionId;
+        this.flowNodeDefinitionId = flowNodeDefinitionId;
     }
 
     @Override
@@ -73,12 +75,35 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     }
 
     @Override
-    public int getTokenCount() {
-        return tokenCount;
+    public SFlowElementsContainerType getContainerType() {
+        return SFlowElementsContainerType.FLOWNODE;
     }
 
-    public void setTokenCount(final int tokenCount) {
-        this.tokenCount = tokenCount;
+    @Override
+    public int getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(int stateId) {
+        this.stateId = stateId;
+    }
+
+    @Override
+    public String getStateName() {
+        return stateName;
+    }
+
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
+    @Override
+    public int getPreviousStateId() {
+        return previousStateId;
+    }
+
+    public void setPreviousStateId(int previousStateId) {
+        this.previousStateId = previousStateId;
     }
 
     @Override
@@ -86,7 +111,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         return reachedStateDate;
     }
 
-    public void setReachedStateDate(final long reachedStateDate) {
+    public void setReachedStateDate(long reachedStateDate) {
         this.reachedStateDate = reachedStateDate;
     }
 
@@ -95,26 +120,8 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(final long lastUpdateDate) {
+    public void setLastUpdateDate(long lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
-    }
-
-    @Override
-    public int getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(final int stateId) {
-        this.stateId = stateId;
-    }
-
-    @Override
-    public int getPreviousStateId() {
-        return previousStateId;
-    }
-
-    public void setPreviousStateId(final int previousStateId) {
-        this.previousStateId = previousStateId;
     }
 
     @Override
@@ -122,7 +129,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         return displayName;
     }
 
-    public void setDisplayName(final String displayName) {
+    public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
@@ -131,22 +138,17 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         return displayDescription;
     }
 
-    public void setDisplayDescription(final String displayDescription) {
+    public void setDisplayDescription(String displayDescription) {
         this.displayDescription = displayDescription;
     }
 
     @Override
-    public SFlowElementsContainerType getContainerType() {
-        return SFlowElementsContainerType.FLOWNODE;
+    public int getTokenCount() {
+        return tokenCount;
     }
 
-    @Override
-    public long getExecutedBy() {
-        return executedBy;
-    }
-
-    public void setExecutedBy(final long executedBy) {
-        this.executedBy = executedBy;
+    public void setTokenCount(int tokenCount) {
+        this.tokenCount = tokenCount;
     }
 
     @Override
@@ -154,17 +156,26 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         return loopCounter;
     }
 
-    public void setLoopCounter(final int loopCounter) {
+    public void setLoopCounter(int loopCounter) {
         this.loopCounter = loopCounter;
     }
 
     @Override
-    public String getStateName() {
-        return stateName;
+    public long getExecutedBy() {
+        return executedBy;
     }
 
-    public void setStateName(final String stateName) {
-        this.stateName = stateName;
+    public void setExecutedBy(long executedBy) {
+        this.executedBy = executedBy;
+    }
+
+    @Override
+    public long getExecutedByDelegate() {
+        return executedByDelegate;
+    }
+
+    public void setExecutedByDelegate(long executedByDelegate) {
+        this.executedByDelegate = executedByDelegate;
     }
 
     @Override
@@ -173,7 +184,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     }
 
     @Override
-    public void setDeleted(final boolean deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 
@@ -182,17 +193,17 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         return stateExecuting;
     }
 
-    public void setStateExecuting(final boolean stateExecuting) {
+    public void setStateExecuting(boolean stateExecuting) {
         this.stateExecuting = stateExecuting;
     }
 
     @Override
     public long getFlowNodeDefinitionId() {
-        return flownodeDefinitionId;
+        return flowNodeDefinitionId;
     }
 
-    public void setFlowNodeDefinitionId(long flownodeDefinitionId) {
-        this.flownodeDefinitionId = flownodeDefinitionId;
+    public void setFlowNodeDefinitionId(long flowNodeDefinitionId) {
+        this.flowNodeDefinitionId = flowNodeDefinitionId;
     }
 
     @Override
@@ -203,6 +214,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
+        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
         result = prime * result + loopCounter;
         result = prime * result + previousStateId;
@@ -211,7 +223,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         result = prime * result + stateId;
         result = prime * result + (stateName == null ? 0 : stateName.hashCode());
         result = prime * result + tokenCount;
-        result = prime * result + (int) (flownodeDefinitionId ^ flownodeDefinitionId >>> 32);
+        result = prime * result + (int) (flowNodeDefinitionId ^ flowNodeDefinitionId >>> 32);
         return result;
     }
 
@@ -247,6 +259,9 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         if (executedBy != other.executedBy) {
             return false;
         }
+        if (executedByDelegate != other.executedByDelegate) {
+            return false;
+        }
         if (lastUpdateDate != other.lastUpdateDate) {
             return false;
         }
@@ -275,7 +290,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         if (tokenCount != other.tokenCount) {
             return false;
         }
-        if (flownodeDefinitionId != other.flownodeDefinitionId) {
+        if (flowNodeDefinitionId != other.flowNodeDefinitionId) {
             return false;
         }
         return true;
@@ -286,7 +301,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         return "SFlowNodeInstanceImpl [stateId=" + stateId + ", stateName=" + stateName + ", previousStateId=" + previousStateId + ", reachedStateDate="
                 + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", displayName=" + displayName + ", displayDescription=" + displayDescription
                 + ", tokenCount=" + tokenCount + ", loopCounter=" + loopCounter + ", executedBy=" + executedBy + ", deleted=" + deleted + ", stateExecuting="
-                + stateExecuting + ", flownodeDefinitionId=" + flownodeDefinitionId + "]";
+                + stateExecuting + ", flownodeDefinitionId=" + flowNodeDefinitionId + "]";
     }
 
 }

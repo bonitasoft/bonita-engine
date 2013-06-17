@@ -858,10 +858,22 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
+        executeFlowNode(getUserIdFromSession(), flownodeInstanceId);
+    }
+
+    @Override
+    public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+
+        final long starterId;
+        if (userId == 0) {
+            starterId = getUserIdFromSession();
+        } else {
+            starterId = userId;
+        }
         try {
-            processExecutor.executeActivity(flownodeInstanceId, getUserIdFromSession());
+            processExecutor.executeActivity(flownodeInstanceId, starterId, getUserIdFromSession());
         } catch (final SFlowNodeExecutionException e) {
             throw new FlowNodeExecutionException(e);
         } catch (final SActivityInterruptedException e) {
@@ -4911,7 +4923,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 flowNodeExecutor.setStateByStateId(processDefinition, activity, stateId);
                 // execute the flow node only if it is not the final state
                 if (!state.isTerminal()) {
-                    processExecutor.executeActivity(activityInstanceId, getUserIdFromSession());
+                    processExecutor.executeActivity(activityInstanceId, getUserIdFromSession(), getUserIdFromSession());
                 }
             } catch (final SBonitaException e) {
                 throw new ActivityExecutionException(e);

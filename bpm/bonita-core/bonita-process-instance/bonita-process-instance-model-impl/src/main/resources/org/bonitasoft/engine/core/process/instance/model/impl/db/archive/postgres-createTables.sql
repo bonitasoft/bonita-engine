@@ -65,6 +65,7 @@ CREATE TABLE arch_flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy INT8,
+  executedByDelegate INT8,
   activityInstanceId INT8,
   aborting BOOLEAN NOT NULL,
   triggeredByEvent BOOLEAN,

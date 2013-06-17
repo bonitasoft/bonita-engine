@@ -129,8 +129,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         try {
-            final long userId = getUserIdFromSession();
-            processExecutor.executeActivity(activityInstanceId, userId);
+            processExecutor.executeActivity(activityInstanceId, getUserIdFromSession(), getUserIdFromSession());
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new BonitaException(e.getMessage());

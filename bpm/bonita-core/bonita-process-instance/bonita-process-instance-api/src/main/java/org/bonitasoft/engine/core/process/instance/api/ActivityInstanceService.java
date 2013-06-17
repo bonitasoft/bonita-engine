@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModif
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SUnhideableTaskException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;

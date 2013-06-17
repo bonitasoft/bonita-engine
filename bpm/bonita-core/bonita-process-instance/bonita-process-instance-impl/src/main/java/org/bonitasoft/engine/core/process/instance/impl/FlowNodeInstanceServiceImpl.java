@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -83,7 +82,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         this.persistenceRead = persistenceRead;
         this.instanceBuilders = instanceBuilders;
         this.logger = logger;
-        this.activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
+        activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
         this.eventService = eventService;
         this.queriableLoggerService = queriableLoggerService;
     }
@@ -97,9 +96,9 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     }
 
     protected SFlowNodeInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SFlowElementInstance flowElementInstance) {
-        final SFlowNodeInstanceLogBuilder logBuilder = this.instanceBuilders.getActivityInstanceLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
+        final SFlowNodeInstanceLogBuilder logBuilder = instanceBuilders.getActivityInstanceLogBuilder();
+        initializeLogBuilder(logBuilder, message);
+        updateLog(actionType, logBuilder);
         logBuilder.processInstanceId(flowElementInstance.getRootContainerId());
         return logBuilder;
     }
@@ -109,16 +108,16 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
         final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(this.activityInstanceKeyProvider.getPreviousStateIdKey(), flowNodeInstance.getStateId());
-        descriptor.addField(this.activityInstanceKeyProvider.getStateIdKey(), state.getId());
-        descriptor.addField(this.activityInstanceKeyProvider.getStateNameKey(), state.getName());
-        descriptor.addField(this.activityInstanceKeyProvider.getStableKey(), state.isStable());
-        descriptor.addField(this.activityInstanceKeyProvider.getTerminalKey(), state.isTerminal());
-        descriptor.addField(this.activityInstanceKeyProvider.getReachStateDateKey(), now);
-        descriptor.addField(this.activityInstanceKeyProvider.getLastUpdateDateKey(), now);
-        descriptor.addField(this.activityInstanceKeyProvider.getStateExecutingKey(), false);
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            this.logger.log(
+        descriptor.addField(activityInstanceKeyProvider.getPreviousStateIdKey(), flowNodeInstance.getStateId());
+        descriptor.addField(activityInstanceKeyProvider.getStateIdKey(), state.getId());
+        descriptor.addField(activityInstanceKeyProvider.getStateNameKey(), state.getName());
+        descriptor.addField(activityInstanceKeyProvider.getStableKey(), state.isStable());
+        descriptor.addField(activityInstanceKeyProvider.getTerminalKey(), state.isTerminal());
+        descriptor.addField(activityInstanceKeyProvider.getReachStateDateKey(), now);
+        descriptor.addField(activityInstanceKeyProvider.getLastUpdateDateKey(), now);
+        descriptor.addField(activityInstanceKeyProvider.getStateExecutingKey(), false);
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(
                     getClass(),
                     TechnicalLogSeverity.DEBUG,
                     MessageFormat.format("[{0} with id {1}] changed state {2}->{3}(new={4})", flowNodeInstance.getClass().getSimpleName(),
@@ -126,10 +125,11 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
-            this.recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setState");
         } catch (final SRecorderException e) {
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
@@ -142,10 +142,10 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
         final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(this.activityInstanceKeyProvider.getStateExecutingKey(), true);
-        descriptor.addField(this.activityInstanceKeyProvider.getLastUpdateDateKey(), now);
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            this.logger.log(
+        descriptor.addField(activityInstanceKeyProvider.getStateExecutingKey(), true);
+        descriptor.addField(activityInstanceKeyProvider.getLastUpdateDateKey(), now);
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(
                     getClass(),
                     TechnicalLogSeverity.DEBUG,
                     MessageFormat.format("[{0} with id {1}] have executing flag set to true", flowNodeInstance.getClass().getSimpleName(),
@@ -153,10 +153,11 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
-            this.recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setState");
         } catch (final SRecorderException e) {
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
@@ -168,7 +169,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public void updateDisplayName(final SFlowNodeInstance flowNodeInstance, final String displayName) throws SFlowNodeModificationException {
         if (displayName != null && !displayName.equals(flowNodeInstance.getDisplayName())) {
             final String event = ACTIVITYINSTANCE_DISPLAY_NAME;
-            final String key = this.activityInstanceKeyProvider.getDisplayNameKey();
+            final String key = activityInstanceKeyProvider.getDisplayNameKey();
             updateOneField(flowNodeInstance, displayName, event, key);
         }
     }
@@ -180,9 +181,9 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         descriptor.addField(lastUpdateKey, displayDescription);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(event).setObject(flowNodeInstance).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(event).setObject(flowNodeInstance).done();
         try {
-            this.recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateOneField");
 
         } catch (final SRecorderException e) {
@@ -196,7 +197,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public void updateDisplayDescription(final SFlowNodeInstance flowNodeInstance, final String displayDescription) throws SFlowNodeModificationException {
         if (displayDescription != null && !displayDescription.equals(flowNodeInstance.getDisplayDescription())) {
             final String event = ACTIVITYINSTANCE_DISPLAY_DESCRIPTION;
-            final String key = this.activityInstanceKeyProvider.getDisplayDescriptionKey();
+            final String key = activityInstanceKeyProvider.getDisplayDescriptionKey();
             updateOneField(flowNodeInstance, displayDescription, event, key);
         }
     }
@@ -205,13 +206,14 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public void setTaskPriority(final SFlowNodeInstance flowNodeInstance, final STaskPriority priority) throws SFlowNodeModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(this.activityInstanceKeyProvider.getPriorityKey(), priority);
+        descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
-            this.recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setTaskPriority");
 
         } catch (final SRecorderException e) {
@@ -225,7 +227,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public List<SFlowNodeInstance> getActiveFlowNodes(final long rootContainerId) throws SFlowNodeReadException {
         try {
             final SelectListDescriptor<SFlowNodeInstance> selectListDescriptor = SelectDescriptorBuilder.getActiveFlowNodes(rootContainerId);
-            return this.persistenceRead.selectList(selectListDescriptor);
+            return persistenceRead.selectList(selectListDescriptor);
         } catch (final SBonitaReadException bre) {
             // TODO log the exception
             throw new SFlowNodeReadException(bre);
@@ -236,7 +238,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public SFlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException {
         SFlowNodeInstance selectOne;
         try {
-            selectOne = this.persistenceRead.selectById(SelectDescriptorBuilder.getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
+            selectOne = persistenceRead.selectById(SelectDescriptorBuilder
+                    .getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
@@ -290,7 +293,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public void setStateCategory(final SFlowElementInstance flowElementInstance, final SStateCategory stateCategory) throws SFlowNodeModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "update stateCategory", flowElementInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(this.activityInstanceKeyProvider.getStateCategoryKey(), stateCategory);
+        descriptor.addField(activityInstanceKeyProvider.getStateCategoryKey(), stateCategory);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowElementInstance, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(STATE_CATEGORY).setObject(flowElementInstance)
@@ -307,21 +310,28 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     }
 
     @Override
-    public void setExecutedBy(final SFlowNodeInstance flowNodeInstance, final long userId) throws SActivityModificationException {
+    public void setExecutedBy(final SFlowNodeInstance flowNodeInstance, final long userId) throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(this.activityInstanceKeyProvider.getExecutedBy(), userId);
-        updateActivity(flowNodeInstance, EXECUTED_BY_MODIFIED, descriptor);
+        descriptor.addField(activityInstanceKeyProvider.getExecutedBy(), userId);
+        updateFlowNode(flowNodeInstance, EXECUTED_BY_MODIFIED, descriptor);
     }
 
     @Override
-    public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final long dueDate) throws SActivityModificationException {
+    public void setExecutedByDelegate(final SFlowNodeInstance flowNodeInstance, final long executerDelegateId) throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(this.activityInstanceKeyProvider.getExpectedEndDateKey(), dueDate);
-        updateActivity(flowNodeInstance, EXPECTED_END_DATE_MODIFIED, descriptor);
+        descriptor.addField(activityInstanceKeyProvider.getExecutedByDelegate(), executerDelegateId);
+        updateFlowNode(flowNodeInstance, EXECUTED_BY_DELEGATE_MODIFIED, descriptor);
     }
 
-    protected void updateActivity(final SFlowNodeInstance flowNodeInstance, final String eventName, final EntityUpdateDescriptor descriptor)
-            throws SActivityModificationException {
+    @Override
+    public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final long dueDate) throws SFlowNodeModificationException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(activityInstanceKeyProvider.getExpectedEndDateKey(), dueDate);
+        updateFlowNode(flowNodeInstance, EXPECTED_END_DATE_MODIFIED, descriptor);
+    }
+
+    protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName, final EntityUpdateDescriptor descriptor)
+            throws SFlowNodeModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, eventName, flowNodeInstance);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(eventName).setObject(flowNodeInstance).done();
@@ -330,7 +340,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateActivity");
         } catch (final SRecorderException sre) {
             initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateActivity");
-            throw new SActivityModificationException(sre);
+            throw new SFlowNodeModificationException(sre);
         }
     }
 
@@ -384,19 +394,19 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     }
 
     protected EventService getEventService() {
-        return this.eventService;
+        return eventService;
     }
 
     protected Recorder getRecorder() {
-        return this.recorder;
+        return recorder;
     }
 
     protected ReadPersistenceService getPersistenceRead() {
-        return this.persistenceRead;
+        return persistenceRead;
     }
 
     protected BPMInstanceBuilders getInstanceBuilders() {
-        return this.instanceBuilders;
+        return instanceBuilders;
     }
 
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
@@ -404,8 +414,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
         final SQueriableLog log = logBuilder.done();
-        if (this.queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            this.queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
+        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
+            queriableLoggerService.log(getClass().getName(), callerMethodName, log);
         }
     }
 

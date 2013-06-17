@@ -78,6 +78,7 @@ CREATE TABLE flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy INT8,
+  executedByDelegate INT8,
   deleted BOOLEAN DEFAULT FALSE,
   state_executing BOOLEAN DEFAULT FALSE,
   abortedByBoundary INT8,

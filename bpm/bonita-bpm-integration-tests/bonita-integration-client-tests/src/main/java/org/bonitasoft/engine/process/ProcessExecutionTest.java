@@ -97,7 +97,9 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // Check that the current getSession() user name is the one used to start the process:
         LOGGER.debug("current getSession() user name used to start the process: " + processInstance.getStartedBy());
-        assertEquals(getSession().getUserId(), processInstance.getStartedBy());
+        final long loggedUserId = getSession().getUserId();
+        assertEquals(loggedUserId, processInstance.getStartedBy());
+        assertEquals(loggedUserId, processInstance.getStartedByDelegate());
 
         // Clean up
         waitForUserTask("step1", processInstance);
@@ -501,25 +503,33 @@ public class ProcessExecutionTest extends CommonAPITest {
         getProcessAPI().updateDueDateOfTask(123456789l, null);
     }
 
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "Flow node", "Task", "Execute", "On behalf" }, jira = "ENGINE-1159")
     @Test
     public void executeTaskOnBehalf() throws Exception {
-        loginWith(USERNAME, PASSWORD);
-        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process", "1.0",
+        final User john = createUser("john", "bpm", william.getId());
+        final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION,
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, william);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, APITestUtil.ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        // execute step 1 using john
+        // Assign step1 to john
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         assertEquals(0, step1.getExecutedBy());
-        assignAndExecuteStep(step1, william.getId());
+        assertEquals(0, step1.getExecutedByDelegate());
+        getProcessAPI().assignUserTask(step1.getId(), john.getId());
+
+        // Execute step1 by delegate (william)
+        loginWith(USERNAME, PASSWORD);
+        getProcessAPI().executeFlowNode(step1.getId(), john.getId());
         waitForUserTask("step2", processInstance);
 
         // check that the step1 was executed by john
         final ArchivedActivityInstance step1Archived = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(william.getId(), step1Archived.getExecutedBy());
+        assertEquals(john.getId(), step1Archived.getExecutedBy());
+        assertEquals(william.getId(), step1Archived.getExecutedByDelegate());
 
         // clean
+        deleteUser(john);
         disableAndDeleteProcess(processDefinition);
     }
 

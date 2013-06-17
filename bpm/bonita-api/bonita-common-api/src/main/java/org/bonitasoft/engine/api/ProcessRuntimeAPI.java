@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
@@ -54,20 +53,15 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * @author Baptiste Mesta
@@ -299,10 +293,12 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ProcessDefinitionNotFoundException;
 
     /**
-     * Start the process on behalf of a given user name
+     * Start an instance of the process definition on behalf of a given user
+     * If userId equals 0, the logged-in user is declared as the starter of the process.
+     * The user, who started the process on behalf of a given user, is declared as a starter delegate.
      * 
      * @param userId
-     *            the user id of the user starting the process
+     *            the identifier of the user for which you want to start the process
      * @param processDefinitionId
      *            Identifier of the processDefinition
      * @return The ProcessInstance Objects
@@ -315,9 +311,11 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process definition on behalf of a given user, and set the initial values of the data with the given operations.
+     * If userId equals 0, the logged-in user is declared as the starter of the process.
+     * The user, who started the process on behalf of a given user, is declared as a starter delegate.
      * 
      * @param userId
-     *            the id of the user to start the process on behalf of
+     *            the identifier of the user for which you want to start the process
      * @param processDefinitionId
      *            Identifier of the process definition will be started
      * @param operations
@@ -341,16 +339,32 @@ public interface ProcessRuntimeAPI {
             throws UserNotFoundException, ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Execute an activity that is is a non stable state
-     * Will make the activity go in the next stable state and then continue the execution of the process
+     * Execute an flowNode that is is a non stable state
+     * Will make the flow node go in the next stable state and then continue the execution of the process
      * 
      * @param flownodeInstanceId
-     *            id of the flow node to execute
+     *            the identifier of the flow node to execute
      * @throws FlowNodeExecutionException
      *             if an execution exception occurs
      * @since 6.0
      */
     void executeFlowNode(long flownodeInstanceId) throws FlowNodeExecutionException;
+
+    /**
+     * Start an flow node that is is a non stable state on behalf of a given user
+     * Will make the flow node go in the next stable state and then continue the execution of the process
+     * If userId equals 0, the logged-in user is declared as the executer of the flow node.
+     * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
+     * 
+     * @param userId
+     *            the identifier of the user for which you want to execute the flow node
+     * @param flownodeInstanceId
+     *            the identifier of the flow node to execute
+     * @throws FlowNodeExecutionException
+     *             if an execution exception occurs
+     * @since 6.0.1
+     */
+    void executeFlowNode(long userId, long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
      * Returns all activities (active and finished) of a process instance.

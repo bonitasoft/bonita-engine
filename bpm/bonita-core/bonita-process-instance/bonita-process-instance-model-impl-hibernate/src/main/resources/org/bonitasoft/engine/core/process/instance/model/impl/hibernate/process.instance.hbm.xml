@@ -95,7 +95,7 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<discriminator column="kind" type="string" />
-		<property name="flownodeDefinitionId" column="flownodeDefinitionId" />
+		<property name="flowNodeDefinitionId" column="flownodeDefinitionId" />
 		<property name="rootContainerId" column="rootContainerId" />
 		<property name="parentContainerId" column="parentContainerId" />
 		<property name="name" column="name" />
@@ -122,6 +122,7 @@
 		<property name="description" column="description" />
 		<property name="loopCounter" column="loop_counter" />
 		<property name="executedBy" column="executedBy" />
+		<property name="executedByDelegate" column="executedByDelegate" />
 		<property name="deleted" column="deleted" />
 		<property name="stateExecuting" column="state_executing" />
 		<filter name="tenantFilter" />

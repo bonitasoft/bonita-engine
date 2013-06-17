@@ -76,6 +76,7 @@ CREATE TABLE flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy BIGINT,
+  executedByDelegate BIGINT,
   activityInstanceId BIGINT,
   state_executing BOOLEAN DEFAULT FALSE,
   abortedByBoundary BIGINT,
