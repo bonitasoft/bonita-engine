@@ -8,76 +8,101 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.List;
 
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCriterion;
+import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.platform.TenantNotFoundException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Yanyan Liu
+ * @author Celine Souchet
  */
 public class TenantTest {
 
-    private static final String DEFAULT_TENANT = "default";
+    private final static String userName = "tenant_name";
 
-    private final String userName = "default_tenant_name";
+    private final static String password = "tenant_password";
 
-    private final String password = "default_tenant_password";
+    private static long tenantId;
 
     private static final Object LOCK = new Object();
 
     private APISession apiSession;
 
-    private static long defaultTenantId;
+    private static PlatformAPI platformAPI;
+
+    private static PlatformLoginAPI platformLoginAPI;
+
+    private static PlatformSession session;
 
     @BeforeClass
-    public static void beforeClass() throws BonitaException, BonitaHomeNotSetException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.initializePlatform();
+    public static void beforeClass() throws BonitaException {
+        platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        logAsPlatformAdmin();
+        try {
+            platformAPI.initializePlatform();
+        } catch (final CreationException e) {
+            // Platform already created
+        }
         platformAPI.startNode();
-        defaultTenantId = platformAPI.createTenant(new TenantCreator(DEFAULT_TENANT, "default", "testIconName", "testIconPath", "default_tenant_name",
-                "default_tenant_password"));
-        platformAPI.activateTenant(defaultTenantId);
-        defaultTenantId = platformAPI.getTenantByName(DEFAULT_TENANT).getId();
-        platformLoginAPI.logout(session);
+        createTenant();
+    }
+
+    private static void createTenant() throws CreationException, AlreadyExistsException, TenantNotFoundException, TenantActivationException {
+        tenantId = platformAPI.createTenant(new TenantCreator("tenant", "tenant", "testIconName", "testIconPath", userName, password));
+        platformAPI.activateTenant(tenantId);
+        tenantId = platformAPI.getTenantByName("tenant").getId();
+    }
+
+    private static void logAsPlatformAdmin() throws PlatformLoginException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        session = platformLoginAPI.login("platformAdmin", "platform");
+        platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
     }
 
     @AfterClass
-    public static void afterClass() throws BonitaException, BonitaHomeNotSetException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.deactiveTenant(defaultTenantId);
-        platformAPI.deleteTenant(defaultTenantId);
+    public static void afterClass() throws BonitaException {
+        deleteTenant();
         platformAPI.stopNode();
         platformAPI.cleanPlatform();
         platformLoginAPI.logout(session);
     }
 
+    private static void deleteTenant() throws TenantNotFoundException, TenantDeactivationException, DeletionException {
+        platformAPI.deactiveTenant(tenantId);
+        platformAPI.deleteTenant(tenantId);
+    }
+
     @Test
-    public void testSingleThreadTenant() throws Exception {
+    public void singleThreadTenant() throws Exception {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        final APISession apiSession = loginAPI.login(defaultTenantId, userName, password);
+        final APISession apiSession = loginAPI.login(tenantId, userName, password);
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
 
         identityAPI.createUser("auser1", "bpm");
@@ -88,7 +113,7 @@ public class TenantTest {
     }
 
     @Test
-    public void testMultiThreadTenant() throws Exception {
+    public void multiThreadTenant() throws Exception {
         final LoginThread login = new LoginThread();
         final Thread loginThread = new Thread(login);
         final GetUserRequestThread getUser = new GetUserRequestThread(login);
@@ -124,7 +149,7 @@ public class TenantTest {
             synchronized (LOCK) {
                 try {
                     loginAPI = TenantAPIAccessor.getLoginAPI();
-                    apiSession = loginAPI.login(defaultTenantId, userName, password);
+                    apiSession = loginAPI.login(tenantId, userName, password);
                 } catch (final Exception e) {
                     failed = true;
                     throw new RuntimeException(e);

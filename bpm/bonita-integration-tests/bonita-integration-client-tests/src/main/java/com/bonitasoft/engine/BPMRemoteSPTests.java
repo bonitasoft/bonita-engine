@@ -18,19 +18,20 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    // SPIdentityTests.class, // slow execution test suite only
-    // SPProcessManagementTest.class, // slow execution test suite only
-    NodeAPITest.class,
-    LogTest.class,
-    ExternalCommandsTestSP.class,
-    MultiInstanceTest.class,
-    ProcessTests.class,
-    ProfileTests.class,
-    RemoteConnectorExecutionTestSP.class,
-    MonitoringAPITest.class,
-    SearchEntitiesTests.class,
-    ReportingAPIIT.class,
-    PlatformMonitoringAPITest.class
+        // SPIdentityTests.class, // slow execution test suite only
+        // SPProcessManagementTest.class, // slow execution test suite only
+        NodeAPITest.class,
+        LogTest.class,
+        ExternalCommandsTestSP.class,
+        MultiInstanceTest.class,
+        ProcessTests.class,
+        ProfileTests.class,
+        RemoteConnectorExecutionTestSP.class,
+        MonitoringAPITest.class,
+        SearchEntitiesTests.class,
+        ReportingAPIIT.class,
+        PlatformMonitoringAPITest.class,
+        TenantTest.class
 })
 public class BPMRemoteSPTests {
 
