@@ -1,7 +1,5 @@
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -12,8 +10,11 @@ import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
+import org.bonitasoft.engine.api.impl.ReportingAPIImpl;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class APIMethodTest {
 
@@ -41,6 +42,11 @@ public class APIMethodTest {
     @Ignore
     public void checkAllMethodsOfProcessAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(ProcessAPIImpl.class);
+    }
+
+    @Test
+    public void checkAllMethodsOfReportAPIContainsSerializableParameters() {
+        checkAllParametersAreSerializable(ReportingAPIImpl.class);
     }
 
     protected void checkAllParametersAreSerializable(final Class<?> api) {

@@ -13,19 +13,12 @@
  **/
 package org.bonitasoft.engine.bpm;
 
+
 /**
- * Every <code>BaseElement</code> object has an identifier that can be accessed through the {@link #getId()} method.
- * 
  * @author Baptiste Mesta
- * @author Emmanuel Duchastenier
  */
 public interface BaseElement extends BonitaObject {
 
-    /**
-     * Gets this unique Object Identifier.
-     * 
-     * @return this unique Object Identifier
-     */
     long getId();
 
 }

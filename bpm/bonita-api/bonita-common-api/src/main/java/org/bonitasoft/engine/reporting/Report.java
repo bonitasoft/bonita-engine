@@ -15,25 +15,17 @@ package org.bonitasoft.engine.reporting;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.BaseElement;
+import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface Report extends BaseElement {
+public interface Report extends BonitaObject {
 
-    /**
-     * Gets the name of this <code>Report</code>
-     * 
-     * @return
-     */
+    long getId();
+
     String getName();
 
-    /**
-     * Is this report provided by default.
-     * 
-     * @return
-     */
     boolean isProvided();
 
     String getDescription();

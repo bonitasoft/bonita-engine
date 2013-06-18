@@ -18,6 +18,7 @@ import org.bonitasoft.engine.process.ProcessTests;
 import org.bonitasoft.engine.process.SupervisorTest;
 import org.bonitasoft.engine.process.task.ManualTasksTest;
 import org.bonitasoft.engine.profile.ProfileTests;
+import org.bonitasoft.engine.reporting.ReportingAPIIT;
 import org.bonitasoft.engine.search.SearchEntitiesTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -43,7 +44,8 @@ import org.junit.runners.Suite.SuiteClasses;
         CallActivityTest.class,
         LoopTest.class,
         MultiInstanceTest.class,
-        TenantAccessorTest.class
+        TenantAccessorTest.class,
+        ReportingAPIIT.class
 })
 public class BPMRemoteTests {
 

@@ -25,6 +25,8 @@ public interface APIAccessor {
 
     CommandAPI getCommandAPI();
 
+    ReportingAPI getReportingAPI();
+
     ProfileAPI getProfileAPI();
 
 }

@@ -20,7 +20,7 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-
+import org.bonitasoft.engine.api.ReportingAPI;
 /**
  * @author Matthieu Chaffotte
  */
@@ -41,6 +41,11 @@ public class APIAccessorImpl implements APIAccessor, Serializable {
     @Override
     public CommandAPI getCommandAPI() {
         return new CommandAPIImpl();
+    }
+
+    @Override
+    public ReportingAPI getReportingAPI() {
+        return new ReportingAPIImpl();
     }
 
     @Override
