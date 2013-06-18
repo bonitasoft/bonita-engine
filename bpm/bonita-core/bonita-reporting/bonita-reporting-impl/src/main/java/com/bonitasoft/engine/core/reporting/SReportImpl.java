@@ -37,6 +37,19 @@ public class SReportImpl implements SReport {
         super();
     }
 
+    public SReportImpl(final SReport report) {
+        this(report.getName(), report.getInstallationDate(), report.getInstalledBy(), report.isProvided(), report.getDescription(), report
+                .getLastModificationDate(), report.getScreenshot());
+    }
+
+    public SReportImpl(final String name, final long installationDate, final long installedBy, final boolean provided, final String description,
+            final long lastModificationDate, final byte[] screenshot) {
+        this(name, installationDate, installedBy, provided);
+        setDescription(description);
+        setLastModificationDate(lastModificationDate);
+        setScreenshot(screenshot);
+    }
+
     public SReportImpl(final String name, final long installationDate, final long installedBy, final boolean provided) {
         super();
         this.name = name;

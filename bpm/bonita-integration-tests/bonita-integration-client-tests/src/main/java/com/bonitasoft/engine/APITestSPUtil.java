@@ -26,6 +26,7 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -45,6 +46,7 @@ import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.reporting.Report;
 
 public class APITestSPUtil extends APITestUtil {
 
@@ -219,6 +221,21 @@ public class APITestSPUtil extends APITestUtil {
                 getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpoint.getId()));
             }
             messages.add(bpBuilder.toString());
+        }
+        return messages;
+    }
+
+    public List<String> checkExistenceOfReports() throws SearchException {
+        final List<String> messages = new ArrayList<String>();
+        final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
+        final SearchResult<Report> reportSR = getReportingAPI().searchReports(build.done());
+        final List<Report> reports = reportSR.getResult();
+        if (reportSR.getCount() > 0) {
+            final StringBuilder messageBuilder = new StringBuilder("Some Reports are still present: ");
+            for (final Report report : reports) {
+                messageBuilder.append(report.getName()).append(", ");
+            }
+            messages.add(messageBuilder.toString());
         }
         return messages;
     }

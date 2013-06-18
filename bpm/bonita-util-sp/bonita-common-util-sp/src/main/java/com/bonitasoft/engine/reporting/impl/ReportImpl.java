@@ -13,6 +13,7 @@
  **/
 package com.bonitasoft.engine.reporting.impl;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import com.bonitasoft.engine.reporting.Report;
@@ -114,6 +115,7 @@ public class ReportImpl implements Report {
         result = prime * result + ((lastModificationDate == null) ? 0 : lastModificationDate.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + (provided ? 1231 : 1237);
+        result = prime * result + Arrays.hashCode(screenshot);
         return result;
     }
 
@@ -151,6 +153,8 @@ public class ReportImpl implements Report {
         } else if (!name.equals(other.name))
             return false;
         if (provided != other.provided)
+            return false;
+        if (!Arrays.equals(screenshot, other.screenshot))
             return false;
         return true;
     }

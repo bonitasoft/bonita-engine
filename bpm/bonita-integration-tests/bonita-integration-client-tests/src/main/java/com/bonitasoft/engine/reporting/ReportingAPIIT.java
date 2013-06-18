@@ -1,5 +1,11 @@
 package com.bonitasoft.engine.reporting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.bonitasoft.engine.exception.BonitaException;
@@ -8,13 +14,10 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.reporting.Report;
-import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 
 @SuppressWarnings("javadoc")
 public class ReportingAPIIT extends CommonAPISPTest {
@@ -36,26 +39,26 @@ public class ReportingAPIIT extends CommonAPISPTest {
     @Test
     public void reportNumberOfUsers() throws BonitaException {
         final String csvUsers = getReportingAPI().selectList("SELECT COUNT(*) as nb FROM user_");
-        Assert.assertTrue(("nb" + lineSeparator + "1" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("nb" + lineSeparator + "1" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
     public void reportUsers() throws BonitaException {
         final String csvUsers = getReportingAPI().selectList("SELECT userName, enabled FROM user_");
-        Assert.assertTrue(("USERNAME,ENABLED" + lineSeparator + "matti,false" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("USERNAME,ENABLED" + lineSeparator + "matti,false" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
     public void reportUsersusingAlias() throws BonitaException {
         final String csvUsers = getReportingAPI().selectList("SELECT userName AS name, enabled FROM user_");
-        Assert.assertTrue(("NAME,ENABLED" + lineSeparator + "matti,false" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("NAME,ENABLED" + lineSeparator + "matti,false" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
-    public void test() throws BonitaException {
+    public void searchReportsWithNoResults() throws BonitaException {
         final SearchOptions options = new SearchOptionsImpl(0, 10);
         final SearchResult<Report> reports = getReportingAPI().searchReports(options);
-        Assert.assertEquals(0, reports.getCount());
+        assertEquals(0, reports.getCount());
     }
 
     @Test
@@ -86,7 +89,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("ORDER BY 14 DESC, 6, 4");
 
         final String csvUsers = getReportingAPI().selectList(builder.toString());
-        Assert.assertTrue(("CS_PROCESS_DEFINITION_ID,CS_NAME,CS_STATE_ID,CS_START_DATE,CS_START,CS_END_DATE,CS_END,CS_ID,CS_SOURCEOBJECTID,APS_PROCESS_ID,APS_NAME,USR_FIRSTNAME,USR_LASTNAME,CS_DURATION" + lineSeparator)
+        assertTrue(("CS_PROCESS_DEFINITION_ID,CS_NAME,CS_STATE_ID,CS_START_DATE,CS_START,CS_END_DATE,CS_END,CS_ID,CS_SOURCEOBJECTID,APS_PROCESS_ID,APS_NAME,USR_FIRSTNAME,USR_LASTNAME,CS_DURATION" + lineSeparator)
                 .equalsIgnoreCase(csvUsers));
     }
 
@@ -134,7 +137,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("AND CS.STARTDATE BETWEEN 1369173600470 AND 1369864799470 ");
 
         final String csvUsers = getReportingAPI().selectList(builder.toString());
-        Assert.assertTrue(("CS_PROCESS_DEFINITION_ID,CS_NAME,CS_STATE_ID,CS_START_DATE,CS_ID,CS_SOURCEOBJECTID,APS_PROCESS_ID,APS_NAME,USR_FIRSTNAME,USR_LASTNAME" + lineSeparator)
+        assertTrue(("CS_PROCESS_DEFINITION_ID,CS_NAME,CS_STATE_ID,CS_START_DATE,CS_ID,CS_SOURCEOBJECTID,APS_PROCESS_ID,APS_NAME,USR_FIRSTNAME,USR_LASTNAME" + lineSeparator)
                 .equalsIgnoreCase(csvUsers));
     }
 
@@ -191,7 +194,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("ORDER BY 2, 1 ");
 
         final String csvUsers = getReportingAPI().selectList(builder.toString());
-        Assert.assertTrue(("CS_STATE_ID,CS_START_DATE,CS_COUNT" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("CS_STATE_ID,CS_START_DATE,CS_COUNT" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
@@ -268,7 +271,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("AND TSK.EXPECTEDENDDATE BETWEEN 1369173600955 AND 1369864799955 ");
 
         final String csvUsers = getReportingAPI().selectList(builder.toString());
-        Assert.assertTrue(("TSK_FLOW_NODE_DEFINITION_ID,TSK_DISPLAY_NAME,TSK_STATE_NAME,TSK_EXPECTED_END_DATE,CS_ID,CS_STATE_NAME,APS_PROCESS_ID,APS_NAME,USR_FIRSTNAME,USR_LASTNAME" + lineSeparator)
+        assertTrue(("TSK_FLOW_NODE_DEFINITION_ID,TSK_DISPLAY_NAME,TSK_STATE_NAME,TSK_EXPECTED_END_DATE,CS_ID,CS_STATE_NAME,APS_PROCESS_ID,APS_NAME,USR_FIRSTNAME,USR_LASTNAME" + lineSeparator)
                 .equalsIgnoreCase(csvUsers));
     }
 
@@ -282,7 +285,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("AND APS.TENANTID = 1");
 
         final String csvUsers = getReportingAPI().selectList(builder.toString());
-        Assert.assertTrue(("APS_PROCESS_ID,APS_NAME" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("APS_PROCESS_ID,APS_NAME" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
@@ -368,16 +371,41 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("ORDER BY 2, 1 ");
 
         final String csvUsers = getReportingAPI().selectList(builder.toString());
-        Assert.assertTrue(("TSK_STATE_NAME,TSK_EXPECTED_END_DATE,TSK_COUNT" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("TSK_STATE_NAME,TSK_EXPECTED_END_DATE,TSK_COUNT" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
     public void addGetAndDeleteReport() throws BonitaException {
         final Report report = getReportingAPI().createReport("report1", null, null);
-        Assert.assertEquals("report1", report.getName());
-        Assert.assertFalse(report.isProvided());
+        assertEquals("report1", report.getName());
+        assertFalse(report.isProvided());
 
         getReportingAPI().deleteReport(report.getId());
+    }
+
+    @Test
+    public void addAndRetrieveReport() throws BonitaException {
+        final Report report = getReportingAPI().createReport("addAndRetrieveReport_test", "a test report", null);
+        final Report retrievedReport = getReportingAPI().getReport(report.getId());
+        assertEquals(report, retrievedReport);
+
+        getReportingAPI().deleteReport(retrievedReport.getId());
+    }
+
+    @Test
+    public void getReportContent() throws BonitaException {
+        final byte[] reportContentBytes = "some dummy report content".getBytes();
+        final Report report = getReportingAPI().createReport("getReportContent_test", "a test report with content", reportContentBytes);
+        final byte[] retrievedReportContent = getReportingAPI().getReportContent(report.getId());
+        assertTrue("Retrieved report content does not match the set content", Arrays.equals(reportContentBytes, retrievedReportContent));
+
+        getReportingAPI().deleteReport(report.getId());
+        try {
+            getReportingAPI().getReportContent(report.getId());
+            fail("Report content should have been deleted along with it.");
+        } catch (ReportNotFoundException e) {
+            // ok.
+        }
     }
 
     @Test
@@ -386,9 +414,9 @@ public class ReportingAPIIT extends CommonAPISPTest {
         final SearchOptionsImpl options = new SearchOptionsImpl(0, 10);
         options.addFilter(ReportSearchDescriptor.NAME, "report1");
         final SearchResult<Report> searchReports = getReportingAPI().searchReports(options);
-        Assert.assertEquals(1, searchReports.getCount());
+        assertEquals(1, searchReports.getCount());
         final Report report2 = searchReports.getResult().get(0);
-        Assert.assertEquals(report, report2);
+        assertEquals(report, report2);
 
         getReportingAPI().deleteReports(Collections.singletonList(report.getId()));
     }

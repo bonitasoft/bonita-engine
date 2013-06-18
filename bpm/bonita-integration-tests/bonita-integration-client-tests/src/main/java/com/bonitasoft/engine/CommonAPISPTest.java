@@ -99,6 +99,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             messages.addAll(checkExistenceOfFlowNodes());
             messages.addAll(checkExistenceOfCategories());
             messages.addAll(checkExistenceOfBreakpoints());
+            messages.addAll(checkExistenceOfReports());
             logout();
         }
         return messages;

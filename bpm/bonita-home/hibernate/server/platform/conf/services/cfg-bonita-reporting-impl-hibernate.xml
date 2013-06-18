@@ -11,6 +11,7 @@
 		<property name="classAliasMappings">
 			<map>
 				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="report" />
+				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="reportcontent" />
 			</map>
 		</property>
 	</bean>

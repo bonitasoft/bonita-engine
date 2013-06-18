@@ -140,6 +140,8 @@
         <entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
         <entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
         <entry key="com.bonitasoft.engine.core.reporting.SReport" value="com.bonitasoft.engine.core.reporting.SReportImpl" />
+        <entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="com.bonitasoft.engine.core.reporting.SReportContentImpl" />
+        <entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContent" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
 
         <entry key="org.bonitasoft.engine.core.category.model.SCategory" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
         <entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />

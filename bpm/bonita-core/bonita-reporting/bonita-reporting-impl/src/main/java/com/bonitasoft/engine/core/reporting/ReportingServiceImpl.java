@@ -121,10 +121,13 @@ public class ReportingServiceImpl implements ReportingService {
         final String message = "Adding a new report with name " + report.getName();
         final SReportLogBuilder logBuilder = getReportLog(ActionType.CREATED, message);
         try {
-            final InsertRecord insertRecord = new InsertRecord(report);
-            final SInsertEvent insertEvent = getInsertEvent(report, REPORT);
-            recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_OK, logBuilder, "addReport");
+            SSaveReportWithContent reportContent = new SSaveReportWithContentImpl(report, content);
+            final InsertRecord insertContentRecord = new InsertRecord(reportContent);
+            final SInsertEvent insertContentEvent = getInsertEvent(insertContentRecord, REPORT);
+            recorder.recordInsert(insertContentRecord, insertContentEvent);
+            report.setId(reportContent.getId());
+
+            initiateLogBuilder(reportContent.getId(), SQueriableLog.STATUS_OK, logBuilder, "addReport");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addReport"));
             }
@@ -274,6 +277,10 @@ public class ReportingServiceImpl implements ReportingService {
     @Override
     public SReportBuilder getReportBuilder() {
         return new SReportBuilderImpl();
+    }
+
+    protected SReportContentBuilder getReportContentBuilder() {
+        return new SReportContentBuilderImpl();
     }
 
     @Override

@@ -43,7 +43,7 @@ public class SReportLogBuilderImpl extends CRUDELogBuilder implements SReportLog
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(REPORT_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: report identifier");
+            throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: report identifier");
         }
     }
 

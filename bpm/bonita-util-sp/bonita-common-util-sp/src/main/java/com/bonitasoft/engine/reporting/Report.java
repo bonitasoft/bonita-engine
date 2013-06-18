@@ -43,6 +43,11 @@ public interface Report extends BaseElement {
      */
     String getDescription();
 
+    /**
+     * Get the date when this report was initially installed into the Engine.
+     * 
+     * @return the date when this report was initially installed into the Engine.
+     */
     Date getInstallationDate();
 
     /**
@@ -52,6 +57,11 @@ public interface Report extends BaseElement {
      */
     long getInstalledBy();
 
+    /**
+     * Get the date when this report was last modified.
+     * 
+     * @return the date when this report was last modified.
+     */
     Date getLastModificationDate();
 
     /**
