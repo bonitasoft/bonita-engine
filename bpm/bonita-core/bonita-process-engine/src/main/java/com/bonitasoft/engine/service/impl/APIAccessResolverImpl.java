@@ -21,10 +21,12 @@ import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.ReportingAPI;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformLoginAPIImpl;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
+import org.bonitasoft.engine.api.impl.ReportingAPIImpl;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 
@@ -70,6 +72,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(CommandAPI.class.getName(), new CommandAPIExt());
         apis.put(PlatformCommandAPI.class.getName(), new PlatformCommandAPIImpl());
         apis.put(NodeAPI.class.getName(), new NodeAPIImpl());
+        apis.put(ReportingAPI.class.getName(), new ReportingAPIImpl());
         apis.put(com.bonitasoft.engine.api.ReportingAPI.class.getName(), new ReportingAPIExt());
         apis.put(ProfileAPI.class.getName(), new ProfileAPIImpl());
         apis.put(com.bonitasoft.engine.api.ProfileAPI.class.getName(), new ProfileAPIExt());
