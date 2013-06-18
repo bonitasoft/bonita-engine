@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.reporting.ReportingService;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -225,5 +226,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DependencyResolver getDependencyResolver();
 
     DefaultCommandProvider getDefaultCommandProvider();
+
+    ReportingService getReportingService();
 
 }
