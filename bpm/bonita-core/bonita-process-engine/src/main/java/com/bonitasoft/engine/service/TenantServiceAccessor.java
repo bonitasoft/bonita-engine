@@ -11,7 +11,6 @@ package com.bonitasoft.engine.service;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 
@@ -23,8 +22,6 @@ public interface TenantServiceAccessor extends org.bonitasoft.engine.service.Ten
     ParameterService getParameterService();
 
     BreakpointService getBreakpointService();
-
-    ReportingService getReportingService();
 
     @Override
     SearchEntitiesDescriptor getSearchEntitiesDescriptor();

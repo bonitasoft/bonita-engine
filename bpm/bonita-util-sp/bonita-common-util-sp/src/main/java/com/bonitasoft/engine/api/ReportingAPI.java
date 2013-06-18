@@ -15,19 +15,14 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.reporting.Report;
+import org.bonitasoft.engine.reporting.ReportNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
-import com.bonitasoft.engine.reporting.Report;
-import com.bonitasoft.engine.reporting.ReportNotFoundException;
-
 /**
- * This API gives access to all reporting features.
- * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
- * @author Emmanuel Duchastenier
- * @see Report
  */
 public interface ReportingAPI {
 

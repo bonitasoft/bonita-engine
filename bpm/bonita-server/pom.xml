@@ -537,12 +537,12 @@
 
 		<!-- Reporting -->
 		<dependency>
-			<groupId>com.bonitasoft.engine.core.reporting</groupId>
+			<groupId>org.bonitasoft.engine.core.reporting</groupId>
 			<artifactId>bonita-reporting-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.bonitasoft.engine.core.reporting</groupId>
+			<groupId>org.bonitasoft.engine.core.reporting</groupId>
 			<artifactId>bonita-reporting-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -898,9 +898,9 @@
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<!-- Reporting -->
-									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
-									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
-									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>

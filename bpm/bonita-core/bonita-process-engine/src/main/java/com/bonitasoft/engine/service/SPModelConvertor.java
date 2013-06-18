@@ -39,7 +39,6 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
-import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.log.impl.LogImpl;
@@ -51,8 +50,6 @@ import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
 import com.bonitasoft.engine.platform.impl.TenantImpl;
-import com.bonitasoft.engine.reporting.Report;
-import com.bonitasoft.engine.reporting.impl.ReportImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -237,22 +234,4 @@ public final class SPModelConvertor extends ModelConvertor {
         }
         return clientUserbuilder.done();
     }
-
-    public static Report toReport(final SReport sReport) {
-        final ReportImpl report = new ReportImpl(sReport.getId(), sReport.getName(), sReport.getInstallationDate(), sReport.getInstalledBy());
-        report.setDescription(sReport.getDescription());
-        report.setProvided(sReport.isProvided());
-        report.setLastModificationDate(new Date(sReport.getLastModificationDate()));
-        report.setScreenshot(sReport.getScreenshot());
-        return report;
-    }
-
-    public static List<Report> toReports(final List<SReport> sReports) {
-        final List<Report> reports = new ArrayList<Report>(sReports.size());
-        for (final SReport sReport : sReports) {
-            reports.add(toReport(sReport));
-        }
-        return reports;
-    }
-
 }
