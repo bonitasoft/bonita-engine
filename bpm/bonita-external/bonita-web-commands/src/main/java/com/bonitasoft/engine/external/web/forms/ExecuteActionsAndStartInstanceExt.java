@@ -101,7 +101,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
 
-                return startProcess(sProcessDefinitionID, userId, operations, operationsInputValues, connectorsWithInput).getId();
+                return startProcess(userId, sProcessDefinitionID, operations, operationsInputValues, connectorsWithInput).getId();
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
@@ -116,9 +116,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         }
     }
 
-    private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
-            final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws ProcessDefinitionNotFoundException,
-            CreationException,
+    private ProcessInstance startProcess(long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Object> context,
+            final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws ProcessDefinitionNotFoundException, CreationException,
             RetrieveException, ProcessDefinitionNotEnabledException, OperationExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -126,11 +125,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-        final long starterId;
         if (userId == 0) {
-            starterId = getUserIdFromSession();
-        } else {
-            starterId = userId;
+            userId = getUserIdFromSession();
         }
         // Retrieval of the process definition:
         SProcessDefinition sDefinition;
@@ -150,7 +146,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessInstance startedInstance;
         try {
             final List<SOperation> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
-            startedInstance = processExecutor.start(sDefinition, starterId, getUserIdFromSession(), sOperations, context, connectorsWithInput);
+            startedInstance = processExecutor.start(userId, sDefinition, sOperations, context, connectorsWithInput);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e);
