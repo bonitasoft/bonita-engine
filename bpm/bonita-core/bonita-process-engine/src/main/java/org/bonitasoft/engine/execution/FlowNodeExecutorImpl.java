@@ -192,7 +192,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState stepForward(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Long executerId, final Long executerDelegateId, Long processInstanceId) throws SFlowNodeExecutionException {
+            final Long executedBy, Long processInstanceId) throws SFlowNodeExecutionException {
         boolean sharedLockCreated = false;
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         boolean txOpened = false;
@@ -232,11 +232,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 sharedLockCreated = true;
                 if (!fFlowNodeInstance.isStateExecuting()) {
                     archiveFlowNodeInstance(fFlowNodeInstance, false, processDefinition);
-                    if (executerId != null && executerId > 0 && fFlowNodeInstance.getExecutedBy() != executerId) {
-                        activityInstanceService.setExecutedBy(fFlowNodeInstance, executerId);
-                    }
-                    if (executerDelegateId != null && executerDelegateId > 0 && fFlowNodeInstance.getExecutedByDelegate() != executerDelegateId) {
-                        activityInstanceService.setExecutedByDelegate(fFlowNodeInstance, executerDelegateId);
+                    if (executedBy != null && executedBy > 0 && fFlowNodeInstance.getExecutedBy() != executedBy) {
+                        activityInstanceService.setExecutedBy(fFlowNodeInstance, executedBy);
                     }
                     if (operations != null) {
                         for (final SOperation operation : operations) {
@@ -359,12 +356,12 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState gotoNextStableState(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Long executerId, Long executerDelegateId, final Long processInstanceId) throws SFlowNodeExecutionException, SActivityInterruptedException {
-        FlowNodeState state = stepForward(flowNodeInstanceId, expressionContext, operations, executerId, executerDelegateId, processInstanceId);
+            final Long executedBy, final Long processInstanceId) throws SFlowNodeExecutionException, SActivityInterruptedException {
+        FlowNodeState state = stepForward(flowNodeInstanceId, expressionContext, operations, executedBy, processInstanceId);
         if (state != null) {// state did not change
             handleInterruption(state);
             while (state != null && !state.isStable()) {
-                state = stepForward(flowNodeInstanceId, null, null, null, null, processInstanceId);
+                state = stepForward(flowNodeInstanceId, null, null, null, processInstanceId);
                 handleInterruption(state);
             }
         }
@@ -441,7 +438,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 lockService.releaseExclusiveLockAccess(parentId, FLOWNODE_COMPLETION_LOCK);
             }
             if (hit) {// we continue parent if hit of the parent return true
-                gotoNextStableState(parentId, null, null, null, null,
+                gotoNextStableState(parentId, null, null, null,
                         child.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder().getProcessDefinitionIndex()));
             }
         }
@@ -487,7 +484,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     @Override
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
             final Long processInstanceId) throws SFlowNodeExecutionException, SActivityInterruptedException, SActivityReadException {
-        gotoNextStableState(flowNodeInstanceId, null, null, null, null, processInstanceId);
+        gotoNextStableState(flowNodeInstanceId, null, null, null, processInstanceId);
     }
 
     @Override

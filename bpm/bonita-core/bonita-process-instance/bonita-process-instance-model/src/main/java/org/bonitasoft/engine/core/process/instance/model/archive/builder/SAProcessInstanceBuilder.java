@@ -50,8 +50,6 @@ public interface SAProcessInstanceBuilder {
 
     String getStartedByKey();
 
-    String getStartedByDelegateKey();
-
     String getStateIdKey();
 
     String getNameKey();

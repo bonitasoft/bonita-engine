@@ -85,7 +85,7 @@ public class InstantiateProcessWork extends BonitaWork {
                     lockService, logger);
             interruptor.interruptProcessInstance(idOfTheProcessToInterrupt, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        processExecutor.start(processDefinition, 0, 0, getExpressionContext(), operations.getOperations(), null, null, callerId, subProcessId);
+        processExecutor.start(0, processDefinition, getExpressionContext(), operations.getOperations(), null, null, callerId, subProcessId);
     }
 
     private SExpressionContext getExpressionContext() {

@@ -21,7 +21,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
 public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInstance {
 
@@ -32,8 +31,6 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
     private Date startDate;
 
     private long startedBy;
-
-    private long startedByDelegate;
 
     private Date endDate;
 
@@ -85,26 +82,9 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
         return startDate;
     }
 
-    public void setStartDate(final Date startDate) {
-        this.startDate = startDate;
-    }
-
     @Override
     public long getStartedBy() {
         return startedBy;
-    }
-
-    public void setStartedBy(final long startedBy) {
-        this.startedBy = startedBy;
-    }
-
-    @Override
-    public long getStartedByDelegate() {
-        return startedByDelegate;
-    }
-
-    public void setStartedByDelegate(final long startedByDelegate) {
-        this.startedByDelegate = startedByDelegate;
     }
 
     @Override
@@ -112,17 +92,25 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
         return endDate;
     }
 
+    public void setStartDate(final Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setStartedBy(final long startedBy) {
+        this.startedBy = startedBy;
+    }
+
     public void setEndDate(final Date endDate) {
         this.endDate = endDate;
+    }
+
+    public void setLastUpdate(final Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
     @Override
     public Date getLastUpdate() {
         return lastUpdate;
-    }
-
-    public void setLastUpdate(final Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
     }
 
     @Override
@@ -204,46 +192,6 @@ public class ProcessInstanceImpl extends NamedElementImpl implements ProcessInst
 
     public void setStringIndex5(final String stringIndex5) {
         this.stringIndex5 = stringIndex5;
-    }
-
-    public String getStringIndexLabel1() {
-        return stringIndexLabel1;
-    }
-
-    public void setStringIndexLabel1(final String stringIndexLabel1) {
-        this.stringIndexLabel1 = stringIndexLabel1;
-    }
-
-    public String getStringIndexLabel2() {
-        return stringIndexLabel2;
-    }
-
-    public void setStringIndexLabel2(final String stringIndexLabel2) {
-        this.stringIndexLabel2 = stringIndexLabel2;
-    }
-
-    public String getStringIndexLabel3() {
-        return stringIndexLabel3;
-    }
-
-    public void setStringIndexLabel3(final String stringIndexLabel3) {
-        this.stringIndexLabel3 = stringIndexLabel3;
-    }
-
-    public String getStringIndexLabel4() {
-        return stringIndexLabel4;
-    }
-
-    public void setStringIndexLabel4(final String stringIndexLabel4) {
-        this.stringIndexLabel4 = stringIndexLabel4;
-    }
-
-    public String getStringIndexLabel5() {
-        return stringIndexLabel5;
-    }
-
-    public void setStringIndexLabel5(final String stringIndexLabel5) {
-        this.stringIndexLabel5 = stringIndexLabel5;
     }
 
     public void setStringIndexLabel(final int index, final String label) {

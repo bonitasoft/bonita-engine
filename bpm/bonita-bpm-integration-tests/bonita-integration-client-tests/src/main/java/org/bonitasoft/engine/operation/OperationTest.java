@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.operation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,6 +27,11 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForStep;
@@ -34,9 +42,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -506,27 +511,4 @@ public class OperationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "custom type", "java operation", "classloader" }, jira = "ENGINE-ENGINE-1503", story = "update a custom variable using a java operation with a object")
-    @Test
-    public void executeSetDataOperationWithCustomTypeAndObject() throws Exception {
-        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        builder.addClasspathResource(getResource("/custom-0.1.jar.bak", "custom-0.1.jar"));
-
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("ProcessWithCustomData", "1.0");
-        designProcessDefinition.addData("adress", "org.bonitasoft.custom.Address", new ExpressionBuilder().createGroovyScriptExpression("create adress",
-                "new org.bonitasoft.custom.Address(\"name1\",\"Rue ampère\",\"38000\",\"Grenoble\",\"France\")", "org.bonitasoft.custom.Address"));
-        designProcessDefinition
-                .addActor("Workers")
-                .addUserTask("step1", "Workers")
-                .addOperation(new OperationBuilder().createSetDataOperation("adress", new ExpressionBuilder().createGroovyScriptExpression("modify adress",
-                        " new org.bonitasoft.custom.Address(\"plop\",\"Rue ampère\",\"38100\",\"Grenoble\",\"France\")",
-                        "java.lang.Object")));
-        designProcessDefinition.addAutomaticTask("start").addUserTask("step2", "Workers").addTransition("start", "step1").addTransition("step1", "step2");
-        builder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), "Workers", john);
-        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, john.getId());
-        waitForUserTask("step2", startProcess);
-        disableAndDeleteProcess(processDefinition);
-    }
 }

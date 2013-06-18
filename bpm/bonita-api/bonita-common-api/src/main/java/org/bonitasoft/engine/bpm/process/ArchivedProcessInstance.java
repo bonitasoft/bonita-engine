@@ -23,7 +23,6 @@ import org.bonitasoft.engine.bpm.NamedElement;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
 public interface ArchivedProcessInstance extends NamedElement, BaseElement, ArchivedElement {
 
@@ -31,17 +30,7 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
 
     Date getStartDate();
 
-    /**
-     * @return id of the user who originally started the process
-     * @since 6.0.1
-     */
     long getStartedBy();
-
-    /**
-     * @return id of the user (delegate) who started the process for the original starter
-     * @since 6.0.1
-     */
-    long getStartedByDelegate();
 
     Date getEndDate();
 

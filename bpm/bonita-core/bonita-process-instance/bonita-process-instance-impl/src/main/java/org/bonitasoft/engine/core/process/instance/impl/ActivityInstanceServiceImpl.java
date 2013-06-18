@@ -708,22 +708,14 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void setLoopMax(final SLoopActivityInstance loopActivity, final Integer loopMap) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("loopMax", loopMap);
-        try {
-            updateFlowNode(loopActivity, LOOPINSTANCE_LOOPMAX_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
-            throw new SActivityModificationException(e);
-        }
+        updateActivity(loopActivity, LOOPINSTANCE_LOOPMAX_MODIFIED, descriptor);
     }
 
     @Override
     public void setLoopCardinality(final SFlowNodeInstance flowNodeInstance, final int intLoopCardinality) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getLoopCardinalityKey(), intLoopCardinality);
-        try {
-            updateFlowNode(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
-            throw new SActivityModificationException(e);
-        }
+        updateActivity(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
     }
 
     @Override
@@ -731,11 +723,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
-        try {
-            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
-            throw new SActivityModificationException(e);
-        }
+        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
     }
 
     @Override
@@ -745,11 +733,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfTerminatedInstancesKey(), flowNodeInstance.getNumberOfTerminatedInstances()
                 + number);
-        try {
-            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
-            throw new SActivityModificationException(e);
-        }
+        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
     }
 
     @Override
@@ -759,11 +743,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
                 + number);
-        try {
-            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
-            throw new SActivityModificationException(e);
-        }
+        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
     }
 
     @Override

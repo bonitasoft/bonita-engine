@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -45,8 +45,6 @@ public class SProcessInstanceBuilderImpl implements SProcessInstanceBuilder {
     private static final String END_DATE_KEY = "endDate";
 
     private static final String STARTED_BY_KEY = "startedBy";
-
-    private static final String STARTED_BY_DELEGATE_KEY = "startedByDelegate";
 
     private static final String START_DATE_KEY = "startDate";
 
@@ -94,12 +92,6 @@ public class SProcessInstanceBuilderImpl implements SProcessInstanceBuilder {
     @Override
     public SProcessInstanceBuilder setStartedBy(final long startedBy) {
         entity.setStartedBy(startedBy);
-        return this;
-    }
-
-    @Override
-    public SProcessInstanceBuilder setStartedByDelegate(long startedByDelegate) {
-        entity.setStartedByDelegate(startedByDelegate);
         return this;
     }
 
@@ -161,11 +153,6 @@ public class SProcessInstanceBuilderImpl implements SProcessInstanceBuilder {
     @Override
     public String getStartedByKey() {
         return STARTED_BY_KEY;
-    }
-
-    @Override
-    public String getStartedByDelegateKey() {
-        return STARTED_BY_DELEGATE_KEY;
     }
 
     @Override

@@ -317,7 +317,6 @@ public class ModelConvertor {
         flowNode.setDisplayDescription(sflowNode.getDisplayDescription());
         flowNode.setDescription(sflowNode.getDescription());
         flowNode.setExecutedBy(sflowNode.getExecutedBy());
-        flowNode.setExecutedByDelegate(sflowNode.getExecutedByDelegate());
         flowNode.setStateCategory(StateCategory.valueOf(sflowNode.getStateCategory().name()));
     }
 
@@ -543,7 +542,6 @@ public class ModelConvertor {
             clientProcessInstanceBuilder.setStartDate(sInstance.getStartDate());
         }
         clientProcessInstanceBuilder.setStartedBy(sInstance.getStartedBy());
-        clientProcessInstanceBuilder.setStartedByDelegate(sInstance.getStartedByDelegate());
         if (sInstance.getEndDate() > 0) {
             clientProcessInstanceBuilder.setEndDate(sInstance.getEndDate());
         }
@@ -664,8 +662,7 @@ public class ModelConvertor {
             aFlowNode.setArchiveDate(new Date(saFlowNode.getArchiveDate()));
         }
         aFlowNode.setExecutedBy(saFlowNode.getExecutedBy());
-        aFlowNode.setExecutedByDelegate(saFlowNode.getExecutedByDelegate());
-        aFlowNode.setFlownodeDefinitionId(saFlowNode.getFlowNodeDefinitionId());
+        aFlowNode.setFlownodeDefinitionId(saFlowNode.getFlownodeDefinitionId());
         aFlowNode.setTerminal(saFlowNode.isTerminal());
     }
 
@@ -753,7 +750,7 @@ public class ModelConvertor {
     private static ArchivedMultiInstanceActivityInstanceImpl toArchivedMultiInstanceActivityInstance(final SAMultiInstanceActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedMultiInstanceActivityInstanceImpl archivedMultiInstanceActivityInstanceImpl = new ArchivedMultiInstanceActivityInstanceImpl(
-                sInstance.getName(), sInstance.getFlowNodeDefinitionId(), sInstance.isSequential(), sInstance.getLoopDataInputRef(),
+                sInstance.getName(), sInstance.getFlownodeDefinitionId(), sInstance.isSequential(), sInstance.getLoopDataInputRef(),
                 sInstance.getLoopDataOutputRef(), sInstance.getDataInputItemRef(), sInstance.getDataOutputItemRef(), sInstance.getNumberOfActiveInstances(),
                 sInstance.getNumberOfCompletedInstances(), sInstance.getNumberOfTerminatedInstances(), sInstance.getLoopCardinality());
         updateArchivedActivityInstance(archivedMultiInstanceActivityInstanceImpl, flowNodeStateManager, sInstance);

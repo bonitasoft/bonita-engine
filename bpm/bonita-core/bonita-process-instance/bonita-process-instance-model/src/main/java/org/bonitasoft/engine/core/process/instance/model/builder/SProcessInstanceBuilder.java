@@ -36,8 +36,6 @@ public interface SProcessInstanceBuilder {
 
     SProcessInstanceBuilder setStartedBy(long startedBy);
 
-    SProcessInstanceBuilder setStartedByDelegate(long startedByDelegate);
-
     @Deprecated
     SProcessInstanceBuilder setContainerId(long id);
 
@@ -62,8 +60,6 @@ public interface SProcessInstanceBuilder {
     String getStartDateKey();
 
     String getStartedByKey();
-
-    String getStartedByDelegateKey();
 
     String getEndDateKey();
 

@@ -858,22 +858,10 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-        executeFlowNode(getUserIdFromSession(), flownodeInstanceId);
-    }
-
-    @Override
-    public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-
-        final long starterId;
-        if (userId == 0) {
-            starterId = getUserIdFromSession();
-        } else {
-            starterId = userId;
-        }
         try {
-            processExecutor.executeActivity(flownodeInstanceId, starterId, getUserIdFromSession());
+            processExecutor.executeActivity(flownodeInstanceId, getUserIdFromSession());
         } catch (final SFlowNodeExecutionException e) {
             throw new FlowNodeExecutionException(e);
         } catch (final SActivityInterruptedException e) {
@@ -3226,8 +3214,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessInstance startProcess(final long userId, final long processDefinitionId, final List<Operation> operations,
-            final Map<String, Serializable> context)
+    public ProcessInstance startProcess(long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context)
             throws ProcessDefinitionNotFoundException, UserNotFoundException, ProcessActivationException, ProcessExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -3235,11 +3222,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-        final long starterId;
         if (userId == 0) {
-            starterId = getUserIdFromSession();
-        } else {
-            starterId = userId;
+            userId = getUserIdFromSession();
         }
         // Retrieval of the process definition:
         SProcessDefinition sDefinition;
@@ -3271,7 +3255,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            startedInstance = processExecutor.start(sDefinition, starterId, getUserIdFromSession(), sOperations, operationContext);
+            startedInstance = processExecutor.start(userId, sDefinition, sOperations, operationContext);
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }// FIXME in case process instance creation exception -> put it in failed
@@ -4923,7 +4907,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 flowNodeExecutor.setStateByStateId(processDefinition, activity, stateId);
                 // execute the flow node only if it is not the final state
                 if (!state.isTerminal()) {
-                    processExecutor.executeActivity(activityInstanceId, getUserIdFromSession(), getUserIdFromSession());
+                    processExecutor.executeActivity(activityInstanceId, getUserIdFromSession());
                 }
             } catch (final SBonitaException e) {
                 throw new ActivityExecutionException(e);

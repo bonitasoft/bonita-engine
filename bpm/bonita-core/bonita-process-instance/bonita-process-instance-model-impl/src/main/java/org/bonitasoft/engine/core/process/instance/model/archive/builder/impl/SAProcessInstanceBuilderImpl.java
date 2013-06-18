@@ -44,8 +44,6 @@ public class SAProcessInstanceBuilderImpl implements SAProcessInstanceBuilder {
 
     private final String STARTED_BY_KEY = "startedBy";
 
-    private final String STARTED_BY_DELEGATE_KEY = "startedByDelegate";
-
     private final String START_DATE_KEY = "startDate";
 
     private final String LAST_UPDATE_KEY = "lastUpdate";
@@ -101,11 +99,6 @@ public class SAProcessInstanceBuilderImpl implements SAProcessInstanceBuilder {
     @Override
     public String getStartedByKey() {
         return STARTED_BY_KEY;
-    }
-
-    @Override
-    public String getStartedByDelegateKey() {
-        return STARTED_BY_DELEGATE_KEY;
     }
 
     @Override

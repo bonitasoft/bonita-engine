@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceImpl;
 
 /**
  * @author Emmanuel Duchastenier
@@ -48,11 +49,6 @@ public class ProcessInstanceBuilder {
 
     public ProcessInstanceBuilder setStartedBy(final long startedBy) {
         processInstance.setStartedBy(startedBy);
-        return this;
-    }
-
-    public ProcessInstanceBuilder setStartedByDelegate(final long startedByDelegate) {
-        processInstance.setStartedByDelegate(startedByDelegate);
         return this;
     }
 
