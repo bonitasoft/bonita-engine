@@ -26,16 +26,8 @@ public class BonitaSchedulerFactory extends StdSchedulerFactory {
 
     private SchedulerImpl schedulerService;
 
-    public BonitaSchedulerFactory() {
-        super();
-    }
-
     public BonitaSchedulerFactory(final Properties props) throws SchedulerException {
         super(props);
-    }
-
-    public BonitaSchedulerFactory(final String fileName) throws SchedulerException {
-        super(fileName);
     }
 
     @Override
