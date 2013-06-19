@@ -1,50 +1,44 @@
-CREATE TABLE queriableLog (
-  tenantid NUMERIC(19,0) NOT NULL,
-  id NUMERIC(19,0) NOT NULL,
-  timeStamp NUMERIC(19,0) NOT NULL,
+CREATE TABLE queriable_log (
+  tenantid NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  timeStamp NUMERIC(19, 0) NOT NULL,
   year SMALLINT NOT NULL,
   month TINYINT NOT NULL,
-  day TINYINT NOT NULL,
-  hour TINYINT NOT NULL, 
-  minute TINYINT NOT NULL,
-  second TINYINT NOT NULL,
-  millisecond SMALLINT NOT NULL,
-  dayOfWeek VARCHAR(50) NOT NULL,
   dayOfYear SMALLINT NOT NULL,
   weekOfYear TINYINT NOT NULL,
   userId VARCHAR(50) NOT NULL,
-  threadNumber NUMERIC(19,0) NOT NULL,
-  clusterNode VARCHAR(50) NULL,
+  threadNumber NUMERIC(19, 0) NOT NULL,
+  clusterNode VARCHAR(50),
   productVersion VARCHAR(50) NOT NULL,
   severity VARCHAR(50) NOT NULL,
   actionType VARCHAR(50) NOT NULL,
   actionScope VARCHAR(100),
   actionStatus TINYINT NOT NULL,
-  rawMessage TEXT NOT NULL,
-  callerClassName VARCHAR(200) NULL,
-  callerMethodName VARCHAR(80) NULL,
-  numericIndex1 NUMERIC(19,0) NULL,
-  numericIndex2 NUMERIC(19,0) NULL,
-  numericIndex3 NUMERIC(19,0) NULL,
-  numericIndex4 NUMERIC(19,0) NULL,
-  numericIndex5 NUMERIC(19,0) NULL,
+  rawMessage VARCHAR(255) NOT NULL,
+  callerClassName VARCHAR(200),
+  callerMethodName VARCHAR(80),
+  numericIndex1 NUMERIC(19, 0),
+  numericIndex2 NUMERIC(19, 0),
+  numericIndex3 NUMERIC(19, 0),
+  numericIndex4 NUMERIC(19, 0),
+  numericIndex5 NUMERIC(19, 0),
   PRIMARY KEY (tenantid, id)
 )
 GO
 
-CREATE TABLE queriableLog_p (
-  tenantid NUMERIC(19,0) NOT NULL,
-  id NUMERIC(19,0) NOT NULL,
-  queriableLogId NUMERIC(19,0) NOT NULL,
+CREATE TABLE queriablelog_p (
+  tenantid NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  queriableLogId NUMERIC(19, 0) NOT NULL,
   name VARCHAR(50) NOT NULL,
-  stringValue TEXT NULL,
-  blobValue IMAGE NULL,
+  stringValue VARCHAR(255),
+  blobId NUMERIC(19, 0),
+  valueType VARCHAR(30),
   PRIMARY KEY (tenantid, id)
 )
 GO
 
-CREATE INDEX idx_queriableLog ON queriableLog_p (queriableLogId)
+CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId)
 GO
-
-ALTER TABLE queriableLog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriableLog(tenantid, id)
+ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id)
 GO

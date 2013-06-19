@@ -1,1 +1,2 @@
-DELETE FROM migration_plan;
+DELETE FROM migration_plan
+GO

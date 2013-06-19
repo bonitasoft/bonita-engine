@@ -1,1 +1,2 @@
-DELETE FROM process_comment;
+DELETE FROM process_comment
+GO

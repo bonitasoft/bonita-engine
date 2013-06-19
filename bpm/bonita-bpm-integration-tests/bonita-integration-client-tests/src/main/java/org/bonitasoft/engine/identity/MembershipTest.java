@@ -63,7 +63,7 @@ public class MembershipTest extends CommonAPITest {
     @Test
     public void getUserMembershipsWithPageOutOfRangeException() throws BonitaException {
         final User u = getIdentityAPI().createUser("u", "engine");
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(u.getId(), -1, 3, UserMembershipCriterion.ROLE_NAME_ASC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(u.getId(), 0, 3, UserMembershipCriterion.ROLE_NAME_ASC);
         assertTrue(userMemberships.isEmpty());
         getIdentityAPI().deleteUser(u.getId());
     }

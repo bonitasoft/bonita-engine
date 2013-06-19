@@ -3,10 +3,11 @@ CREATE TABLE human (
     id NUMERIC(19, 0) NOT NULL,
     firstname VARCHAR(80) NULL,
     lastname VARCHAR(80) NULL,
-    age INT NULL,
+    age INT,
     parent_id NUMERIC(19, 0) DEFAULT NULL,
     car_id NUMERIC(19, 0) DEFAULT NULL,
     discriminant VARCHAR(10) NOT NULL,
+    deleted BIT,
     PRIMARY KEY (tenantid, id)
 )
 GO

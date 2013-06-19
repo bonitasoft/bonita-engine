@@ -1,6 +1,4 @@
-ALTER TABLE dependencymapping DROP CONSTRAINT fk_depmapping_depid
+DROP TABLE dependencymapping
 GO
 DROP TABLE dependency
-GO
-DROP TABLE dependencymapping
 GO

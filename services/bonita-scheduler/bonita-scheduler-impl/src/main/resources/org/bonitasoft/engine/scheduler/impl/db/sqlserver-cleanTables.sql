@@ -1,3 +1,5 @@
-DELETE FROM job_param;
+DELETE FROM job_param
+GO
 
-DELETE FROM job_desc;
+DELETE FROM job_desc
+GO

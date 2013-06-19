@@ -1,1 +1,2 @@
-DELETE FROM document_mapping;
+DELETE FROM document_mapping
+GO

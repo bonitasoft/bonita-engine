@@ -1,5 +1,8 @@
-DELETE FROM profilemember;
+DELETE FROM profilemember
+GO
 
-DELETE FROM profileentry;
+DELETE FROM profileentry
+GO
 
-DELETE FROM profile;
+DELETE FROM profile
+GO

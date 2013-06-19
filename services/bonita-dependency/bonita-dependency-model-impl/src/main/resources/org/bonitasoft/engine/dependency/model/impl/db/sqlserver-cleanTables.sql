@@ -1,3 +1,5 @@
-DELETE FROM dependencymapping;
+DELETE FROM dependencymapping
+GO
 
-DELETE FROM dependency;
+DELETE FROM dependency
+GO

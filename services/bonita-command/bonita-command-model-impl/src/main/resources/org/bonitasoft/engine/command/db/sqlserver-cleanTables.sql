@@ -1,1 +1,2 @@
-DELETE FROM command;
+DELETE FROM command
+GO

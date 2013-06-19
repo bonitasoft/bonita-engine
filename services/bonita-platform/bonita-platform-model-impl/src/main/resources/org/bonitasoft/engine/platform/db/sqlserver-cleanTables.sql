@@ -1,3 +1,5 @@
-DELETE FROM tenant;
+DELETE FROM tenant
+GO
 
-DELETE FROM platform;
+DELETE FROM platform
+GO

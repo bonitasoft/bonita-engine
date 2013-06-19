@@ -1,2 +1,4 @@
-DELETE FROM dependencymapping WHERE tenantid = ${tenantid};
-DELETE FROM dependency WHERE tenantid = ${tenantid};
+DELETE FROM dependencymapping WHERE tenantid = ${tenantid}
+GO
+DELETE FROM dependency WHERE tenantid = ${tenantid}
+GO

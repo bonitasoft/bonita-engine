@@ -2,7 +2,7 @@ CREATE TABLE employee (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   name VARCHAR(50) NOT NULL,
-  age NUMERIC(19, 0) NOT NULL,
+  age INT NOT NULL,
   laptopid NUMERIC(19, 0),
   archivedate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -35,7 +35,8 @@ CREATE TABLE address (
   employeeid NUMERIC(19, 0) NOT NULL,
   archivedate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
-);
+)
+GO
 
 CREATE TABLE project (
   tenantid NUMERIC(19, 0) NOT NULL,

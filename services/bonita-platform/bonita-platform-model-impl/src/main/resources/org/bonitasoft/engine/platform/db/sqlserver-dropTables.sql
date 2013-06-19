@@ -1,4 +1,4 @@
-DROP TABLE platform
-GO
 DROP TABLE tenant
+GO
+DROP TABLE platform
 GO

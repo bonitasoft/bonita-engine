@@ -1,3 +1,5 @@
-DELETE FROM queriablelog_p;
+DELETE FROM queriablelog_p
+GO
 
-DELETE FROM queriable_log;
+DELETE FROM queriable_log
+GO

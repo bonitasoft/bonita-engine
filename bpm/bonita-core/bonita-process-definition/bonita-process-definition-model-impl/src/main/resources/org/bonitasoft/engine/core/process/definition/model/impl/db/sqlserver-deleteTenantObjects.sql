@@ -1,1 +1,2 @@
-DELETE FROM process_definition WHERE tenantid = ${tenantid};
+DELETE FROM process_definition WHERE tenantid = ${tenantid}
+GO

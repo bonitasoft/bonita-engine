@@ -1,0 +1,103 @@
+-- ------------------------------------------------ Foreign Keys -----------------------------------------------
+ALTER TABLE actor DROP CONSTRAINT fk_actor_tenantId
+GO
+ALTER TABLE actormember DROP CONSTRAINT fk_actormember_tenantId
+GO
+ALTER TABLE queriable_log DROP CONSTRAINT fk_queriable_log_tenantId
+GO
+ALTER TABLE queriablelog_p DROP CONSTRAINT fk_queriablelog_p_tenantId
+GO
+ALTER TABLE category DROP CONSTRAINT fk_category_tenantId
+GO
+ALTER TABLE command DROP CONSTRAINT fk_command_tenantId
+GO
+ALTER TABLE connector_instance DROP CONSTRAINT fk_connector_instance_tenantId
+GO
+ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId
+GO
+ALTER TABLE data_mapping DROP CONSTRAINT fk_data_mapping_tenantId
+GO
+ALTER TABLE datasource DROP CONSTRAINT fk_datasource_tenantId
+GO
+ALTER TABLE datasourceparameter DROP CONSTRAINT fk_datasourceparameter_tenantId
+GO
+ALTER TABLE dependency DROP CONSTRAINT fk_dependency_tenantId
+GO
+ALTER TABLE dependencymapping DROP CONSTRAINT fk_dependencymapping_tenantId
+GO
+ALTER TABLE document_content DROP CONSTRAINT fk_document_content_tenantId
+GO
+ALTER TABLE document_mapping DROP CONSTRAINT fk_document_mapping_tenantId
+GO
+ALTER TABLE event_trigger_instance DROP CONSTRAINT fk_event_trigger_instance_tenantId
+GO
+ALTER TABLE external_identity_mapping DROP CONSTRAINT fk_external_identity_mapping_tenantId
+GO
+ALTER TABLE flownode_instance DROP CONSTRAINT fk_flownode_instance_tenantId
+GO
+ALTER TABLE group_ DROP CONSTRAINT fk_group__tenantId
+GO
+ALTER TABLE hidden_activity DROP CONSTRAINT fk_hidden_activity_tenantId
+GO
+ALTER TABLE job_desc DROP CONSTRAINT fk_job_desc_tenantId
+GO
+ALTER TABLE job_param DROP CONSTRAINT fk_job_param_tenantId
+GO
+ALTER TABLE message_instance DROP CONSTRAINT fk_message_instance_tenantId
+GO
+-- ALTER TABLE migration_plan DROP CONSTRAINT fk_migration_plan_tenantId
+GO
+ALTER TABLE p_metadata_def DROP CONSTRAINT fk_p_metadata_def_tenantId
+GO
+ALTER TABLE p_metadata_val DROP CONSTRAINT fk_p_metadata_val_tenantId
+GO
+ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_tenantId
+GO
+ALTER TABLE processcategorymapping DROP CONSTRAINT fk_processcategorymapping_tenantId
+GO
+ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_tenantId
+GO
+ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_tenantId
+GO
+ALTER TABLE process_instance DROP CONSTRAINT fk_process_instance_tenantId
+GO
+ALTER TABLE processsupervisor DROP CONSTRAINT fk_processsupervisor_tenantId
+GO
+ALTER TABLE profile DROP CONSTRAINT fk_profile_tenantId
+GO
+ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_tenantId
+GO
+ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId
+GO
+ALTER TABLE role DROP CONSTRAINT fk_role_tenantId
+GO
+ALTER TABLE transition_instance DROP CONSTRAINT fk_transition_instance_tenantId
+GO
+ALTER TABLE user_ DROP CONSTRAINT fk_user__tenantId
+GO
+ALTER TABLE user_membership DROP CONSTRAINT fk_user_membership_tenantId
+GO
+ALTER TABLE waiting_event DROP CONSTRAINT fk_waiting_event_tenantId
+GO
+
+ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId
+GO
+ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId
+GO
+
+
+--  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
+ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_tenantId
+GO
+ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_arch_flownode_instance_tenantId
+GO
+ALTER TABLE arch_process_comment DROP CONSTRAINT fk_arch_process_comment_tenantId
+GO
+ALTER TABLE arch_process_instance DROP CONSTRAINT fk_arch_process_instance_tenantId
+GO
+ALTER TABLE arch_transition_instance DROP CONSTRAINT fk_arch_transition_instance_tenantId
+GO
+ALTER TABLE arch_data_instance DROP CONSTRAINT fk_arch_data_instance_tenantId
+GO
+ALTER TABLE arch_data_mapping DROP CONSTRAINT fk_arch_data_mapping_tenantId
+GO
