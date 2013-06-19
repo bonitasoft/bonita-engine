@@ -15,5 +15,6 @@
 
 	<modules>
 		<module>bonita-scheduler-impl-mybatis</module>
+		<module>bonita-scheduler-quartz-sp</module>
 	</modules>
 </project>
