@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -30,6 +31,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
@@ -154,7 +156,7 @@ public class ReportingServiceImpl implements ReportingService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getReport"));
         }
         try {
-            final SReport report = persistenceService.selectById(new SelectByIdDescriptor<SReport>("getReportyId", SReport.class, reportId));
+            final SReport report = persistenceService.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId));
             if (report == null) {
                 throw new SReportNotFoundException(reportId);
             }
@@ -165,6 +167,26 @@ public class ReportingServiceImpl implements ReportingService {
         } catch (final SBonitaReadException sbe) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getReport", sbe));
+            }
+            throw sbe;
+        }
+    }
+
+    @Override
+    public SReport getReportByName(final String reportName) throws SBonitaReadException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getReportByName"));
+        }
+        try {
+            final SReport report = persistenceService.selectOne(new SelectOneDescriptor<SReport>("getReportByName", Collections.singletonMap("reportName",
+                    (Object) reportName), SReport.class));
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getReportByName"));
+            }
+            return report;
+        } catch (final SBonitaReadException sbe) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getReportByName", sbe));
             }
             throw sbe;
         }

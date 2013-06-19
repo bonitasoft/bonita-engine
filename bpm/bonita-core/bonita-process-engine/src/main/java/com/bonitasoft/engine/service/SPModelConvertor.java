@@ -40,6 +40,7 @@ import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.reporting.SReport;
+import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.log.impl.LogImpl;
@@ -52,6 +53,8 @@ import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
 import com.bonitasoft.engine.platform.impl.TenantImpl;
 import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportCreator;
+import com.bonitasoft.engine.reporting.ReportCreator.ReportField;
 import com.bonitasoft.engine.reporting.impl.ReportImpl;
 
 /**
@@ -253,6 +256,25 @@ public final class SPModelConvertor extends ModelConvertor {
             reports.add(toReport(sReport));
         }
         return reports;
+    }
+
+    public static SReport constructSReport(final ReportCreator creator, final SReportBuilder sReportBuilder, final long creatorUserId) {
+        final Map<ReportField, Serializable> fields = creator.getFields();
+        final String name = (String) fields.get(ReportField.NAME);
+        // Boolean isProvided = (Boolean) fields.get(ReportField.PROVIDED);
+        // if (isProvided == null) {
+        // isProvided = false;
+        // }
+        final SReportBuilder newSReportBuilder = sReportBuilder.createNewInstance(name, System.currentTimeMillis(), creatorUserId, false);
+        final String description = (String) fields.get(ReportField.DESCRIPTION);
+        if (description != null) {
+            newSReportBuilder.setDescription(description);
+        }
+        final byte[] screenshot = (byte[]) fields.get(ReportField.SCREENSHOT);
+        if (screenshot != null) {
+            newSReportBuilder.setScreenshot(screenshot);
+        }
+        return newSReportBuilder.done();
     }
 
 }

@@ -19,6 +19,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportNotFoundException;
 
 /**
@@ -76,21 +77,37 @@ public interface ReportingAPI {
     SearchResult<Report> searchReports(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Creates a new report.
+     * Creates a new report with no screenshot.
      * 
      * @param name
-     *            the name of the report
+     *            the name of the report.
      * @param description
-     *            the description of the report, ready to be displayed
+     *            the description of the report, ready to be displayed.
      * @param content
-     *            the binary content of the report
-     * @return the newly created report
+     *            the binary content of the report.
+     * @return the newly created report.
+     * @throws AlreadyExistsException
+     *             if a report with this name already exists.
+     * @throws CreationException
+     *             if an error occurs during the creation.
+     * @see #createReport(ReportCreator, byte[])
+     */
+    Report createReport(String name, final String description, byte[] content) throws AlreadyExistsException, CreationException;
+
+    /**
+     * Creates a custom report.
+     * 
+     * @param reportCreator
+     *            the creator object to instantiate the new report.
+     * @param content
+     *            the binary content of the report.
+     * @return the newly created report.
      * @throws AlreadyExistsException
      *             if a report with this name already exists.
      * @throws CreationException
      *             if an error occurs during the creation.
      */
-    Report createReport(String name, final String description, byte[] content) throws AlreadyExistsException, CreationException;
+    Report createReport(ReportCreator reportCreator, final byte[] content) throws AlreadyExistsException, CreationException;
 
     /**
      * Deletes a report identified by its ID.

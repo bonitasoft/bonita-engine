@@ -8,6 +8,12 @@
 		WHERE report.id = :id
 	</query>
 
+   <query name="getReportByName">
+		SELECT report
+		FROM com.bonitasoft.engine.core.reporting.SReportImpl AS report
+		WHERE report.name = :reportName
+	</query>
+
 	<query name="getNumberOfSReport">
 		SELECT COUNT(report)
 		FROM com.bonitasoft.engine.core.reporting.SReportImpl AS report

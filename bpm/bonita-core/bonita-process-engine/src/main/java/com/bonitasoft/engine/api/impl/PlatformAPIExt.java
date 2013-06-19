@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -73,6 +74,9 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
+import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
+import com.bonitasoft.engine.core.reporting.ReportingService;
+import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
@@ -211,6 +215,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
                 final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
                 createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
+                deployTenantReports(tenantId, tenantServiceAccessor);
                 sessionService.deleteSession(session.getId());
                 return tenantId;
             } finally {
@@ -219,6 +224,82 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
         } catch (final Exception e) {
             throw new CreationException("Unable to create tenant " + tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.NAME), e);
+        }
+    }
+
+    private void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws IOException, BonitaHomeNotSetException,
+            SBonitaException {
+        final String reportFolder = BonitaHomeServer.getInstance().getTenantReportFolder(tenantId);
+        final String reportListFilename = reportFolder + File.separator + "reports.lst";
+        final File reportListFile = new File(reportListFilename);
+        if (!reportListFile.exists()) {
+            return;
+        }
+        final Properties properties = PropertiesManager.getProperties(reportListFile);
+        for (Entry<Object, Object> reports : properties.entrySet()) {
+            final String reportName = (String) reports.getKey();
+            final String reportDescription = (String) reports.getValue();
+            final byte[] content = getReportContent(reportFolder, reportName);
+            final byte[] screenshot = getReportScreenshot(reportFolder, reportName);
+
+            final ReportingService reportingService = tenantAccessor.getReportingService();
+            final SReportBuilder reportBuilder = reportingService.getReportBuilder();
+            reportBuilder.createNewInstance(reportName, /* system user */-1, true, reportDescription, screenshot);
+            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+            // Here we are already in a transaction, so we can call execute() directly:
+            addReport.execute();
+        }
+    }
+
+    /**
+     * Get the binary content of a report, from its name.
+     * 
+     * @param reportFolder
+     *            the folder where to look.
+     * @param reportName
+     *            the name of the report. The content must match <report_name>-content* to be recognized as the report content.
+     * @return the binary content, if found, null otherwise. If several report contents match this pattern, the first one
+     * @throws IOException
+     *             if an I/O error occurs while reading the report content.
+     */
+    protected byte[] getReportContent(final String reportFolder, final String reportName) throws IOException {
+        final File[] fileContents = new File(reportFolder).listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(@SuppressWarnings("unused") final File dir, final String name) {
+                return name.startsWith(reportName + "-content");
+            }
+        });
+        if (fileContents.length > 0) {
+            return IOUtil.getAllContentFrom(fileContents[0].getAbsoluteFile());
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the binary screenshot of a report, from its name.
+     * 
+     * @param reportFolder
+     *            the folder where to look.
+     * @param reportName
+     *            the name of the report. The screenshot must match <report_name>-screenshot* to be recognized as the report screenshot.
+     * @return the binary screenshot, if found, null otherwise. If several report screenshots match this pattern, the first one
+     * @throws IOException
+     *             if an I/O error occurs while reading the report screenshot.
+     */
+    protected byte[] getReportScreenshot(final String reportFolder, final String reportName) throws IOException {
+        final File[] filescreenshots = new File(reportFolder).listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(@SuppressWarnings("unused") final File dir, final String name) {
+                return name.startsWith(reportName + "-screenshot");
+            }
+        });
+        if (filescreenshots.length > 0) {
+            return IOUtil.getAllContentFrom(filescreenshots[0].getAbsoluteFile());
+        } else {
+            return null;
         }
     }
 

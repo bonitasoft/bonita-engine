@@ -10,6 +10,7 @@ package com.bonitasoft.engine.core.reporting;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public class SReportBuilderImpl implements SReportBuilder {
 
@@ -23,14 +24,38 @@ public class SReportBuilderImpl implements SReportBuilder {
     }
 
     @Override
-    public SReportBuilder description(final String description) {
+    public SReportBuilder createNewInstance(final String name, final long installationDate, final long installedBy, final boolean provided,
+            final String description, final byte[] screenshot) {
+        report = new SReportImpl(name, installationDate, installedBy, provided, description, installationDate, screenshot);
+        return this;
+    }
+
+    @Override
+    public SReportBuilder createNewInstance(final String name, final long installedBy, final boolean provided, final String description, final byte[] screenshot) {
+        report = new SReportImpl(name, System.currentTimeMillis(), installedBy, provided, description, System.currentTimeMillis(), screenshot);
+        return this;
+    }
+
+    @Override
+    public SReportBuilder setDescription(final String description) {
         report.setDescription(description);
+        return this;
+    }
+
+    @Override
+    public SReportBuilder setScreenshot(final byte[] screenshot) {
+        report.setScreenshot(screenshot);
         return this;
     }
 
     @Override
     public String getNameKey() {
         return "name";
+    }
+
+    @Override
+    public String getDescriptionKey() {
+        return "description";
     }
 
     @Override

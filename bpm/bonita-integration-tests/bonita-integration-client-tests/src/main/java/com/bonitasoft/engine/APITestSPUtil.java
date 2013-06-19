@@ -47,6 +47,7 @@ import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 
 public class APITestSPUtil extends APITestUtil {
 
@@ -227,7 +228,8 @@ public class APITestSPUtil extends APITestUtil {
 
     public List<String> checkExistenceOfReports() throws SearchException {
         final List<String> messages = new ArrayList<String>();
-        final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
+        // only for non-default tenants:
+        final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000).filter(ReportSearchDescriptor.PROVIDED, false);
         final SearchResult<Report> reportSR = getReportingAPI().searchReports(build.done());
         final List<Report> reports = reportSR.getResult();
         if (reportSR.getCount() > 0) {

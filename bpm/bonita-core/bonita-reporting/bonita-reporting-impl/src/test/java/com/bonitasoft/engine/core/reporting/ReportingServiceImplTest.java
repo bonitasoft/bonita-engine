@@ -174,7 +174,7 @@ public class ReportingServiceImplTest {
         final long reportId = 15;
         final SReport expected = new SReportImpl("report1", 123456, 45, true);
         expected.setId(reportId);
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportyId", SReport.class, reportId))).thenReturn(expected);
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
 
         final SReport report = serviceImpl.getReport(reportId);
         Assert.assertEquals(expected, report);
@@ -190,7 +190,7 @@ public class ReportingServiceImplTest {
         final long reportId = 15;
         final SReport expected = new SReportImpl("report1", 123456, 45, true);
         expected.setId(reportId);
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportyId", SReport.class, reportId))).thenReturn(null);
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(null);
 
         serviceImpl.getReport(reportId);
     }
@@ -205,7 +205,7 @@ public class ReportingServiceImplTest {
         final long reportId = 15;
         final SReport expected = new SReportImpl("report1", 123456, 45, true);
         expected.setId(reportId);
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportyId", SReport.class, reportId))).thenThrow(new SBonitaReadException("ouch!"));
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenThrow(new SBonitaReadException("ouch!"));
 
         serviceImpl.getReport(reportId);
     }
@@ -232,7 +232,7 @@ public class ReportingServiceImplTest {
             }
 
         }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportyId", SReport.class, reportId))).thenReturn(expected);
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
         when(loggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
 
         serviceImpl.deleteReport(reportId);
@@ -259,7 +259,7 @@ public class ReportingServiceImplTest {
             }
 
         }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportyId", SReport.class, reportId))).thenReturn(expected);
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
         when(loggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
 
         serviceImpl.deleteReport(reportId);

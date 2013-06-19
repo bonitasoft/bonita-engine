@@ -34,10 +34,13 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.SearchReports;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
+import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportNotFoundException;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -49,11 +52,44 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
  */
 public class ReportingAPIExt implements ReportingAPI {
 
+    private long getUserIdFromSession() {
+        SessionAccessor sessionAccessor;
+        long userId;
+        try {
+            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final long sessionId = sessionAccessor.getSessionId();
+            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            userId = platformServiceAccessor.getSessionService().getSession(sessionId).getUserId();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+        return userId;
+    }
+
+    protected CreationException handleReportDuplication(final String name, final TenantServiceAccessor tenantAccessor,
+            final TransactionExecutor transactionExecutor, final SBonitaException sbe) {
+        // Check if the problem is primary key duplication:
+        try {
+            final GetReport getReport = new GetReport(tenantAccessor, name);
+            transactionExecutor.execute(getReport);
+            if (getReport.getResult() != null) {
+                return new AlreadyExistsException("A report already exists with the name " + name);
+            }
+        } catch (SBonitaException e) {
+            // ignore it
+        }
+        return new CreationException(sbe);
+    }
+
     @Override
     public Report createReport(final String name, final String description, final byte[] content) throws AlreadyExistsException, CreationException {
-
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final AddReport addReport = new AddReport(tenantAccessor, name, description, content);
+        ReportingService reportingService = tenantAccessor.getReportingService();
+        final long userId = getUserIdFromSession();
+        final SReportBuilder reportBuilder = reportingService.getReportBuilder();
+        reportBuilder.createNewInstance(name, userId, false, description, null);
+        SReport report = reportBuilder.done();
+        final AddReport addReport = new AddReport(reportingService, report, content);
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
             transactionExecutor.execute(addReport);
@@ -61,7 +97,26 @@ public class ReportingAPIExt implements ReportingAPI {
         } catch (final SReportAlreadyExistsException sraee) {
             throw new AlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
-            throw new CreationException(sbe);
+            throw handleReportDuplication(name, tenantAccessor, transactionExecutor, sbe);
+        }
+    }
+
+    @Override
+    public Report createReport(final ReportCreator reportCreator, final byte[] content) throws AlreadyExistsException, CreationException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final long userId = getUserIdFromSession();
+        ReportingService reportingService = tenantAccessor.getReportingService();
+        final SReportBuilder reportBuilder = reportingService.getReportBuilder();
+        final SReport sReport = SPModelConvertor.constructSReport(reportCreator, reportBuilder, userId);
+        final AddReport addReport = new AddReport(reportingService, sReport, content);
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        try {
+            transactionExecutor.execute(addReport);
+            return SPModelConvertor.toReport(addReport.getResult());
+        } catch (final SReportAlreadyExistsException sraee) {
+            throw new AlreadyExistsException(sraee);
+        } catch (final SBonitaException sbe) {
+            throw handleReportDuplication((String) reportCreator.getFields().get(ReportCreator.ReportField.NAME), tenantAccessor, transactionExecutor, sbe);
         }
     }
 

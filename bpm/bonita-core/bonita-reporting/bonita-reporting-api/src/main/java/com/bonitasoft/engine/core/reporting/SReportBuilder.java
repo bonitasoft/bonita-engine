@@ -15,7 +15,9 @@ public interface SReportBuilder {
 
     SReportBuilder createNewInstance(String name, long installationDate, long installedBy, boolean provided);
 
-    SReportBuilder description(String description);
+    SReportBuilder createNewInstance(String name, long installationDate, long installedBy, boolean provided, String description, byte[] screenshot);
+
+    SReportBuilder createNewInstance(String name, long installedBy, boolean provided, String description, byte[] screenshot);
 
     SReport done();
 
@@ -23,10 +25,16 @@ public interface SReportBuilder {
 
     String getNameKey();
 
+    String getDescriptionKey();
+
     String getProvidedKey();
 
     String getInstallationDateKey();
 
     String getInstalledByKey();
+
+    public SReportBuilder setDescription(final String description);
+
+    public SReportBuilder setScreenshot(final byte[] screenshot);
 
 }

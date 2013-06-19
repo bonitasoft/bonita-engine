@@ -17,6 +17,7 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public class GetReport implements TransactionContentWithResult<SReport> {
 
@@ -24,7 +25,9 @@ public class GetReport implements TransactionContentWithResult<SReport> {
 
     private final TenantServiceAccessor accessor;
 
-    private final long reportId;
+    private long reportId = -1;
+
+    private String reportName;
 
     public GetReport(final TenantServiceAccessor accessor, final long reportId) {
         super();
@@ -32,10 +35,20 @@ public class GetReport implements TransactionContentWithResult<SReport> {
         this.reportId = reportId;
     }
 
+    public GetReport(final TenantServiceAccessor accessor, final String reportName) {
+        super();
+        this.accessor = accessor;
+        this.reportName = reportName;
+    }
+
     @Override
     public void execute() throws SBonitaException {
         final ReportingService reportingService = accessor.getReportingService();
-        report = reportingService.getReport(reportId);
+        if (reportId != -1) {
+            report = reportingService.getReport(reportId);
+        } else {
+            report = reportingService.getReportByName(reportName);
+        }
     }
 
     @Override

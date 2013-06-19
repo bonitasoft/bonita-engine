@@ -8,16 +8,23 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.platform.TenantCreator;
 
 @SuppressWarnings("javadoc")
 public class ReportingAPIIT extends CommonAPISPTest {
@@ -392,6 +399,18 @@ public class ReportingAPIIT extends CommonAPISPTest {
         getReportingAPI().deleteReport(retrievedReport.getId());
     }
 
+    @Test(expected = AlreadyExistsException.class)
+    @Ignore("constraint violation problem for now... won't stay long.")
+    public void addTwiceSameReportFails() throws BonitaException {
+        final String reportName = "same_name";
+        final Report report = getReportingAPI().createReport(reportName, "a test report", null);
+        try {
+            getReportingAPI().createReport(reportName, "another description", null);
+        } finally {
+            getReportingAPI().deleteReport(report.getId());
+        }
+    }
+
     @Test
     public void getReportContent() throws BonitaException {
         final byte[] reportContentBytes = "some dummy report content".getBytes();
@@ -411,14 +430,41 @@ public class ReportingAPIIT extends CommonAPISPTest {
     @Test
     public void searchProfiles() throws BonitaException {
         final Report report = getReportingAPI().createReport("report1", null, null);
-        final SearchOptionsImpl options = new SearchOptionsImpl(0, 10);
-        options.addFilter(ReportSearchDescriptor.NAME, "report1");
-        final SearchResult<Report> searchReports = getReportingAPI().searchReports(options);
+        final SearchOptionsBuilder options = new SearchOptionsBuilder(0, 10);
+        options.filter(ReportSearchDescriptor.NAME, "report1");
+        final SearchResult<Report> searchReports = getReportingAPI().searchReports(options.done());
         assertEquals(1, searchReports.getCount());
         final Report report2 = searchReports.getResult().get(0);
         assertEquals(report, report2);
 
         getReportingAPI().deleteReports(Collections.singletonList(report.getId()));
+    }
+
+    @Test
+    public void createTenantDeploysDefaultReports() throws BonitaException {
+        logout();
+        PlatformSession session = loginPlatform();
+        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final long tenantId = platformAPI.createTenant(new TenantCreator("newTenant", "a test tenant to check default report creation", "testIconName",
+                "testIconPath", "myTenantAdmin", "theirPassword"));
+        platformAPI.activateTenant(tenantId);
+        logoutPlatform(session);
+        loginWith("myTenantAdmin", "theirPassword", tenantId);
+        try {
+            final SearchOptionsBuilder options = new SearchOptionsBuilder(0, 10);
+            final SearchResult<Report> searchReports = getReportingAPI().searchReports(options.done());
+            // 3 reports by default:
+            assertEquals(3, searchReports.getCount());
+        } finally {
+            // cleanup:
+            logout();
+            session = loginPlatform();
+            platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+            platformAPI.deactiveTenant(tenantId);
+            platformAPI.deleteTenant(tenantId);
+            logoutPlatform(session);
+            login();
+        }
     }
 
 }

@@ -28,6 +28,17 @@ public interface ReportingService {
 
     SReport getReport(long reportId) throws SBonitaReadException, SReportNotFoundException;
 
+    /**
+     * Get a report from its name.
+     * 
+     * @param reportName
+     *            the name of the report to retrieve.
+     * @return the report if found, NULL if not found.
+     * @throws SBonitaReadException
+     *             if an read error occurs.
+     */
+    SReport getReportByName(String reportName) throws SBonitaReadException;
+
     long getNumberOfReports(QueryOptions options) throws SBonitaSearchException;
 
     List<SReport> searchReports(QueryOptions options) throws SBonitaSearchException;

@@ -42,7 +42,7 @@ public class SReportBuilderImplTest {
         final long installationDate = System.currentTimeMillis();
         final int installedBy = 10;
         final String description = "description";
-        builder.createNewInstance(name, installationDate, installedBy, true).description(description);
+        builder.createNewInstance(name, installationDate, installedBy, true).setDescription(description);
         final SReport report = builder.done();
         final SReportImpl expected = new SReportImpl(name, installationDate, installedBy, true);
         expected.setDescription(description);
