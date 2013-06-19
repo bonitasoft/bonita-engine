@@ -29,6 +29,8 @@ public final class BonitaHomeServer extends BonitaHome {
 
     private static final String CONF = "conf";
 
+    private static final String REPORTS = "reports";
+
     private static final String BONITA_HOME_SERVER = "server";
 
     private static final String BONITA_HOME_PLATFORM = "platform";
@@ -52,7 +54,7 @@ public final class BonitaHomeServer extends BonitaHome {
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
 
     private BonitaHomeServer() {
-        this.platformProperties = null;
+        platformProperties = null;
     }
 
     public static BonitaHomeServer getInstance() {
@@ -60,23 +62,23 @@ public final class BonitaHomeServer extends BonitaHome {
     }
 
     public String getBonitaHomeServerFolder() throws BonitaHomeNotSetException {
-        if (this.serverPath == null) {
+        if (serverPath == null) {
             final StringBuilder path = new StringBuilder(getBonitaHomeFolder());
             path.append(File.separatorChar);
             path.append(BONITA_HOME_SERVER);
-            this.serverPath = path.toString();
+            serverPath = path.toString();
         }
-        return this.serverPath;
+        return serverPath;
     }
 
     public String getPlatformFolder() throws BonitaHomeNotSetException {
-        if (this.platformPath == null) {
+        if (platformPath == null) {
             final StringBuilder path = new StringBuilder(getBonitaHomeServerFolder());
             path.append(File.separatorChar);
             path.append(BONITA_HOME_PLATFORM);
-            this.platformPath = path.toString();
+            platformPath = path.toString();
         }
-        return this.platformPath;
+        return platformPath;
     }
 
     public String getPlatformConfFolder() throws BonitaHomeNotSetException {
@@ -94,13 +96,13 @@ public final class BonitaHomeServer extends BonitaHome {
     }
 
     public String getTenantsFolder() throws BonitaHomeNotSetException {
-        if (this.tenantsPath == null) {
+        if (tenantsPath == null) {
             final StringBuilder path = new StringBuilder(getBonitaHomeServerFolder());
             path.append(File.separatorChar);
             path.append(BONITA_HOME_TENANTS);
-            this.tenantsPath = path.toString();
+            tenantsPath = path.toString();
         }
-        return this.tenantsPath;
+        return tenantsPath;
     }
 
     public String getProcessesFolder(final long tenantId) throws BonitaHomeNotSetException {
@@ -139,6 +141,24 @@ public final class BonitaHomeServer extends BonitaHome {
         return path.toString();
     }
 
+    /**
+     * Returns the absolute path to the reports folder inside a specific tenant folder.
+     * 
+     * @param tenantId
+     *            the ID of the tenant to search for.
+     * @return the absolute path to the reports folder for the tenant.
+     * @throws BonitaHomeNotSetException
+     *             if BonitaHome is not set.
+     */
+    public String getTenantReportFolder(final long tenantId) throws BonitaHomeNotSetException {
+        final StringBuilder path = new StringBuilder(getTenantsFolder());
+        path.append(File.separatorChar);
+        path.append(tenantId);
+        path.append(File.separatorChar);
+        path.append(REPORTS);
+        return path.toString();
+    }
+
     public String getTenantTemplateFolder() throws BonitaHomeNotSetException {
         final StringBuilder path = new StringBuilder(getPlatformFolder());
         path.append(File.separatorChar);
@@ -148,17 +168,17 @@ public final class BonitaHomeServer extends BonitaHome {
 
     @Override
     protected void refresh() {
-        this.platformPath = null;
-        this.serverPath = null;
-        this.tenantsPath = null;
-        this.platformProperties = null;
+        platformPath = null;
+        serverPath = null;
+        tenantsPath = null;
+        platformProperties = null;
     }
 
     public Properties getPlatformProperties() throws BonitaHomeNotSetException, IOException {
-        if (this.platformProperties == null) {
-            this.platformProperties = PropertiesManager.getProperties(getPlaformFile());
+        if (platformProperties == null) {
+            platformProperties = PropertiesManager.getProperties(getPlaformFile());
         }
-        return this.platformProperties;
+        return platformProperties;
     }
 
 }
