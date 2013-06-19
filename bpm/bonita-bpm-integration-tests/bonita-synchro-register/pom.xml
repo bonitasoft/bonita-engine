@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine</groupId>
 		<artifactId>bonita-bpm-integration-tests</artifactId>
-		<version>6.1.0-rc1-SNAPSHOT</version>
+		<version>6.1.0-rc-01</version>
 	</parent>
 	<artifactId>bonita-synchro-register</artifactId>
 	<dependencies>
