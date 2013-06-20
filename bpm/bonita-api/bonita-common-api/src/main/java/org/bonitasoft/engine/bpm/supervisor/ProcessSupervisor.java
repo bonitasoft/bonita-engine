@@ -16,9 +16,11 @@ package org.bonitasoft.engine.bpm.supervisor;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * A process supervisor is the responsible for what happens to a specific process. A process supervisor can see the tasks of the process and do administration
- * of the process.
- * As for actors, process supervisors map people to processes through user / group / role associations.
+ * A supervisor of a process is responsible for what happens to the process. A supervisor can see
+ * the tasks in the process, and can carry out process administration. A supervisor is defined in a ProcessSupervisor
+ * object as a mapping of users, groups, or roles to the process supervisor (similar to actor mapping).
+ * A process has one ProcessSupervisor; however, as this can be mapped to several users, either explicitly or by
+ * mapping groups or roles, the process can be supervised by several people.
  * 
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
