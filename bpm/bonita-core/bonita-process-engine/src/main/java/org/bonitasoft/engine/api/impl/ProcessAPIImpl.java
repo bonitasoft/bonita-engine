@@ -175,10 +175,8 @@ import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
@@ -281,25 +279,15 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilder;
@@ -355,7 +343,6 @@ import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -385,7 +372,6 @@ import org.bonitasoft.engine.search.document.SearchDocumentsSupervisedBy;
 import org.bonitasoft.engine.search.flownode.SearchArchivedFlowNodeInstances;
 import org.bonitasoft.engine.search.flownode.SearchFlowNodeInstances;
 import org.bonitasoft.engine.search.identity.SearchUsersWhoCanStartProcessDeploymentInfo;
-import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolvingUser;
@@ -4544,9 +4530,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final Class<? extends PersistentObject> entityClass = getEntityClass(searchOptions);
         final SearchActivityInstances searchActivityInstancesTransaction = new SearchActivityInstances(activityInstanceService, flowNodeStateManager,
-                searchEntitiesDescriptor.getActivityInstanceDescriptor(), searchOptions, entityClass);
+                searchEntitiesDescriptor.getActivityInstanceDescriptor(), searchOptions);
         try {
             transactionExecutor.execute(searchActivityInstancesTransaction);
         } catch (final SBonitaException e) {
@@ -4590,47 +4575,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         return searchFlowNodeInstancesTransaction.getResult();
     }
 
-    private Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions) {
-        Class<? extends PersistentObject> entityClass = SActivityInstance.class;
-        final SearchFilter searchFilter = getSearchFilter(searchOptions, ActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
-        if (searchFilter != null) {
-            final FlowNodeType activityType = (FlowNodeType) searchFilter.getValue();
-            if (activityType != null) {
-                switch (activityType) {
-                    case AUTOMATIC_TASK:
-                        entityClass = SAutomaticTaskInstance.class;
-                        break;
-                    case MANUAL_TASK:
-                        entityClass = SManualTaskInstance.class;
-                        break;
-                    case USER_TASK:
-                        entityClass = SUserTaskInstance.class;
-                        break;
-                    case HUMAN_TASK:
-                        entityClass = SHumanTaskInstance.class;
-                        break;
-                    case RECEIVE_TASK:
-                        entityClass = SReceiveTaskInstance.class;
-                        break;
-                    default:
-                        entityClass = SActivityInstance.class;
-                        break;
-                }
-                searchOptions.getFilters().remove(searchFilter);
-            }
-        }
-        return entityClass;
-    }
-
-    private SearchFilter getSearchFilter(final SearchOptions searchOptions, final String searchedKey) {
-        for (final SearchFilter searchFilter : searchOptions.getFilters()) {
-            if (searchedKey.equals(searchFilter.getField())) {
-                return searchFilter;
-            }
-        }
-        return null;
-    }
-
     @Override
     public SearchResult<ArchivedActivityInstance> searchArchivedActivities(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -4639,52 +4583,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final Class<? extends PersistentObject> entityClass = getArchivedEntityClass(searchOptions);
         final ArchiveService archiveService = tenantAccessor.getArchiveService();
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SearchArchivedActivityInstances searchActivityInstancesTransaction = new SearchArchivedActivityInstances(activityInstanceService,
-                flowNodeStateManager, searchEntitiesDescriptor.getArchivedActivityInstanceDescriptor(), searchOptions, entityClass, persistenceService);
+                flowNodeStateManager, searchEntitiesDescriptor.getArchivedActivityInstanceDescriptor(), searchOptions, persistenceService);
         try {
             transactionExecutor.execute(searchActivityInstancesTransaction);
         } catch (final SBonitaException e) {
             throw new SearchException(e);
         }
         return searchActivityInstancesTransaction.getResult();
-    }
-
-    private Class<? extends PersistentObject> getArchivedEntityClass(final SearchOptions searchOptions) {
-        Class<? extends PersistentObject> entityClass = SAActivityInstance.class;
-        final SearchFilter searchFilter = getSearchFilter(searchOptions, ArchivedActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
-        if (searchFilter != null) {
-            final FlowNodeType activityType = (FlowNodeType) searchFilter.getValue();
-            if (activityType != null) {
-                switch (activityType) {
-                    case AUTOMATIC_TASK:
-                        entityClass = SAAutomaticTaskInstance.class;
-                        break;
-                    case MANUAL_TASK:
-                        entityClass = SAManualTaskInstance.class;
-                        break;
-                    case USER_TASK:
-                        entityClass = SAUserTaskInstance.class;
-                        break;
-                    case HUMAN_TASK:
-                        entityClass = SAHumanTaskInstance.class;
-                        break;
-                    case RECEIVE_TASK:
-                        entityClass = SAReceiveTaskInstance.class;
-                        break;
-                    case SEND_TASK:
-                        entityClass = SASendTaskInstance.class;
-                        break;
-                    default:
-                        entityClass = SAActivityInstance.class;
-                        break;
-                }
-                searchOptions.getFilters().remove(searchFilter);
-            }
-        }
-        return entityClass;
     }
 
     @Override
