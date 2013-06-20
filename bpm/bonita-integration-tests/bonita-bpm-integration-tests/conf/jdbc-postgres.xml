@@ -10,6 +10,7 @@
 
      <!-- Hibernate specific configuration -->
      <entry key="hibernate.journal.dialect">org.hibernate.dialect.PostgreSQLDialect</entry>
+     <entry key="hibernate.journal.interceptor">org.bonitasoft.engine.persistence.PostgresInterceptor</entry>
 
      <!-- Quartz specific configuration -->
      <entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.PostgreSQLDelegate</entry>
