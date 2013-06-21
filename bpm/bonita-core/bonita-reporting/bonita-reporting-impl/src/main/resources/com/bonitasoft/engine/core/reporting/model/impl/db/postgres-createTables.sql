@@ -8,6 +8,7 @@ CREATE TABLE report (
   provided BOOLEAN,
   lastModificationDate INT8 NOT NULL,
   screenshot BYTEA,
+  content BYTEA,
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );
