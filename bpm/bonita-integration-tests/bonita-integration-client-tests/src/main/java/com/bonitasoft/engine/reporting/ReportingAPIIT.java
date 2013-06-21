@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -63,7 +64,11 @@ public class ReportingAPIIT extends CommonAPISPTest {
     @Test
     public void searchReportsWithNoResults() throws BonitaException {
         final SearchOptions options = new SearchOptionsImpl(0, 10);
-        final SearchResult<Report> reports = getReportingAPI().searchReports(options);
+        SearchResult<Report> reports = getReportingAPI().searchReports(options);
+        assertEquals(3, reports.getCount());
+        final List<Report> r = reports.getResult();
+        getReportingAPI().deleteReports(Arrays.asList(r.get(0).getId(), r.get(1).getId(), r.get(2).getId()));
+        reports = getReportingAPI().searchReports(options);
         assertEquals(0, reports.getCount());
     }
 
@@ -450,11 +455,10 @@ public class ReportingAPIIT extends CommonAPISPTest {
         logoutPlatform(session);
         loginWith("myTenantAdmin", "theirPassword", tenantId);
         try {
-            final SearchOptionsBuilder options = new SearchOptionsBuilder(0, 10);
-            final SearchResult<Report> searchReports = getReportingAPI().searchReports(options.done());
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).done();
+            SearchResult<Report> searchReports = getReportingAPI().searchReports(searchOptions);
             // 3 reports by default:
             assertEquals(3, searchReports.getCount());
-            assertEquals(3, searchReports.getResult().size());
         } finally {
             // cleanup:
             logout();

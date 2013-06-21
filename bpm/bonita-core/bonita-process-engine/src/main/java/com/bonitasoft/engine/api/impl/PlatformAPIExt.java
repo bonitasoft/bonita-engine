@@ -68,6 +68,7 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.PlatformAPI;
@@ -151,9 +152,45 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         return create(creator);
     }
 
-    //
-    // private long create(final String tenantName, final String description, final String iconName, final String iconPath, final String userName,
-    // final String password, final boolean isDefault) throws CreationException, PlatformNotStartedException {
+    @Override
+    public void initializePlatform() throws CreationException {
+        PlatformServiceAccessor platformAccessor;
+        try {
+            platformAccessor = getPlatformAccessor();
+        } catch (final Exception e) {
+            throw new CreationException(e);
+        }
+        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+        // 1 tx to create content and default tenant
+        super.initializePlatform();
+        long tenantId;
+        try {
+            tenantId = getDefaultTenant().getId();
+        } catch (TenantNotFoundException e) {
+            throw new CreationException(e);
+        }
+        final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
+                SessionAccessor sessionAccessor = serviceAccessorFactory.createSessionAccessor();
+                final SessionService sessionService = platformAccessor.getSessionService();
+                final SSession session = sessionService.createSession(tenantId, -1L, "dummy", true);
+                sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+
+                // This part is specific to SP: reporting.
+                deployTenantReports(tenantId, tenantServiceAccessor);
+            } catch (Exception e) {
+                throw new CreationException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new CreationException(e);
+        }
+    }
 
     private long create(final TenantCreator creator) throws CreationException {
         PlatformServiceAccessor platformAccessor = null;
