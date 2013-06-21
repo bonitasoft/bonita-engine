@@ -18,7 +18,6 @@ import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -400,7 +399,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    @Ignore("constraint violation problem for now... won't stay long.")
+    // @Ignore("constraint violation problem for now... won't stay long.")
     public void addTwiceSameReportFails() throws BonitaException {
         final String reportName = "same_name";
         final Report report = getReportingAPI().createReport(reportName, "a test report", null);
@@ -455,6 +454,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
             final SearchResult<Report> searchReports = getReportingAPI().searchReports(options.done());
             // 3 reports by default:
             assertEquals(3, searchReports.getCount());
+            assertEquals(3, searchReports.getResult().size());
         } finally {
             // cleanup:
             logout();
