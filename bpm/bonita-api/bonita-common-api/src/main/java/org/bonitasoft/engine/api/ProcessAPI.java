@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.api;
 
 /**
- * Contains all methods that handles process.
+ * Contains all methods that handle processes.
  * Using this API you can handle:
  * <ul>
- * <li>{@link ProcessRuntimeAPI Execution of processes}: start process, retrieve tasks, execute tasks, retrieve data value...</li>
+ * <li>{@link ProcessRuntimeAPI Execution of processes}: start process, retrieve tasks, execute tasks, retrieve data...</li>
  * <li> {@link ProcessManagementAPI Management of processes}: Deploy/Undeploy processes, enable/disable process...</li>
  * <li> {@link DocumentAPI Documents}: create, list, retrieve documents</li>
  * </ul>
