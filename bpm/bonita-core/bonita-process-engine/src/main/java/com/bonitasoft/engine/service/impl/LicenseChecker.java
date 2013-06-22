@@ -57,7 +57,7 @@ public class LicenseChecker {
     }
 
     public boolean checkLicence() {
-        if (!Manager.isValid()) {
+        if (!new Manager().isValid()) {
             stopNode();
             return false;
         }
@@ -66,7 +66,7 @@ public class LicenseChecker {
 
     public void checkLicenceAndFeature(final String feature) throws IllegalStateException {
         checkLicence();
-        if (!Manager.isFeatureActive(feature)) {
+        if (!new Manager().isFeatureActive(feature)) {
             final String message = exceptions.get(feature);
             throw new IllegalStateException(message);
         }
@@ -100,7 +100,7 @@ public class LicenseChecker {
      * @return the license error message, if any.
      */
     public String getErrorMessage() {
-        return Manager.getErrorMessage();
+        return new Manager().getErrorMessage();
     }
 
 }
