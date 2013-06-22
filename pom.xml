@@ -9,7 +9,7 @@
 
 	<groupId>com.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine-sp</artifactId>
-	<version>6.1.0-rc-02</version>
+	<version>6.1.0-rc-03-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bonita Engine SP</name>
