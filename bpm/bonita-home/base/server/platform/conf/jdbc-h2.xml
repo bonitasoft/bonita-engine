@@ -10,7 +10,7 @@
 
      <!-- Hibernate specific configuration -->
      <entry key="hibernate.journal.dialect">org.bonitasoft.engine.persistence.dialect.MyH2Dialect</entry>
-     <entry key="hibernate.journal.interceptor"></entry>
+     <entry key="hibernate.journal.interceptor" />
 
      <!-- Quartz specific configuration -->
 

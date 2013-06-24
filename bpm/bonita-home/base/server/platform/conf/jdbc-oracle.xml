@@ -10,7 +10,7 @@
 
     <!-- Hibernate specific configuration -->
     <entry key="hibernate.journal.dialect">org.hibernate.dialect.Oracle10gDialect</entry>
-    <entry key="hibernate.journal.interceptor"></entry>
+    <entry key="hibernate.journal.interceptor" />
 
     <!-- Quartz specific configuration -->
 

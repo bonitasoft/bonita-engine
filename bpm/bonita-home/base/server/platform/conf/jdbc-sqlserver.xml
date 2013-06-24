@@ -9,7 +9,8 @@
      <entry key="sql.delimiter">GO</entry>
 
      <!-- Hibernate specific configuration -->
-     <entry key="hibernate.journal.dialect">org.hibernate.dialect.SQLServerDialect</entry>
+     <entry key="hibernate.journal.dialect">org.bonitasoft.engine.persistence.dialect.SQLServer2008Dialect</entry>
+     <entry key="hibernate.journal.interceptor" />
 
      <!-- Quartz specific configuration -->
 	<entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.MSSQLDelegate</entry>
