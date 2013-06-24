@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,37 +18,47 @@ package org.bonitasoft.engine.core.process.definition.model;
  * @author Baptitse Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public enum SFlowNodeType {
 
-    AUTOMATIC_TASK,
+    AUTOMATIC_TASK("automatic task"),
 
-    USER_TASK,
+    USER_TASK("user task"),
 
-    MANUAL_TASK,
+    MANUAL_TASK("manual task"),
 
-    RECEIVE_TASK,
+    RECEIVE_TASK("receive task"),
 
-    SEND_TASK,
+    SEND_TASK("send task"),
 
-    GATEWAY,
+    GATEWAY("gateway"),
 
-    START_EVENT,
+    START_EVENT("start event"),
 
-    INTERMEDIATE_CATCH_EVENT,
+    INTERMEDIATE_CATCH_EVENT("intermediate catch event"),
 
-    BOUNDARY_EVENT,
+    BOUNDARY_EVENT("boundary event"),
 
-    INTERMEDIATE_THROW_EVENT,
+    INTERMEDIATE_THROW_EVENT("intermediate throw event"),
 
-    END_EVENT,
+    END_EVENT("end event"),
 
-    LOOP_ACTIVITY,
+    LOOP_ACTIVITY("loop activity"),
 
-    MULTI_INSTANCE_ACTIVITY,
+    MULTI_INSTANCE_ACTIVITY("multi-instance activity"),
 
-    CALL_ACTIVITY,
+    CALL_ACTIVITY("call activity"),
 
-    SUB_PROCESS;
+    SUB_PROCESS("sub process");
 
+    private final String value;
+
+    private SFlowNodeType(final String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

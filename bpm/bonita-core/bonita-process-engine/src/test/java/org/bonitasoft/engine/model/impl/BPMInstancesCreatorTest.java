@@ -13,6 +13,17 @@
  **/
 package org.bonitasoft.engine.model.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.ignoreStubs;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,18 +38,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInsta
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.ignoreStubs;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -67,7 +66,7 @@ public class BPMInstancesCreatorTest {
     @Test
     public void testExecutionOrder() throws Exception {
         final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, instanceBuilders, null, null, null, transactionExecutor,
-                connectorInstanceService, null, null, null);
+                connectorInstanceService, null, null, null, null);
         final SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
         when(instanceBuilders.getSConnectorInstanceBuilder()).thenReturn(connectorBuilder);
         when(connectorBuilder.createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), anyInt()))

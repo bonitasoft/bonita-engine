@@ -43,6 +43,8 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
@@ -52,6 +54,7 @@ import org.bonitasoft.engine.xml.SXMLParseException;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class UserFilterServiceImpl implements UserFilterService {
 
@@ -67,13 +70,16 @@ public class UserFilterServiceImpl implements UserFilterService {
 
     private final Parser parser;
 
+    private final TechnicalLoggerService logger;
+
     public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService, final ReadSessionAccessor sessionAccessor,
-            final ExpressionResolverService expressionResolverService, final ParserFactory parserFactory) {
+            final ExpressionResolverService expressionResolverService, final ParserFactory parserFactory, final TechnicalLoggerService logger) {
         super();
         this.connectorExecutor = connectorExecutor;
         this.cacheService = cacheService;
         this.sessionAccessor = sessionAccessor;
         this.expressionResolverService = expressionResolverService;
+        this.logger = logger;
         final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>(2);
         bindings.add(JarDependenciesBinding.class);
         bindings.add(UserFilterImplementationBinding.class);
@@ -83,6 +89,7 @@ public class UserFilterServiceImpl implements UserFilterService {
     @Override
     public FilterResult executeFilter(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition, final Map<String, SExpression> inputs,
             final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException {
+        final FilterResult filterResult;
         try {
             UserFilterImplementationDescriptor descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
             if (descriptor == null) {
@@ -94,12 +101,18 @@ public class UserFilterServiceImpl implements UserFilterService {
                 }
             }
             final String implementationClassName = descriptor.getImplementationClassName();
-            return executeFilterInClassloader(implementationClassName, inputs, classLoader, expressionContext, actorName);
+            filterResult = executeFilterInClassloader(implementationClassName, inputs, classLoader, expressionContext, actorName);
         } catch (final SConnectorException e) {
             throw new SUserFilterExecutionException(e.getCause());// Usergit chec FilterException wrapped in a connectorException
         } catch (final Throwable e) {// catch throwable because we might have NoClassDefFound... see ENGINE-1333
             throw new SUserFilterExecutionException(e);
         }
+
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed userFilter <" + sUserFilterDefinition.getName() + "> with userFilter id <"
+                    + sUserFilterDefinition.getUserFilterId() + ">, and version <" + sUserFilterDefinition.getVersion() + ">");
+        }
+        return filterResult;
     }
 
     private UserFilterImplementationDescriptor getDescriptor(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition)

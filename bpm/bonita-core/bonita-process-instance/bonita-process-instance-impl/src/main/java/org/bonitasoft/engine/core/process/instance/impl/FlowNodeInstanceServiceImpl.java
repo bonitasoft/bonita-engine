@@ -409,6 +409,10 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         return instanceBuilders;
     }
 
+    protected TechnicalLoggerService getLogger() {
+        return logger;
+    }
+
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);

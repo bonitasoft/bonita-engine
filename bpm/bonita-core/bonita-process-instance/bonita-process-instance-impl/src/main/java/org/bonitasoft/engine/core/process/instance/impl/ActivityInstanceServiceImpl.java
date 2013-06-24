@@ -55,6 +55,7 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -135,6 +136,33 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createActivityInstance");
             throw new SActivityCreationException(e);
         }
+        getLogger().log(this.getClass(), TechnicalLogSeverity.INFO, "Created " + activityInstance.getType().getValue() + " <" + activityInstance.getName() +
+                "> with id <" + activityInstance.getId() + ">");
+    }
+
+    @Override
+    public SManualTaskInstance createManualUserTask(final long userTaskId, final String name, final long flowNodeDefinitionId, final String displayName,
+            final long userId, final String description, final long dueDate, final STaskPriority priority) throws SActivityCreationException,
+            SFlowNodeNotFoundException, SFlowNodeReadException {
+        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) getFlowNodeInstance(userTaskId);
+        final SManualTaskInstanceBuilder manualTaskInstanceBuilder = getInstanceBuilders().getSManualTaskInstanceBuilder();
+        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getProcessDefinitionIndex());
+        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getRootProcessInstanceIndex());
+        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getParentProcessInstanceIndex());
+        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilder.createNewManualTaskInstance(name, flowNodeDefinitionId,
+                parentUserTask.getRootContainerId(), userTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
+                parentProcessInstanceId);
+        createNewManualTaskInstance.setParentContainerId(userTaskId);
+        createNewManualTaskInstance.setParentActivityInstanceId(userTaskId);
+        createNewManualTaskInstance.setAssigneeId(userId);
+        createNewManualTaskInstance.setExpectedEndDate(dueDate);
+        createNewManualTaskInstance.setDescription(description);
+        createNewManualTaskInstance.setDisplayDescription(description);
+        createNewManualTaskInstance.setDisplayName(displayName);
+        createNewManualTaskInstance.setPriority(priority);
+        final SActivityInstance sActivityInstance = createNewManualTaskInstance.done();
+        createActivityInstance(sActivityInstance);
+        return (SManualTaskInstance) sActivityInstance;
     }
 
     protected SPendingActivityMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SPendingActivityMapping mapping) {
@@ -366,31 +394,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
         }
-    }
-
-    @Override
-    public SManualTaskInstance createManualUserTask(final long userTaskId, final String name, final long flowNodeDefinitionId, final String displayName,
-            final long userId, final String description, final long dueDate, final STaskPriority priority) throws SActivityCreationException,
-            SFlowNodeNotFoundException, SFlowNodeReadException {
-        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) getFlowNodeInstance(userTaskId);
-        final SManualTaskInstanceBuilder manualTaskInstanceBuilder = getInstanceBuilders().getSManualTaskInstanceBuilder();
-        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getProcessDefinitionIndex());
-        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getRootProcessInstanceIndex());
-        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getParentProcessInstanceIndex());
-        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilder.createNewManualTaskInstance(name, flowNodeDefinitionId,
-                parentUserTask.getRootContainerId(), userTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
-                parentProcessInstanceId);
-        createNewManualTaskInstance.setParentContainerId(userTaskId);
-        createNewManualTaskInstance.setParentActivityInstanceId(userTaskId);
-        createNewManualTaskInstance.setAssigneeId(userId);
-        createNewManualTaskInstance.setExpectedEndDate(dueDate);
-        createNewManualTaskInstance.setDescription(description);
-        createNewManualTaskInstance.setDisplayDescription(description);
-        createNewManualTaskInstance.setDisplayName(displayName);
-        createNewManualTaskInstance.setPriority(priority);
-        final SActivityInstance sActivityInstance = createNewManualTaskInstance.done();
-        createActivityInstance(sActivityInstance);
-        return (SManualTaskInstance) sActivityInstance;
     }
 
     @Override

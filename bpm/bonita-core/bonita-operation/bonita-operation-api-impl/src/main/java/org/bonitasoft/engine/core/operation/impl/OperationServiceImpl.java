@@ -26,10 +26,13 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Zhang Bole
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class OperationServiceImpl implements OperationService {
 
@@ -37,10 +40,13 @@ public class OperationServiceImpl implements OperationService {
 
     private final ExpressionResolverService expressionResolverService;
 
+    private final TechnicalLoggerService logger;
+
     public OperationServiceImpl(final OperationExecutorStrategyProvider operationExecutorStrategyProvider,
-            final ExpressionResolverService expressionResolverService) {
+            final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger) {
         super();
         this.expressionResolverService = expressionResolverService;
+        this.logger = logger;
         final List<OperationExecutorStrategy> expressionExecutors = operationExecutorStrategyProvider.getOperationExecutors();
         operationExecutorsMap = new HashMap<String, OperationExecutorStrategy>(expressionExecutors.size());
         for (final OperationExecutorStrategy operationExecutorStrategy : expressionExecutors) {
@@ -65,6 +71,17 @@ public class OperationServiceImpl implements OperationService {
             final Object operationValue = getOperationValue(operation, expressionContext, rightOperand);
             final OperationExecutorStrategy operationExecutorStrategy = getOperationExecutorStrategy(operation);
             operationExecutorStrategy.execute(operation, operationValue, dataContainerId, dataContainerType, expressionContext);
+
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+                if (dataContainerType != null) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed operation on "
+                            + dataContainerType + " <" + dataContainerId + "> : " + operation.getLeftOperand().getName() + " " + operation.getOperator() + " "
+                            + operationValue);
+                } else {
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed operation " + " <" + dataContainerId + "> : "
+                            + operation.getLeftOperand().getName() + " " + operation.getOperator() + " " + operationValue);
+                }
+            }
         }
     }
 

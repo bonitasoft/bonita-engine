@@ -4,6 +4,7 @@
 	<bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
 		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="byType" />

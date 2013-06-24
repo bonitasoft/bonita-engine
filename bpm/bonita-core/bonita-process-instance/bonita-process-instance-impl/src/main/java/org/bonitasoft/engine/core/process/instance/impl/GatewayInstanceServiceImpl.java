@@ -43,6 +43,8 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -80,14 +82,17 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private final TokenService tokenService;
 
+    private final TechnicalLoggerService logger;
+
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
             final BPMInstanceBuilders instanceBuilders, final ProcessDefinitionService processDefinitionService,
-            final QueriableLoggerService queriableLoggerService, final TokenService tokenService) {
+            final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger, final TokenService tokenService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
         this.instanceBuilders = instanceBuilders;
         this.queriableLoggerService = queriableLoggerService;
+        this.logger = logger;
         this.tokenService = tokenService;
         sGatewayInstanceBuilder = instanceBuilders.getSGatewayInstanceBuilder();
     }
@@ -108,6 +113,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
             throw new SGatewayCreationException(e);
         }
+
+        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Created gateway instance <" + gatewayInstance.getName() + "> with id <"
+                + gatewayInstance.getId() + ">");
     }
 
     @Override

@@ -120,7 +120,7 @@ public class ProcessArchiver {
     }
 
     /**
-     * @param processInstance
+     * @param sProcessInstance
      * @param connectorInstanceService
      * @param archiveDate
      * @param containerId

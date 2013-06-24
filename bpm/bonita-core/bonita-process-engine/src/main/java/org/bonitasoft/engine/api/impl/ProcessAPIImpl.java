@@ -695,29 +695,30 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
-        final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
+        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
 
         // create the runtime process definition
-        final SProcessDefinition sDefinition = bpmDefinitionBuilders.getProcessDefinitionBuilder()
-                .createNewInstance(processDefinition, sExpressionBuilders, sDataDefinitionBuilders, sOperationBuilders).done();
+        final SProcessDefinition sProcessDefinition = bpmDefinitionBuilders.getProcessDefinitionBuilder()
+                .createNewInstance(designProcessDefinition, sExpressionBuilders, sDataDefinitionBuilders, sOperationBuilders).done();
 
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 try {
-                    processDefinitionService.getProcessDefinitionId(processDefinition.getName(), processDefinition.getVersion());
-                    throw new AlreadyExistsException("The process " + processDefinition.getName() + " in version " + processDefinition.getVersion()
+                    processDefinitionService.getProcessDefinitionId(designProcessDefinition.getName(), designProcessDefinition.getVersion());
+                    throw new AlreadyExistsException("The process " + designProcessDefinition.getName() + " in version " + designProcessDefinition.getVersion()
                             + " already exists.");
                 } catch (final SProcessDefinitionReadException e) {
                     // ok
                 }
-                processDefinitionService.store(sDefinition, processDefinition.getDisplayName(), processDefinition.getDisplayDescription());
-                unzipBar(businessArchive, sDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
+                processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
+                unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
                 // TODO refactor this to avoid using transaction executor inside
-                final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(this, businessArchive, tenantAccessor, sDefinition);
+                final boolean isResolved = tenantAccessor.getDependencyResolver()
+                        .resolveDependencies(this, businessArchive, tenantAccessor, sProcessDefinition);
                 if (isResolved) {
                     tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
-                            dependencyBuilderAccessor, sDefinition);
+                            dependencyBuilderAccessor, sProcessDefinition);
                 }
             } catch (final BonitaHomeNotSetException e) {
                 transactionExecutor.setTransactionRollback();
@@ -734,7 +735,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final STransactionException e) {
             throw new ProcessDeployException(e);
         }
-        return ModelConvertor.toProcessDefinition(sDefinition);
+
+        final ProcessDefinition processDefinition = ModelConvertor.toProcessDefinition(sProcessDefinition);
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + getUserNameFromSession() + "> has installed process <" +
+                    sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+        }
+        return processDefinition;
     }
 
     @Override
@@ -814,7 +822,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-        final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService);
+        final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService,
+                tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession());
         try {
             transactionExecutor.execute(transactionContent);
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -831,7 +840,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         try {
-            final EnableProcess enableProcess = new EnableProcess(processDefinitionService, processId, eventsHandler);
+            final EnableProcess enableProcess = new EnableProcess(processDefinitionService, processId, eventsHandler,
+                    tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession());
             transactionExecutor.execute(enableProcess);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
@@ -3211,6 +3221,20 @@ public class ProcessAPIImpl implements ProcessAPI {
         return userId;
     }
 
+    private String getUserNameFromSession() {
+        SessionAccessor sessionAccessor;
+        final String userName;
+        try {
+            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final long sessionId = sessionAccessor.getSessionId();
+            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            userName = platformServiceAccessor.getSessionService().getSession(sessionId).getUserName();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+        return userName;
+    }
+
     @Override
     public ProcessInstance startProcess(final long userId, final long processDefinitionId, final List<Operation> operations,
             final Map<String, Serializable> context)
@@ -3228,7 +3252,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             starterId = userId;
         }
         // Retrieval of the process definition:
-        SProcessDefinition sDefinition;
+        final SProcessDefinition sProcessDefinition;
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
@@ -3236,7 +3260,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
                     throw new ProcessActivationException("Process disabled");
                 }
-                sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             } catch (final SProcessDefinitionNotFoundException e) {
                 throw new ProcessDefinitionNotFoundException(e);
             } catch (final SBonitaException e) {
@@ -3248,7 +3272,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final STransactionException e) {
             throw new RetrieveException(e);
         }
-        SProcessInstance startedInstance;
+        final SProcessInstance startedInstance;
         try {
             final List<SOperation> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
             Map<String, Object> operationContext;
@@ -3257,11 +3281,24 @@ public class ProcessAPIImpl implements ProcessAPI {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            startedInstance = processExecutor.start(sDefinition, starterId, getUserIdFromSession(), sOperations, operationContext);
+            startedInstance = processExecutor.start(sProcessDefinition, starterId, getUserIdFromSession(), sOperations, operationContext);
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }// FIXME in case process instance creation exception -> put it in failed
-        return ModelConvertor.toProcessInstance(sDefinition, startedInstance);
+
+        final ProcessInstance processInstance = ModelConvertor.toProcessInstance(sProcessDefinition, startedInstance);
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+            if (starterId == getUserIdFromSession()) {
+                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + getUserNameFromSession() + "> has started instance <"
+                        + processInstance.getId() + "> of process <" + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+            }
+            else {
+                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user with id <" + starterId + "> has started instance <"
+                        + processInstance.getId() + "> of process <" + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+            }
+        }
+        return processInstance;
     }
 
     private List<SOperation> toSOperation(final List<Operation> operations, final SOperationBuilders sOperationBuilders,

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModif
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SUnhideableTaskException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
@@ -68,6 +69,28 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityCreationException
      */
     void createActivityInstance(SActivityInstance activityInstance) throws SActivityCreationException;
+
+    /**
+     * Create manual user task in DB by given information. This is create sub task for the given user task.
+     * 
+     * @param userTaskId
+     *            identifier of user task, the user task is the parent of the created manual user task
+     * @param name
+     *            name of user task
+     * @param displayName
+     * @param userId
+     *            identifier of user that the new created manual user task will be assigned to.
+     * @param description
+     *            description of user task
+     * @param dueDate
+     *            expected end date of the new created manual user task
+     * @return the new created manual user task object
+     * @throws SActivityCreationException
+     * @throws SFlowNodeNotFoundException
+     * @throws SFlowNodeReadException
+     */
+    SManualTaskInstance createManualUserTask(long userTaskId, String name, long flowNodeDefinitionId, String displayName, long userId, String description,
+            long dueDate, STaskPriority priority) throws SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException;
 
     /**
      * Create a new pending activity mapping in DB
@@ -265,28 +288,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityReadException
      */
     List<SActivityInstance> getChildrenOfAnActivity(long parentActivityInstanceId, int fromIndex, int numberOfResults) throws SActivityReadException;
-
-    /**
-     * Create manual user task in DB by given information. This is create sub task for the given user task.
-     * 
-     * @param userTaskId
-     *            identifier of user task, the user task is the parent of the created manual user task
-     * @param name
-     *            name of user task
-     * @param displayName
-     * @param userId
-     *            identifier of user that the new created manual user task will be assigned to.
-     * @param description
-     *            description of user task
-     * @param dueDate
-     *            expected end date of the new created manual user task
-     * @return the new created manual user task object
-     * @throws SActivityCreationException
-     * @throws SFlowNodeNotFoundException
-     * @throws SFlowNodeReadException
-     */
-    SManualTaskInstance createManualUserTask(long userTaskId, String name, long flowNodeDefinitionId, String displayName, long userId, String description,
-            long dueDate, STaskPriority priority) throws SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException;
 
     /**
      * Assign the specific human task to the user
