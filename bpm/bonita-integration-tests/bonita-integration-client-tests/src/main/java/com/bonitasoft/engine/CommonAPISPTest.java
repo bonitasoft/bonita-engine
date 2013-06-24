@@ -57,6 +57,8 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
                 clean();
             } catch (final Exception be) {
                 LOGGER.error("Unable to clean db", be);
+            }finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
             }
         }
 
@@ -69,6 +71,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
                 throw new BonitaRuntimeException(e);
             }
             LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+            LOGGER.info("-----------------------------------------------------------------------------------------------");
             if (!clean.isEmpty()) {
                 throw new BonitaRuntimeException(clean.toString());
             }

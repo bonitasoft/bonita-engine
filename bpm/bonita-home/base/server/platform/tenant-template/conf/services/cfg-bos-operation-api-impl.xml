@@ -6,6 +6,7 @@
 		<constructor-arg name="operationExecutorStrategyProvider"
 			ref="operationExecutorStrategyProvider" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="operationExecutorStrategyProvider"

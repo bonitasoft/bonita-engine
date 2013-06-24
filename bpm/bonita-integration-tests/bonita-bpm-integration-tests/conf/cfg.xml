@@ -117,6 +117,7 @@
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">

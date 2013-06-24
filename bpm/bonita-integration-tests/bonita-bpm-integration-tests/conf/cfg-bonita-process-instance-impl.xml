@@ -48,6 +48,7 @@
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="tokenService" ref="tokenService" />
+        <constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
 	<bean id="transitionService" class="org.bonitasoft.engine.core.process.instance.impl.TransitionServiceImpl">
