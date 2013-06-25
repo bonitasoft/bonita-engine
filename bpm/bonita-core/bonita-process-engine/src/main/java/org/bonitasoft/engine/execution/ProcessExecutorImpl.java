@@ -527,8 +527,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 rootProcessInstanceId = sProcessInstance.getId();
             }
             bpmInstancesCreator.createFlowNodeInstances(sDefinition, rootProcessInstanceId, sProcessInstance.getId(), flownNodeDefinitions,
-                    rootProcessInstanceId,
-                    sProcessInstance.getId(), SStateCategory.NORMAL, sDefinition.getId());
+                    rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL, sDefinition.getId());
         } catch (final SBonitaException e) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             throw new RuntimeException(e);
@@ -658,7 +657,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (gatewayInstance != null
                 && gatewayInstance.getHitBys() != null
                 && (gatewayInstance.getHitBys().contains(GatewayInstanceService.FINISH) || Arrays.asList(gatewayInstance.getHitBys().split(",")).contains(
-                        transitionInstance.getName())) && gatewayInstance.getTokenRefId() == transitionInstance.getTokenRefId()) {
+                        transitionInstance.getName())) && gatewayInstance.getTokenRefId().equals(transitionInstance.getTokenRefId())) {
             gatewayInstance = null;// already hit we create a new one
         }
         if (gatewayInstance != null) {
@@ -1121,34 +1120,35 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, long starterDelegateId, final List<SOperation> operations,
-            final Map<String, Object> context) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
-            SActivityInterruptedException, SProcessInstanceCreationException {
+    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
+            final List<SOperation> operations, final Map<String, Object> context) throws SActivityReadException, SActivityExecutionFailedException,
+            SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException {
         return start(sProcessDefinition, starterId, starterDelegateId, null, operations, context, null, -1, -1);
     }
 
     @Override
-    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, long starterDelegateId,
+    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context) throws SActivityReadException,
             SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException {
         return start(sProcessDefinition, starterId, starterDelegateId, expressionContext, operations, context, null, -1, -1);
     }
 
     @Override
-    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, long starterDelegateId) throws SActivityReadException,
-            SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException {
+    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId)
+            throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException,
+            SProcessInstanceCreationException {
         return start(sProcessDefinition, starterId, starterDelegateId, null, null, null, null, -1, -1);
     }
 
     @Override
-    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, long starterDelegateId,
+    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
             final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
             throws SActivityReadException, SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException {
         return start(sProcessDefinition, starterId, starterDelegateId, null, operations, context, connectorsWithInput, -1, -1);
     }
 
     @Override
-    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, long starterDelegateId,
+    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context, final long callerId)
             throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException,
             SProcessInstanceCreationException {
@@ -1156,7 +1156,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, long starterDelegateId,
+    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final long subProcessDefinitionId)
             throws SProcessInstanceCreationException, SActivityReadException, SActivityExecutionException {
