@@ -1,1 +1,2 @@
-DELETE FROM breakpoint;
+DELETE FROM breakpoint
+GO
