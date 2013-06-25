@@ -78,7 +78,9 @@ public class EhCacheCacheService implements CacheService {
         ehCacheConfig.setMaxElementsInMemory(cacheConfig.getMaxElementsInMemory());
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
-        ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
+        if (!cacheConfig.isEternal()) {
+            ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
+        }
         ehCacheConfig.setEternal(cacheConfig.isEternal());
         return ehCacheConfig;
     }
