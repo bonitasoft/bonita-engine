@@ -64,7 +64,7 @@ public class LocalIntegrationTests {
     }
 
     private static void setupSpringContext() {
-        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "sqlserver");
+        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
