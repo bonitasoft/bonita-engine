@@ -57,6 +57,20 @@
 			<artifactId>bonita-cache-ehcache</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- add hazel cast here because hibernate cache use it by configuration -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-hibernate</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-spring</artifactId>
+		</dependency>
+
 
 		<!-- Category -->
 		<dependency>

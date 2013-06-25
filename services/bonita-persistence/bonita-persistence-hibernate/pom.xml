@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -7,12 +6,16 @@
 		<artifactId>bonita-persistence</artifactId>
 		<version>6.1.0-rc-03-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>bonita-persistence-hibernate-sp</artifactId>
-	
+
 	<name>Bonita Persistence Service: Hibernate SP Implementation</name>
-	
+
 	<dependencies>
+		<dependency>
+			<groupId>com.bonitasoft.manager</groupId>
+			<artifactId>manager</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core</artifactId>
@@ -23,11 +26,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-      <groupId>com.bonitasoft.engine</groupId>
-      <artifactId>bonita-delete-batch</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-delete-batch</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 </project>
 	
