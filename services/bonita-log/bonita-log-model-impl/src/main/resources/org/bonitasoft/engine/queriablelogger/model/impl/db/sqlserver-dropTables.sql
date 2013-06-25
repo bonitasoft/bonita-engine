@@ -1,6 +1,4 @@
-ALTER TABLE queriableLog_p DROP CONSTRAINT fk_queriableLogId
+DROP TABLE queriablelog_p
 GO
-DROP TABLE queriableLog_p
-GO
-DROP TABLE queriableLog
+DROP TABLE queriable_log
 GO

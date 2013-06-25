@@ -19,11 +19,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-        BPMLocalSuiteTests.class,
-        BPMRemoteTests.class,
-        APIMethodTest.class
-})
+@SuiteClasses({ BPMLocalSuiteTests.class, BPMRemoteTests.class, APIMethodTest.class })
 public class LocalIntegrationTests {
 
     private static final String TMP_BONITA_HOME = "target/eclipse-bonita-home";
@@ -68,7 +64,7 @@ public class LocalIntegrationTests {
     }
 
     private static void setupSpringContext() {
-        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "sqlserver");
 
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");

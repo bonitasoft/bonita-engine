@@ -25,13 +25,18 @@ generate_postgres (){
 	cat $PATHTOFILE/$FILENAME | sed -f postgres.sed > $PATHTOFILE/postgres-${PATTERNFILENAME};
 }
 
+generate_sqlserver (){
+	PATHTOFILE=$1
+	FILENAME=$2
+	PATTERNFILENAME=$3
+	cat $PATHTOFILE/$FILENAME | sed -f sqlserver.sed > $PATHTOFILE/sqlserver-${PATTERNFILENAME};
+}
+
 parse (){
 	PATHTOFILE=${1%/*}
 	FILENAME=${1##*/}
 	PATTERNFILENAME=${FILENAME#*-}
-	generate_oracle $PATHTOFILE $FILENAME $PATTERNFILENAME;
-	generate_mysql $PATHTOFILE $FILENAME $PATTERNFILENAME;
-	generate_postgres $PATHTOFILE $FILENAME $PATTERNFILENAME;
+	generate_sqlserver $PATHTOFILE $FILENAME $PATTERNFILENAME;
 }
 
 if [ $# != 1 ]; then
@@ -45,4 +50,3 @@ for f in ${files}
 do
 	parse $f
 done
-

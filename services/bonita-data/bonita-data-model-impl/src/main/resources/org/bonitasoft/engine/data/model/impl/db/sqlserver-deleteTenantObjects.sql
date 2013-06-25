@@ -1,2 +1,4 @@
-DELETE FROM datasourceparameter WHERE tenantid = ${tenantid};
-DELETE FROM datasource WHERE tenantid = ${tenantid};
+DELETE FROM datasourceparameter WHERE tenantid = ${tenantid}
+GO
+DELETE FROM datasource WHERE tenantid = ${tenantid}
+GO

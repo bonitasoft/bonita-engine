@@ -1,27 +1,14 @@
-ALTER TABLE user_membership DROP CONSTRAINT fk_usr_mbshp_usrId
+DROP TABLE user_membership
 GO
-ALTER TABLE user_membership DROP CONSTRAINT fk_usr_mbshp_rId
+DROP TABLE p_metadata_val
 GO
-ALTER TABLE user_membership DROP CONSTRAINT fk_usr_mbshp_gId
+DROP TABLE p_metadata_def
 GO
-DROP TABLE  user_membership
+DROP TABLE user_contactinfo
 GO
-
-ALTER TABLE p_metadata_val DROP CONSTRAINT fk_p_md_val_mdId
+DROP TABLE user_
 GO
-ALTER TABLE p_metadata_val DROP CONSTRAINT fk_p_md_val_usrId
+DROP TABLE role
 GO
-DROP TABLE  p_metadata_val
-GO
-
-DROP TABLE  p_metadata_def
-GO
-
-DROP TABLE  user_
-GO
-
-DROP TABLE  role
-GO
-
-DROP TABLE  group_
+DROP TABLE group_
 GO

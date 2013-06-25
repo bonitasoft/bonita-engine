@@ -1,2 +1,2 @@
-INSERT INTO sequence VALUES(${tenantid}, 11000, 1)
+INSERT INTO sequence VALUES(${tenantid}, 10050, 1)
 GO

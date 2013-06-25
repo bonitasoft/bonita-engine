@@ -1,1 +1,2 @@
-DELETE FROM processsupervisor;
+DELETE FROM processsupervisor
+GO

@@ -1,1 +1,2 @@
-DELETE FROM platformCommand;
+DELETE FROM platformCommand
+GO

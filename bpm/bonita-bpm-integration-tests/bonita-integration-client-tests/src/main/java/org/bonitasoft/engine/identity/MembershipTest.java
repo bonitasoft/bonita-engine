@@ -1,9 +1,5 @@
 package org.bonitasoft.engine.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +13,10 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Bole Zhang
@@ -63,7 +63,7 @@ public class MembershipTest extends CommonAPITest {
     @Test
     public void getUserMembershipsWithPageOutOfRangeException() throws BonitaException {
         final User u = getIdentityAPI().createUser("u", "engine");
-        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(u.getId(), -1, 3, UserMembershipCriterion.ROLE_NAME_ASC);
+        final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(u.getId(), 0, 3, UserMembershipCriterion.ROLE_NAME_ASC);
         assertTrue(userMemberships.isEmpty());
         getIdentityAPI().deleteUser(u.getId());
     }

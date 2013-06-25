@@ -1,1 +1,2 @@
-DELETE FROM external_identity_mapping;
+DELETE FROM external_identity_mapping
+GO

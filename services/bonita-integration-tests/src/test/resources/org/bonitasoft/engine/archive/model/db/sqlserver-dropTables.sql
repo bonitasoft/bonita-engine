@@ -1,12 +1,19 @@
-DROP TABLE  employee;
+DROP TABLE employee
 GO
-DROP TABLE  laptop;
+
+DROP TABLE laptop
 GO
-DROP TABLE  address;
+
+DROP TABLE address
 GO
-DROP TABLE  project;
+
+DROP TABLE project
 GO
-DROP TABLE  employeeprojectmapping;
+
+DROP TABLE employeeprojectmapping
 GO
-DROP TABLE  saemployee;
+
+DROP TABLE saemployee
 GO
+
+

@@ -1,2 +1,2 @@
-DROP TABLE  process_comment
+DROP TABLE process_comment
 GO

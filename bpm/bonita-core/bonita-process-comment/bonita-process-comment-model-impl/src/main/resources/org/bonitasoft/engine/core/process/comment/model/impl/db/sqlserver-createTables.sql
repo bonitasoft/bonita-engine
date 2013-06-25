@@ -5,8 +5,7 @@ CREATE TABLE process_comment (
   userId NUMERIC(19, 0),
   processInstanceId NUMERIC(19, 0) NOT NULL,
   postDate NUMERIC(19, 0) NOT NULL,
-  content TEXT NOT NULL,
+  content VARCHAR(255) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
 GO
-

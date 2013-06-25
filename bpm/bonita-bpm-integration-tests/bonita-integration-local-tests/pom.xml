@@ -59,6 +59,13 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>com.microsoft.jdbc</groupId>
+			<artifactId>sqlserver</artifactId>
+			<version>3.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/sqljdbc4.jar</systemPath>
+		</dependency>
 
 		<!-- Local JNDI implementation -->
 		<dependency>

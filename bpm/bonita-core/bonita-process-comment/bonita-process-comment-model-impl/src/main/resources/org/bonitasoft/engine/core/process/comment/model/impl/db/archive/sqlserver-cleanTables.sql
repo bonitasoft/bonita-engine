@@ -1,1 +1,2 @@
-DELETE FROM arch_process_comment;
+DELETE FROM arch_process_comment
+GO

@@ -1,1 +1,2 @@
-DELETE FROM process_definition;
+DELETE FROM process_definition
+GO

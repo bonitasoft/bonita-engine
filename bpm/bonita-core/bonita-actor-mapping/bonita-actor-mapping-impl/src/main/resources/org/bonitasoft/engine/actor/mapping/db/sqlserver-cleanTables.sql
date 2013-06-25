@@ -1,3 +1,5 @@
-DELETE FROM actormember;
+DELETE FROM actormember
+GO
 
-DELETE FROM actor;
+DELETE FROM actor
+GO

@@ -1,3 +1,5 @@
-DELETE FROM datasourceparameter;
+DELETE FROM datasourceparameter
+GO
 
-DELETE FROM datasource;
+DELETE FROM datasource
+GO

@@ -1,1 +1,2 @@
-DELETE FROM process_comment WHERE tenantid = ${tenantid};
+DELETE FROM process_comment WHERE tenantid = ${tenantid}
+GO
