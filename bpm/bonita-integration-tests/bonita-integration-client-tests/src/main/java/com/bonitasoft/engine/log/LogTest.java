@@ -51,7 +51,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -297,7 +296,7 @@ public class LogTest extends CommonAPISPTest {
                 null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
@@ -458,10 +457,8 @@ public class LogTest extends CommonAPISPTest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final long procInstanceId = startProcess.getId();
         assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
-        final WaitForStep waitForStep0 = waitForStep("step0", startProcess);
-        assignAndExecuteStep(waitForStep0.getResult(), userId);
-
-        waitForStep("step2", startProcess);
+        waitForUserTaskAndExecuteIt("step0", startProcess, userId);
+        waitForUserTask("step2", startProcess, 20000);
 
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         assertEquals(numberOfUsers, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
