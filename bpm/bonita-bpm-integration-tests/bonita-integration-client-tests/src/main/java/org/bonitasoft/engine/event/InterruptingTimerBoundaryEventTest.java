@@ -1,9 +1,5 @@
 package org.bonitasoft.engine.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -27,6 +23,10 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
 
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
@@ -45,7 +45,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         waitForArchivedActivity(waitForStep1.getId(), TestStates.getAbortedState());
 
@@ -105,7 +105,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // check that the exception flow was taken
         final WaitForStep waitForExceptionStep = waitForStep(50, 2000, exceptionFlowTaskName, processInstance, TestStates.getReadyState(null));
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
         assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
@@ -141,7 +141,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // check that the exception flow was taken
         final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         waitForArchivedActivity(multiInstance.getId(), TestStates.getAbortedState());
 
@@ -176,7 +176,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
         assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
@@ -248,7 +248,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // Check that step1 is aborted
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(100, 1000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         disableAndDeleteProcess(processDefinition);
     }

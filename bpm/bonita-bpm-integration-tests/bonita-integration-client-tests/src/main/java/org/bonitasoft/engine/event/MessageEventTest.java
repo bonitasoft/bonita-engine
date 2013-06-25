@@ -319,7 +319,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
@@ -345,7 +345,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
@@ -369,7 +369,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
         // the message will be send before the target process is deployed
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 6000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
@@ -402,7 +402,7 @@ public class MessageEventTest extends CommonAPITest {
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
         assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
@@ -454,7 +454,7 @@ public class MessageEventTest extends CommonAPITest {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
         assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1));
         waitForEventInWaitingState(receiveMessageProcessInstance2, CATCH_EVENT_NAME);
@@ -464,7 +464,7 @@ public class MessageEventTest extends CommonAPITest {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "2", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 3000, sendMessageProcessInstance2, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
 
         assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2));
 
@@ -496,7 +496,7 @@ public class MessageEventTest extends CommonAPITest {
 
         // instantiate a process containing whom the targetProcess is of the ProcessDefinition receiveMessageProcess
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
         final Boolean gotMessage1 = doesUserTaskExist(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
         final Boolean gotMessage2 = doesUserTaskExist(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2);
@@ -560,7 +560,7 @@ public class MessageEventTest extends CommonAPITest {
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance1
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
         // waitForStep(100, 5000, "userTask1", receiveMessageProcessInstance1);
@@ -598,7 +598,7 @@ public class MessageEventTest extends CommonAPITest {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe 2", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 3000, sendMessageProcessInstance1, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
         assertFalse(new WaitForStep(50, 6000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
 
         // instantiate a process having both two correlation keys matching, the process must go further
@@ -606,7 +606,7 @@ public class MessageEventTest extends CommonAPITest {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 3000, sendMessageProcessInstance2, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
         waitForStep(50, 11000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -677,7 +677,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 9 * 1000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
@@ -715,7 +715,7 @@ public class MessageEventTest extends CommonAPITest {
         waitForEventInWaitingState(catchMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         checkNbPendingTaskOf(2, user);
 
@@ -748,7 +748,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 3000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         // at the first test some time the cron job time some time before executing
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 9 * 1000, true, 1, user);
@@ -796,7 +796,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
         // waitForStep(50, 6000, "step1", receiveMessageProcessInstance);
@@ -820,7 +820,7 @@ public class MessageEventTest extends CommonAPITest {
     public void messageSentProcessFinishBeforeReceiveProcessIsEnabled() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
 
@@ -917,7 +917,7 @@ public class MessageEventTest extends CommonAPITest {
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(20, 5000, sendMessageProcessInstance1, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
         assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
