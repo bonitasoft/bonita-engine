@@ -161,7 +161,7 @@ public class APITestUtil {
 
     public static final int DEFAULT_REPEAT = 50;
 
-    public static final int DEFAULT_TIMEOUT = 8000;
+    public static final int DEFAULT_TIMEOUT = 10000;
 
     @After
     public void clearSynchroRepository() throws Exception {
@@ -172,15 +172,6 @@ public class APITestUtil {
         } catch (final Exception e) {
             e.printStackTrace();
         }
-    }
-
-    protected boolean isProcessInstanceFinishedAndArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance,
-            final ProcessAPI processAPI) throws Exception {
-        return new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
-    }
-
-    protected boolean isProcessInstanceFinishedAndArchived(final ProcessInstance processInstance) throws Exception {
-        return isProcessInstanceFinishedAndArchived(50, 1000, processInstance, getProcessAPI());
     }
 
     protected void loginWith(final String userName, final String password) throws BonitaException {
@@ -776,6 +767,14 @@ public class APITestUtil {
 
     protected void waitForProcessToFinish(final ProcessInstance processInstance, final String state) throws Exception {
         waitForProcessToFinish(50, 10000, processInstance, state);
+    }
+
+    protected boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
+        return new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
+    }
+
+    protected boolean waitProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
+        return waitProcessToFinishAndBeArchived(100, 7000, processInstance);
     }
 
     protected ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception {

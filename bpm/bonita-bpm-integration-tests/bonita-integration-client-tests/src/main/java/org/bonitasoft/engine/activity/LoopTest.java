@@ -1,8 +1,5 @@
 package org.bonitasoft.engine.activity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +23,9 @@ import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Matthieu Chaffotte
@@ -63,7 +63,7 @@ public class LoopTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, instance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(instance));
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(2, archivedActivityInstances.size());

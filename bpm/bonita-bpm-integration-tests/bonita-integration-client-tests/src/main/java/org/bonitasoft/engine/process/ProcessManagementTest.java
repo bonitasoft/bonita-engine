@@ -286,8 +286,8 @@ public class ProcessManagementTest extends CommonAPITest {
         // one archive for each change in the activity state. For automatic tasks we have initializingAndexecuting, completed
         checkNbOfArchivedActivityInstances(processInstance1, 2 * 2);
         checkNbOfArchivedActivityInstances(processInstance2, 3 * 2);
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 800, processInstance1, getProcessAPI()));
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 800, processInstance2, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance1));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance2));
         disableAndDeleteProcess(processDefinition1);
         disableAndDeleteProcess(processDefinition2);
     }
@@ -348,7 +348,7 @@ public class ProcessManagementTest extends CommonAPITest {
                 assertEquals("task3", archivedActivityInstances.get(desc3 * nbOfStates + i).getName());
             }
         }
-        assertTrue(isProcessInstanceFinishedAndArchived(processInstance2));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance2));
         disableAndDeleteProcess(processDefinition2);
     }
 
@@ -903,7 +903,6 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDeploymentInfoUpdater processDeploymentInfoUpdateDescriptor = new ProcessDeploymentInfoUpdater();
         final String updatedDisplayName = "updatedDisplayName";
         final String updatedDisplayDescription = "updatedDisplayDescription";
-        final ActivationState updatedActivationState = ActivationState.DISABLED;
         final String iconPath = "iconPathOne";
         processDeploymentInfoUpdateDescriptor.setDisplayName(updatedDisplayName);
         processDeploymentInfoUpdateDescriptor.setDisplayDescription(updatedDisplayDescription);

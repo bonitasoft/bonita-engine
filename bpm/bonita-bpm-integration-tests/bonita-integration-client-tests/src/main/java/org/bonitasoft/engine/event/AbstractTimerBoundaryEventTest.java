@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
@@ -34,6 +31,9 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
 import org.junit.Before;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -299,7 +299,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         // remove comments when boundary events are archived
         // final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
@@ -357,7 +357,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 500); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(100, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -398,7 +398,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser().getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(100, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -419,7 +419,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
 
         waitForUserTaskAndExecuteIt("step2", processInstance, getUser().getId());
 
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 6000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
         disableAndDeleteProcess(processDefinition);

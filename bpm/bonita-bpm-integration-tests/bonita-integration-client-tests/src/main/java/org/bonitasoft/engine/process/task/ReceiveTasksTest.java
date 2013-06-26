@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.process.task;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,6 +68,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Julien Molinaro
  */
@@ -102,6 +102,7 @@ public class ReceiveTasksTest extends CommonAPITest {
      * dynamic -> deployAndEnable(receiveProcess), startProcess(receiveProcess)
      * checks : receiveProcess wait on receive task and don't and halt on the user task.
      */
+    @SuppressWarnings("unchecked")
     @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
             "Send", "Receive" })
     @Test
@@ -132,6 +133,7 @@ public class ReceiveTasksTest extends CommonAPITest {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess), startProcess(sendProcess)
      * checks : receiveProcess wait on receive task, sendProcess is finished, receiveProcess continue and halt on the user task, receive task is archived
      */
+    @SuppressWarnings("unchecked")
     @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
             "Send", "Receive" })
     @Test
@@ -154,7 +156,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         assertEquals(1, searchResult.getCount());
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         waitForStep(50, 5000, "userTask1", receiveMessageProcessInstance);
 
@@ -186,7 +188,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "waitForMessage", null, null, null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                 "delivery", user, "m3", null, null, null);
@@ -194,7 +196,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
 
-        waitForStep(50, 5000, "userTask1", receiveMessageProcessInstance);
+        waitForUserTask("userTask1", receiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -217,8 +219,8 @@ public class ReceiveTasksTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
         final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(sendMessageProcess2.getId());
 
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, sendMessageProcessInstance1, getProcessAPI()));
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, sendMessageProcessInstance2, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                 "delivery", user, "m4", null, null, null);
@@ -226,7 +228,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
 
-        waitForStep(50, 5000, "userTask1", receiveMessageProcessInstance);
+        waitForUserTask("userTask1", receiveMessageProcessInstance, 50000);
 
         disableAndDeleteProcess(sendMessageProcess1);
         disableAndDeleteProcess(sendMessageProcess2);
@@ -257,7 +259,7 @@ public class ReceiveTasksTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, sendMessageProcessInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 9 * 1000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
@@ -278,6 +280,7 @@ public class ReceiveTasksTest extends CommonAPITest {
      * dynamic -> deployAndEnable(receiveProcess), startProcess(receiveProcess), cancelProcessInstance(receiveProcess)
      * checks : receiveProcess wait on receive task, 1 waiting event, receiveProcess is cancelled, receiveProcess is archived, no more waiting event
      */
+    @SuppressWarnings("unchecked")
     @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
             "Send", "Receive" })
     @Test

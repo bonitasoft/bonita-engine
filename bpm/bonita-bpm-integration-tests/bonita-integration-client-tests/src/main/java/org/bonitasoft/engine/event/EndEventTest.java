@@ -1,8 +1,5 @@
 package org.bonitasoft.engine.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
@@ -25,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.joran.event.EndEvent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class EndEventTest extends CommonAPITest {
 
@@ -55,7 +54,7 @@ public class EndEventTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
-        assertTrue(isProcessInstanceFinishedAndArchived(50, 5000, processInstance, getProcessAPI()));
+        assertTrue(waitProcessToFinishAndBeArchived(processInstance));
         // final List<String> expectedEvents = getList("endEvent", "startEvent");
         // List<EventInstance> eventInstances = processAPI.getEventInstances(processInstance.getId(), 0, 5, EventSorting.NAME_ASC);
         // assertEquals(expectedEvents.size(), eventInstances.size());
