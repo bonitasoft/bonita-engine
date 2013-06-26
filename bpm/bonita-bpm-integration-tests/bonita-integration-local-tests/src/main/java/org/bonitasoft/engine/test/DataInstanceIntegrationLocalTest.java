@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.test;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -7,10 +8,8 @@ import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -18,67 +17,38 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.process.Employee;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
+
+    private User cebolinha;
+
+    private User cascao;
 
     @Before
     public void beforeTest() throws BonitaException {
         login();
+        cebolinha = createUser("cebolinha", "bpm");
+        cascao = createUser("cascao", "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
+        deleteUser(cebolinha.getId());
+        deleteUser(cascao.getId());
         logout();
-    }
-
-    @Cover(classes = DataInstance.class, concept = BPMNConcept.DATA, jira = "ENGINE-736", keywords = { "data", "container" }, story = "get archived values of data")
-    @Test
-    public void getDataValueForCompletedActivitesAndProcess() throws Exception {
-        final User user = createUser("john", "bpm");
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithArchivedData", "1.0");
-        processDefinitionBuilder.addActor("actor");
-        processDefinitionBuilder.addUserTask("step1", "actor").addShortTextData("step1Data", new ExpressionBuilder().createConstantStringExpression("s1_1"));
-        processDefinitionBuilder.addUserTask("step2", "actor");
-        processDefinitionBuilder.addTransition("step1", "step2");
-        processDefinitionBuilder.addShortTextData("processData1", new ExpressionBuilder().createConstantStringExpression("p1_1"));
-        processDefinitionBuilder.addShortTextData("processData2", new ExpressionBuilder().createConstantStringExpression("p2_1"));
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, "actor", user);
-        final long processDefinitionId = processDefinition.getId();
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
-        getProcessAPI().updateProcessDataInstance("processData2", processInstance.getId(), "p2_2");
-        getProcessAPI().updateActivityDataInstance("step1Data", step1.getId(), "s1_2");
-        assignAndExecuteStep(step1, user.getId());
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
-        // check value at end of the activity
-        final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals("s1_2", getProcessAPI().getActivityDataInstance("step1Data", archivedActivityInstance.getId()));
-        assertEquals("p1_1", getProcessAPI().getProcessDataInstance("processData1", processDefinitionId));
-        assertEquals("p2_2", getProcessAPI().getProcessDataInstance("processData2", processDefinitionId));
-        assignAndExecuteStep(step2, user.getId());
-        waitForProcessToFinish(processInstance);
-        // after archived same value
-        assertEquals("s1_2", getProcessAPI().getActivityDataInstance("step1Data", archivedActivityInstance.getId()));
-        assertEquals("p1_1", getProcessAPI().getProcessDataInstance("processData1", processDefinitionId));
-        assertEquals("p2_2", getProcessAPI().getProcessDataInstance("processData2", processDefinitionId));
-
-        this.disableAndDeleteProcess(processDefinition);
-        deleteUser(user);
     }
 
     @Test
     public void processWithCustomData() throws Exception {
-        final User john = createUser("john", "bpm");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithCustomData", "1.0");
         builder.addUserTask("step1", "actor");
         builder.addActor("actor");
@@ -88,7 +58,67 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
                 "org.bonitasoft.custom.Address");
         builder.addData("address", "org.bonitasoft.custom.Address", expression);
 
-        final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.done());
+        final BusinessArchive businessArchive = addClasspathRessource(builder).done();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, "actor", cascao);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        assertNotNull(getProcessAPI().getProcessDataInstance("address", processInstance.getId()).getValue());
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "ENGINE-1498")
+    @Test
+    public void callActivityWith2CustomDatasUsingSameExternalLibrairy() throws Exception {
+        final String targetProcessName = "targetProcess";
+        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+
+        // Build target process
+        final Expression defaultValueForEmployeeOnTStep1 = new ExpressionBuilder().createGroovyScriptExpression("initAddress",
+                "import org.bonitasoft.custom.Address; \n" + "return new Address(\"Santa Claus\", \"Tähtikuja 1\", \"96930\", \"Napapiiri\", \"Suomi\")",
+                "org.bonitasoft.custom.Address");
+        final ProcessDefinitionBuilder targetProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(targetProcessName, PROCESS_VERSION);
+        targetProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("tStart");
+        targetProcessDefinitionBuilder.addUserTask("tStep1", ACTOR_NAME).addData("data", Employee.class.getName(), defaultValueForEmployeeOnTStep1);
+        targetProcessDefinitionBuilder.addEndEvent("tEnd");
+        targetProcessDefinitionBuilder.addTransition("tStart", "tStep1").addTransition("tStep1", "tEnd");
+        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(), ACTOR_NAME,
+                cebolinha);
+
+        // Build main process
+        final Expression defaultValueForEmployeeOnStep1 = new ExpressionBuilder().createGroovyScriptExpression("initAddress",
+                "import org.bonitasoft.custom.Address; \n" + "return new Address(\"plop\", \"plop 1\", \"45655\", \"plop3\", \"plop4\")",
+                "org.bonitasoft.custom.Address");
+        final ProcessDefinitionBuilder callingProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        callingProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("start");
+        callingProcessDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addData("data", Employee.class.getName(), defaultValueForEmployeeOnStep1);
+        callingProcessDefinitionBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName")).addDescription("callActivityDescription")
+                .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
+        callingProcessDefinitionBuilder.addEndEvent("end");
+        callingProcessDefinitionBuilder.addTransition("start", "step1").addTransition("step1", "callActivity").addTransition("callActivity", "end");
+        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(), ACTOR_NAME,
+                cascao);
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+
+        final long step1Id = waitForUserTask("step1", callingProcessInstance).getId();
+        assertNotNull(getProcessAPI().getActivityDataInstance("data", step1Id).getValue());
+        assignAndExecuteStep(step1Id, cascao.getId());
+        final long tStep1Id = waitForUserTask("tStep1", callingProcessInstance).getId();
+        assertNotNull(getProcessAPI().getActivityDataInstance("data", tStep1Id).getValue());
+        assignAndExecuteStep(tStep1Id, cebolinha.getId());
+        assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+
+        // Clean up
+        disableAndDeleteProcess(callingProcessDefinition);
+        disableAndDeleteProcess(targetProcessDefinition);
+    }
+
+    private BusinessArchiveBuilder addClasspathRessource(final ProcessDefinitionBuilder targetProcessDefinitionBuilder)
+            throws InvalidProcessDefinitionException, IOException {
+        final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
+                targetProcessDefinitionBuilder.done());
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/custom-0.1.jar.bak");
         try {
             assertNotNull(stream);
@@ -97,14 +127,6 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
         } finally {
             stream.close();
         }
-
-        final BusinessArchive businessArchive = archiveBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, "actor", john);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        assertNotNull(getProcessAPI().getProcessDataInstance("address", processInstance.getId()).getValue());
-
-        disableAndDeleteProcess(processDefinition);
-        deleteUser(john);
+        return archiveBuilder;
     }
 }

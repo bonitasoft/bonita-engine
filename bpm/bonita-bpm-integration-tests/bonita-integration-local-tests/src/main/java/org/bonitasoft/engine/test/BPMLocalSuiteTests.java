@@ -12,7 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ProcessWithExpressionTestLocal.class,
         ProcessArchiveTest.class,
         LocalTimerEventTest.class,
-        // DataInstanceIntegrationLocalTest.class,
+        DataInstanceIntegrationLocalTest.class,
         GatewayExecutionLocalTest.class
 })
 public class BPMLocalSuiteTests {
