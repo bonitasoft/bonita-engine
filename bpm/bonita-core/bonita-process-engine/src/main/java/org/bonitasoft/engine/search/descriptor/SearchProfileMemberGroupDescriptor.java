@@ -40,7 +40,8 @@ public class SearchProfileMemberGroupDescriptor extends SearchEntityDescriptor {
 
     public SearchProfileMemberGroupDescriptor(final IdentityModelBuilder identityModelBuilder) {
         final GroupBuilder groupBuilder = identityModelBuilder.getGroupBuilder();
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(3);
+        searchEntityKeys = new HashMap<String, FieldDescriptor>(4);
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilder.ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilder.PROFILE_ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SGroup.class, groupBuilder.getNameKey()));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, groupBuilder.getParentPathKey()));

@@ -1029,11 +1029,11 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
         assertEquals(5, archivedProcessInstances.size());
-        assertEquals(processInstance1.getId(), archivedProcessInstances.get(0).getSourceObjectId());
-        assertEquals(processInstance2.getId(), archivedProcessInstances.get(1).getSourceObjectId());
-        assertEquals(processInstance3.getId(), archivedProcessInstances.get(2).getSourceObjectId());
-        assertEquals(processInstance4.getId(), archivedProcessInstances.get(3).getSourceObjectId());
-        assertEquals(processInstance5.getId(), archivedProcessInstances.get(4).getSourceObjectId());
+        assertEquals(6, archivedProcessInstances.get(0).getStateId());
+        assertEquals(6, archivedProcessInstances.get(1).getStateId());
+        assertEquals(6, archivedProcessInstances.get(2).getStateId());
+        assertEquals(6, archivedProcessInstances.get(3).getStateId());
+        assertEquals(6, archivedProcessInstances.get(4).getStateId());
 
         // Order by USER_ID
         // searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
