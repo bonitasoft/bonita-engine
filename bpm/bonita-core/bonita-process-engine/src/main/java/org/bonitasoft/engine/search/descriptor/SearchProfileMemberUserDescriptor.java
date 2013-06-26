@@ -38,7 +38,8 @@ public class SearchProfileMemberUserDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> profileMemberAllFields;
 
     public SearchProfileMemberUserDescriptor(final SUserBuilder sUserBuilder) {
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(4);
+        searchEntityKeys = new HashMap<String, FieldDescriptor>(5);
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilder.ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilder.PROFILE_ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SUser.class, sUserBuilder.getFirstNameKey()));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SUser.class, sUserBuilder.getLastNameKey()));

@@ -42,7 +42,8 @@ public class SearchProfileMemberRoleAndGroupDescriptor extends SearchEntityDescr
     public SearchProfileMemberRoleAndGroupDescriptor(final IdentityModelBuilder identityModelBuilder) {
         final GroupBuilder groupBuilder = identityModelBuilder.getGroupBuilder();
         final RoleBuilder roleBuilder = identityModelBuilder.getRoleBuilder();
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(4);
+        searchEntityKeys = new HashMap<String, FieldDescriptor>(5);
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilder.ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.PROFILE_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilder.PROFILE_ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, roleBuilder.getNameKey()));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, groupBuilder.getNameKey()));
