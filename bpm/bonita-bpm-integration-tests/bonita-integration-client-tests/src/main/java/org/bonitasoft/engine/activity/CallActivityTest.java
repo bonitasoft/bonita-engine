@@ -73,6 +73,7 @@ import static org.junit.Assert.fail;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class CallActivityTest extends CommonAPITest {
 
@@ -94,20 +95,20 @@ public class CallActivityTest extends CommonAPITest {
         logout();
     }
 
-    private ProcessDefinition getSimpleProcess(final String actorName, final String processName, final String processVersion, final boolean terminateEnd)
+    private ProcessDefinition getSimpleProcess(final String ACTOR_NAME, final String processName, final String processVersion, final boolean terminateEnd)
             throws BonitaException {
         final Expression clientNumberExpr = new ExpressionBuilder().createConstantIntegerExpression(10);
         final Expression protocolNumberExpr = new ExpressionBuilder().createConstantIntegerExpression(305020);
 
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
-        processDefBuilder.addActor(actorName);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addShortTextData("firstName", null);
         processDefBuilder.addShortTextData("lastName", null);
         processDefBuilder.addShortTextData("calledProcessData", null);
         processDefBuilder.addIntegerData("clientNumber", clientNumberExpr);
         processDefBuilder.addIntegerData("protocolNumber", protocolNumberExpr);
         processDefBuilder.addStartEvent("tStart");
-        processDefBuilder.addUserTask("tStep1", actorName);
+        processDefBuilder.addUserTask("tStep1", ACTOR_NAME);
         final EndEventDefinitionBuilder endEvent = processDefBuilder.addEndEvent("tEnd");
         if (terminateEnd) {
             endEvent.addTerminateEventTrigger();
@@ -115,12 +116,12 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addTransition("tStart", "tStep1");
         processDefBuilder.addTransition("tStep1", "tEnd");
 
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), actorName, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cebolinha);
 
         return targetProcessDefinition;
     }
 
-    private ProcessDefinition getProcessWithCallActivity(final String actorName, final boolean addInputOperations, final boolean addOutputOperations,
+    private ProcessDefinition getProcessWithCallActivity(final String ACTOR_NAME, final boolean addInputOperations, final boolean addOutputOperations,
             final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion) throws BonitaException {
 
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
@@ -130,12 +131,12 @@ public class CallActivityTest extends CommonAPITest {
         }
         final Expression expressionTrue = new ExpressionBuilder().createConstantBooleanExpression(true);
 
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
         processDefBuilder.addShortTextData("fName", null);
         processDefBuilder.addShortTextData("lName", null);
         processDefBuilder.addIntegerData("cNumber", null);
         processDefBuilder.addIntegerData("pNumber", null);
-        processDefBuilder.addActor(actorName);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
         addDataInputOperationsIfNeed(addInputOperations, callActivityBuilder);
@@ -144,13 +145,13 @@ public class CallActivityTest extends CommonAPITest {
             callActivityBuilder.addLoop(false, expressionTrue, new ExpressionBuilder().createConstantIntegerExpression(loopNb));
         }
         addDataOutputOperationIfNeed(addOutputOperations, callActivityBuilder);
-        processDefBuilder.addUserTask("step1", actorName);
+        processDefBuilder.addUserTask("step1", ACTOR_NAME);
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefBuilder.done(), actorName, cascao);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
 
         return processDefinition;
     }
@@ -186,7 +187,7 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
     @Test
     public void callActivity() throws Exception {
-        executeCallAtivityUntilEndOfProcess(false, false, "1.0", false);
+        executeCallAtivityUntilEndOfProcess(false, false, PROCESS_VERSION, false);
 
     }
 
@@ -197,7 +198,7 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "Call Activity" })
     @Test
     public void callActivityWithDataInputOperations() throws Exception {
-        executeCallAtivityUntilEndOfProcess(true, false, "1.0", false);
+        executeCallAtivityUntilEndOfProcess(true, false, PROCESS_VERSION, false);
     }
 
     /*
@@ -207,7 +208,7 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
     @Test
     public void callActivityWithDataOutputOperations() throws Exception {
-        executeCallAtivityUntilEndOfProcess(false, true, "1.0", false);
+        executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, false);
     }
 
     /*
@@ -217,7 +218,7 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
     @Test
     public void callActivityWithDataOutputOperationsAndTerminateEnd() throws Exception {
-        executeCallAtivityUntilEndOfProcess(false, true, "1.0", true);
+        executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, true);
     }
 
     /*
@@ -238,26 +239,26 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, jira = "ENGINE-878", keywords = { "Data mapping with operations execution order" })
     @Test
     public void callActivityWithDataOutputAndOperationAreExecutedInTheGoodOrder() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef = getSimpleProcess(actorName, "targetProcess", "1.0", false);
+
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression("1.0");
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithCallActivity", "1.0");
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithCallActivity", PROCESS_VERSION);
         processDefBuilder.addIntegerData("cNumber", new ExpressionBuilder().createConstantIntegerExpression(125));
         processDefBuilder.addIntegerData("pNumber", null);
         processDefBuilder.addIntegerData("dataInitWithCNumber", new ExpressionBuilder().createConstantIntegerExpression(12));
-        processDefBuilder.addActor(actorName);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
         addDataOutputOperationIfNeed(true, callActivityBuilder);
         callActivityBuilder.addOperation(new OperationBuilder().createSetDataOperation("dataInitWithCNumber",
                 new ExpressionBuilder().createDataExpression("cNumber", Integer.class.getName())));
-        processDefBuilder.addUserTask("step1", actorName);
+        processDefBuilder.addUserTask("step1", ACTOR_NAME);
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
-        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), actorName, cascao);
+        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         // execute process until step1
@@ -286,12 +287,12 @@ public class CallActivityTest extends CommonAPITest {
      */
     private void executeCallAtivityUntilEndOfProcess(final boolean addInputOperations, final boolean addOutputOperations, final String strTargetVersion,
             final boolean terminateEnd) throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef1 = getSimpleProcess(actorName, "targetProcess", "1.0", terminateEnd);
-        final ProcessDefinition targetProcessDef3 = getSimpleProcess(actorName, "targetProcess", "3.0", terminateEnd);
-        final ProcessDefinition targetProcessDef2 = getSimpleProcess(actorName, "targetProcess", "2.0", terminateEnd);
 
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(actorName, addInputOperations, addOutputOperations, "callingProcess",
+        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, terminateEnd);
+        final ProcessDefinition targetProcessDef3 = getSimpleProcess(ACTOR_NAME, "targetProcess", "3.0", terminateEnd);
+        final ProcessDefinition targetProcessDef2 = getSimpleProcess(ACTOR_NAME, "targetProcess", "2.0", terminateEnd);
+
+        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, addInputOperations, addOutputOperations, "callingProcess",
                 "targetProcess", 0, strTargetVersion);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
@@ -320,7 +321,7 @@ public class CallActivityTest extends CommonAPITest {
 
         if (strTargetVersion == null || strTargetVersion.contentEquals("2.0")) {
             assertEquals(targetProcessDef2.getId(), targetPI.getProcessDefinitionId());
-        } else if (strTargetVersion.contentEquals("1.0")) {
+        } else if (strTargetVersion.contentEquals(PROCESS_VERSION)) {
             assertEquals(targetProcessDef1.getId(), targetPI.getProcessDefinitionId());
         }
 
@@ -382,15 +383,14 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     private void variableMultiLevelCallActivity(final int nbLevel) throws Exception {
-        final String actorName = "delivery";
 
         final ProcessDefinition[] processDefLevels = new ProcessDefinition[nbLevel];
 
         for (int i = 0; i < nbLevel; i++) {
             if (i != nbLevel - 1) {
-                processDefLevels[i] = getProcessWithCallActivity(actorName, false, false, "processLevel" + i, "processLevel" + (i + 1), 0, "1.0");
+                processDefLevels[i] = getProcessWithCallActivity(ACTOR_NAME, false, false, "processLevel" + i, "processLevel" + (i + 1), 0, PROCESS_VERSION);
             } else {
-                processDefLevels[i] = getSimpleProcess(actorName, "processLevel" + i, "1.0", false);
+                processDefLevels[i] = getSimpleProcess(ACTOR_NAME, "processLevel" + i, PROCESS_VERSION, false);
             }
 
         }
@@ -459,8 +459,8 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
     @Test
     public void callUndeployedProcess() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition processDef = getProcessWithCallActivity(actorName, false, false, "callingProcess", "unDeployedProcess", 0, "1.0");
+
+        final ProcessDefinition processDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "unDeployedProcess", 0, PROCESS_VERSION);
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
@@ -472,9 +472,10 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     private void callActivityInALoop(final int nbLoop) throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef = getSimpleProcess(actorName, "targetProcess", "1.0", false);
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(actorName, false, false, "callingProcess", "targetProcess", nbLoop, "1.0");
+
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
+        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", nbLoop,
+                PROCESS_VERSION);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
@@ -521,9 +522,9 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" })
     @Test
     public void testGetArchivedCallActivityInstance() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef = getSimpleProcess(actorName, "targetProcess", "1.0", false);
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(actorName, false, false, "callingProcess", "targetProcess", 0, "1.0");
+
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
+        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
@@ -574,10 +575,10 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
     @Test
     public void deleteProcessInstanceThatIsCalledByCallActivity() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef1 = getSimpleProcess(actorName, "targetProcess", "1.0", false);
 
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(actorName, false, false, "callingProcess", "targetProcess", 0, "1.0");
+        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
+
+        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
 
@@ -607,10 +608,10 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
     @Test
     public void deleteProcessDefinitionWithProcessInstanceThatIsCalledByCallActivity() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef1 = getSimpleProcess(actorName, "targetProcess", "1.0", false);
 
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(actorName, false, false, "callingProcess", "targetProcess", 0, "1.0");
+        final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
+
+        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
 
@@ -635,8 +636,7 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Dependencies" })
     @Test
     public void callActivityWithDependencies() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef = getSimpleProcess(actorName, "targetProcess", "1.0", false);
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
 
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
 
@@ -645,21 +645,21 @@ public class CallActivityTest extends CommonAPITest {
         dependencies.add(vExpression);
         final Expression targetProcessVersionExpr = new ExpressionBuilder().createGroovyScriptExpression("version", "v", String.class.getName(), dependencies);
 
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", "1.0");
-        processDefBuilder.addShortTextData("v", new ExpressionBuilder().createConstantStringExpression("1.0"));
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        processDefBuilder.addShortTextData("v", new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION));
         processDefBuilder.addShortTextData("lName", null);
         processDefBuilder.addIntegerData("cNumber", null);
         processDefBuilder.addIntegerData("pNumber", null);
-        processDefBuilder.addActor(actorName);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
-        processDefBuilder.addUserTask("step1", actorName);
+        processDefBuilder.addUserTask("step1", ACTOR_NAME);
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
 
-        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), actorName, cascao);
+        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
@@ -670,7 +670,7 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessInstance targetPI = processInstances.get(0);
         assertEquals(targetPI.getProcessDefinitionId(), targetProcessDef.getId());
 
-        assertEquals("1.0", targetProcessDef.getVersion());
+        assertEquals(PROCESS_VERSION, targetProcessDef.getVersion());
 
         final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
         final ActivityInstance callActivityInstance = waitForActivity.getResult();
@@ -697,61 +697,33 @@ public class CallActivityTest extends CommonAPITest {
 
         disableAndDeleteProcess(callingProcessDef);
         disableAndDeleteProcess(targetProcessDef);
-
-    }
-
-    @Cover(classes = { ProcessDefinitionBuilder.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Expression" })
-    @Test(expected = InvalidProcessDefinitionException.class)
-    public void callActivityTargetProcessExprIsNull() throws Exception {
-        final String actorName = "delivery";
-
-        final Expression targetProcessNameExpr = null;
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression("1.0");
-
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", "1.0");
-        processDefBuilder.addShortTextData("lName", null);
-        processDefBuilder.addIntegerData("cNumber", null);
-        processDefBuilder.addIntegerData("pNumber", null);
-        processDefBuilder.addActor(actorName);
-        processDefBuilder.addStartEvent("start");
-        processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
-        processDefBuilder.addUserTask("step1", actorName);
-        processDefBuilder.addEndEvent("end");
-        processDefBuilder.addTransition("start", "callActivity");
-        processDefBuilder.addTransition("callActivity", "step1");
-        processDefBuilder.addTransition("step1", "end");
-
-        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), actorName, cascao);
-
-        disableAndDeleteProcess(callingProcessDef);
-
     }
 
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
     @Test
     public void callActivityCheckAttributes() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition targetProcessDef = getSimpleProcess(actorName, "targetProcess", "1.0", false);
+
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
 
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression("1.0");
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
 
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", "1.0");
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
         processDefBuilder.addShortTextData("lName", null);
         processDefBuilder.addIntegerData("cNumber", null);
         processDefBuilder.addIntegerData("pNumber", null);
-        processDefBuilder.addActor(actorName);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName")).addDescription("callActivityDescription")
                 .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
-        processDefBuilder.addUserTask("step1", actorName);
+        processDefBuilder.addUserTask("step1", ACTOR_NAME);
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
 
-        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), actorName, cascao);
+        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
@@ -791,27 +763,52 @@ public class CallActivityTest extends CommonAPITest {
         disableAndDeleteProcess(targetProcessDef);
     }
 
+    @Cover(classes = { ProcessDefinitionBuilder.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Expression" })
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void callActivityTargetProcessExprIsNull() throws Exception {
+
+        final Expression targetProcessNameExpr = null;
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        processDefBuilder.addShortTextData("lName", null);
+        processDefBuilder.addIntegerData("cNumber", null);
+        processDefBuilder.addIntegerData("pNumber", null);
+        processDefBuilder.addActor(ACTOR_NAME);
+        processDefBuilder.addStartEvent("start");
+        processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+        processDefBuilder.addUserTask("step1", ACTOR_NAME);
+        processDefBuilder.addEndEvent("end");
+        processDefBuilder.addTransition("start", "callActivity");
+        processDefBuilder.addTransition("callActivity", "step1");
+        processDefBuilder.addTransition("step1", "end");
+
+        final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+
+        disableAndDeleteProcess(callingProcessDef);
+
+    }
+
     @Cover(classes = { CallActivityInstance.class, HumanTaskInstance.class, ArchivedProcessInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = {
             "Call Activity", "Human Task", "Search", "Archived Process Instance" }, jira = "ENGINE-922")
     @Test
     public void callActivityTargetProcessWithJustHumanTask() throws Exception {
-        final String actorName = "delivery";
 
         // Build target process
-        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", "1.0");
-        targetProcessDefBuilder.addActor(actorName);
+        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+        targetProcessDefBuilder.addActor(ACTOR_NAME);
         targetProcessDefBuilder.addStartEvent("tStart");
-        targetProcessDefBuilder.addUserTask("tStep1", actorName);
+        targetProcessDefBuilder.addUserTask("tStep1", ACTOR_NAME);
         targetProcessDefBuilder.addEndEvent("tEnd");
         targetProcessDefBuilder.addTransition("tStart", "tStep1");
         targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), actorName, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
 
         // Build and start calling process
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression("1.0");
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", "1.0");
-        processDefBuilder.addActor(actorName);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName")).addDescription("callActivityDescription")
@@ -819,7 +816,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), actorName, cascao);
+        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
         // Execute step in the target process
@@ -845,30 +842,29 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Engine constant" }, jira = "ENGINE-1009")
     @Test
     public void callActivityWithTaskUsingEngineExpressions() throws Exception {
-        final String actorName = "delivery";
 
         // Build target process
-        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", "1.0");
-        targetProcessDefBuilder.addActor(actorName);
+        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+        targetProcessDefBuilder.addActor(ACTOR_NAME);
         targetProcessDefBuilder.addStartEvent("tStart");
-        targetProcessDefBuilder.addUserTask("tStep1", actorName).addData("rootProcId", Long.class.getName(),
+        targetProcessDefBuilder.addUserTask("tStep1", ACTOR_NAME).addData("rootProcId", Long.class.getName(),
                 new ExpressionBuilder().createEngineConstant(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID));
         targetProcessDefBuilder.addEndEvent("tEnd");
         targetProcessDefBuilder.addTransition("tStart", "tStep1");
         targetProcessDefBuilder.addTransition("tStep1", "tEnd");
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), actorName, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
 
         // Build and start calling process
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression("1.0");
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", "1.0");
-        processDefBuilder.addActor(actorName);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
         processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
         processDefBuilder.addEndEvent("end");
         processDefBuilder.addTransition("start", "callActivity");
         processDefBuilder.addTransition("callActivity", "end");
-        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), actorName, cascao);
+        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
         final ActivityInstance activityInstance = waitForUserTask("tStep1", callingProcessInstance.getId());
@@ -881,39 +877,37 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Connector", "Data mapping" }, jira = "ENGINE-1243")
     @Test
     public void callActivityWithDataMappingAndConnectors() throws Exception {
-        final String actorName = "delivery";
-
         // Build target process
-        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", "1.0");
-        targetProcessDefBuilder.addActor(actorName);
+        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+        targetProcessDefBuilder.addActor(ACTOR_NAME);
         targetProcessDefBuilder.addData("subProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("subDefault"));
         targetProcessDefBuilder.addAutomaticTask("tStep1").addOperation(
                 new OperationBuilder().createSetDataOperation("subProcessData", new ExpressionBuilder().createConstantStringExpression("subModified")));
-        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), actorName, cebolinha);
+        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
 
         // Build and start calling process
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
-        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression("1.0");
-        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", "1.0");
-        processDefBuilder.addActor(actorName);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addData("parentProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("parentDefault"));
         processDefBuilder.addData("valueOnCallOnEnter", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("none"));
         processDefBuilder.addData("valueOnCallOnFinish", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("none"));
         final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
 
         callActivityBuilder
-                .addConnector("onEnterConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
+                .addConnector("onEnterConnector", "org.bonitasoft.connector.testConnectorWithOutput", PROCESS_VERSION, ConnectorEvent.ON_ENTER)
                 .addInput("input1", new ExpressionBuilder().createDataExpression("parentProcessData", String.class.getName()))
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnEnter").done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         callActivityBuilder
-                .addConnector("onEnterConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_FINISH)
+                .addConnector("onEnterConnector", "org.bonitasoft.connector.testConnectorWithOutput", PROCESS_VERSION, ConnectorEvent.ON_FINISH)
                 .addInput("input1", new ExpressionBuilder().createDataExpression("parentProcessData", String.class.getName()))
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnFinish").done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         callActivityBuilder.addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
                 new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
-        processDefBuilder.addUserTask("end", actorName);
+        processDefBuilder.addUserTask("end", ACTOR_NAME);
         processDefBuilder.addTransition("callActivity", "end");
         final BusinessArchiveBuilder bizArchive = new BusinessArchiveBuilder();
         bizArchive.createNewBusinessArchive();
@@ -922,7 +916,7 @@ public class CallActivityTest extends CommonAPITest {
                 .getResourceAsStream("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl"))));
         bizArchive.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
 
-        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(bizArchive.done(), actorName, cascao);
+        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(bizArchive.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
         final ActivityInstance activityInstance = waitForUserTask("end", callingProcessInstance.getId());
