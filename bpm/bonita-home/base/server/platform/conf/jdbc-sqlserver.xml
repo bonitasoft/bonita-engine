@@ -4,12 +4,12 @@
 <properties>
     <comment>Bonita platform core database configuration</comment>
 
-    <!-- MySQL configuration -->
+    <!-- SQL Server configuration -->
 
      <entry key="sql.delimiter">GO</entry>
 
      <!-- Hibernate specific configuration -->
-     <entry key="hibernate.journal.dialect">org.bonitasoft.engine.persistence.dialect.SQLServer2008Dialect</entry>
+     <entry key="hibernate.journal.dialect">org.hibernate.dialect.SQLServerDialect</entry>
      <entry key="hibernate.journal.interceptor" />
 
      <!-- Quartz specific configuration -->
