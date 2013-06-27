@@ -1,10 +1,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="cacheConfigurations">
+	<bean id="cacheConfigurations" class="org.bonitasoft.engine.cache.CacheConfigurations">
+		<constructor-arg name="configurations">
 			<map>
 				<entry key="GROOVY_SCRIPT_CACHE_NAME">
 					<ref bean="groovyScriptCacheConfig" />
@@ -15,13 +13,13 @@
 			</map>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<property name="timeToLiveSeconds" value="3600" />
 		<property name="maxElementsInMemory" value="10000" />
 		<property name="inMemoryOnly" value="true" />
 	</bean>
-	
+
 	<bean id="transientDataCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<property name="maxElementsInMemory" value="10000" />
 		<property name="inMemoryOnly" value="true" />

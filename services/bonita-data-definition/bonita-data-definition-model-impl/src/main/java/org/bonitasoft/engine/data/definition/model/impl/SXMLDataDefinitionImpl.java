@@ -20,6 +20,8 @@ import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
  */
 public class SXMLDataDefinitionImpl extends SDataDefinitionImpl implements SXMLDataDefinition {
 
+    private static final long serialVersionUID = 1L;
+
     private String namespace;
 
     private String element;

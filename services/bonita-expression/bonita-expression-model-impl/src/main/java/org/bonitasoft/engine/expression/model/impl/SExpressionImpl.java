@@ -27,6 +27,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SExpressionImpl implements SExpression {
 
+    private static final long serialVersionUID = 1L;
+
     private String name;
 
     private String content;

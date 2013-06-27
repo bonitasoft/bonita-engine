@@ -57,21 +57,21 @@ public class CacheServiceTest {
     }
 
     protected CacheService getCacheService() throws CacheException {
-        final HashMap<String, CacheConfiguration> cacheConfigurations = new HashMap<String, CacheConfiguration>(1);
+        final HashMap<String, CacheConfiguration> configurationsMap = new HashMap<String, CacheConfiguration>(1);
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setTimeToLiveSeconds(1);
         cacheConfiguration.setMaxElementsInMemory(100);
         cacheConfiguration.setMaxElementsInMemory(200);
         cacheConfiguration.setInMemoryOnly(true);
-        cacheConfigurations.put(SOME_DEFAULT_CACHE_NAME, cacheConfiguration);
+        configurationsMap.put(SOME_DEFAULT_CACHE_NAME, cacheConfiguration);
         cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setTimeToLiveSeconds(1);
         cacheConfiguration.setMaxElementsInMemory(100);
         cacheConfiguration.setMaxElementsInMemory(200);
         cacheConfiguration.setInMemoryOnly(true);
         cacheConfiguration.setEternal(true);
-        cacheConfigurations.put(ETERNAL_CACHE, cacheConfiguration);
-
+        configurationsMap.put(ETERNAL_CACHE, cacheConfiguration);
+        final CacheConfigurations cacheConfigurations = new CacheConfigurations(configurationsMap);
         return new EhCacheCacheService(new TechnicalLoggerService() {
 
             @Override

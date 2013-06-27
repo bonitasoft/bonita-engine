@@ -27,6 +27,7 @@ import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
+import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -50,24 +51,25 @@ public class EhCacheCacheService implements CacheService {
 
     private final Map<String, CacheConfiguration> cacheConfigurations;
 
-    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final Map<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations) {
+    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
-        this.cacheConfigurations = new HashMap<String, CacheConfiguration>(cacheConfigurations.size());
-        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : cacheConfigurations.entrySet()) {
+        final Map<String, org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
+        this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
+        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : configurations.entrySet()) {
             this.cacheConfigurations.put(cacheConfig.getKey(), getEhCacheConfiguration(cacheConfig.getValue()));
 
         }
         cacheManager = CacheManager.create();
     }
 
-    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final Map<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations, final URL configFile) {
+    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations,
+            final URL configFile) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
-        this.cacheConfigurations = new HashMap<String, CacheConfiguration>(cacheConfigurations.size());
-        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : cacheConfigurations.entrySet()) {
+        final Map<String, org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
+        this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
+        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : configurations.entrySet()) {
             this.cacheConfigurations.put(cacheConfig.getKey(), getEhCacheConfiguration(cacheConfig.getValue()));
         }
         cacheManager = CacheManager.create(configFile);
@@ -78,6 +80,7 @@ public class EhCacheCacheService implements CacheService {
         ehCacheConfig.setMaxElementsInMemory(cacheConfig.getMaxElementsInMemory());
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
+        ehCacheConfig.setMemoryStoreEvictionPolicy(cacheConfig.getEvictionPolicy());
         if (!cacheConfig.isEternal()) {
             ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
         }

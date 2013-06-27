@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.core.operation.model;
 
+import java.io.Serializable;
+
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  */
-public interface SOperation {
+public interface SOperation extends Serializable {
 
     SLeftOperand getLeftOperand();
 

@@ -24,6 +24,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SOperationImpl implements SOperation {
 
+    private static final long serialVersionUID = 1L;
+
     private SLeftOperand leftOperand;
 
     private SOperatorType type;

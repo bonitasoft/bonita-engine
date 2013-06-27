@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.core.operation.model;
 
+import java.io.Serializable;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  */
-public interface SLeftOperand {
+public interface SLeftOperand extends Serializable {
 
     String getName();
 
