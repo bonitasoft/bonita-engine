@@ -57,18 +57,10 @@
 			<artifactId>bonita-cache-ehcache</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- add hazel cast here because hibernate cache use it by configuration -->
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-hibernate</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-spring</artifactId>
+			<groupId>com.bonitasoft.engine.cache</groupId>
+			<artifactId>bonita-cache-api-clustered-impl</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 
@@ -709,6 +701,19 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
+		</dependency>		
+		<!-- add hazel cast here because hibernate cache use it by configuration -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-hibernate</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-spring</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -742,6 +747,7 @@
 									<!-- Cache -->
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
+									<include>com.bonitasoft.engine.cache:bonita-cache-api-clustered-impl</include>
 									<!-- Category -->
 									<include>org.bonitasoft.engine.core.category:bonita-category-model</include>
 									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
