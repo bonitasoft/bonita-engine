@@ -32,7 +32,7 @@ public class BonitaSchedulerFactoryExtended extends BonitaSchedulerFactory {
     }
 
     private static Properties merge(final Properties props, final Properties additionalProperties) {
-        if (!new Manager().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+        if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
         final Properties properties = new Properties();

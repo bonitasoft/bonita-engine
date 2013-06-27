@@ -24,10 +24,11 @@ public class NodeAPIImpl implements NodeAPI {
 
     @Override
     public LicenseInfo getLicenseInfo() {
-        final Map<String, String> info = new Manager().getInfo();
+        final Manager manager = Manager.getInstance();
+		final Map<String, String> info = manager.getInfo();
         final String edition = info.get("subscriptionType");
         final String licensee = info.get("customerName");
-        final List<String> features = new Manager().activeFeatures();
+        final List<String> features = manager.activeFeatures();
         final Date expirationDate = new Date(Long.valueOf(info.get("expirationDate")));
         final String numberOfCPUCoresAsString = info.get("numberOfCPUCores");
         int numberOfCPUCores = -1;
