@@ -24,6 +24,7 @@
 		<module>bonita-expression</module>
 		<module>bonita-external-identity-mapping</module>
 		<module>bonita-identity</module>
+        <module>bonita-lock</module>
 		<module>bonita-log</module>
 		<module>bonita-persistence</module>
 		<module>bonita-platform</module>

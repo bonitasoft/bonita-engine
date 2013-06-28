@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>services</artifactId>
+		<groupId>com.bonitasoft.engine</groupId>
+		<version>6.1.0-rc-03-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.bonitasoft.engine.lock</groupId>
+	<artifactId>bonita-lock</artifactId>
+
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>bonita-lock-api-clustered-impl</module>
+	</modules>
+
+</project>

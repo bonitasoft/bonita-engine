@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd ">
 	<!-- configure the instance named bonita,it is the default instance used by bonita -->
 	
-	<bean id="hazelcastInstance" class="com.bonitasoft.engine.service.impl.BonitaHazelcastInstanceFactory" factory-method="newHazelcastInstance">
+	<bean id="hazelcastInstance" class="com.bonitasoft.engine.service.impl.BonitaHazelcastInstanceFactory" factory-method="newHazelcastInstance" scope="singleton">
 		<constructor-arg>
 			<bean class="com.hazelcast.config.Config">
 				<property name="groupConfig">

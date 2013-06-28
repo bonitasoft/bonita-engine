@@ -22,10 +22,17 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Instance;
 import com.hazelcast.core.Prefix;
 
+/**
+ * Cache service that uses hazelcast
+ * 
+ * @author Baptiste Mesta
+ */
 public class ClusteredCacheService implements CacheService {
 
     private final TechnicalLoggerService logger;
@@ -35,6 +42,9 @@ public class ClusteredCacheService implements CacheService {
     private final HazelcastInstance hazelcastInstance;
 
     public ClusteredCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final HazelcastInstance hazelcastInstance) {
+        if (!new Manager().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+            throw new IllegalStateException("The clustering is not an active feature.");
+        }
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.hazelcastInstance = hazelcastInstance;

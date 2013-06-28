@@ -18,6 +18,9 @@ import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 
 /**
+ * Delegate cache request to local or distributed cache services
+ * if the cache name is contains in the list localOnlyCaches the call is delegated to local cache, else it is delegated to the distributed cache
+ * 
  * @author Baptiste Mesta
  */
 public class DelegatingCacheService implements CacheService {

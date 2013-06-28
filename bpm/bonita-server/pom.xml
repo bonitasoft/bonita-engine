@@ -309,6 +309,11 @@
 			<artifactId>bonita-lock-api-memory-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.lock</groupId>
+			<artifactId>bonita-lock-api-clustered-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Login -->
 		<dependency>
@@ -839,6 +844,7 @@
 									<!-- Lock -->
 									<include>org.bonitasoft.engine.lock:bonita-lock-api</include>
 									<include>org.bonitasoft.engine.lock:bonita-lock-api-memory-impl</include>
+									<include>com.bonitasoft.engine.lock:bonita-lock-api-clustered-impl</include>
 									<!-- Login -->
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
