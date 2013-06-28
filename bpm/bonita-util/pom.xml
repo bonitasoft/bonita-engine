@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.1.0-rc-03-SNAPSHOT</version>
+		<version>6.1.0-rc-03</version>
 		<relativePath>..</relativePath>
 	</parent>
 
