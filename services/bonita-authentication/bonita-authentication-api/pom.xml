@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-authentication</artifactId>
 		<groupId>org.bonitasoft.engine.authentication</groupId>
-		<version>6.1.0-rc-03</version>
+		<version>6.1.0-rc-04-SNPASHOT</version>
 	</parent>
 
 	<artifactId>bonita-authentication-api</artifactId>

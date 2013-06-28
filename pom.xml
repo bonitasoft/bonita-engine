@@ -4,7 +4,7 @@
 
 	<groupId>org.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine</artifactId>
-	<version>6.1.0-rc-03</version>
+	<version>6.1.0-rc-04-SNPASHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bonita Execution Engine</name>
