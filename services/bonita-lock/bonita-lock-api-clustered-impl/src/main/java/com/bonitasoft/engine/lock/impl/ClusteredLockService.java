@@ -29,7 +29,7 @@ public class ClusteredLockService implements LockService {
 
     public ClusteredLockService(final HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
-        if (!new Manager().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+        if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
     }

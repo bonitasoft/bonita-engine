@@ -42,7 +42,7 @@ public class ClusteredCacheService implements CacheService {
     private final HazelcastInstance hazelcastInstance;
 
     public ClusteredCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final HazelcastInstance hazelcastInstance) {
-        if (!new Manager().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+        if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
         this.logger = logger;
