@@ -25,6 +25,8 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
@@ -34,16 +36,20 @@ public class ClusteredCacheServiceTest {
 
     IMap clusteredCache;
 
+    private Manager manager;
+
     @Before
     public void setUp() throws Exception {
         final HazelcastInstance hazelcastInstance = mock(HazelcastInstance.class);
         clusteredCache = mock(IMap.class);
+        manager = mock(Manager.class);
         when(hazelcastInstance.getMap(anyString())).thenReturn(clusteredCache);
 
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final ReadSessionAccessor sessionAccessor = mock(ReadSessionAccessor.class);
 
-        cacheService = new ClusteredCacheService(logger, sessionAccessor, hazelcastInstance);
+        when(manager.isFeatureActive(Features.ENGINE_CLUSTERING)).thenReturn(true);
+        cacheService = new ClusteredCacheServiceExt(manager, logger, sessionAccessor, hazelcastInstance);
     }
 
     // TODO test with exceptions + clear all + get cache names
@@ -93,6 +99,12 @@ public class ClusteredCacheServiceTest {
         when(clusteredCache.size()).thenReturn(10);
 
         assertEquals(10, cacheService.getCacheSize("myCache"));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void protectedService() throws Exception {
+        when(manager.isFeatureActive(Features.ENGINE_CLUSTERING)).thenReturn(false);
+        cacheService = new ClusteredCacheServiceExt(manager, null, null, null);
     }
 
 }
