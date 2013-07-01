@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-process-comment</artifactId>
 		<groupId>com.bonitasoft.engine.core.process.comment</groupId>
-		<version>6.1.0-rc-04-SNPASHOT</version>
+		<version>6.1.0-rc-04-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-comment-model-impl-mybatis</artifactId>
