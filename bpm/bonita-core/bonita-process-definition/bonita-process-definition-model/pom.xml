@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-process-definition</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-		<version>6.0.1</version>
+		<version>6.0.2-rc-01-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-definition-model</artifactId>
