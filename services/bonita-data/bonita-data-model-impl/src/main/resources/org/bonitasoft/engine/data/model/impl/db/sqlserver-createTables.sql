@@ -8,9 +8,9 @@ CREATE TABLE datasource (
   PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_datasource_name ON datasource (name)
+CREATE INDEX idx_datasource_name ON datasource (name, id)
 GO
-CREATE INDEX idx_datasource_version ON datasource (version)
+CREATE INDEX idx_datasource_version ON datasource (version, id)
 GO
 
 CREATE TABLE datasourceparameter (
@@ -22,7 +22,7 @@ CREATE TABLE datasourceparameter (
   PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_datasourceparameter_datasourceid ON datasourceparameter (datasourceid)
+CREATE INDEX idx_datasourceparameter_datasourceid ON datasourceparameter (datasourceid, id)
 GO
 ALTER TABLE datasourceparameter ADD CONSTRAINT fk_dsparam_dsid FOREIGN KEY (tenantid, datasourceid) REFERENCES datasource(tenantid, id) ON DELETE CASCADE
 GO

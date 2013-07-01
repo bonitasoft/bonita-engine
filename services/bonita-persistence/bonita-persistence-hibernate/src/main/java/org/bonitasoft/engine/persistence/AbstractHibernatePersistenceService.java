@@ -479,7 +479,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private <T> String getQueryWithOrderByClause(final String query, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
         final StringBuilder builder = new StringBuilder(query);
-        appendOrderByClause(builder, selectDescriptor.getQueryOptions());
+        appendOrderByClause(builder, selectDescriptor);
         return builder.toString();
     }
 
@@ -551,29 +551,46 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         return completeField;
     }
 
-    private <T> void appendOrderByClause(final StringBuilder builder, final QueryOptions queryOptions) throws SBonitaReadException {
+    private <T> void appendOrderByClause(final StringBuilder builder, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
         builder.append(" ORDER BY ");
         boolean startWithComma = false;
-        for (final OrderByOption orderByOption : queryOptions.getOrderByOptions()) {
+        boolean sortedById = false;
+        for (final OrderByOption orderByOption : selectDescriptor.getQueryOptions().getOrderByOptions()) {
             if (startWithComma) {
                 builder.append(',');
             }
             final Class<? extends PersistentObject> clazz = orderByOption.getClazz();
             if (clazz != null) {
-                // builder.append(selectDescriptor.getInputParameter(key));//FIXME add user. before the field
-                final String className = clazz.getName();
-                final String classAlias = classAliasMappings.get(className);
-                if (classAlias == null || classAlias.trim().isEmpty()) {
-                    throw new SBonitaReadException("No class alias found for class " + className);
-                }
-                builder.append(classAlias);
-                builder.append('.');
+                appendClassAlias(builder, clazz);
             }
-            builder.append(orderByOption.getFieldName());
+            final String fieldName = orderByOption.getFieldName();
+            if ("id".equalsIgnoreCase(fieldName) || "sourceObjectId".equalsIgnoreCase(fieldName)) {
+                sortedById = true;
+            }
+            builder.append(fieldName);
             builder.append(' ');
             builder.append(orderByOption.getOrderByType().toString());
             startWithComma = true;
         }
+        if (!sortedById) {
+            if (startWithComma) {
+                builder.append(',');
+            }
+            appendClassAlias(builder, selectDescriptor.getEntityType());
+            builder.append("id");
+            builder.append(' ');
+            builder.append("ASC");
+        }
+    }
+
+    private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz) throws SBonitaReadException {
+        final String className = clazz.getName();
+        final String classAlias = classAliasMappings.get(className);
+        if (classAlias == null || classAlias.trim().isEmpty()) {
+            throw new SBonitaReadException("No class alias found for class " + className);
+        }
+        builder.append(classAlias);
+        builder.append('.');
     }
 
     protected void setQueryCache(final Query query, final String name) {

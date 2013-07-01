@@ -89,9 +89,9 @@ CREATE TABLE flownode_instance (
 )
 GO
 
-CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
+CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId, id)
 GO
-CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
+CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4, id)
 GO
 
 CREATE TABLE transition_instance (
