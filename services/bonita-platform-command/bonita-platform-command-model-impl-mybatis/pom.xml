@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-platform-command</artifactId>
 		<groupId>com.bonitasoft.engine.platform.command</groupId>
-		<version>6.0.2-rc-01-SNAPSHOT</version>
+		<version>6.0.1</version>
 	</parent>
 
 	<artifactId>bonita-platform-command-model-impl-mybatis</artifactId>
