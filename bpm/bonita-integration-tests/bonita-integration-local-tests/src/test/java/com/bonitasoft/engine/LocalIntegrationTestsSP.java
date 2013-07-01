@@ -10,7 +10,10 @@ package com.bonitasoft.engine;
 
 import javax.naming.Context;
 
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,7 +41,16 @@ public class LocalIntegrationTestsSP {
         System.err.println("=================== LocalIntegrationTestsSP.beforeClass()");
 
         setupSpringContext();
-        APITestSPUtil.createPlatformStructure();
+        try {
+            APITestSPUtil.createPlatformStructure();
+        } catch (Exception e) {
+            final PlatformSession session = APITestSPUtil.loginPlatform();
+            final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+            platformAPI.stopNode();
+            platformAPI.cleanPlatform();
+            APITestSPUtil.deletePlatformStructure();
+            APITestSPUtil.createPlatformStructure();
+        }
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
 
