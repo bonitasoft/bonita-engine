@@ -1,22 +1,11 @@
 package org.bonitasoft.engine.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.session.SessionNotFoundException;
-import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.AfterClass;
@@ -30,42 +19,35 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class PlatformTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlatformTest.class);
 
     private static PlatformAPI platformAPI;
 
-    private static PlatformLoginAPI platformLoginAPI;
-
     private static PlatformSession session;
 
     @BeforeClass
     public static void beforeClass() throws BonitaException {
-        platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        logAsPlatformAdmin();
-        try {
-            platformAPI.initializePlatform();
-        } catch (final CreationException e) {
-            // Platform already created
-        }
-        platformAPI.startNode();
-    }
-
-    private static void logAsPlatformAdmin() throws PlatformLoginException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        session = platformLoginAPI.login("platformAdmin", "platform");
+        session = APITestUtil.loginPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        APITestUtil.initializeAndStartPlatformWithDefaultTenant(platformAPI, false);
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
-        platformAPI.stopNode();
-        platformAPI.cleanPlatform();
-        platformLoginAPI.logout(session);
+        APITestUtil.stopAndCleanPlatformAndTenant(platformAPI, false);
+        APITestUtil.logoutPlatform(session);
     }
 
     @Before
-    public void before() throws PlatformNotFoundException, CreationException, StartNodeException {
+    public void before() throws BonitaException {
         if (!platformAPI.isPlatformCreated()) {
             platformAPI.createAndInitializePlatform();
             platformAPI.startNode();
@@ -83,37 +65,16 @@ public class PlatformTest {
         @Override
         public void failed(final Throwable cause, final Description d) {
             LOGGER.info("Failed test: " + getClass().getName() + "." + d.getMethodName());
+            LOGGER.info("-------------------------------------------------------------------------------------");
         }
 
         @Override
         public void succeeded(final Description d) {
             LOGGER.info("Succeeded test: " + getClass().getName() + "." + d.getMethodName());
+            LOGGER.info("-------------------------------------------------------------------------------------");
         }
 
     };
-
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.")
-    @Test(expected = PlatformLoginException.class)
-    public void testWrongLogin() throws BonitaException {
-        try {
-            platformLoginAPI.logout(session);
-            platformLoginAPI.login("titi", "toto");
-            fail();
-        } finally {
-            logAsPlatformAdmin();
-        }
-    }
-
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.")
-    @Test(expected = SessionNotFoundException.class)
-    public void testLogoutWithWrongSession() throws BonitaException {
-        try {
-            platformLoginAPI.logout(new PlatformSessionImpl(123l, null, -1l, null, -1l));
-        } finally {
-            platformLoginAPI.logout(session);
-            logAsPlatformAdmin();
-        }
-    }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Test if platform is created.")
     @Test
@@ -138,11 +99,11 @@ public class PlatformTest {
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.")
-    @Test(expected = PlatformNotFoundException.class)
+    @Test
     public void deletePlatform() throws BonitaException {
         platformAPI.stopNode();
         platformAPI.cleanAndDeletePlaftorm();
-        platformAPI.getPlatform();
+        assertFalse(platformAPI.isPlatformCreated());
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "State" }, story = "Try to get platfom state.")

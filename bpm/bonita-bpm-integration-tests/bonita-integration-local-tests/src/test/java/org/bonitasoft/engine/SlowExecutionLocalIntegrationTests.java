@@ -7,6 +7,7 @@ import org.bonitasoft.engine.event.MessageEventTest;
 import org.bonitasoft.engine.event.NonInterruptingTimerBoundaryEventTest;
 import org.bonitasoft.engine.event.TimerEventSubProcessTest;
 import org.bonitasoft.engine.event.TimerEventTest;
+import org.bonitasoft.engine.platform.PlatformLoginTest;
 import org.bonitasoft.engine.platform.PlatformTest;
 import org.bonitasoft.engine.test.APIMethodTest;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
@@ -15,22 +16,23 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ 
-    
-    // Same suites as in LocalIntegrationTests below:
-    BPMLocalSuiteTests.class,
-    BPMRemoteTests.class,
-    APIMethodTest.class,
-    
-    // Specific slow test suites below:
-    NonInterruptingTimerBoundaryEventTest.class,
-    InterruptingTimerBoundaryEventTest.class,
-    TimerEventTest.class,
-    MessageEventTest.class,
-    MessageBoundaryEventTest.class,
-    TimerEventSubProcessTest.class,
-    MessageEventSubProcessTest.class,
-    PlatformTest.class
+@SuiteClasses({
+
+        // Same suites as in LocalIntegrationTests below:
+        BPMLocalSuiteTests.class,
+        BPMRemoteTests.class,
+        APIMethodTest.class,
+
+        // Specific slow test suites below:
+        NonInterruptingTimerBoundaryEventTest.class,
+        InterruptingTimerBoundaryEventTest.class,
+        TimerEventTest.class,
+        MessageEventTest.class,
+        MessageBoundaryEventTest.class,
+        TimerEventSubProcessTest.class,
+        MessageEventSubProcessTest.class,
+        PlatformLoginTest.class,
+        PlatformTest.class
 
 })
 public class SlowExecutionLocalIntegrationTests extends LocalIntegrationTests {

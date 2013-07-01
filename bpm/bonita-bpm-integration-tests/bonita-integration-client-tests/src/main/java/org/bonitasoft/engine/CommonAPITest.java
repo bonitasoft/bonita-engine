@@ -28,7 +28,6 @@ public abstract class CommonAPITest extends APITestUtil {
     @BeforeClass
     public static void beforeClass() throws BonitaException {
         APITestUtil.initializeAndStartPlatformWithDefaultTenant(true);
-        // APITestUtil.initializeAndStartPlatformWithDefaultTenant(false);
     }
 
     @AfterClass
@@ -51,6 +50,8 @@ public abstract class CommonAPITest extends APITestUtil {
                 clean();
             } catch (final Exception be) {
                 LOGGER.error("Unable to clean db", be);
+            } finally {
+                LOGGER.info("-------------------------------------------------------------------------------------");
             }
         }
 
@@ -63,6 +64,7 @@ public abstract class CommonAPITest extends APITestUtil {
                 throw new BonitaRuntimeException(e);
             }
             LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+            LOGGER.info("-------------------------------------------------------------------------------------");
             if (!clean.isEmpty()) {
                 throw new BonitaRuntimeException(clean.toString());
             }

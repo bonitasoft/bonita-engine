@@ -16,14 +16,18 @@ package org.bonitasoft.engine.login;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
@@ -32,14 +36,23 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.platform.LoginException;
+import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -93,4 +106,110 @@ public class LoginAPITest extends CommonAPITest {
         platformCommandAPI.removeDependency(COMMAND_DEPENDENCY_NAME);
     }
 
+    @Test(expected = LoginException.class)
+    public void loginFailsWithNullUsername() throws BonitaException {
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        loginTenant.login(null, null);
+    }
+
+    @Test(expected = LoginException.class)
+    public void loginFailsWithEmptyUsername() throws BonitaException {
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        loginTenant.login("", null);
+    }
+
+    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with null password", jira = "ENGINE-622")
+    @Test(expected = LoginException.class)
+    public void loginFailsWithNullPassword() throws BonitaException {
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        loginTenant.login("matti", null);
+    }
+
+    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with wrong password")
+    @Test(expected = LoginException.class)
+    public void loginFailsWithWrongPassword() throws BonitaException {
+        final String userName = "Truc";
+        APITestUtil.createUserOnDefaultTenant(userName, "goodPassword");
+        try {
+            final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+            loginTenant.login(userName, "WrongPassword");
+            fail("Should not be reached");
+        } finally {
+            final APISession session = APITestUtil.loginDefaultTenant();
+            final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+            identityAPI.deleteUser(userName);
+        }
+    }
+
+    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with empty password", jira = "ENGINE-622")
+    @Test(expected = LoginException.class)
+    public void loginFailsWithEmptyPassword() throws BonitaException {
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        loginTenant.login("matti", "");
+    }
+
+    @Test
+    public void userLoginDefaultTenant() throws BonitaException, InterruptedException {
+        final String userName = "matti";
+        final String password = "tervetuloa";
+        APITestUtil.createUserOnDefaultTenant(userName, password);
+
+        final Date now = new Date();
+        Thread.sleep(300);
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        final APISession apiSession = loginAPI.login(userName, password);
+        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
+        final User user = identityAPI.getUserByUserName(userName);
+        identityAPI.deleteUser(userName);
+
+        assertEquals(userName, user.getUserName());
+        assertNotSame(password, user.getPassword());
+        assertTrue(now.before(user.getLastConnection()));
+    }
+
+    @Test
+    public void loginWithExistingUserAndCheckId() throws BonitaException {
+        final APISession session = APITestUtil.loginDefaultTenant();
+        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+        final String userName = "corvinus";
+        final String password = "underworld";
+        final User user = identityAPI.createUser(userName, password);
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        final APISession login = loginTenant.login(userName, password);
+        assertTrue("userId should be valuated", user.getId() != -1);
+        assertEquals(user.getId(), login.getUserId());
+
+        identityAPI.deleteUser(user.getId());
+        APITestUtil.logoutTenant(session);
+    }
+
+    @Test
+    public void loginWithNonTechnicalUser() throws BonitaException {
+        final String username = "install";
+        final String pwd = "install";
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        APISession session = loginTenant.login(username, pwd);
+        IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+        final User user = identityAPI.createUser("matti", "kieli");
+        loginTenant.logout(session);
+
+        session = loginTenant.login("matti", "kieli");
+        assertTrue("Should be logged in as a NON-Technical user", !session.isTechnicalUser());
+        loginTenant.logout(session);
+
+        session = loginTenant.login(username, pwd);
+        identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+        identityAPI.deleteUser(user.getId());
+        loginTenant.logout(session);
+    }
+
+    @Test
+    public void loginWithTechnicalUser() throws BonitaException {
+        final String username = "install";
+        final String pwd = "install";
+        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
+        final APISession session = loginTenant.login(username, pwd);
+        assertTrue("Should be logged in as Technical user", session.isTechnicalUser());
+        loginTenant.logout(session);
+    }
 }
