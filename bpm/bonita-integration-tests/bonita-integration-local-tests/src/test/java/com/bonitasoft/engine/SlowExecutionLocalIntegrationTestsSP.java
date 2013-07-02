@@ -7,6 +7,7 @@ import org.bonitasoft.engine.event.MessageEventTest;
 import org.bonitasoft.engine.event.NonInterruptingTimerBoundaryEventTest;
 import org.bonitasoft.engine.event.TimerEventSubProcessTest;
 import org.bonitasoft.engine.event.TimerEventTest;
+import org.bonitasoft.engine.platform.PlatformLoginTest;
 import org.bonitasoft.engine.platform.PlatformTest;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.event.SPTimerBoundaryEventTest;
 import com.bonitasoft.engine.identity.SPIdentityTests;
+import com.bonitasoft.engine.platform.SPPlatformLoginTest;
 import com.bonitasoft.engine.platform.SPPlatformTest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 
@@ -37,9 +39,11 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
         MessageBoundaryEventTest.class,
         TimerEventSubProcessTest.class,
         MessageEventSubProcessTest.class,
+        PlatformLoginTest.class,
         PlatformTest.class,
 
         // SP specific slow test suites:
+        SPPlatformLoginTest.class,
         SPPlatformTest.class,
         SPTimerBoundaryEventTest.class,
         SPIdentityTests.class,
