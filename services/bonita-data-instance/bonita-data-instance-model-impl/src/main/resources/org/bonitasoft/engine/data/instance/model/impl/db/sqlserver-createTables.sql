@@ -22,7 +22,7 @@ CREATE TABLE data_instance (
 )
 GO
 
-CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId)
+CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId, id)
 GO
 
 CREATE TABLE data_mapping (
@@ -37,5 +37,5 @@ CREATE TABLE data_mapping (
 )
 GO
 
-CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId)
+CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId, id)
 GO

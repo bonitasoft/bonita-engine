@@ -31,7 +31,7 @@ CREATE TABLE role (
 )
 GO
 
-CREATE INDEX idx_role_name ON role (tenantid, name)
+CREATE INDEX idx_role_name ON role (tenantid, name, id)
 GO
 
 CREATE TABLE user_ (
@@ -57,7 +57,7 @@ CREATE TABLE user_ (
 )
 GO
 
-CREATE INDEX idx_user_name ON user_ (tenantid, userName)
+CREATE INDEX idx_user_name ON user_ (tenantid, userName, id)
 GO
 
 CREATE TABLE user_contactinfo (
@@ -83,7 +83,7 @@ CREATE TABLE user_contactinfo (
 GO
 ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE
 GO
-CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, personal)
+CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, personal, id)
 GO
 
 
@@ -98,7 +98,7 @@ CREATE TABLE p_metadata_def (
 )
 GO
 
-CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name)
+CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name, id)
 GO
 
 CREATE TABLE p_metadata_val (

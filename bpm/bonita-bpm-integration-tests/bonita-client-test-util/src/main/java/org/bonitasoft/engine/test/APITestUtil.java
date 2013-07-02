@@ -356,22 +356,6 @@ public class APITestUtil {
         return actorList;
     }
 
-    public ProcessAPI getProcessAPI() {
-        return processAPI;
-    }
-
-    public ProfileAPI getProfileAPI() {
-        return profileAPI;
-    }
-
-    public IdentityAPI getIdentityAPI() {
-        return identityAPI;
-    }
-
-    public CommandAPI getCommandAPI() {
-        return commandAPI;
-    }
-
     protected ProcessSupervisor createSupervisor(final long processDefID, final long userId) throws BonitaException {
         return getProcessAPI().createProcessSupervisorForUser(processDefID, userId);
     }
@@ -1092,26 +1076,6 @@ public class APITestUtil {
                 .addTransition("step1", "step2").addTransition("step1", "step3").addTransition("step1", "step4").getProcess();
     }
 
-    protected void setProcessAPI(final ProcessAPI processAPI) {
-        this.processAPI = processAPI;
-    }
-
-    protected void setProfileAPI(final ProfileAPI profileAPI) {
-        this.profileAPI = profileAPI;
-    }
-
-    protected void setIdentityAPI(final IdentityAPI identityAPI) {
-        this.identityAPI = identityAPI;
-    }
-
-    protected void setCommandAPI(final CommandAPI commandAPI) {
-        this.commandAPI = commandAPI;
-    }
-
-    protected void setSession(final APISession session) {
-        this.session = session;
-    }
-
     public void checkNbOfOpenTasks(final ProcessInstance processInstance, final String message, final int expectedNbOfOpenActivities) throws Exception {
         final CheckNbOfOpenActivities checkNbOfOpenActivities = new CheckNbOfOpenActivities(40, 5000, true, processInstance, expectedNbOfOpenActivities,
                 getProcessAPI());
@@ -1409,6 +1373,42 @@ public class APITestUtil {
             messages.add(commandBuilder.toString());
         }
         return messages;
+    }
+
+    protected ProcessAPI getProcessAPI() {
+        return processAPI;
+    }
+
+    protected void setProcessAPI(ProcessAPI processAPI) {
+        this.processAPI = processAPI;
+    }
+
+    protected IdentityAPI getIdentityAPI() {
+        return identityAPI;
+    }
+
+    protected void setIdentityAPI(IdentityAPI identityAPI) {
+        this.identityAPI = identityAPI;
+    }
+
+    protected CommandAPI getCommandAPI() {
+        return commandAPI;
+    }
+
+    protected void setCommandAPI(CommandAPI commandAPI) {
+        this.commandAPI = commandAPI;
+    }
+
+    protected ProfileAPI getProfileAPI() {
+        return profileAPI;
+    }
+
+    protected void setProfileAPI(ProfileAPI profileAPI) {
+        this.profileAPI = profileAPI;
+    }
+
+    protected void setSession(APISession session) {
+        this.session = session;
     }
 
 }

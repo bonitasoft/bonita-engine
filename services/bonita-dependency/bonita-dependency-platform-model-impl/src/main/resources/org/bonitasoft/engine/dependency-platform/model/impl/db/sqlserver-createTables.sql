@@ -8,9 +8,9 @@ CREATE TABLE pdependency (
   PRIMARY KEY (id)
 )
 GO
-CREATE INDEX idx_pdependency_name ON pdependency (name)
+CREATE INDEX idx_pdependency_name ON pdependency (name, id)
 GO
-CREATE INDEX idx_pdependency_version ON pdependency (version)
+CREATE INDEX idx_pdependency_version ON pdependency (version, id)
 GO
 
 CREATE TABLE pdependencymapping (
@@ -22,7 +22,7 @@ CREATE TABLE pdependencymapping (
   PRIMARY KEY (id)
 )
 GO
-CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid)
+CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid, id)
 GO
 ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE
 GO
