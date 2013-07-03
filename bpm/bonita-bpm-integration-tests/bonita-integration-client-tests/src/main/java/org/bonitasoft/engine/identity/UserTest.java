@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -25,8 +24,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -848,45 +845,36 @@ public class UserTest extends CommonAPITest {
         getIdentityAPI().deleteUser(user1.getId());
         getIdentityAPI().deleteUser(user3.getId());
         getIdentityAPI().deleteUser(user4.getId());
-        APITestUtil.logoutTenant(getSession());
     }
 
     @Test
     public void searchTermWithSpecialChars() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.searchTerm("Séba");
         final SearchOptions searchOptions = builder.done();
-        SearchResult<User> searchUsers = identityAPI.searchUsers(searchOptions);
+        SearchResult<User> searchUsers = getIdentityAPI().searchUsers(searchOptions);
         assertEquals(0, searchUsers.getCount());
 
-        final User friend = identityAPI.createUser("Sébastien", "ENCRYPTED");
+        final User friend = getIdentityAPI().createUser("Sébastien", "ENCRYPTED");
 
-        searchUsers = identityAPI.searchUsers(searchOptions);
+        searchUsers = getIdentityAPI().searchUsers(searchOptions);
         assertEquals(1, searchUsers.getCount());
         final List<User> users = searchUsers.getResult();
         assertEquals(friend, users.get(0));
 
-        identityAPI.deleteUser(friend.getId());
-
-        APITestUtil.logoutTenant(session);
+        getIdentityAPI().deleteUser(friend.getId());
     }
 
     @Test
     public void searchTermIsInsensitive() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-
-        final User manu = identityAPI.createUser("emmanuel", "ENCRYPTED", "manuel", "Duch");
-        final User marie = identityAPI.createUser("Marie", "bpm", "Marie", "Gillain");
-        final User marcel = identityAPI.createUser("marcel", "bpm", "marcel", "Desaillie");
+        final User manu = getIdentityAPI().createUser("emmanuel", "ENCRYPTED", "manuel", "Duch");
+        final User marie = getIdentityAPI().createUser("Marie", "bpm", "Marie", "Gillain");
+        final User marcel = getIdentityAPI().createUser("marcel", "bpm", "marcel", "Desaillie");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.searchTerm("Ma");
         builder.sort(UserSearchDescriptor.FIRST_NAME, Order.ASC);
-        final SearchResult<User> searchUsers = identityAPI.searchUsers(builder.done());
+        final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
         assertEquals(3, searchUsers.getCount());
         final List<User> users = searchUsers.getResult();
