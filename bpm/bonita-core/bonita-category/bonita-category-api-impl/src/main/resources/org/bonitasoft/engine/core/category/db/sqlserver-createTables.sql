@@ -1,9 +1,9 @@
 CREATE TABLE category (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name NVARCHAR(50) NOT NULL,
   creator NUMERIC(19, 0),
-  description VARCHAR(MAX),
+  description NVARCHAR(MAX),
   creationDate NUMERIC(19, 0) NOT NULL,
   lastUpdateDate NUMERIC(19, 0) NOT NULL,
   UNIQUE (tenantid, name),

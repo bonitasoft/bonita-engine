@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,12 +29,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class UserTest extends CommonAPITest {
 
@@ -826,7 +826,7 @@ public class UserTest extends CommonAPITest {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(UserSearchDescriptor.FIRST_NAME, "John");
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.ASC);
-        SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
+        final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
         assertEquals(2, searchUsers.getCount());
         List<User> usersResult = searchUsers.getResult();

@@ -94,9 +94,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throw new SPersistenceException(e);
         }
         final String dialect = configuration.getProperty("hibernate.dialect");
-        if (dialect != null && dialect.contains("PostgreSQL")) {
-            configuration.setInterceptor(new PostgresInterceptor());
+        if (dialect != null) {
+            if (dialect.contains("PostgreSQL")) {
+                configuration.setInterceptor(new PostgresInterceptor());
+            } else if (dialect.contains("SQLServer")) {
+                configuration.setInterceptor(new SQLServerInterceptor());
+            }
         }
+
         sessionFactory = configuration.buildSessionFactory();
         statistics = sessionFactory.getStatistics();
 
