@@ -24,7 +24,7 @@ public class ListArchivingStrategy extends AbstractArchivingStrategy implements 
 
     public ListArchivingStrategy(final Map<String, Boolean> archives) {
         super(archives);
-        if (!Manager.getInstance().isFeatureActive(Features.ENGINE_ARCHIVE_CONFIG)) {
+        if (!new Manager().isFeatureActive(Features.ENGINE_ARCHIVE_CONFIG)) {
             throw new IllegalStateException("The archive configuration is not an active feature.");
         }
     }

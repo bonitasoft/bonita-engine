@@ -11,12 +11,13 @@ public class LicenseTest {
 
     @Test
     public void validateLicence() {
-        Assert.assertTrue("The license should be valid because of: " + Manager.getInstance().getErrorMessage(), Manager.getInstance().isValid());
+        Manager manager = new Manager();
+        Assert.assertTrue("The license should be valid because of: " + manager.getErrorMessage(), manager.isValid());
     }
 
     private void valideFeature(final String feature) {
         try {
-            Assert.assertTrue("The feature: ' " + feature + "' is not active.", Manager.getInstance().isFeatureActive(feature));
+            Assert.assertTrue("The feature: ' " + feature + "' is not active.", new Manager().isFeatureActive(feature));
         } catch (final ConfigurationError exception) {
             Assert.assertTrue("The feature : '" + feature + "' is not supported due to an invalid license.", false);
         }
