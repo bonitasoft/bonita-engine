@@ -5,16 +5,6 @@
 	<comment>Bonita platform core database configuration</comment>
 
 	<!-- SQL Server configuration -->
-
-<<<<<<< Updated upstream
-    <entry key="sql.delimiter">GO</entry>
-
-     <!-- Hibernate specific configuration -->
-     <entry key="hibernate.journal.dialect">org.hibernate.dialect.SQLServerDialect</entry>
-
-     <!-- Quartz specific configuration -->
-     <entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.MSSQLDelegate</entry>
-=======
 	<entry key="sql.delimiter">GO</entry>
 
 	<!-- Hibernate specific configuration -->
@@ -23,5 +13,5 @@
 
 	<!-- Quartz specific configuration -->
 	<entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.MSSQLDelegate</entry>
->>>>>>> Stashed changes
+
 </properties>
