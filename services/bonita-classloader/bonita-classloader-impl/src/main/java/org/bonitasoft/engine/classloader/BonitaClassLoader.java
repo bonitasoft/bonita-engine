@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.xbean.classloader.JarFileClassLoader;
 import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 
@@ -33,7 +32,7 @@ import org.bonitasoft.engine.commons.NullCheckingUtil;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class BonitaClassLoader extends JarFileClassLoader {
+public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     private final String type;
 
@@ -45,7 +44,6 @@ public class BonitaClassLoader extends JarFileClassLoader {
 
     private final File temporaryFolder;
 
-    private final ClassLoader parent;
     /**
      * Logger
      */
@@ -53,7 +51,6 @@ public class BonitaClassLoader extends JarFileClassLoader {
 
     BonitaClassLoader(final Map<String, byte[]> resources, final String type, final long id, final String temporaryFolder, final ClassLoader parent) {
         super(type + "__" + id, new URL[] {}, parent);
-        this.parent = parent;
         NullCheckingUtil.checkArgsNotNull(resources, type, id, temporaryFolder, parent);
         this.type = type;
         this.id = id;
@@ -136,7 +133,7 @@ public class BonitaClassLoader extends JarFileClassLoader {
         }    
 
         if (c == null) {
-            c = this.parent.loadClass(name);
+            c = getParent().loadClass(name);
         }
 
         if (resolve) {

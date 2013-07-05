@@ -46,6 +46,7 @@ import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
+import org.hibernate.Interceptor;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -93,6 +94,29 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         } catch (final ConfigurationException e) {
             throw new SPersistenceException(e);
         }
+        final String dialect = configuration.getProperty("hibernate.dialect");
+        if (dialect != null) {
+            if (dialect.contains("PostgreSQL")) {
+                configuration.setInterceptor(new PostgresInterceptor());
+            } else if (dialect.contains("SQLServer")) {
+                configuration.setInterceptor(new SQLServerInterceptor());
+            }
+        }
+        final String className = configuration.getProperty("hibernate.interceptor");
+        if (className != null && !className.isEmpty()) {
+            try {
+                final Interceptor interceptor = (Interceptor) Class.forName(className).newInstance();
+                configuration.setInterceptor(interceptor);
+            } catch (final ClassNotFoundException cnfe) {
+                throw new SPersistenceException(cnfe);
+            } catch (InstantiationException e) {
+                throw new SPersistenceException(e);
+            } catch (IllegalAccessException e) {
+                throw new SPersistenceException(e);
+            }
+
+        }
+
         sessionFactory = configuration.buildSessionFactory();
         statistics = sessionFactory.getStatistics();
 
@@ -309,7 +333,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final String setterName = "set" + StringUtil.firstCharToUpperCase(fieldName);
             ClassReflector.invokeMethodByName(entity, setterName, parameterValue);
         } catch (final Exception e) {
-            throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id + " and fieldName : " + fieldName, e);
+            throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id, e);
         }
     }
 

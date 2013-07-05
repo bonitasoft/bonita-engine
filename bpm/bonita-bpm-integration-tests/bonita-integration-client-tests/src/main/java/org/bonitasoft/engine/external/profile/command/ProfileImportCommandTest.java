@@ -1,9 +1,5 @@
 package org.bonitasoft.engine.external.profile.command;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -22,6 +18,7 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileMember;
+import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -30,6 +27,10 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProfileImportCommandTest extends AbstractCommandProfileTest {
 
@@ -76,7 +77,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
 
         // check profile entries and their attributes
         for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {
-            SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
                     .sort(ProfileEntrySearchDescriptor.PROFILE_ID, Order.ASC).done();
             final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(searchOptions);
             assertNotNull(searchedProfileEntries);
@@ -104,7 +105,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
 
         // check profileEntries
         for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {
-            SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, i)
                     .sort(ProfileEntrySearchDescriptor.NAME, Order.ASC).done();
             final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(searchOptions);
 
@@ -114,7 +115,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
         SearchOptions searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1)
                 .sort(ProfileEntrySearchDescriptor.NAME, Order.ASC).done();
         final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(searchOptions);
-        List<ProfileEntry> searchedProfileEntriesRes2 = searchedProfileEntries.getResult();
+        final List<ProfileEntry> searchedProfileEntriesRes2 = searchedProfileEntries.getResult();
         assertNotNull(searchedProfileEntriesRes2);
         assertEquals(1, searchedProfileEntriesRes2.size());
         assertEquals("Home", searchedProfileEntriesRes2.get(0).getName());
@@ -122,7 +123,8 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
         assertEquals("CurrentUserTeamTasksDashboard", searchedProfileEntriesRes2.get(0).getType());
 
         // check profile mapping
-        searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileEntrySearchDescriptor.PROFILE_ID, newId1).done();
+        searchOptions = new SearchOptionsBuilder(0, Integer.MAX_VALUE).filter(ProfileMemberSearchDescriptor.PROFILE_ID, newId1)
+                .sort(ProfileMemberSearchDescriptor.ID, Order.ASC).done();
         final SearchResult<ProfileMember> searchpms = getProfileAPI().searchProfileMembers("user", searchOptions);
         assertEquals(2, searchpms.getCount());
         assertEquals(users.get(0).getId(), searchpms.getResult().get(0).getUserId());

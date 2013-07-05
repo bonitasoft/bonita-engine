@@ -1,7 +1,7 @@
 CREATE TABLE employee (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name NVARCHAR(50) NOT NULL,
   age INT NOT NULL,
   laptopid NUMERIC(19, 0),
   archivedate NUMERIC(19, 0) NOT NULL,
@@ -21,8 +21,8 @@ GO
 CREATE TABLE laptop (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  brand VARCHAR(50) NOT NULL,
-  model VARCHAR(50) NOT NULL,
+  brand NVARCHAR(50) NOT NULL,
+  model NVARCHAR(50) NOT NULL,
   archivedate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
@@ -31,7 +31,7 @@ GO
 CREATE TABLE address (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  address VARCHAR(50) NOT NULL,
+  address NVARCHAR(50) NOT NULL,
   employeeid NUMERIC(19, 0) NOT NULL,
   archivedate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -41,7 +41,7 @@ GO
 CREATE TABLE project (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name NVARCHAR(50) NOT NULL,
   archivedate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
