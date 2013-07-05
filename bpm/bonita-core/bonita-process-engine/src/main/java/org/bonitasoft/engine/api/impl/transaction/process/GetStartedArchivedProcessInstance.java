@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -64,7 +64,7 @@ public class GetStartedArchivedProcessInstance implements TransactionContentWith
         try {
             archivedProcessInstance = searchArchivedProcessInstances.getResult().getResult().get(0);
         } catch (final IndexOutOfBoundsException e) {
-            throw new SProcessInstanceNotFoundException(processInstanceId);
+            throw new SAProcessInstanceNotFoundException(processInstanceId, ProcessInstanceState.STARTED.name());
         }
     }
 
