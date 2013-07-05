@@ -17,10 +17,5 @@
 			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>
