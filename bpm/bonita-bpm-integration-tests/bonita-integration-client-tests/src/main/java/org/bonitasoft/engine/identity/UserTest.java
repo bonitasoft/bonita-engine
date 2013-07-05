@@ -70,7 +70,6 @@ public class UserTest extends CommonAPITest {
 
     @Test
     public void createUserByUsernameAndPassword() throws BonitaException {
-
         getIdentityAPI().getNumberOfUsers();
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
@@ -79,13 +78,11 @@ public class UserTest extends CommonAPITest {
         final User user = getIdentityAPI().getUserByUserName("bonitasoft");
         assertNotNull(user);
         getIdentityAPI().deleteUser("bonitasoft");
-
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
     @Test
     public void createDisabledUserByUsernameAndPassword() throws BonitaException {
-
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
 
@@ -94,12 +91,10 @@ public class UserTest extends CommonAPITest {
         assertEquals(false, user.isEnabled());
 
         getIdentityAPI().deleteUser("bonitasoft");
-
     }
 
     @Test(expected = AlreadyExistsException.class)
     public void createUserByUsernameAndPasswordException() throws BonitaException {
-
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
         assertEquals("bonitasoft", userCreated.getUserName());
@@ -112,32 +107,25 @@ public class UserTest extends CommonAPITest {
             getIdentityAPI().createUser("bonitasoft", "123456");
         } finally {
             getIdentityAPI().deleteUser("bonitasoft");
-
         }
     }
 
     public void getFirstPageWithNoResult() throws BonitaException {
-
         getIdentityAPI().getUsers(0, 10, UserCriterion.USER_NAME_ASC);
     }
 
     @Test(expected = CreationException.class)
     public void createUserFailed() throws BonitaException {
-
         getIdentityAPI().createUser(null, null);
-
     }
 
     @Test(expected = CreationException.class)
     public void createUserUsingNullUser() throws BonitaException {
-
         getIdentityAPI().createUser(null);
-
     }
 
     @Test
     public void createUserByAUser() throws BonitaException {
-
         final String userName = "spring";
         final UserCreator creator = new UserCreator(userName, "bpm");
         creator.setTitle("wwwwwwwwwwwwwwwwwwwwwwwwwwww");
@@ -146,25 +134,21 @@ public class UserTest extends CommonAPITest {
         assertEquals(userName, user.getUserName());
 
         getIdentityAPI().deleteUser(userName);
-
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
     @Test
     public void createDisabledUserByAUser() throws BonitaException {
-
         final User user = getIdentityAPI().createUser("bonitasoft", "bpm");
         assertNotNull(user);
         assertEquals(false, user.isEnabled());
 
         getIdentityAPI().deleteUser("bonitasoft");
-
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
     @Test
     public void createEnabledUserByAUser() throws BonitaException {
-
         final UserCreator creator = new UserCreator("bonitasoft", "bpm");
         creator.setEnabled(true);
         final User user = getIdentityAPI().createUser(creator);
@@ -172,74 +156,45 @@ public class UserTest extends CommonAPITest {
         assertEquals(true, user.isEnabled());
 
         getIdentityAPI().deleteUser("bonitasoft");
-
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithANullUserNameUsingBuilder() throws BonitaException {
-
-        try {
-            getIdentityAPI().createUser(null, "revontuli");
-        } finally {
-
-        }
+        getIdentityAPI().createUser(null, "revontuli");
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithANullPasswordUsingBuilder() throws BonitaException {
-
-        try {
-            getIdentityAPI().createUser("matti", null);
-        } finally {
-
-        }
+        getIdentityAPI().createUser("matti", null);
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithAnEmptyUserNameUsingBuilder() throws BonitaException {
-
-        try {
-            getIdentityAPI().createUser("", "revontuli");
-        } finally {
-
-        }
+        getIdentityAPI().createUser("", "revontuli");
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithAnEmptyPasswordUsingBuilder() throws BonitaException {
-
-        try {
-            getIdentityAPI().createUser("matti", "");
-        } finally {
-
-        }
+        getIdentityAPI().createUser("matti", "");
     }
 
     @Test(expected = UserNotFoundException.class)
     public void getUserByUsernameWithException() throws BonitaException {
-
-        try {
-            getIdentityAPI().getUserByUserName("Bonita");
-        } finally {
-
-        }
+        getIdentityAPI().getUserByUserName("Bonita");
     }
 
     @Test
     public void getUserByUsername() throws BonitaException {
-
         getIdentityAPI().createUser("bonita", "password");
         final User user = getIdentityAPI().getUserByUserName("bonita");
         assertEquals("bonita", user.getUserName());
         assertNotSame("password", user.getPassword());
 
         getIdentityAPI().deleteUser("bonita");
-
     }
 
     @Test
     public void getNumberOfUsers() throws BonitaException {
-
         getIdentityAPI().createUser("jane", "bpm");
         getIdentityAPI().createUser("paul", "bpm");
 
@@ -248,12 +203,10 @@ public class UserTest extends CommonAPITest {
 
         getIdentityAPI().deleteUser("jane");
         getIdentityAPI().deleteUser("paul");
-
     }
 
     @Test
     public void getUserById() throws BonitaException {
-
         final User userCreated = getIdentityAPI().createUser("zhang", "engine");
         final User user = getIdentityAPI().getUser(userCreated.getId());
         assertNotNull(user);
@@ -261,42 +214,31 @@ public class UserTest extends CommonAPITest {
         assertNotSame("engine", user.getPassword());
 
         getIdentityAPI().deleteUser("zhang");
-
     }
 
     @Test(expected = UserNotFoundException.class)
     public void cannotGetTechUser() throws BonitaException {
-
-        try {
-            getIdentityAPI().getUser(-1);
-        } finally {
-
-        }
+        getIdentityAPI().getUser(-1);
     }
 
     @Test
     public void cannotGetTechUserInList() throws BonitaException {
-
         final Map<Long, User> users = getIdentityAPI().getUsers(Arrays.asList(-1l));
         assertNull(users.get(-1));
-
     }
 
     @Test(expected = UserNotFoundException.class)
     public void getUserByIDWithUserNotFoundException() throws BonitaException {
-
         final User userCreated = getIdentityAPI().createUser("zhang", "engine");
         try {
             getIdentityAPI().getUser(userCreated.getId() + 100);
         } finally {
             getIdentityAPI().deleteUser("zhang");
-
         }
     }
 
     @Test
     public void getUsersByIDs() throws BonitaException {
-
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
@@ -314,13 +256,10 @@ public class UserTest extends CommonAPITest {
         assertEquals("jmege", users.get(userCreated2.getId()).getUserName());
         assertNotSame("engine", users.get(userCreated2.getId()).getPassword());
 
-        getIdentityAPI().deleteUser("zhang");
-        getIdentityAPI().deleteUser("jmege");
-
+        deleteUsers(userCreated1, userCreated2);
     }
 
     public void getUsersByIDsWithoutUserNotFoundException() throws BonitaException {
-
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
@@ -335,53 +274,39 @@ public class UserTest extends CommonAPITest {
         assertEquals("zhang", users.get(userCreated1.getId()).getUserName());
         assertEquals("engine", users.get(userCreated1.getId()).getPassword());
 
-        getIdentityAPI().deleteUser("zhang");
-        getIdentityAPI().deleteUser("jmege");
-
+        deleteUsers(userCreated1, userCreated2);
     }
 
     @Test
     public void deleteUserByUserName() throws BonitaException {
-
         getIdentityAPI().createUser("testDelete", "engine");
         getIdentityAPI().deleteUser("testDelete");
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
-
     }
 
     @Test
     public void deleteNonExistingUserByUserName() throws BonitaException {
-
         final String userName = "testDelete";
         getIdentityAPI().createUser(userName, "engine");
         getIdentityAPI().deleteUser(userName);
-        try {
-            getIdentityAPI().deleteUser(userName);
-        } finally {
-
-        }
+        getIdentityAPI().deleteUser(userName);
     }
 
     @Test(expected = DeletionException.class)
     public void deleteUserByUserNameWithUserDeletionException() throws BonitaException {
-
         getIdentityAPI().deleteUser(null);
-
     }
 
     @Test
     public void deleteUser() throws BonitaException {
-
         final User user = getIdentityAPI().createUser("testDelete", "engine");
         getIdentityAPI().deleteUser(user.getId());
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
-
     }
 
     @Cover(classes = { User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-1055", keywords = { "contact info", "user" })
     @Test
     public void deleteUserContactInfo() throws BonitaException {
-
         final UserCreator creator = new UserCreator("john", "bpm");
         creator.setFirstName("John").setLastName("Doe");
         final ContactDataCreator persoCreator = new ContactDataCreator();
@@ -400,24 +325,17 @@ public class UserTest extends CommonAPITest {
         getIdentityAPI().deleteUser(john.getId());
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
         assertNull(getIdentityAPI().getUserContactData(john.getId(), true));
-
     }
 
     @Test
     public void deleteNonExistingUser() throws BonitaException {
-
         final User user = getIdentityAPI().createUser("testDelete", "engine");
         getIdentityAPI().deleteUser(user.getId());
-        try {
-            getIdentityAPI().deleteUser(user.getId());
-        } finally {
-
-        }
+        getIdentityAPI().deleteUser(user.getId());
     }
 
     @Test
     public void deleteUsers() throws BonitaException {
-
         final List<Long> userIds = new ArrayList<Long>();
         userIds.add(getIdentityAPI().createUser("user1", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user2", "engine").getId());
@@ -427,22 +345,15 @@ public class UserTest extends CommonAPITest {
 
         getIdentityAPI().deleteUsers(userIds);
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
-
     }
 
     @Test
     public void deleteNonExistingUsers() throws BonitaException {
-
-        try {
-            getIdentityAPI().deleteUsers(null);
-        } finally {
-
-        }
+        getIdentityAPI().deleteUsers(null);
     }
 
     @Test
     public void deleteUsersDeleteAllExistingOnesAndIgnoresOthers() throws BonitaException {
-
         final List<Long> userIds = new ArrayList<Long>();
         userIds.add(getIdentityAPI().createUser("user1", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user2", "engine").getId());
@@ -450,12 +361,10 @@ public class UserTest extends CommonAPITest {
 
         getIdentityAPI().deleteUsers(userIds);
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
-
     }
 
     @Test
     public void updateUser() throws BonitaException {
-
         final String james = "james";
         final User user = getIdentityAPI().createUser(james, "mbp");
         final UserUpdater updateDescriptor = new UserUpdater();
@@ -571,13 +480,11 @@ public class UserTest extends CommonAPITest {
         assertEquals(title, updatedUser.getTitle());
 
         getIdentityAPI().deleteUser(updatedUser.getId());
-
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Enabled", "User", "Update" }, jira = "ENGINE-577")
     @Test
     public void updateUserToBeEnabled() throws BonitaException {
-
         // Create user, and updateDescriptor
         final User user = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(user);
@@ -591,12 +498,10 @@ public class UserTest extends CommonAPITest {
 
         // Clean
         getIdentityAPI().deleteUser("bonitasoft");
-
     }
 
     @Test
     public void updateUserManager() throws BonitaException {
-
         final User matti = getIdentityAPI().createUser("matti", "bpm");
         final User james = getIdentityAPI().createUser("james", "bpm");
         assertEquals(0, james.getManagerUserId());
@@ -606,34 +511,25 @@ public class UserTest extends CommonAPITest {
         assertNotNull(updatedUser);
         assertEquals(matti.getId(), updatedUser.getManagerUserId());
 
-        getIdentityAPI().deleteUser(james.getId());
-        getIdentityAPI().deleteUser(matti.getId());
-
+        deleteUsers(james, matti);
     }
 
     @Test(expected = UserNotFoundException.class)
     public void updateUserWithUserNotFoundException() throws BonitaException {
-
         final UserUpdater updateDescriptor = new UserUpdater();
         updateDescriptor.setUserName("john");
         updateDescriptor.setPassword("bpm");
         final int userId = 100;
-        try {
-            getIdentityAPI().updateUser(userId, updateDescriptor);
-        } finally {
-
-        }
+        getIdentityAPI().updateUser(userId, updateDescriptor);
     }
 
     @Test(expected = UpdateException.class)
     public void updateUserWithUserUpdateException() throws BonitaException {
-
         final User oldUser = getIdentityAPI().createUser("old", "oldPassword");
         try {
             getIdentityAPI().updateUser(oldUser.getId(), null);
         } finally {
             getIdentityAPI().deleteUser(oldUser.getId());
-
         }
     }
 
@@ -641,7 +537,6 @@ public class UserTest extends CommonAPITest {
             "user", "contact data" })
     @Test
     public void updateUserWithOnlyDataChanging() throws BonitaException {
-
         final User user = getIdentityAPI().createUser("james", "mbp");
 
         final ContactDataUpdater persoDataUpDescr = new ContactDataUpdater();
@@ -730,7 +625,6 @@ public class UserTest extends CommonAPITest {
         assertEquals(zipCode2, proData.getZipCode());
 
         getIdentityAPI().deleteUser(updatedUser.getId());
-
     }
 
     @Test
@@ -802,11 +696,7 @@ public class UserTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(UserSearchDescriptor.FIRST_NAME, "Jean-Gustave");
         builder.sort("WRONG_SORT_KEY", Order.ASC);
-        try {
-            getIdentityAPI().searchUsers(builder.done());
-        } finally {
-
-        }
+        getIdentityAPI().searchUsers(builder.done());
     }
 
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "Users", "Filter", "Order", "Pagination",
