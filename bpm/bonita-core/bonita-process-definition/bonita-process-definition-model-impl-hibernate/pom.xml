@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-process-definition</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-		<version>6.1.0-rc-04</version>
+		<version>6.1.0-rc-05-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-definition-model-impl-hibernate</artifactId>
