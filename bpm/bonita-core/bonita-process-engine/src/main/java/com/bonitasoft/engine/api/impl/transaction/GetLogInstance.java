@@ -8,9 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction;
 
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
