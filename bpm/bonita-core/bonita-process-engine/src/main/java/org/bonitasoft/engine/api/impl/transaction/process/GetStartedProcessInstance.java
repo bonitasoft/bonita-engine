@@ -63,7 +63,7 @@ public class GetStartedProcessInstance implements TransactionContentWithResult<P
         try {
             processInstance = searchProcessInstances.getResult().getResult().get(0);
         } catch (final IndexOutOfBoundsException e) {
-            throw new SProcessInstanceNotFoundException(processInstanceId);
+            throw new SProcessInstanceNotFoundException(processInstanceId, ProcessInstanceState.STARTED.name());
         }
     }
 
