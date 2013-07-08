@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-scheduler</artifactId>
 		<groupId>com.bonitasoft.engine.scheduler</groupId>
-		<version>6.1.0-rc-04</version>
+		<version>6.1.0-rc-05-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-scheduler-impl-mybatis</artifactId>
