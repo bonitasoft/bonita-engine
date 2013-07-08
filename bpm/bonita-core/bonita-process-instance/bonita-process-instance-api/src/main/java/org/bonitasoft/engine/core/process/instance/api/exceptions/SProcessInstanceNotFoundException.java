@@ -32,10 +32,6 @@ public class SProcessInstanceNotFoundException extends SBonitaException {
         super("Process instance with id <" + processInstanceId + "> and state <" + state + "> not found");
     }
 
-    public SProcessInstanceNotFoundException(final long processInstanceId, final String state) {
-        super("Process instance with id <" + processInstanceId + "> and state <" + state + "> not found");
-    }
-
     public SProcessInstanceNotFoundException(final String message) {
         super(message);
     }
