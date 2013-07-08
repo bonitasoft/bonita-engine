@@ -108,10 +108,22 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- platform command -->
+		<!-- platform-command -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>
 			<artifactId>bonita-platform-command-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -799,6 +811,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-services-test-conf</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -854,11 +873,35 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine</groupId>
+									<artifactId>bonita-services-test-conf</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
-						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/bpm/test/AllBPMTestsWithJNDI.java</include>

@@ -112,6 +112,7 @@
 		<property name="hbmResources">
 			<list>
 				<ref bean="hbm-bonita-persistence-test" />
+				<ref bean="hbm-bonita-archive-test" />
 				<ref bean="hbm-bonita-log-model" />
 				<ref bean="hbm-bonita-platform-model" />
 				<ref bean="hbm-bonita-data-model" />
@@ -125,7 +126,6 @@
 				<ref bean="hbm-bos-data-instance-model-arch" />
 				<ref bean="hbm-bos-platform-command-model" />
 				<ref bean="hbm-bos-profile-model" />
-				<ref bean="hbm-bonita-archive-test" />
 			</list>
 		</property>
 	</bean>

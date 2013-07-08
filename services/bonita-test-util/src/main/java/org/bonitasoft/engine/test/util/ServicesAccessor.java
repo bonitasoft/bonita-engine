@@ -56,14 +56,14 @@ public final class ServicesAccessor {
 
         final File serviceFolder = new File(serviceFolderPath);
         if (!serviceFolder.isDirectory()) {
-            throw new RuntimeException("Folder '" + serviceFolderPath + "'is not a directory.");
+            throw new RuntimeException("Folder '" + serviceFolderPath + "' is not a directory.");
         }
 
         try {
             final FileFilter fileFilter = getFileFilter();
             final File[] listFiles = serviceFolder.listFiles(fileFilter);
             if (listFiles.length == 0) {
-                throw new RuntimeException("No file found");
+                throw new RuntimeException("System property 'bonita.services.folder' does not contain any file");
             }
             final String[] resources = new String[listFiles.length];
             for (int i = 0; i < listFiles.length; i++) {
