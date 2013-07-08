@@ -453,6 +453,11 @@
 			<artifactId>bonita-platform-session-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.platform.session</groupId>
+			<artifactId>bonita-platform-session-clustered-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Process Comment -->
 		<dependency>
@@ -603,6 +608,11 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.session</groupId>
 			<artifactId>bonita-session-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.session</groupId>
+			<artifactId>bonita-session-clustered-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -899,6 +909,7 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
+									<include>com.bonitasoft.engine.platform.session:bonita-platform-session-clustered-impl</include>
 									<!-- Process Comment -->
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl</include>
@@ -953,6 +964,7 @@
 									<include>org.bonitasoft.engine.session:bonita-session-model-impl</include>
 									<include>org.bonitasoft.engine.session:bonita-session-api-impl</include>
 									<include>org.bonitasoft.engine.session:bonita-session-api</include>
+									<include>com.bonitasoft.engine.session:bonita-session-clustered-impl</include>
 									<!-- Session Accessor -->
 									<include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-read</include>
 									<include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-threadlocal</include>
