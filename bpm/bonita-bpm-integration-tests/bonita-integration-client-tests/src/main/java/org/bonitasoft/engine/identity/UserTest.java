@@ -160,47 +160,27 @@ public class UserTest extends CommonAPITest {
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithANullUserNameUsingBuilder() throws BonitaException {
-        try {
-            getIdentityAPI().createUser(null, "revontuli");
-        } finally {
-
-        }
+        getIdentityAPI().createUser(null, "revontuli");
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithANullPasswordUsingBuilder() throws BonitaException {
-        try {
-            getIdentityAPI().createUser("matti", null);
-        } finally {
-
-        }
+        getIdentityAPI().createUser("matti", null);
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithAnEmptyUserNameUsingBuilder() throws BonitaException {
-        try {
-            getIdentityAPI().createUser("", "revontuli");
-        } finally {
-
-        }
+        getIdentityAPI().createUser("", "revontuli");
     }
 
     @Test(expected = CreationException.class)
     public void cannotCreateAUserWithAnEmptyPasswordUsingBuilder() throws BonitaException {
-        try {
-            getIdentityAPI().createUser("matti", "");
-        } finally {
-
-        }
+        getIdentityAPI().createUser("matti", "");
     }
 
     @Test(expected = UserNotFoundException.class)
     public void getUserByUsernameWithException() throws BonitaException {
-        try {
-            getIdentityAPI().getUserByUserName("Bonita");
-        } finally {
-
-        }
+        getIdentityAPI().getUserByUserName("Bonita");
     }
 
     @Test
@@ -276,8 +256,7 @@ public class UserTest extends CommonAPITest {
         assertEquals("jmege", users.get(userCreated2.getId()).getUserName());
         assertNotSame("engine", users.get(userCreated2.getId()).getPassword());
 
-        getIdentityAPI().deleteUser("zhang");
-        getIdentityAPI().deleteUser("jmege");
+        deleteUsers(userCreated1, userCreated2);
     }
 
     public void getUsersByIDsWithoutUserNotFoundException() throws BonitaException {
@@ -295,8 +274,7 @@ public class UserTest extends CommonAPITest {
         assertEquals("zhang", users.get(userCreated1.getId()).getUserName());
         assertEquals("engine", users.get(userCreated1.getId()).getPassword());
 
-        getIdentityAPI().deleteUser("zhang");
-        getIdentityAPI().deleteUser("jmege");
+        deleteUsers(userCreated1, userCreated2);
     }
 
     @Test
@@ -533,8 +511,7 @@ public class UserTest extends CommonAPITest {
         assertNotNull(updatedUser);
         assertEquals(matti.getId(), updatedUser.getManagerUserId());
 
-        getIdentityAPI().deleteUser(james.getId());
-        getIdentityAPI().deleteUser(matti.getId());
+        deleteUsers(james, matti);
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -728,10 +705,10 @@ public class UserTest extends CommonAPITest {
     public void searchUser() throws BonitaException {
         final List<User> users = new ArrayList<User>();
         users.add(getIdentityAPI().createUser("jgrGF[|00", "bpm", "John", "Taylor"));
-        users.add(getIdentityAPI().createUser("45Ã¨DG'fgb", "bpm", "Jack", "Jack"));
-        users.add(getIdentityAPI().createUser("Ã \"(Ã¨g", "bpm", "John", "Smith"));
+        users.add(getIdentityAPI().createUser("45èDG'fgb", "bpm", "Jack", "Jack"));
+        users.add(getIdentityAPI().createUser("à\"(èg", "bpm", "John", "Smith"));
         users.add(getIdentityAPI().createUser("^^jhg", "bpm", "Paul", "Taylor"));
-        users.add(getIdentityAPI().createUser("Ù…Ø±Ø­Ø¨Ø§!", "bpm", "Jack", "Jack"));
+        users.add(getIdentityAPI().createUser("مرحبا!", "bpm", "Jack", "Jack"));
         users.add(getIdentityAPI().createUser("user02", "bpm", "Pierre", "Smith"));
         users.add(getIdentityAPI().createUser("User00", "bpm", "Marie", "Taylor"));
 
@@ -739,7 +716,7 @@ public class UserTest extends CommonAPITest {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(UserSearchDescriptor.FIRST_NAME, "John");
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.ASC);
-        SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
+        final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
         assertEquals(2, searchUsers.getCount());
         List<User> usersResult = searchUsers.getResult();
@@ -842,9 +819,7 @@ public class UserTest extends CommonAPITest {
         assertEquals(user3, users.get(1));
         assertEquals(user1, users.get(2));
 
-        getIdentityAPI().deleteUser(user1.getId());
-        getIdentityAPI().deleteUser(user3.getId());
-        getIdentityAPI().deleteUser(user4.getId());
+        deleteUsers(user1, user3, user4);
     }
 
     @Test

@@ -58,7 +58,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     private final Map<String, SQLTransformer> sqlTransformers = new HashMap<String, SQLTransformer>();
 
     private final String statementDelimiter;
-    
+
     private final String likeEscapeCharacter;
 
     private final String name;
@@ -67,8 +67,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     protected final DataSource datasource;
 
-    public AbstractDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter, 
-            final SequenceManager sequenceManager, final DataSource datasource) {
+    public AbstractDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
+            final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource) {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
@@ -151,7 +151,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     @Override
     public void initializeStructure() throws SPersistenceException, IOException {
-        initializeStructure(Collections.<String, String>emptyMap());
+        initializeStructure(Collections.<String, String> emptyMap());
     }
 
     @Override
@@ -170,8 +170,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         }
     }
 
-    private void executeSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements, final boolean useDataSourceConnection) throws SPersistenceException,
-            IOException {
+    private void executeSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
+            final boolean useDataSourceConnection) throws SPersistenceException, IOException {
         if (replacements != null) {
             final HashMap<String, String> replacementsWithVarDelimiters = new HashMap<String, String>();
             for (final Entry<String, String> entry : replacements.entrySet()) {
@@ -195,8 +195,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         return new ArrayList<SQLTransformer>(sqlTransformers.values());
     }
 
-    protected abstract void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements, final boolean useDataSourceConnection)
-            throws SPersistenceException, IOException;
+    protected abstract void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
+            final boolean useDataSourceConnection) throws SPersistenceException, IOException;
 
     @Override
     public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final QueryOptions options, final Map<String, Object> parameters)
@@ -289,11 +289,11 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
             }
         }
     }
-    
+
     /**
      * Get like clause for given term with escaped sql query wildcards and escape character
      */
-    protected String getLikeEscapeClause(String term) {
+    protected String getLikeEscapeClause(final String term) {
         final StringBuilder builder = new StringBuilder();
         builder.append(" LIKE '");
         // 1) escape ' character by adding another ' character

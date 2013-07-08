@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,23 +16,21 @@ package org.bonitasoft.engine.core.process.instance.api.exceptions;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Baptiste Mesta
- * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SProcessInstanceNotFoundException extends SBonitaException {
+public class SAProcessInstanceNotFoundException extends SBonitaException {
 
     private static final long serialVersionUID = 1956687311066803177L;
 
-    public SProcessInstanceNotFoundException(final long processInstanceId) {
-        super("Process instance with id " + processInstanceId + " not found");
+    public SAProcessInstanceNotFoundException(final long processInstanceId) {
+        super("Archived process instance with id <" + processInstanceId + "> not found");
     }
 
-    public SProcessInstanceNotFoundException(final long processInstanceId, final String state) {
-        super("Process instance with id <" + processInstanceId + "> and state <" + state + "> not found");
+    public SAProcessInstanceNotFoundException(final long processInstanceId, final String state) {
+        super("Archived process instance with id <" + processInstanceId + "> and state <" + state + "> not found");
     }
 
-    public SProcessInstanceNotFoundException(final String message) {
+    public SAProcessInstanceNotFoundException(final String message) {
         super(message);
     }
 

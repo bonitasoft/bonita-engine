@@ -2,9 +2,9 @@ CREATE TABLE actor (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   scopeId NUMERIC(19, 0) NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
-  description VARCHAR(MAX),
+  name NVARCHAR(50) NOT NULL,
+  displayName NVARCHAR(75),
+  description NVARCHAR(MAX),
   initiator BIT,
   UNIQUE (tenantid, id, scopeId, name),
   PRIMARY KEY (tenantid, id)
