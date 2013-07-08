@@ -263,7 +263,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     // disableAndDelete(processDefinition);
     // }
 
-    @Test(expected = DeletionException.class)
+    @Test
     public void deleteUnknownProcess() throws Exception {
         getProcessAPI().deleteProcess(123456789);
     }

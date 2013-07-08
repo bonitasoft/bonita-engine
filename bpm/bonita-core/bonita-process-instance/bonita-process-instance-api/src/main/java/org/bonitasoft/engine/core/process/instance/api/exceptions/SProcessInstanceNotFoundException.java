@@ -25,7 +25,11 @@ public class SProcessInstanceNotFoundException extends SBonitaException {
     private static final long serialVersionUID = 1956687311066803177L;
 
     public SProcessInstanceNotFoundException(final long processInstanceId) {
-        super("Process instance with id " + processInstanceId + " not found");
+        super("Process instance with id <" + processInstanceId + "> not found");
+    }
+
+    public SProcessInstanceNotFoundException(final long processInstanceId, final String state) {
+        super("Process instance with id <" + processInstanceId + "> and state <" + state + "> not found");
     }
 
     public SProcessInstanceNotFoundException(final long processInstanceId, final String state) {
