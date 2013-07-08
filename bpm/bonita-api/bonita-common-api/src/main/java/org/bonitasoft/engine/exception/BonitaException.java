@@ -48,6 +48,9 @@ public class BonitaException extends Exception {
     }
 
     private void mergeStacks(final Throwable cause) {
+        if (cause == null) {
+            return;
+        }
         final StackTraceElement[] currentStack = getStackTrace();
         final List<StackTraceElement[]> causesStacks = new ArrayList<StackTraceElement[]>();
         final List<Throwable> exceptions = new ArrayList<Throwable>();
