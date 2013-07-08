@@ -3,11 +3,10 @@ package com.bonitasoft.engine.session.impl;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -95,17 +94,7 @@ public class SessionProviderClusteredTest {
 
     @Test
     public void testCleanInvalidSessions() throws Exception {
-        SSessionImpl sessionNotExpired = new SSessionImpl(123l, 1l, "john", "6.0", "BPM", 12);
-        sessionNotExpired.setDuration(1000);
-        sessionNotExpired.setLastRenewDate(new Date());
-        SSessionImpl sessionExpired = new SSessionImpl(124l, 1l, "jack", "6.0", "BPM", 13);
-        sessionExpired.setDuration(1000);
-        sessionExpired.setLastRenewDate(new Date(System.currentTimeMillis() - 2000));
-        when(map.values()).thenReturn(Arrays.asList((SSession) sessionNotExpired, (SSession) sessionExpired));
-        sessionProviderClustered.cleanInvalidSessions();
-        // check only expired session is removed
-        verify(map).remove(124l);
-        verify(map, never()).remove(123l);
+        verifyZeroInteractions(map);
 
     }
 

@@ -23,7 +23,7 @@ import com.hazelcast.core.IMap;
  */
 public final class PlatformSessionProviderClustered implements PlatformSessionProvider {
 
-    private static final String SESSION_MAP = "SESSION_MAP";
+    private static final String SESSION_MAP = "SESSION_MAP_PLATFORM";
 
     private final IMap<Long, SPlatformSession> sessions;
 

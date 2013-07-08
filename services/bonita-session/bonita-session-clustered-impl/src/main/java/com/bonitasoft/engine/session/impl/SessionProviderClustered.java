@@ -8,9 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.session.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bonitasoft.engine.session.SSessionAlreadyExistsException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
@@ -78,15 +75,7 @@ public final class SessionProviderClustered implements SessionProvider {
 
     @Override
     public synchronized void cleanInvalidSessions() {
-        final List<Long> invalidSessionIds = new ArrayList<Long>();
-        for (final SSession session : sessions.values()) {
-            if (!session.isValid()) {
-                invalidSessionIds.add(session.getId());
-            }
-        }
-        for (final Long invalidSessionId : invalidSessionIds) {
-            sessions.remove(invalidSessionId);
-        }
+        // do nothing since sessions are cleaned whith a TTL
     }
 
     @Override

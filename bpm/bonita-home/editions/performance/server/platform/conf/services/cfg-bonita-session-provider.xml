@@ -7,4 +7,12 @@
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 	</bean>
 
+	
+	<bean id="sessionCache" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<!-- do not put the first letter because it will need to match the pattern *ESSION... -->
+		<property name="name" value="ESSION_MAP" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="timeToLiveSeconds" value="4000" />
+		<property name="maxElementsInMemory" value="100000" />
+	</bean>
 </beans>
