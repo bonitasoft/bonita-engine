@@ -13,28 +13,30 @@
  **/
 package org.bonitasoft.engine.cache;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author Baptiste Mesta
  */
 public class CacheConfigurations {
 
-    private final Map<String, CacheConfiguration> configurations;
+    private List<CacheConfiguration> configurations;
 
     /**
      * @param configurations
      */
-    public CacheConfigurations(final Map<String, CacheConfiguration> configurations) {
+    public CacheConfigurations() {
         super();
-        this.configurations = configurations;
     }
 
     /**
      * @return the configurations
      */
-    public Map<String, CacheConfiguration> getConfigurations() {
+    public List<CacheConfiguration> getConfigurations() {
         return configurations;
     }
 
+    public void setConfigurations(final List<CacheConfiguration> configurations) {
+        this.configurations = configurations;
+    }
 }

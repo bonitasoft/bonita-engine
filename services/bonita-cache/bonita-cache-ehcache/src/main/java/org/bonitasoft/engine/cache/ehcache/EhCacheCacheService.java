@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -54,10 +53,10 @@ public class EhCacheCacheService implements CacheService {
     public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
-        final Map<String, org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
+        final List<org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
         this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
-        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : configurations.entrySet()) {
-            this.cacheConfigurations.put(cacheConfig.getKey(), getEhCacheConfiguration(cacheConfig.getValue()));
+        for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
+            this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
 
         }
         cacheManager = CacheManager.create();
@@ -67,10 +66,10 @@ public class EhCacheCacheService implements CacheService {
             final URL configFile) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
-        final Map<String, org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
+        final List<org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
         this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
-        for (final Entry<String, org.bonitasoft.engine.cache.CacheConfiguration> cacheConfig : configurations.entrySet()) {
-            this.cacheConfigurations.put(cacheConfig.getKey(), getEhCacheConfiguration(cacheConfig.getValue()));
+        for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
+            this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
         }
         cacheManager = CacheManager.create(configFile);
     }
