@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,10 +26,12 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Zhang Bole
  * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
 public class DeleteArchivedProcessInstances implements TransactionContent {
 
@@ -41,11 +43,10 @@ public class DeleteArchivedProcessInstances implements TransactionContent {
 
     private final ArchiveService archiveService;
 
-    public DeleteArchivedProcessInstances(final ProcessInstanceService processInstanceService, final long processDefinitionId,
-            final ArchiveService archiveService) {
-        this.processInstanceService = processInstanceService;
+    public DeleteArchivedProcessInstances(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
-        this.archiveService = archiveService;
+        processInstanceService = tenantAccessor.getProcessInstanceService();
+        archiveService = tenantAccessor.getArchiveService();
     }
 
     @Override
@@ -69,4 +70,9 @@ public class DeleteArchivedProcessInstances implements TransactionContent {
             } while (!sourceProcessInstanceIds.isEmpty());
         }
     }
+
+    protected long getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
 }

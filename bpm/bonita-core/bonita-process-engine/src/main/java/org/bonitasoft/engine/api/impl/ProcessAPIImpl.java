@@ -449,7 +449,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private static final String CONTAINER_TYPE_ACTIVITY_INSTANCE = "ACTIVITY_INSTANCE";
 
-    private static TenantServiceAccessor getTenantAccessor() {
+    protected static TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -487,9 +487,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void deleteProcess(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         // multiple tx here because we must lock instances when deleting them
         // but if the second tx crash we can relaunch deleteprocess without issues
         try {
@@ -502,22 +499,20 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new DeletionException(e);
         }
 
-        // 1 tx for the rest
+        // 1 tx for deleting the process definition and co.
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-                final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-                final DeleteProcess deleteProcess = new DeleteProcess(processDefinitionService, processDefinition, processInstanceService,
-                        tenantAccessor.getArchiveService(), actorMappingService);
-                transactionExecutor.execute(deleteProcess);
+                final TransactionContent deleteTrancastionContent = getDeleteTrancastionContent(processDefinitionId);
+                transactionExecutor.execute(deleteTrancastionContent);
                 final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
                 final File file = new File(processesFolder);
                 if (!file.exists()) {
                     file.mkdir();
                 }
 
-                final File processFolder = new File(file, String.valueOf(processDefinition.getId()));
+                final File processFolder = new File(file, String.valueOf(processDefinitionId));
                 IOUtil.deleteDir(processFolder);
             } catch (final BonitaHomeNotSetException e) {
                 transactionExecutor.setTransactionRollback();
@@ -536,7 +531,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
+    protected TransactionContent getDeleteTrancastionContent(final long processDefinitionId) {
+        return new DeleteProcess(getTenantAccessor(), processDefinitionId);
+    }
+
+    private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
             throws SBonitaException, SearchException, SProcessInstanceHierarchicalDeletionException {
         List<ProcessInstance> processInstances;
         final int maxResults = 100;
@@ -3487,12 +3486,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
             deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
-            final DeleteArchivedProcessInstances transactionContent = new DeleteArchivedProcessInstances(processInstanceService, processDefinitionId,
-                    tenantAccessor.getArchiveService());
+            final DeleteArchivedProcessInstances transactionContent = new DeleteArchivedProcessInstances(tenantAccessor, processDefinitionId);
             transactionExecutor.execute(transactionContent);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
