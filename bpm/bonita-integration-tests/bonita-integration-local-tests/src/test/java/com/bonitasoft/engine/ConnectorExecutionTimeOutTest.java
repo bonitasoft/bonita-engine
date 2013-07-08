@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +31,6 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
@@ -42,6 +39,8 @@ import com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta
@@ -60,7 +59,6 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "Connector", "Execution too long" }, jira = "ENGINE-472", story = "Test if connector fails when connector execution is too long.")
     @Test
-    @Ignore("Using BOS implementation for Now (6.0.0)")
     public void testExecuteConnectorWithExecutionTooLong() throws Exception {
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("testConnectorWithExecutionTooLong",
@@ -97,8 +95,8 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
     @Test
     public void testExecuteConnectorWithCustomOutputTypeWithCommands() throws Exception {
         final String delivery = "Delivery men";
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "testExecuteConnectorWithCustomOutputTypeWithCommands", "1.0");
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("testConnectorWithExecutionTooLong",
+                "1.0");
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addShortTextData("value", null);
         designProcessDefinition.addUserTask("step1", delivery);
