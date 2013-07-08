@@ -20,6 +20,7 @@ import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.session.PlatformSessionProvider;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
@@ -42,9 +43,10 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
 
     private long sessionDuration = DEFAULT_SESSION_DURATION;
 
-    public PlatformSessionServiceImpl(final SPlatformSessionModelBuilder platformSessionModelBuilder, final TechnicalLoggerService logger) {
+    public PlatformSessionServiceImpl(final PlatformSessionProvider platformSessionProvider, final SPlatformSessionModelBuilder platformSessionModelBuilder,
+            final TechnicalLoggerService logger) {
         this.platformSessionModelBuilder = platformSessionModelBuilder;
-        platformSessionProvider = PlatformSessionProvider.getInstance();
+        this.platformSessionProvider = platformSessionProvider;
         this.logger = logger;
     }
 
