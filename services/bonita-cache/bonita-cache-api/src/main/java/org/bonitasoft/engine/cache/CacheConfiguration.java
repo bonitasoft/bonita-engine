@@ -18,17 +18,19 @@ package org.bonitasoft.engine.cache;
  */
 public class CacheConfiguration {
 
-    protected String evictionPolicy = "LRU";
+    private String evictionPolicy = "LRU";
 
-    protected long timeToLiveSeconds = 60 * 60;
+    private long timeToLiveSeconds = 60 * 60;
 
-    protected int maxElementsInMemory = 10000;
+    private int maxElementsInMemory = 10000;
 
-    protected int maxElementsOnDisk = 20000;
+    private int maxElementsOnDisk = 20000;
 
-    protected boolean inMemoryOnly = false;
+    private boolean inMemoryOnly = false;
 
-    protected boolean eternal = false;
+    private boolean eternal = false;
+
+    private String name;
 
     /**
      * @return the evictionPolicy
@@ -133,6 +135,14 @@ public class CacheConfiguration {
      */
     public void setInMemoryOnly(final boolean inMemoryOnly) {
         this.inMemoryOnly = inMemoryOnly;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }
