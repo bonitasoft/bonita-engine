@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
 
-	<profile name="Team Manager">
+	<profile name="Team Manager" isDefault="true">
 		<description>TM profile</description>
 		<iconPath>/profiles/profileTeamManager.png</iconPath>
 		<profileEntries>

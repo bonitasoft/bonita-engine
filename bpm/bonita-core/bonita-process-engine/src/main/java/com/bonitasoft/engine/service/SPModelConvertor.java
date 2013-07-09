@@ -25,8 +25,6 @@ import org.bonitasoft.engine.monitoring.SGcInfo;
 import org.bonitasoft.engine.monitoring.SMemoryUsage;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.profile.ProfileCreator;
-import org.bonitasoft.engine.profile.ProfileCreator.ProfileField;
 import org.bonitasoft.engine.profile.ProfileEntryCreator;
 import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
@@ -52,6 +50,8 @@ import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
 import com.bonitasoft.engine.platform.impl.TenantImpl;
+import com.bonitasoft.engine.profile.ProfileCreator;
+import com.bonitasoft.engine.profile.ProfileCreator.ProfileField;
 import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportCreator.ReportField;
@@ -137,9 +137,11 @@ public final class SPModelConvertor extends ModelConvertor {
         return breakpoints;
     }
 
-    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder) {
+    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder, final boolean isDefault, final long createdBy) {
+        final long creationDate = System.currentTimeMillis();
         final Map<ProfileField, Serializable> fields = creator.getFields();
-        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME));
+        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME), isDefault, creationDate,
+                createdBy, creationDate, createdBy);
         final String description = (String) fields.get(ProfileField.DESCRIPTION);
         if (description != null) {
             newSProfileBuilder.setDescription(description);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
-	<profile name="Administrator">
+	<profile name="Administrator" isDefault="true">
 		<description>Administrator profile</description>
 		<iconPath>/profiles/profileAdmin.png</iconPath>
 		<profileEntries>
@@ -200,7 +200,7 @@
 		</profileMapping>
 	</profile>
 
-	<profile name="Team Manager">
+	<profile name="Team Manager" isDefault="true">
 		<description>Team Manager profile</description>
 		<iconPath>/profiles/profileTeamManager.png</iconPath>
 		<profileEntries>
@@ -290,7 +290,7 @@
 			</users>
 		</profileMapping>
 	</profile>
-	<profile name="Process owner">
+	<profile name="Process owner" isDefault="false">
 		<description>Process owner profile</description>
 		<iconPath>/profiles/profileProcessOwner.png</iconPath>
 		<profileEntries>
@@ -407,7 +407,7 @@
 			</memberships>
 		</profileMapping>
 	</profile>
-	<profile name="User">
+	<profile name="User" isDefault="false">
 		<description>User profile</description>
 		<iconPath>/profiles/profileUser.png</iconPath>
 		<profileEntries>
