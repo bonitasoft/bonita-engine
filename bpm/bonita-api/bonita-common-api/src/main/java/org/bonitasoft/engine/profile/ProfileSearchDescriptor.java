@@ -23,4 +23,6 @@ public final class ProfileSearchDescriptor {
 
     public static final String NAME = "name";
 
+    public static final String IS_DEFAULT = "isDefault";
+
 }

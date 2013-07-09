@@ -1,9 +1,14 @@
 CREATE TABLE profile (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
+  isDefault NUMBER(1) NOT NULL,
   name VARCHAR2(50) NOT NULL,
   description VARCHAR2(1024),
   iconPath VARCHAR2(50),
+  creationDate NUMBER(19, 0) NOT NULL,
+  createdBy NUMBER(19, 0) NOT NULL,
+  lastUpdateDate NUMBER(19, 0) NOT NULL,
+  lastUpdatedBy NUMBER(19, 0) NOT NULL,
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );

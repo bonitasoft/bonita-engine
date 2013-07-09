@@ -1854,8 +1854,13 @@ public class ModelConvertor {
     public static Profile toProfile(final SProfile sProfile) {
         final ProfileImpl profileImpl = new ProfileImpl(sProfile.getName());
         profileImpl.setId(sProfile.getId());
+        profileImpl.setDefault(sProfile.isDefault());
         profileImpl.setDescription(sProfile.getDescription());
         profileImpl.setIconPath(sProfile.getIconPath());
+        profileImpl.setCreationDate(new Date(sProfile.getCreationDate()));
+        profileImpl.setCreatedBy(sProfile.getCreatedBy());
+        profileImpl.setLastUpdateDate(new Date(sProfile.getLastUpdateDate()));
+        profileImpl.setLastUpdatedBy(sProfile.getLastUpdatedBy());
         return profileImpl;
     }
 

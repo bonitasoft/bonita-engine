@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.bpm.NamedElementImpl;
 import org.bonitasoft.engine.profile.Profile;
 
@@ -23,12 +25,31 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
 
     private static final long serialVersionUID = 9223087187374465662L;
 
+    private boolean isDefault;
+
     private String description;
 
     private String iconPath;
 
+    private Date creationDate;
+
+    private long createdBy;
+
+    private Date lastUpdateDate;
+
+    private long lastUpdatedBy;
+
     public ProfileImpl(final String name) {
         super(name);
+    }
+
+    @Override
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(final boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     @Override
@@ -50,11 +71,52 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
     }
 
     @Override
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(final Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    @Override
+    public long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(final long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @Override
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(final Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    @Override
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(final long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
+        result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
+        result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
+        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
+        result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
+        result = prime * result + (int) (lastUpdatedBy ^ lastUpdatedBy >>> 32);
         return result;
     }
 
@@ -73,6 +135,9 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
             return false;
         }
         final ProfileImpl other = (ProfileImpl) obj;
+        if (isDefault != other.isDefault) {
+            return false;
+        }
         if (description == null) {
             if (other.description != null) {
                 return false;
@@ -87,6 +152,27 @@ public class ProfileImpl extends NamedElementImpl implements Profile {
         } else if (!iconPath.equals(other.iconPath)) {
             return false;
         }
+        if (creationDate == null) {
+            if (other.creationDate != null) {
+                return false;
+            }
+        } else if (!creationDate.equals(other.creationDate)) {
+            return false;
+        }
+        if (createdBy != other.createdBy) {
+            return false;
+        }
+        if (lastUpdateDate == null) {
+            if (other.lastUpdateDate != null) {
+                return false;
+            }
+        } else if (!lastUpdateDate.equals(other.lastUpdateDate)) {
+            return false;
+        }
+        if (lastUpdatedBy != other.lastUpdatedBy) {
+            return false;
+        }
+
         return true;
     }
 

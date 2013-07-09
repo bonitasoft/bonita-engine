@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -39,6 +39,7 @@ import org.bonitasoft.engine.profile.model.SProfileEntry;
 
 /**
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public class ImportProfiles implements TransactionContentWithResult<List<String>> {
 
@@ -46,15 +47,19 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
 
     private final IdentityService identityService;
 
-    private final List<ExportedProfile> profiles;
+    private final List<ExportedProfile> exportedProfiles;
+
+    private final long importer;
 
     private final List<String> warnings = new ArrayList<String>();
 
-    public ImportProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profiles) {
+    public ImportProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
+            final long importer) {
         super();
         this.profileService = profileService;
         this.identityService = identityService;
-        this.profiles = profiles;
+        this.exportedProfiles = exportedProfiles;
+        this.importer = importer;
     }
 
     @Override
@@ -63,14 +68,17 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
         final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
         final SProfileEntryBuilder proEntryBuilder = builders.getSProfileEntryBuilder();
 
-        for (final ExportedProfile profile : profiles) {
+        for (final ExportedProfile exportedProfile : exportedProfiles) {
             // insert profile
-            if (profile.getName() != null && !"".equals(profile.getName())) {
-                final SProfile sprofile = profileBuilder.createNewInstance(profile.getName()).setDescription(profile.getDescription())
-                        .setIconPath(profile.getIconPath()).done();
+            if (exportedProfile.getName() != null && !"".equals(exportedProfile.getName())) {
+                final long creationDate = System.currentTimeMillis();
+                final SProfile sprofile = profileBuilder
+                        .createNewInstance(exportedProfile.getName(), exportedProfile.isDefault(), creationDate, importer, creationDate, importer)
+                        .setDescription(exportedProfile.getDescription())
+                        .setIconPath(exportedProfile.getIconPath()).done();
                 final SProfile newProfile = profileService.createProfile(sprofile);
                 // insert profileEntries
-                final List<ExportedParentProfileEntry> parentProfileEntries = profile.getParentProfileEntries();
+                final List<ExportedParentProfileEntry> parentProfileEntries = exportedProfile.getParentProfileEntries();
                 for (final ExportedParentProfileEntry parentprofileEntry : parentProfileEntries) {
                     final SProfileEntry sproEntry = proEntryBuilder.createNewInstance(parentprofileEntry.getName(), newProfile.getId())
                             .setDescription(parentprofileEntry.getDescription()).setIndex(parentprofileEntry.getIndex()).setPage(parentprofileEntry.getPage())
@@ -88,7 +96,7 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
                     }
                 }
                 // insert profileMapping
-                final ExportedProfileMapping profileMapp = profile.getProfileMapping();
+                final ExportedProfileMapping profileMapp = exportedProfile.getProfileMapping();
                 final long profileId = newProfile.getId();
                 final List<String> userNames = profileMapp.getUsers();
                 for (final String userName : userNames) {
@@ -158,4 +166,5 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
     public List<String> getResult() {
         return warnings;
     }
+
 }

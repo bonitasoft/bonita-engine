@@ -22,10 +22,14 @@ public interface SProfileUpdateBuilder {
 
     EntityUpdateDescriptor done();
 
+    SProfileUpdateBuilder setName(String name);
+
     SProfileUpdateBuilder setDescription(String description);
 
     SProfileUpdateBuilder setIconPath(String iconPath);
 
-    SProfileUpdateBuilder setName(String name);
+    SProfileUpdateBuilder setLastUpdateDate(long lastUpdateDate);
+
+    SProfileUpdateBuilder setLastUpdatedBy(long lastUpdatedBy);
 
 }

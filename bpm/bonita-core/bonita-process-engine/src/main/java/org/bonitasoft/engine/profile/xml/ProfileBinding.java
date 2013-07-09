@@ -33,7 +33,7 @@ public class ProfileBinding extends ElementBinding {
 
     @Override
     public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
-        profileBuilder = new ExportedProfileBuilder(attributes.get("name"));
+        profileBuilder = new ExportedProfileBuilder(attributes.get("name"), Boolean.valueOf(attributes.get("isDefault")));
     }
 
     @Override
