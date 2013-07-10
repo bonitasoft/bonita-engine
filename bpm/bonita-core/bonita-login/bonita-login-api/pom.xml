@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-login</artifactId>
 		<groupId>org.bonitasoft.engine.core.login</groupId>
-		<version>6.1.0-rc-05</version>
+		<version>6.1.0-rc-06-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-login-api</artifactId>
