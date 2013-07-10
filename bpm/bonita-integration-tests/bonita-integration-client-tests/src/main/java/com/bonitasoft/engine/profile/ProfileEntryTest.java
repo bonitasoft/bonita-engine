@@ -1,8 +1,11 @@
 package com.bonitasoft.engine.profile;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
+import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -18,10 +21,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
-import com.bonitasoft.engine.api.ProfileAPI;
-
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Julien Mege
  * @author Celine Souchet
@@ -30,7 +29,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create and delete profile entry.")
     @Test
-    public void createAndDeleteProfileEntry() throws BonitaException, IOException {
+    public void createAndDeleteProfileEntry() throws BonitaException {
         final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry1", adminProfileId).setDescription("Description profileEntry1")
                 .setIndex(0L).setType("folder").setParentId(1L).setPage("MyPage");
         final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
@@ -60,7 +59,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create profile entry in 2nd position.")
     @Test
-    public void insertInIndex2() throws BonitaException, IOException {
+    public void insertInIndex2() throws BonitaException {
         final ProfileEntryCreator profileEntryCreator0 = new ProfileEntryCreator("ProfileEntry0", adminProfileId).setDescription("Description profileEntry1")
                 .setIndex(0L).setType("folder").setParentId(12L).setPage("MyPage");
         getProfileAPI().createProfileEntry(profileEntryCreator0);
@@ -82,7 +81,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "No index" }, story = "Create profile entry without index.")
     @Test
-    public void createProfileEntryWithoutIndex() throws BonitaException, IOException {
+    public void createProfileEntryWithoutIndex() throws BonitaException {
         // Create Profile1
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
@@ -120,7 +119,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update" }, story = "Update profile entry.")
     @Test
-    public void updateProfileEntry() throws BonitaException, IOException {
+    public void updateProfileEntry() throws BonitaException {
         final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry2")
                 .setType("folder").setIndex(12L).setParentId(1L);
         final ProfileEntry createdProfile = getProfileAPI().createProfileEntry(profileEntryCreator);
@@ -145,7 +144,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Delete", "Index" }, story = "Update profile entry index on delete.")
     @Test
-    public void updateProfileEntryIndexOnDelete() throws BonitaException, IOException {
+    public void updateProfileEntryIndexOnDelete() throws BonitaException {
         // Create Profile1
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final Long profileId = createdProfile.getId();
@@ -181,9 +180,44 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().deleteProfile(profileId);
     }
 
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Delete", "Cascade" }, story = "Delete profile entry, and its children.", jira = "ENGINE-1605")
+    @Test
+    public void deleteProfileEntryAndChildren() throws BonitaException {
+        // Create Profile1
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final Long profileId = createdProfile.getId();
+
+        // Create Profile Entry 1
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder");
+        final ProfileEntry profileEntryToDelete = getProfileAPI().createProfileEntry(profileEntryCreator1);
+
+        // Create Profile entry 2
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
+                .setIndex(2L).setType("folder").setParentId(profileEntryToDelete.getId());
+        getProfileAPI().createProfileEntry(profileEntryCreator2);
+
+        // Create Profile Entry 3
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntry3", profileId).setDescription("Description profileEntry3")
+                .setIndex(4L).setType("folder").setParentId(profileEntryToDelete.getId());
+        getProfileAPI().createProfileEntry(profileEntryCreator3);
+
+        // Delete Profile Entry 1
+        getProfileAPI().deleteProfileEntry(profileEntryToDelete.getId());
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builder.filter(ProfileEntrySearchDescriptor.PARENT_ID, profileEntryToDelete.getId());
+        final List<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+        assertTrue(searchedProfileEntries.isEmpty());
+
+        // Delete profile1
+        getProfileAPI().deleteProfile(profileId);
+    }
+
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Insert", "Index" }, story = "Update profile entry index on insert.")
     @Test
-    public void updateProfileEntryIndexOnInsert() throws BonitaException, IOException {
+    public void updateProfileEntryIndexOnInsert() throws BonitaException {
         // Create Profile Entry 1
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();
@@ -220,7 +254,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Index" }, story = "Update profile entry index on update.")
     @Test
-    public void updateProfileEntryIndexOnUpdate() throws BonitaException, IOException {
+    public void updateProfileEntryIndexOnUpdate() throws BonitaException {
         // Create Profile1
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
         final long profileId = createdProfile.getId();

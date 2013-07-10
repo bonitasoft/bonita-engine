@@ -19,7 +19,6 @@ import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.profile.DeleteAllExistingProfiles;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfile;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileByName;
-import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileEntry;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -60,7 +59,6 @@ import com.bonitasoft.engine.api.impl.transaction.profile.ImportAndHandleSameNam
 import com.bonitasoft.engine.api.impl.transaction.profile.ImportProfileMember;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfile;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntry;
-import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnDelete;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnInsert;
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileCreator;
@@ -413,26 +411,9 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
-        SProfileEntry sProfileEntry;
-
-        final GetProfileEntry getProfileEntryTransaction = new GetProfileEntry(profileService, id);
-        try {
-            transactionExecutor.execute(getProfileEntryTransaction);
-            sProfileEntry = getProfileEntryTransaction.getResult();
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
-
         final DeleteProfileEntry deleteProfileEntryTransaction = new DeleteProfileEntry(profileService, id);
         try {
             transactionExecutor.execute(deleteProfileEntryTransaction);
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
-
-        final UpdateProfileEntryIndexOnDelete updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnDelete(profileService, sProfileEntry);
-        try {
-            transactionExecutor.execute(updateProfileEntryIndexTransaction);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
