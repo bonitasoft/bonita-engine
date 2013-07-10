@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.1.0-rc-05-SNAPSHOT</version>
+		<version>6.1.0-rc-05</version>
 	</parent>
 
 	<groupId>org.bonitasoft.engine.platform.authentication</groupId>
