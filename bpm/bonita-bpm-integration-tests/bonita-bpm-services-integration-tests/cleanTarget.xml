@@ -1,23 +1,12 @@
 <project name="bpm-services" default="cleantarget">
 
-	<property name="target.dir" value="${basedir}/target" />
-	<property name="conf.dir" value="${target.dir}/conf" />
-
-	<target name="cleantarget">
-		<delete dir="${target.dir}" includes="*.db" />
-		<delete dir="${target.dir}/server" />
-		<delete dir="${target.dir}/home" />
-		<copy todir="${target.dir}/home">
-			<fileset dir="${basedir}/home" excludes="**/.svn" />
-		</copy>
-
-		<delete dir="${conf.dir}" />
-		<copy todir="${conf.dir}">
-			<fileset dir="../../../services/bonita-services-test-conf/src/test/resources/conf" />
-		</copy>
-		<copy todir="${conf.dir}" overwrite="true">
-			<fileset dir="${basedir}/src/test/resources/conf" includes="**/*" />
-		</copy>
-	</target>
+    <target name="cleantarget">
+        <delete dir="${basedir}/target" includes="*.db"/>
+    	  <delete dir="${basedir}/target/server"/>
+      	<delete dir="${basedir}/target/home"/>
+    	<copy todir="${basedir}/target/home">
+      		<fileset dir="${basedir}/home"  excludes="**/.svn"/>
+     	</copy>
+    </target>
 
 </project>

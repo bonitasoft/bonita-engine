@@ -53,7 +53,6 @@
 				<!-- platform -->
 				<entry key="org.bonitasoft.engine.platform.model.SPlatform" value="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" />
 				<entry key="org.bonitasoft.engine.platform.model.STenant" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
-        <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
 				<!-- services -->
 				<entry key="org.bonitasoft.engine.data.model.SDataSource" value="org.bonitasoft.engine.data.model.impl.SDataSourceImpl" />
 				<entry key="org.bonitasoft.engine.data.model.SDataSourceParameter" value="org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl" />
@@ -193,22 +192,21 @@
 				<ref bean="hbm-bonita-dependency-model" />
 				<ref bean="hbm-bonita-dependency-platform-model" />
 				<ref bean="hbm-bonita-identity-model" />
-				<ref bean="hbm-bonita-scheduler" />
-				<ref bean="hbm-bonita-document-model" />
-				<ref bean="hbm-bos-command-model" />
-				<ref bean="hbm-bos-data-instance-model" />
-				<ref bean="hbm-bos-data-instance-model-arch" />
-				<ref bean="hbm-bos-platform-command-model" />
-				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bonita-process-definition-model" />
 				<ref bean="hbm-bonita-process-instance-model" />
 				<ref bean="hbm-bonita-process-instance-model-arch" />
+				<ref bean="hbm-bonita-scheduler" />
+				<ref bean="hbm-bonita-document-model" />
 				<ref bean="hbm-bos-actor-mapping" />
 				<ref bean="hbm-bos-category-model" />
+				<ref bean="hbm-bos-command-model" />
+				<ref bean="hbm-bos-data-instance-model" />
+				<ref bean="hbm-bos-data-instance-model-arch" />
 				<ref bean="hbm-bos-process-comment-model" />
 				<ref bean="hbm-bos-process-comment-model-arch" />
 				<ref bean="hbm-bos-process-document-mapping-model" />
 				<ref bean="hbm-bos-process-document-mapping-model-arch" />
+				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bos-supervisor-mapping" />
 				<ref bean="hbm-bos-external-identity-mapping" />
 			</list>

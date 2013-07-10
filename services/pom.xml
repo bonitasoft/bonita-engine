@@ -50,7 +50,6 @@
 		<module>bonita-profile</module>
 		<module>bonita-lock</module>
 		<module>bonita-work</module>
-		<module>bonita-services-test-conf</module>
 	</modules>
 	
 	<profiles>
