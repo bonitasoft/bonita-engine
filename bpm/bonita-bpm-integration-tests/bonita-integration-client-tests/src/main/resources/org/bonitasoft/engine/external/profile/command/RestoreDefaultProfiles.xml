@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
-	<profile name="Administrator">
+	<profile name="Administrator" isDefault="true">
 		<description>Administrator profile</description>
 		<iconPath>/profiles/profileAdmin.png</iconPath>
 		<profileEntries>
@@ -186,7 +186,7 @@
 			</users>
 		</profileMapping>
 	</profile>
-	<profile name="User">
+	<profile name="User" isDefault="false">
 		<description>User profile</description>
 		<iconPath>/profiles/profileUser.png</iconPath>
 		<profileEntries>

@@ -28,8 +28,8 @@ public class ExportedProfileBuilder {
 
     private final ExportedProfile profile;
 
-    public ExportedProfileBuilder(final String profileName) {
-        profile = new ExportedProfile(profileName);
+    public ExportedProfileBuilder(final String profileName, final boolean isDefault) {
+        profile = new ExportedProfile(profileName, isDefault);
     }
 
     public ExportedProfileBuilder setDescription(final String description) {

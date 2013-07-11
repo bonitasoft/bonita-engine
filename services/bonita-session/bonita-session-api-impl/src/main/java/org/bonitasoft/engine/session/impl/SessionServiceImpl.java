@@ -24,6 +24,7 @@ import org.bonitasoft.engine.platform.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.session.model.builder.SSessionBuilders;
@@ -48,10 +49,11 @@ public class SessionServiceImpl implements SessionService {
 
     private final TechnicalLoggerService logger;
 
-    public SessionServiceImpl(final SSessionBuilders sessionModelBuilder, final PlatformService platformService, final String applicationName,
+    public SessionServiceImpl(final SessionProvider sessionProvider, final SSessionBuilders sessionModelBuilder, final PlatformService platformService,
+            final String applicationName,
             final TechnicalLoggerService logger) {
         this.sessionModelBuilder = sessionModelBuilder;
-        sessionProvider = SessionProvider.getInstance();
+        this.sessionProvider = sessionProvider;
         this.platformService = platformService;
         this.applicationName = applicationName;
         this.logger = logger;

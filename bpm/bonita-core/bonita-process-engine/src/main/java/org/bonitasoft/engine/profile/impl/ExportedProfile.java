@@ -24,6 +24,8 @@ public class ExportedProfile {
 
     private final String name;
 
+    private boolean isDefault;
+
     private String description;
 
     private String iconPath;
@@ -32,10 +34,19 @@ public class ExportedProfile {
 
     private ExportedProfileMapping profileMapping;
 
-    public ExportedProfile(final String name) {
+    public ExportedProfile(final String name, final boolean isDefault) {
         this.name = name;
+        this.isDefault = isDefault;
         parentProfileEntries = new ArrayList<ExportedParentProfileEntry>();
         profileMapping = new ExportedProfileMapping();
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(final boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     public String getDescription() {
@@ -78,8 +89,9 @@ public class ExportedProfile {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (isDefault ? 1231 : 1237);
+        result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         return result;
     }
@@ -96,6 +108,9 @@ public class ExportedProfile {
             return false;
         }
         final ExportedProfile other = (ExportedProfile) obj;
+        if (isDefault != other.isDefault) {
+            return false;
+        }
         if (description == null) {
             if (other.description != null) {
                 return false;

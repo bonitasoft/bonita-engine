@@ -58,7 +58,7 @@ public class ProfileServiceTest extends CommonServiceTest {
         getTransactionService().begin();
         final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = sProfileBuilder.createNewInstance("profile1").done();
+        final SProfile profile = sProfileBuilder.createNewInstance("profile1", true, 0, 0, 0, 0).done();
         final SProfile createdProfile = profileService.createProfile(profile);
         final SProfile gotProfile = profileService.getProfile(createdProfile.getId());
         Assert.assertEquals(createdProfile, gotProfile);
@@ -76,7 +76,7 @@ public class ProfileServiceTest extends CommonServiceTest {
         getTransactionService().begin();
         final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1").done());
+        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1", false, 0, 0, 0, 0).done());
         final SProfileEntryBuilder sProfileEntryBuilder = sProfileBuilderAccessor.getSProfileEntryBuilder();
         final SProfileEntry profileEntry = profileService.createProfileEntry(sProfileEntryBuilder.createNewInstance("entry1", profile.getId()).done());
         List<SProfileEntry> entries = profileService.getEntriesOfProfile(profile.getId(), 0, 10);
@@ -95,7 +95,7 @@ public class ProfileServiceTest extends CommonServiceTest {
         getTransactionService().begin();
         final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1").done());
+        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1", true, 0, 0, 0, 0).done());
 
         final List<OrderByOption> orderByOptions = getOrderByOptions();
         final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId",
@@ -145,7 +145,7 @@ public class ProfileServiceTest extends CommonServiceTest {
         getTransactionService().begin();
         final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1").done());
+        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1", false, 0, 0, 0, 0).done());
 
         final SUser john = createUser("john", "bpm");
         final SUser jane = createUser("jane", "bpm");

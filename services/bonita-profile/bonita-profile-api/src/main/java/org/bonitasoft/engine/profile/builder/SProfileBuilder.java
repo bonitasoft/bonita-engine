@@ -31,15 +31,35 @@ public interface SProfileBuilder {
 
     String ID = "id";
 
+    String IS_DEFAULT = "isDefault";
+
+    String CREATION_DATE = "creationDate";
+
+    String CREATED_BY = "createdBy";
+
+    String LAST_UPDATE_DATE = "lastUpdateDate";
+
+    String LAST_UPDATED_BY = "lastUpdatedBy";
+
     SProfileBuilder createNewInstance(SProfile profile);
 
-    SProfileBuilder createNewInstance(String name);
+    SProfileBuilder createNewInstance(String name, boolean isDefault, long creationDate, long createdBy, long lastUpdateDate, long lastUpdatedBy);
 
     SProfileBuilder setId(long id);
+
+    SProfileBuilder setDefault(boolean isDefault);
 
     SProfileBuilder setDescription(String description);
 
     SProfileBuilder setIconPath(String iconPath);
+
+    SProfileBuilder setCreationDate(long creationDate);
+
+    SProfileBuilder setCreatedBy(long createdBy);
+
+    SProfileBuilder setLastUpdateDate(long lastUpdateDate);
+
+    SProfileBuilder setLastUpdatedBy(long lastUpdatedBy);
 
     SProfile done();
 

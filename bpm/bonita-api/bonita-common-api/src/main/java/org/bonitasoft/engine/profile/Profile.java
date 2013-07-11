@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 
@@ -21,8 +23,18 @@ import org.bonitasoft.engine.bpm.NamedElement;
  */
 public interface Profile extends NamedElement, BaseElement {
 
+    boolean isDefault();
+
     String getDescription();
 
     String getIconPath();
+
+    Date getCreationDate();
+
+    long getCreatedBy();
+
+    Date getLastUpdateDate();
+
+    long getLastUpdatedBy();
 
 }

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.platform.session.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.platform.session.PlatformSessionProvider;
 import org.bonitasoft.engine.platform.session.SSessionAlreadyExistsException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
@@ -24,23 +25,18 @@ import org.bonitasoft.engine.platform.session.model.SPlatformSession;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public final class PlatformSessionProvider {
-
-    private static PlatformSessionProvider instance = null;
+public final class PlatformSessionProviderImpl implements PlatformSessionProvider {
 
     private static Map<Long, SPlatformSession> platformSessions;
 
-    private PlatformSessionProvider() {
+    static {
         platformSessions = new HashMap<Long, SPlatformSession>();
     }
 
-    public static PlatformSessionProvider getInstance() {
-        if (instance == null) {
-            instance = new PlatformSessionProvider();
-        }
-        return instance;
+    public PlatformSessionProviderImpl() {
     }
 
+    @Override
     public synchronized void addSession(final SPlatformSession session) throws SSessionAlreadyExistsException {
         final long id = session.getId();
         if (platformSessions.containsKey(id)) {
@@ -49,6 +45,7 @@ public final class PlatformSessionProvider {
         platformSessions.put(id, session);
     }
 
+    @Override
     public void removeSession(final long sessionId) throws SSessionNotFoundException {
         if (!platformSessions.containsKey(sessionId)) {
             throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
@@ -56,6 +53,7 @@ public final class PlatformSessionProvider {
         platformSessions.remove(sessionId);
     }
 
+    @Override
     public SPlatformSession getSession(final long sessionId) throws SSessionNotFoundException {
         if (!platformSessions.containsKey(sessionId)) {
             throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
@@ -63,6 +61,7 @@ public final class PlatformSessionProvider {
         return platformSessions.get(sessionId);
     }
 
+    @Override
     public void updateSession(final SPlatformSession session) throws SSessionNotFoundException {
         final long id = session.getId();
         if (!platformSessions.containsKey(id)) {

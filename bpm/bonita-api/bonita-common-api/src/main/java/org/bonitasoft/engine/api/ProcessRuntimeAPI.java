@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
@@ -54,14 +55,18 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * @author Baptiste Mesta
@@ -235,20 +240,21 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *            identifier of the process instance to delete
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still active
+     *             if a process instance can't be deleted because of a parent that is still existing.
      * @since 6.0
      */
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
 
     /**
-     * Delete process instances by its process definition id
-     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
-     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
+     * Delete all instances of a specified process definition.
+     * If the process definition id does not match anything, no exception is thrown, but nothing is deleted.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            the identifier of the processDefinition.
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still active
+     *             if a process instance cannot be deleted because of a parent that still exists.
+     * @throws DeletionException
+     *             if other deletion problem occurs.
      * @since 6.0
      */
     void deleteProcessInstances(long processDefinitionId) throws DeletionException;
