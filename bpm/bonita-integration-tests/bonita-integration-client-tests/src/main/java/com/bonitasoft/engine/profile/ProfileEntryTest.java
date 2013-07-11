@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.profile;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -12,7 +13,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
-import org.bonitasoft.engine.profile.ProfileEntryCreator;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -57,6 +57,52 @@ public class ProfileEntryTest extends AbstractProfileTest {
         assertEquals(ADMIN_PROFILE_ENTRY_COUNT, searchedProfileEntries.getCount());
     }
 
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Without", "Name" }, story = "Create profile entry without name.", jira = "ENGINE-1607")
+    @Test
+    public void createProfileEntryWithoutName() throws BonitaException {
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator(adminProfileId).setDescription("Description profileEntry1")
+                .setIndex(0L).setType("folder").setParentId(1L).setPage("MyPage");
+        final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
+
+        final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(createdProfileEntry.getId());
+        assertEquals(createdProfileEntry.getId(), getProfileEntryResult.getId());
+        assertNull(getProfileEntryResult.getName());
+
+        // Clean up
+        getProfileAPI().deleteProfileEntry(getProfileEntryResult.getId());
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "With", "Same", "Page", "Parent", "Profile" }, story = "Can't create profile entry with same parent, profile, page.", jira = "ENGINE-1607")
+    @Test(expected = CreationException.class)
+    public void cantCreate2ProfileEntriesWithSamePageInSameParent() throws BonitaException {
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator(adminProfileId).setParentId(1L).setPage("MyPage").setDescription("description");
+        final ProfileEntry profileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
+
+        try {
+            final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator(adminProfileId).setParentId(1L).setPage("MyPage")
+                    .setDescription("description2");
+            getProfileAPI().createProfileEntry(profileEntryCreator2);
+        } finally {
+            // Clean up
+            getProfileAPI().deleteProfileEntry(profileEntry.getId());
+        }
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "With", "Same", "Name", "Parent", "Profile" }, story = "Create profile entry with same parent, profile, name.", jira = "ENGINE-1607")
+    @Test
+    public void create2ProfileEntriesWithSameNameInSameParent() throws BonitaException {
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator(adminProfileId).setParentId(1L).setPage("MyPage");
+        final ProfileEntry profileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
+
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator(adminProfileId).setParentId(1L).setPage("MyPage2")
+                .setDescription("description2");
+        final ProfileEntry profileEntry2 = getProfileAPI().createProfileEntry(profileEntryCreator2);
+
+        // Clean up
+        getProfileAPI().deleteProfileEntry(profileEntry.getId());
+        getProfileAPI().deleteProfileEntry(profileEntry2.getId());
+    }
+
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create profile entry in 2nd position.")
     @Test
     public void insertInIndex2() throws BonitaException {
@@ -64,15 +110,15 @@ public class ProfileEntryTest extends AbstractProfileTest {
                 .setIndex(0L).setType("folder").setParentId(12L).setPage("MyPage");
         getProfileAPI().createProfileEntry(profileEntryCreator0);
         final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", adminProfileId).setDescription("Description profileEntry1")
-                .setIndex(1L).setType("folder").setParentId(12L).setPage("MyPage");
+                .setIndex(1L).setType("folder").setParentId(12L).setPage("MyPage2");
         getProfileAPI().createProfileEntry(profileEntryCreator1);
         final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntry3", adminProfileId).setDescription("Description profileEntry1")
-                .setIndex(2L).setType("folder").setParentId(12L).setPage("MyPage");
+                .setIndex(2L).setType("folder").setParentId(12L).setPage("MyPage3");
         getProfileAPI().createProfileEntry(profileEntryCreator3);
 
         // insert the element between 0 and 2
         final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry1")
-                .setIndex(2L).setType("folder").setParentId(12L).setPage("MyPage");
+                .setIndex(2L).setType("folder").setParentId(12L).setPage("MyPage4");
         final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(createdProfileEntry.getId());

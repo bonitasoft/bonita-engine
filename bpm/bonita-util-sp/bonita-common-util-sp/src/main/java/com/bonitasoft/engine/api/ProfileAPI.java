@@ -17,12 +17,12 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
-import org.bonitasoft.engine.profile.ProfileEntryCreator;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
 
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileCreator;
+import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater;
 import com.bonitasoft.engine.profile.ProfileUpdater;
 

@@ -30,8 +30,6 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
-import org.bonitasoft.engine.profile.ProfileEntryCreator;
-import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -62,6 +60,8 @@ import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntry;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnInsert;
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileCreator;
+import com.bonitasoft.engine.profile.ProfileEntryCreator;
+import com.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater.ProfileEntryUpdateField;
 import com.bonitasoft.engine.profile.ProfileUpdater;
@@ -394,7 +394,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public ProfileEntry createProfileEntry(final String name, final String description, final long profileId, final String type) throws CreationException {
-        final ProfileEntryCreator creator = new ProfileEntryCreator(name, profileId).setDescription(description).setType(type);
+        final ProfileEntryCreator creator = new ProfileEntryCreator(name, profileId).setName(name).setDescription(description).setType(type);
         return createProfileEntry(creator);
     }
 
