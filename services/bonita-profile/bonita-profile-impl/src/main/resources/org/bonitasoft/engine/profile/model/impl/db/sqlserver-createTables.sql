@@ -18,15 +18,18 @@ CREATE TABLE profileentry (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   profileId NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(50) NOT NULL,
+  name NVARCHAR(50),
   description NVARCHAR(MAX),
   parentId NUMERIC(19, 0),
   index_ NUMERIC(19, 0),
   type NVARCHAR(50),
   page NVARCHAR(50),
-  UNIQUE (tenantId, parentId, profileId, name),
+  UNIQUE (tenantId, parentId, profileId, page),
   PRIMARY KEY (tenantId, id)
 )
+GO
+
+CREATE INDEX indexProfileEntry ON profileentry(tenantId, parentId, profileId)
 GO
 
 CREATE TABLE profilemember (

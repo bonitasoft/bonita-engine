@@ -1,3 +1,5 @@
+DROP INDEX profileentry.indexProfileEntry
+GO
 DROP TABLE profilemember
 GO
 DROP TABLE profileentry

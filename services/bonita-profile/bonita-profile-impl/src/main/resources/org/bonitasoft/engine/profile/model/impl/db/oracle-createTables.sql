@@ -17,15 +17,17 @@ CREATE TABLE profileentry (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   profileId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50) NOT NULL,
+  name VARCHAR2(50),
   description VARCHAR2(1024),
   parentId NUMBER(19, 0),
   index_ NUMBER(19, 0),
   type VARCHAR2(50),
   page VARCHAR2(50),
-  UNIQUE (tenantId, parentId, profileId, name),
+  UNIQUE (tenantId, parentId, profileId, page),
   PRIMARY KEY (tenantId, id)
 );
+
+CREATE INDEX indexProfileEntry ON profileentry(tenantId, parentId, profileId);
 
 CREATE TABLE profilemember (
   tenantId NUMBER(19, 0) NOT NULL,
