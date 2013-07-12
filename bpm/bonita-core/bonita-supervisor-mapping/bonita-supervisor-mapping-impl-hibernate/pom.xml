@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-supervisor-mapping</artifactId>
 		<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-		<version>6.1.0-rc-05</version>
+		<version>6.1.0-rc-06-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-supervisor-mapping-impl-hibernate</artifactId>
