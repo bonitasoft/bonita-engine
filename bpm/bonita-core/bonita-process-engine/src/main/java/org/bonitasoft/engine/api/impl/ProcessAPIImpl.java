@@ -68,9 +68,6 @@ import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategories
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveProcessDefinitionsOfCategory;
 import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
-import org.bonitasoft.engine.api.impl.transaction.command.expression.EvaluateExpressionsDefinitionLevel;
-import org.bonitasoft.engine.api.impl.transaction.command.expression.EvaluateExpressionsInstanceLevel;
-import org.bonitasoft.engine.api.impl.transaction.command.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
 import org.bonitasoft.engine.api.impl.transaction.comment.GetComments;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
@@ -90,6 +87,9 @@ import org.bonitasoft.engine.api.impl.transaction.document.GetDocumentContent;
 import org.bonitasoft.engine.api.impl.transaction.document.GetDocumentsOfProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.document.GetNumberOfDocumentsOfProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.event.GetEventInstances;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.HideTasks;
 import org.bonitasoft.engine.api.impl.transaction.flownode.IsTaskHidden;
@@ -490,7 +490,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                final TransactionContent deleteTrancastionContent = getDeleteTrancastionContent(processDefinitionId);
+                final TransactionContent deleteTrancastionContent = getDeleteTransactionContent(processDefinitionId);
                 transactionExecutor.execute(deleteTrancastionContent);
                 final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
                 final File file = new File(processesFolder);
@@ -517,7 +517,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected TransactionContent getDeleteTrancastionContent(final long processDefinitionId) {
+    protected TransactionContent getDeleteTransactionContent(final long processDefinitionId) {
         return new DeleteProcess(getTenantAccessor(), processDefinitionId);
     }
 

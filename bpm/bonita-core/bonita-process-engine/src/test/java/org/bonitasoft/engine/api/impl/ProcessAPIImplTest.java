@@ -13,26 +13,20 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
-import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  * 
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
 
     @InjectMocks
     private ProcessAPIImpl processAPIImpl;
-
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.api.impl.ProcessAPIImpl#searchHumanTaskInstances(org.bonitasoft.engine.search.SearchOptions)}.
