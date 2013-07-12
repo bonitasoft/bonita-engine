@@ -27,7 +27,7 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
@@ -35,7 +35,7 @@ import org.bonitasoft.engine.work.BonitaWork;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class InstantiateProcessWork extends BonitaWork {
+public class InstantiateProcessWork extends TxBonitaWork {
 
     private final OperationsWithContext operations;
 

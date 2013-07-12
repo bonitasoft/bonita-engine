@@ -14,12 +14,12 @@
 package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
  */
-public class HandleErrorEventOnFail extends BonitaWork {
+public class HandleErrorEventOnFail extends TxBonitaWork {
 
     private final ExecuteConnectorOfActivity executeConnectorOfActivity;
 

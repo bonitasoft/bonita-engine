@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,23 +14,13 @@
 package org.bonitasoft.engine.work;
 
 /**
- * This service allows to trigger the execution of work asynchronously
- * Any runnable registered on the service will be launched in other thread at the end of the transaction.
- * 
+ * @author Emmanuel Duchastenier
  * @author Charles Souillard
- * @author Baptiste Mesta
  */
-public interface WorkService {
+public abstract class TxBonitaWork extends AbstractBonitaWork {
 
-    /**
-     * @param runnable
-     * @throws WorkRegisterException
-     * @since 6.0
-     */
-    void registerWork(final AbstractBonitaWork runnable) throws WorkRegisterException;
-
-    void stop(Long tenantId);
-
-    void start(Long tenantId);
-
+    @Override
+    protected boolean isTransactional() {
+        return true;
+    }
 }

@@ -21,18 +21,18 @@ import java.util.Collection;
  */
 public class SequenceRunnableExecutor extends NotifyingRunnable {
 
-    private final Collection<BonitaWork> works;
+    private final Collection<AbstractBonitaWork> works;
 
     private boolean cancelled = false;
 
-    public SequenceRunnableExecutor(final Collection<BonitaWork> works, final RunnableListener runnableListener, final long tenantId) {
+    public SequenceRunnableExecutor(final Collection<AbstractBonitaWork> works, final RunnableListener runnableListener, final long tenantId) {
         super(runnableListener, tenantId);
         this.works = works;
     }
 
     @Override
     public void innerRun() {
-        for (final BonitaWork work : works) {
+        for (final AbstractBonitaWork work : works) {
             if (!cancelled) {
                 work.run();
             }

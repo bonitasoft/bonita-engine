@@ -3,9 +3,9 @@ package org.bonitasoft.engine.continuation;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.NonTxBonitaWork;
 
-public class ListAdder extends BonitaWork {
+public class ListAdder extends NonTxBonitaWork {
 
     private final List<String> list;
 

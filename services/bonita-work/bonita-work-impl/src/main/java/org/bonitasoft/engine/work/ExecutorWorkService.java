@@ -66,7 +66,7 @@ public class ExecutorWorkService implements WorkService, RunnableListener {
     }
 
     @Override
-    public void registerWork(final BonitaWork work) throws WorkRegisterException {
+    public void registerWork(final AbstractBonitaWork work) throws WorkRegisterException {
         final AbstractWorkSynchronization synchro = getContinuationSynchronization();
         synchro.addWork(work);
     }

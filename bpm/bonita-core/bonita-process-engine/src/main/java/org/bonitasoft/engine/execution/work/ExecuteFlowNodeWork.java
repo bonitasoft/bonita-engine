@@ -19,12 +19,12 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.execution.ContainerExecutor;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
  */
-public class ExecuteFlowNodeWork extends BonitaWork {
+public class ExecuteFlowNodeWork extends TxBonitaWork {
 
     private final ContainerExecutor containerExecutor;
 

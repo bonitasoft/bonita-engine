@@ -142,47 +142,32 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(final SBonitaException originalException) throws SBonitaException {
-        setInFailInTransaction(true);
+    protected void errorEventOnFail() throws SBonitaException {
+        setConnectorOnlyToFailed();
         // FIXME see comment below
         /*
          * we do this in a work because the boundary might not be in waiting state and have registered the waiting error now...
          * we should find an other way to "wait" the waiting error to be registered
          * maybe the waiting error should be registered synchronously when creating the task and not by the boundary event?
          */
-        final boolean txOpened = transactionExecutor.openTransaction();
-        try {
-            workService.registerWork(new HandleErrorEventOnFail(this));
-        } finally {
-            transactionExecutor.completeTransaction(txOpened);
-        }
-        throw originalException;
+        workService.registerWork(new HandleErrorEventOnFail(this));
     }
 
-    void handleErrorEventOnFail() throws STransactionException, SBonitaException {
-        final boolean txOpened = transactionExecutor.openTransaction();
-        try {
-            // create a fake definition
-            final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders
-                    .getThrowErrorEventTriggerDefinitionBuilder();
-            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(
-                    sConnectorDefinition.getErrorCode()).done();
-            final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
-            // event definition as the error code as name, this way we don't need to find the connector that throw this error
-            final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(sConnectorDefinition.getErrorCode())
-                    .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
-            // create an instance using this definition
-            final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(eventDefinition);
-            final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(processDefinition, eventDefinition,
-                    throwEventInstance, errorEventTriggerDefinition, flowNodeInstance);
-            if (!hasActionToExecute) {
-                setInFailInTransaction(false);
-            }
-        } catch (final SBonitaException e) {
-            transactionExecutor.setTransactionRollback();
-            throw e;
-        } finally {
-            transactionExecutor.completeTransaction(txOpened);
+    void handleErrorEventOnFail() throws SBonitaException {
+        // create a fake definition
+        final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(
+                sConnectorDefinition.getErrorCode()).done();
+        final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
+        // event definition as the error code as name, this way we don't need to find the connector that throw this error
+        final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(sConnectorDefinition.getErrorCode())
+                .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
+        // create an instance using this definition
+        final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(eventDefinition);
+        final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(processDefinition, eventDefinition,
+                throwEventInstance, errorEventTriggerDefinition, flowNodeInstance);
+        if (!hasActionToExecute) {
+            setConnectorAndContainerToFailed();
         }
     }
 }

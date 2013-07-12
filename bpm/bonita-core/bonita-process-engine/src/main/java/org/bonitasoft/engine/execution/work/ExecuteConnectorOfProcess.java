@@ -80,23 +80,14 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     protected void continueFlow() throws SBonitaException {
-        boolean txOpened = false;
-        try {
-            txOpened = transactionExecutor.openTransaction();
-            final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstance.getId());
-            final boolean connectorTriggered = processExecutor.executeConnectors(processDefinition, intTxProcessInstance, activationEvent, connectorService);
-            if (!connectorTriggered) {
-                if (activationEvent == ConnectorEvent.ON_ENTER) {
-                    processExecutor.startElements(processDefinition, intTxProcessInstance);
-                } else {
-                    processExecutor.handleProcessCompletion(processDefinition, intTxProcessInstance, false);
-                }
+        final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstance.getId());
+        final boolean connectorTriggered = processExecutor.executeConnectors(processDefinition, intTxProcessInstance, activationEvent, connectorService);
+        if (!connectorTriggered) {
+            if (activationEvent == ConnectorEvent.ON_ENTER) {
+                processExecutor.startElements(processDefinition, intTxProcessInstance);
+            } else {
+                processExecutor.handleProcessCompletion(processDefinition, intTxProcessInstance, false);
             }
-        } catch (final SBonitaException e) {
-            transactionExecutor.setTransactionRollback();
-            throw e;
-        } finally {
-            transactionExecutor.completeTransaction(txOpened);
         }
     }
 
@@ -115,37 +106,23 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(final SBonitaException originalException) throws SBonitaException {
-        setInFailInTransaction(true);
-        final boolean txOpened = transactionExecutor.openTransaction();
-        SBonitaException exception = null;
-        try {
-            // create a fake definition
-            final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders
-                    .getThrowErrorEventTriggerDefinitionBuilder();
-            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(
-                    sConnectorDefinition.getErrorCode()).done();
-            final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
-            // event definition as the error code as name, this way we don't need to find the connector that throw this error
-            final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(sConnectorDefinition.getErrorCode())
-                    .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
-            // create an instance using this definition
-            final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(eventDefinition);
-            final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(processDefinition, eventDefinition,
-                    throwEventInstance, errorEventTriggerDefinition, null);
-            if (!hasActionToExecute) {
-                setInFailInTransaction(false);
-            }
-        } catch (final SBonitaException e) {
-            transactionExecutor.setTransactionRollback();
-            exception = e;
-        } finally {
-            transactionExecutor.completeTransaction(txOpened);
+    protected void errorEventOnFail() throws SBonitaException {
+        setConnectorOnlyToFailed();
+        // create a fake definition
+        final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(
+                sConnectorDefinition.getErrorCode()).done();
+        final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
+        // event definition as the error code as name, this way we don't need to find the connector that throw this error
+        final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(sConnectorDefinition.getErrorCode())
+                .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
+        // create an instance using this definition
+        final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(eventDefinition);
+        final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(processDefinition, eventDefinition,
+                throwEventInstance, errorEventTriggerDefinition, null);
+        if (!hasActionToExecute) {
+            setConnectorAndContainerToFailed();
         }
-        if (exception != null) {
-            throw exception;
-        }
-        throw originalException;
     }
 
 }

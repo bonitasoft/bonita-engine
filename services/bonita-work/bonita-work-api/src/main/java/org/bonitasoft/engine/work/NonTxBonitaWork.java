@@ -13,24 +13,14 @@
  **/
 package org.bonitasoft.engine.work;
 
+
 /**
- * This service allows to trigger the execution of work asynchronously
- * Any runnable registered on the service will be launched in other thread at the end of the transaction.
- * 
- * @author Charles Souillard
  * @author Baptiste Mesta
  */
-public interface WorkService {
+public abstract class NonTxBonitaWork extends AbstractBonitaWork {
 
-    /**
-     * @param runnable
-     * @throws WorkRegisterException
-     * @since 6.0
-     */
-    void registerWork(final AbstractBonitaWork runnable) throws WorkRegisterException;
-
-    void stop(Long tenantId);
-
-    void start(Long tenantId);
-
+    @Override
+    protected boolean isTransactional() {
+        return false;
+    }
 }

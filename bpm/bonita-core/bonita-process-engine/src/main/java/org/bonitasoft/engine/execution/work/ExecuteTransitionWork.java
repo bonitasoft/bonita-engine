@@ -17,12 +17,12 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.execution.ContainerExecutor;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
  */
-public class ExecuteTransitionWork extends BonitaWork {
+public class ExecuteTransitionWork extends TxBonitaWork {
 
     private final SProcessDefinition sDefinition;
 
