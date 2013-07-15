@@ -948,6 +948,9 @@
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
+									<!-- Security Manager -->
+									<include>com.bonitasoft.manager:manager</include>
+									<include>org.bonitasoft.security:sysUtil</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
