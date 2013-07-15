@@ -81,6 +81,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private final WorkService workService;
 
+    //charles comment
     public ExecuteConnectorOfActivity(final ContainerRegistry containerRegistry, final TransactionExecutor transactionExecutor,
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final BPMInstanceBuilders bpmInstanceBuilders,
             final DataInstanceService dataInstanceService, final SDataInstanceBuilders dataInstanceBuilders,
