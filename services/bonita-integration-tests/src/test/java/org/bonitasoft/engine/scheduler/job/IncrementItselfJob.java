@@ -17,18 +17,13 @@ public class IncrementItselfJob extends GroupJob {
 
     @Override
     public void execute() throws JobExecutionException {
-        System.out.println(" µµµ IncrementItselfJob start " + value);
         value++;
-        System.out.println(" µµµ IncrementItselfJob stop " + value);
     }
 
     public static int getValue() {
         return value;
     }
 
-    /**
-     * 
-     */
     public static void reset() {
         value = 0;
     }

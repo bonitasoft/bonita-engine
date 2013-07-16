@@ -101,6 +101,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -249,6 +250,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private DefaultCommandProvider commandProvider;
 
     private ReportingService reportingService;
+
+    private WorkService workService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -857,6 +860,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             reportingService = beanAccessor.getService(ReportingService.class);
         }
         return reportingService;
+    }
+
+    @Override
+    public WorkService getWorkService() {
+        if (workService == null) {
+            workService = beanAccessor.getService(WorkService.class);
+        }
+        return workService;
     }
 
 }

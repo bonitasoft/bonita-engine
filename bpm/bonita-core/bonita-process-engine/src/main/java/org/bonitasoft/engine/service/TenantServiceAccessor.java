@@ -78,6 +78,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.XMLWriter;
@@ -228,5 +229,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DefaultCommandProvider getDefaultCommandProvider();
 
     ReportingService getReportingService();
+
+    WorkService getWorkService();
 
 }

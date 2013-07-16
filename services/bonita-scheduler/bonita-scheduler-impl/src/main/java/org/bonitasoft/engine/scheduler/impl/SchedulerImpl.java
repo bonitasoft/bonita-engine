@@ -421,8 +421,8 @@ public class SchedulerImpl implements SchedulerService {
                 parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
             }
             statelessJob.setAttributes(parameterMap);
-            final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), transactionService, queriableLogService, statelessJob, logger,
-                    jobIdentifier.getTenantId(), eventService, jobTruster, sessionService, sessionAccessor);
+            final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger, jobIdentifier.getTenantId(),
+                    eventService, jobTruster, sessionService, sessionAccessor);
             if (traceEnabled) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPersistedJob"));
             }

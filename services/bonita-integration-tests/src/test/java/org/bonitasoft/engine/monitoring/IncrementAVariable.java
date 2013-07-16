@@ -8,8 +8,8 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
 
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
+import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 
 public class IncrementAVariable implements StatelessJob {
@@ -59,11 +59,6 @@ public class IncrementAVariable implements StatelessJob {
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         variableName = (String) attributes.get("variableName");
-    }
-
-    @Override
-    public boolean isWrappedInTransaction() {
-        return true;
     }
 
 }

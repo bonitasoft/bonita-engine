@@ -157,6 +157,7 @@ CREATE TABLE waiting_event (
   	relatedActivityInstanceId BIGINT,
   	locked BOOLEAN,
   	active BOOLEAN,
+  	progress TINYINT,
   	correlation1 VARCHAR(128),
   	correlation2 VARCHAR(128),
   	correlation3 VARCHAR(128),

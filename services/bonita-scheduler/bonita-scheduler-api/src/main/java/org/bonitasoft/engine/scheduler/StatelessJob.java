@@ -71,17 +71,4 @@ public interface StatelessJob extends Serializable {
      */
     void setAttributes(Map<String, Serializable> attributes) throws SJobConfigurationException;
 
-    /**
-     * Tell the scheduler if the job should be wrapped in a transaction
-     * Most jobs should be but some:
-     * <ul>
-     * <li></li>
-     * <li></li>
-     * </ul>
-     * 
-     * @return true if the job should be wrapped in a transaction
-     * @since 6.0
-     */
-    boolean isWrappedInTransaction();
-
 }

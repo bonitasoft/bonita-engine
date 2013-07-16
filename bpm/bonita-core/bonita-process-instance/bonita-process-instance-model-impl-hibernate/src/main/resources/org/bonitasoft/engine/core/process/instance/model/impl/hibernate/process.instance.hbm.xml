@@ -318,6 +318,7 @@
 		extends="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl">
 		<property name="messageName" column="messageName" />
 		<property name="locked" column="locked" />
+		<property name="progress" column="progress" />
 		<property name="correlation1" column="correlation1" />
 		<property name="correlation2" column="correlation2" />
 		<property name="correlation3" column="correlation3" />

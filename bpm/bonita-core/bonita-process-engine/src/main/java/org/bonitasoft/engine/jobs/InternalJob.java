@@ -36,9 +36,4 @@ public abstract class InternalJob implements StatelessJob {
         }
     }
 
-    @Override
-    public boolean isWrappedInTransaction() {
-        return false;
-    }
-
 }
