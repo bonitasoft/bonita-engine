@@ -102,7 +102,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
     @Test
     public void testHitTransition() throws SBonitaException {
         final SGatewayInstance gatewayInstance = bpmServicesBuilder.getBPMInstanceBuilders().getSGatewayInstanceBuilder()
-                .createNewInstance("Gateway1", 1, 1, 1, SGatewayType.EXCLUSIVE, 2, 3, 3).setStateId(1).setHitBys("a,b,c").done();
+                .createNewInstance("Gateway1", 1, 1, 1, SGatewayType.EXCLUSIVE, 2, 3, 3).setStateId(1).setHitBys("1,2,3").done();
 
         insertGatewayInstance(gatewayInstance);
 
