@@ -76,6 +76,11 @@ public class InsertBatchLogsJob implements StatelessJob {
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
     }
 
+    @Override
+    public boolean isWrappedInTransaction() {
+        return false;
+    }
+
     public static void setTransactionService(final TransactionService transactionService) {
         InsertBatchLogsJob.transactionService = transactionService;
     }
