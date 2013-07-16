@@ -599,7 +599,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SStateCategory stateCategory = parentProcessInstance.getStateCategory();
             if (isGateway) {
                 final SGatewayInstance gatewayInstance = createOrRetreiveGateway(sDefinition, transitionInstance, sFlowNodeDefinition, stateCategory);
-                gatewayInstanceService.hitTransition(gatewayInstance, transitionInstance.getName());
+                gatewayInstanceService.hitTransition(gatewayInstance, sFlowNodeDefinition.getTransitionIndex(transitionInstance.getName()));
                 nextFlowNodeInstanceId = gatewayInstance.getId();
                 if (gatewayInstanceService.checkMergingCondition(sDefinition, gatewayInstance)) {
                     gatewayInstanceService.setFinish(gatewayInstance);
@@ -653,11 +653,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         } catch (final SGatewayNotFoundException e) {
             // no gateway found we create one
         }
+
         // check if it's already hit
         if (gatewayInstance != null
                 && gatewayInstance.getHitBys() != null
                 && (gatewayInstance.getHitBys().contains(GatewayInstanceService.FINISH) || Arrays.asList(gatewayInstance.getHitBys().split(",")).contains(
-                        transitionInstance.getName())) && gatewayInstance.getTokenRefId().equals(transitionInstance.getTokenRefId())) {
+                        flowNodeDefinition.getTransitionIndex(transitionInstance.getName())))
+                && gatewayInstance.getTokenRefId().equals(transitionInstance.getTokenRefId())) {
             gatewayInstance = null;// already hit we create a new one
         }
         if (gatewayInstance != null) {
@@ -1043,6 +1045,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 transitionService.archive(sTransitionDefinition, child, TransitionState.ABORTED);
             }
         }
+
         for (final STransitionDefinition sTransitionDefinition : validOutgoingTransitionDefinitions) {
             final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionDefinition.getName());
             if (flowNodeDefinition instanceof SActivityDefinition) {

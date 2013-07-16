@@ -69,18 +69,12 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
         getTransactionService().complete();
     }
 
-    private void updateGatewayHitbys(final SGatewayInstance gatewayInstance, final String transitionDefinitionName) throws SBonitaException {
+    private void updateGatewayHitbys(final SGatewayInstance gatewayInstance, final long transitionIndex) throws SBonitaException {
         getTransactionService().begin();
         final SGatewayInstance gatewayInstance2 = gatewayInstanceService().getGatewayInstance(gatewayInstance.getId());
-        gatewayInstanceService().hitTransition(gatewayInstance2, transitionDefinitionName);
+        gatewayInstanceService().hitTransition(gatewayInstance2, transitionIndex);
         getTransactionService().complete();
     }
-
-    /*
-     * @Test
-     * public void testGetGatewayInstance(){
-     * }
-     */
 
     @Test
     public void testCheckMergingCondition() throws SBonitaException {
@@ -116,10 +110,10 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
         checkGateway(gatewayInstance, gatewayInstanceRes, 2, 3);
 
-        updateGatewayHitbys(gatewayInstanceRes, "d");
+        updateGatewayHitbys(gatewayInstanceRes, 4);
 
         final SGatewayInstance gatewayInstanceRes2 = getGatewayInstanceFromDB(gatewayInstance.getId());
         assertNotNull(gatewayInstanceRes2);
-        assertEquals("a,b,c,d", gatewayInstanceRes2.getHitBys());
+        assertEquals("1,2,3,4", gatewayInstanceRes2.getHitBys());
     }
 }

@@ -201,7 +201,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         }
     }
 
-    public void addIncomingTransition(int index, STransitionDefinition sTransition) {
+    public void addIncomingTransition(final int index, final STransitionDefinition sTransition) {
         if (!incomings.contains(sTransition)) {
             incomings.add(index, sTransition);
         }
@@ -336,6 +336,22 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int getTransitionIndex(final String transitionName) {
+        int index = 1;
+        boolean found = false;
+        final Iterator<STransitionDefinition> iterator = incomings.iterator();
+        while (!found && iterator.hasNext()) {
+            final STransitionDefinition next = iterator.next();
+            if (next.getName().equals(transitionName)) {
+                found = true;
+            } else {
+                index++;
+            }
+        }
+        return index;
     }
 
 }
