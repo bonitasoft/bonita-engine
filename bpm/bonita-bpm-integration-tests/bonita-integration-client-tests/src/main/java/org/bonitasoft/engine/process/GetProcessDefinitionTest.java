@@ -272,17 +272,17 @@ public class GetProcessDefinitionTest extends CommonAPITest {
             // So that we have more than one user member of actorName1 in pDef1:
             getProcessAPI().addUserToActor(actorInstance2.getId(), user3.getId());
         }
-        processes = getProcessAPI()
-                .getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(user1.getId(), user2.getId()), 0, 10, ProcessDeploymentInfoCriterion.NAME_ASC);
+        processes = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(user1.getId(), user2.getId()), 0, 10,
+                ProcessDeploymentInfoCriterion.NAME_ASC);
         assertEquals(0, processes.size());
 
-        processes = getProcessAPI()
-                .getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(user1.getId(), user3.getId()), 0, 10, ProcessDeploymentInfoCriterion.NAME_ASC);
+        processes = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(user1.getId(), user3.getId()), 0, 10,
+                ProcessDeploymentInfoCriterion.NAME_ASC);
         assertEquals(1, processes.size());
         assertEquals(pDef1.getId(), processes.get(0).getProcessId());
 
-        processes = getProcessAPI()
-                .getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(user2.getId(), user3.getId()), 0, 10, ProcessDeploymentInfoCriterion.NAME_ASC);
+        processes = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForUsers(Arrays.asList(user2.getId(), user3.getId()), 0, 10,
+                ProcessDeploymentInfoCriterion.NAME_ASC);
         assertEquals(1, processes.size());
         assertEquals(pDef2.getId(), processes.get(0).getProcessId());
 
@@ -497,8 +497,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, actorName, groupSonToDelete);
 
         List<ProcessDeploymentInfo> procDepInfos = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForGroups(
-                Arrays.asList(groupSonToDelete.getId(), groupToDelete.getId()), 0, 10,
-                ProcessDeploymentInfoCriterion.NAME_ASC);
+                Arrays.asList(groupSonToDelete.getId(), groupToDelete.getId()), 0, 10, ProcessDeploymentInfoCriterion.NAME_ASC);
         assertEquals(2, procDepInfos.size());
 
         final ProcessDeploymentInfo firstPDInfos = procDepInfos.get(0);
@@ -645,6 +644,34 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition1);
         disableAndDeleteProcess(processDefinition2);
         disableAndDeleteProcess(processDefinition3);
+    }
+
+    @Test
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "User", "Process" }, jira = "ENGINE-1375")
+    public void getPaginatedProcessesWithActorOnlyForUser() throws Exception {
+        final String actorName1 = "ITAccountCreator";
+        final String actorName2 = "ITAccountValidator";
+        final User user1 = createUser("any", "contrasena");
+        final User user2 = createUser("bob", "smith");
+        final DesignProcessDefinition design1 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess1", "1.0",
+                Arrays.asList("step1", "step2"), Arrays.asList(true, true), actorName1, false);
+        final ProcessDefinition pDef1 = deployAndEnableWithActor(design1, actorName1, user1);
+        final DesignProcessDefinition design2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("MyProcess2", "1.1", Arrays.asList("mi_etapa"),
+                Arrays.asList(true), actorName2, false);
+        final ProcessDefinition pDef2 = deployAndEnableWithActor(design2, actorName2, user1);
+
+        final int startIndex = 0;
+        final int maxResults = 1;
+        final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfosWithActorOnlyForUser(user1.getId(), startIndex, maxResults,
+                ProcessDeploymentInfoCriterion.NAME_ASC);
+        assertEquals(1, processes.size());
+        assertEquals(processes.get(0).getProcessId(), pDef1.getId());
+
+        disableAndDeleteProcess(pDef1);
+        disableAndDeleteProcess(pDef2);
+
+        deleteUser(user1);
+        deleteUser(user2);
     }
 
 }
