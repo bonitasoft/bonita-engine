@@ -161,6 +161,14 @@
 										</copy>
 										<copy tofile="${tomcat.deploy.dir}/bonita.war"
 											file="${distrib.dir}/war/bonita-deploy-war-${project.version}.war" />
+											
+										<!-- Create default bonita.home folder -->
+										<copy todir="${bonita.home}" verbose="true">
+											<fileset dir="${distrib.dir}/resources/home/" />
+										</copy>
+
+										<copy file="${basedir}/client/bonita-client.properties"
+											todir="${bonita.home}/client/conf" overwrite="true" />
 									</target>
 								</configuration>
 							</execution>
@@ -179,13 +187,6 @@
 											<pathelement path="${test_classpath}" />
 										</path>
 
-										<!-- Create default bonita.home folder -->
-										<copy todir="${bonita.home}" verbose="true">
-											<fileset dir="${distrib.dir}/resources/home/" />
-										</copy>
-
-										<copy file="${basedir}/client/bonita-client.properties"
-											todir="${bonita.home}/client/conf" overwrite="true" />
 
 										<waitfor maxwait="1" maxwaitunit="minute">
 											<socket server="localhost" port="${provider.port}" />
@@ -238,6 +239,7 @@
 								<systemProperties>
 									<bonita.home>${bonita.home}</bonita.home>
 									<sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
+									<db.vendor>${db.vendor}</db.vendor>
 
 									<file.encoding>${project.build.sourceEncoding}</file.encoding>
 									<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>

@@ -4,6 +4,10 @@
 <web-app>
 	<display-name>Bonita engine</display-name>
 
+	<listener>
+		<listener-class>org.bonitasoft.engine.api.internal.servlet.BonitaServletContextListener</listener-class>
+	</listener>
+	
 	<servlet>
 		<servlet-name>HttpAPIServlet</servlet-name>
 		<servlet-class>org.bonitasoft.engine.api.internal.servlet.HttpAPIServlet</servlet-class>
@@ -13,5 +17,6 @@
 		<servlet-name>HttpAPIServlet</servlet-name>
 		<url-pattern>/serverAPI/*</url-pattern>
 	</servlet-mapping>
+
 
 </web-app>
