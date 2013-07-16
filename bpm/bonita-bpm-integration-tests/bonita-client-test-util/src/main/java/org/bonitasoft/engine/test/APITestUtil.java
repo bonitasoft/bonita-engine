@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,12 +118,6 @@ import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Duchastenier
@@ -498,9 +498,9 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorsName, final User users)
+    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorsName, final User user)
             throws BonitaException {
-        return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorsName), Collections.singletonList(users));
+        return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorsName), Collections.singletonList(user));
     }
 
     protected ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
@@ -1384,7 +1384,7 @@ public class APITestUtil {
         return processAPI;
     }
 
-    protected void setProcessAPI(ProcessAPI processAPI) {
+    protected void setProcessAPI(final ProcessAPI processAPI) {
         this.processAPI = processAPI;
     }
 
@@ -1392,7 +1392,7 @@ public class APITestUtil {
         return identityAPI;
     }
 
-    protected void setIdentityAPI(IdentityAPI identityAPI) {
+    protected void setIdentityAPI(final IdentityAPI identityAPI) {
         this.identityAPI = identityAPI;
     }
 
@@ -1400,7 +1400,7 @@ public class APITestUtil {
         return commandAPI;
     }
 
-    protected void setCommandAPI(CommandAPI commandAPI) {
+    protected void setCommandAPI(final CommandAPI commandAPI) {
         this.commandAPI = commandAPI;
     }
 
@@ -1408,7 +1408,7 @@ public class APITestUtil {
         return profileAPI;
     }
 
-    protected void setProfileAPI(ProfileAPI profileAPI) {
+    protected void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
     }
 
@@ -1416,11 +1416,11 @@ public class APITestUtil {
         return reportingAPI;
     }
 
-    protected void setReportingAPI(ReportingAPI reportingAPI) {
+    protected void setReportingAPI(final ReportingAPI reportingAPI) {
         this.reportingAPI = reportingAPI;
     }
 
-    protected void setSession(APISession session) {
+    protected void setSession(final APISession session) {
         this.session = session;
     }
 
