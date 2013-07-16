@@ -143,9 +143,11 @@ public class ServerAPIImpl implements ServerAPI {
                     default:
                         throw new ServerWrappedException(new InvalidSessionException("Unknown session type: " + session.getClass().getName()));
                 }
-                Thread.currentThread().setContextClassLoader(serverClassLoader);
             } else if (accessResolver.needSession(apiInterfaceName)) {
                 throw new ServerWrappedException(new InvalidSessionException("Session is null!"));
+            }
+            if (serverClassLoader != null) {
+                Thread.currentThread().setContextClassLoader(serverClassLoader);
             }
             return sessionAccessor;
         } catch (final ServerWrappedException swe) {
