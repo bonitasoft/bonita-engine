@@ -83,6 +83,7 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
+import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -555,6 +556,20 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new InvalidConnectorImplementationException(e);
             } catch (final SBonitaException e) {
                 transactionExecutor.setTransactionRollback();
+                throw new UpdateException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new UpdateException(e);
+        }
+        //refresh classloader in an other transaction.
+        DependencyService dependencyService = getTenantAccessor().getDependencyService();
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+            	dependencyService.refreshClassLoader("process", processDefinitionId);
+            } catch (final SBonitaException e) {
                 throw new UpdateException(e);
             } finally {
                 transactionExecutor.completeTransaction(txOpened);

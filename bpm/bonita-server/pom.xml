@@ -82,6 +82,11 @@
 			<artifactId>bonita-classloader-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.classloader</groupId>
+			<artifactId>bonita-classloader-clustered</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Command -->
 		<dependency>
@@ -772,6 +777,7 @@
 									<!-- Classloader -->
 									<include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
 									<include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
+									<include>com.bonitasoft.engine.classloader:bonita-classloader-clustered</include>
 									<!-- Command -->
 									<include>org.bonitasoft.engine.command:bonita-command-model</include>
 									<include>org.bonitasoft.engine.command:bonita-command-model-impl</include>
