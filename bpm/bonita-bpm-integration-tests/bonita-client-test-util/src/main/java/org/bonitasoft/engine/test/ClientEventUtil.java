@@ -75,6 +75,14 @@ public class ClientEventUtil {
         return map;
     }
 
+    public static Map<String, Serializable> getReadyTaskEvent(final String taskName) {
+        final Map<String, Serializable> map = new HashMap<String, Serializable>(5);
+        map.put(TYPE, FLOW_NODE);
+        map.put(NAME, taskName);
+        map.put(STATE_ID, 4);
+        return map;
+    }
+
     public static Map<String, Serializable> getProcessInstanceFinishedEvent(final long processInstanceId) {
         final Map<String, Serializable> map = new HashMap<String, Serializable>(4);
         map.put(TYPE, PROCESS);

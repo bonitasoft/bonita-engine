@@ -43,14 +43,6 @@ public class InstantiateProcessWork extends BonitaWork {
 
     private final SProcessDefinition processDefinition;
 
-    private long callerId = -1;
-
-    private long subProcessId = -1;
-
-    private Long idOfTheProcessToInterrupt;
-
-    private SFlowNodeInstance subProcflowNodeInstance;
-
     private final ProcessInstanceService processInstanceService;
 
     private final FlowNodeInstanceService flowNodeInstanceService;
@@ -62,6 +54,16 @@ public class InstantiateProcessWork extends BonitaWork {
     private final BPMInstancesCreator bpmInstancesCreator;
 
     private final TransactionExecutor transactionExecutor;
+
+    private long callerId = -1;
+
+    private long subProcessId = -1;
+
+    private long targetSFlowNodeDefinitionId = -1;
+
+    private Long idOfTheProcessToInterrupt;
+
+    private SFlowNodeInstance subProcflowNodeInstance;
 
     public InstantiateProcessWork(final SProcessDefinition processDefinition, final OperationsWithContext operations, final ProcessExecutor processExecutor,
             final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final LockService lockService,
@@ -85,7 +87,8 @@ public class InstantiateProcessWork extends BonitaWork {
                     lockService, logger);
             interruptor.interruptProcessInstance(idOfTheProcessToInterrupt, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        processExecutor.start(0, processDefinition, getExpressionContext(), operations.getOperations(), null, null, callerId, subProcessId);
+        processExecutor.start(0, processDefinition, targetSFlowNodeDefinitionId, getExpressionContext(), operations.getOperations(), null, null, callerId,
+                subProcessId);
     }
 
     private SExpressionContext getExpressionContext() {
@@ -106,5 +109,9 @@ public class InstantiateProcessWork extends BonitaWork {
 
     public void setIdOfTheProcessToInterrupt(final Long idOfTheProcessToInterrupt) {
         this.idOfTheProcessToInterrupt = idOfTheProcessToInterrupt;
+    }
+
+    public void setTargetSFlowNodeDefinitionId(long targetSFlowNodeDefinitionId) {
+        this.targetSFlowNodeDefinitionId = targetSFlowNodeDefinitionId;
     }
 }

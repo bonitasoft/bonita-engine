@@ -56,9 +56,10 @@ public interface ProcessExecutor extends ContainerExecutor {
             Map<String, Object> context, long callerId) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
             SActivityInterruptedException, SProcessInstanceCreationException;
 
-    SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
-            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectors, long callerId, final long subProcessId)
-            throws SActivityReadException, SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
+    SProcessInstance start(long userId, SProcessDefinition sDefinition, long targetSFlowNodeDefinitionId, SExpressionContext expressionContext,
+            final List<SOperation> operations, Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectors, long callerId,
+            final long subProcessId) throws SActivityReadException, SActivityExecutionException, SActivityInterruptedException,
+            SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, List<SOperation> sOperations, Map<String, Object> context,
             List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SActivityReadException, SActivityExecutionFailedException,
@@ -72,8 +73,8 @@ public interface ProcessExecutor extends ContainerExecutor {
     SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance) throws SActivityReadException,
             SProcessInstanceCreationException, SActivityExecutionException;
 
-    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId) throws SActivityReadException,
-            SProcessInstanceCreationException, SActivityExecutionException;
+    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId,
+            final long targetSFlowNodeDefinitionId) throws SActivityReadException, SProcessInstanceCreationException, SActivityExecutionException;
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
             throws SBonitaException;

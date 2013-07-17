@@ -1,5 +1,16 @@
 package org.bonitasoft.engine.execution;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,18 +53,6 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -169,7 +168,7 @@ public class ProcessExecutorImplTest {
         final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        when(mockedProcessExecutorImpl.start(userId, sProcessDefinition, null, operations, context, null, -1, -1)).thenReturn(sProcessInstance);
+        when(mockedProcessExecutorImpl.start(userId, sProcessDefinition, -1, null, operations, context, null, -1, -1)).thenReturn(sProcessInstance);
 
         // Let's call it for real:
         doCallRealMethod().when(mockedProcessExecutorImpl).start(userId, sProcessDefinition, operations, context);
@@ -195,17 +194,17 @@ public class ProcessExecutorImplTest {
         final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        when(mockedProcessExecutorImpl.startElements(sProcessDefinition, sProcessInstance, subProcessDefinitionId)).thenReturn(sProcessInstance);
+        when(mockedProcessExecutorImpl.startElements(sProcessDefinition, sProcessInstance, subProcessDefinitionId, -1)).thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.createProcessInstance(userId, sProcessDefinition, callerId)).thenReturn(sProcessInstance);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(userId, sProcessDefinition, expressionContext, operations, context, connectors, callerId,
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(userId, sProcessDefinition, -1, expressionContext, operations, context, connectors, callerId,
                 subProcessDefinitionId);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(userId, sProcessDefinition, expressionContext, operations, context, connectors,
+        final SProcessInstance result = mockedProcessExecutorImpl.start(userId, sProcessDefinition, -1, expressionContext, operations, context, connectors,
                 callerId, subProcessDefinitionId);
 
         // and check methods are called:
-        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessDefinition.class), any(SProcessInstance.class), anyLong());
+        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessDefinition.class), any(SProcessInstance.class), anyLong(), anyLong());
         verify(mockedProcessExecutorImpl).createProcessInstance(userId, sProcessDefinition, callerId);
 
         assertNotNull(result);
