@@ -37,6 +37,8 @@ public class TriggerTimerEventJob extends InternalJob {
 
     private Long processDefinitionId;
 
+    private long targetSFlowNodeDefinitionId;
+
     private Long flowNodeInstanceId;
 
     private Long parentProcessInstanceId;
@@ -65,10 +67,10 @@ public class TriggerTimerEventJob extends InternalJob {
     public void execute() throws JobExecutionException, FireEventException {
         try {
             if (subProcessId == null) {
-                eventsHandler.triggerCatchEvent(eventType, processDefinitionId, flowNodeInstanceId, containerType);
+                eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);
             } else {
-                eventsHandler.triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId, containerType, subProcessId, parentProcessInstanceId,
-                        rootProcessInstanceId, isInterrupting);
+                eventsHandler.triggerCatchEvent(SEventTriggerType.TIMER, processDefinitionId, targetSFlowNodeDefinitionId, containerType, subProcessId,
+                        parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
         } catch (final SBonitaException e) {
             throw new JobExecutionException(e);
@@ -78,6 +80,7 @@ public class TriggerTimerEventJob extends InternalJob {
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         processDefinitionId = (Long) attributes.get("processDefinitionId");
+        targetSFlowNodeDefinitionId = (Long) attributes.get("targetSFlowNodeDefinitionId");
         flowNodeInstanceId = (Long) attributes.get("flowNodeInstanceId");
         containerType = (String) attributes.get("containerType");
         eventType = (String) attributes.get("eventType");

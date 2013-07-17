@@ -660,6 +660,15 @@ public class APITestUtil {
         return getActivityInstance(waitForTask);
     }
 
+    protected ActivityInstance waitForUserTask(final String taskName) throws Exception {
+        return waitForUserTask(taskName, DEFAULT_TIMEOUT);
+    }
+
+    protected ActivityInstance waitForUserTask(final String taskName, final int timeout) throws Exception {
+        final Long waitForTask = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getReadyTaskEvent(taskName), timeout);
+        return getActivityInstance(waitForTask);
+    }
+
     private ActivityInstance getActivityInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
         if (id != null) {
             return getProcessAPI().getActivityInstance(id);
