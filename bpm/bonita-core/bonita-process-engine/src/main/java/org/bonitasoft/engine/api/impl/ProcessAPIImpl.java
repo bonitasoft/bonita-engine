@@ -3262,7 +3262,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
+            transactionExecutor.execute(new TransactionContent() {
+
+                @Override
+                public void execute() throws SBonitaException {
+                    deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
+                }
+            });
             final DeleteArchivedProcessInstances transactionContent = new DeleteArchivedProcessInstances(tenantAccessor, processDefinitionId);
             transactionExecutor.execute(transactionContent);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
@@ -4747,7 +4753,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void hideTasks(final long userId, final Long... activityInstanceId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
+        // FIXME: check a priori if task is already hidden and then throw UpdateException:
         final TransactionContent hideTasksTx = new HideTasks(tenantAccessor.getActivityInstanceService(), userId, activityInstanceId);
         try {
             hideTasksTx.execute();
