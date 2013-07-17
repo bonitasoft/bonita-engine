@@ -256,6 +256,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
+import org.bonitasoft.engine.core.process.definition.model.builder.ProcessDefinitionDeployInfoBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
@@ -3051,6 +3052,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ProcessDefinitionDeployInfoBuilder builder = tenantAccessor.getBPMDefinitionBuilders().getProcessDefinitionDeployInfoBuilder();
+
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
@@ -3061,8 +3064,56 @@ public class ProcessAPIImpl implements ProcessAPI {
                         processDefIds.add(sActor.getScopeId());
                     }
                 }
+
+                String field = null;
+                OrderByType order = null;
+                switch (sortingCriterion) {
+                    case DEFAULT:
+                        break;
+                    case LABEL_ASC:
+                        // field = processDefinitionDeployInfoKyeProvider.get
+                        // FIXME add label?
+                        break;
+                    case LABEL_DESC:
+                        break;
+                    case NAME_ASC:
+                        field = builder.getNameKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case NAME_DESC:
+                        field = builder.getNameKey();
+                        order = OrderByType.DESC;
+                        break;
+                    case ACTIVATION_STATE_ASC:
+                        field = builder.getActivationStateKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case ACTIVATION_STATE_DESC:
+                        field = builder.getActivationStateKey();
+                        order = OrderByType.DESC;
+                        break;
+                    case CONFIGURATION_STATE_ASC:
+                        field = builder.getConfigurationStateKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case CONFIGURATION_STATE_DESC:
+                        field = builder.getConfigurationStateKey();
+                        order = OrderByType.DESC;
+                        break;
+                    case VERSION_ASC:
+                        field = builder.getVersionKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case VERSION_DESC:
+                        field = builder.getVersionKey();
+                        order = OrderByType.DESC;
+                        break;
+                    default:
+                        break;
+                }
+
                 final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService.getProcessDeploymentInfos(new ArrayList<Long>(
-                        processDefIds));
+                        processDefIds), startIndex, maxResults, field, order);
                 return ModelConvertor.toProcessDeploymentInfo(processDefinitionDeployInfos);
             } catch (final SBonitaException e) {
                 // no rollback only read db
