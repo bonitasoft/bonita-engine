@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +23,11 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
-import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -36,7 +39,6 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.service.impl.SessionAccessorNotFoundException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
@@ -68,17 +70,68 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
+    private static final List<String> nonTxMethodNames = Arrays.asList("createPlatform", "initializePlatform", "createAndInitializePlatform", "startNode",
+            "deleteProcessInstances", "deleteProcess");
+
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
+        System.err.println("Calling method " + methodName + " on class " + apiInterfaceName);
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         SessionAccessor sessionAccessor = null;
         try {
             sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
-            return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues);
+
+            final Session session = (Session) options.get("session");
+
+            if (session != null && !nonTxMethodNames.contains(methodName)) {
+                final SessionType sessionType = getSessionType(session);
+                TransactionExecutor transactionExecutor = null;
+                final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
+                final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
+                switch (sessionType) {
+                    case PLATFORM:
+                        transactionExecutor = platformServiceAccessor.getTransactionExecutor();
+                        break;
+                    case API:
+                        final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
+                        transactionExecutor = tenantAccessor.getTransactionExecutor();
+                        break;
+                    default:
+                        throw new ServerWrappedException(new InvalidSessionException("Unknown session type: " + session.getClass().getName()));
+                }
+
+                final TransactionContentWithResult<Object> txContent = new TransactionContentWithResult<Object>() {
+
+                    private Object result;
+
+                    @Override
+                    public void execute() throws SBonitaException {
+                        try {
+                            result = invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues);
+                        } catch (SBonitaException e) {
+                            throw e;
+                        } catch (Throwable e) {
+                            throw new ServerAPIRuntimeException(e);
+                        }
+                    }
+
+                    @Override
+                    public Object getResult() {
+                        return result;
+                    }
+                };
+                transactionExecutor.execute(txContent);
+                return txContent.getResult();
+            } else {
+                return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues);
+            }
+        } catch (final ServerAPIRuntimeException e) {
+            final Throwable cause = e.getCause();
+            throw new ServerWrappedException(cause);
         } catch (final ServerWrappedException e) {
             throw e;
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             throw new ServerWrappedException(e);
         } finally {
             // clean session id
@@ -87,6 +140,16 @@ public class ServerAPIImpl implements ServerAPI {
             }
             // reset class loader
             Thread.currentThread().setContextClassLoader(baseClassLoader);
+        }
+    }
+
+    private static final class ServerAPIRuntimeException extends RuntimeException {
+
+        private static final long serialVersionUID = -5675131531953146131L;
+
+        ServerAPIRuntimeException(final Throwable t) {
+            super(t);
+
         }
     }
 
@@ -168,7 +231,7 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private Object invokeAPI(final String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues)
-            throws ServerWrappedException {
+            throws Throwable {
         try {
             Class<?>[] parameterTypes = null;
             if (classNameParameters != null && !classNameParameters.isEmpty()) {
@@ -191,21 +254,7 @@ public class ServerAPIImpl implements ServerAPI {
             final Object api = accessResolver.getAPIImplementation(apiInterfaceName);
             return ClassReflector.invokeMethod(api, methodName, parameterTypes, parametersValues);
         } catch (final InvocationTargetException ite) {
-            throw new ServerWrappedException(ite.getCause());
-        } catch (final IllegalArgumentException iae) {
-            throw new BonitaRuntimeException(iae);
-        } catch (final IllegalAccessException iae) {
-            throw new BonitaRuntimeException(iae);
-        } catch (final SecurityException se) {
-            throw new BonitaRuntimeException(se);
-        } catch (final NoSuchMethodException nsme) {
-            throw new BonitaRuntimeException(nsme);
-        } catch (final ClassNotFoundException cnfe) {
-            throw new BonitaRuntimeException(cnfe);
-        } catch (final SessionAccessorNotFoundException sanfe) {
-            throw new BonitaRuntimeException(sanfe);
-        } catch (final APIImplementationNotFoundException apiinfe) {
-            throw new ServerWrappedException(apiinfe);
+            throw ite.getCause();
         }
     }
 

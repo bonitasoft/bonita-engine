@@ -44,7 +44,6 @@ import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandBuilder;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -89,11 +88,10 @@ public class CommandAPIImpl implements CommandAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final AddSDependency addSDependency = new AddSDependency(dependencyService, dependencyBuilderAccessor, name, jar, tenantAccessor.getTenantId(),
                 "tenant");
         try {
-            transactionExecutor.execute(addSDependency);
+            addSDependency.execute();
         } catch (final SDependencyAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
         } catch (final SBonitaException sbe) {
@@ -106,10 +104,9 @@ public class CommandAPIImpl implements CommandAPI {
         // FIXME it is maybe too much to delete dependency mappings with the dependency -> better if there are mappings of this dependency throws an exception.
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final DeleteSDependency deleteSDependency = new DeleteSDependency(dependencyService, name);
         try {
-            transactionExecutor.execute(deleteSDependency);
+            deleteSDependency.execute();
         } catch (final SDependencyNotFoundException sdnfe) {
             throw new DependencyNotFoundException(sdnfe);
         } catch (final SBonitaException sbe) {
@@ -131,12 +128,11 @@ public class CommandAPIImpl implements CommandAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CommandService commandService = tenantAccessor.getCommandService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SCommandBuilder commandBuilder = tenantAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
         final SCommand sCommand = commandBuilder.createNewInstance(name, description, implementation).setSystem(false).done();
         try {
             final CreateSCommand createCommand = new CreateSCommand(commandService, sCommand);
-            transactionExecutor.execute(createCommand);
+            createCommand.execute();
             return ModelConvertor.toCommandDescriptor(sCommand);
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
@@ -147,11 +143,10 @@ public class CommandAPIImpl implements CommandAPI {
     public Serializable execute(final String name, final Map<String, Serializable> parameters) throws CommandNotFoundException,
             CommandParameterizationException, CommandExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final CommandService commandService = tenantAccessor.getCommandService();
         try {
             final GetTenantCommand getTenantCommand = new GetTenantCommand(commandService, name);
-            transactionExecutor.execute(getTenantCommand);
+            getTenantCommand.execute();
             final TenantCommand command = getTenantCommand.getResult();
             return command.execute(parameters, tenantAccessor);
         } catch (final SCommandNotFoundException scnfe) {
@@ -169,11 +164,10 @@ public class CommandAPIImpl implements CommandAPI {
     public Serializable execute(final long commandId, final Map<String, Serializable> parameters) throws CommandNotFoundException,
             CommandParameterizationException, CommandExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final CommandService commandService = tenantAccessor.getCommandService();
         try {
             final GetTenantCommand getTenantCommand = new GetTenantCommand(commandService, commandId);
-            transactionExecutor.execute(getTenantCommand);
+            getTenantCommand.execute();
             final TenantCommand command = getTenantCommand.getResult();
             return command.execute(parameters, tenantAccessor);
         } catch (final SCommandNotFoundException scnfe) {
@@ -196,9 +190,8 @@ public class CommandAPIImpl implements CommandAPI {
         try {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final CommandService commandService = tenantAccessor.getCommandService();
-            final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
             final DeleteSCommand deleteCommand = new DeleteSCommand(commandService, name);
-            transactionExecutor.execute(deleteCommand);
+            deleteCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new CommandNotFoundException(scnfe);
         } catch (final SBonitaException sbe) {
@@ -208,11 +201,10 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public CommandDescriptor getCommand(final String commandName) throws CommandNotFoundException {
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final CommandService commandService = getTenantAccessor().getCommandService();
         try {
             final GetSCommand getComandByName = new GetSCommand(commandService, commandName);
-            transactionExecutor.execute(getComandByName);
+            getComandByName.execute();
             final SCommand sCommand = getComandByName.getResult();
             return ModelConvertor.toCommandDescriptor(sCommand);
         } catch (final SBonitaException e) {
@@ -223,10 +215,9 @@ public class CommandAPIImpl implements CommandAPI {
     @Override
     public List<CommandDescriptor> getAllCommands(final int startIndex, final int maxResults, final CommandCriterion sort) {
         final CommandService commandService = getTenantAccessor().getCommandService();
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         try {
             final GetSCommands getCommands = new GetSCommands(commandService, startIndex, maxResults, sort);
-            transactionExecutor.execute(getCommands);
+            getCommands.execute();
             return ModelConvertor.toCommandDescriptors(getCommands.getResult());
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -239,11 +230,10 @@ public class CommandAPIImpl implements CommandAPI {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
         final CommandService commandService = getTenantAccessor().getCommandService();
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final SCommandUpdateBuilder commandUpdateBuilder = getTenantAccessor().getSCommandBuilderAccessor().getSCommandUpdateBuilder();
         try {
             final UpdateSCommand updateCommand = new UpdateSCommand(commandService, commandUpdateBuilder, commandName, updateDescriptor);
-            transactionExecutor.execute(updateCommand);
+            updateCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new UpdateException(scnfe);
         } catch (final SBonitaException e) {
@@ -256,9 +246,8 @@ public class CommandAPIImpl implements CommandAPI {
         try {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final CommandService commandService = tenantAccessor.getCommandService();
-            final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
             final DeleteAllCommands deleteCommand = new DeleteAllCommands(commandService);
-            transactionExecutor.execute(deleteCommand);
+            deleteCommand.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -267,10 +256,9 @@ public class CommandAPIImpl implements CommandAPI {
     @Override
     public List<CommandDescriptor> getUserCommands(final int startIndex, final int maxResults, final CommandCriterion sort) {
         final CommandService commandService = getTenantAccessor().getCommandService();
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         try {
             final GetCommands getCommands = new GetCommands(commandService, startIndex, maxResults, sort);
-            transactionExecutor.execute(getCommands);
+            getCommands.execute();
             return ModelConvertor.toCommandDescriptors(getCommands.getResult());
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -279,11 +267,10 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public CommandDescriptor get(final long commandId) throws CommandNotFoundException {
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final CommandService commandService = getTenantAccessor().getCommandService();
         try {
             final GetSCommand getComandById = new GetSCommand(commandService, commandId);
-            transactionExecutor.execute(getComandById);
+            getComandById.execute();
             final SCommand sCommand = getComandById.getResult();
             return ModelConvertor.toCommandDescriptor(sCommand);
         } catch (final SBonitaException e) {
@@ -297,11 +284,10 @@ public class CommandAPIImpl implements CommandAPI {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
         final CommandService commandService = getTenantAccessor().getCommandService();
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final SCommandUpdateBuilder commandUpdateBuilder = getTenantAccessor().getSCommandBuilderAccessor().getSCommandUpdateBuilder();
         try {
             final UpdateSCommand updateCommand = new UpdateSCommand(commandService, commandUpdateBuilder, commandId, updater);
-            transactionExecutor.execute(updateCommand);
+            updateCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new UpdateException(scnfe);
         } catch (final SBonitaException e) {
@@ -314,9 +300,8 @@ public class CommandAPIImpl implements CommandAPI {
         try {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final CommandService commandService = tenantAccessor.getCommandService();
-            final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
             final DeleteSCommand deleteCommand = new DeleteSCommand(commandService, commandId);
-            transactionExecutor.execute(deleteCommand);
+            deleteCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new CommandNotFoundException(scnfe);
         } catch (final SBonitaException sbe) {
@@ -330,9 +315,8 @@ public class CommandAPIImpl implements CommandAPI {
         final CommandService commandService = tenantAccessor.getCommandService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchCommands searchCommands = new SearchCommands(commandService, searchEntitiesDescriptor.getCommandDescriptor(), searchOptions);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(searchCommands);
+            searchCommands.execute();
             return searchCommands.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);

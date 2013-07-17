@@ -29,7 +29,6 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Matthieu Chaffotte
@@ -72,21 +71,11 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
             e.printStackTrace();// no logger available yet
             throw new PlatformLogoutException(e.getMessage());
         }
-        final TransactionService transactionService = platformAccessor.getTransactionService();
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
         try {
-            transactionService.begin();
             platformLoginService.logout(session.getId());
         } catch (final SSessionNotFoundException e) {
             throw new SessionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new PlatformLogoutException(e.getMessage());
-        } finally {
-            try {
-                transactionService.complete();
-            } catch (final SBonitaException e) {
-                throw new PlatformLogoutException(e.getMessage());
-            }
         }
     }
 

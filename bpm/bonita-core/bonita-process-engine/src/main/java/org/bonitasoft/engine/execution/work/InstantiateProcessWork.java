@@ -81,8 +81,7 @@ public class InstantiateProcessWork extends TxBonitaWork {
     protected void work() throws SBonitaException {
         if (idOfTheProcessToInterrupt != null) {
             final TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(
-                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, flowNodeInstanceService, transactionExecutor, processExecutor,
-                    lockService, logger);
+                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, flowNodeInstanceService, processExecutor, lockService, logger);
             interruptor.interruptProcessInstance(idOfTheProcessToInterrupt, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
         processExecutor.start(0, processDefinition, getExpressionContext(), operations.getOperations(), null, null, callerId, subProcessId);

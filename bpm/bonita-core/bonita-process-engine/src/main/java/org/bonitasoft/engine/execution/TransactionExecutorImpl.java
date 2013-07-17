@@ -66,6 +66,8 @@ public class TransactionExecutorImpl implements TransactionExecutor {
             return false;
         } else {
             try {
+                // System.err.println("\n\n\ntransactionService.begin()\n");
+                // Thread.dumpStack();
                 transactionService.begin();
                 return true;
             } catch (final STransactionCreationException e) {
@@ -77,12 +79,16 @@ public class TransactionExecutorImpl implements TransactionExecutor {
     @Override
     public void completeTransaction(final boolean txOpened) throws STransactionException {
         if (txOpened) {
+            // System.err.println("\n\n\ntransactionService.complete()\n");
+            // Thread.dumpStack();
             transactionService.complete();
         }
     }
 
     @Override
     public void setTransactionRollback() throws STransactionException {
+        // System.err.println("\n\n\ntransactionService.rollbackonly()\n");
+        // Thread.dumpStack();
         transactionService.setRollbackOnly();
     }
 

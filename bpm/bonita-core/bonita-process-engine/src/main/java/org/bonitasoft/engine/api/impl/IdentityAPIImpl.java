@@ -64,7 +64,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -133,7 +132,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 
 /**
  * @author Matthieu Chaffotte
@@ -199,7 +197,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
 
@@ -215,7 +213,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         try {
             final UpdateUser updateUserTransaction = new UpdateUser(identityService, userId, userChangeDescriptor, persoDataChangeDescriptor,
                     proDataChangeDescriptor, modelBuilder.getUserContactInfoBuilder());
-            transactionExecutor.execute(updateUserTransaction);
+            updateUserTransaction.execute();
             return ModelConvertor.toUser(updateUserTransaction.getResult());
         } catch (final SUserNotFoundException sunfe) {
             throw new UserNotFoundException(sunfe);
@@ -320,7 +318,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteUser(final long userId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -328,9 +326,9 @@ public class IdentityAPIImpl implements IdentityAPI {
 
         try {
             final DeleteUser deleteUser = new DeleteUser(identityService, actorMappingService, profileService, userId, sProfileBuilderAccessor);
-            transactionExecutor.execute(deleteUser);
+            deleteUser.execute();
             final Set<Long> removedActorIds = deleteUser.getRemovedActorIds();
-            updateActorProcessDependencies(tenantAccessor, actorMappingService, transactionExecutor, removedActorIds);
+            updateActorProcessDependencies(tenantAccessor, actorMappingService, removedActorIds);
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -342,7 +340,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             throw new DeletionException("User name can not be null!");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
@@ -350,9 +348,9 @@ public class IdentityAPIImpl implements IdentityAPI {
 
         try {
             final DeleteUser deleteUser = new DeleteUser(identityService, actorMappingService, profileService, userName, sProfileBuilderAccessor);
-            transactionExecutor.execute(deleteUser);
+            deleteUser.execute();
             final Set<Long> removedActorIds = deleteUser.getRemovedActorIds();
-            updateActorProcessDependencies(tenantAccessor, actorMappingService, transactionExecutor, removedActorIds);
+            updateActorProcessDependencies(tenantAccessor, actorMappingService, removedActorIds);
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -362,14 +360,14 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void deleteUsers(final List<Long> userIds) throws DeletionException {
         if (userIds != null && !userIds.isEmpty()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
             final IdentityService identityService = tenantAccessor.getIdentityService();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final ProfileService profileService = tenantAccessor.getProfileService();
             final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
             try {
                 final DeleteUsers deleteUsers = new DeleteUsers(identityService, actorMappingService, profileService, sProfileBuilderAccessor, userIds);
-                transactionExecutor.execute(deleteUsers);
+                deleteUsers.execute();
             } catch (final SBonitaException sbe) {
                 throw new DeletionException(sbe);
             }
@@ -383,10 +381,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetSUser transactionContent = new GetSUser(identityService, userId);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return ModelConvertor.toUser(transactionContent.getResult());
         } catch (final SUserNotFoundException sunfe) {
             throw new UserNotFoundException(sunfe);
@@ -399,10 +397,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public User getUserByUserName(final String userName) throws UserNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetSUser transactionContent = new GetSUser(identityService, userName);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return ModelConvertor.toUser(transactionContent.getResult());
         } catch (final SUserNotFoundException sunfe) {
             throw new UserNotFoundException(sunfe);
@@ -418,10 +416,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetSContactInfo txContent = new GetSContactInfo(userId, identityService, personal);
-            transactionExecutor.execute(txContent);
+            txContent.execute();
             final SContactInfo result = txContent.getResult();
             if (result == null) {
                 return null;
@@ -436,10 +434,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUsers() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetNumberOfInstance transactionContent = new GetNumberOfInstance("getNumberOfUsers", identityService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return transactionContent.getResult();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -450,20 +448,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     // FIXME rewrite ME!!!
     public List<User> getUsers(final int startIndex, final int maxResults, final UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final IdentityService identityService = tenantAccessor.getIdentityService();
-                return getUsersWithOrder(startIndex, maxResults, criterion, tenantAccessor, identityService);
-            } catch (final SBonitaException sbe) {
-                transactionExecutor.setTransactionRollback();
-                throw new RetrieveException(sbe);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
-            throw new RetrieveException(e);
+            final IdentityService identityService = tenantAccessor.getIdentityService();
+            return getUsersWithOrder(startIndex, maxResults, criterion, tenantAccessor, identityService);
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
         }
     }
 
@@ -484,12 +473,12 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public SearchResult<User> searchUsers(final SearchOptions options) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchUsers searchUsers = new SearchUsers(identityService, searchEntitiesDescriptor.getUserDescriptor(), options);
         try {
-            transactionExecutor.execute(searchUsers);
+            searchUsers.execute();
             return searchUsers.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);
@@ -500,10 +489,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUsersInRole(final long roleId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(roleId, "getNumberOfUsersInRole", identityService);
-            transactionExecutor.execute(transactionContentWithResult);
+            transactionContentWithResult.execute();
             return transactionContentWithResult.getResult();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -514,7 +503,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<User> getUsersInRole(final long roleId, final int startIndex, final int maxResults, final UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -548,7 +537,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             final String fieldExecutor = field;
             final OrderByType orderExecutor = order;
             final GetUsersInRole getUsersInRole = new GetUsersInRole(roleId, startIndex, maxResults, fieldExecutor, orderExecutor, identityService);
-            transactionExecutor.execute(getUsersInRole);
+            getUsersInRole.execute();
             return ModelConvertor.toUsers(getUsersInRole.getResult());
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -559,10 +548,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUsersInGroup(final long groupId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(groupId, "getNumberOfUsersInGroup", identityService);
         try {
-            transactionExecutor.execute(transactionContentWithResult);
+            transactionContentWithResult.execute();
             return transactionContentWithResult.getResult();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -573,7 +562,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<User> getUsersInGroup(final long groupId, final int startIndex, final int maxResults, final UserCriterion crterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -605,7 +594,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         try {
             final GetUsersInGroup getUsersOfGroup = new GetUsersInGroup(groupId, startIndex, maxResults, order, field, identityService);
-            transactionExecutor.execute(getUsersOfGroup);
+            getUsersOfGroup.execute();
             return ModelConvertor.toUsers(getUsersOfGroup.getResult());
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -624,11 +613,11 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final SRole sRole = ModelConvertor.constructSRole(creator, tenantAccessor.getIdentityModelBuilder());
         try {
             final CreateRole createRole = new CreateRole(sRole, identityService);
-            transactionExecutor.execute(createRole);
+            createRole.execute();
             return ModelConvertor.toRole(sRole);
         } catch (final SBonitaException sbe) {
             try {
@@ -649,11 +638,11 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final IdentityModelBuilder identityModelBuilder = tenantAccessor.getIdentityModelBuilder();
         final RoleUpdateBuilder roleUpdateBuilder = identityModelBuilder.getRoleUpdateBuilder();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final EntityUpdateDescriptor changeDescriptor = getRoleUpdateDescriptor(roleUpdateBuilder, updateDescriptor);
             final UpdateRole updateRole = new UpdateRole(changeDescriptor, roleId, identityService);
-            transactionExecutor.execute(updateRole);
+            updateRole.execute();
             return getRole(roleId);
         } catch (final SRoleNotFoundException srnfe) {
             throw new RoleNotFoundException(srnfe);
@@ -694,14 +683,14 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
         final DeleteRole deleteRole = new DeleteRole(identityService, actorMappingService, profileService, roleId, sProfileBuilderAccessor);
         try {
-            transactionExecutor.execute(deleteRole);
+            deleteRole.execute();
             final Set<Long> removedActorIds = deleteRole.getRemovedActorIds();
-            updateActorProcessDependencies(tenantAccessor, actorMappingService, transactionExecutor, removedActorIds);
+            updateActorProcessDependencies(tenantAccessor, actorMappingService, removedActorIds);
         } catch (final SRoleNotFoundException srnfe) {
 
         } catch (final SBonitaException sbe) {
@@ -715,12 +704,12 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
         final DeleteRoles deleteRoles = new DeleteRoles(identityService, actorMappingService, profileService, sProfileBuilderAccessor, roleIds);
         try {
-            transactionExecutor.execute(deleteRoles);
+            deleteRoles.execute();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -729,11 +718,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Role getRole(final long roleId) throws RoleNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetRole getRole = new GetRole(roleId, identityService);
-            transactionExecutor.execute(getRole);
+            getRole.execute();
             return ModelConvertor.toRole(getRole.getResult());
         } catch (final SBonitaException sbe) {
             throw new RoleNotFoundException(sbe);
@@ -743,11 +732,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Role getRoleByName(final String roleName) throws RoleNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetRoleByName getRoleByName = new GetRoleByName(roleName, identityService);
-            transactionExecutor.execute(getRoleByName);
+            getRoleByName.execute();
             return ModelConvertor.toRole(getRoleByName.getResult());
         } catch (final SBonitaException e) {
             throw new RoleNotFoundException(e);
@@ -757,11 +746,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public long getNumberOfRoles() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfRoles", identityService);
-            transactionExecutor.execute(getNumberOfInstance);
+            getNumberOfInstance.execute();
             return getNumberOfInstance.getResult();
         } catch (final SBonitaException e) {
             return 0;
@@ -772,7 +761,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<Role> getRoles(final int startIndex, final int maxResults, final RoleCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -798,7 +787,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             final String fieldExecutor = field;
             final OrderByType orderExecutor = order;
             final GetRoles getRolesWithOrder = new GetRoles(identityService, startIndex, maxResults, fieldExecutor, orderExecutor);
-            transactionExecutor.execute(getRolesWithOrder);
+            getRolesWithOrder.execute();
             return ModelConvertor.toRoles(getRolesWithOrder.getResult());
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -822,12 +811,12 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public SearchResult<Role> searchRoles(final SearchOptions options) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchRoles searchRoles = new SearchRoles(identityService, searchEntitiesDescriptor.getRoleDescriptor(), options);
         try {
-            transactionExecutor.execute(searchRoles);
+            searchRoles.execute();
             return searchRoles.getResult();
         } catch (final SBonitaException sbe) {
             throw new BonitaRuntimeException(sbe);
@@ -848,11 +837,11 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final SGroup sGroup = ModelConvertor.constructSGroup(creator, tenantAccessor.getIdentityModelBuilder());
         try {
             final CreateGroup createGroup = new CreateGroup(sGroup, identityService);
-            transactionExecutor.execute(createGroup);
+            createGroup.execute();
             return ModelConvertor.toGroup(sGroup);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
@@ -870,12 +859,12 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final IdentityModelBuilder identityModelBuilder = tenantAccessor.getIdentityModelBuilder();
         final GroupUpdateBuilder groupUpdateBuilder = identityModelBuilder.getGroupUpdateBuilder();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final SGroup group = getSGroup(groupId, tenantAccessor);
             final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(groupUpdateBuilder, updater);
             final UpdateGroup updateGroup = new UpdateGroup(group.getId(), changeDescriptor, identityService, identityModelBuilder);
-            transactionExecutor.execute(updateGroup);
+            updateGroup.execute();
             return getGroup(groupId);
         } catch (final SGroupNotFoundException sgnfe) {
             throw new GroupNotFoundException(sgnfe);
@@ -920,13 +909,13 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
         final DeleteGroup deleteGroup = new DeleteGroup(identityService, actorMappingService, profileService, groupId, sProfileBuilderAccessor);
         try {
-            transactionExecutor.execute(deleteGroup);
-            updateActorProcessDependencies(tenantAccessor, actorMappingService, transactionExecutor, deleteGroup.getRemovedActorIds());
+            deleteGroup.execute();
+            updateActorProcessDependencies(tenantAccessor, actorMappingService, deleteGroup.getRemovedActorIds());
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -941,13 +930,13 @@ public class IdentityAPIImpl implements IdentityAPI {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final IdentityService identityService = tenantAccessor.getIdentityService();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-            final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
             final ProfileService profileService = tenantAccessor.getProfileService();
             final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
             try {
                 final DeleteGroups deleteGroups = new DeleteGroups(identityService, actorMappingService, profileService, sProfileBuilderAccessor, groupIds);
-                transactionExecutor.execute(deleteGroups);
-                updateActorProcessDependencies(tenantAccessor, actorMappingService, transactionExecutor, deleteGroups.getRemovedActorIds());
+                deleteGroups.execute();
+                updateActorProcessDependencies(tenantAccessor, actorMappingService, deleteGroups.getRemovedActorIds());
             } catch (final SBonitaException e) {
                 throw new DeletionException(e);
             }
@@ -967,10 +956,10 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     private SGroup getSGroup(final long groupId, final TenantServiceAccessor tenantAccessor) throws SGroupNotFoundException {
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetSGroup getSGroup = new GetSGroup(groupId, identityService);
-            transactionExecutor.execute(getSGroup);
+            getSGroup.execute();
             return getSGroup.getResult();
         } catch (final SGroupNotFoundException sgnfe) {
             throw sgnfe;
@@ -982,11 +971,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Group getGroupByPath(final String groupPath) throws GroupNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetGroupByPath getGroup = new GetGroupByPath(groupPath, identityService);
-            transactionExecutor.execute(getGroup);
+            getGroup.execute();
             return ModelConvertor.toGroup(getGroup.getResult());
         } catch (final SGroupNotFoundException sgnfe) {
             throw new GroupNotFoundException(sgnfe);
@@ -999,10 +988,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfGroups() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfGroups", identityService);
-            transactionExecutor.execute(getNumberOfInstance);
+            getNumberOfInstance.execute();
             return getNumberOfInstance.getResult();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -1027,7 +1016,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<Group> getGroups(final int startIndex, final int maxResults, final GroupCriterion pagingCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -1051,7 +1040,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         try {
             final GetGroups getGroups = new GetGroups(identityService, startIndex, maxResults, order, field);
-            transactionExecutor.execute(getGroups);
+            getGroups.execute();
             return ModelConvertor.toGroups(getGroups.getResult());
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -1061,12 +1050,12 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public SearchResult<Group> searchGroups(final SearchOptions options) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchGroups searchGroups = new SearchGroups(identityService, searchEntitiesDescriptor.getGroupDescriptor(), options);
         try {
-            transactionExecutor.execute(searchGroups);
+            searchGroups.execute();
             return searchGroups.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);
@@ -1095,11 +1084,11 @@ public class IdentityAPIImpl implements IdentityAPI {
      * Check / update process resolution information, for all processes in a list of actor IDs.
      */
     private void updateActorProcessDependencies(final TenantServiceAccessor tenantAccessor, final ActorMappingService actorMappingService,
-            final TransactionExecutor transactionExecutor, final Set<Long> removedActorIds) throws SBonitaException {
+            final Set<Long> removedActorIds) throws SBonitaException {
         final Set<Long> processDefinitionIds = new HashSet<Long>(removedActorIds.size());
         for (final Long actorId : removedActorIds) {
             final GetActor getActor = new GetActor(actorMappingService, actorId);
-            transactionExecutor.execute(getActor);
+            getActor.execute();
             final SActor actor = getActor.getResult();
             final Long processDefId = Long.valueOf(actor.getScopeId());
             if (!processDefinitionIds.contains(processDefId)) {
@@ -1112,18 +1101,12 @@ public class IdentityAPIImpl implements IdentityAPI {
     /**
      * Check / update process resolution information, for all processes in a list of actor IDs.
      */
-    private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor, final ActorMappingService actorMappingService,
-            final TransactionExecutor transactionExecutor) throws SBonitaException {
+    private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor) throws SBonitaException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
         final ActorProcessDependencyResolver dependencyResolver = new ActorProcessDependencyResolver();
         do {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
+            processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
             for (final Long processDefinitionId : processDefinitionIds) {
                 tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor, dependencyResolver);
             }
@@ -1200,18 +1183,18 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityModelBuilder identityModelBuilder = tenantAccessor.getIdentityModelBuilder();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final long assignedBy = ModelConvertor.getCurrentUserId();
         try {
             final AddUserMembership createUserMembership = new AddUserMembership(userId, groupId, roleId, assignedBy, identityService,
                     identityModelBuilder.getUserMembershipBuilder());
-            transactionExecutor.execute(createUserMembership);
+            createUserMembership.execute();
             final SUserMembership sUserMembership = createUserMembership.getResult();
             return ModelConvertor.toUserMembership(sUserMembership);
         } catch (final SBonitaException sbe) {
             try {
                 final GetUserMembership getUserMembership = new GetUserMembership(userId, groupId, roleId, identityService);
-                transactionExecutor.execute(getUserMembership);
+                getUserMembership.execute();
                 if (getUserMembership.getResult() != null) {
                     throw new AlreadyExistsException("A userMembership with userId \"" + userId + "\", groupId \"" + groupId + "\" and roleId \"" + roleId
                             + "\" already exists");
@@ -1228,12 +1211,11 @@ public class IdentityAPIImpl implements IdentityAPI {
         // FIXME rewrite
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor tranExecutor = tenantAccessor.getTransactionExecutor();
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         final long currentUserId = ModelConvertor.getCurrentUserId();
         try {
             final AddUserMemberships transactionContent = new AddUserMemberships(groupId, roleId, userIds, modelBuilder, identityService, currentUserId);
-            tranExecutor.execute(transactionContent);
+            transactionContent.execute();
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
@@ -1244,14 +1226,14 @@ public class IdentityAPIImpl implements IdentityAPI {
             UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final EntityUpdateDescriptor changeDescriptor = tenantAccessor.getIdentityModelBuilder().getUserMembershipUpdateBuilder().updateGroupId(newGroupId)
                 .updateRoleId(newRoleId).done();
         try {
             final TransactionContent transactionContent = new UpdateMembershipByRoleIdAndGroupId(userMembershipId, identityService, changeDescriptor);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             final GetUserMembership getMembershipAfterUpdate = new GetUserMembership(userMembershipId, identityService);
-            transactionExecutor.execute(getMembershipAfterUpdate);
+            getMembershipAfterUpdate.execute();
             final SUserMembership sMembershipAfterUpdate = getMembershipAfterUpdate.getResult();
             return ModelConvertor.toUserMembership(sMembershipAfterUpdate);
         } catch (final SBonitaException sbe) {
@@ -1262,11 +1244,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteUserMembership(final long userMembershipId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final DeleteUserMembership deleteMembership = new DeleteUserMembership(userMembershipId, identityService);
         try {
-            transactionExecutor.execute(deleteMembership);
+            deleteMembership.execute();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -1275,11 +1257,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteUserMembership(final long userId, final long groupId, final long roleId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final TransactionContent transactionContent = new DeleteUserMembership(userId, groupId, roleId, identityService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -1289,10 +1271,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void deleteUserMemberships(final List<Long> userIds, final long groupId, final long roleId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final TransactionContent transactionContent = new DeleteUserMemberships(groupId, userIds, identityService, roleId);
         try {
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -1302,10 +1284,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public UserMembership getUserMembership(final long userMembershipId) throws MembershipNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final GetUserMembership getUserMembership = new GetUserMembership(userMembershipId, identityService);
         try {
-            transactionExecutor.execute(getUserMembership);
+            getUserMembership.execute();
             final SUserMembership sMembership = getUserMembership.getResult();
             return ModelConvertor.toUserMembership(sMembership);
         } catch (final SBonitaException sbe) {
@@ -1317,10 +1299,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUserMemberships(final long userId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final TransactionContentWithResult<Long> transactionContent = new GetNumberOfUserMemberships(userId, identityService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return transactionContent.getResult();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -1330,50 +1312,42 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults, final UserMembershipCriterion pagingCrterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final IdentityService identityService = tenantAccessor.getIdentityService();
-                final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
-                OrderByOption orderByOption = null;
-                switch (pagingCrterion) {
-                    case ROLE_NAME_DESC:
-                        orderByOption = new OrderByOption(SRole.class, modelBuilder.getRoleBuilder().getNameKey(), OrderByType.DESC);
-                        break;
-                    case GROUP_NAME_ASC:
-                        orderByOption = new OrderByOption(SGroup.class, modelBuilder.getGroupBuilder().getNameKey(), OrderByType.ASC);
-                        break;
-                    case GROUP_NAME_DESC:
-                        orderByOption = new OrderByOption(SGroup.class, modelBuilder.getGroupBuilder().getNameKey(), OrderByType.DESC);
-                        break;
-                    // case ASSIGNED_BY_ASC:
-                    // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.ASC);
-                    // break;
-                    // case ASSIGNED_BY_DESC:
-                    // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.DESC);
-                    // break;
-                    case ASSIGNED_DATE_ASC:
-                        orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedDateKey(), OrderByType.ASC);
-                        break;
-                    case ASSIGNED_DATE_DESC:
-                        orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedDateKey(), OrderByType.DESC);
-                        break;
-                    case ROLE_NAME_ASC:
-                    default:
-                        orderByOption = new OrderByOption(SRole.class, modelBuilder.getRoleBuilder().getNameKey(), OrderByType.ASC);
-                        break;
-                }
 
-                return getUserMemberships(userId, startIndex, maxResults, orderByOption, identityService);
-            } catch (final SBonitaException sbe) {
-                transactionExecutor.setTransactionRollback();
-                throw new RetrieveException(sbe);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+        try {
+            final IdentityService identityService = tenantAccessor.getIdentityService();
+            final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
+            OrderByOption orderByOption = null;
+            switch (pagingCrterion) {
+                case ROLE_NAME_DESC:
+                    orderByOption = new OrderByOption(SRole.class, modelBuilder.getRoleBuilder().getNameKey(), OrderByType.DESC);
+                    break;
+                case GROUP_NAME_ASC:
+                    orderByOption = new OrderByOption(SGroup.class, modelBuilder.getGroupBuilder().getNameKey(), OrderByType.ASC);
+                    break;
+                case GROUP_NAME_DESC:
+                    orderByOption = new OrderByOption(SGroup.class, modelBuilder.getGroupBuilder().getNameKey(), OrderByType.DESC);
+                    break;
+                // case ASSIGNED_BY_ASC:
+                // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.ASC);
+                // break;
+                // case ASSIGNED_BY_DESC:
+                // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.DESC);
+                // break;
+                case ASSIGNED_DATE_ASC:
+                    orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedDateKey(), OrderByType.ASC);
+                    break;
+                case ASSIGNED_DATE_DESC:
+                    orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedDateKey(), OrderByType.DESC);
+                    break;
+                case ROLE_NAME_ASC:
+                default:
+                    orderByOption = new OrderByOption(SRole.class, modelBuilder.getRoleBuilder().getNameKey(), OrderByType.ASC);
+                    break;
             }
-        } catch (final STransactionException ste) {
-            throw new RetrieveException(ste);
+
+            return getUserMemberships(userId, startIndex, maxResults, orderByOption, identityService);
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
         }
     }
 
@@ -1401,10 +1375,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<UserMembership> getUserMembershipsByGroup(final long groupId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final GetUserMembershipsOfGroup transactionContentWithResult = new GetUserMembershipsOfGroup(groupId, identityService, startIndex, maxResults);
         try {
-            transactionExecutor.execute(transactionContentWithResult);
+            transactionContentWithResult.execute();
             return ModelConvertor.toUserMembership(transactionContentWithResult.getResult());
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -1415,10 +1389,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<UserMembership> getUserMembershipsByRole(final long roleId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         try {
             final GetUserMembershipsOfRole transactionContentWithResult = new GetUserMembershipsOfRole(roleId, identityService, startIndex, maxResults);
-            transactionExecutor.execute(transactionContentWithResult);
+            transactionContentWithResult.execute();
             return ModelConvertor.toUserMembership(transactionContentWithResult.getResult());
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -1428,14 +1402,14 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteOrganization() throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final DeleteOrganization deleteOrganization = new DeleteOrganization(identityService, profileService, actorMappingService);
         try {
-            transactionExecutor.execute(deleteOrganization);
-            updateActorProcessDependenciesForAllActors(tenantAccessor, actorMappingService, transactionExecutor);
+            deleteOrganization.execute();
+            updateActorProcessDependenciesForAllActors(tenantAccessor);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -1449,10 +1423,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void importOrganization(final String organizationContent, final ImportPolicy policy) throws OrganizationImportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
         final ImportOrganization importOrganization = new ImportOrganization(tenantAccessor, organizationContent, policy);
         try {
-            transactionExecutor.execute(importOrganization);
+            importOrganization.execute();
         } catch (final SBonitaException e) {
             throw new OrganizationImportException(e);
         }

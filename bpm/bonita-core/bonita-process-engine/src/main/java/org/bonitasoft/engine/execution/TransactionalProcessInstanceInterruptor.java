@@ -19,7 +19,6 @@ import org.bonitasoft.engine.api.impl.transaction.flownode.SearchFlowNodeInstanc
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetFlowNodeStateCategory;
 import org.bonitasoft.engine.api.impl.transaction.process.SetProcessStateCategory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -37,26 +36,23 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
-    private final TransactionExecutor transactionExecutor;
-
     private final ProcessExecutor processExecutor;
 
     private long count;
 
     public TransactionalProcessInstanceInterruptor(final BPMInstanceBuilders bpmInstanceBuilders, final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService flowNodeInstanceService, final TransactionExecutor transactionExecutor, final ProcessExecutor processExecutor,
-            final LockService lockService, final TechnicalLoggerService logger) {
+            final FlowNodeInstanceService flowNodeInstanceService, final ProcessExecutor processExecutor, final LockService lockService,
+            final TechnicalLoggerService logger) {
         super(bpmInstanceBuilders, lockService, logger);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
-        this.transactionExecutor = transactionExecutor;
         this.processExecutor = processExecutor;
     }
 
     @Override
     protected void setProcessStateCategory(final long processInstanceId, final SStateCategory stateCategory) throws SBonitaException {
         final SetProcessStateCategory setProcessStateCategoryTransaction = new SetProcessStateCategory(processInstanceService, processInstanceId, stateCategory);
-        transactionExecutor.execute(setProcessStateCategoryTransaction);
+        setProcessStateCategoryTransaction.execute();
     }
 
     @Override
@@ -68,7 +64,7 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
     protected List<SFlowNodeInstance> getChildren(final long processInstanceId) throws SBonitaException {
         final SearchFlowNodeInstances searchFlowNodeInstancesTransaction = new SearchFlowNodeInstances(flowNodeInstanceService,
                 getQueryOptions(processInstanceId), SFlowNodeInstance.class);
-        transactionExecutor.execute(searchFlowNodeInstancesTransaction);
+        searchFlowNodeInstancesTransaction.execute();
         final List<SFlowNodeInstance> children = searchFlowNodeInstancesTransaction.getResult();
         count = searchFlowNodeInstancesTransaction.getCount();
         return children;
@@ -78,7 +74,7 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
     protected List<SFlowNodeInstance> getChildrenExcept(final long processInstanceId, final long childExceptionId) throws SBonitaException {
         final SearchFlowNodeInstances searchFlowNodeInstancesTransaction = new SearchFlowNodeInstances(flowNodeInstanceService, getQueryOptions(
                 processInstanceId, childExceptionId), SFlowNodeInstance.class);
-        transactionExecutor.execute(searchFlowNodeInstancesTransaction);
+        searchFlowNodeInstancesTransaction.execute();
         final List<SFlowNodeInstance> children = searchFlowNodeInstancesTransaction.getResult();
         count = searchFlowNodeInstancesTransaction.getCount();
         return children;
@@ -98,7 +94,7 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
     protected void setChildStateCategory(final long flowNodeInstanceId, final SStateCategory stateCategory) throws SBonitaException {
         final SetFlowNodeStateCategory setFlowNodeStateCategoryTransaction = new SetFlowNodeStateCategory(flowNodeInstanceService, flowNodeInstanceId,
                 stateCategory);
-        transactionExecutor.execute(setFlowNodeStateCategoryTransaction);
+        setFlowNodeStateCategoryTransaction.execute();
     }
 
 }
