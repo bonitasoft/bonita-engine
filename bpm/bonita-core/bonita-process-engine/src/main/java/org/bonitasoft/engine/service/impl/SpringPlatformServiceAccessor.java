@@ -188,7 +188,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public ClassLoaderService getClassLoaderService() {
         if (classLoaderService == null) {
-            classLoaderService = SpringPlatformFileSystemBeanAccessor.getService(ClassLoaderService.class);
+            classLoaderService = SpringPlatformFileSystemBeanAccessor.getService("classLoaderService", ClassLoaderService.class);
         }
         return classLoaderService;
     }

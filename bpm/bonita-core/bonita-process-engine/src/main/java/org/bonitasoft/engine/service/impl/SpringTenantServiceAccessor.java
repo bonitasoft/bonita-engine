@@ -479,7 +479,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public ClassLoaderService getClassLoaderService() {
         if (classLoaderService == null) {
-            classLoaderService = beanAccessor.getService(ClassLoaderService.class);
+            classLoaderService = beanAccessor.getService("classLoaderService", ClassLoaderService.class);
         }
         return classLoaderService;
     }
