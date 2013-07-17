@@ -76,4 +76,9 @@ public class ExecuteMessageCoupleWork extends TxBonitaWork implements Serializab
         eventInstanceService.updateMessageInstance(messageInstanceToUpdate, descriptor);
     }
 
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": messageInstanceId: " + messageInstanceId + ", waitingMessageId: " + waitingMessageId;
+    }
+
 }
