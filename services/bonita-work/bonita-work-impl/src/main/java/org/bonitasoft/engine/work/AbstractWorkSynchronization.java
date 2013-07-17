@@ -33,7 +33,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
 
     private boolean executed = false;
 
-    private final TechnicalLoggerService loggerService;
+    protected final TechnicalLoggerService loggerService;
 
     private final SessionAccessor sessionAccessor;
 

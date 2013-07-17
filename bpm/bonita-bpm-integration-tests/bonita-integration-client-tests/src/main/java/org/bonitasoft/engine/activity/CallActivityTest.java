@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.activity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,15 +71,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@SuppressWarnings("javadoc")
 public class CallActivityTest extends CommonAPITest {
 
     private User cebolinha;
@@ -444,8 +445,7 @@ public class CallActivityTest extends CommonAPITest {
         final WaitForStep waitForStep = waitForStep(50, 5000, userTaskName, rootProcessInstance, TestStates.getReadyState(null));
         if (childProcessInstances != null) {
             for (final ProcessInstance childProcessInstance : childProcessInstances) {
-                assertTrue("target process was not archived: " + childProcessInstance.getName(),
-                        waitProcessToFinishAndBeArchived(childProcessInstance));
+                assertTrue("target process was not archived: " + childProcessInstance.getName(), waitProcessToFinishAndBeArchived(childProcessInstance));
             }
         }
 

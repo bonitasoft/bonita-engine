@@ -29,4 +29,8 @@ public class ListAdder extends NonTxBonitaWork {
         list.add(toAdd);
     }
 
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString() + " after (ms) " + delay;
+    }
 }

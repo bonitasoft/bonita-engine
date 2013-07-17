@@ -31,4 +31,9 @@ public class HandleErrorEventOnFail extends TxBonitaWork {
     protected void work() throws SBonitaException {
         executeConnectorOfActivity.handleErrorEventOnFail();
     }
+
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName();
+    }
 }

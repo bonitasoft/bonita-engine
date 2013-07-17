@@ -38,7 +38,7 @@ public class SequenceWorkSynchronization extends AbstractWorkSynchronization {
 
     @Override
     protected void executeRunnables(final Collection<AbstractBonitaWork> works) {
-        executorService.submit(new SequenceRunnableExecutor(works, runnableListener, getTenantId()));
+        executorService.submit(new SequenceRunnableExecutor(works, runnableListener, getTenantId(), loggerService));
     }
 
 }

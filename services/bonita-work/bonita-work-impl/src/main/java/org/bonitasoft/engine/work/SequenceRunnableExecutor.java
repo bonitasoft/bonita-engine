@@ -15,6 +15,9 @@ package org.bonitasoft.engine.work;
 
 import java.util.Collection;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+
 /**
  * @author Charles Souillard
  * @author Baptiste Mesta
@@ -25,16 +28,27 @@ public class SequenceRunnableExecutor extends NotifyingRunnable {
 
     private boolean cancelled = false;
 
-    public SequenceRunnableExecutor(final Collection<AbstractBonitaWork> works, final RunnableListener runnableListener, final long tenantId) {
+    private final TechnicalLoggerService loggerService;
+
+    public SequenceRunnableExecutor(final Collection<AbstractBonitaWork> works, final RunnableListener runnableListener, final long tenantId,
+            final TechnicalLoggerService loggerService) {
         super(runnableListener, tenantId);
         this.works = works;
+        this.loggerService = loggerService;
     }
 
     @Override
     public void innerRun() {
         for (final AbstractBonitaWork work : works) {
             if (!cancelled) {
-                work.run();
+                try {
+                    work.run();
+                } catch (Throwable t) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Error while executing one work in the list of works: " + work.getDescription(),
+                            t);
+                    // TODO: do we need to stack again here?:
+                    t.printStackTrace();
+                }
             }
         }
     }

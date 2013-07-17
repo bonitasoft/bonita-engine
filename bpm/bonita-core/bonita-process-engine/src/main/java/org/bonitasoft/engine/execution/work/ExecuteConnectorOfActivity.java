@@ -170,4 +170,9 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
             setConnectorAndContainerToFailed();
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": flowNodeInstance:" + flowNodeInstance.getId();
+    }
 }

@@ -44,4 +44,9 @@ public class ExecuteTransitionWork extends TxBonitaWork {
     protected void work() throws SBonitaException {
         containerExecutor.executeTransition(sDefinition, sTransitionInstance);
     }
+
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": transitionInstanceId:" + sTransitionInstance.getId();
+    }
 }

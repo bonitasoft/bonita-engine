@@ -41,6 +41,8 @@ public abstract class AbstractBonitaWork implements Runnable {
 
     private long tenantId;
 
+    protected abstract String getDescription();
+
     protected abstract boolean isTransactional();
 
     public AbstractBonitaWork() {
@@ -58,6 +60,9 @@ public abstract class AbstractBonitaWork implements Runnable {
             }
             session = createSession();// FIXME get the technical user of the tenant
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
+
+            // FIXME: change log level:
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Starting work :" + getDescription());
             work();
         } catch (final Throwable e) {
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work", e);

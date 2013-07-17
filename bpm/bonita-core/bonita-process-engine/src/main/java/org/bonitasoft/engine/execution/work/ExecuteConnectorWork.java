@@ -24,7 +24,6 @@ import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
-import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
@@ -57,7 +56,7 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
         @Override
         public void execute() throws SBonitaException {
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Error while executing connector", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while executing connector", e);
             // TODO: store connection root cause in connnector_instance DB
             switch (sConnectorDefinition.getFailAction()) {
                 case ERROR_EVENT:
@@ -213,7 +212,7 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
                 try {
                     final ConnectorResult result = connectorService.executeConnector(processDefinition.getId(), connector, processClassloader, inputParameters);
                     transactionExecutor.execute(new EvaluateConnectorOutputsTxContent(result));
-                } catch (final SConnectorException e) {
+                } catch (final SBonitaException e) {
                     transactionExecutor.execute(new HandleConnectorOnFailEventTxContent(e));
                 }
             }

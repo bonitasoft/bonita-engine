@@ -125,4 +125,9 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": processInstanceId:" + processInstance.getId();
+    }
+
 }

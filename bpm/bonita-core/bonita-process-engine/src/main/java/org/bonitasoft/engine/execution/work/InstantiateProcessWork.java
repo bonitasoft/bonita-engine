@@ -107,4 +107,10 @@ public class InstantiateProcessWork extends TxBonitaWork {
     public void setIdOfTheProcessToInterrupt(final Long idOfTheProcessToInterrupt) {
         this.idOfTheProcessToInterrupt = idOfTheProcessToInterrupt;
     }
+
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": Process of type " + processDefinition.getName() + " (" + processDefinition.getVersion() + ")"
+                + ((subProcflowNodeInstance != null) ? ", subProcflowNodeInstanceId:" + subProcflowNodeInstance.getId() : "");
+    }
 }

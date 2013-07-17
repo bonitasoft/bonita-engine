@@ -1,5 +1,10 @@
 package org.bonitasoft.engine.activity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -46,14 +51,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * @author Baptiste Mesta
  */
+@SuppressWarnings("javadoc")
 public class MultiInstanceTest extends CommonAPITest {
 
     private static final String JACK = "jack";
@@ -697,13 +698,13 @@ public class MultiInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test
     /**
      * Test of parallel multi-instance with several users.
      * 
      * @throws Exception
      * @since 6.0
      */
+    @Test
     public void multiInstanceParallelWithSeveralUsers() throws Exception {
         final String panel = "Panel";
         final int loopMax = 3;
@@ -747,13 +748,13 @@ public class MultiInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test
     /**
      * Test of sequential multi-instance with several users.
      * 
      * @throws Exception
      * @since 6.0
      */
+    @Test
     public void multiInstanceSequentialWithSeveralUsers() throws Exception {
         final String panel = "Panel";
         final int loopMax = 3;
@@ -797,13 +798,13 @@ public class MultiInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test
     /**
      * Test of sequential multi-instance with sub-process.
      * 
      * @throws Exception
      * @since 6.0
      */
+    @Test
     public void multiInstanceSequentialWithSubProcess() throws Exception {
         final String delivery = "Delivery men";
         final int loopMax = 3;

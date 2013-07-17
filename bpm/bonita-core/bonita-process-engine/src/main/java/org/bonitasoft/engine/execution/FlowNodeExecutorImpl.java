@@ -369,7 +369,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     private void handleInterruption(final FlowNodeState state) throws SActivityInterruptedException {
-        if (state.isInterrupting()) {
+        if (state != null && state.isInterrupting()) {
             throw new SActivityInterruptedException();
         }
     }

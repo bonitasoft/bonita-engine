@@ -49,4 +49,9 @@ public class ExecuteFlowNodeWork extends TxBonitaWork {
     protected void work() throws SBonitaException {
         containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId);
     }
+
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": processInstanceId:" + processInstanceId + ", flowNodeInstanceId: " + flowNodeInstanceId;
+    }
 }
