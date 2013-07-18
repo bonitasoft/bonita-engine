@@ -85,7 +85,7 @@ public class SServiceMXBeanTest extends CommonServiceTest {
     }
 
     public SServiceMXBean getServiceMXBean() throws Exception {
-        return new SServiceMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getSessionService());
+        return new SServiceMXBeanImpl(monitoringService, getSessionAccessor(), getSessionService());
     }
 
     /**
