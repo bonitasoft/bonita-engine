@@ -366,7 +366,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression", "Process instance" }, story = "Evaluate a complex expression on process instance.")
     @Ignore("not yet supported")
     @Test
-    public void testEvaluateComplexExpressionOnProcessInstance() throws Exception {
+    public void evaluateComplexExpressionOnProcessInstance() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "bpm");
         loginWith(userName, "bpm");
@@ -401,7 +401,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Pattern expression" }, story = "Evaluate a pattern expression.")
     @Test
-    public void testEvaluatePatternExpression() throws Exception {
+    public void evaluatePatternExpression() throws Exception {
         final String userName = "Manu";
         final User manu = createUser(userName, "poele");
         loginWith(userName, "poele");
