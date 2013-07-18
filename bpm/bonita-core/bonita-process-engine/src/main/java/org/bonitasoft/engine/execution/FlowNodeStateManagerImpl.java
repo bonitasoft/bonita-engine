@@ -89,7 +89,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -198,14 +197,14 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry,
             final ArchiveService archiveService, final TechnicalLoggerService logger, final DocumentMappingService documentMappingService,
             final SCommentService commentService, final SACommentBuilder saCommentBuilder, final TransactionExecutor transactionExecutor,
-            final TransactionService transactionService, final LockService lockService, final EventsHandler eventsHandler,
-            final UserFilterService userFilterService, final ActorMappingService actorMappingService, final IdentityService identityService,
-            final WorkService workService, final BPMDefinitionBuilders bpmDefinitionBuilders) {
+            final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
+            final ActorMappingService actorMappingService, final IdentityService identityService, final WorkService workService,
+            final BPMDefinitionBuilders bpmDefinitionBuilders) {
         initStates(connectorService, connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService,
                 eventInstanceService, sDataInstanceBuilders, instanceBuilders, operationService, activityInstanceService, bpmInstancesCreator,
                 containerRegistry, processDefinitionService, processInstanceService, archiveService, logger, documentMappingService, commentService,
-                saCommentBuilder, transactionExecutor, transactionService, lockService, eventsHandler, userFilterService, actorMappingService, identityService,
-                workService, bpmDefinitionBuilders);
+                saCommentBuilder, transactionExecutor, lockService, eventsHandler, userFilterService, actorMappingService, identityService, workService,
+                bpmDefinitionBuilders);
         defineTransitionsForAllNodesType();
         initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
     }
@@ -341,9 +340,9 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final TechnicalLoggerService logger,
             final DocumentMappingService documentMappingService, final SCommentService commentService, final SACommentBuilder saCommentBuilder,
-            final TransactionExecutor transactionExecutor, final TransactionService transactionService, final LockService lockService,
-            final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
-            final IdentityService identityService, final WorkService workService, final BPMDefinitionBuilders bpmDefinitionBuilders) {
+            final TransactionExecutor transactionExecutor, final LockService lockService, final EventsHandler eventsHandler,
+            final UserFilterService userFilterService, final ActorMappingService actorMappingService, final IdentityService identityService,
+            final WorkService workService, final BPMDefinitionBuilders bpmDefinitionBuilders) {
         stateBehaviors = new StateBehaviors(transactionExecutor, bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService,
                 classLoaderService, instanceBuilders, actorMappingService, connectorService, connectorInstanceService, expressionResolverService,
                 processDefinitionService, dataInstanceService, operationService, workService, containerRegistry, this, processInstanceService, archiveService,

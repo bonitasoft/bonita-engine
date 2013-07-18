@@ -37,4 +37,9 @@ public interface TransactionExecutor {
 
     void setTransactionRollback() throws STransactionException;
 
+    /**
+     * @return true if a transaction is currently active
+     */
+    boolean isTransactionActive();
+
 }

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.api.impl.transaction.reporting.GetReport;
 import org.bonitasoft.engine.api.impl.transaction.reporting.GetReportContent;
 import org.bonitasoft.engine.api.impl.transaction.reporting.SearchReports;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.reporting.ReportingService;
 import org.bonitasoft.engine.core.reporting.SReport;
 import org.bonitasoft.engine.core.reporting.SReportNotFoundException;
@@ -70,9 +69,8 @@ public class ReportingAPIImpl implements ReportingAPI {
     public Report getReport(final long reportId) throws ReportNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final GetReport getReport = new GetReport(tenantAccessor, reportId);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(getReport);
+            getReport.execute();
             final SReport report = getReport.getResult();
             return ModelConvertor.toReport(report);
         } catch (final SReportNotFoundException srnfe) {
@@ -86,9 +84,8 @@ public class ReportingAPIImpl implements ReportingAPI {
     public byte[] getReportContent(final long reportId) throws ReportNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final GetReportContent getReport = new GetReportContent(tenantAccessor, reportId);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(getReport);
+            getReport.execute();
             return getReport.getResult();
         } catch (final SReportNotFoundException srnfe) {
             throw new ReportNotFoundException(srnfe);
@@ -100,13 +97,12 @@ public class ReportingAPIImpl implements ReportingAPI {
     @Override
     public SearchResult<Report> searchReports(final SearchOptions options) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ReportingService reportingService = tenantAccessor.getReportingService();
         final SearchReports searchReports = new SearchReports(reportingService, searchEntitiesDescriptor.getReportDescriptor(reportingService
                 .getReportBuilder()), options);
         try {
-            transactionExecutor.execute(searchReports);
+            searchReports.execute();
             return searchReports.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);

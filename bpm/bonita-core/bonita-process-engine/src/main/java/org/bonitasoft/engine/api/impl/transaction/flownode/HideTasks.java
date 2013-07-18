@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl.transaction.flownode;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -26,18 +27,35 @@ public class HideTasks implements TransactionContent {
 
     private final long userId;
 
-    private final Long[] activityInstanceId;
+    private final Long[] activityInstanceIds;
 
-    public HideTasks(final ActivityInstanceService activityInstanceService, final long userId, final Long... activityInstanceId) {
+    public HideTasks(final ActivityInstanceService activityInstanceService, final long userId, final Long... activityInstanceIds) {
         this.activityInstanceService = activityInstanceService;
         this.userId = userId;
-        this.activityInstanceId = activityInstanceId;
+        this.activityInstanceIds = activityInstanceIds;
 
     }
 
     @Override
     public void execute() throws SBonitaException {
-        activityInstanceService.hideTasks(userId, activityInstanceId);
-    }
+        // First, let's check if no task is already hidden:
+        boolean found = false;
+        long foundActivityInstanceId = 0;
+        for (int i = 0; i < activityInstanceIds.length && !found; i++) {
+            long activityInstanceId = activityInstanceIds[i];
+            try {
+                activityInstanceService.getHiddenTask(activityInstanceId);
+                found = true;
+                foundActivityInstanceId = activityInstanceId;
+            } catch (STaskVisibilityException vis) {
+                // Ok, is not hidden already.
+            }
+        }
+        if (found) {
+            throw new STaskVisibilityException("Task with id " + foundActivityInstanceId + " is already hidden");
+        }
 
+        // If not, we can hide the tasks:
+        activityInstanceService.hideTasks(userId, activityInstanceIds);
+    }
 }

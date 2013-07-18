@@ -90,7 +90,6 @@
 		<constructor-arg name="commentService" ref="commentService" />
 		<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />		
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
-		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="userFilterService" ref="userFilterService" />

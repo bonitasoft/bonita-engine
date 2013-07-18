@@ -490,6 +490,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         // multiple tx here because we must lock instances when deleting them
         // but if the second tx crash we can relaunch deleteprocess without issues
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        checkNoActiveTransaction(transactionExecutor);
         try {
             transactionExecutor.execute(new TransactionContent() {
 
@@ -506,7 +507,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         // 1 tx for deleting the process definition and co.
         try {
-            final TransactionContent deleteTransactionContent = getDeleteTransactionContent(processDefinitionId);
+            final TransactionContent deleteTransactionContent = new DeleteProcess(getTenantAccessor(), processDefinitionId);
             transactionExecutor.execute(deleteTransactionContent);
             final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
             final File file = new File(processesFolder);
@@ -525,8 +526,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected TransactionContent getDeleteTransactionContent(final long processDefinitionId) {
-        return new DeleteProcess(getTenantAccessor(), processDefinitionId);
+    /**
+     * @param transactionExecutor
+     */
+    protected void checkNoActiveTransaction(final TransactionExecutor transactionExecutor) {
+        if (transactionExecutor.isTransactionActive()) {
+            throw new RuntimeException("This method MUST NOT be called inside a existing transaction!");
+        }
     }
 
     private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
@@ -650,6 +656,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void deleteProcesses(final List<Long> processIdList) throws DeletionException {
+        checkNoActiveTransaction(getTenantAccessor().getTransactionExecutor());
         for (final Long processId : processIdList) {
             deleteProcess(processId);
         }
@@ -798,13 +805,19 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void disableAndDelete(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
+        checkNoActiveTransaction(getTenantAccessor().getTransactionExecutor());
         disableProcess(processDefinitionId);
         deleteProcess(processDefinitionId);
     }
 
     @Override
     public void disableProcess(final long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException {
+
+        // FIXME: don't use transactionExecutor (because of disableAndDelete) :
+
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        checkNoActiveTransaction(transactionExecutor);
         final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
@@ -812,7 +825,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService);
         try {
-            transactionContent.execute();
+            transactionExecutor.execute(transactionContent);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -3261,6 +3274,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        checkNoActiveTransaction(transactionExecutor);
         try {
             transactionExecutor.execute(new TransactionContent() {
 
@@ -4753,7 +4767,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void hideTasks(final long userId, final Long... activityInstanceId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // FIXME: check a priori if task is already hidden and then throw UpdateException:
         final TransactionContent hideTasksTx = new HideTasks(tenantAccessor.getActivityInstanceService(), userId, activityInstanceId);
         try {
             hideTasksTx.execute();

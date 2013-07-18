@@ -13,19 +13,16 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.IOException;
-
 import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
-import org.bonitasoft.engine.api.impl.transaction.platform.Login;
+import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.Logout;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
@@ -55,8 +52,12 @@ public class LoginAPIImpl implements LoginAPI {
     @Override
     public APISession login(final String userName, final String password) throws LoginException {
         checkUsernameAndPassword(userName, password);
-        final STenant tenant = getDefaultTenant();
-        return login(userName, password, tenant);
+
+        try {
+            return login(userName, password, null);
+        } catch (Throwable e) {
+            throw new LoginException(e);
+        }
     }
 
     protected void checkUsernameAndPassword(final String userName, final String password) throws LoginException {
@@ -68,69 +69,96 @@ public class LoginAPIImpl implements LoginAPI {
         }
     }
 
-    protected APISession login(final String userName, final String password, final STenant tenant) throws LoginException {
-        SessionAccessor sessionAccessor = null;
-        try {
-            final long tenantId = tenant.getId();
-            final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(tenantId);
-            final LoginService loginService = serviceAccessor.getLoginService();
-            final Login login = new Login(loginService, tenant.getId(), userName, password);
-            final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
-            transactionExecutor.execute(login);
-            final SSession session = login.getResult();
-            if (!session.isTechnicalUser()) {
-                sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-                sessionAccessor.setSessionInfo(session.getId(), tenantId);
-                final IdentityService identityService = serviceAccessor.getIdentityService();
-                final GetSUser getSUser = new GetSUser(identityService, userName);
-                transactionExecutor.execute(getSUser);
-                final SUser sUser = getSUser.getResult();
-                final IdentityModelBuilder identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
-                final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
-                final long lastConnection = System.currentTimeMillis();
-                final EntityUpdateDescriptor updateDescriptor = userUpdateBuilder.updateLastConnection(lastConnection).done();
-                final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null, null);
-                transactionExecutor.execute(updateUser);
-            }
-            return ModelConvertor.toAPISession(session, tenant.getName());
-        } catch (final Exception sbe) {
-            throw new LoginException(sbe);
-        } finally {
-            if (sessionAccessor != null) {
-                sessionAccessor.deleteSessionId();
-            }
+    protected APISession login(final String userName, final String password, final Long tenantId) throws Throwable {
+        final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+        final PlatformService platformService = platformServiceAccessor.getPlatformService();
+        final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
+        TransactionContentWithResult<STenant> getTenant;
+        if (tenantId == null) {
+            getTenant = new GetDefaultTenantInstance(platformService);
+        } else {
+            getTenant = new GetTenantInstance(tenantId, platformService);
         }
+        platformTransactionExecutor.execute(getTenant);
+        final STenant sTenant = getTenant.getResult();
+        if (!platformService.isTenantActivated(sTenant)) {
+            throw new LoginException("Tenant " + sTenant.getName() + " is not activated");
+        }
+
+        final long localTenantId = sTenant.getId();
+        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
+        final LoginService loginService = serviceAccessor.getLoginService();
+        final IdentityService identityService = serviceAccessor.getIdentityService();
+        final IdentityModelBuilder identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
+        final TransactionExecutor tenantTransactionExecutor = serviceAccessor.getTransactionExecutor();
+
+        final TransactionContentWithResult<SSession> txContent = new LoginAndRetrieveUser(loginService, identityService, identityModelBuilder, localTenantId,
+                userName, password);
+        try {
+            tenantTransactionExecutor.execute(txContent);
+        } catch (BonitaRuntimeException e) {
+            throw e.getCause();
+        }
+
+        return ModelConvertor.toAPISession(txContent.getResult(), sTenant.getName());
     }
 
-    private STenant getDefaultTenant() throws LoginException {
-        try {
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            final PlatformService platformService = platformServiceAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformServiceAccessor.getTransactionExecutor();
-            final GetDefaultTenantInstance getTenant = new GetDefaultTenantInstance(platformService);
-            transactionExecutor.execute(getTenant);
-            final STenant sTenant = getTenant.getResult();
-            if (!platformService.isTenantActivated(sTenant)) {
-                throw new LoginException("Tenant " + sTenant.getName() + " is not activated");
-            }
-            return sTenant;
-        } catch (final SBonitaException sbe) {
-            throw new LoginException(sbe);
-        } catch (final BonitaHomeNotSetException bhnse) {
-            throw new LoginException(bhnse);
-        } catch (final InstantiationException ie) {
-            throw new LoginException(ie);
-        } catch (final IllegalAccessException iae) {
-            throw new LoginException(iae);
-        } catch (final ClassNotFoundException cnfe) {
-            throw new LoginException(cnfe);
-        } catch (final IOException ioe) {
-            throw new LoginException(ioe);
-        } catch (final BonitaHomeConfigurationException bhce) {
-            throw new LoginException(bhce);
-        } catch (final RuntimeException re) { // FIXME
-            throw new LoginException(re);
+    private class LoginAndRetrieveUser implements TransactionContentWithResult<SSession> {
+
+        private final LoginService loginService;
+
+        private final IdentityService identityService;
+
+        private final long tenantId;
+
+        private final String userName;
+
+        private final String password;
+
+        private final IdentityModelBuilder identityModelBuilder;
+
+        private SSession session;
+
+        public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService, final IdentityModelBuilder identityModelBuilder,
+                final long tenantId, final String userName, final String password) {
+            this.loginService = loginService;
+            this.identityService = identityService;
+            this.identityModelBuilder = identityModelBuilder;
+            this.tenantId = tenantId;
+            this.userName = userName;
+            this.password = password;
+
         }
+
+        @Override
+        public SSession getResult() {
+            return session;
+        }
+
+        @Override
+        public void execute() throws SBonitaException {
+            SessionAccessor sessionAccessor = null;
+            try {
+                session = loginService.login(tenantId, userName, password);
+                if (!session.isTechnicalUser()) {
+                    sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+                    sessionAccessor.setSessionInfo(session.getId(), tenantId);
+                    SUser sUser = identityService.getUserByUserName(userName);
+                    final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
+                    final long lastConnection = System.currentTimeMillis();
+                    final EntityUpdateDescriptor updateDescriptor = userUpdateBuilder.updateLastConnection(lastConnection).done();
+                    final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null, null);
+                    updateUser.execute();
+                }
+            } catch (Exception e) {
+                throw new BonitaRuntimeException(e);
+            } finally {
+                if (sessionAccessor != null) {
+                    sessionAccessor.deleteSessionId();
+                }
+            }
+        }
+
     }
 
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {

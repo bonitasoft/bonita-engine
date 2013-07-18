@@ -78,7 +78,8 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private static final List<String> nonTxMethodNames = Arrays.asList("deleteProcessInstances", "deleteProcess");
+    private static final List<String> nonTxMethodNames = Arrays.asList("deleteProcessInstances", "deleteProcess", "deleteProcesses", "disableAndDelete",
+            "disableProcess", "login");
 
     private static final List<String> nonTxInterfaceNames = Arrays.asList("org.bonitasoft.engine.api.PlatformAPI");
 
