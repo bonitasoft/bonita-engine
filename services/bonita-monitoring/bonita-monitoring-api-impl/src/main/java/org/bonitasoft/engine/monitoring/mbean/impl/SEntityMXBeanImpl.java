@@ -127,7 +127,7 @@ public class SEntityMXBeanImpl implements SEntityMXBean {
 
         long sessionId = -1;
         try {
-            sessionId = MBeanUtil.createSesssion(transactionSvc, sessionAccessor, sessionService, tenantId, username);
+            sessionId = MBeanUtil.createSesssion(sessionAccessor, sessionService, tenantId, username);
             transactionSvc.begin();
             numberOfUsers = monitoringService.getNumberOfUsers();
 

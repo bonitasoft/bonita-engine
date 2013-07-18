@@ -68,20 +68,10 @@ public class MBeanUtil {
         return ManagementFactory.getThreadMXBean();
     }
 
-    public static long createSesssion(final TransactionService transactionSvc, final SessionAccessor sessionAccessor, final SessionService sessionService,
+    public static long createSesssion(final SessionAccessor sessionAccessor, final SessionService sessionService,
             final long tenantId, final String username) throws Exception {
-        SSession session = null;
-        try {
-            transactionSvc.begin();
-            session = sessionService.createSession(tenantId, username);
-            sessionAccessor.setSessionInfo(session.getId(), tenantId);
-
-        } catch (final Exception e) {
-            transactionSvc.setRollbackOnly();
-            throw e;
-        } finally {
-            transactionSvc.complete();;
-        }
+        final SSession session = sessionService.createSession(tenantId, username);
+        sessionAccessor.setSessionInfo(session.getId(), tenantId);
         return session.getId();
     }
 

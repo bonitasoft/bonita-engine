@@ -75,7 +75,7 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
 
     private void addMBeans() {
         final SEntityMXBean entityBean = new SEntityMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
-        final SServiceMXBean serviceBean = new SServiceMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
+        final SServiceMXBean serviceBean = new SServiceMXBeanImpl(this, sessionAccessor, sessionService);
         addMBean(entityBean);
         addMBean(serviceBean);
     }

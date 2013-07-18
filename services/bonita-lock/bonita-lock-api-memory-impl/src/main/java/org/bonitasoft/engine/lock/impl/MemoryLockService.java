@@ -67,7 +67,17 @@ public class MemoryLockService implements LockService {
         }
         final String key = getKey(objectToLockId, objectType);
         ensureProcessHasLockObject(key);
+        
+        final long before = System.currentTimeMillis();
         readWriteLock.get(key).writeLock().lock();
+        final long after = System.currentTimeMillis();
+        final long time = after - before;
+        if (time > 50) {
+        	System.err.println("EXCLUSIVE LOCK ON: " + key + " took " + time + "ms. Stack:");
+        	Thread.dumpStack();
+        }
+        
+        
         if (debugEnabled) {
             logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]acquired X id=" + objectToLockId + ", type=" + objectType);
         }
@@ -99,6 +109,17 @@ public class MemoryLockService implements LockService {
         final String key = getKey(objectToLockId, objectType);
         ensureProcessHasLockObject(key);
         readWriteLock.get(key).readLock().lock();
+        
+        final long before = System.currentTimeMillis();
+        readWriteLock.get(key).readLock().lock();
+        final long after = System.currentTimeMillis();
+        final long time = after - before;
+        if (time > 50) {
+        	System.err.println("SHARED LOCK ON: " + key + " took " + time + "ms. Stack:");
+        	Thread.dumpStack();
+        }
+        
+        
         if (debugEnabled) {
             logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]acquired S id=" + objectToLockId + ", type=" + objectType);
         }

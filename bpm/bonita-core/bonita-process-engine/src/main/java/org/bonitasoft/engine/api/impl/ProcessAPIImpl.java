@@ -506,7 +506,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         // 1 tx for deleting the process definition and co.
         try {
-            final TransactionContent deleteTrancastionContent = getDeleteTrancastionContent(processDefinitionId);
+            final TransactionContent deleteTrancastionContent = getDeleteTransactionContent(processDefinitionId);
             transactionExecutor.execute(deleteTrancastionContent);
             final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
             final File file = new File(processesFolder);
@@ -525,7 +525,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected TransactionContent getDeleteTrancastionContent(final long processDefinitionId) {
+    protected TransactionContent getDeleteTransactionContent(final long processDefinitionId) {
         return new DeleteProcess(getTenantAccessor(), processDefinitionId);
     }
 

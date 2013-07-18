@@ -46,8 +46,6 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
 
     private final TenantMonitoringService monitoringService;
 
-    private final TransactionService transactionSvc;
-
     private final SessionAccessor sessionAccessor;
 
     private final SessionService sessionService;
@@ -56,13 +54,12 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
 
     private long numberOfExecutingJobs = 0;
 
-    public SServiceMXBeanImpl(final TransactionService transactionSvc, final TenantMonitoringService monitoringService, final SessionAccessor sessionAccessor,
+    public SServiceMXBeanImpl(final TenantMonitoringService monitoringService, final SessionAccessor sessionAccessor,
             final SessionService sessionService) {
         this.monitoringService = monitoringService;
         this.sessionAccessor = sessionAccessor;
         mbserver = MBeanUtil.getMBeanServer();
         this.sessionService = sessionService;
-        this.transactionSvc = transactionSvc;
     }
 
     @Override
@@ -108,7 +105,7 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
     public long getNumberOfActiveTransactions() throws SMonitoringException {
         long sesssionId = -1;
         try {
-            sesssionId = MBeanUtil.createSesssion(transactionSvc, sessionAccessor, sessionService, tenantId, username);
+            sesssionId = MBeanUtil.createSesssion(sessionAccessor, sessionService, tenantId, username);
             numberOfactiveTransactions = monitoringService.getNumberOfActiveTransactions();
         } catch (final Exception e) {
             throw new SMonitoringException("Impossible to retrieve number of active transactions", e);
@@ -131,7 +128,7 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
     public long getNumberOfExecutingJobs() throws SMonitoringException {
         long sesssionId = -1;
         try {
-            sesssionId = MBeanUtil.createSesssion(transactionSvc, sessionAccessor, sessionService, tenantId, username);
+            sesssionId = MBeanUtil.createSesssion(sessionAccessor, sessionService, tenantId, username);
             numberOfExecutingJobs = monitoringService.getNumberOfExecutingJobs();
         } catch (final Exception e) {
             throw new SMonitoringException("Impossible to retrieve number of executing jobs", e);
