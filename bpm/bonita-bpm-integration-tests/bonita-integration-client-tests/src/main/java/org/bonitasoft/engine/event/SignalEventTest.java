@@ -55,7 +55,8 @@ public class SignalEventTest extends CommonAPITest {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("SayGO", "1.0").addStartEvent("Start").addEndEvent("End").addSignalEventTrigger("GO").addTransition("Start", "End");
+        builder.createNewInstance("SayGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start").addUserTask("step1", ACTOR_NAME).addEndEvent("End")
+                .addSignalEventTrigger("GO").addTransition("Start", "step1").addTransition("step1", "End");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive endSignalArchive = archiveBuilder.done();
 
@@ -65,24 +66,33 @@ public class SignalEventTest extends CommonAPITest {
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(builder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
 
-        final ProcessDefinition startSignal = deployAndEnableWithActor(startSignalArchive, ACTOR_NAME, john);
-        final ProcessDefinition endSignal = deployAndEnableProcess(endSignalArchive);
+        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableWithActor(startSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableWithActor(endSignalArchive, ACTOR_NAME, john);
 
         logout();
         loginWith("john", "bpm");
 
-        getProcessAPI().startProcess(endSignal.getId());
+        // Check that the process with trigger signal on start is not started, before send signal
+        final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
+        waitForUserTask("step1", processInstanceWithEndSignal.getId());
+        checkNbOfProcessInstances(1);
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 5000, true, 1, john);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("Task1", taskInstance.getName());
+        assertEquals("step1", taskInstances.get(0).getName());
 
-        disableAndDeleteProcess(startSignal);
-        disableAndDeleteProcess(endSignal);
+        // Send signal
+        assignAndExecuteStep(taskInstances.get(0), john.getId());
+        waitForProcessToFinish(processInstanceWithEndSignal.getId());
+
+        // Check that the process with trigger signal on start is started, after send signal
+        waitForUserTask("Task1");
+        taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        assertEquals(1, taskInstances.size());
+        assertEquals("Task1", taskInstances.get(0).getName());
+
+        disableAndDeleteProcess(processDefinitionWithStartSignal);
+        disableAndDeleteProcess(processDefinitionWithEndSignal);
     }
 
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal event",
