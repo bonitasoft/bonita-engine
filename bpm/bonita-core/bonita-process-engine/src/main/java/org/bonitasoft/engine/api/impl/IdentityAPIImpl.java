@@ -1067,7 +1067,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         try {
             final CreateUser createUser = new CreateUser(sUser, sPersonalData, sProfessionalData, tenantAccessor.getIdentityService(), tenantAccessor
                     .getIdentityModelBuilder().getUserContactInfoBuilder());
-            tenantAccessor.getTransactionExecutor().execute(createUser);
+            createUser.execute();
             return ModelConvertor.toUser(createUser.getResult());
         } catch (final SBonitaException sbe) {
             try {
