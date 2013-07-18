@@ -506,8 +506,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         // 1 tx for deleting the process definition and co.
         try {
-            final TransactionContent deleteTrancastionContent = getDeleteTransactionContent(processDefinitionId);
-            transactionExecutor.execute(deleteTrancastionContent);
+            final TransactionContent deleteTransactionContent = getDeleteTransactionContent(processDefinitionId);
+            transactionExecutor.execute(deleteTransactionContent);
             final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
             final File file = new File(processesFolder);
             if (!file.exists()) {
