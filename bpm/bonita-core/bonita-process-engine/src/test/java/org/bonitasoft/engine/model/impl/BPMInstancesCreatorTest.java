@@ -66,7 +66,7 @@ public class BPMInstancesCreatorTest {
 
     @Test
     public void testExecutionOrder() throws Exception {
-        final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, instanceBuilders, null, null, null, transactionExecutor,
+        final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, instanceBuilders, null, null, null,
                 connectorInstanceService, null, null, null);
         final SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
         when(instanceBuilders.getSConnectorInstanceBuilder()).thenReturn(connectorBuilder);

@@ -31,7 +31,6 @@ import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -119,8 +118,6 @@ public class BPMInstancesCreator {
 
     private final EventInstanceService eventInstanceService;
 
-    private final TransactionExecutor transactionExecutor;
-
     private final ConnectorInstanceService connectorInstanceService;
 
     private Map<SFlowNodeType, Integer> firstStateIds;
@@ -135,7 +132,7 @@ public class BPMInstancesCreator {
 
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService, final BPMInstanceBuilders instanceBuilders,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
-            final EventInstanceService eventInstanceService, final TransactionExecutor transactionExecutor,
+            final EventInstanceService eventInstanceService,
             final ConnectorInstanceService connectorInstanceService, final SDataInstanceBuilders sDataInstanceBuilders,
             final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService) {
         super();
@@ -144,7 +141,6 @@ public class BPMInstancesCreator {
         this.actorMappingService = actorMappingService;
         this.gatewayInstanceService = gatewayInstanceService;
         this.eventInstanceService = eventInstanceService;
-        this.transactionExecutor = transactionExecutor;
         this.connectorInstanceService = connectorInstanceService;
         this.sDataInstanceBuilders = sDataInstanceBuilders;
         this.expressionResolverService = expressionResolverService;
@@ -177,7 +173,7 @@ public class BPMInstancesCreator {
         } else {
             transactionContent = new CreateEventInstance((SEventInstance) flownNodeInstance, eventInstanceService);
         }
-        transactionExecutor.execute(transactionContent);
+        transactionContent.execute();
         createConnectorInstances(flownNodeInstance, sFlowNodeDefinition.getConnectors(), SConnectorInstance.FLOWNODE_TYPE);
         return flownNodeInstance;
     }
@@ -458,7 +454,7 @@ public class BPMInstancesCreator {
 
         final GetActor getSActor = new GetActor(actorMappingService, actorName, processDefinitionId);
         try {
-            transactionExecutor.execute(getSActor);
+            getSActor.execute();
         } catch (final SBonitaException sbe) {
             throw new SActorNotFoundException(sbe);
         }
@@ -500,7 +496,7 @@ public class BPMInstancesCreator {
                     .done());
         }
         final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
-        transactionExecutor.execute(transaction);
+        transaction.execute();
     }
 
     public void setFirstStateIds(final Map<SFlowNodeType, Integer> firstStateIds) {
@@ -545,7 +541,7 @@ public class BPMInstancesCreator {
             }
             if (expression != null) {
                 final EvaluateExpression evaluateExpression = new EvaluateExpression(expressionResolverService, currentExpressionContext, expression);
-                transactionExecutor.execute(evaluateExpression);
+                evaluateExpression.execute();
                 defaultValue = evaluateExpression.getResult();
             }
             final SDataInstanceBuilder sDataInstanceBuilder = sDataInstanceBuilders.getDataInstanceBuilder();
@@ -561,7 +557,7 @@ public class BPMInstancesCreator {
         if (hasLocalOrInheritedData(processDefinition, processContainer)) {
             final CreateSDataInstances transaction = new CreateSDataInstances(sDataInstances, dataInstanceService, processInstance, activityInstanceService,
                     instanceBuilders, processDefinition);
-            transactionExecutor.execute(transaction);
+            transaction.execute();
         }
     }
 
