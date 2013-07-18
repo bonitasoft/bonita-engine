@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -60,6 +62,8 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
  */
 public class PlatformServiceImpl implements PlatformService {
 
+    private static String CACHE_KEY = "PLATFORM";
+
     private final PersistenceService platformPersistenceService;
 
     private final List<TenantPersistenceService> tenantPersistenceServices;
@@ -72,12 +76,15 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final boolean error;
 
+    private final PlatformCacheService platformCacheService;
+
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final List<TenantPersistenceService> tenantPersistenceServices,
-            final STenantBuilder tenantBuilder, final TechnicalLoggerService logger) {
+            final STenantBuilder tenantBuilder, final TechnicalLoggerService logger, PlatformCacheService platformCacheService) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.tenantBuilder = tenantBuilder;
         this.logger = logger;
+        this.platformCacheService = platformCacheService;
         trace = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         error = logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR);
     }
@@ -255,6 +262,7 @@ public class PlatformServiceImpl implements PlatformService {
 
         try {
             platformPersistenceService.delete(platform);
+            platformCacheService.clear(CACHE_KEY);
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deletePlatform"));
             }
@@ -266,6 +274,8 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
             throw new SPlatformDeletionException("Unable to delete the platform row: " + e.getMessage(), e);
+        } catch (CacheException e) {
+            throw new SPlatformDeletionException("Unable to delete the platform from cache: " + e.getMessage(), e);
         }
     }
 
@@ -386,6 +396,25 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public SPlatform getPlatform() throws SPlatformNotFoundException {
+        try {
+            SPlatform sPlatform = (SPlatform) platformCacheService.get(CACHE_KEY, CACHE_KEY);
+            if (sPlatform == null) {
+                throw new SPlatformNotFoundException("platform not present in cache");
+            }
+            return sPlatform;
+        } catch (CacheException e) {
+            throw new SPlatformNotFoundException("platform not present in cache", e);
+        }
+    }
+
+    /* *************************
+     * The Platform is stored 1 time for each cache
+     * We do this because the cache service handle
+     * multi tenancy
+     * *************************
+     */
+    @Override
+    public SPlatform cachePlatform() throws SPlatformNotFoundException {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getPlatform"));
         }
@@ -398,6 +427,7 @@ public class PlatformServiceImpl implements PlatformService {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPlatform"));
             }
+            platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
             return platform;
         } catch (final Throwable e) {
             if (trace) {

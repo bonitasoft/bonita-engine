@@ -41,7 +41,8 @@ public interface PlatformService {
     String ACTIVATED = "ACTIVATED";
 
     /**
-     * Get the existed sPlatform
+     * Retrieve the platform from the cache
+     * No need to be in a transaction
      * 
      * @return sPlatform
      * @throws SPlatformNotFoundException
@@ -285,5 +286,13 @@ public interface PlatformService {
      * @throws SPlatformCreationException
      */
     void initializePlatformStructure() throws SPlatformCreationException;
+
+    /**
+     * Store platform in cache in order to avoid getting the platform in transaction
+     * 
+     * @return
+     * @throws SPlatformNotFoundException
+     */
+    SPlatform cachePlatform() throws SPlatformNotFoundException;
 
 }

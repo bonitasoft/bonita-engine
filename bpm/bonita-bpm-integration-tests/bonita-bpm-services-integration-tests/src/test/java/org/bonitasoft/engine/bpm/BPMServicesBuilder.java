@@ -21,6 +21,7 @@ import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
@@ -667,6 +668,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public ReportingService getReportingService() {
         return null;
+    }
+
+    @Override
+    public PlatformCacheService getPlatformCacheService() {
+        return accessor.getInstanceOf(PlatformCacheService.class);
     }
 
 }

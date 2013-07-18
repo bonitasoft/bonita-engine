@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,40 +20,30 @@ import java.util.Map;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheException;
-import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
+ * Platform version of the EhCacheCacheService
+ * 
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- * @author Hongwen Zang
  */
-public class EhCacheCacheService extends
-        CommonEhCacheCacheService implements CacheService {
+public class PlatformEhCacheCacheService extends
+        CommonEhCacheCacheService implements PlatformCacheService {
 
-    public EhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations,
+    public PlatformEhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations,
             URL configFile) {
         super(logger, sessionAccessor, cacheConfigurations, configFile);
     }
 
-    public EhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations) {
+    public PlatformEhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations) {
         super(logger, sessionAccessor, cacheConfigurations);
     }
 
-    /**
-     * @param cacheName
-     * @return
-     * @throws CacheException
-     */
     @Override
     protected String getKeyFromCacheName(final String cacheName) throws CacheException {
-        try {
-            return String.valueOf(sessionAccessor.getTenantId()) + '_' + cacheName;
-        } catch (final TenantIdNotSetException e) {
-            throw new CacheException(e);
-        }
+        return "P_" + cacheName;
     }
 
     @Override
@@ -61,15 +51,11 @@ public class EhCacheCacheService extends
         final String[] cacheNames = cacheManager.getCacheNames();
         final ArrayList<String> cacheNamesList = new ArrayList<String>(cacheNames.length);
         String prefix;
-        try {
-            prefix = String.valueOf(sessionAccessor.getTenantId()) + '_';
-            for (final String cacheName : cacheNames) {
-                if (cacheName.startsWith(prefix)) {
-                    cacheNamesList.add(getCacheNameFromKey(cacheName));
-                }
+        prefix = "P_";
+        for (final String cacheName : cacheNames) {
+            if (cacheName.startsWith(prefix)) {
+                cacheNamesList.add(getCacheNameFromKey(cacheName));
             }
-        } catch (final TenantIdNotSetException e) {
-            throw new RuntimeException(e);
         }
         return cacheNamesList;
     }

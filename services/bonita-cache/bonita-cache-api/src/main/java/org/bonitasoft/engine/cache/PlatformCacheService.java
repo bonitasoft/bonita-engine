@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,14 +13,15 @@
  */
 package org.bonitasoft.engine.cache;
 
+
 /**
- * Service that helps you to cache objects
+ * Service that helps you to cache objects on a pltform level
  * Objects must be stored in a specific cache and this cache must exists
  * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @since 6.0
  */
-public interface CacheService extends CommonCacheService {
+public interface PlatformCacheService extends CommonCacheService {
 
 }

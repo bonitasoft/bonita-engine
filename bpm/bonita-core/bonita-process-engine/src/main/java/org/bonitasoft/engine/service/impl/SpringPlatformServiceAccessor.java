@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.service.impl;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
@@ -83,6 +84,8 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private NodeConfiguration platformConfguration;
 
     private WorkService workService;
+
+    private PlatformCacheService platformCacheService;
 
     @Override
     public TransactionService getTransactionService() {
@@ -253,6 +256,14 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             workService = SpringPlatformFileSystemBeanAccessor.getService(WorkService.class);
         }
         return workService;
+    }
+
+    @Override
+    public PlatformCacheService getPlatformCacheService() {
+        if (platformCacheService == null) {
+            platformCacheService = SpringPlatformFileSystemBeanAccessor.getService(PlatformCacheService.class);
+        }
+        return platformCacheService;
     }
 
 }

@@ -31,8 +31,8 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteSessions;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
-import org.bonitasoft.engine.api.impl.transaction.platform.GetIsPlatformCreated;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
+import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshPlatformClassLoader;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshTenantClassLoaders;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
@@ -43,6 +43,7 @@ import org.bonitasoft.engine.command.SCommandAlreadyExistsException;
 import org.bonitasoft.engine.command.SCommandCreationException;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandBuilder;
+import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -61,7 +62,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -133,6 +133,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             txOpened = transactionExecutor.openTransaction();
             try {
                 platformService.createPlatform(platform);
+                platformService.cachePlatform();
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
@@ -672,7 +673,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContentWithResult<Boolean> transactionContent = new GetIsPlatformCreated(platformService);
+        final TransactionContentWithResult<Boolean> transactionContent = new IsPlatformCreated(platformService);
         try {
             transactionExecutor.execute(transactionContent);
             return transactionContent.getResult();
