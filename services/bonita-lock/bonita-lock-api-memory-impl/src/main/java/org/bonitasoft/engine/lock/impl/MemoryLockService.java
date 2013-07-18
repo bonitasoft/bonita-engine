@@ -108,7 +108,6 @@ public class MemoryLockService implements LockService {
         }
         final String key = getKey(objectToLockId, objectType);
         ensureProcessHasLockObject(key);
-        readWriteLock.get(key).readLock().lock();
         
         final long before = System.currentTimeMillis();
         readWriteLock.get(key).readLock().lock();
