@@ -28,7 +28,6 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -402,11 +401,11 @@ public class SchedulerImpl implements SchedulerService {
         }
         SSession session = null;
         try {
-            transactionService.begin();
-            // this.saveTenantId2Session(jobIdentifier.getTenantId()); // TODO: (HUI) set tenantID here
+            
             session = sessionService.createSession(jobIdentifier.getTenantId(), "scheduler");// FIXME get the technical user of the tenant
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
-
+            
+            transactionService.begin();
             final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(new SelectByIdDescriptor<SJobDescriptorImpl>("getSJobDescriptorImplById",
                     SJobDescriptorImpl.class, jobIdentifier.getId()));
             // FIXME do something here if the job does not exists
@@ -427,30 +426,6 @@ public class SchedulerImpl implements SchedulerService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPersistedJob"));
             }
             return jobWrapper;
-        } catch (final SBonitaReadException e) {
-            if (traceEnabled) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e));
-            }
-            try {
-                transactionService.setRollbackOnly();
-            } catch (final STransactionException e1) {
-                if (errorEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
-                }
-            }
-            throw new SSchedulerException("Unable to find the job descriptor", e);
-        } catch (final ClassNotFoundException e) {
-            if (traceEnabled) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e));
-            }
-            try {
-                transactionService.setRollbackOnly();
-            } catch (final STransactionException e1) {
-                if (errorEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
-                }
-            }
-            throw new SSchedulerException("The job class couldn't be found", e);
         } catch (final Exception e) {
             if (traceEnabled) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e));

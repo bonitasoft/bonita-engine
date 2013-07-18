@@ -38,7 +38,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.scheduler.SSchedulerException;
@@ -56,7 +55,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Matthieu Chaffotte
@@ -174,16 +172,10 @@ public class ServerAPIImpl implements ServerAPI {
             STransactionRollbackException, STransactionException, BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, BonitaHomeConfigurationException, IOException, SSessionException, ClassLoaderException, STenantNotFoundException,
             SSchedulerException, org.bonitasoft.engine.session.SSessionException {
-        // boolean hasSetSessionAccessor = false;
         SessionAccessor sessionAccessor = null;
-        TransactionService txService = null;
 
-        try {
             final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
             final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
-
-            txService = platformServiceAccessor.getTransactionService();
-            txService.begin();
 
             ClassLoader serverClassLoader = null;
             final Session session = (Session) options.get("session");
@@ -225,11 +217,6 @@ public class ServerAPIImpl implements ServerAPI {
                 Thread.currentThread().setContextClassLoader(serverClassLoader);
             }
             return sessionAccessor;
-        } finally {
-            if (txService != null && txService.isTransactionActive()) {
-                txService.complete();
-            }
-        }
     }
 
     private SessionType getSessionType(final Session session) {
@@ -277,10 +264,6 @@ public class ServerAPIImpl implements ServerAPI {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "The scheduler is not started!");
         }
         final APISession apiSession = (APISession) session;
-        final STenant tenant = platformAccessor.getPlatformService().getTenant(apiSession.getTenantId());
-        if (!PlatformService.ACTIVATED.equals(tenant.getStatus())) {
-            throw new InvalidSessionException("The tenantd is not activated");
-        }
         final TenantServiceAccessor tenantAccessor = platformAccessor.getTenantServiceAccessor(apiSession.getTenantId());
         final LoginService tenantLoginService = tenantAccessor.getLoginService();
         if (!tenantLoginService.isValid(apiSession.getId())) {

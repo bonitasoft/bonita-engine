@@ -55,12 +55,12 @@ public abstract class AbstractBonitaWork implements Runnable {
     public void run() {
         SSession session = null;
         try {
+            session = sessionService.createSession(tenantId, "scheduler");// FIXME get the technical user of the tenant
+            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
+
             if (isTransactional()) {
                 transactionService.begin();
             }
-            session = createSession();// FIXME get the technical user of the tenant
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
-
             // FIXME: change log level:
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Starting work :" + getDescription());
             work();
@@ -93,26 +93,6 @@ public abstract class AbstractBonitaWork implements Runnable {
                 }
             }
         }
-    }
-
-    private SSession createSession() throws SBonitaException {
-        SSession session = null;
-        try {
-            if (!isTransactional()) {
-                transactionService.begin();
-            }
-            session = sessionService.createSession(tenantId, "scheduler");
-        } catch (final SBonitaException e) {
-            if (!isTransactional()) {
-                transactionService.setRollbackOnly();
-            }
-            throw e;
-        } finally {
-            if (!isTransactional()) {
-                transactionService.complete();
-            }
-        }
-        return session;
     }
 
     public void setTechnicalLogger(final TechnicalLoggerService loggerService) {
