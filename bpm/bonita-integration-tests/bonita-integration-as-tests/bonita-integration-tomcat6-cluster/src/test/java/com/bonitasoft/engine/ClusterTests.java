@@ -10,15 +10,30 @@ package com.bonitasoft.engine;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.ApiAccessType;
+import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.connector.AbstractConnector;
+import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnableToReadBonitaClientConfiguration;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 /**
  * 
@@ -60,8 +76,10 @@ public class ClusterTests extends CommonAPISPTest {
         logout();
         // init the context here
         changeToNode2();
-        loginWith(USERNAME, PASSWORD);
+        login();
+        logout();
         changeToNode1();
+        loginWith(USERNAME, PASSWORD);
     }
 
     @After
@@ -101,13 +119,55 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     @Test
-    public void createUserAndGetItOnOtherNode() throws Exception {
+    public void useSameSessionOnBothNodes() throws Exception {
         User createUser = getIdentityAPI().createUser("john", "bpm", "John", "Doe");
         changeToNode2();
         User userByUserName = getIdentityAPI().getUserByUserName("john");
         assertEquals(createUser, userByUserName);
         getIdentityAPI().deleteUser("john");
 
+    }
+
+    @Test
+    public void classLoaderClustered() throws Exception {
+
+        // Input expression
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+                "1.0");
+        designProcessDefinition.addActor("actor");
+        UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", "actor");
+        addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
+        addUserTask
+                .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
+                .addOutput(
+                        new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
+                designProcessDefinition.done());
+
+        addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl",
+                "TestConnectorWithOutput.impl",
+                TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
+
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
+        addMappingOfActorsForUser("actor", user.getId(), processDefinition);
+        getProcessAPI().enableProcess(processDefinition.getId());
+
+        // start it on node 2
+        changeToNode2();
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(user.getId(), 1);
+        assertEquals("inputValue", getProcessAPI().getActivityDataInstance("text", waitForPendingTasks.get(0).getId()).getValue());
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
+            final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
+        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
+        bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
 
 }
