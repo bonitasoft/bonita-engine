@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.activity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,11 +70,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -435,7 +435,7 @@ public class CallActivityTest extends CommonAPITest {
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
     @Test
-    public void testMultiLevelCallActivity() throws Exception {
+    public void multiLevelCallActivity() throws Exception {
         variableMultiLevelCallActivity(10);
     }
 
@@ -521,7 +521,7 @@ public class CallActivityTest extends CommonAPITest {
 
     @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" })
     @Test
-    public void testGetArchivedCallActivityInstance() throws Exception {
+    public void getArchivedCallActivityInstance() throws Exception {
 
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
