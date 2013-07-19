@@ -133,7 +133,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             txOpened = transactionExecutor.openTransaction();
             try {
                 platformService.createPlatform(platform);
-                platformService.cachePlatform();
+                platformService.getPlatform();
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }

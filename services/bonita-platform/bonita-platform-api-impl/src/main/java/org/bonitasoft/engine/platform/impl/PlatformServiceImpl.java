@@ -128,6 +128,7 @@ public class PlatformServiceImpl implements PlatformService {
         // if platform doesn't exist, insert it
         try {
             platformPersistenceService.insert(platform);
+            cachePlatform(platform);
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createPlatform"));
             }
@@ -139,7 +140,15 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
             throw new SPlatformCreationException("Unable to insert the platform row: " + e.getMessage(), e);
-        }
+        } catch (CacheException e) {
+        	if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatform", e));
+            }
+            if (error) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            }
+            throw new SPlatformCreationException("Unable to cache the platform: " + e.getMessage(), e);
+		}
     }
 
     @Override
@@ -248,7 +257,7 @@ public class PlatformServiceImpl implements PlatformService {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deletePlatform"));
         }
-        final SPlatform platform = getPlatform();
+        final SPlatform platform = readPlatform();
         List<STenant> existingTenants;
         try {
             existingTenants = getTenants(QueryOptions.defaultQueryOptions());
@@ -413,9 +422,12 @@ public class PlatformServiceImpl implements PlatformService {
      * multi tenancy
      * *************************
      */
-    @Override
-    public SPlatform cachePlatform() throws SPlatformNotFoundException {
-        if (trace) {
+    private void cachePlatform(final SPlatform platform) throws CacheException {
+        platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
+    }
+    
+    private SPlatform readPlatform() throws SPlatformNotFoundException {
+    	if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getPlatform"));
         }
         SPlatform platform = null;
@@ -427,7 +439,6 @@ public class PlatformServiceImpl implements PlatformService {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPlatform"));
             }
-            platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
             return platform;
         } catch (final Throwable e) {
             if (trace) {

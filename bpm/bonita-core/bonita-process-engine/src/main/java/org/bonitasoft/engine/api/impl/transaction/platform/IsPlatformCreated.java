@@ -33,7 +33,7 @@ public class IsPlatformCreated implements TransactionContentWithResult<Boolean> 
 
     @Override
     public void execute() throws SBonitaException {
-        platformService.cachePlatform();
+        platformService.getPlatform();
         created = platformService.isPlatformCreated();
     }
 

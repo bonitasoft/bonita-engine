@@ -287,12 +287,4 @@ public interface PlatformService {
      */
     void initializePlatformStructure() throws SPlatformCreationException;
 
-    /**
-     * Store platform in cache in order to avoid getting the platform in transaction
-     * 
-     * @return
-     * @throws SPlatformNotFoundException
-     */
-    SPlatform cachePlatform() throws SPlatformNotFoundException;
-
 }

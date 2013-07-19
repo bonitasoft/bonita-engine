@@ -56,7 +56,7 @@ public class RefreshPlatformClassLoader implements TransactionContentWithResult<
             }
         } while (tenants.size() == maxResults);
         // reput the platform in cache at the node start
-        platformService.cachePlatform();
+        platformService.getPlatform();
     }
 
     @Override
