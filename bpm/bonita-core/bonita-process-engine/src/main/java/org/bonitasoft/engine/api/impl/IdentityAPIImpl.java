@@ -36,8 +36,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroups;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRoles;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUser;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUserMembership;
-import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUserMemberships;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUsers;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetGroupByPath;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetGroups;
@@ -1244,12 +1242,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteUserMembership(final long userMembershipId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final DeleteUserMembership deleteMembership = new DeleteUserMembership(userMembershipId, identityService);
+
         try {
-            deleteMembership.call();
-        } catch (final SBonitaException e) {
+            identityService.deleteUserMembership(userMembershipId);
+        } catch (final SIdentityException e) {
             throw new DeletionException(e);
         }
     }
@@ -1257,13 +1254,12 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteUserMembership(final long userId, final long groupId, final long roleId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
+
         try {
-            final DeleteUserMembership transactionContent = new DeleteUserMembership(userId, groupId, roleId, identityService);
-            transactionContent.call();
-        } catch (final SBonitaException sbe) {
-            throw new DeletionException(sbe);
+            identityService.deleteUserMembership(identityService.getLightUserMembership(userId, groupId, roleId));
+        } catch (final SIdentityException e) {
+            throw new DeletionException(e);
         }
     }
 
@@ -1272,11 +1268,13 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
 
-        final TransactionContent transactionContent = new DeleteUserMemberships(groupId, userIds, identityService, roleId);
         try {
-            transactionContent.execute();
-        } catch (final SBonitaException sbe) {
-            throw new DeletionException(sbe);
+            for (final long userId : userIds) {
+                final SUserMembership userMembership = identityService.getLightUserMembership(userId, groupId, roleId);
+                identityService.deleteUserMembership(userMembership);
+            }
+        } catch (final SIdentityException e) {
+            throw new DeletionException(e);
         }
     }
 
