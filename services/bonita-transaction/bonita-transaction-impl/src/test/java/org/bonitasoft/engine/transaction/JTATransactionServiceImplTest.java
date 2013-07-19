@@ -1,11 +1,13 @@
 package org.bonitasoft.engine.transaction;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.concurrent.Callable;
 
 import javax.transaction.Status;
 import javax.transaction.TransactionManager;
@@ -64,6 +66,69 @@ public class JTATransactionServiceImplTest {
         } catch (STransactionCreationException e) {
             verify(txManager, times(1)).rollback();
         }
+    }
+
+    @Test
+    public void setRollbackOnly() throws Exception {
+        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        TransactionManager txManager = mock(TransactionManager.class);
+        EventService eventService = mock(EventService.class);
+
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
+
+        txService.setRollbackOnly();
+        verify(txManager).setRollbackOnly();
+    }
+
+    /**
+     * The method call has to be executed between a transaction.
+     * @throws Exception
+     */
+    @Test
+    public void testExecuteInTransactionWithCommit() throws Exception {
+        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        TransactionManager txManager = mock(TransactionManager.class);
+        EventService eventService = mock(EventService.class);
+
+        when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
+
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
+        Callable<Void> callable = mock(Callable.class);
+
+        txService.executeInTransaction(callable);
+        
+        verify(txManager).begin();
+        verify(callable).call();
+        verify(txManager).commit();
+    }
+
+    /**
+     * The method call has to be executed between a transaction.
+     * @throws Exception
+     */
+    @Test
+    public void testExecuteInTransactionWithRollback() throws Exception {
+        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        TransactionManager txManager = mock(TransactionManager.class);
+        EventService eventService = mock(EventService.class);
+
+        // First to allow to start the transaction, then to force to call rollback
+        when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_MARKED_ROLLBACK);
+
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
+        
+        Callable<Void> callable = mock(Callable.class);
+        when(callable.call()).thenThrow(new Exception("Mocked exception"));
+
+        try {
+            txService.executeInTransaction(callable);
+            fail("An exception should have been thrown.");
+        } catch (Exception e) {
+        }
+        verify(txManager).begin();
+        verify(callable).call();
+        verify(txManager).setRollbackOnly();
+        verify(txManager).rollback();
     }
 
 }

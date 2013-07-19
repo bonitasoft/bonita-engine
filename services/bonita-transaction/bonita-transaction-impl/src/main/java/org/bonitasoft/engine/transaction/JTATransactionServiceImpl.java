@@ -15,6 +15,7 @@ package org.bonitasoft.engine.transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
@@ -222,8 +223,17 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
-        return synchronizations;
+    public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+        begin();
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            setRollbackOnly();
+            throw e;
+        } finally {
+            complete();
+        }
+        
     }
 
 }
