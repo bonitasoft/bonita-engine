@@ -137,7 +137,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
                 flowNodeInstance.getRootContainerId(), flowNodeInstance.getParentContainerId());
         builder.setParentActivityInstanceId(flowNodeInstance.getId());
         final SThrowEventInstance done = (SThrowEventInstance) builder.done();
-        new CreateEventInstance(done, eventInstanceService).execute();
+        new CreateEventInstance(done, eventInstanceService).call();
         return done;
     }
 

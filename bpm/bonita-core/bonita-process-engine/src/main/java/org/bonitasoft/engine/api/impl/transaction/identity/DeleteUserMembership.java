@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.identity;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -20,7 +22,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 /**
  * @author Bole Zhang
  */
-public class DeleteUserMembership implements TransactionContent {
+public class DeleteUserMembership implements Callable<Void> {
 
     private final IdentityService identityService;
 
@@ -49,12 +51,13 @@ public class DeleteUserMembership implements TransactionContent {
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public Void call() throws SBonitaException {
         if (userMembershipId == -1) {
             identityService.deleteUserMembership(identityService.getLightUserMembership(userId, groupId, roleId));
         } else {
             identityService.deleteUserMembership(userMembershipId);
         }
+        return null;
     }
 
 }

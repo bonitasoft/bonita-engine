@@ -30,7 +30,6 @@ import org.bonitasoft.engine.api.impl.transaction.data.CreateSDataInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -165,15 +164,13 @@ public class BPMInstancesCreator {
         final SFlowNodeInstance flownNodeInstance = toFlowNodeInstance(sProcessDefinition.getId(), rootContainerId, parentContainerId, parentContainerType,
                 sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, createInnerActivity, loopCounter, stateCategory,
                 relatedActivityInstanceId, tokenRefId);
-        final TransactionContent transactionContent;
         if (SFlowNodeType.GATEWAY.equals(flownNodeInstance.getType())) {
-            transactionContent = new CreateGatewayInstance((SGatewayInstance) flownNodeInstance, gatewayInstanceService);
+            new CreateGatewayInstance((SGatewayInstance) flownNodeInstance, gatewayInstanceService).call();
         } else if (flownNodeInstance instanceof SActivityInstance) {
-            transactionContent = new CreateActivityInstance((SActivityInstance) flownNodeInstance, activityInstanceService);
+            new CreateActivityInstance((SActivityInstance) flownNodeInstance, activityInstanceService).call();
         } else {
-            transactionContent = new CreateEventInstance((SEventInstance) flownNodeInstance, eventInstanceService);
+            new CreateEventInstance((SEventInstance) flownNodeInstance, eventInstanceService).call();
         }
-        transactionContent.execute();
         createConnectorInstances(flownNodeInstance, sFlowNodeDefinition.getConnectors(), SConnectorInstance.FLOWNODE_TYPE);
         return flownNodeInstance;
     }

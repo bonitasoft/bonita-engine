@@ -42,7 +42,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
@@ -608,8 +607,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 final SFlowNodeInstance flowNodeInstance = bpmInstancesCreator.toFlowNodeInstance(sDefinition.getId(), transitionInstance.getRootContainerId(),
                         transitionInstance.getParentContainerId(), SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId,
                         parentProcessInstanceId, true, -1, stateCategory, -1, fTransitionInstance.getTokenRefId());
-                final TransactionContent transactionContent = new CreateEventInstance((SEventInstance) flowNodeInstance, eventInstanceService);
-                transactionContent.execute();
+                new CreateEventInstance((SEventInstance) flowNodeInstance, eventInstanceService).call();
                 nextFlowNodeInstanceId = flowNodeInstance.getId();
                 toExecute = true;
             }

@@ -1248,7 +1248,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final DeleteUserMembership deleteMembership = new DeleteUserMembership(userMembershipId, identityService);
         try {
-            deleteMembership.execute();
+            deleteMembership.call();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -1260,8 +1260,8 @@ public class IdentityAPIImpl implements IdentityAPI {
 
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final TransactionContent transactionContent = new DeleteUserMembership(userId, groupId, roleId, identityService);
-            transactionContent.execute();
+            final DeleteUserMembership transactionContent = new DeleteUserMembership(userId, groupId, roleId, identityService);
+            transactionContent.call();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
