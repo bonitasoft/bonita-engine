@@ -545,7 +545,7 @@ public class StateBehaviors {
         final OperationsWithContext operations = new OperationsWithContext(context, operationList);
         final SProcessDefinition targetPRocessDefinition = processDefinitionService.getProcessDefinition(targetProcessDefinitionId);
         final InstantiateProcessWork instantiateProcessWork = new InstantiateProcessWork(targetPRocessDefinition, operations, processExecutor,
-                processInstanceService, activityInstanceService, null, logger, bpmInstancesCreator, transactionExecutor);
+                processInstanceService, activityInstanceService, null, logger, bpmInstancesCreator);
         instantiateProcessWork.setCallerId(callerId);
         workService.registerWork(instantiateProcessWork);
     }

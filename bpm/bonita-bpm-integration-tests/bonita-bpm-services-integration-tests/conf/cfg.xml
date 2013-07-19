@@ -161,7 +161,6 @@
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService"/>
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor"/>
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
 		<constructor-arg name="containerRegistry" ref="containerRegistry"/>
 		<constructor-arg name="workService" ref="workService"/>

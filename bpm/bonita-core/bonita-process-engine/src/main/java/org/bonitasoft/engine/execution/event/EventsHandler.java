@@ -21,7 +21,6 @@ import java.util.Set;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
@@ -95,8 +94,6 @@ public class EventsHandler {
 
     private final Map<SEventTriggerType, EventHandlerStrategy> handlers;
 
-    private final TransactionExecutor transactionExecutor;
-
     private final ContainerRegistry containerRegistry;
 
     private final WorkService workService;
@@ -122,12 +119,11 @@ public class EventsHandler {
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders, final BPMDefinitionBuilders bpmDefinitionBuilders,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final TransactionExecutor transactionExecutor, final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
+            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
             final WorkService workService, final ProcessInstanceService processInstanceService, final LockService lockService, final TokenService tokenService,
             final TechnicalLoggerService logger) {
         this.bpmDefinitionBuilders = bpmDefinitionBuilders;
         this.eventInstanceService = eventInstanceService;
-        this.transactionExecutor = transactionExecutor;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
         this.workService = workService;
@@ -339,7 +335,7 @@ public class EventsHandler {
                 triggerCatchEvent(waitingEvent, eventType, processDefinitionId, flowNodeInstanceId, operations);
             }
         };
-        transactionExecutor.execute(transactionContent);
+        transactionContent.execute();
     }
 
     private void triggerInTransaction(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final OperationsWithContext operations,
@@ -353,7 +349,7 @@ public class EventsHandler {
                         rootProcessInstanceId, isInterrupting);
             }
         };
-        transactionExecutor.execute(transactionContent);
+        transactionContent.execute();
     }
 
     private void triggerCatchEvent(final SWaitingEvent waitingEvent, final SBPMEventType eventType, final Long processDefinitionId,
@@ -384,7 +380,7 @@ public class EventsHandler {
         tokenService.createToken(parentProcessInstanceId, parentProcessInstance.getProcessDefinitionId(), null);
         final InstantiateProcessWork work;
         work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations, processExecutor,
-                processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator, transactionExecutor);
+                processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator);
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
@@ -423,7 +419,7 @@ public class EventsHandler {
     private void instantiate(final long processDefinitionId, final OperationsWithContext operations) throws WorkRegisterException,
             SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations,
-                processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator, transactionExecutor);
+                processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator);
         workService.registerWork(work);
     }
 

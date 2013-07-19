@@ -19,7 +19,6 @@ import java.util.Map;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProvider;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -47,12 +46,11 @@ public class SearchWaitingEventsCommand extends CommandWithParameters {
             throws SCommandParameterizationException, SCommandExecutionException {
         final EventInstanceService eventInstanceService = serviceAccessor.getEventInstanceService();
         final SWaitingEventKeyProvider waitingEventKeyProvider = serviceAccessor.getBPMInstanceBuilders().getSWaitingMessageEventBuilder();
-        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
         final SearchOptions searchOptions = getMandatoryParameter(parameters, SEARCH_OPTIONS_KEY, "Missing mandatory field: " + SEARCH_OPTIONS_KEY);
         final SearchWaitingEvents searchWaitingEvents = new SearchWaitingEvents(new SearchWaitingEventSerchDescriptor(waitingEventKeyProvider), searchOptions,
                 eventInstanceService);
         try {
-            transactionExecutor.execute(searchWaitingEvents);
+            searchWaitingEvents.execute();
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }

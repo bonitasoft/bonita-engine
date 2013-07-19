@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
@@ -61,11 +60,9 @@ public class InstantiateProcessWork extends TxBonitaWork {
 
     private final BPMInstancesCreator bpmInstancesCreator;
 
-    private final TransactionExecutor transactionExecutor;
-
     public InstantiateProcessWork(final SProcessDefinition processDefinition, final OperationsWithContext operations, final ProcessExecutor processExecutor,
             final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final LockService lockService,
-            final TechnicalLoggerService logger, final BPMInstancesCreator bpmInstancesCreator, final TransactionExecutor transactionExecutor) {
+            final TechnicalLoggerService logger, final BPMInstancesCreator bpmInstancesCreator) {
         this.processDefinition = processDefinition;
         this.operations = operations;
         this.processExecutor = processExecutor;
@@ -74,7 +71,6 @@ public class InstantiateProcessWork extends TxBonitaWork {
         this.lockService = lockService;
         this.logger = logger;
         this.bpmInstancesCreator = bpmInstancesCreator;
-        this.transactionExecutor = transactionExecutor;
     }
 
     @Override
