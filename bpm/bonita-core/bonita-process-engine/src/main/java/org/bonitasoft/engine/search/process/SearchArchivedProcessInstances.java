@@ -42,13 +42,13 @@ public class SearchArchivedProcessInstances extends AbstractArchivedProcessInsta
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processInstanceService.getNumberOfArchivedProcessInstances(searchOptions, persistenceService);
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+        return processInstanceService.getNumberOfArchivedProcessInstances(queryOptions, persistenceService);
     }
 
     @Override
-    public List<SAProcessInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processInstanceService.searchArchivedProcessInstances(searchOptions, persistenceService);
+    public List<SAProcessInstance> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+        return processInstanceService.searchArchivedProcessInstances(queryOptions, persistenceService);
     }
 
 }

@@ -88,7 +88,7 @@ public class ServerAPIImpl implements ServerAPI {
 	@Override
 	public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
 			final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-		System.err.println("Calling method " + methodName + " on class " + apiInterfaceName);
+		//System.err.println("Calling method " + methodName + " on class " + apiInterfaceName);
 		final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
 		SessionAccessor sessionAccessor = null;
 		try {
