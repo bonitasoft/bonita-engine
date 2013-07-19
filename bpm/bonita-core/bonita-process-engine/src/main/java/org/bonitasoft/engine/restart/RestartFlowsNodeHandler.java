@@ -15,7 +15,6 @@ package org.bonitasoft.engine.restart;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -25,7 +24,6 @@ import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -36,41 +34,31 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
 
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
-        final TransactionExecutor transactionExecutor = tenantServiceAccessor.getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
         List<SFlowNodeInstance> flowNodes;
         final WorkService workService = platformServiceAccessor.getWorkService();
         final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
-                final int processInstanceIndex = bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex();
-                do {
-                    flowNodes = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
-                    queryOptions = QueryOptions.getNextPage(queryOptions);
-                    for (final SFlowNodeInstance flowNodeInstance : flowNodes) {
-                        workService.registerWork(new ExecuteFlowNodeWork(processExecutor, flowNodeInstance.getId(), null, null, flowNodeInstance
-                                .getLogicalGroup(processInstanceIndex)));
-                    }
-                } while (flowNodes.size() == queryOptions.getNumberOfResults());
-            } catch (final WorkRegisterException e) {
-                handleException(transactionExecutor, e, "Unable to restart flowNodes: can't register work");
-            } catch (final SFlowNodeReadException e) {
-                handleException(transactionExecutor, e, "Unable to restart flowNodes: can't read flow nodes");
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
-            throw new RestartException("Unable to restart transitions: issue with transaction", e);
+            final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
+            final int processInstanceIndex = bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex();
+            do {
+                flowNodes = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
+                queryOptions = QueryOptions.getNextPage(queryOptions);
+                for (final SFlowNodeInstance flowNodeInstance : flowNodes) {
+                    workService.registerWork(new ExecuteFlowNodeWork(processExecutor, flowNodeInstance.getId(), null, null, flowNodeInstance
+                            .getLogicalGroup(processInstanceIndex)));
+                }
+            } while (flowNodes.size() == queryOptions.getNumberOfResults());
+        } catch (final WorkRegisterException e) {
+            handleException(e, "Unable to restart flowNodes: can't register work");
+        } catch (final SFlowNodeReadException e) {
+            handleException(e, "Unable to restart flowNodes: can't read flow nodes");
         }
 
     }
 
-    private void handleException(final TransactionExecutor transactionExecutor, final Exception e, final String message) throws STransactionException,
-            RestartException {
-        transactionExecutor.setTransactionRollback();
+    private void handleException(final Exception e, final String message) throws RestartException {
         throw new RestartException(message, e);
     }
 }

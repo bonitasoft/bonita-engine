@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -82,7 +83,6 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.restart.RestartException;
 import org.bonitasoft.engine.restart.TenantRestartHandler;
 import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -95,6 +95,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -119,25 +120,24 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new CreationException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+        final TransactionService transactionService = platformAccessor.getTransactionService();
         final SPlatform platform = constructPlatform(platformAccessor);
         try {
             platformService.createPlatformTables();
             platformService.createTenantTables();
 
-            boolean txOpened;
-            txOpened = transactionExecutor.openTransaction();
+            transactionService.begin();
             try {
                 platformService.initializePlatformStructure();
             } finally {
-                transactionExecutor.completeTransaction(txOpened);
+                transactionService.complete();
             }
-            txOpened = transactionExecutor.openTransaction();
+            transactionService.begin();
             try {
                 platformService.createPlatform(platform);
                 platformService.getPlatform();
             } finally {
-                transactionExecutor.completeTransaction(txOpened);
+                transactionService.complete();
             }
         } catch (final SBonitaException e) {
             throw new CreationException("Platform Creation failed.", e);
@@ -154,14 +154,14 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new CreationException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+        final TransactionService transactionService = platformAccessor.getTransactionService();
         final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
         // 1 tx to create content and default tenant
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
+            transactionService.begin();
             try {
                 // inside new tx because we need sequence ids
-                createDefaultTenant(platformAccessor, platformService, transactionExecutor, txOpened);
+                createDefaultTenant(platformAccessor, platformService, transactionService);
                 activateDefaultTenant();
             } catch (final SBonitaException e) {
                 if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
@@ -169,7 +169,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
                 throw new CreationException("Platform initialisation failed.", e);
             } finally {
-                transactionExecutor.completeTransaction(txOpened);
+                transactionService.complete();
             }
         } catch (final STransactionException e1) {
             throw new CreationException(e1);
@@ -214,7 +214,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     public void startNode() throws StartNodeException {
-        PlatformServiceAccessor platformAccessor = null;
+        final PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
         try {
             platformAccessor = getPlatformAccessor();
@@ -266,7 +266,15 @@ public class PlatformAPIImpl implements PlatformAPI {
                         final TransactionExecutor transactionExecutor = tenantServiceAccessor.getTransactionExecutor();
                         final long sessionId = createSessionAndMakeItActive(defaultTenant.getId(), sessionAccessor, sessionService, transactionExecutor);
                         for (final TenantRestartHandler restartHandler : platformConfiguration.getTenantRestartHandlers()) {
-                            restartHandler.handleRestart(platformAccessor, tenantServiceAccessor);
+                            Callable<Void> callable = new Callable<Void>() {
+
+                                @Override
+                                public Void call() throws Exception {
+                                    restartHandler.handleRestart(platformAccessor, tenantServiceAccessor);
+                                    return null;
+                                }
+                            };
+                            tenantServiceAccessor.getTransactionService().executeInTransaction(callable);
                         }
                         sessionService.deleteSession(sessionId);
                     }
@@ -294,7 +302,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 throw new StartNodeException("Platform starting failed.", e);
             } catch (final InvocationTargetException e) {
                 throw new StartNodeException("Platform starting failed.", e);
-            } catch (final RestartException e) {
+            } catch (final Exception e) {
                 throw new StartNodeException("Platform starting failed.", e);
             } finally {
                 cleanSessionAccessor(sessionAccessor);
@@ -431,7 +439,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void createDefaultTenant(final PlatformServiceAccessor platformAccessor, final PlatformService platformService,
-            final TransactionExecutor transactionExecutor, final boolean txOpened) throws STenantCreationException {
+            final TransactionService transactionService) throws STenantCreationException {
         final String tenantName = "default";
         final String description = "Default tenant";
         String userName = "";
@@ -445,8 +453,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                     .setDescription(description).done();
             final Long tenantId = platformService.createTenant(tenant);
 
-            transactionExecutor.completeTransaction(txOpened);
-            transactionExecutor.openTransaction();
+            transactionService.complete();
+            transactionService.begin();
             // add tenant folder
             String targetDir;
             String sourceDir;
