@@ -141,14 +141,14 @@ public class PlatformServiceImpl implements PlatformService {
             }
             throw new SPlatformCreationException("Unable to insert the platform row: " + e.getMessage(), e);
         } catch (CacheException e) {
-        	if (trace) {
+            if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatform", e));
             }
             if (error) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
             throw new SPlatformCreationException("Unable to cache the platform: " + e.getMessage(), e);
-		}
+        }
     }
 
     @Override
@@ -408,7 +408,12 @@ public class PlatformServiceImpl implements PlatformService {
         try {
             SPlatform sPlatform = (SPlatform) platformCacheService.get(CACHE_KEY, CACHE_KEY);
             if (sPlatform == null) {
-                throw new SPlatformNotFoundException("platform not present in cache");
+                // try to read it from database
+                sPlatform = readPlatform();
+                if (sPlatform == null) {
+                    throw new SPlatformNotFoundException("platform not present in cache");
+                }
+                cachePlatform(sPlatform);
             }
             return sPlatform;
         } catch (CacheException e) {
@@ -425,9 +430,9 @@ public class PlatformServiceImpl implements PlatformService {
     private void cachePlatform(final SPlatform platform) throws CacheException {
         platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
     }
-    
+
     private SPlatform readPlatform() throws SPlatformNotFoundException {
-    	if (trace) {
+        if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getPlatform"));
         }
         SPlatform platform = null;
