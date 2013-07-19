@@ -8,7 +8,7 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ReportingAPI;
-import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
+import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ServerAPIImpl;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -74,7 +74,7 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
 
 	private static <T> T getAPI(final Class<T> clazz, final APISession session) {
 		final ServerAPI serverAPI = getServerAPI();
-		final ClientSessionInterceptor sessionInterceptor = new ClientSessionInterceptor(clazz.getName(), serverAPI, session);
+		final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
 		return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
 	}
 

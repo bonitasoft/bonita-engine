@@ -48,6 +48,7 @@ public interface PlatformLoginAPI {
      * @throws PlatformLoginException
      *             occurs when an exception is thrown during login the platform
      */
+	@NoSessionRequired
     PlatformSession login(String userName, String password) throws PlatformLoginException;
 
     /**
@@ -60,6 +61,7 @@ public interface PlatformLoginAPI {
      * @throws SessionNotFoundException
      *             if the session is not found on the server side. This may occurs when the session has expired.
      */
+	@NoSessionRequired
     void logout(PlatformSession session) throws PlatformLogoutException, SessionNotFoundException;
 
 }

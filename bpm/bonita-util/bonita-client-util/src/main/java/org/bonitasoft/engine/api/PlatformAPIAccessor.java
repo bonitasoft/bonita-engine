@@ -17,7 +17,6 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
-import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -42,80 +41,85 @@ import org.bonitasoft.engine.util.APITypeManager;
  */
 public class PlatformAPIAccessor {
 
-    private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ApiAccessType apiType = APITypeManager.getAPIType();
-        Map<String, String> parameters = null;
-        switch (apiType) {
-            case LOCAL:
-                return LocalServerAPIFactory.getServerAPI();
-            case EJB3:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB3ServerAPI(parameters);
-            case EJB2:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB2ServerAPI(parameters);
-            case HTTP:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new HTTPServerAPI(parameters);
-            default:
-                throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
-        }
-    }
+	private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+		final ApiAccessType apiType = APITypeManager.getAPIType();
+		Map<String, String> parameters = null;
+		switch (apiType) {
+		case LOCAL:
+			return LocalServerAPIFactory.getServerAPI();
+		case EJB3:
+			parameters = APITypeManager.getAPITypeParameters();
+			return new EJB3ServerAPI(parameters);
+		case EJB2:
+			parameters = APITypeManager.getAPITypeParameters();
+			return new EJB2ServerAPI(parameters);
+		case HTTP:
+			parameters = APITypeManager.getAPITypeParameters();
+			return new HTTPServerAPI(parameters);
+		default:
+			throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
+		}
+	}
 
-    /**
-     * Reload the configuration of the Bonita home from the file system
-     * It allows to change in runtime the Bonita engine your client application uses
-     */
-    public static void refresh() {
-        APITypeManager.refresh();
-    }
+	/**
+	 * Reload the configuration of the Bonita home from the file system
+	 * It allows to change in runtime the Bonita engine your client application uses
+	 */
+	public static void refresh() {
+		APITypeManager.refresh();
+	}
 
-    /**
-     * @return the {@link PlatformLoginAPI}
-     * @throws BonitaHomeNotSetException
-     * @throws ServerAPIException
-     * @throws UnknownAPITypeException
-     */
-    public static PlatformLoginAPI getPlatformLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ServerAPI serverAPI = getServerAPI();
-        final ClientInterceptor interceptor = new ClientInterceptor(PlatformLoginAPI.class.getName(), serverAPI);
-        return (PlatformLoginAPI) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { PlatformLoginAPI.class }, interceptor);
-    }
+	/**
+	 * @return the {@link PlatformLoginAPI}
+	 * @throws BonitaHomeNotSetException
+	 * @throws ServerAPIException
+	 * @throws UnknownAPITypeException
+	 */
+	public static PlatformLoginAPI getPlatformLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+		return getAPI(PlatformLoginAPI.class);
+	}
 
-    private static <T> T getAPI(final Class<T> clazz, final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
-        final ServerAPI serverAPI = getServerAPI();
-        final ClientSessionInterceptor sessionInterceptor = new ClientSessionInterceptor(clazz.getName(), serverAPI, session);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
-    }
+	private static <T> T getAPI(final Class<T> clazz, final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
+	UnknownAPITypeException {
+		final ServerAPI serverAPI = getServerAPI();
+		final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
+		return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+	}
 
-    /**
-     * @param session
-     *            a {@link PlatformSession} created using the {@link PlatformLoginAPI}
-     * @return
-     *         the {@link PlatformAPI}
-     * @throws InvalidSessionException
-     * @throws BonitaHomeNotSetException
-     * @throws ServerAPIException
-     * @throws UnknownAPITypeException
-     */
-    public static PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return getAPI(PlatformAPI.class, session);
-    }
+	private static <T> T getAPI(final Class<T> clazz) throws BonitaHomeNotSetException, ServerAPIException,
+	UnknownAPITypeException {
+		final ServerAPI serverAPI = getServerAPI();
+		final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI);
+		return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+	}
 
-    /**
-     * @param session
-     *            a {@link PlatformSession} created using the {@link PlatformLoginAPI}
-     * @return
-     *         the {@link PlatformCommandAPI}
-     * @throws BonitaHomeNotSetException
-     * @throws ServerAPIException
-     * @throws UnknownAPITypeException
-     * @throws InvalidSessionException
-     */
-    public static PlatformCommandAPI getPlatformCommandAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
-        return getAPI(PlatformCommandAPI.class, session);
-    }
+	/**
+	 * @param session
+	 *            a {@link PlatformSession} created using the {@link PlatformLoginAPI}
+	 * @return
+	 *         the {@link PlatformAPI}
+	 * @throws InvalidSessionException
+	 * @throws BonitaHomeNotSetException
+	 * @throws ServerAPIException
+	 * @throws UnknownAPITypeException
+	 */
+	public static PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+		return getAPI(PlatformAPI.class, session);
+	}
+
+	/**
+	 * @param session
+	 *            a {@link PlatformSession} created using the {@link PlatformLoginAPI}
+	 * @return
+	 *         the {@link PlatformCommandAPI}
+	 * @throws BonitaHomeNotSetException
+	 * @throws ServerAPIException
+	 * @throws UnknownAPITypeException
+	 * @throws InvalidSessionException
+	 */
+	public static PlatformCommandAPI getPlatformCommandAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
+	UnknownAPITypeException {
+		return getAPI(PlatformCommandAPI.class, session);
+	}
 
 }

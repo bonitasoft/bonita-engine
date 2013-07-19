@@ -17,7 +17,6 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
-import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -68,14 +67,18 @@ public final class TenantAPIAccessor {
 
     private static <T> T getAPI(final Class<T> clazz, final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
-        final ClientSessionInterceptor sessionInterceptor = new ClientSessionInterceptor(clazz.getName(), serverAPI, session);
+        final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+    }
+    
+    private static <T> T getAPI(final Class<T> clazz) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        final ServerAPI serverAPI = getServerAPI();
+        final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI);
         return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
     }
 
     public static LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ServerAPI serverAPI = getServerAPI();
-        final ClientInterceptor interceptor = new ClientInterceptor(LoginAPI.class.getName(), serverAPI);
-        return (LoginAPI) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { LoginAPI.class }, interceptor);
+    	return getAPI(LoginAPI.class);
     }
 
     public static IdentityAPI getIdentityAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
