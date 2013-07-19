@@ -72,6 +72,7 @@ public class TestUtil {
         }
     }
 
+    // This method should disappear as well, with the Transaction refactoring.
     public static void closeTransactionIfOpen(final TransactionService txService) throws SBadTransactionStateException, FireEventException,
             STransactionException {
         final TransactionState txState = txService.getState();
