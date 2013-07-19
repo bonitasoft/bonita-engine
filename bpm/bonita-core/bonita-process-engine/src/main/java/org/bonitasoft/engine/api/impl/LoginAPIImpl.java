@@ -48,7 +48,8 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Matthieu Chaffotte
  * @author Zhang Bole
  */
-public class LoginAPIImpl implements LoginAPI {
+public class LoginAPIImpl extends
+        AbstractLoginApiImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
@@ -75,6 +76,8 @@ public class LoginAPIImpl implements LoginAPI {
         final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
+        // first call before create session: put the platform in cache if necessary
+        putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
         TransactionContentWithResult<STenant> getTenant;
         if (tenantId == null) {
             getTenant = new GetDefaultTenantInstance(platformService);
