@@ -16,10 +16,11 @@ package org.bonitasoft.engine.api.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
@@ -84,13 +85,6 @@ public class ServerAPIImpl implements ServerAPI {
 		}
 	}
 
-
-
-	private static final List<String> nonTxMethodNames = Arrays.asList("deleteProcessInstances", "deleteProcess", "deleteProcesses", "disableAndDelete",
-			"disableProcess", "login");
-
-	private static final List<String> nonTxInterfaceNames = Arrays.asList("org.bonitasoft.engine.api.PlatformAPI");
-
 	@Override
 	public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
 			final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
@@ -99,49 +93,8 @@ public class ServerAPIImpl implements ServerAPI {
 		SessionAccessor sessionAccessor = null;
 		try {
 			sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
-
 			final Session session = (Session) options.get("session");
-
-			if (session != null && !nonTxMethodNames.contains(methodName) && !nonTxInterfaceNames.contains(apiInterfaceName)) {
-				final SessionType sessionType = getSessionType(session);
-				TransactionExecutor transactionExecutor = null;
-				final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
-				final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
-				switch (sessionType) {
-				case PLATFORM:
-					transactionExecutor = platformServiceAccessor.getTransactionExecutor();
-					break;
-				case API:
-					final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
-					transactionExecutor = tenantAccessor.getTransactionExecutor();
-					break;
-				default:
-					throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
-				}
-
-				final TransactionContentWithResult<Object> txContent = new TransactionContentWithResult<Object>() {
-
-					private Object result;
-
-					@Override
-					public void execute() throws SBonitaException {
-						try {
-							result = invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues);
-						} catch (Throwable e) {
-							throw new ServerAPIRuntimeException(e);
-						}
-					}
-
-					@Override
-					public Object getResult() {
-						return result;
-					}
-				};
-				transactionExecutor.execute(txContent);
-				return txContent.getResult();
-			} else {
-				return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues);
-			}
+			return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
 		} catch (final ServerAPIRuntimeException e) {
 			final Throwable cause = e.getCause();
 			if (cause instanceof BonitaRuntimeException || cause instanceof BonitaException) {
@@ -240,8 +193,74 @@ public class ServerAPIImpl implements ServerAPI {
 		return sessionType;
 	}
 
-	private Object invokeAPI(final String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues)
+	private Object invokeAPI(final String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues, final Session session)
 			throws Throwable {
+		final Class<?>[] parameterTypes = getParameterTypes(classNameParameters);
+		
+		final Object apiImpl = accessResolver.getAPIImplementation(apiInterfaceName);
+		final Method method = ClassReflector.getMethod(apiImpl.getClass(), methodName, parameterTypes);
+		if (method.isAnnotationPresent(CustomTransactions.class)) {
+			return invokeAPI(parametersValues, apiImpl, method);
+		} else {
+			return invokeAPIInTransaction(apiInterfaceName, methodName, parametersValues, apiImpl, method, session);
+		}
+	}
+
+	private Object invokeAPIInTransaction(final String apiInterfaceName, final String methodName, final Object[] parametersValues, final Object apiImpl, final Method method, final Session session) throws Throwable {
+		if (session == null) {
+			throw new BonitaRuntimeException("session is null");
+		}
+		//if (session != null) {
+			final SessionType sessionType = getSessionType(session);
+			TransactionExecutor transactionExecutor = null;
+			final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
+			final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
+			switch (sessionType) {
+			case PLATFORM:
+				transactionExecutor = platformServiceAccessor.getTransactionExecutor();
+				break;
+			case API:
+				final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
+				transactionExecutor = tenantAccessor.getTransactionExecutor();
+				break;
+			default:
+				throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
+			}
+
+			final TransactionContentWithResult<Object> txContent = new TransactionContentWithResult<Object>() {
+
+				private Object result;
+
+				@Override
+				public void execute() throws SBonitaException {
+					try {
+						result = invokeAPI(parametersValues, apiImpl, method);
+					} catch (Throwable e) {
+						throw new ServerAPIRuntimeException(e);
+					}
+				}
+
+				@Override
+				public Object getResult() {
+					return result;
+				}
+			};
+			transactionExecutor.execute(txContent);
+			return txContent.getResult();
+		//} else {
+			//return invokeAPI(parametersValues, apiImpl, method);
+			//}
+    }
+	
+	private Object invokeAPI(final Object[] parametersValues, final Object apiImpl, final Method method) throws Throwable {
+	    try {
+			return method.invoke(apiImpl, parametersValues);
+		} catch (InvocationTargetException e) {
+			throw e.getCause();
+		}
+    }
+	
+	private Class<?>[] getParameterTypes(final List<String> classNameParameters) throws ClassNotFoundException {
 		Class<?>[] parameterTypes = null;
 		if (classNameParameters != null && !classNameParameters.isEmpty()) {
 			parameterTypes = new Class<?>[classNameParameters.size()];
@@ -260,14 +279,9 @@ public class ServerAPIImpl implements ServerAPI {
 				parameterTypes[i] = classType;
 			}
 		}
-		final Object api = accessResolver.getAPIImplementation(apiInterfaceName);
-		try {
-			return ClassReflector.invokeMethod(api, methodName, parameterTypes, parametersValues);
-		} catch (InvocationTargetException e) {
-			throw e.getCause();
-		}
+		return parameterTypes;
 	}
-
+	
 	private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session) throws STenantNotFoundException, SSchedulerException {
 		final SchedulerService schedulerService = platformAccessor.getSchedulerService();
 		final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
@@ -50,6 +51,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 public class LoginAPIImpl implements LoginAPI {
 
     @Override
+    @CustomTransactions
     public APISession login(final String userName, final String password) throws LoginException {
         checkUsernameAndPassword(userName, password);
 
@@ -166,6 +168,7 @@ public class LoginAPIImpl implements LoginAPI {
     }
 
     @Override
+    @CustomTransactions
     public void logout(final APISession session) throws LogoutException, SessionNotFoundException {
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(session.getTenantId());
         final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();

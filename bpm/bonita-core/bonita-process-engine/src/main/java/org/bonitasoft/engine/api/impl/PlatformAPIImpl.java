@@ -21,6 +21,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
@@ -109,6 +110,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
     @Override
+    @CustomTransactions
     public void createPlatform() throws CreationException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -143,6 +145,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void initializePlatform() throws CreationException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -174,6 +177,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void createAndInitializePlatform() throws CreationException {
         createPlatform();
         initializePlatform();
@@ -208,6 +212,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void startNode() throws StartNodeException {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
@@ -311,6 +316,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
@@ -343,6 +349,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void cleanPlatform() throws DeletionException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -365,6 +372,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void deletePlatform() throws DeletionException {
         // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor;
@@ -394,6 +402,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void cleanAndDeletePlaftorm() throws DeletionException {
         cleanPlatform();
         deletePlatform();
@@ -401,6 +410,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @Deprecated
+    @CustomTransactions
     public Platform getPlatform() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -664,6 +674,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public boolean isPlatformCreated() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -701,6 +712,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public PlatformState getPlatformState() throws PlatformNotFoundException {
         // TODO: find an other way to check if bonita_home is set
         getPlatform();

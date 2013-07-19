@@ -41,6 +41,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivities;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
@@ -485,6 +486,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void deleteProcess(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         // multiple tx here because we must lock instances when deleting them
@@ -655,6 +657,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void deleteProcesses(final List<Long> processIdList) throws DeletionException {
         checkNoActiveTransaction(getTenantAccessor().getTransactionExecutor());
         for (final Long processId : processIdList) {
@@ -804,6 +807,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void disableAndDelete(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
         checkNoActiveTransaction(getTenantAccessor().getTransactionExecutor());
         disableProcess(processDefinitionId);
@@ -811,6 +815,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void disableProcess(final long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException {
 
         // FIXME: don't use transactionExecutor (because of disableAndDelete) :
@@ -3271,6 +3276,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.Date;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -37,6 +38,7 @@ import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 public class PlatformLoginAPIImpl implements PlatformLoginAPI {
 
     @Override
+    @CustomTransactions
     public PlatformSession login(final String userName, final String password) throws PlatformLoginException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -63,6 +65,7 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
     }
 
     @Override
+    @CustomTransactions
     public void logout(final PlatformSession session) throws PlatformLogoutException, SessionNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
