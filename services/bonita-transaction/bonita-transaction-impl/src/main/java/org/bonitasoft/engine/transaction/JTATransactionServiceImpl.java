@@ -58,9 +58,11 @@ public class JTATransactionServiceImpl implements TransactionService {
     public void begin() throws STransactionCreationException {
         try {
             if (txManager.getStatus() == Status.STATUS_NO_TRANSACTION) {
+                boolean transactionStarted = false;
+                boolean mustRollback = false;
                 try {
                     txManager.begin();
-
+                    transactionStarted = true;
                     final Transaction tx = txManager.getTransaction();
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                         logger.log(getClass(), TechnicalLogSeverity.DEBUG,
@@ -79,8 +81,13 @@ public class JTATransactionServiceImpl implements TransactionService {
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
-                } catch (final FireEventException e) {
-                    throw new STransactionCreationException(e);
+                } catch (final Throwable t) {
+                    mustRollback = true;
+                    throw new STransactionCreationException(t);
+                } finally {
+                    if (transactionStarted && mustRollback) {
+                        txManager.rollback();
+                    }
                 }
             } else {
                 throw new STransactionCreationException("We do not support nested transaction.");
