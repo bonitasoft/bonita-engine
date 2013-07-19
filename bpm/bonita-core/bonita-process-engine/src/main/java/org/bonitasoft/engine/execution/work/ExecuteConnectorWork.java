@@ -35,6 +35,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.NonTxBonitaWork;
 
 /**

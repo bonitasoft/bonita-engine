@@ -98,6 +98,8 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBui
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -252,12 +254,32 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ReportingService reportingService;
 
     private WorkService workService;
+    
+    private SessionService sessionService;
+    
+    private ReadSessionAccessor readSessionAccessor;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
         this.tenantId = tenantId;
     }
 
+    @Override
+    public ReadSessionAccessor getReadSessionAccessor() {
+    	if (readSessionAccessor == null) {
+    		readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
+        }
+        return readSessionAccessor;
+    }
+    
+    @Override
+    public SessionService getSessionService() {
+    	if (sessionService == null) {
+    		sessionService = beanAccessor.getService(SessionService.class);
+        }
+        return sessionService;
+    }
+    
     @Override
     public IdentityModelBuilder getIdentityModelBuilder() {
         if (identityModelBuilder == null) {

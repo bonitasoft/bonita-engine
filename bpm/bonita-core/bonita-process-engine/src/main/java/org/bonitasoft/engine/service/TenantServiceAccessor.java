@@ -75,6 +75,8 @@ import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -92,6 +94,10 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     long getTenantId();
 
+    SessionService getSessionService();
+    
+    ReadSessionAccessor getReadSessionAccessor();
+    
     IdentityModelBuilder getIdentityModelBuilder();
 
     IdentityService getIdentityService();

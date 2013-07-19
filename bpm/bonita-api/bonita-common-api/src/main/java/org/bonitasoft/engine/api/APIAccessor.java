@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.Serializable;
+
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface APIAccessor {
+public interface APIAccessor extends Serializable {
 
     IdentityAPI getIdentityAPI();
 

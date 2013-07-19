@@ -105,6 +105,7 @@ import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
@@ -674,5 +675,12 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     public PlatformCacheService getPlatformCacheService() {
         return accessor.getInstanceOf(PlatformCacheService.class);
     }
+    
+    @Override
+    public ReadSessionAccessor getReadSessionAccessor() {
+    	return accessor.getInstanceOf(ReadSessionAccessor.class);
+    }
+
+    
 
 }
