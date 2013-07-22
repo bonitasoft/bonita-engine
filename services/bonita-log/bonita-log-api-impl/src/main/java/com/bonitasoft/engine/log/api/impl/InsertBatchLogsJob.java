@@ -21,7 +21,6 @@ import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -54,31 +53,15 @@ public class InsertBatchLogsJob implements StatelessJob {
         final List<SQueriableLog> logs = BatchLogBuffer.getInstance().clearLogs();
         if (logs.size() > 0) {
             try {
-                transactionService.begin();
                 persistenceService.insertInBatch(new ArrayList<PersistentObject>(logs));
             } catch (final SBonitaException e) {
-                try {
-                    transactionService.setRollbackOnly();
-                } catch (final STransactionException e1) {
-                }
                 throw new JobExecutionException(e);
-            } finally {
-                try {
-                    transactionService.complete();
-                } catch (final SBonitaException e) {
-                    throw new JobExecutionException(e);
-                }
             }
         }
     }
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-    }
-
-    @Override
-    public boolean isWrappedInTransaction() {
-        return false;
     }
 
     public static void setTransactionService(final TransactionService transactionService) {
