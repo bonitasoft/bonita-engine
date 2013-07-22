@@ -100,6 +100,8 @@
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
+		<constructor-arg name="workService" ref="workService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -219,6 +221,7 @@
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders" />
 		<constructor-arg name="operationBuilders" ref="sOperationBuilders" />
+		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
