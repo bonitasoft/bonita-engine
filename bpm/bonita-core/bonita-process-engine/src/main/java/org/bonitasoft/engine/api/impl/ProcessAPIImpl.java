@@ -2524,8 +2524,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final XMLWriter writer = tenantAccessor.getXMLWriter();
         try {
-            new ExportActorMapping(actorMappingService, identityService, writer, processDefinitionId).execute();
-            return new ExportActorMapping(actorMappingService, identityService, writer, processDefinitionId).getResult();
+            final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, writer, processDefinitionId);
+            exportActorMapping.execute();
+            return exportActorMapping.getResult();
         } catch (final SBonitaException sbe) {
             throw new ActorMappingExportException(sbe);
         }
