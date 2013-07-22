@@ -737,6 +737,14 @@ public class APITestUtil {
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
     }
 
+    protected void waitForFlowNodeInReadyState(final ProcessInstance processInstance, final String flowNodeName, final boolean useRootProcessInstance)
+            throws Exception {
+        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.getReadyState(flowNodeName), flowNodeName, useRootProcessInstance,
+                DEFAULT_TIMEOUT);
+        final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
+        assertNotNull(flowNodeInstance);
+    }
+
     protected void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
         final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
                 processInstance, getProcessAPI(), state);
