@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.search;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +44,6 @@ import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Matthieu Chaffotte
@@ -1123,7 +1123,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
             final long activityInstanceId = activityInstance.getId();
             getProcessAPI().setActivityStateById(activityInstanceId, 12);
         }
-
+        waitForProcessToFinish(processInstance);
         // Search Archived process
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10).searchTerm("Na'");
         final SearchResult<ArchivedProcessInstance> searchProcessInstanceResult = getProcessAPI().searchArchivedProcessInstances(builder.done());

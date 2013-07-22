@@ -1,10 +1,13 @@
 package org.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
@@ -39,11 +42,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class GatewayExecutionTest extends CommonAPITest {
 
@@ -453,12 +451,8 @@ public class GatewayExecutionTest extends CommonAPITest {
         final GatewayInstance flowNodeInstance = (GatewayInstance) searchFlowNodeInstances.getResult().get(0);
         assertTrue(flowNodeInstance instanceof GatewayInstance);
         // retry the gateway
-        try {
-            getProcessAPI().retryTask(gateway.getId());
-            fail("should not work");
-        } catch (final ActivityExecutionException e) {
-            // ok
-        }
+        getProcessAPI().retryTask(gateway.getId());
+        waitForFlowNodeToFail(processInstance);
         // should still be in failed
         final SearchResult<FlowNodeInstance> searchFlowNodeInstances2 = getProcessAPI().searchFlowNodeInstances(searchOptions);
         assertEquals("failed", searchFlowNodeInstances2.getResult().get(0).getState());
@@ -1015,7 +1009,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
         if (expected.length == 1 && expected[0].isEmpty()) {
-            assertTrue(new WaitUntil(100, 1000) {
+            assertTrue("Expected a task in fail state, there was none or more than one", new WaitUntil(100, 1000) {
 
                 @Override
                 protected boolean check() throws Exception {

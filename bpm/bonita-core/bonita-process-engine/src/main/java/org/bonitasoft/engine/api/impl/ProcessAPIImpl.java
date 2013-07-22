@@ -270,9 +270,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
@@ -601,7 +598,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final List<Long> unReleasedLocks = new ArrayList<Long>(1);
         for (final Long lockedProcessId : lockedProcesses) {
             try {
-                lockService.releaseExclusiveLockAccess(lockedProcessId, objectType);
+                lockService.unlock(lockedProcessId, objectType);
             } catch (final SLockException e) {
                 unReleasedLocks.add(lockedProcessId);
                 log(tenantAccessor, e);
@@ -613,7 +610,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     private void createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses, final Long... processInstanceIds)
             throws SLockException {
         for (final Long processInstanceId : processInstanceIds) {
-            lockService.createExclusiveLockAccess(processInstanceId, objectType);
+            lockService.lock(processInstanceId, objectType);
             lockedProcesses.add(processInstanceId);
         }
     }
@@ -889,18 +886,25 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        checkNoActiveTransaction(transactionExecutor);
         try {
-            processExecutor.executeActivity(flownodeInstanceId, getUserIdFromSession());
-        } catch (final SFlowNodeExecutionException e) {
+            transactionExecutor.execute(new TransactionContent() {
+
+                @Override
+                public void execute() throws SBonitaException {
+                    SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+                    processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), getUserIdFromSession());
+                }
+            });
+        } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
-        } catch (final SActivityInterruptedException e) {
-            throw new ActivityExecutionException(e);
-        } catch (final SActivityReadException e) {
-            throw new ActivityExecutionException(e);
         }
     }
 
@@ -4663,7 +4667,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             flowNodeExecutor.setStateByStateId(processDefinition, activity, stateId);
             // execute the flow node only if it is not the final state
             if (!state.isTerminal()) {
-                processExecutor.executeActivity(activityInstanceId, getUserIdFromSession());
+                processExecutor.executeFlowNode(activityInstanceId, null, null, activity.getParentProcessInstanceId(), getUserIdFromSession());
             }
         } catch (final SBonitaException e) {
             throw new ActivityExecutionException(e);

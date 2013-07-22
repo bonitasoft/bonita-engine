@@ -148,7 +148,6 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             final int numberOfCompletedInstances = miActivity.getNumberOfCompletedInstances();
             final int numberOfTerminatedInstances = miActivity.getNumberOfTerminatedInstances();
             final int numberOfInstances = miActivity.getNumberOfInstances();
-
             if (miActivity.isSequential()) {
                 // only instantiate when we are in sequence
                 List<SFlowNodeInstance> createInnerInstances = null;
@@ -162,7 +161,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 }
                 return numberOfActiveInstances == 0 && (createInnerInstances == null || createInnerInstances.size() == 0);
             } else {
-                return numberOfActiveInstances == 0 || numberOfInstances == (numberOfCompletedInstances + numberOfTerminatedInstances);
+                return numberOfActiveInstances == 0 || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);

@@ -37,7 +37,8 @@ public class ExecuteFlowNodeWork extends TxBonitaWork {
     private final Long processInstanceId;
 
     public ExecuteFlowNodeWork(final ContainerExecutor containerExecutor, final long flowNodeInstanceId, final List<SOperation> operations,
-            final SExpressionContext contextDependency, final Long processInstanceId) {
+            final SExpressionContext contextDependency,
+            final long processInstanceId) {
         this.containerExecutor = containerExecutor;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.operations = operations;
@@ -47,11 +48,12 @@ public class ExecuteFlowNodeWork extends TxBonitaWork {
 
     @Override
     protected void work() throws SBonitaException {
-        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId);
+        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null);
+
     }
 
     @Override
-    protected String getDescription() {
+    public String getDescription() {
         return getClass().getSimpleName() + ": processInstanceId:" + processInstanceId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 }

@@ -60,9 +60,10 @@ public abstract class AbstractBonitaWork implements Runnable {
 
             if (isTransactional()) {
                 transactionService.begin();
+                System.out.println("Opened tx for " + this.getDescription());
             }
             // FIXME: change log level:
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Starting work :" + getDescription());
+            loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Starting work :" + getDescription());
             work();
         } catch (final Throwable e) {
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work", e);
@@ -78,6 +79,7 @@ public abstract class AbstractBonitaWork implements Runnable {
             if (isTransactional()) {
                 try {
                     transactionService.complete();
+                    System.out.println("Completed tx for " + this.getDescription());
                 } catch (STransactionCommitException e) {
                     throw new SBonitaRuntimeException("Cannot commit transaction.", e);
                 } catch (STransactionRollbackException e) {

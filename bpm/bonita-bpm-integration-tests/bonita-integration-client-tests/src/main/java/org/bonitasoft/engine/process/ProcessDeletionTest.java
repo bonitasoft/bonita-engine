@@ -70,7 +70,6 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, pedro.getId());
-
         getProcessAPI().deleteProcessInstance(processInstance.getId());
 
         Thread.sleep(1500);
@@ -101,10 +100,19 @@ public class ProcessDeletionTest extends CommonAPITest {
     @Test
     @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "delete process" })
     public void deleteProcessDefinitionStopsCreatingNewActivities() throws Exception {
-        final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("process To Delete", "2.5");
+        final String actorName = "delivery";
+        processDefinitionBuilder.addActor(actorName);
+        processDefinitionBuilder.addUserTask("step1", actorName);
+        for (int i = 0; i < 30; i++) {
+            final String activityName = "step2" + i;
+            processDefinitionBuilder.addUserTask(activityName, actorName);
+            processDefinitionBuilder.addTransition("step1", activityName);
+        
+        }
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, pedro);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, pedro.getId());
-
         disableAndDeleteProcess(processDefinition.getId()); // will fail in CommonAPITest.succeeded if activities are created after delete
         Thread.sleep(1500);
     }

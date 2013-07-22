@@ -46,7 +46,7 @@ public class ExecuteTransitionWork extends TxBonitaWork {
     }
 
     @Override
-    protected String getDescription() {
+    public String getDescription() {
         return getClass().getSimpleName() + ": transitionInstanceId:" + sTransitionInstance.getId();
     }
 }

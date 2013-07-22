@@ -1,5 +1,12 @@
 package org.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,6 +20,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -68,13 +76,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Baptiste Mesta
@@ -1432,7 +1433,7 @@ public class ProcessManagementTest extends CommonAPITest {
         userTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
         assertEquals(ActivityStates.FAILED_STATE, userTaskInstance.getState());
         getProcessAPI().retryTask(activityInstanceId);
-
+        waitForProcessToFinish(pi0);
         disableAndDeleteProcess(processDefinition);
         deleteUser(user.getId());
     }

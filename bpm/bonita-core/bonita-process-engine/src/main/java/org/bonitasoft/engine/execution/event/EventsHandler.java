@@ -46,7 +46,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
@@ -361,8 +360,11 @@ public class EventsHandler {
             default:
                 if (waitingEvent != null) { // is null if it's a timer
                     eventInstanceService.deleteWaitingEvent(waitingEvent);
+                    executeFlowNode(flowNodeInstanceId, operations, waitingEvent.getParentProcessInstanceId());
+                } else {
+                    long processInstanceId = eventInstanceService.getFlowNodeInstance(flowNodeInstanceId).getParentProcessInstanceId();
+                    executeFlowNode(flowNodeInstanceId, operations, processInstanceId);
                 }
-                executeFlowNode(flowNodeInstanceId, operations);
                 break;
         }
     }
@@ -410,10 +412,10 @@ public class EventsHandler {
                 parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
-    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations) throws SActivityReadException,
-            SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException, WorkRegisterException {
-        containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(), null);// FIXME
-        // operations
+    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, long processInstanceId) throws SActivityReadException,
+            SActivityExecutionFailedException, SActivityExecutionException, WorkRegisterException {
+        containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
+                processInstanceId);
     }
 
     private void instantiate(final long processDefinitionId, final OperationsWithContext operations) throws WorkRegisterException,

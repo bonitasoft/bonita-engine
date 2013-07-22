@@ -25,9 +25,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 
@@ -42,29 +40,27 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 public interface ProcessExecutor extends ContainerExecutor {
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition) throws SActivityReadException, SActivityExecutionFailedException,
-            SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
+            SActivityExecutionException, SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, final List<SOperation> operations, Map<String, Object> context)
-            throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException,
+            throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
             SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
             Map<String, Object> context) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
-            SActivityInterruptedException, SProcessInstanceCreationException;
+            SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
             Map<String, Object> context, long callerId) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
-            SActivityInterruptedException, SProcessInstanceCreationException;
+            SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
             Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectors, long callerId, final long subProcessId)
-            throws SActivityReadException, SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
+            throws SActivityReadException, SActivityExecutionException, SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, List<SOperation> sOperations, Map<String, Object> context,
             List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SActivityReadException, SActivityExecutionFailedException,
-            SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
-
-    void executeActivity(long flownNodeInstanceId, Long executedBy) throws SActivityInterruptedException, SActivityReadException, SFlowNodeExecutionException;
+            SActivityExecutionException, SProcessInstanceCreationException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
             ConnectorService connectorService) throws SBonitaException;

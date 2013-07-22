@@ -57,7 +57,7 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
 
     @Override
     protected void resumeStableChildExecution(final long flowNodeInstanceId, final long processInstanceId, final long userId) throws SBonitaException {
-        processExecutor.executeActivity(flowNodeInstanceId, userId);
+        processExecutor.executeFlowNode(flowNodeInstanceId, null, null, processInstanceId, userId);
     }
 
     @Override

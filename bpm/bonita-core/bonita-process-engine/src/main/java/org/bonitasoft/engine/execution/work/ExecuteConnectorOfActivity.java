@@ -35,7 +35,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -110,7 +109,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void continueFlow() throws SActivityReadException, SFlowNodeExecutionException, SActivityReadException, SActivityInterruptedException,
+    protected void continueFlow() throws SActivityReadException, SFlowNodeExecutionException, SActivityReadException,
             WorkRegisterException {
         String containerType = SFlowElementsContainerType.PROCESS.name();
         if (flowNodeInstance.getLogicalGroup(2) > 0) {

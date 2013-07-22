@@ -19,7 +19,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -37,16 +36,18 @@ public interface ContainerExecutor {
      * 
      * @param processDefinition
      */
-    void childReachedState(SProcessDefinition processDefinition, SFlowNodeInstance child, FlowNodeState state, long parentId) throws SBonitaException;
+    void childFinished(SProcessDefinition processDefinition, SFlowNodeInstance child, FlowNodeState state, long parentId) throws SBonitaException;
 
     /**
      * execute a flow node in the context of this container executor
      * 
      * @param contextDependency
      * @param operations
+     * @return
      */
-    void executeFlowNode(long flowNodeInstanceId, SExpressionContext contextDependency, List<SOperation> operations, Long processInstanceId)
-            throws SActivityInterruptedException, SActivityReadException, SFlowNodeExecutionException;
+    FlowNodeState executeFlowNode(long flowNodeInstanceId, SExpressionContext contextDependency, List<SOperation> operations, long processInstanceId,
+            Long executedBy)
+            throws SActivityReadException, SFlowNodeExecutionException;
 
     /**
      * execute a transition in the context of this container executor

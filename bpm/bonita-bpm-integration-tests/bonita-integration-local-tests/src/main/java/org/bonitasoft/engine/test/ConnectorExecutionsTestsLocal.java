@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -58,11 +63,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -153,6 +153,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final ActivityInstance task2 = waitForUserTask("step2", processInstance);
         assignAndExecuteStep(task2, userId);
 
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -361,6 +362,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         assignAndExecuteStep(task2, userId);
 
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 

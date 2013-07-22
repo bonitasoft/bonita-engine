@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -51,11 +50,11 @@ public class ContainerRegistry {
         executors.put(containerExecutor.getHandledType(), containerExecutor);
     }
 
-    protected void nodeReachedState(final SProcessDefinition processDefinition, final SFlowNodeInstance child, final FlowNodeState state, final long parentId,
+    public void nodeReachedState(final SProcessDefinition processDefinition, final SFlowNodeInstance child, final FlowNodeState state, final long parentId,
             final String parentType) throws SBonitaException {
         final ContainerExecutor containerExecutor = executors.get(parentType);
         if (containerExecutor != null) {
-            containerExecutor.childReachedState(processDefinition, child, state, parentId);
+            containerExecutor.childFinished(processDefinition, child, state, parentId);
         } else {
             throw new SActivityExecutionException("There is no container executor for the container " + parentId + " having the type " + parentType);
         }
@@ -66,16 +65,16 @@ public class ContainerRegistry {
     }
 
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final String containerType, final Long processInstanceId) throws SActivityReadException, SActivityExecutionFailedException,
-            SActivityExecutionException, SActivityInterruptedException, WorkRegisterException {
+            final String containerType, final long processInstanceId) throws SActivityReadException, SActivityExecutionFailedException,
+            SActivityExecutionException, WorkRegisterException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
         workService.registerWork(new ExecuteFlowNodeWork(containerExecutor, flowNodeInstanceId, operations, contextDependency, processInstanceId));
     }
 
     public void executeFlowNodeInSameThread(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
             final String containerType, final Long processInstanceId) throws SActivityReadException, SFlowNodeExecutionException,
-            SActivityInterruptedException, WorkRegisterException {
+            WorkRegisterException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
-        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId);
+        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null);
     }
 }
