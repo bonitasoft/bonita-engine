@@ -137,7 +137,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
                 throw new ProcessDefinitionNotEnabledException(deployInfo.getName(), deployInfo.getVersion(), deployInfo.getProcessId());
             }
-            sDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
+            sDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
