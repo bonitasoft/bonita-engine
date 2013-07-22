@@ -855,12 +855,12 @@ public class MessageEventTest extends CommonAPITest {
         processBuilder.addEndEvent("endEvent");
         processBuilder.addTransition("startEvent", "auto1");
         processBuilder.addTransition("auto1", "gateway1");
-        processBuilder.addTransition("gateway1", "sendMessage");
+        processBuilder.addTransition("gateway1", "userTask2");
+        processBuilder.addTransition("userTask2", "sendMessage");
         processBuilder.addTransition("sendMessage", "gateway2");
         processBuilder.addTransition("gateway1", "userTask1");
         processBuilder.addTransition("userTask1", "gateway2");
-        processBuilder.addTransition("gateway2", "userTask2");
-        processBuilder.addTransition("userTask2", "endEvent");
+        processBuilder.addTransition("gateway2", "endEvent");
         processBuilder.addTransition("auto1", targetFlowNode);
         processBuilder.addTransition(targetFlowNode, "userTask3");
         processBuilder.addTransition("userTask3", "endEvent");
@@ -893,6 +893,9 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", CATCH_EVENT_NAME);
         final ProcessInstance sendAndReceiveMessageProcessInstance = getProcessAPI().startProcess(sendAndReceiveMessageProcess.getId());
 
+        final ActivityInstance step2 = waitForUserTask("userTask2", sendAndReceiveMessageProcessInstance);
+        waitForEventInWaitingState(sendAndReceiveMessageProcessInstance, CATCH_EVENT_NAME);
+        assignAndExecuteStep(step2.getId(), user.getId());
         waitForUserTask("userTask3", sendAndReceiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendAndReceiveMessageProcess);
