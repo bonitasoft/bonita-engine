@@ -17,7 +17,6 @@ import org.bonitasoft.engine.api.EJB2ServerAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
-import org.bonitasoft.engine.api.impl.ClientSessionInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -58,8 +57,8 @@ public final class TenantAPIAccessor {
 
     private static <T> T getAPI(final Class<T> clazz, final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
-        final ClientSessionInterceptor sessionInterceptor = new ClientSessionInterceptor(clazz.getName(), serverAPI, session);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+        final ClientInterceptor clientInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
+        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, clientInterceptor);
     }
 
     public static LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
