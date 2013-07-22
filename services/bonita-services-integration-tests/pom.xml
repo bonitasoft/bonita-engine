@@ -336,7 +336,7 @@
 
 		<!-- Monitoring -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
+			<groupId>com.bonitasoft.engine.monitoring</groupId>
 			<artifactId>bonita-monitoring-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

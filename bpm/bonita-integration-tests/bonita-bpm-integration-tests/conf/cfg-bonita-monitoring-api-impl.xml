@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="monitoringService" class="org.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl" scope="prototype">
+	<bean id="monitoringService" class="com.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl" scope="prototype">
 		<constructor-arg name="allowMbeansRegistration" value="true" />
 		<constructor-arg name="useCache" value="false" />
 		<constructor-arg name="identityService" ref="identityService" />
@@ -15,7 +15,7 @@
 		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="monitoringServiceWithCache" class="org.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl" scope="prototype">
+	<bean id="monitoringServiceWithCache" class="com.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl" scope="prototype">
 		<constructor-arg name="allowMbeansRegistration" value="true" />
 		<constructor-arg name="useCache" value="true" />
 		<constructor-arg name="identityService" ref="identityService" />
@@ -29,17 +29,17 @@
 		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="jobHandlerService" class="org.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" scope="prototype" />
+	<bean id="jobHandlerService" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" scope="prototype"/>
 
-	<bean id="transactionHandlerService" class="org.bonitasoft.engine.monitoring.impl.STransactionHandlerImpl" scope="prototype" />
+	<bean id="transactionHandlerService" class="com.bonitasoft.engine.monitoring.impl.STransactionHandlerImpl" scope="prototype"/>
 
-	<bean id="schedulerHandlerService" class="org.bonitasoft.engine.monitoring.impl.SSchedulerHandlerImpl" scope="prototype" />
+	<bean id="schedulerHandlerService" class="com.bonitasoft.engine.monitoring.impl.SSchedulerHandlerImpl" scope="prototype"/>
 
-	<bean id="userHandlerService" class="org.bonitasoft.engine.monitoring.impl.SUserHandlerImpl" scope="prototype" />
+	<bean id="userHandlerService" class="com.bonitasoft.engine.monitoring.impl.SUserHandlerImpl" scope="prototype"/>
 
-	<bean id="jvmMXBean" class="org.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl"></bean>
+	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl"/>
 
-	<bean id="platformMonitoringService" class="org.bonitasoft.engine.monitoring.impl.PlatformMonitoringServiceImpl">
+	<bean id="platformMonitoringService" class="com.bonitasoft.engine.monitoring.impl.PlatformMonitoringServiceImpl">
 		<constructor-arg name="allowMbeansRegistration" value="true" />
 		<constructor-arg name="jvmMBean" ref="jvmMXBean" />
 		<constructor-arg name="eventService" ref="eventService" />

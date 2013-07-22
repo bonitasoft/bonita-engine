@@ -8,12 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service;
 
+import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 
 /**
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public interface PlatformServiceAccessor extends org.bonitasoft.engine.service.PlatformServiceAccessor {
 
@@ -22,4 +24,5 @@ public interface PlatformServiceAccessor extends org.bonitasoft.engine.service.P
     @Override
     TenantServiceAccessor getTenantServiceAccessor(long tenantId);
 
+    PlatformMonitoringService getPlatformMonitoringService();
 }

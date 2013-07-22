@@ -23,15 +23,18 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.services.event.handler.IdentityServiceUsingEventServiceTest;
 import com.bonitasoft.services.event.handler.RecorderAndEventServiceTest;
+import com.bonitasoft.services.monitoring.MonitoringTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    AllTests.class,
-    IdentityServiceUsingEventServiceTest.class,
-    RecorderAndEventServiceTest.class
+        AllTests.class,
+        IdentityServiceUsingEventServiceTest.class,
+        RecorderAndEventServiceTest.class,
+        // Last test suite in order to check the correct begin/complete transactions
+        MonitoringTests.class
 })
 public class AllTestsSPWithJNDI {
-    
+
     private static ServicesBuilder servicesBuilder;
 
     private static TransactionService transactionService;
