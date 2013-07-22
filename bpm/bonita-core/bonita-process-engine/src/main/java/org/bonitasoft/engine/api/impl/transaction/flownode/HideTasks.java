@@ -44,7 +44,7 @@ public class HideTasks implements TransactionContent {
         for (int i = 0; i < activityInstanceIds.length && !found; i++) {
             long activityInstanceId = activityInstanceIds[i];
             try {
-                activityInstanceService.getHiddenTask(activityInstanceId);
+                activityInstanceService.getHiddenTask(userId, activityInstanceId);
                 found = true;
                 foundActivityInstanceId = activityInstanceId;
             } catch (STaskVisibilityException vis) {

@@ -607,22 +607,26 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Role createRole(final RoleCreator creator) throws AlreadyExistsException, CreationException {
         if (creator == null) {
-            throw new CreationException("Unable to create a role with a null creator!");
+            throw new CreationException("Unable to create a role with a null RoleCreator object");
+        }
+        if (creator.getFields().get(org.bonitasoft.engine.identity.RoleCreator.RoleField.NAME) == null) {
+            throw new CreationException("Unable to create a role with a null name");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
 
         final SRole sRole = ModelConvertor.constructSRole(creator, tenantAccessor.getIdentityModelBuilder());
         try {
+            getRoleByName(sRole.getName());
+            throw new AlreadyExistsException("A role named \"" + sRole.getName() + "\" already exists");
+        } catch (final RoleNotFoundException rnfe) {
+            // Ok, role can now be created.
+        }
+        try {
             final CreateRole createRole = new CreateRole(sRole, identityService);
             createRole.execute();
             return ModelConvertor.toRole(sRole);
         } catch (final SBonitaException sbe) {
-            try {
-                getRoleByName(sRole.getName());
-                throw new AlreadyExistsException("A role named \"" + sRole.getName() + "\" already exists");
-            } catch (final RoleNotFoundException rnfe) {
-            }
             throw new CreationException("Role create exception!", sbe);
         }
     }
@@ -698,7 +702,11 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public void deleteRoles(final List<Long> roleIds) throws DeletionException {
-        NullCheckingUtil.checkArgsNotNull(roleIds);
+        try {
+            NullCheckingUtil.checkArgsNotNull(roleIds);
+        } catch (IllegalArgumentException e) {
+            throw new DeletionException(e);
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
@@ -1063,17 +1071,17 @@ public class IdentityAPIImpl implements IdentityAPI {
     private User createUser(final TenantServiceAccessor tenantAccessor, final SUser sUser, final SContactInfo sPersonalData,
             final SContactInfo sProfessionalData) throws AlreadyExistsException, CreationException {
         try {
+            getUserByUserName(sUser.getUserName());
+            throw new AlreadyExistsException("A user with name \"" + sUser.getUserName() + "\" already exists");
+        } catch (final UserNotFoundException unfe) {
+            // user does not exists but was unable to be created
+        }
+        try {
             final CreateUser createUser = new CreateUser(sUser, sPersonalData, sProfessionalData, tenantAccessor.getIdentityService(), tenantAccessor
                     .getIdentityModelBuilder().getUserContactInfoBuilder());
             createUser.execute();
             return ModelConvertor.toUser(createUser.getResult());
         } catch (final SBonitaException sbe) {
-            try {
-                getUserByUserName(sUser.getUserName());
-                throw new AlreadyExistsException("A user with name \"" + sUser.getUserName() + "\" already exists");
-            } catch (final UserNotFoundException unfe) {
-                // user does not exists but was unable to be created
-            }
             throw new CreationException(sbe);
         }
     }
@@ -1184,22 +1192,22 @@ public class IdentityAPIImpl implements IdentityAPI {
 
         final long assignedBy = ModelConvertor.getCurrentUserId();
         try {
+            final GetUserMembership getUserMembership = new GetUserMembership(userId, groupId, roleId, identityService);
+            getUserMembership.execute();
+            if (getUserMembership.getResult() != null) {
+                throw new AlreadyExistsException("A userMembership with userId \"" + userId + "\", groupId \"" + groupId + "\" and roleId \"" + roleId
+                        + "\" already exists");
+            }
+        } catch (final SBonitaException e) {
+            // Membership does not exists but was unable to be created
+        }
+        try {
             final AddUserMembership createUserMembership = new AddUserMembership(userId, groupId, roleId, assignedBy, identityService,
                     identityModelBuilder.getUserMembershipBuilder());
             createUserMembership.execute();
             final SUserMembership sUserMembership = createUserMembership.getResult();
             return ModelConvertor.toUserMembership(sUserMembership);
         } catch (final SBonitaException sbe) {
-            try {
-                final GetUserMembership getUserMembership = new GetUserMembership(userId, groupId, roleId, identityService);
-                getUserMembership.execute();
-                if (getUserMembership.getResult() != null) {
-                    throw new AlreadyExistsException("A userMembership with userId \"" + userId + "\", groupId \"" + groupId + "\" and roleId \"" + roleId
-                            + "\" already exists");
-                }
-            } catch (final SBonitaException e) {
-                // Membership does not exists but was unable to be created
-            }
             throw new CreationException(sbe);
         }
     }
