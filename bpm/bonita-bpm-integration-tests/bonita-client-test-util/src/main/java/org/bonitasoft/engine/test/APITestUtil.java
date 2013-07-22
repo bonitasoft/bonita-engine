@@ -732,6 +732,12 @@ public class APITestUtil {
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
     }
 
+	protected void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
+        final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
+                processInstance, getProcessAPI(), state);
+        assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
+    }
+	
     protected void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
         final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
                 processInstance, getProcessAPI(), state);
