@@ -426,14 +426,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Monitoring -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
-			<artifactId>bonita-monitoring-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Operation -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>

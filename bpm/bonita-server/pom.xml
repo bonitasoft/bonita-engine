@@ -303,13 +303,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Monitoring -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
-			<artifactId>bonita-monitoring-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Operation -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>
@@ -728,9 +721,6 @@
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.log:bonita-log-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
-									<!-- Monitoring -->
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
 									<!-- Operation -->
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>

@@ -67,7 +67,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.TenantMonitoringService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -127,8 +126,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     FlowNodeStateManager getFlowNodeStateManager();
 
     TransactionExecutor getTransactionExecutor();
-
-    TenantMonitoringService getTenantMonitoringService();
 
     ActorMappingService getActorMappingService();
 

@@ -21,7 +21,6 @@
 		<module>bonita-process-engine</module>
 		<module>bonita-home-server</module>
 		<module>bonita-actor-mapping</module>
-		<module>bonita-bpm-monitoring</module>
 		<module>bonita-core-data</module>
 		<module>bonita-category</module>
 		<module>bonita-operation</module>

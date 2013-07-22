@@ -28,7 +28,6 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
  * <ul>
  * <li>{@link PlatformAPI}</li>
  * <li>{@link PlatformCommandAPI}</li>
- * <li>{@link PlatformMonitoringAPI}</li>
  * </ul>
  * 
  * @author Matthieu Chaffotte

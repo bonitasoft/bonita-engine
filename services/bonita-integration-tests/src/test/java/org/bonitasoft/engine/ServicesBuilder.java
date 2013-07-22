@@ -22,11 +22,6 @@ import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.PlatformMonitoringService;
-import org.bonitasoft.engine.monitoring.TenantMonitoringService;
-import org.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
-import org.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
-import org.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -71,11 +66,19 @@ public class ServicesBuilder {
 
     public ServicesBuilder() {
         super();
-        accessor = ServicesAccessor.getInstance();
+        setAccessor(ServicesAccessor.getInstance());
+    }
+
+    public ServicesAccessor getAccessor() {
+        return accessor;
+    }
+
+    public void setAccessor(final ServicesAccessor accessor) {
+        this.accessor = accessor;
     }
 
     public QueriableLoggerService buildQueriableLogger(final String name) {
-        return accessor.getInstanceOf(name, QueriableLoggerService.class);
+        return getAccessor().getInstanceOf(name, QueriableLoggerService.class);
     }
 
     public QueriableLoggerService buildQueriableLogger() {
@@ -83,23 +86,23 @@ public class ServicesBuilder {
     }
 
     public IdentityModelBuilder buildIdentityModelBuilder() {
-        return accessor.getInstanceOf(IdentityModelBuilder.class);
+        return getAccessor().getInstanceOf(IdentityModelBuilder.class);
     }
 
     public SDataInstanceBuilders builderSDataInstanceBuilder() {
-        return accessor.getInstanceOf(SDataInstanceBuilders.class);
+        return getAccessor().getInstanceOf(SDataInstanceBuilders.class);
     }
 
     public SDataDefinitionBuilders builderSDataDefinitionBuilders() {
-        return accessor.getInstanceOf(SDataDefinitionBuilders.class);
+        return getAccessor().getInstanceOf(SDataDefinitionBuilders.class);
     }
 
     public DependencyBuilder buildDependencyModelBuilder() {
-        return accessor.getInstanceOf(DependencyBuilder.class);
+        return getAccessor().getInstanceOf(DependencyBuilder.class);
     }
 
     public DependencyMappingBuilder buildDependencyMappingModelBuilder() {
-        return accessor.getInstanceOf(DependencyMappingBuilder.class);
+        return getAccessor().getInstanceOf(DependencyMappingBuilder.class);
     }
 
     public PersistenceService buildPersistence() {
@@ -107,7 +110,7 @@ public class ServicesBuilder {
     }
 
     public PersistenceService buildPersistence(final String name) {
-        return accessor.getInstanceOf(name, PersistenceService.class);
+        return getAccessor().getInstanceOf(name, PersistenceService.class);
     }
 
     public PersistenceService buildJournal() {
@@ -123,167 +126,143 @@ public class ServicesBuilder {
         if (sync) {
             synchType = "recorderSync";
         }
-        return accessor.getInstanceOf(synchType, Recorder.class);
+        return getAccessor().getInstanceOf(synchType, Recorder.class);
     }
 
     public TransactionService buildTransactionService() {
-        return accessor.getInstanceOf(TransactionService.class);
+        return getAccessor().getInstanceOf(TransactionService.class);
     }
 
     public PlatformService buildPlatformService() {
-        return accessor.getInstanceOf(PlatformService.class);
+        return getAccessor().getInstanceOf(PlatformService.class);
     }
 
     public DataService buildDataService() {
-        return accessor.getInstanceOf(DataService.class);
+        return getAccessor().getInstanceOf(DataService.class);
     }
 
     public SDataSourceParameterBuilder buildDataSourceParameterModelBuilder() {
-        return accessor.getInstanceOf(SDataSourceParameterBuilder.class);
+        return getAccessor().getInstanceOf(SDataSourceParameterBuilder.class);
     }
 
     public SDataSourceBuilder buildDataSourceModelBuilder() {
-        return accessor.getInstanceOf(SDataSourceBuilder.class);
+        return getAccessor().getInstanceOf(SDataSourceBuilder.class);
     }
 
     public SPlatformBuilder buildPlatformBuilder() {
-        return accessor.getInstanceOf(SPlatformBuilder.class);
+        return getAccessor().getInstanceOf(SPlatformBuilder.class);
     }
 
     public STenantBuilder buildTenantBuilder() {
-        return accessor.getInstanceOf(STenantBuilder.class);
+        return getAccessor().getInstanceOf(STenantBuilder.class);
     }
 
     public SessionAccessor buildSessionAccessor() {
-        return accessor.getInstanceOf(SessionAccessor.class);
+        return getAccessor().getInstanceOf(SessionAccessor.class);
     }
 
     public IdentityService buildIdentityService() {
-        return accessor.getInstanceOf(IdentityService.class);
+        return getAccessor().getInstanceOf(IdentityService.class);
     }
 
     public ArchiveService buildArchiveService() {
-        return accessor.getInstanceOf(ArchiveService.class);
+        return getAccessor().getInstanceOf(ArchiveService.class);
     }
 
     public ExpressionService buildExpressionService() {
-        return accessor.getInstanceOf(ExpressionService.class);
+        return getAccessor().getInstanceOf(ExpressionService.class);
     }
 
     public DataInstanceService buildDataInstanceService() {
-        return accessor.getInstanceOf(DataInstanceService.class);
+        return getAccessor().getInstanceOf(DataInstanceService.class);
     }
 
     public DependencyService buildDependencyService() {
-        return accessor.getInstanceOf("dependencyService", DependencyService.class);
+        return getAccessor().getInstanceOf("dependencyService", DependencyService.class);
     }
 
     public DependencyService buildPlatformDependencyService() {
-        return accessor.getInstanceOf("platformDependencyService", DependencyService.class);
+        return getAccessor().getInstanceOf("platformDependencyService", DependencyService.class);
     }
 
     public SQueriableLogModelBuilder buildQueriableLogModelBuilder() {
-        return accessor.getInstanceOf(SQueriableLogModelBuilder.class);
+        return getAccessor().getInstanceOf(SQueriableLogModelBuilder.class);
     }
 
     public SchedulerService buildSchedulerService() {
-        return accessor.getInstanceOf(SchedulerService.class);
+        return getAccessor().getInstanceOf(SchedulerService.class);
     }
 
     public ClassLoaderService buildClassLoaderService() {
-        return accessor.getInstanceOf(ClassLoaderService.class);
-    }
-
-    public SServiceMXBean getServiceMXBean() {
-        return accessor.getInstanceOf(SServiceMXBean.class);
-    }
-
-    public SPlatformServiceMXBean getPlatformServiceMXBean() {
-        return accessor.getInstanceOf(SPlatformServiceMXBean.class);
-    }
-
-    public SJvmMXBean getJvmMXBean() {
-        return accessor.getInstanceOf(SJvmMXBean.class);
+        return getAccessor().getInstanceOf(ClassLoaderService.class);
     }
 
     public EventService buildEventService() {
-        return accessor.getInstanceOf(EventService.class);
+        return getAccessor().getInstanceOf(EventService.class);
     }
 
     public ExceptionsManager getExceptionsManager() {
-        return accessor.getInstanceOf(ExceptionsManager.class);
+        return getAccessor().getInstanceOf(ExceptionsManager.class);
     }
 
     public CacheService buildCacheService() {
-        return accessor.getInstanceOf(CacheService.class);
+        return getAccessor().getInstanceOf(CacheService.class);
     }
 
     public AuthenticationService buildAuthenticationService() {
-        return accessor.getInstanceOf(AuthenticationService.class);
+        return getAccessor().getInstanceOf(AuthenticationService.class);
     }
 
     public PlatformAuthenticationService buildPlatformAuthenticationService() {
-        return accessor.getInstanceOf(PlatformAuthenticationService.class);
+        return getAccessor().getInstanceOf(PlatformAuthenticationService.class);
     }
 
     public SessionService buildSessionService() {
-        return accessor.getInstanceOf(SessionService.class);
+        return getAccessor().getInstanceOf(SessionService.class);
     }
 
     public PlatformSessionService buildPlatformSessionService() {
-        return accessor.getInstanceOf(PlatformSessionService.class);
-    }
-
-    public TenantMonitoringService buildTenantMonitoringService(final boolean useCache) {
-        if (useCache) {
-            return accessor.getInstanceOf("monitoringServiceWithCache", TenantMonitoringService.class);
-        } else {
-            return accessor.getInstanceOf("monitoringService", TenantMonitoringService.class);
-        }
-    }
-
-    public PlatformMonitoringService buildPlatformMonitoringService() {
-        return accessor.getInstanceOf(PlatformMonitoringService.class);
+        return getAccessor().getInstanceOf(PlatformSessionService.class);
     }
 
     public TechnicalLoggerService buildTechnicalLoggerService() {
-        return accessor.getInstanceOf(TechnicalLoggerService.class);
+        return getAccessor().getInstanceOf(TechnicalLoggerService.class);
     }
 
     public CommandService buildCommandService() {
-        return accessor.getInstanceOf(CommandService.class);
+        return getAccessor().getInstanceOf(CommandService.class);
     }
 
     public SCommandBuilderAccessor buildSCommandBuilderAccessor() {
-        return accessor.getInstanceOf(SCommandBuilderAccessor.class);
+        return getAccessor().getInstanceOf(SCommandBuilderAccessor.class);
     }
 
     public DependencyBuilderAccessor buildPlatformDependencyBuilderAccessor() {
-        return accessor.getInstanceOf("platformDependencyBuilderAccessor", DependencyBuilderAccessor.class);
+        return getAccessor().getInstanceOf("platformDependencyBuilderAccessor", DependencyBuilderAccessor.class);
     }
 
     public PlatformCommandService buildPlatformCommandService() {
-        return accessor.getInstanceOf(PlatformCommandService.class);
+        return getAccessor().getInstanceOf(PlatformCommandService.class);
     }
 
     public SPlatformCommandBuilderAccessor buildSPlatformCommandBuilderAccessor() {
-        return accessor.getInstanceOf(SPlatformCommandBuilderAccessor.class);
+        return getAccessor().getInstanceOf(SPlatformCommandBuilderAccessor.class);
     }
 
     public ProfileService buildProfileService() {
-        return accessor.getInstanceOf(ProfileService.class);
+        return getAccessor().getInstanceOf(ProfileService.class);
     }
 
     public Parser getParser() {
-        return accessor.getInstanceOf(Parser.class);
+        return getAccessor().getInstanceOf(Parser.class);
     }
 
     public WorkService buildWorkService() {
-        return accessor.getInstanceOf(WorkService.class);
+        return getAccessor().getInstanceOf(WorkService.class);
     }
 
     public <T> T getInstanceOf(final Class<T> class1) {
-        return accessor.getInstanceOf(class1);
+        return getAccessor().getInstanceOf(class1);
     }
 
 }

@@ -850,7 +850,7 @@ public class APITestUtil {
     }
 
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
-        return waitForEvent(50, 5000, processInstance, eventName, state);
+        return waitForEvent(100, 5000, processInstance, eventName, state);
     }
 
     public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String eventName, final String state)

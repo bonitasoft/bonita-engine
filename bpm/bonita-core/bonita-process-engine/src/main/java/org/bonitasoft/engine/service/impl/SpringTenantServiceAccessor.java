@@ -80,7 +80,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.TenantMonitoringService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -150,8 +149,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BPMDefinitionBuilders bpmDefinitionBuilders;
 
     private BPMInstanceBuilders bpmInstanceBuilders;
-
-    private TenantMonitoringService tenantMonitoringServie;
 
     private ActorMappingService actorMappingService;
 
@@ -386,14 +383,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             transactionExecutor = beanAccessor.getService(TransactionExecutor.class);
         }
         return transactionExecutor;
-    }
-
-    @Override
-    public TenantMonitoringService getTenantMonitoringService() {
-        if (tenantMonitoringServie == null) {
-            tenantMonitoringServie = beanAccessor.getService(TenantMonitoringService.class);
-        }
-        return tenantMonitoringServie;
     }
 
     @Override

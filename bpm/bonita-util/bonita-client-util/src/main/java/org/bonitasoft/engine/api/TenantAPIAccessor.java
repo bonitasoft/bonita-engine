@@ -33,7 +33,6 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link ProcessAPI}</li>
  * <li>{@link CommandAPI}</li>
  * <li>{@link IdentityAPI}</li>
- * <li>{@link MonitoringAPI}</li>
  * <li>{@link LoginAPI}</li>
  * </ul>
  * 
