@@ -283,9 +283,8 @@ public class ModelConvertor {
     }
 
     public static Platform toPlatform(final SPlatform sPlatform) {
-        final Platform platform = new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(),
-                sPlatform.getCreatedBy(), sPlatform.getCreated());
-        return platform;
+        return new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(), sPlatform.getCreatedBy(),
+                sPlatform.getCreated());
     }
 
     public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities, final FlowNodeStateManager flowNodeStateManager) {
@@ -733,6 +732,7 @@ public class ModelConvertor {
             case INTERMEDIATE_CATCH_EVENT:
             case INTERMEDIATE_THROW_EVENT:
             case START_EVENT:
+                throw new UnknownElementType("Events are not yet archived");
             default:
                 throw new UnknownElementType(sInstance.getType().name());
         }
@@ -1762,11 +1762,8 @@ public class ModelConvertor {
             case LOOP_ACTIVITY:
                 archiveFlowNodeInstance = toArchivedLoopActivityInstance((SALoopActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
-            case START_EVENT:
-            case INTERMEDIATE_CATCH_EVENT:
-            case INTERMEDIATE_THROW_EVENT:
-            case END_EVENT:
-                // archiveFlowNodeInstance = toArchivedEventInstance((SAEventInstance) saFlowNode, flowNodeStateManager);
+            case SUB_PROCESS:
+                archiveFlowNodeInstance = toArchivedSubProcessActivityInstance((SASubProcessActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case GATEWAY:
                 archiveFlowNodeInstance = toArchivedGatewayInstance((SAGatewayInstance) saFlowNode, flowNodeStateManager);
@@ -1775,7 +1772,11 @@ public class ModelConvertor {
                 archiveFlowNodeInstance = toArchivedMultiInstanceActivityInstance((SAMultiInstanceActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case BOUNDARY_EVENT:
-            case SUB_PROCESS:
+            case START_EVENT:
+            case INTERMEDIATE_CATCH_EVENT:
+            case INTERMEDIATE_THROW_EVENT:
+            case END_EVENT:
+                // archiveFlowNodeInstance = toArchivedEventInstance((SAEventInstance) saFlowNode, flowNodeStateManager);
                 break;
             default:
                 throw new UnknownElementType(saFlowNode.getType().name());

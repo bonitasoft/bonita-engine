@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.search;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +13,8 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -14,6 +22,8 @@ import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescripto
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -38,12 +48,6 @@ import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Matthieu Chaffotte
@@ -1320,4 +1324,35 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         subProcessBuilder.addTransition("start", suProcTaskName);
         return deployAndEnableWithActor(builder.done(), actorName, user);
     }
+
+    @Test
+    public void test() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
+        processBuilder.createNewInstance("EventSubProcess", "1.0");
+        processBuilder.addStartEvent("start");
+        processBuilder.addEndEvent("endSignal").addSignalEventTrigger("go");
+        processBuilder.addTransition("start", "endSignal");
+        final SubProcessDefinitionBuilder subProcessBuilder = processBuilder.addSubProcess("signalSubProcess", true).getSubProcessBuilder();
+        subProcessBuilder.addStartEvent("startSignal").addSignalEventTrigger("go");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcess(processBuilder.getProcess());
+        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
+        Thread.sleep(2000);
+
+        // search
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 5);
+        builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, instance.getId());
+        builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
+        builder.sort(ArchivedFlowNodeInstanceSearchDescriptor.DISPLAY_NAME, Order.ASC);
+
+        final SearchResult<ArchivedFlowNodeInstance> result = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
+        assertEquals(1, result.getCount());
+        assertNotNull(result.getResult().get(0));
+
+        final List<ProcessDeploymentInfo> infos = getProcessAPI().getProcessDeploymentInfos(0, 2, ProcessDeploymentInfoCriterion.NAME_ASC);
+        for (final ProcessDeploymentInfo info : infos) {
+            disableAndDeleteProcess(info.getProcessId());
+        }
+    }
+
 }
