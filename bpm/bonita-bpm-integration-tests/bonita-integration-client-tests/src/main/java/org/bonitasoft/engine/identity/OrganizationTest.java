@@ -1,5 +1,16 @@
 package org.bonitasoft.engine.identity;
 
+import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.managersAre;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.usernamesAre;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,17 +35,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.managersAre;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.usernamesAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class OrganizationTest extends CommonAPITest {
 
@@ -462,6 +462,7 @@ public class OrganizationTest extends CommonAPITest {
         final UserUpdater updateDescriptor = new UserUpdater();
         updateDescriptor.setEnabled(true);
         getIdentityAPI().updateUser(userToDisable.getId(), updateDescriptor);
+        assertEquals(2, getIdentityAPI().getNumberOfUsers());
         try {
             importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", policy);
         } catch (final OrganizationImportException e) {

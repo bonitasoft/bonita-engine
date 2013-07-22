@@ -31,6 +31,11 @@ public interface TransactionExecutor {
 
     void execute(TransactionContent... transactionContents) throws SBonitaException;
 
+    /**
+     * @return true if the transaction has been opened, false it it was already active and has thus not been opened.
+     * @throws STransactionException
+     *             if an error occurs when trying to really open the transaction.
+     */
     boolean openTransaction() throws STransactionException;
 
     void completeTransaction(boolean txOpened) throws STransactionException;

@@ -316,12 +316,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteUser(final long userId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
-
         try {
             final DeleteUser deleteUser = new DeleteUser(identityService, actorMappingService, profileService, userId, sProfileBuilderAccessor);
             deleteUser.execute();
@@ -338,12 +336,10 @@ public class IdentityAPIImpl implements IdentityAPI {
             throw new DeletionException("User name can not be null!");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
-
         try {
             final DeleteUser deleteUser = new DeleteUser(identityService, actorMappingService, profileService, userName, sProfileBuilderAccessor);
             deleteUser.execute();
@@ -358,7 +354,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void deleteUsers(final List<Long> userIds) throws DeletionException {
         if (userIds != null && !userIds.isEmpty()) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
             final IdentityService identityService = tenantAccessor.getIdentityService();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final ProfileService profileService = tenantAccessor.getProfileService();
@@ -379,7 +374,6 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetSUser transactionContent = new GetSUser(identityService, userId);
             transactionContent.execute();
@@ -395,7 +389,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public User getUserByUserName(final String userName) throws UserNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetSUser transactionContent = new GetSUser(identityService, userName);
             transactionContent.execute();
@@ -414,7 +407,6 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetSContactInfo txContent = new GetSContactInfo(userId, identityService, personal);
             txContent.execute();
@@ -432,7 +424,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUsers() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetNumberOfInstance transactionContent = new GetNumberOfInstance("getNumberOfUsers", identityService);
             transactionContent.execute();
@@ -471,7 +462,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public SearchResult<User> searchUsers(final SearchOptions options) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchUsers searchUsers = new SearchUsers(identityService, searchEntitiesDescriptor.getUserDescriptor(), options);
@@ -487,7 +477,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUsersInRole(final long roleId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(roleId, "getNumberOfUsersInRole", identityService);
             transactionContentWithResult.execute();
@@ -501,7 +490,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<User> getUsersInRole(final long roleId, final int startIndex, final int maxResults, final UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -546,7 +534,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUsersInGroup(final long groupId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final GetNumberOfUsersInType transactionContentWithResult = new GetNumberOfUsersInType(groupId, "getNumberOfUsersInGroup", identityService);
         try {
             transactionContentWithResult.execute();
@@ -560,7 +547,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<User> getUsersInGroup(final long groupId, final int startIndex, final int maxResults, final UserCriterion crterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -710,7 +696,6 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
         final DeleteRoles deleteRoles = new DeleteRoles(identityService, actorMappingService, profileService, sProfileBuilderAccessor, roleIds);
@@ -724,7 +709,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Role getRole(final long roleId) throws RoleNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetRole getRole = new GetRole(roleId, identityService);
@@ -738,7 +722,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Role getRoleByName(final String roleName) throws RoleNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetRoleByName getRoleByName = new GetRoleByName(roleName, identityService);
@@ -752,7 +735,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public long getNumberOfRoles() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfRoles", identityService);
@@ -767,7 +749,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<Role> getRoles(final int startIndex, final int maxResults, final RoleCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -817,7 +798,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public SearchResult<Role> searchRoles(final SearchOptions options) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchRoles searchRoles = new SearchRoles(identityService, searchEntitiesDescriptor.getRoleDescriptor(), options);
@@ -865,7 +845,6 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final IdentityModelBuilder identityModelBuilder = tenantAccessor.getIdentityModelBuilder();
         final GroupUpdateBuilder groupUpdateBuilder = identityModelBuilder.getGroupUpdateBuilder();
-
         try {
             final SGroup group = getSGroup(groupId, tenantAccessor);
             final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(groupUpdateBuilder, updater);
@@ -915,7 +894,6 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
         final DeleteGroup deleteGroup = new DeleteGroup(identityService, actorMappingService, profileService, groupId, sProfileBuilderAccessor);
@@ -936,7 +914,6 @@ public class IdentityAPIImpl implements IdentityAPI {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final IdentityService identityService = tenantAccessor.getIdentityService();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-
             final ProfileService profileService = tenantAccessor.getProfileService();
             final SProfileBuilderAccessor sProfileBuilderAccessor = tenantAccessor.getSProfileBuilderAccessor();
             try {
@@ -962,7 +939,6 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     private SGroup getSGroup(final long groupId, final TenantServiceAccessor tenantAccessor) throws SGroupNotFoundException {
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetSGroup getSGroup = new GetSGroup(groupId, identityService);
             getSGroup.execute();
@@ -977,7 +953,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public Group getGroupByPath(final String groupPath) throws GroupNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final GetGroupByPath getGroup = new GetGroupByPath(groupPath, identityService);
@@ -994,7 +969,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfGroups() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetNumberOfInstance getNumberOfInstance = new GetNumberOfInstance("getNumberOfGroups", identityService);
             getNumberOfInstance.execute();
@@ -1022,7 +996,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<Group> getGroups(final int startIndex, final int maxResults, final GroupCriterion pagingCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
         String field = null;
         OrderByType order = null;
@@ -1056,7 +1029,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public SearchResult<Group> searchGroups(final SearchOptions options) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchGroups searchGroups = new SearchGroups(identityService, searchEntitiesDescriptor.getGroupDescriptor(), options);
@@ -1133,7 +1105,6 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     private OrderByType getUserOrderByType(final UserCriterion pagingCriterion) {
         OrderByType order = null;
-
         switch (pagingCriterion) {
             case USER_NAME_ASC:
                 order = OrderByType.ASC;
@@ -1159,7 +1130,6 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     private String getUserFieldKey(final UserCriterion pagingCriterion, final TenantServiceAccessor tenantAccessor) {
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
-
         String field = null;
         switch (pagingCriterion) {
             case USER_NAME_ASC:
@@ -1189,7 +1159,6 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityModelBuilder identityModelBuilder = tenantAccessor.getIdentityModelBuilder();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final long assignedBy = ModelConvertor.getCurrentUserId();
         try {
             final GetUserMembership getUserMembership = new GetUserMembership(userId, groupId, roleId, identityService);
@@ -1232,7 +1201,6 @@ public class IdentityAPIImpl implements IdentityAPI {
             UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final EntityUpdateDescriptor changeDescriptor = tenantAccessor.getIdentityModelBuilder().getUserMembershipUpdateBuilder().updateGroupId(newGroupId)
                 .updateRoleId(newRoleId).done();
         try {
@@ -1251,7 +1219,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void deleteUserMembership(final long userMembershipId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             identityService.deleteUserMembership(userMembershipId);
         } catch (final SIdentityException e) {
@@ -1263,7 +1230,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void deleteUserMembership(final long userId, final long groupId, final long roleId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             identityService.deleteUserMembership(identityService.getLightUserMembership(userId, groupId, roleId));
         } catch (final SIdentityException e) {
@@ -1275,7 +1241,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void deleteUserMemberships(final List<Long> userIds, final long groupId, final long roleId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             for (final long userId : userIds) {
                 final SUserMembership userMembership = identityService.getLightUserMembership(userId, groupId, roleId);
@@ -1290,7 +1255,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public UserMembership getUserMembership(final long userMembershipId) throws MembershipNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final GetUserMembership getUserMembership = new GetUserMembership(userMembershipId, identityService);
         try {
             getUserMembership.execute();
@@ -1305,7 +1269,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public long getNumberOfUserMemberships(final long userId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final TransactionContentWithResult<Long> transactionContent = new GetNumberOfUserMemberships(userId, identityService);
             transactionContent.execute();
@@ -1318,7 +1281,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults, final UserMembershipCriterion pagingCrterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         try {
             final IdentityService identityService = tenantAccessor.getIdentityService();
             final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
@@ -1381,7 +1343,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<UserMembership> getUserMembershipsByGroup(final long groupId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         final GetUserMembershipsOfGroup transactionContentWithResult = new GetUserMembershipsOfGroup(groupId, identityService, startIndex, maxResults);
         try {
             transactionContentWithResult.execute();
@@ -1395,7 +1356,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     public List<UserMembership> getUserMembershipsByRole(final long roleId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
             final GetUserMembershipsOfRole transactionContentWithResult = new GetUserMembershipsOfRole(roleId, identityService, startIndex, maxResults);
             transactionContentWithResult.execute();
@@ -1408,13 +1368,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void deleteOrganization() throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
-        final DeleteOrganization deleteOrganization = new DeleteOrganization(identityService, profileService, actorMappingService);
         try {
-            deleteOrganization.execute();
+            new DeleteOrganization(identityService, profileService, actorMappingService).execute();
             updateActorProcessDependenciesForAllActors(tenantAccessor);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
@@ -1429,10 +1387,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public void importOrganization(final String organizationContent, final ImportPolicy policy) throws OrganizationImportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final ImportOrganization importOrganization = new ImportOrganization(tenantAccessor, organizationContent, policy);
         try {
-            importOrganization.execute();
+            new ImportOrganization(tenantAccessor, organizationContent, policy).execute();
         } catch (final SBonitaException e) {
             throw new OrganizationImportException(e);
         }
