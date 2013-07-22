@@ -72,7 +72,7 @@ public class RetryTransactionExecutor implements TransactionExecutor {
                 attempt++;
                 if (loggerService.isLoggable(TransactionExecutor.class, TechnicalLogSeverity.INFO)) {
                     loggerService.log(TransactionExecutor.class, TechnicalLogSeverity.INFO, "Transaction failed", sre);
-                    loggerService.log(TransactionExecutor.class, TechnicalLogSeverity.INFO, "Retring(# " + attempt + ") in " + sleepTime + " ms");
+                    loggerService.log(TransactionExecutor.class, TechnicalLogSeverity.INFO, "Retrying (# " + attempt + ") in " + sleepTime + " ms");
                 }
                 try {
                     Thread.sleep(sleepTime);
