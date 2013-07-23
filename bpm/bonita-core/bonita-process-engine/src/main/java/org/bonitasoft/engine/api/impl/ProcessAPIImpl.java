@@ -460,14 +460,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private static PlatformServiceAccessor getPlatformServiceAccessor() {
-        try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public SearchResult<HumanTaskInstance> searchHumanTaskInstances(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
