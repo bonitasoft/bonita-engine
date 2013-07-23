@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
+import org.bonitasoft.engine.api.impl.ProcessAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
@@ -55,7 +56,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -116,7 +116,6 @@ import org.bonitasoft.engine.transaction.STransactionException;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
-import com.bonitasoft.engine.api.impl.transaction.process.DeleteProcessExt;
 import com.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
@@ -156,8 +155,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    protected TransactionContent getDeleteTrancastionContent(final long processDefinitionId) {
-        return new DeleteProcessExt(getTenantAccessor(), processDefinitionId);
+    protected ProcessAPIImplDelegate instantiateAPIDelegate() {
+        return new ProcessAPIExtDelegate();
     }
 
     @Override
