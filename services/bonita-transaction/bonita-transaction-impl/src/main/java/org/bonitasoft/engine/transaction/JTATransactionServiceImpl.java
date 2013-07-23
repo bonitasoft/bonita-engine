@@ -211,7 +211,11 @@ public class JTATransactionServiceImpl implements TransactionService {
     @Override
     public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
         try {
-            txManager.getTransaction().registerSynchronization(new JTATransactionWrapper(txSync));
+            final Transaction transaction = txManager.getTransaction();
+            if (transaction == null) {
+                throw new STransactionNotFoundException("No active transaction");
+            }
+            transaction.registerSynchronization(new JTATransactionWrapper(txSync));
             synchronizations.add(txSync);
         } catch (final IllegalStateException e) {
             throw new STransactionNotFoundException(e.getMessage());
@@ -223,7 +227,7 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+    public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
         begin();
         try {
             return callable.call();
@@ -233,7 +237,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         } finally {
             complete();
         }
-        
+
     }
 
 }
