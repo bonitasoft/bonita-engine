@@ -71,7 +71,7 @@ public class TransactionExecutorImpl implements TransactionExecutor {
 
     @Override
     public boolean openTransaction() throws STransactionException {
-        if (transactionService.isTransactionActive()) {
+        if (isTransactionActive()) {
             return false;
         } else {
             try {
