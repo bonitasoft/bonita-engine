@@ -512,7 +512,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteProcess(final long processId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         // multiple tx here because we must lock instances when deleting them
-        // but if the second tx crash we can relaunch deleteprocess without issues
+        // but if the second tx crash we can relaunch delete process without issues
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         checkNoActiveTransaction(transactionExecutor);
         try {
@@ -552,7 +552,7 @@ public class ProcessAPIImpl implements ProcessAPI {
      */
     protected void checkNoActiveTransaction(final TransactionExecutor transactionExecutor) {
         if (transactionExecutor.isTransactionActive()) {
-            throw new RuntimeException("This method MUST NOT be called inside a existing transaction!");
+            throw new RuntimeException("This method MUST NOT be called inside an existing transaction!");
         }
     }
 
@@ -562,14 +562,19 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int maxResults = 1000;
         do {
             processInstances = searchProcessInstancesFromProcessDefinition(tenantAccessor, processDefinitionId, maxResults);
-            final List<Long> processInstanceIds = new ArrayList<Long>(processInstances.size());
-            for (final ProcessInstance processInstance : processInstances) {
-                processInstanceIds.add(processInstance.getId());
-            }
-            if (processInstanceIds.size() > 0) {
-                deleteProcessInstancesInsideLocks(tenantAccessor, true, processInstanceIds.toArray(new Long[processInstanceIds.size()]));
+            if (processInstances.size() > 0) {
+                deleteProcessInstancesInsideLocks(tenantAccessor, true, processInstances);
             }
         } while (!processInstances.isEmpty());
+    }
+
+    private void deleteProcessInstancesInsideLocks(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
+            final List<ProcessInstance> processInstances) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+        final Long[] processInstanceIds = new Long[processInstances.size()];
+        for (int i = 0; i < processInstanceIds.length; i++) {
+            processInstanceIds[i] = processInstances.get(i).getId();
+        }
+        deleteProcessInstancesInsideLocks(tenantAccessor, true, processInstanceIds);
     }
 
     private void deleteProcessInstancesInsideLocks(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
@@ -1866,9 +1871,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public long getNumberOfProcessDefinitionsOfCategory(final long categoryId) {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
-            final GetProcessDefinitionIdsOfCategory transactionContentWithResult = new GetProcessDefinitionIdsOfCategory(categoryId, categoryService);
-            transactionContentWithResult.execute();
-            final List<Long> ids = transactionContentWithResult.getResult();
+            final List<Long> ids = categoryService.getProcessDefinitionIdsOfCategory(categoryId);
             if (ids != null) {
                 return ids.size();
             }
@@ -1912,19 +1915,30 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private OrderByType getOrderByType(final ProcessDeploymentInfoCriterion sortCriterion) {
-        OrderByType order = null;
         if (sortCriterion != null) {
             switch (sortCriterion) {
                 case NAME_ASC:
-                    order = OrderByType.ASC;
-                    break;
+                    return OrderByType.ASC;
                 case NAME_DESC:
-                    order = OrderByType.DESC;
-                    break;
+                    return OrderByType.DESC;
                 case DEFAULT:
-                    order = OrderByType.ASC;
-                    break;
+                    return OrderByType.ASC;
+                default:
+                    return null;
             }
+        }
+        return null;
+    }
+
+    private OrderByType mapPagingCriterionToOrderByType(final CategoryCriterion pagingCriterion) {
+        OrderByType order = null;
+        switch (pagingCriterion) {
+        case NAME_ASC:
+            order = OrderByType.ASC;
+            break;
+        case NAME_DESC:
+            order = OrderByType.DESC;
+            break;
         }
         return order;
     }
@@ -1936,15 +1950,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            OrderByType order = null;
-            switch (pagingCriterion) {
-                case NAME_ASC:
-                    order = OrderByType.ASC;
-                    break;
-                case NAME_DESC:
-                    order = OrderByType.DESC;
-                    break;
-            }
+            OrderByType order = mapPagingCriterionToOrderByType(pagingCriterion);
             return ModelConvertor.toCategories(categoryService.getCategoriesOfProcessDefinition(processDefinitionId, startIndex, maxResults, order));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -1958,15 +1964,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            OrderByType order = null;
-            switch (sortingCriterion) {
-                case NAME_ASC:
-                    order = OrderByType.ASC;
-                    break;
-                case NAME_DESC:
-                    order = OrderByType.DESC;
-                    break;
-            }
+            OrderByType order = mapPagingCriterionToOrderByType(sortingCriterion);
             return ModelConvertor.toCategories(categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, startIndex, maxResults, order));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
