@@ -379,26 +379,6 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().updateProfileEntry(16464654L, updateDescriptor);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "First" }, story = "Need to support Profile entries indexation for drag and Drop", jira = "ENGINE-1644")
-    @Test()
-    public void updateProfileEntryToFirstPosition() throws Exception {
-        // create profiles
-        HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
-
-        // update the second profile entry to set his index to the first position
-        final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
-        updateDescriptor.index(-1);
-        getProfileAPI().updateProfileEntry(profileEntries.get("2nd").getId(), updateDescriptor);
-
-        assertEquals(profileEntries.get("2nd"), 0L);// the second profile entry must have the first index (0) after updating and re-indexing
-        assertEquals(profileEntries.get("1st"), 2L);// the first profile entry must have the second index after re-indexing
-        assertEquals(profileEntries.get("3rd"), 4L);// the third profile entry must keep his index after re-indexing
-
-        // clean up data
-        cleanProfilesEntriesIndexTest(profileEntries);
-
-    }
-
     private Map<String, ProfileEntry> beforeIndexTests() throws AlreadyExistsException, CreationException {
         final ProfileEntryCreator firstProfileEntryCreator = new ProfileEntryCreator("FirstProfileEntry", adminProfileId)
                 .setDescription("the first profile entry")
@@ -430,6 +410,26 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "First" }, story = "Need to support Profile entries indexation for drag and Drop", jira = "ENGINE-1644")
+    @Test()
+    public void updateProfileEntryToFirstPosition() throws Exception {
+        // create profiles
+        HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
+
+        // update the second profile entry to set his index to the first position
+        final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
+        updateDescriptor.index(-1);
+        getProfileAPI().updateProfileEntry(profileEntries.get("2nd").getId(), updateDescriptor);
+
+        assertEquals(profileEntries.get("2nd").getIndex(), 0L);// the second profile entry must have the first index (0) after updating and re-indexing
+        assertEquals(profileEntries.get("1st").getIndex(), 2L);// the first profile entry must have the second index after re-indexing
+        assertEquals(profileEntries.get("3rd").getIndex(), 4L);// the third profile entry must keep his index after re-indexing
+
+        // clean up data
+        cleanProfilesEntriesIndexTest(profileEntries);
+
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "First" }, story = "Need to support Profile entries indexation for drag and Drop", jira = "ENGINE-1644")
     @Test(expected = UpdateException.class)
     public void updateProfileEntryToLastPosition() throws Exception {
         // create profiles
@@ -440,9 +440,9 @@ public class ProfileEntryTest extends AbstractProfileTest {
         updateDescriptor.index(5);
         getProfileAPI().updateProfileEntry(profileEntries.get("2nd").getId(), updateDescriptor);
 
-        assertEquals(profileEntries.get("1st"), 0L);// the first profile entry must keep index (0) after updating and re-indexing
-        assertEquals(profileEntries.get("3rd"), 2L);// the third profile entry must have the second index (2) after re-indexing
-        assertEquals(profileEntries.get("2nd"), 4L);// the second profile entry must have the last index (4)
+        assertEquals(profileEntries.get("1st").getIndex(), 0L);// the first profile entry must keep index (0) after updating and re-indexing
+        assertEquals(profileEntries.get("3rd").getIndex(), 2L);// the third profile entry must have the second index (2) after re-indexing
+        assertEquals(profileEntries.get("2nd").getIndex(), 4L);// the second profile entry must have the last index (4)
 
         // clean up data
         cleanProfilesEntriesIndexTest(profileEntries);
@@ -460,11 +460,11 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
         // move the third element in second place
         updateDescriptor.index(3);
-        getProfileAPI().updateProfileEntry(profileEntries.get("2nd").getId(), updateDescriptor);
+        getProfileAPI().updateProfileEntry(profileEntries.get("3rd").getId(), updateDescriptor);
 
-        assertEquals(profileEntries.get("1st"), 0L);// the first profile entry must keep index (0) after updating and re-indexing
-        assertEquals(profileEntries.get("3rd"), 2L);// the third profile entry must have the second index (2) after re-indexing
-        assertEquals(profileEntries.get("2nd"), 4L);// the second profile entry must have the last index (4)
+        assertEquals(profileEntries.get("1st").getIndex(), 0L);// the first profile entry must keep index (0) after updating and re-indexing
+        assertEquals(profileEntries.get("3rd").getIndex(), 2L);// the third profile entry must have the second index (2) after re-indexing
+        assertEquals(profileEntries.get("2nd").getIndex(), 4L);// the second profile entry must have the last index (4)
 
         // clean up data
         cleanProfilesEntriesIndexTest(profileEntries);
