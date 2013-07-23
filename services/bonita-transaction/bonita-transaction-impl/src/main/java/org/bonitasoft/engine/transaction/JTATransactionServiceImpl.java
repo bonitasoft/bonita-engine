@@ -227,7 +227,12 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
+    public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
+        return synchronizations;
+    }
+
+    @Override
+    public <T> T executeInTransaction(Callable<T> callable) throws Exception {
         begin();
         try {
             return callable.call();

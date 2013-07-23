@@ -108,5 +108,7 @@ public interface TransactionService {
      *                encounters an unexpected error condition.
      */
     void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException;
+    
+    List<BonitaTransactionSynchronization> getBonitaSynchronizations();
 
 }
