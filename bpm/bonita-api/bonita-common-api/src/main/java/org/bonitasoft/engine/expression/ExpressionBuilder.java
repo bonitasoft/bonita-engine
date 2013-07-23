@@ -25,7 +25,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Builds a new {@link Expression}. This class provides utilitary methods for building of different Expression types.
+ * Builds a new {@link Expression}. This class provides utility methods for building of different Expression types.
  * Attributes Name and ReturnType must be set.
  * 
  * @author Feng Hui
