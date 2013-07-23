@@ -78,8 +78,6 @@ import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplemen
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetNumberOfConnectorImplementations;
 import org.bonitasoft.engine.api.impl.transaction.data.GetNumberOfDataInstanceForContainer;
-import org.bonitasoft.engine.api.impl.transaction.document.AttachDocument;
-import org.bonitasoft.engine.api.impl.transaction.document.AttachDocumentAndStoreContent;
 import org.bonitasoft.engine.api.impl.transaction.document.AttachDocumentVersion;
 import org.bonitasoft.engine.api.impl.transaction.document.AttachDocumentVersionAndStoreContent;
 import org.bonitasoft.engine.api.impl.transaction.document.GetArchivedDocument;
@@ -3899,9 +3897,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws SBonitaException {
         final SProcessDocument attachment = buildExternalProcessDocumentReference(documentBuilder, processInstanceId, documentName, fileName, mimeType,
                 authorId, url);
-        final AttachDocument attachDocumentTransationContent = new AttachDocument(processDocumentService, attachment);
-        attachDocumentTransationContent.execute();
-        return attachDocumentTransationContent.getResult();
+        return processDocumentService.attachDocumentToProcessInstance(attachment);
     }
 
     private SProcessDocument buildExternalProcessDocumentReference(final SProcessDocumentBuilder documentBuilder, final long processInstanceId,
@@ -3950,10 +3946,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final byte[] documentContent, final ProcessDocumentService processDocumentService, final SProcessDocumentBuilder documentBuilder,
             final long authorId) throws SBonitaException {
         final SProcessDocument attachment = buildProcessDocument(documentBuilder, processInstanceId, documentName, fileName, mimeType, authorId);
-        final AttachDocumentAndStoreContent attachDocumentTransationContent = new AttachDocumentAndStoreContent(processDocumentService, attachment,
-                documentContent);
-        attachDocumentTransationContent.execute();
-        return attachDocumentTransationContent.getResult();
+        return processDocumentService.attachDocumentToProcessInstance(attachment, documentContent);
     }
 
     @Override

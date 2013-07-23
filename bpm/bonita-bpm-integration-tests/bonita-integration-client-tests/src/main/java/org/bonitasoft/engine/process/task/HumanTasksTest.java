@@ -14,6 +14,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -115,7 +116,11 @@ public class HumanTasksTest extends CommonAPITest {
         loginWith(USERNAME, PASSWORD);
         final ActivityInstance task = waitForUserTask("initTask", processInstance);
         getProcessAPI().assignUserTask(task.getId(), user.getId());
-        getProcessAPI().executeFlowNode(task.getId());
+        try {
+            getProcessAPI().executeFlowNode(task.getId());
+        } catch (FlowNodeExecutionException e) {
+            assertTrue("wrong exception message", e.getMessage().contains("Incompatible assignment operation type"));
+        }
         waitForTaskToFail(processInstance);
         disableAndDeleteProcess(processDef);
     }

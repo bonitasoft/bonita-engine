@@ -25,7 +25,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 
@@ -39,36 +39,25 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  */
 public interface ProcessExecutor extends ContainerExecutor {
 
-    SProcessInstance start(long userId, SProcessDefinition sDefinition) throws SActivityReadException, SActivityExecutionFailedException,
-            SActivityExecutionException, SProcessInstanceCreationException;
-
     SProcessInstance start(long userId, SProcessDefinition sDefinition, final List<SOperation> operations, Map<String, Object> context)
-            throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
-            SProcessInstanceCreationException;
-
-    SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
-            Map<String, Object> context) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
-            SProcessInstanceCreationException;
-
-    SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
-            Map<String, Object> context, long callerId) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
+            throws SFlowNodeReadException, SActivityExecutionFailedException, SActivityExecutionException,
             SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
             Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectors, long callerId, final long subProcessId)
-            throws SActivityReadException, SActivityExecutionException, SProcessInstanceCreationException;
+            throws SFlowNodeReadException, SActivityExecutionException, SProcessInstanceCreationException;
 
     SProcessInstance start(long userId, SProcessDefinition sDefinition, List<SOperation> sOperations, Map<String, Object> context,
-            List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SActivityReadException, SActivityExecutionFailedException,
+            List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SFlowNodeReadException, SActivityExecutionFailedException,
             SActivityExecutionException, SProcessInstanceCreationException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
             ConnectorService connectorService) throws SBonitaException;
 
-    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance) throws SActivityReadException,
+    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance) throws SFlowNodeReadException,
             SProcessInstanceCreationException, SActivityExecutionException;
 
-    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId) throws SActivityReadException,
+    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId) throws SFlowNodeReadException,
             SProcessInstanceCreationException, SActivityExecutionException;
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)

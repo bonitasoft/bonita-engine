@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -126,7 +127,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
             this.recorder.recordUpdate(updateRecord, updateEvent);
@@ -153,7 +155,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
             this.recorder.recordUpdate(updateRecord, updateEvent);
@@ -208,7 +211,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         descriptor.addField(this.activityInstanceKeyProvider.getPriorityKey(), priority);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) this.eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
             this.recorder.recordUpdate(updateRecord, updateEvent);
@@ -227,8 +231,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
             final SelectListDescriptor<SFlowNodeInstance> selectListDescriptor = SelectDescriptorBuilder.getActiveFlowNodes(rootContainerId);
             return this.persistenceRead.selectList(selectListDescriptor);
         } catch (final SBonitaReadException bre) {
-            // TODO log the exception
-            throw new SFlowNodeReadException(bre);
+            throw new SActivityReadException(bre);
         }
     }
 
@@ -236,7 +239,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public SFlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException {
         SFlowNodeInstance selectOne;
         try {
-            selectOne = this.persistenceRead.selectById(SelectDescriptorBuilder.getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
+            selectOne = this.persistenceRead.selectById(SelectDescriptorBuilder
+                    .getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
