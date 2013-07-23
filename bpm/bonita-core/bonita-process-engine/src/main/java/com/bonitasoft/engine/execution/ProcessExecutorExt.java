@@ -63,6 +63,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
@@ -90,12 +91,13 @@ public class ProcessExecutorExt extends ProcessExecutorImpl implements ProcessEx
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final ArchiveService archiveService, final LockService lockService, final TokenService tokenService,
-            final EventsHandler eventsHandler, final BPMDefinitionBuilders bpmDefinitionBuilders, final SOperationBuilders operationBuilders) {
+            final EventsHandler eventsHandler, final BPMDefinitionBuilders bpmDefinitionBuilders, final SOperationBuilders operationBuilders,
+            TransactionService transactionService) {
         super(instanceBuilders, activityInstanceService, processInstanceService, flowNodeStateManager, logger, flowNodeExecutor, transactionExecutor,
                 workService, processDefinitionService, gatewayInstanceService, transitionService, eventInstanceService, connectorService,
                 connectorInstanceService, classLoaderService, operationService, expressionBuilders, expressionResolverService, eventService, handlers,
                 processDocumentService, documentBuilder, sessionAccessor, containerRegistry, bpmInstancesCreator, archiveService, lockService, tokenService,
-                eventsHandler, bpmDefinitionBuilders, operationBuilders);
+                eventsHandler, bpmDefinitionBuilders, operationBuilders, transactionService);
 
         this.instanceBuilders = instanceBuilders;
     }

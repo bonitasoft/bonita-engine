@@ -83,7 +83,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             } finally {
                 transactionExecutor.completeTransaction(txOpened);
             }
-            executeActivity(sActivityInstanceID);
+            executeActivity(sActivityInstanceID, processDefinitionID);
         } catch (final BonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminate(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
