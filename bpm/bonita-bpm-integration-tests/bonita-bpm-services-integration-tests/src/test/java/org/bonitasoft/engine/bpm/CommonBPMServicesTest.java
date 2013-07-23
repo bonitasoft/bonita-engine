@@ -80,6 +80,7 @@ import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.SBadTransactionStateException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
+import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
@@ -214,7 +215,14 @@ public class CommonBPMServicesTest {
     }
 
     protected Group createGroup(final String groupName, final String groupPath) throws AlreadyExistsException, CreationException {
-        return new IdentityAPIImpl().createGroup(groupName, groupPath);
+        try {
+            transactionService.begin();
+            final Group group = new IdentityAPIImpl().createGroup(groupName, groupPath);
+            transactionService.complete();
+            return group;
+        } catch (STransactionException e) {
+            throw new CreationException(e);
+        }
     }
 
     private static void stopScheduler() throws Exception {
