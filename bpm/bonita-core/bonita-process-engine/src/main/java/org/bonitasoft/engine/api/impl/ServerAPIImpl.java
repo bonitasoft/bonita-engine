@@ -97,10 +97,10 @@ public class ServerAPIImpl implements ServerAPI {
             return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
         } catch (final ServerAPIRuntimeException e) {
             final Throwable cause = e.getCause();
-            if (cause instanceof BonitaRuntimeException || cause instanceof BonitaException) {
-                throw new ServerWrappedException(cause);
-            }
-            throw new ServerWrappedException(new BonitaRuntimeException(cause));
+            // if (cause instanceof BonitaRuntimeException || cause instanceof BonitaException) {
+            throw new ServerWrappedException(cause);
+            // }
+            // throw new ServerWrappedException(new BonitaRuntimeException(cause));
         } catch (final BonitaRuntimeException e) {
             throw new ServerWrappedException(e);
         } catch (final BonitaException e) {
