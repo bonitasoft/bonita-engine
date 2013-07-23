@@ -119,7 +119,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDe
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUser;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForUsers;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionIDByNameAndVersion;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionIdsOfCategory;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDeploymentInfosFromIds;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetStartedArchivedProcessInstance;
@@ -448,8 +447,6 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private static final String CONTAINER_TYPE_ACTIVITY_INSTANCE = "ACTIVITY_INSTANCE";
 
-    private static final ProcessAPIImplDelegate API_IMPL_DELEGATE = new ProcessAPIImplDelegate();
-
     protected static TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -458,6 +455,12 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private final ProcessAPIImplDelegate API_IMPL_DELEGATE = instantiateAPIDelegate();
+
+    protected ProcessAPIImplDelegate instantiateAPIDelegate() {
+        return new ProcessAPIImplDelegate();
     }
 
     @Override
@@ -2065,7 +2068,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long numberOfProcessDefinitions = processDefinitionService.getNumberOfProcessDeploymentInfos();
             final List<Long> processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, numberOfProcessDefinitions);
             processDefinitionIds.removeAll(categoryService.getCategorizedProcessIds(processDefinitionIds));
-            OrderByType order = null;
+            OrderByType order;
             switch (sortCriterion) {
                 case NAME_ASC:
                     order = OrderByType.ASC;
@@ -2076,6 +2079,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 case DEFAULT:
                     order = OrderByType.ASC;
                     break;
+                default:
+                    order = null;
             }
             final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService.getProcessDeploymentInfos(processDefinitionIds,
                     startIndex, maxResults, "name", order);

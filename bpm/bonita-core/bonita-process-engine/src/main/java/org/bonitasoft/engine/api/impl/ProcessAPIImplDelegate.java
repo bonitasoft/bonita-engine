@@ -43,7 +43,8 @@ public class ProcessAPIImplDelegate {
 	public void deleteProcessDefinition(final long processId) throws SBonitaException, BonitaHomeNotSetException, IOException {
 		final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
-		new DeleteProcess(getTenantAccessor(), processId).execute();
+		DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processId);
+		deleteProcess.execute();
 
 		final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
 		final File file = new File(processesFolder);
@@ -55,6 +56,10 @@ public class ProcessAPIImplDelegate {
 		IOUtil.deleteDir(processFolder);
 
 	}
+
+    protected DeleteProcess instantiateDeleteProcessTransactionContent(final long processId) {
+        return new DeleteProcess(getTenantAccessor(), processId);
+    }
 	
 	public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
 		final TenantServiceAccessor tenantAccessor = getTenantAccessor();
