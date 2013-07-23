@@ -410,7 +410,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "First" }, story = "Need to support Profile entries indexation for drag and Drop", jira = "ENGINE-1644")
-    @Test()
+    @Test
     public void updateProfileEntryToFirstPosition() throws Exception {
         // create profiles
         HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
@@ -430,7 +430,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "First" }, story = "Need to support Profile entries indexation for drag and Drop", jira = "ENGINE-1644")
-    @Test(expected = UpdateException.class)
+    @Test
     public void updateProfileEntryToLastPosition() throws Exception {
         // create profiles
         HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
@@ -450,7 +450,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry" }, story = "Need to support Profile entries indexation for drag and Drop", jira = "ENGINE-1644")
-    @Test(expected = UpdateException.class)
+    @Test
     public void updateProfileEntryAfterAnotherOne() throws Exception {
         // create profiles
         HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
