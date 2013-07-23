@@ -84,7 +84,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForConnectorExecution;
+import org.bonitasoft.engine.test.wait.WaitForVariableValue;
 import org.junit.Test;
 
 @SuppressWarnings("javadoc")
@@ -1091,7 +1091,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector("actor", johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, johnUser.getId());
-        final WaitForConnectorExecution waitForConnector = new WaitForConnectorExecution(getProcessAPI(), processInstance.getId(), "data", "value1");
+        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
@@ -1129,7 +1129,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // start check value1,stop, check still value1, start, check value 2, check step2 is active
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector("actor", johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForConnectorExecution waitForConnector = new WaitForConnectorExecution(getProcessAPI(), processInstance.getId(), "data", "value1");
+        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();

@@ -255,14 +255,13 @@ public interface ProcessRuntimeAPI {
      *            Identifier of the processDefinition
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance can't be deleted because of a parent that is still active
-     * 
      * @since 6.0
-     * 
-     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and {@link #deleteArchivedProcessInstances(long, int, int, ProcessInstanceCriterion)}
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
+     *             {@link #deleteArchivedProcessInstances(long, int, int, ProcessInstanceCriterion)}
      */
     @Deprecated
     void deleteProcessInstances(long processDefinitionId) throws DeletionException;
-    
+
     /**
      * Delete active process instances of process definition given as input parameter respecting the pagination parameters
      * 
@@ -275,11 +274,12 @@ public interface ProcessRuntimeAPI {
      * @param criterion
      *            the sort criterion
      * @return the number of elements that have been deleted
-     * @throws DeletionException if a process instance can't be deleted because of a parent that is still active
+     * @throws DeletionException
+     *             if a process instance can't be deleted because of a parent that is still active
      * @since 6.1
      */
     long deleteProcessInstances(long processDefinitionId, int startIndex, int maxResults, ProcessInstanceCriterion criterion) throws DeletionException;
-    
+
     /**
      * Delete archived process instances of process definition given as input parameter respecting the pagination parameters
      * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
@@ -294,7 +294,8 @@ public interface ProcessRuntimeAPI {
      * @param criterion
      *            the sort criterion
      * @return the number of elements that have been deleted
-     * @throws DeletionException if a process instance can't be deleted because of a parent that is still active
+     * @throws DeletionException
+     *             if a process instance can't be deleted because of a parent that is still active
      * @since 6.1
      */
     long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults, ProcessInstanceCriterion criterion) throws DeletionException;
@@ -393,7 +394,7 @@ public interface ProcessRuntimeAPI {
     void executeFlowNode(long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
-     * Returns all activities (active and finished) of a process instance.
+     * Returns all currently active activities of a process instance.
      * 
      * @param processInstanceId
      *            Identifier of the process instance
@@ -407,11 +408,13 @@ public interface ProcessRuntimeAPI {
     List<ActivityInstance> getActivities(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Get an instance of process with its processInstance id.
+     * Get an instance of process from its processInstance ID.
      * 
      * @param processInstanceId
      *            Identifier of the process instance
      * @return the matching instance of process
+     * @throws ProcessInstanceNotFoundException
+     *             if no process instance can be found with the provided ID.
      * @since 6.0
      */
     ProcessInstance getProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException;

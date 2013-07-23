@@ -41,7 +41,6 @@ public class IncrementVariableJobWithMultiTenancy extends GroupJob {
                 storage.setVariable(variableName, value + 1);
             }
         }
-        System.out.println("  µµµµ IncrementVariableJobWithMultiTenancy end");
     }
 
     @Override

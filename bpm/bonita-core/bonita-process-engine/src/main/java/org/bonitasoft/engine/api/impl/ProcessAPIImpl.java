@@ -43,7 +43,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.api.impl.transaction.activity.GetActivities;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
@@ -877,7 +876,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void enableProcess(final long processId) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         try {
             final EnableProcess enableProcess = new EnableProcess(processDefinitionService, processId, eventsHandler);
@@ -909,14 +907,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ActivityInstance> getActivities(final long processInstanceId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final GetActivities getActivityInstances = new GetActivities(processInstanceId, startIndex, maxResults, activityInstanceService);
         try {
-            getActivityInstances.execute();
-            final List<SActivityInstance> result = getActivityInstances.getResult();
-            return ModelConvertor.toActivityInstances(result, flowNodeStateManager);
+            return ModelConvertor.toActivityInstances(activityInstanceService.getActivityInstances(processInstanceId, startIndex, maxResults, null, null),
+                    flowNodeStateManager);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -926,7 +921,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public long getNumberOfProcessDeploymentInfos() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
         final TransactionContentWithResult<Long> transactionContentWithResult = new GetNumberOfProcessDeploymentInfos(processDefinitionService);
         try {
             transactionContentWithResult.execute();
@@ -940,7 +934,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public ProcessDefinition getProcessDefinition(final long processId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processId);
             return ModelConvertor.toProcessDefinition(sProcessDefinition);
@@ -955,7 +948,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public ProcessDeploymentInfo getProcessDeploymentInfo(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
         try {
             final TransactionContentWithResult<SProcessDefinitionDeployInfo> transactionContentWithResult = new GetProcessDefinitionDeployInfo(
                     processDefinitionId, processDefinitionService);
@@ -976,11 +968,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance getProcessInstance(final long processInstanceId) throws ProcessInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getProcessInstanceDescriptor();
-
         try {
             final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService,
                     searchProcessInstanceDescriptor, processInstanceId);
