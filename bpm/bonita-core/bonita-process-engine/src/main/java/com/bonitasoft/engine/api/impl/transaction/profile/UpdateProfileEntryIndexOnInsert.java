@@ -3,7 +3,7 @@
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction.profile;
@@ -59,41 +59,33 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        int fromIndex = 0;
+        Long fromIndex = insertedProfileEntry.getIndex();
         List<SProfileEntry> profileEntryList;
+        Long loopIndex = fromIndex + 1;
+
+        // loop on profile entry results because we get NUMBER_OF_RESULTS * i entries
         do {
-            profileEntryList = searchProfileEntriesForParentIdAndProfileId(fromIndex);
+
+            profileEntryList = searchProfileEntriesForParentIdAndProfileId(loopIndex);
             for (final SProfileEntry profileEntry : profileEntryList) {
-                updateProfileEntryIndex(profileEntry, profileEntryList.indexOf(profileEntry) + fromIndex * NUMBER_OF_RESULTS);
+                updateProfileEntryIndex(profileEntry);// for every element of the set we update the index
             }
-            fromIndex++;
+            loopIndex++;
         } while (!profileEntryList.isEmpty());
+
+        // at the end we update the inserted profile entry to set the right index:
+        // if -1 is sent the right value will be 0 to put the profile entry at the first position
+        // else the value is only a odd number so we had to increment by 1 to set a good index
+        updateProfileEntry(insertedProfileEntry, fromIndex < 0 ? 0 : fromIndex + 1);
     }
 
-    private void updateProfileEntryIndex(final SProfileEntry profileEntry, final int i) throws SProfileEntryNotFoundException,
+    private void updateProfileEntryIndex(final SProfileEntry profileEntry) throws SProfileEntryNotFoundException,
             SProfileEntryUpdateException {
-        final long insertedIndex = insertedProfileEntry.getIndex();
-        final long j = i * 2;
-        if (profileEntry.getId() != insertedProfileEntry.getId()) {
-            if (insertedIndex > j && profileEntry.getIndex() != j) {
-                updateProfileEntry(profileEntry, j);
-            }
-            if (insertedIndex == j) {
-                updateProfileEntry(profileEntry, j + 2);
-            }
-            if (insertedIndex < j) {
-                updateProfileEntry(profileEntry, j);
-            }
-        } else {
-            if (insertedIndex < 0) {
-                updateProfileEntry(profileEntry, Long.valueOf(0));
-            } else if (insertedIndex > j) {
-                updateProfileEntry(profileEntry, j);
-            }
-        }
+        // inserted entry is insert before the set, so we must shift the set of indexes by 2 values
+        updateProfileEntry(profileEntry, profileEntry.getIndex() + 2);
     }
 
-    private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final int fromIndex) throws SBonitaSearchException {
+    private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final Long fromIndex) throws SBonitaSearchException {
         Long profileId = null;
         Long parentId = null;
         if (insertedProfileEntry != null) {
@@ -106,7 +98,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PARENT_ID, parentId));
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(2);
         orderByOptions.add(new OrderByOption(SProfileEntry.class, ProfileEntrySearchDescriptor.INDEX, OrderByType.ASC));
-        final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex.intValue() * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
         return profileService.searchProfileEntries(queryOptions);
     }
 
