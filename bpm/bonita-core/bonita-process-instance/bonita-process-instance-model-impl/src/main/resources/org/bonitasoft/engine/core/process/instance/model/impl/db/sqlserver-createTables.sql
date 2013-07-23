@@ -165,6 +165,7 @@ CREATE TABLE waiting_event (
   	relatedActivityInstanceId NUMERIC(19, 0),
   	locked BIT,
   	active BIT,
+  	progress TINYINT,
   	correlation1 NVARCHAR(128),
   	correlation2 NVARCHAR(128),
   	correlation3 NVARCHAR(128),

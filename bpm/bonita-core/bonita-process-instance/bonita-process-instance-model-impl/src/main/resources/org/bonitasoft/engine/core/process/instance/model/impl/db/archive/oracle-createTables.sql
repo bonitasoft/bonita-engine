@@ -36,8 +36,8 @@ CREATE TABLE arch_flownode_instance (
   displayDescription VARCHAR2(255),
   stateId INT NOT NULL,
   stateName VARCHAR2(50),
-  terminal NUMBER(1) NOT NULL,
-  stable NUMBER(1),
+  terminal NUMBER(1)  NOT NULL,
+  stable NUMBER(1) ,
   actorId NUMBER(19, 0) NULL,
   assigneeId NUMBER(19, 0) DEFAULT 0 NOT NULL,
   reachedStateDate NUMBER(19, 0),
@@ -65,9 +65,9 @@ CREATE TABLE arch_flownode_instance (
   nbTerminatedInst INT,
   executedBy NUMBER(19, 0),
   activityInstanceId NUMBER(19, 0),
-  aborting NUMBER(1) NOT NULL,
-  triggeredByEvent NUMBER(1),
-  interrupting NUMBER(1),
+  aborting NUMBER(1)  NOT NULL,
+  triggeredByEvent NUMBER(1) ,
+  interrupting NUMBER(1) ,
   PRIMARY KEY (tenantid, id)
 );
 

@@ -37,6 +37,9 @@ parse (){
 	FILENAME=${1##*/}
 	PATTERNFILENAME=${FILENAME#*-}
 	generate_sqlserver $PATHTOFILE $FILENAME $PATTERNFILENAME;
+	generate_postgres $PATHTOFILE $FILENAME $PATTERNFILENAME;
+	generate_mysql $PATHTOFILE $FILENAME $PATTERNFILENAME;
+	generate_oracle $PATHTOFILE $FILENAME $PATTERNFILENAME;
 }
 
 if [ $# != 1 ]; then
