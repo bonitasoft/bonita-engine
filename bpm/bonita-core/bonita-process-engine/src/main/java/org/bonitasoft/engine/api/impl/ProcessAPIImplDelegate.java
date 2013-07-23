@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
-import org.bonitasoft.engine.bpm.process.ProcessActivationException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
