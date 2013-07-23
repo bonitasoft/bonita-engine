@@ -148,8 +148,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private static final String GATEWAY_LOCK = SFlowNodeType.GATEWAY.name();
 
-    private static final String PROCESS_COMPLETION_LOCK = SFlowElementsContainerType.PROCESS.name() + "_finish";
-
     private final BPMInstanceBuilders instanceBuilders;
 
     protected final ActivityInstanceService activityInstanceService;
@@ -163,8 +161,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     protected final ProcessInstanceService processInstanceService;
 
     private final TokenService tokenService;
-
-    protected final TransactionExecutor transactionExecutor;
 
     private final WorkService workService;
 
@@ -207,6 +203,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final SOperationBuilders operationBuilders;
 
     private final TransactionService transactionService;
+
+    private final TransactionExecutor transactionExecutor;
 
     public ProcessExecutorImpl(final BPMInstanceBuilders instanceBuilders, final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final FlowNodeStateManager flowNodeStateManager, final TechnicalLoggerService logger,

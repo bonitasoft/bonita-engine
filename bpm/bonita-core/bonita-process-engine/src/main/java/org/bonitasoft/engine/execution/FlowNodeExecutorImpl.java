@@ -13,17 +13,12 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.transaction.activity.SetActivityState;
-import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -83,8 +78,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
      */
     private final int setInFailThreadTimeout;
 
-    private static final String FLOWNODE_COMPLETION_LOCK = SFlowElementsContainerType.FLOWNODE.name() + "_finish";
-
     private final FlowNodeStateManager flowNodeStateManager;
 
     private final ActivityInstanceService activityInstanceService;
@@ -117,12 +110,10 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final WorkService workService;
 
-    private final TransactionExecutor transactionExecutor;
-
     private final TransactionService transactionService;
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-            final TransactionExecutor transactionExecutor, final OperationService operationService, final ArchiveService archiveService,
+            final OperationService operationService, final ArchiveService archiveService,
             final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders,
             final TechnicalLoggerService logger, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final SCommentService commentService, final ProcessInstanceService processInstanceService, final LockService lockService,
@@ -131,7 +122,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
-        this.transactionExecutor = transactionExecutor;
         this.operationService = operationService;
         this.archiveService = archiveService;
         this.dataInstanceService = dataInstanceService;
@@ -152,7 +142,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-            final TransactionExecutor transactionExecutor, final OperationService operationService, final ArchiveService archiveService,
+            final OperationService operationService, final ArchiveService archiveService,
             final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders,
             final TechnicalLoggerService logger, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final SCommentService commentService, final ProcessInstanceService processInstanceService, final LockService lockService,
@@ -161,7 +151,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
-        this.transactionExecutor = transactionExecutor;
         this.operationService = operationService;
         this.archiveService = archiveService;
         this.dataInstanceService = dataInstanceService;
@@ -347,21 +336,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             throws SActivityStateExecutionException {
         final FlowNodeState state = flowNodeStateManager.getState(stateId);
         try {
-            final TransactionContent content = new TransactionContent() {
-
-                @Override
-                public void execute() throws SBonitaException {
-                    final SFlowNodeInstance fFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());
-                    archiveFlowNodeInstance(fFlowNodeInstance, false, processDefinition);
-                }
-            };
-            final SetActivityState transactionContent = new SetActivityState(activityInstanceService, flowNodeInstance.getId(), state);
-            final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flowNodeInstance.getId());
-            transactionExecutor.execute(Arrays.asList(content, transactionContent, getFlowNodeInstance));
+            final SFlowNodeInstance fFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());
+            archiveFlowNodeInstance(fFlowNodeInstance, false, processDefinition);
+            activityInstanceService.setState(fFlowNodeInstance, state);
             if (state.isTerminal()) {
                 try {
                     // reschedule this work but without the operations
-                    workService.registerWork(new NotifyChildFinishedWork(containerRegistry, processDefinition, getFlowNodeInstance.getResult(), state));
+                    workService.registerWork(new NotifyChildFinishedWork(containerRegistry, processDefinition, fFlowNodeInstance, state));
                 } catch (WorkRegisterException e) {
                     throw new SFlowNodeExecutionException(e);
                 }

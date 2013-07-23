@@ -1940,12 +1940,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     private OrderByType mapPagingCriterionToOrderByType(final CategoryCriterion pagingCriterion) {
         OrderByType order = null;
         switch (pagingCriterion) {
-        case NAME_ASC:
-            order = OrderByType.ASC;
-            break;
-        case NAME_DESC:
-            order = OrderByType.DESC;
-            break;
+            case NAME_ASC:
+                order = OrderByType.ASC;
+                break;
+            case NAME_DESC:
+                order = OrderByType.DESC;
+                break;
         }
         return order;
     }
@@ -4662,7 +4662,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ActivityExecutionException("Unable to retry a task that is not failed - task name=" + activity.getName() + " id=" + activityInstanceId
                     + " that was in state " + flowNodeState);
         }
-        // this should not open a new transaction (it's ok now because transaction executor don't open a new one)
         try {
             flowNodeExecutor.setStateByStateId(processDefinition, activity, stateId);
             // execute the flow node only if it is not the final state
