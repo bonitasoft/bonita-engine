@@ -8,26 +8,22 @@
  *******************************************************************************/
 package com.bonitasoft.engine.execution;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.execution.TransactionExecutorImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SRetryableException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class RetryTransactionExecutor implements TransactionExecutor {
-
-    private final TransactionService transactionService;
+public class RetryTransactionExecutor extends TransactionExecutorImpl {
 
     private final TechnicalLoggerService loggerService;
 
@@ -39,21 +35,11 @@ public class RetryTransactionExecutor implements TransactionExecutor {
 
     public RetryTransactionExecutor(final TransactionService transactionService, final TechnicalLoggerService loggerService, final int retries,
             final long delay, final double delayFactor) {
-        this.transactionService = transactionService;
+        super(transactionService);
         this.loggerService = loggerService;
         this.retries = retries;
         this.delay = delay;
         this.delayFactor = delayFactor;
-    }
-
-    @Override
-    public void execute(final TransactionContent transactionContent) throws SBonitaException {
-        execute(Arrays.asList(transactionContent));
-    }
-
-    @Override
-    public void execute(final TransactionContent... transactionContents) throws SBonitaException {
-        execute(Arrays.asList(transactionContents));
     }
 
     @Override
@@ -66,7 +52,7 @@ public class RetryTransactionExecutor implements TransactionExecutor {
                 for (final TransactionContent transactionContent : transactionContents) {
                     transactionContent.execute();
                 }
-                attempt = retries + 1;
+                attempt = retries + 1; // To exit the loop :)
             } catch (final SRetryableException sre) {
                 setTransactionRollback();
                 attempt++;
@@ -89,32 +75,6 @@ public class RetryTransactionExecutor implements TransactionExecutor {
                 completeTransaction(txOpened);
             }
         }
-    }
-
-    @Override
-    public boolean openTransaction() throws STransactionException {
-        if (transactionService.isTransactionActive()) {
-            return false;
-        } else {
-            try {
-                transactionService.begin();
-                return true;
-            } catch (final STransactionCreationException e) {
-                throw new STransactionException("Unable to open transaction, transaction state is " + transactionService.getState(), e);
-            }
-        }
-    }
-
-    @Override
-    public void completeTransaction(final boolean txOpened) throws STransactionException {
-        if (txOpened) {
-            transactionService.complete();
-        }
-    }
-
-    @Override
-    public void setTransactionRollback() throws STransactionException {
-        transactionService.setRollbackOnly();
     }
 
 }
