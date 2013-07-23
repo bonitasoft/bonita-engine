@@ -15,6 +15,17 @@
 			</map>
 		</constructor-arg>
 	</bean>
+	<bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheConfigurations">
+			<map>
+				<entry key="PLATFORM">
+					<ref bean="platformCacheConfig" />
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
 	
 	
 	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
@@ -25,6 +36,12 @@
 	
 	<bean id="transientDataCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<property name="maxElementsInMemory" value="10000" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="eternal" value="true" />
+	</bean>
+
+	<bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="maxElementsInMemory" value="100" />
 		<property name="inMemoryOnly" value="true" />
 		<property name="eternal" value="true" />
 	</bean>

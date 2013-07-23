@@ -65,7 +65,6 @@
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
 		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
@@ -113,7 +112,6 @@
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService"/>
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor"/>
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
 		<constructor-arg name="containerRegistry" ref="containerRegistry"/>
 		<constructor-arg name="workService" ref="workService"/>
