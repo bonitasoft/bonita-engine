@@ -34,7 +34,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class JTATransactionServiceImpl implements TransactionService {
 
-    private final TechnicalLoggerService logger;
+    protected final TechnicalLoggerService logger;
 
     private final TransactionManager txManager;
 
@@ -242,7 +242,6 @@ public class JTATransactionServiceImpl implements TransactionService {
         } finally {
             complete();
         }
-
     }
 
 }
