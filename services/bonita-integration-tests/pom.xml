@@ -578,10 +578,41 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-services-test-conf</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine</groupId>
+									<artifactId>bonita-services-test-conf</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/test-classes/</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -593,7 +624,7 @@
 						</property>
 					</properties>
 					<systemPropertyVariables>
-						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/AllTestsWithJNDI.java</include>

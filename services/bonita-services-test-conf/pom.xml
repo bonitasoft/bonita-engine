@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
-		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
+		<artifactId>services</artifactId>
 		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-home</artifactId>
-	<packaging>pom</packaging>
-
-	<name>Bonita Home</name>
+	<artifactId>bonita-services-test-conf</artifactId>
 
 	<build>
 		<plugins>
@@ -20,16 +16,12 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>distrib-assembly</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly-common.xml</descriptor>
-								<descriptor>assembly-base.xml</descriptor>
-								<descriptor>assembly-base-hibernate.xml</descriptor>
 								<descriptor>assembly.xml</descriptor>
 							</descriptors>
 						</configuration>
@@ -38,4 +30,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>
