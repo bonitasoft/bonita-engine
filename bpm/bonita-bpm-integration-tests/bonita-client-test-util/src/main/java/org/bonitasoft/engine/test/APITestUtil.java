@@ -574,7 +574,7 @@ public class APITestUtil {
     }
 
     protected void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
-        getProcessAPI().disableAndDelete(processDefinitionId);
+        getProcessAPI().disableAndDeleteProcessDefinition(processDefinitionId);
     }
 
     protected void disableAndDeleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
