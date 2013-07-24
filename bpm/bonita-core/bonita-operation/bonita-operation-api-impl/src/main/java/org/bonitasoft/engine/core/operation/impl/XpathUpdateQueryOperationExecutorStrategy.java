@@ -52,24 +52,12 @@ import org.xml.sax.SAXException;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
-public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecutorStrategy {
+public class XpathUpdateQueryOperationExecutorStrategy extends UpdateOperationExecutorStrategy {
 
     public static final String TYPE_XPATH_UPDATE_QUERY = "XPATH_UPDATE_QUERY";
 
-    private final DataInstanceService dataInstanceService;
-
-    private final SDataInstanceBuilders sDataInstanceBuilders;
-
     public XpathUpdateQueryOperationExecutorStrategy(final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders) {
-        this.dataInstanceService = dataInstanceService;
-        this.sDataInstanceBuilders = sDataInstanceBuilders;
-    }
-
-    private EntityUpdateDescriptor getUpdateDescriptor(final Serializable newValue) {
-        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        final SDataInstanceBuilder sDataInstanceBuilder = sDataInstanceBuilders.getDataInstanceBuilder();
-        updateDescriptor.addField(sDataInstanceBuilder.getValueKey(), newValue);
-        return updateDescriptor;
+        super(dataInstanceService, sDataInstanceBuilders);
     }
 
     @Override
@@ -77,13 +65,30 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
         return TYPE_XPATH_UPDATE_QUERY;
     }
 
+    private String getStringValue(final Object variableValue) {
+        if (variableValue instanceof String) {
+            return (String) variableValue;
+        } else {
+            return String.valueOf(variableValue);
+        }
+    }
+
+    private boolean isSetAttribute(final String xpathExpression, final Object variableValue) {
+        if (variableValue instanceof Attr) {
+            return true;
+        } else {
+            final String[] segments = xpathExpression.split("/");
+            return segments[segments.length - 1].startsWith("@");
+        }
+    }
+
     @Override
-    public void execute(final SOperation operation, final Object value, final long containerId, final String containerType,
+    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         try {
             final String dataInstanceName = operation.getLeftOperand().getName();
-            final SXMLDataInstance sDataInstance = (SXMLDataInstance) dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
-            final String dataValue = (String) sDataInstance.getValue();
+            // should be a String because the data is an xml expression
+            final String dataValue = (String) expressionContext.getInputValues().get(dataInstanceName);
             final SExpressionContext sExpressionContext = new SExpressionContext();
             sExpressionContext.setInputValues(expressionContext.getInputValues());
             final Object variableValue = value;
@@ -139,9 +144,7 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
                 final Node parentNode = (Node) xpath.compile(parentPath).evaluate(document, XPathConstants.NODE);
                 parentNode.appendChild(document.createTextNode(getStringValue(variableValue)));
             }
-            final String content = DocumentManager.getDocumentContent(document);
-            final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(content);
-            dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
+            return DocumentManager.getDocumentContent(document);
         } catch (final ParserConfigurationException pce) {
             throw new SOperationExecutionException(pce);
         } catch (final SAXException saxe) {
@@ -156,25 +159,6 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
             throw new SOperationExecutionException(tfce);
         } catch (final TransformerException te) {
             throw new SOperationExecutionException(te);
-        } catch (final SDataInstanceException e) {
-            throw new SOperationExecutionException(e);
-        }
-    }
-
-    private String getStringValue(final Object variableValue) {
-        if (variableValue instanceof String) {
-            return (String) variableValue;
-        } else {
-            return String.valueOf(variableValue);
-        }
-    }
-
-    private boolean isSetAttribute(final String xpathExpression, final Object variableValue) {
-        if (variableValue instanceof Attr) {
-            return true;
-        } else {
-            final String[] segments = xpathExpression.split("/");
-            return segments[segments.length - 1].startsWith("@");
         }
     }
 }

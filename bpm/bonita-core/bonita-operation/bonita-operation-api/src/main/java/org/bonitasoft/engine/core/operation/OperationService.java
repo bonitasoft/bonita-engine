@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.operation;
 
+import java.util.List;
+
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -43,6 +45,22 @@ public interface OperationService {
             throws SOperationExecutionException;
 
     /**
+     * Execute the given operation in the given context and update data that are in the given data container
+     * 
+     * @param operations
+     *            the operations to execute
+     * @param dataContainerId
+     *            the id of the data container (used for left operand)
+     * @param dataContainerType
+     *            the type of the data container (used for left operand)
+     * @param expressionContext
+     *            the context in which execute the operation
+     * @throws SOperationExecutionException
+     */
+    void execute(List<SOperation> operations, long dataContainerId, String dataContainerType, SExpressionContext expressionContext)
+            throws SOperationExecutionException;
+
+    /**
      * Execute given operation in the given context
      * 
      * @param operation
@@ -52,5 +70,14 @@ public interface OperationService {
      * @throws SOperationExecutionException
      */
     void execute(SOperation operation, SExpressionContext expressionContext) throws SOperationExecutionException;
+
+    /**
+     * Execute the given operation in the given context and update data that are in the same context
+     * 
+     * @param operations
+     * @param expressionContext
+     * @throws SOperationExecutionException
+     */
+    void execute(List<SOperation> operations, SExpressionContext expressionContext) throws SOperationExecutionException;
 
 }

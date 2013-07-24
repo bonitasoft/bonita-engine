@@ -626,9 +626,7 @@ public class StateBehaviors {
                 final List<SOperation> sOperations = activityDefinition.getSOperations();
                 final SExpressionContext sExpressionContext = new SExpressionContext(activityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                         processDefinition.getId());
-                for (final SOperation sOperation : sOperations) {
-                    operationService.execute(sOperation, sExpressionContext);
-                }
+                operationService.execute(sOperations, sExpressionContext);
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);

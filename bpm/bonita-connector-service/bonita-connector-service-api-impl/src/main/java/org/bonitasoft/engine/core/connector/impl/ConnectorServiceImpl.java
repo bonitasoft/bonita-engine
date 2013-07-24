@@ -148,8 +148,9 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new SConnectorException(e);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed connector <" + sConnectorInstance.getName() + "> with id <"
-                    + sConnectorInstance.getId() + ">, version <" + sConnectorInstance.getVersion() + ">, and inputs :");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                    "Executed connector <" + sConnectorInstance.getName() + "> with id <" + sConnectorInstance.getId() + ">, version <"
+                            + sConnectorInstance.getVersion() + ">, and inputs :");
             if (inputParameters != null) {
                 final Set<String> inputNames = inputParameters.keySet();
                 for (final String inputName : inputNames) {
@@ -163,10 +164,8 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Override
     public void executeOutputOperation(final List<SOperation> outputs, final SExpressionContext expressionContext, final ConnectorResult result)
             throws SBonitaException {
-        expressionContext.setInputValues(result.getResult());
-        for (final SOperation operation : outputs) {
-            operationService.execute(operation, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);// data is in
-        }
+        expressionContext.setInputValues(new HashMap<String, Object>(result.getResult()));
+        operationService.execute(outputs, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);// data is in
         disconnect(result);
     }
 

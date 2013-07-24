@@ -59,6 +59,36 @@ public class SExpressionContext {
     private Map<SExpression, String> invertedDataMap;
 
     public SExpressionContext() {
+        inputValues = new HashMap<String, Object>();
+    }
+    
+    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId) {
+        this.containerId = containerId;
+        this.containerType = containerType;
+        this.processDefinitionId = processDefinitionId;
+        inputValues = new HashMap<String, Object>();
+    }
+
+    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues) {
+        this.containerId = containerId;
+        this.containerType = containerType;
+        if (inputValues == null) {
+            this.inputValues = new HashMap<String, Object>();
+        } else {
+            this.inputValues = new HashMap<String, Object>(inputValues);
+        }
+    }
+
+    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues,
+            final long time) {
+        this.containerId = containerId;
+        this.containerType = containerType;
+        if (inputValues == null) {
+            this.inputValues = new HashMap<String, Object>();
+        } else {
+            this.inputValues = new HashMap<String, Object>(inputValues);
+        }
+        this.time = time;
     }
 
     public Long getProcessDefinitionId() {
@@ -70,9 +100,6 @@ public class SExpressionContext {
     }
 
     public void setSerializableInputValues(final Map<String, Serializable> inputValues) {
-        if (this.inputValues == null) {
-            this.inputValues = new HashMap<String, Object>();
-        }
         if (inputValues != null) {
             this.inputValues.putAll(inputValues);
         }
@@ -86,33 +113,7 @@ public class SExpressionContext {
         this.time = time;
     }
 
-    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId) {
-        this.containerId = containerId;
-        this.containerType = containerType;
-        this.processDefinitionId = processDefinitionId;
-    }
 
-    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues) {
-        this.containerId = containerId;
-        this.containerType = containerType;
-        if (inputValues == null) {
-            this.inputValues = Collections.emptyMap();
-        } else {
-            this.inputValues = new HashMap<String, Object>(inputValues);
-        }
-    }
-
-    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues,
-            final long time) {
-        this.containerId = containerId;
-        this.containerType = containerType;
-        if (inputValues == null) {
-            this.inputValues = Collections.emptyMap();
-        } else {
-            this.inputValues = new HashMap<String, Object>(inputValues);
-        }
-        this.time = time;
-    }
 
     public void setContainerId(final Long containerId) {
         this.containerId = containerId;
