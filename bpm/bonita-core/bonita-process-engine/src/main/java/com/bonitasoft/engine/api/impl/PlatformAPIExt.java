@@ -20,6 +20,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CreateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
@@ -620,6 +621,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void startNode() throws StartNodeException {
         LicenseChecker.getInstance().checkLicence();
         super.startNode();

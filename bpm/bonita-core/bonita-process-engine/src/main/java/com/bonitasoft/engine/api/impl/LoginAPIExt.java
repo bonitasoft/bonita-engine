@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 
@@ -24,6 +25,7 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
 
     @Override
+    @CustomTransactions
     public APISession login(final String userName, final String password) throws LoginException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started: " + LicenseChecker.getInstance().getErrorMessage());
@@ -32,6 +34,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     }
 
     @Override
+    @CustomTransactions
     public APISession login(final long tenantId, final String userName, final String password) throws LoginException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started");

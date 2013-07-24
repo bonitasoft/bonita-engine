@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.api.NoSessionRequired;
+
 import com.bonitasoft.engine.platform.LicenseInfo;
 
 /**
@@ -24,6 +26,7 @@ public interface NodeAPI {
      * @return
      *         License informations
      */
+    @NoSessionRequired
     LicenseInfo getLicenseInfo();
 
 }
