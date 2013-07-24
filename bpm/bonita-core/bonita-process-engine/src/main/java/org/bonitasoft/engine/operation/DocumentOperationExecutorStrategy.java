@@ -18,6 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
+import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
@@ -63,14 +64,26 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
     }
 
     @Override
-    public void execute(final SOperation operation, final Object value, final long containerId, final String containerType,
+    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
-        final boolean isDocumentWithContent = value instanceof DocumentValue;
-        if (!isDocumentWithContent && value != null) {
+        return value;
+    }
+
+    @Override
+    public String getOperationType() {
+        return TYPE_DOCUMENT_CREATE_UPDATE;
+    }
+
+    @Override
+    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+            throws SOperationExecutionException {
+        final boolean isDocumentWithContent = newValue instanceof DocumentValue;
+        if (!isDocumentWithContent && newValue != null) {
             throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
-                    + value.getClass().getName());
+                    + newValue.getClass().getName());
         }
 
+        final String documentName = sLeftOperand.getName();
         long processInstanceId;
         try {
             if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
@@ -79,8 +92,7 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(containerId);
                 processInstanceId = flowNodeInstance.getRootContainerId();
             }
-            final String documentName = operation.getLeftOperand().getName();
-            if (value == null) {
+            if (newValue == null) {
                 // we just delete the current version
                 try {
                     processDocumentService.removeCurrentVersion(processInstanceId, documentName);
@@ -91,7 +103,7 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
 
                 final long sessionId = sessionAccessor.getSessionId();
                 final long authorId = sessionService.getSession(sessionId).getUserId();
-                final DocumentValue documentValue = (DocumentValue) value;
+                final DocumentValue documentValue = (DocumentValue) newValue;
                 if (documentValue.hasContent()) {
                     try {
                         final SProcessDocument currentDocument = processDocumentService.getDocument(processInstanceId, documentName);
@@ -154,8 +166,8 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
     }
 
     @Override
-    public String getOperationType() {
-        return TYPE_DOCUMENT_CREATE_UPDATE;
+    public boolean doUpdateData() {
+        return false;
     }
 
 }
