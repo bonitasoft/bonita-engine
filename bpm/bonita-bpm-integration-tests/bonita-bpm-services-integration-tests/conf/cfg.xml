@@ -150,6 +150,7 @@
 		<constructor-arg name="identityService" ref="identityService" />
 		<constructor-arg name="workService" ref="workService"/>
 		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
+		<constructor-arg name="tokenService" ref="tokenService"/>
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">

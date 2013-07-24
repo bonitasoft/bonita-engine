@@ -63,7 +63,6 @@ import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
-import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
@@ -99,6 +98,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanc
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -788,7 +788,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
 
             final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, child, sProcessInstance);
-            System.out.println("child finished on process id=" + processInstanceId + ", token count=" + tokensOfProcess);
             if (tokensOfProcess == 0) {
                 boolean hasActionsToExecute = false;
                 if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
@@ -914,28 +913,25 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
         }
         if (SFlowNodeType.BOUNDARY_EVENT.equals(child.getType())) {
-            if (validOutgoingTransitionDefinitions.size() == 0) {
-                // no output nothing to do
-                consumeInputToken = false;
-                createToken = false;
-                implicitEnd = false;
+            // the creation of tokens for the boundaries are done inside the ExecutingBoundaryEventStateImpl
+            // we don't change tokens
+            consumeInputToken = false;
+            createToken = false;
+            implicitEnd = false;
+            // still need to get the refId to put on the next element
+            SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) child;
+            if (boundaryEventInstance.isInterrupting()) {
+                // we create the same token that activated the activity
+                // the activity is canceled so a token will be consumed by the aborted activity
+                final SToken token = tokenService.getToken(boundaryEventInstance.getParentProcessInstanceId(), boundaryEventInstance.getTokenRefId());
+                outputTokenRefId = token.getRefId();
+                outputParentTokenRefId = token.getParentRefId();
             } else {
-                if (((SBoundaryEventDefinition) flowNode).isInterrupting()) {
-                    // we create the same token that activated the activity
-                    // the activity is canceled so a token will be consumed by the aborted activity
-                    consumeInputToken = false;
-                    createToken = true;
-                    final SToken token = tokenService.getToken(sProcessInstance.getId(), child.getTokenRefId());
-                    outputTokenRefId = token.getRefId();
-                    outputParentTokenRefId = token.getParentRefId();
-                } else {
-                    // a token with no parent is produced -> not the same "execution" than activity
-                    consumeInputToken = false;
-                    createToken = true;
-                    outputTokenRefId = child.getId();
-                    outputParentTokenRefId = null;
-                }
+                // a token with no parent is produced -> not the same "execution" than activity
+                outputTokenRefId = boundaryEventInstance.getId();
+                outputParentTokenRefId = null;
             }
+
         } else {
 
             if (validOutgoingTransitionDefinitions.size() > 0) {
