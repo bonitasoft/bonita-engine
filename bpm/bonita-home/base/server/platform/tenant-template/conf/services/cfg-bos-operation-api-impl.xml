@@ -3,6 +3,7 @@
 
 	<bean id="operationService"
 		class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 		<constructor-arg name="operationExecutorStrategyProvider"
 			ref="operationExecutorStrategyProvider" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
