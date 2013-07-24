@@ -59,30 +59,27 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        Long fromIndex = insertedProfileEntry.getIndex();
         List<SProfileEntry> profileEntryList;
-        Long loopIndex = fromIndex + 1;
+        Long loopIndex = 0L;
 
         // loop on profile entry results because we get NUMBER_OF_RESULTS * i entries
+        Long i = 0L;
         do {
-
             profileEntryList = searchProfileEntriesForParentIdAndProfileId(loopIndex);
+
             for (final SProfileEntry profileEntry : profileEntryList) {
-                updateProfileEntryIndex(profileEntry);// for every element of the set we update the index
+                // for every element of the set we update the index
+                try {
+                    updateProfileEntryIndex(profileEntry, i);
+                } catch (SProfileEntryNotFoundException e) {
+                    throw new SProfileEntryUpdateException(e.getCause());
+                } catch (SProfileEntryUpdateException e) {
+                    throw new SProfileEntryUpdateException(e.getCause());
+                }
+                i++;
             }
             loopIndex++;
         } while (!profileEntryList.isEmpty());
-
-        // at the end we update the inserted profile entry to set the right index:
-        // if -1 is sent the right value will be 0 to put the profile entry at the first position
-        // else the value is only a odd number so we had to increment by 1 to set a good index
-        updateProfileEntry(insertedProfileEntry, fromIndex < 0 ? 0 : fromIndex + 1);
-    }
-
-    private void updateProfileEntryIndex(final SProfileEntry profileEntry) throws SProfileEntryNotFoundException,
-            SProfileEntryUpdateException {
-        // inserted entry is insert before the set, so we must shift the set of indexes by 2 values
-        updateProfileEntry(profileEntry, profileEntry.getIndex() + 2);
     }
 
     private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final Long fromIndex) throws SBonitaSearchException {
@@ -102,10 +99,11 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
         return profileService.searchProfileEntries(queryOptions);
     }
 
-    private void updateProfileEntry(final SProfileEntry profileEntry, final Long profileEntryIndex) throws SProfileEntryNotFoundException,
+    private void updateProfileEntryIndex(final SProfileEntry profileEntry, final Long position) throws SProfileEntryNotFoundException,
             SProfileEntryUpdateException {
+        Long indexToSet = 2L * position;
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField(SProfileEntryBuilder.INDEX, profileEntryIndex);
+        entityUpdateDescriptor.addField(SProfileEntryBuilder.INDEX, indexToSet);
         profileService.updateProfileEntry(profileEntry, entityUpdateDescriptor);
     }
 }

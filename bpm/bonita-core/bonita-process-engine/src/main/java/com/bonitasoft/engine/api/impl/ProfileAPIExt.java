@@ -30,6 +30,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
+import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -448,7 +449,14 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             }
         }
 
-        return SPModelConvertor.toProfileEntry(sProfileEntry);
+        ProfileEntry updatedSProfileEntry = null;
+        try {
+            updatedSProfileEntry = getProfileEntry(id);
+        } catch (ProfileEntryNotFoundException e) {
+            throw new UpdateException(e.getCause());
+        }
+        return updatedSProfileEntry;
+
     }
 
     private ProfileCreator getProfileCreator(final ExportedProfile exportedProfile) {

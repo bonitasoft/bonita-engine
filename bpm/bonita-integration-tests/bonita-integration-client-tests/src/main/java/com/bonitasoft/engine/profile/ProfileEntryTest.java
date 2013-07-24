@@ -273,17 +273,17 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
         // Create Profile Entry 1
         final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
-                .setIndex(0L).setType("folder");
+                .setType("folder");
         getProfileAPI().createProfileEntry(profileEntryCreator1);
 
         // Create Profile Entry 3
         final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntry3", profileId).setDescription("Description profileEntry3")
-                .setIndex(2L).setType("folder");
+                .setType("folder");
         getProfileAPI().createProfileEntry(profileEntryCreator3);
 
         // Create Profile entry 2
         final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
-                .setIndex(2L).setType("folder");
+                .setType("folder");
         getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -293,9 +293,9 @@ public class ProfileEntryTest extends AbstractProfileTest {
         assertEquals(0L, searchedProfileEntries.get(0).getIndex());
         assertEquals("ProfileEntry1", searchedProfileEntries.get(0).getName());
         assertEquals(2L, searchedProfileEntries.get(1).getIndex());
-        assertEquals("ProfileEntry2", searchedProfileEntries.get(1).getName());
+        assertEquals("ProfileEntry3", searchedProfileEntries.get(1).getName());
         assertEquals(4L, searchedProfileEntries.get(2).getIndex());
-        assertEquals("ProfileEntry3", searchedProfileEntries.get(2).getName());
+        assertEquals("ProfileEntry2", searchedProfileEntries.get(2).getName());
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
@@ -380,15 +380,36 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     private Map<String, ProfileEntry> beforeIndexTests() throws AlreadyExistsException, CreationException {
-        final ProfileEntryCreator firstProfileEntryCreator = new ProfileEntryCreator("FirstProfileEntry", adminProfileId)
+
+        final ProfileCreator profileCreator = new ProfileCreator("myprofile");
+        Profile profile = getProfileAPI().createProfile(profileCreator);
+
+        long profileId = profile.getId();
+        final ProfileEntryCreator folderProfileEntryCreator = new ProfileEntryCreator("folder", profileId)
                 .setDescription("the first profile entry")
-                .setIndex(0L).setType("folder").setPage("MyPage1");
-        final ProfileEntryCreator secondProfileEntryCreator = new ProfileEntryCreator("secondProfileEntry", adminProfileId)
+                .setType("folder");
+
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(folderProfileEntryCreator);
+
+        final ProfileEntryCreator firstProfileEntryCreator = new ProfileEntryCreator("FirstProfileEntry", profileId)
+                .setDescription("the first profile entry")
+                .setType("page")
+                .setIndex(0L)
+                .setPage("MyPage1")
+                .setParentId(folderProfileEntry.getId());
+
+        final ProfileEntryCreator secondProfileEntryCreator = new ProfileEntryCreator("secondProfileEntry", profileId)
                 .setDescription("the second profile entry")
-                .setIndex(0L).setType("folder").setPage("MyPage2");
-        final ProfileEntryCreator thirdProfileEntryCreator = new ProfileEntryCreator("thirdProfileEntry", adminProfileId)
+                .setIndex(2L)
+                .setType("page")
+                .setPage("MyPage2")
+                .setParentId(folderProfileEntry.getId());
+        final ProfileEntryCreator thirdProfileEntryCreator = new ProfileEntryCreator("thirdProfileEntry", profileId)
                 .setDescription("the third profile entry")
-                .setIndex(0L).setType("folder").setPage("MyPage3");
+                .setIndex(4L)
+                .setType("page")
+                .setPage("MyPage3")
+                .setParentId(folderProfileEntry.getId());
 
         final ProfileEntry firstProfileEntry = getProfileAPI().createProfileEntry(firstProfileEntryCreator);
         final ProfileEntry secondProfileEntry = getProfileAPI().createProfileEntry(secondProfileEntryCreator);
@@ -414,15 +435,22 @@ public class ProfileEntryTest extends AbstractProfileTest {
     public void updateProfileEntryToFirstPosition() throws Exception {
         // create profiles
         HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
+        ProfileEntry firstProfileEntry = profileEntries.get("1st");
+        ProfileEntry secondProfileEntry = profileEntries.get("2nd");
+        ProfileEntry thirdProfileEntry = profileEntries.get("3rd");
 
         // update the second profile entry to set his index to the first position
         final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
         updateDescriptor.index(-1);
-        getProfileAPI().updateProfileEntry(profileEntries.get("2nd").getId(), updateDescriptor);
+        getProfileAPI().updateProfileEntry(secondProfileEntry.getId(), updateDescriptor);
 
-        assertEquals(profileEntries.get("2nd").getIndex(), 0L);// the second profile entry must have the first index (0) after updating and re-indexing
-        assertEquals(profileEntries.get("1st").getIndex(), 2L);// the first profile entry must have the second index after re-indexing
-        assertEquals(profileEntries.get("3rd").getIndex(), 4L);// the third profile entry must keep his index after re-indexing
+        secondProfileEntry = getProfileAPI().getProfileEntry(secondProfileEntry.getId());
+        firstProfileEntry = getProfileAPI().getProfileEntry(firstProfileEntry.getId());
+        thirdProfileEntry = getProfileAPI().getProfileEntry(thirdProfileEntry.getId());
+
+        assertEquals(0L, secondProfileEntry.getIndex());// the second profile entry must have the first index (0) after updating and re-indexing
+        assertEquals(2L, firstProfileEntry.getIndex());// the first profile entry must have the second index after re-indexing
+        assertEquals(4L, thirdProfileEntry.getIndex());// the third profile entry must keep his index after re-indexing
 
         // clean up data
         cleanProfilesEntriesIndexTest(profileEntries);
@@ -435,14 +463,21 @@ public class ProfileEntryTest extends AbstractProfileTest {
         // create profiles
         HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
 
+        ProfileEntry firstProfileEntry = profileEntries.get("1st");
+        ProfileEntry secondProfileEntry = profileEntries.get("2nd");
+        ProfileEntry thirdProfileEntry = profileEntries.get("3rd");
+
         // set to the last position assume profileEntries has 3 elements
         final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
         updateDescriptor.index(5);
-        getProfileAPI().updateProfileEntry(profileEntries.get("2nd").getId(), updateDescriptor);
 
-        assertEquals(profileEntries.get("1st").getIndex(), 0L);// the first profile entry must keep index (0) after updating and re-indexing
-        assertEquals(profileEntries.get("3rd").getIndex(), 2L);// the third profile entry must have the second index (2) after re-indexing
-        assertEquals(profileEntries.get("2nd").getIndex(), 4L);// the second profile entry must have the last index (4)
+        secondProfileEntry = getProfileAPI().updateProfileEntry(secondProfileEntry.getId(), updateDescriptor);
+        firstProfileEntry = getProfileAPI().getProfileEntry(firstProfileEntry.getId());
+        thirdProfileEntry = getProfileAPI().getProfileEntry(thirdProfileEntry.getId());
+
+        assertEquals(0L, firstProfileEntry.getIndex());// the first profile entry must keep index (0) after updating and re-indexing
+        assertEquals(2L, thirdProfileEntry.getIndex());// the third profile entry must have the second index (2) after re-indexing
+        assertEquals(4L, secondProfileEntry.getIndex());// the second profile entry must have the last index (4)
 
         // clean up data
         cleanProfilesEntriesIndexTest(profileEntries);
@@ -454,17 +489,22 @@ public class ProfileEntryTest extends AbstractProfileTest {
     public void updateProfileEntryAfterAnotherOne() throws Exception {
         // create profiles
         HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
+        ProfileEntry firstProfileEntry = profileEntries.get("1st");
+        ProfileEntry secondProfileEntry = profileEntries.get("2nd");
+        ProfileEntry thirdProfileEntry = profileEntries.get("3rd");
 
         // set to the last position assume profileEntries has 3 elements
         final ProfileEntryUpdater updateDescriptor = new ProfileEntryUpdater();
 
         // move the third element in second place
-        updateDescriptor.index(3);
-        getProfileAPI().updateProfileEntry(profileEntries.get("3rd").getId(), updateDescriptor);
+        updateDescriptor.index(1);
+        thirdProfileEntry = getProfileAPI().updateProfileEntry(thirdProfileEntry.getId(), updateDescriptor);
+        secondProfileEntry = getProfileAPI().getProfileEntry(secondProfileEntry.getId());
+        firstProfileEntry = getProfileAPI().getProfileEntry(firstProfileEntry.getId());
 
-        assertEquals(profileEntries.get("1st").getIndex(), 0L);// the first profile entry must keep index (0) after updating and re-indexing
-        assertEquals(profileEntries.get("3rd").getIndex(), 2L);// the third profile entry must have the second index (2) after re-indexing
-        assertEquals(profileEntries.get("2nd").getIndex(), 4L);// the second profile entry must have the last index (4)
+        assertEquals(0L, firstProfileEntry.getIndex());// the first profile entry must keep index (0) after updating and re-indexing
+        assertEquals(2L, thirdProfileEntry.getIndex());// the third profile entry must have the second index (2) after re-indexing
+        assertEquals(4L, secondProfileEntry.getIndex());// the second profile entry must have the last index (4)
 
         // clean up data
         cleanProfilesEntriesIndexTest(profileEntries);
