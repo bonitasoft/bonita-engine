@@ -912,7 +912,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     break;
             }
         }
-        if (SFlowNodeType.BOUNDARY_EVENT.equals(child.getType())) {
+        if (flowNode == null) {
+            // not in the definition: no merge no split no implicit end
+            consumeInputToken = false;
+            createToken = false;
+            implicitEnd = false;
+        } else if (SFlowNodeType.BOUNDARY_EVENT.equals(child.getType())) {
             // the creation of tokens for the boundaries are done inside the ExecutingBoundaryEventStateImpl
             // we don't change tokens
             consumeInputToken = false;

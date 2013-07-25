@@ -895,7 +895,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         waitForUserTask("errorTask", startProcess);
-
+        System.out.println("before delete");
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -1242,11 +1242,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
         final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-        // .addData(
-        // "data",
-        // "org.bonitasoft.dfgdfg.Restaurant",
-        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()",
-        // "org.bonitasoft.dfgdfg.Restaurant"))
+                // .addData(
+                // "data",
+                // "org.bonitasoft.dfgdfg.Restaurant",
+                // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
+                // "org.bonitasoft.dfgdfg.Restaurant"))
                 .addUserTask("step1", "actor");
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));

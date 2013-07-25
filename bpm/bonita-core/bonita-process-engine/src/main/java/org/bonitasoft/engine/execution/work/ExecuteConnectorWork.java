@@ -35,7 +35,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.NonTxBonitaWork;
 
 /**
@@ -51,6 +50,8 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
         private final SBonitaException e;
 
+        private boolean continueFlow;
+
         private HandleConnectorOnFailEventTxContent(final SBonitaException e) {
             this.e = e;
         }
@@ -62,16 +63,24 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
             switch (sConnectorDefinition.getFailAction()) {
                 case ERROR_EVENT:
                     errorEventOnFail();
+                    continueFlow = false;
                     break;
                 case FAIL:
                     setConnectorAndContainerToFailed();
+                    continueFlow = false;
                     break;
                 case IGNORE:
                     setConnectorOnlyToFailed();
+                    continueFlow = true;
                     break;
                 default:
+                    continueFlow = false;
                     break;
             }
+        }
+
+        public Boolean shouldContinueFlow() {
+            return continueFlow;
         }
     }
 
@@ -205,19 +214,24 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
     protected void work() throws SBonitaException {
         final ClassLoader processClassloader = getClassLoader();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        HandleConnectorOnFailEventTxContent handleError = null;
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
             if (errorThrownWhenEvaluationOfInputParameters != null) {
-                transactionExecutor.execute(new HandleConnectorOnFailEventTxContent(errorThrownWhenEvaluationOfInputParameters));
+                handleError = new HandleConnectorOnFailEventTxContent(errorThrownWhenEvaluationOfInputParameters);
+                transactionExecutor.execute(handleError);
             } else {
                 try {
                     final ConnectorResult result = connectorService.executeConnector(processDefinition.getId(), connector, processClassloader, inputParameters);
                     transactionExecutor.execute(new EvaluateConnectorOutputsTxContent(result));
                 } catch (final SBonitaException e) {
-                    transactionExecutor.execute(new HandleConnectorOnFailEventTxContent(e));
+                    handleError = new HandleConnectorOnFailEventTxContent(e);
+                    transactionExecutor.execute(handleError);
                 }
             }
-            transactionExecutor.execute(new ContinueFlowTxContent());
+            if (handleError == null || handleError.shouldContinueFlow()) {
+                transactionExecutor.execute(new ContinueFlowTxContent());
+            }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
