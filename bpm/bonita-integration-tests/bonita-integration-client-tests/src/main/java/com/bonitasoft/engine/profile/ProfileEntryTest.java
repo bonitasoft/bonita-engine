@@ -121,7 +121,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
         // insert the element between 0 and 2
         final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry1")
-                .setIndex(2L).setType("folder").setParentId(12L).setPage("MyPage4");
+                .setIndex(1L).setType("folder").setParentId(12L).setPage("MyPage4");
         final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(createdProfileEntry.getId());
