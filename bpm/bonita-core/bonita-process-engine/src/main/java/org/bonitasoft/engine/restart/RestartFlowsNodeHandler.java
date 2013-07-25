@@ -25,6 +25,8 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -46,19 +48,25 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
         FlowNodeStateManager flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
         ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         ContainerRegistry containerRegistry = tenantServiceAccessor.getContainerRegistry();
+        TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
             final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
             final int processInstanceIndex = bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex();
             do {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow nodes...");
                 flowNodes = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
                 for (final SFlowNodeInstance flowNodeInstance : flowNodes) {
                     if (flowNodeInstance.isTerminal()) {
                         // if it is terminal it means the notify was not called yet
                         long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + flowNodeInstance.getName() + ":"
+                                + flowNodeInstance.getId());
                         workService.registerWork(new NotifyChildFinishedWork(containerRegistry, processDefinitionService
                                 .getProcessDefinition(processDefinitionId), flowNodeInstance, flowNodeStateManager.getState(flowNodeInstance.getStateId())));
                     } else {
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + flowNodeInstance.getName() + ":"
+                                + flowNodeInstance.getId());
                         workService.registerWork(new ExecuteFlowNodeWork(processExecutor, flowNodeInstance.getId(), null, null, flowNodeInstance
                                 .getLogicalGroup(processInstanceIndex)));
                     }
