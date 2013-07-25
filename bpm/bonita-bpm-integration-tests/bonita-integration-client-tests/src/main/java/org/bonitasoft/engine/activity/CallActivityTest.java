@@ -400,7 +400,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
         final ProcessInstance[] procInstLevels = new ProcessInstance[nbLevel];
         procInstLevels[0] = getProcessAPI().startProcess(processDefLevels[0].getId(), operations, null);
-        checkNbOfProcessInstances(50, 1000 * nbLevel, nbLevel, ProcessInstanceCriterion.NAME_DESC);
+        checkNbOfProcessInstances(50, 5000 * nbLevel, nbLevel, ProcessInstanceCriterion.NAME_DESC);
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, nbLevel, ProcessInstanceCriterion.NAME_ASC); // if nbLevel>10 use
                                                                                                                                            // CREATION_DATE_ASC
         assertEquals(nbLevel, processInstances.size());

@@ -9,7 +9,7 @@
 				<index>0</index>
 				<description>My team activitys dashboard</description>
 				<type>CurrentUserTeamTasksDashboard</type>
-				<page></page>
+				<page>6</page>
 			</parentProfileEntry>
 		</profileEntries>
 		<profileMapping>
