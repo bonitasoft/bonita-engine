@@ -56,9 +56,9 @@
 
 	<query name="getFlowNodeInstancesToRestart">
 		SELECT a
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS a
 		WHERE a.deleted = FALSE
-		AND (a.stateExecuting = TRUE OR a.stable = FALSE)
+		AND (a.stateExecuting = TRUE OR a.stable = FALSE OR a.terminal = TRUE)
 	</query>
 
 	<query name="getActiveGatewayInstanceOfProcess">

@@ -15,12 +15,16 @@ package org.bonitasoft.engine.restart;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
+import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -39,6 +43,9 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
         List<SFlowNodeInstance> flowNodes;
         final WorkService workService = platformServiceAccessor.getWorkService();
         final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
+        FlowNodeStateManager flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
+        ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
+        ContainerRegistry containerRegistry = tenantServiceAccessor.getContainerRegistry();
         try {
             final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
             final int processInstanceIndex = bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex();
@@ -46,13 +53,20 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                 flowNodes = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
                 for (final SFlowNodeInstance flowNodeInstance : flowNodes) {
-                    workService.registerWork(new ExecuteFlowNodeWork(processExecutor, flowNodeInstance.getId(), null, null, flowNodeInstance
-                            .getLogicalGroup(processInstanceIndex)));
+                    if (flowNodeInstance.isTerminal()) {
+                        // if it is terminal it means the notify was not called yet
+                        long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+                        workService.registerWork(new NotifyChildFinishedWork(containerRegistry, processDefinitionService
+                                .getProcessDefinition(processDefinitionId), flowNodeInstance, flowNodeStateManager.getState(flowNodeInstance.getStateId())));
+                    } else {
+                        workService.registerWork(new ExecuteFlowNodeWork(processExecutor, flowNodeInstance.getId(), null, null, flowNodeInstance
+                                .getLogicalGroup(processInstanceIndex)));
+                    }
                 }
             } while (flowNodes.size() == queryOptions.getNumberOfResults());
         } catch (final WorkRegisterException e) {
             handleException(e, "Unable to restart flowNodes: can't register work");
-        } catch (final SFlowNodeReadException e) {
+        } catch (final SBonitaException e) {
             handleException(e, "Unable to restart flowNodes: can't read flow nodes");
         }
 

@@ -57,7 +57,7 @@ public class RestartHandlersTests extends CommonAPITest {
     /*
      * This test is not synchronized correctly so there is the test below: we have more elements so some are restarted using restart handlers
      */
-    @Test
+    // @Test
     @Cover(classes = {}, concept = BPMNConcept.ACTIVITIES, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode" }, story = "elements must be restarted when they were not completed when the node was shut down")
     public void restartElements() throws Exception {
         final User user = createUser("john", "bpm");
@@ -69,6 +69,7 @@ public class RestartHandlersTests extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), "actor", user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, user.getId());
+        Thread.sleep(50);// wait that notify is executed at least
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
@@ -102,10 +103,14 @@ public class RestartHandlersTests extends CommonAPITest {
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
+        Thread.sleep(50);// wait that notify is executed at least
         platformAPI.stopNode();
+        Thread.sleep(50);
         platformAPI.startNode();
         APITestUtil.logoutPlatform(loginPlatform);
         login();
+        // check all are not already pending
+        assertTrue(getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()) < names.size() - 5);
         final WaitUntil waitUntil = new WaitUntil(100, 5000, false) {
 
             @Override

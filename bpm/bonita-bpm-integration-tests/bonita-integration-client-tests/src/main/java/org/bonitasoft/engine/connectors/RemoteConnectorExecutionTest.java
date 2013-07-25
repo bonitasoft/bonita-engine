@@ -1144,6 +1144,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // connector restarted
         assertEquals("value2", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         assignAndExecuteStep(step1, johnUserId);
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition.getId());
     }
 
