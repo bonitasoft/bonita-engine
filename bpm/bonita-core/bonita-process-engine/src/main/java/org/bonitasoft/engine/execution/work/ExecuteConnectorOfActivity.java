@@ -143,13 +143,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     @Override
     protected void errorEventOnFail() throws SBonitaException {
         setConnectorOnlyToFailed();
-        // FIXME see comment below
-        /*
-         * we do this in a work because the boundary might not be in waiting state and have registered the waiting error now...
-         * we should find an other way to "wait" the waiting error to be registered
-         * maybe the waiting error should be registered synchronously when creating the task and not by the boundary event?
-         */
-        workService.registerWork(new HandleErrorEventOnFail(this));
+        handleErrorEventOnFail();
     }
 
     void handleErrorEventOnFail() throws SBonitaException {
