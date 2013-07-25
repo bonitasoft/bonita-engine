@@ -16,6 +16,7 @@
 				<index>2</index>
 				<description>Organization</description>
 				<type>folder</type>
+				<page>1</page>
 				<childrenEntries>
 					<profileEntry name="Users">
 						<parentName>Organization</parentName>
@@ -52,6 +53,7 @@
 				<index>4</index>
 				<description>BPM</description>
 				<type>folder</type>
+				<page>2</page>
 				<childrenEntries>
 					<profileEntry name="Processes">
 						<parentName>BPM</parentName>
@@ -81,6 +83,7 @@
 				<index>6</index>
 				<description>Reporting</description>
 				<type>folder</type>
+				<page>3</page>
 				<childrenEntries>
 					<profileEntry name="Dashboard">
 						<parentName>Reporting</parentName>
@@ -103,6 +106,7 @@
 				<index>8</index>
 				<description>Monitoring</description>
 				<type>folder</type>
+				<page>4</page>
 				<childrenEntries>
 					<profileEntry name="Dashboard">
 						<parentName>Monitoring</parentName>
@@ -125,6 +129,7 @@
 				<index>10</index>
 				<description>User XP</description>
 				<type>folder</type>
+				<page>5</page>
 				<childrenEntries>
 					<profileEntry name="Profiles">
 						<parentName>User XP</parentName>
@@ -154,6 +159,7 @@
 				<index>12</index>
 				<description>Server</description>
 				<type>folder</type>
+				<page>6</page>
 				<childrenEntries>
 					<profileEntry name="Commands">
 						<parentName>Server</parentName>
@@ -216,6 +222,7 @@
 				<index>2</index>
 				<description>My team</description>
 				<type>folder</type>
+				<page>9</page>
 				<childrenEntries>
 					<profileEntry name="Users">
 						<parentName>My team</parentName>
@@ -306,6 +313,7 @@
 				<index>2</index>
 				<description>BPM</description>
 				<type>folder</type>
+				<page>1</page>
 				<childrenEntries>
 					<profileEntry name="Processes">
 						<parentName>BPM</parentName>
@@ -364,6 +372,7 @@
 				<index>6</index>
 				<description>Monitoring</description>
 				<type>folder</type>
+				<page>2</page>
 				<childrenEntries>
 					<profileEntry name="Dashboard">
 						<parentName>Monitoring</parentName>
@@ -423,6 +432,7 @@
 				<index>2</index>
 				<description>Tasks</description>
 				<type>folder</type>
+				<page>1</page>
 				<childrenEntries>
 					<profileEntry name="My tasks">
 						<parentName>Tasks</parentName>
@@ -452,6 +462,7 @@
 				<index>4</index>
 				<description>Applications</description>
 				<type>folder</type>
+				<page>2</page>
 				<childrenEntries>
 					<profileEntry name="Recently used">
 						<parentName>Applications</parentName>
@@ -475,6 +486,7 @@
 				<index>6</index>
 				<description>Cases</description>
 				<type>folder</type>
+				<page>3</page>
 				<childrenEntries>
 					<profileEntry name="Recently used">
 						<parentName>Cases</parentName>
