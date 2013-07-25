@@ -3,5 +3,5 @@ CREATE TABLE blob_ (
 	id BIGINT NOT NULL,
 	blobValue MEDIUMBLOB,
 	PRIMARY KEY (tenantid, id)
-);
+) ENGINE = INNODB;
 

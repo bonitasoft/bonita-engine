@@ -55,7 +55,7 @@ CREATE TABLE flownode_instance (
   lastUpdateDate BIGINT,
   expectedEndDate BIGINT,
   claimedDate BIGINT,
-  priority BIGINT,
+  priority TINYINT,
   gatewayType VARCHAR(50),
   hitBys VARCHAR(255),
   stateCategory VARCHAR(50) NOT NULL,
