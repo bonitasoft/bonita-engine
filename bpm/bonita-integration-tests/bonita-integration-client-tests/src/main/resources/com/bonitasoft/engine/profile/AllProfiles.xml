@@ -350,6 +350,7 @@
 				<index>4</index>
 				<description>Reporting</description>
 				<type>folder</type>
+				<page>3</page>
 				<childrenEntries>
 					<profileEntry name="Dashboard">
 						<parentName>Reporting</parentName>

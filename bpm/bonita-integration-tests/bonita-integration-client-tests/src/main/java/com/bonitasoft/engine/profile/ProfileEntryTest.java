@@ -63,8 +63,8 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Without", "Name" }, story = "Create profile entry without name.", jira = "ENGINE-1607")
     @Test
     public void createProfileEntryWithoutName() throws BonitaException {
-        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator(adminProfileId).setDescription("Description profileEntry1")
-                .setIndex(0L).setType("folder").setParentId(1L).setPage("MyPage");
+        final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator(adminProfileId).setDescription("Description profileEntry1").setIndex(0L)
+                .setType("folder").setParentId(1L).setPage("MyPage");
         final ProfileEntry createdProfileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
 
         final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(createdProfileEntry.getId());
@@ -76,8 +76,8 @@ public class ProfileEntryTest extends AbstractProfileTest {
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "With", "Same", "Page", "Parent", "Profile" }, story = "Can't create profile entry with same parent, profile, page.", jira = "ENGINE-1607")
-    @Test(expected = CreationException.class)
-    public void cantCreate2ProfileEntriesWithSamePageInSameParent() throws BonitaException {
+    @Test()
+    public void canCreate2ProfileEntriesWithSamePageInSameParent() throws BonitaException {
         final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator(adminProfileId).setParentId(1L).setPage("MyPage").setDescription("description");
         final ProfileEntry profileEntry = getProfileAPI().createProfileEntry(profileEntryCreator);
 
@@ -205,7 +205,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
         // Create Profile entry 2
         final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
-                .setIndex(2L).setType("folder");
+                .setIndex(2L).setType("folder").setPage("toto");
         final ProfileEntry profileEntryToDelete = getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         // Create Profile Entry 3
@@ -309,8 +309,8 @@ public class ProfileEntryTest extends AbstractProfileTest {
         final long profileId = createdProfile.getId();
 
         // Create Profile Entry Menu1
-        final ProfileEntryCreator profileEntryCreatorMenu1 = new ProfileEntryCreator("Menu1", profileId).setDescription("Description Menu1")
-                .setIndex(0L).setType("folder");
+        final ProfileEntryCreator profileEntryCreatorMenu1 = new ProfileEntryCreator("Menu1", profileId).setDescription("Description Menu1").setIndex(0L)
+                .setType("folder");
         final ProfileEntry createdProfileMenu = getProfileAPI().createProfileEntry(profileEntryCreatorMenu1);
         final long profileMenuId = createdProfileMenu.getId();
 
@@ -382,39 +382,26 @@ public class ProfileEntryTest extends AbstractProfileTest {
     private Map<String, ProfileEntry> beforeIndexTests() throws AlreadyExistsException, CreationException {
 
         final ProfileCreator profileCreator = new ProfileCreator("myprofile");
-        Profile profile = getProfileAPI().createProfile(profileCreator);
+        final Profile profile = getProfileAPI().createProfile(profileCreator);
 
-        long profileId = profile.getId();
-        final ProfileEntryCreator folderProfileEntryCreator = new ProfileEntryCreator("folder", profileId)
-                .setDescription("the first profile entry")
-                .setType("folder");
+        final long profileId = profile.getId();
+        final ProfileEntryCreator folderProfileEntryCreator = new ProfileEntryCreator("folder", profileId).setDescription("the first profile entry").setType(
+                "folder");
 
         final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(folderProfileEntryCreator);
 
-        final ProfileEntryCreator firstProfileEntryCreator = new ProfileEntryCreator("FirstProfileEntry", profileId)
-                .setDescription("the first profile entry")
-                .setType("page")
-                .setIndex(0L)
-                .setPage("MyPage1")
-                .setParentId(folderProfileEntry.getId());
+        final ProfileEntryCreator firstProfileEntryCreator = new ProfileEntryCreator("FirstProfileEntry", profileId).setDescription("the first profile entry")
+                .setType("page").setIndex(0L).setPage("MyPage1").setParentId(folderProfileEntry.getId());
 
         final ProfileEntryCreator secondProfileEntryCreator = new ProfileEntryCreator("secondProfileEntry", profileId)
-                .setDescription("the second profile entry")
-                .setIndex(2L)
-                .setType("page")
-                .setPage("MyPage2")
-                .setParentId(folderProfileEntry.getId());
-        final ProfileEntryCreator thirdProfileEntryCreator = new ProfileEntryCreator("thirdProfileEntry", profileId)
-                .setDescription("the third profile entry")
-                .setIndex(4L)
-                .setType("page")
-                .setPage("MyPage3")
-                .setParentId(folderProfileEntry.getId());
+                .setDescription("the second profile entry").setIndex(2L).setType("page").setPage("MyPage2").setParentId(folderProfileEntry.getId());
+        final ProfileEntryCreator thirdProfileEntryCreator = new ProfileEntryCreator("thirdProfileEntry", profileId).setDescription("the third profile entry")
+                .setIndex(4L).setType("page").setPage("MyPage3").setParentId(folderProfileEntry.getId());
 
         final ProfileEntry firstProfileEntry = getProfileAPI().createProfileEntry(firstProfileEntryCreator);
         final ProfileEntry secondProfileEntry = getProfileAPI().createProfileEntry(secondProfileEntryCreator);
         final ProfileEntry thirdProfileEntry = getProfileAPI().createProfileEntry(thirdProfileEntryCreator);
-        HashMap<String, ProfileEntry> returnedMap = new HashMap<String, ProfileEntry>();
+        final HashMap<String, ProfileEntry> returnedMap = new HashMap<String, ProfileEntry>();
 
         returnedMap.put("1st", firstProfileEntry);
         returnedMap.put("2nd", secondProfileEntry);
@@ -423,7 +410,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
 
     }
 
-    private void cleanProfilesEntriesIndexTest(Map<String, ProfileEntry> profileEntries) throws DeletionException {
+    private void cleanProfilesEntriesIndexTest(final Map<String, ProfileEntry> profileEntries) throws DeletionException {
         // Clean up
         getProfileAPI().deleteProfileEntry(profileEntries.get("1st").getId());
         getProfileAPI().deleteProfileEntry(profileEntries.get("2nd").getId());
@@ -434,7 +421,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryToFirstPosition() throws Exception {
         // create profiles
-        HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
+        final HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
         ProfileEntry firstProfileEntry = profileEntries.get("1st");
         ProfileEntry secondProfileEntry = profileEntries.get("2nd");
         ProfileEntry thirdProfileEntry = profileEntries.get("3rd");
@@ -461,7 +448,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryToLastPosition() throws Exception {
         // create profiles
-        HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
+        final HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
 
         ProfileEntry firstProfileEntry = profileEntries.get("1st");
         ProfileEntry secondProfileEntry = profileEntries.get("2nd");
@@ -488,7 +475,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
     @Test
     public void updateProfileEntryAfterAnotherOne() throws Exception {
         // create profiles
-        HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
+        final HashMap<String, ProfileEntry> profileEntries = (HashMap<String, ProfileEntry>) beforeIndexTests();
         ProfileEntry firstProfileEntry = profileEntries.get("1st");
         ProfileEntry secondProfileEntry = profileEntries.get("2nd");
         ProfileEntry thirdProfileEntry = profileEntries.get("3rd");
