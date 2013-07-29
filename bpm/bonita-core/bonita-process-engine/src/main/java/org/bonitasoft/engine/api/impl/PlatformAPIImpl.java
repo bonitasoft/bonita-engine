@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
@@ -117,8 +118,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final SPlatform platform = constructPlatform(platformAccessor);
         try {
+            final SPlatform platform = constructPlatform(platformAccessor);
             platformService.createPlatformTables();
             platformService.createTenantTables();
 
@@ -137,6 +138,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
         } catch (final SBonitaException e) {
             throw new CreationException("Platform Creation failed.", e);
+        } catch (final IOException ioe) {
+            throw new CreationException("Platform Creation failed.", ioe);
         }
     }
 
@@ -182,11 +185,13 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
-    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) {
+    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) throws IOException {
+        final URL resource = PlatformAPIImpl.class.getResource("platform.properties");
+        final Properties properties = PropertiesManager.getProperties(resource);
         // FIXME construct platform object from a configuration file
-        final String version = "BOS-6.0";
+        final String version = (String) properties.get("version");
         final String previousVersion = "";
-        final String initialVersion = "BOS-6.0";
+        final String initialVersion = (String) properties.get("version");
         // FIXME createdBy when PlatformSessionAccessor will exist
         final String createdBy = "platformAdmin";
         // FIXME do that in the builder
@@ -604,12 +609,12 @@ public class PlatformAPIImpl implements PlatformAPI {
             @Override
             public void execute() throws SBonitaException {
                 final SSession session = sessionService.createSession(tenantId, "system"); // FIXME use technical user
-                this.sessionId = session.getId();
+                sessionId = session.getId();
             }
 
             @Override
             public Long getResult() {
-                return this.sessionId;
+                return sessionId;
             }
         };
 

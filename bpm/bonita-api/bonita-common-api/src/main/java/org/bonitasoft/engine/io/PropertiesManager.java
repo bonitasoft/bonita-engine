@@ -18,6 +18,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -39,18 +42,27 @@ public class PropertiesManager {
         }
     }
 
+    public static Properties getProperties(final URL url) throws IOException {
+        final InputStreamReader reader = new InputStreamReader(url.openStream());
+        return getProperties(reader);
+    }
+
     public static Properties getProperties(final String fileName) throws IOException {
         return getProperties(new File(fileName));
     }
 
     public static Properties getProperties(final File file) throws IOException {
+        final FileReader reader = new FileReader(file);
+        return getProperties(reader);
+    }
+
+    private static Properties getProperties(final Reader reader) throws IOException {
         final Properties properties = new Properties();
-        final FileReader fileReader = new FileReader(file);
         try {
-            properties.load(fileReader);
+            properties.load(reader);
             return properties;
         } finally {
-            fileReader.close();
+            reader.close();
         }
     }
 
