@@ -61,12 +61,7 @@
         </property>
 	</bean>
 
-	<bean id="transactionExecutor" class="com.bonitasoft.engine.execution.RetryTransactionExecutor">
+	<bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutor">
 		<constructor-arg name="transactionService" ref="transactionService" />
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
-		<constructor-arg name="retries" value="3" />
-		<constructor-arg name="delay" value="20" />
-		<constructor-arg name="delayFactor" value="1.5" />
-	</bean>
-
+	</bean> 
 </beans>
