@@ -247,8 +247,8 @@ public class CommonBPMServicesTest {
 
     private List<String> clean() throws Exception {
         try {
-            transactionService.begin();
             sSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
+            transactionService.begin();
             sessionAccessor.setSessionInfo(sSession.getId(), sSession.getTenantId());
             final List<String> messages = new ArrayList<String>();
             // final STenant tenant = platformService.getTenant(tenantId);
