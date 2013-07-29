@@ -711,33 +711,37 @@ public class StateBehaviors {
 
         final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 processDefinition.getId());
-        Map<String, Object> inputParameters = null;
+        ExecuteConnectorWork work = null;
         try {
+            Map<String, Object> inputParameters = null;
             inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), sExpressionContext, null);
+            work = buildWorkToExecuteConnector(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters);
+
         } catch (final SBonitaException sbe) {
+            work = buildWorkToSetConnectorFailed(processDefinition, flowNodeInstance, connector, sConnectorDefinition, sbe);
+
+        } finally {
             try {
-                final ExecuteConnectorWork work = getWork(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters);
-                work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
-                workService.registerWork(work);
-            } catch (final WorkRegisterException e) {
-                throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstance, e);
-            }
-        }
-        if (inputParameters != null) {
-            try {
-                workService.registerWork(getWork(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters));
+                workService.registerWork(work);    
             } catch (final WorkRegisterException e) {
                 throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstance, e);
             }
         }
     }
 
-    private ExecuteConnectorOfActivity getWork(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+    private ExecuteConnectorOfActivity buildWorkToExecuteConnector(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
         return new ExecuteConnectorOfActivity(containerRegistry, transactionExecutor, processInstanceService, archiveService, instanceBuilders,
                 dataInstanceService, dataInstanceBuilders, activityInstanceService, flowNodeStateManager, classLoaderService, connectorService,
                 connectorInstanceService, processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters, eventsHandler,
                 bpmInstancesCreator, bpmDefinitionBuilders, eventInstanceService, workService);
+    }
+
+    private ExecuteConnectorOfActivity buildWorkToSetConnectorFailed(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+            final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition, SBonitaException sbe) {
+        final ExecuteConnectorOfActivity work = buildWorkToExecuteConnector(processDefinition, flowNodeInstance, connector, sConnectorDefinition, null);
+        work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
+        return work;
     }
 
     public void createAttachedBoundaryEvents(final SProcessDefinition processDefinition, final SActivityInstance activityInstance)
@@ -820,7 +824,7 @@ public class StateBehaviors {
     }
 
     private void interruptWaitingEvents(final long instanceId, final SCatchEventDefinition catchEventDef) throws SBonitaSearchException,
-            SWaitingEventModificationException {
+    SWaitingEventModificationException {
         if (!catchEventDef.getEventTriggers().isEmpty()) {
             final SWaitingEventKeyProvider waitingEventKeyProvider = instanceBuilders.getSWaitingMessageEventBuilder();
             interruptWaitingEvents(instanceId, SWaitingEvent.class, waitingEventKeyProvider);
