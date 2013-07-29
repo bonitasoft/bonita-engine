@@ -90,13 +90,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         try {
             final ClassLoader processClassloader;
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
-            final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
+            processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);

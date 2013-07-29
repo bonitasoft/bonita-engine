@@ -14,7 +14,6 @@ import java.util.Map;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 
 import com.bonitasoft.engine.api.impl.transaction.RemoveBreakpoint;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
@@ -30,11 +29,9 @@ public class RemoveBreakpointCommand extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor tenantAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         final long breakpointId = getLongMandadoryParameter(parameters, "breakpointId");
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final RemoveBreakpoint transactionContent = new RemoveBreakpoint(breakpointService, breakpointId);
         try {
-            transactionExecutor.execute(transactionContent);
+            new RemoveBreakpoint(breakpointService, breakpointId).execute();
             return null;
         } catch (final SBreakpointNotFoundException sbnfe) {
             throw new SCommandExecutionException(sbnfe);

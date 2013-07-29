@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.impl.ReportingAPIImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -37,9 +36,8 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final AddReport addReport = new AddReport(tenantAccessor, name, description, content);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(addReport);
+            addReport.execute();
             return ModelConvertor.toReport(addReport.getResult());
         } catch (final SReportAlreadyExistsException sraee) {
             throw new AlreadyExistsException(sraee);
@@ -52,9 +50,8 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
     public void deleteReport(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReport deleteReport = new DeleteReport(tenantAccessor, id);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(deleteReport);
+            deleteReport.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -64,9 +61,8 @@ public class ReportingAPIExt extends ReportingAPIImpl implements ReportingAPI {
     public void deleteReports(final List<Long> reportIds) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReports deleteReports = new DeleteReports(tenantAccessor, reportIds);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(deleteReports);
+            deleteReports.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }

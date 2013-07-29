@@ -10,7 +10,6 @@ package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.OrganizationExportException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -45,10 +44,9 @@ public class IdentityAPIExt extends IdentityAPIImpl implements IdentityAPI {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.WEB_ORGANIZATION_EXCHANGE);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService());
         try {
-            transactionExecutor.execute(exportOrganization);
+            exportOrganization.execute();
             return exportOrganization.getResult();
         } catch (final SBonitaException e) {
             throw new OrganizationExportException(e);

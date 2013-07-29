@@ -15,9 +15,7 @@ import java.util.Map;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.persistence.OrderAndField;
-import org.bonitasoft.engine.transaction.STransactionException;
 
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
@@ -38,22 +36,13 @@ public class GetBreakpointsCommand extends TenantCommand {
         final int maxResults = getIntegerMandadoryParameter(parameters, "maxResults");
         final BreakpointCriterion sort = getParameter(parameters, "sort", "");
         final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SBreakpointBuilder builder = tenantAccessor.getBPMInstanceBuilders().getSBreakpointBuilder();
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForBreakpoints(sort, builder);
-                final List<SBreakpoint> breakpoints = breakpointService.getBreakpoints(startIndex, maxResults, orderAndField.getField(),
-                        orderAndField.getOrder());
-                return (Serializable) SPModelConvertor.toBreakpoints(breakpoints);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new SCommandExecutionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
+            final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForBreakpoints(sort, builder);
+            final List<SBreakpoint> breakpoints = breakpointService.getBreakpoints(startIndex, maxResults, orderAndField.getField(),
+                    orderAndField.getOrder());
+            return (Serializable) SPModelConvertor.toBreakpoints(breakpoints);
+        } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }
     }

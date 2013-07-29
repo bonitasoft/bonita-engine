@@ -8,17 +8,17 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.SMonitoringException;
 import org.bonitasoft.engine.monitoring.TenantMonitoringService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.monitoring.MonitoringException;
@@ -32,6 +32,7 @@ import com.bonitasoft.manager.Features;
  */
 public class MonitoringAPIImpl implements MonitoringAPI {
 
+    @CustomTransactions
     @Override
     public long getNumberOfActiveTransactions() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
@@ -72,31 +73,17 @@ public class MonitoringAPIImpl implements MonitoringAPI {
     public long getNumberOfUsers() throws MonitoringException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
 
-        final TenantMonitoringService tenantMonitoringService = getTenantMonitoringService();
-        final TransactionService transactionService = getTransactionService();
-        final TechnicalLoggerService logger = getTechnicalLogger();
-
-        long numberOfUsers;
         try {
-            transactionService.begin();
-            numberOfUsers = tenantMonitoringService.getNumberOfUsers();
-        } catch (final SBonitaException e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-            throw new MonitoringException(e.getMessage());
-        } finally {
-            try {
-                transactionService.complete();
-            } catch (final SBonitaException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-                throw new MonitoringException(e.getMessage());
-            }
-        }
-        return numberOfUsers;
-    }
+            return getTenantMonitoringService().getNumberOfUsers();
+        } catch (SMonitoringException e) {
+            final TechnicalLoggerService logger = getTechnicalLogger();
 
-    private TransactionService getTransactionService() {
-        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-        return tenantServiceAccessor.getTransactionService();
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+            }
+            throw new MonitoringException(e.getMessage());
+        }
     }
 
     private TechnicalLoggerService getTechnicalLogger() {
