@@ -2,7 +2,6 @@ package org.bonitasoft.engine.continuation;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.work.NonTxBonitaWork;
 
 public class ListAdder extends NonTxBonitaWork {
@@ -20,7 +19,7 @@ public class ListAdder extends NonTxBonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         try {
             Thread.sleep(delay);
         } catch (final InterruptedException e) {

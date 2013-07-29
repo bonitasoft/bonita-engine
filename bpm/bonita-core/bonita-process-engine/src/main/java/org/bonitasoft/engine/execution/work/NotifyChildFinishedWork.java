@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -43,7 +42,7 @@ public class NotifyChildFinishedWork extends TxBonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         containerRegistry.nodeReachedState(processDefinition, flowNodeInstance, state, flowNodeInstance.getParentContainerId(), flowNodeInstance
                 .getParentContainerType().name());
 

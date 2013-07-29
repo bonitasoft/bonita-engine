@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.execution.ContainerExecutor;
@@ -41,7 +40,7 @@ public class ExecuteTransitionWork extends TxBonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         containerExecutor.executeTransition(sDefinition, sTransitionInstance);
     }
 

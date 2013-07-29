@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.execution.ContainerExecutor;
@@ -47,9 +46,8 @@ public class ExecuteFlowNodeWork extends TxBonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null);
-
     }
 
     @Override

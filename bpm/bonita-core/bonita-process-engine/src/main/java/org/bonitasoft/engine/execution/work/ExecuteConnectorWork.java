@@ -205,7 +205,7 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
     protected abstract void evaluateOutput(ConnectorResult result) throws SBonitaException;
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         final ClassLoader processClassloader = getClassLoader();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         HandleConnectorOnFailEventTxContent handleError = null;

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
@@ -74,7 +73,7 @@ public class InstantiateProcessWork extends TxBonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         if (idOfTheProcessToInterrupt != null) {
             final TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(
                     bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, flowNodeInstanceService, processExecutor, lockService, logger);

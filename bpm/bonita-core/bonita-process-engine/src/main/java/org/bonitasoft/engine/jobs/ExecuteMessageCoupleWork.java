@@ -15,7 +15,6 @@ package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
@@ -54,7 +53,7 @@ public class ExecuteMessageCoupleWork extends TxBonitaWork implements Serializab
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         final SWaitingMessageEvent waitingMessage = eventInstanceService.getWaitingMessage(waitingMessageId);
         if (waitingMessage != null) {
             enventsHandler.triggerCatchEvent(waitingMessage, messageInstanceId);

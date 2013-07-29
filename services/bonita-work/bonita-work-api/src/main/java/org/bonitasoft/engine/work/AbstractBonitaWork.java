@@ -13,17 +13,15 @@
  **/
 package org.bonitasoft.engine.work;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -33,66 +31,69 @@ public abstract class AbstractBonitaWork implements Runnable {
 
     protected TechnicalLoggerService loggerService;
 
-    private TransactionService transactionService;
-
     private SessionService sessionService;
 
     private SessionAccessor sessionAccessor;
 
     private long tenantId;
 
-    protected abstract String getDescription();
+    protected TransactionService transactionService;
 
-    protected abstract boolean isTransactional();
+    protected abstract String getDescription();
 
     public AbstractBonitaWork() {
         super();
     }
 
-    protected abstract void work() throws SBonitaException;
-
     @Override
-    public void run() {
+    public final void run() {
         SSession session = null;
         try {
-            session = sessionService.createSession(tenantId, "scheduler");// FIXME get the technical user of the tenant
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
+            session = sessionService.createSession(tenantId, "workservice");
+            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
             if (isTransactional()) {
-                transactionService.begin();
+                workInTransaction();
+            } else {
+                work();
             }
-            // FIXME: change log level:
-            loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Starting work :" + getDescription());
-            work();
-        } catch (final Throwable e) {
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work", e);
-            if (isTransactional()) {
-                try {
-                    transactionService.setRollbackOnly();
-                } catch (STransactionException e1) {
-                    throw new SBonitaRuntimeException("Cannot rollback transaction.", e);
-                }
-            }
-            throw new SBonitaRuntimeException("Cannot execute work", e);
+        } catch (final SBonitaException e) {
+            handleError(e);
+        } catch (final Exception e) {
+            // Edge case we cannot manage
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
         } finally {
-            if (isTransactional()) {
-                try {
-                    transactionService.complete();
-                } catch (STransactionCommitException e) {
-                    throw new SBonitaRuntimeException("Cannot commit transaction.", e);
-                } catch (STransactionRollbackException e) {
-                    throw new SBonitaRuntimeException("Cannot rollback transaction.", e);
-                }
-            }
             if (session != null) {
                 try {
                     sessionAccessor.deleteSessionId();
                     sessionService.deleteSession(session.getId());
                 } catch (final SSessionNotFoundException e) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
+                    loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
                 }
             }
         }
+    }
+
+    protected abstract boolean isTransactional();
+
+    protected void workInTransaction() throws Exception {
+        final Callable<Void> runWork = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                work();
+                return null;
+            }
+        };
+
+        // Call the method work() wrapped in a transaction.
+        transactionService.executeInTransaction(runWork);
+    }
+
+    protected abstract void work() throws Exception;
+
+    protected void handleError(final SBonitaException e) {
+        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.");
     }
 
     public void setTechnicalLogger(final TechnicalLoggerService loggerService) {
