@@ -16,9 +16,9 @@ package org.bonitasoft.engine.execution;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -49,8 +49,10 @@ public class TransactionExecutorImpl implements TransactionExecutor {
 
         try {
             this.transactionService.executeInTransaction(txContentCallable);
+        } catch (SBonitaException e) {
+            throw e;
         } catch (Exception e) {
-            throw new SBonitaReadException(e);
+            throw new SBonitaRuntimeException(e);
         }
     }
 
