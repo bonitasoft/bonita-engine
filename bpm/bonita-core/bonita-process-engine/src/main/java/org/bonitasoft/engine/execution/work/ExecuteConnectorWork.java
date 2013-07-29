@@ -170,22 +170,16 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
     protected abstract SThrowEventInstance createThrowErrorEventInstance(SEndEventDefinition eventDefinition) throws SBonitaException;
 
     protected void setConnectorAndContainerToFailed() throws SBonitaException {
-        setFailed(false);
+        setConnectorOnlyToFailed();
+        setContainerInFail();
     }
 
     protected void setConnectorOnlyToFailed() throws SBonitaException {
-        setFailed(true);
+        final SConnectorInstance intTxConnectorInstance = connectorInstanceService.getConnectorInstance(connector.getId());
+        connectorInstanceService.setState(intTxConnectorInstance, ConnectorService.FAILED);
     }
 
     protected abstract void setContainerInFail() throws SBonitaException;
-
-    private void setFailed(final boolean onlyConnector) throws SBonitaException {
-        final SConnectorInstance intTxConnectorInstance = connectorInstanceService.getConnectorInstance(connector.getId());
-        connectorInstanceService.setState(intTxConnectorInstance, ConnectorService.FAILED);
-        if (!onlyConnector) {
-            setContainerInFail();
-        }
-    }
 
     protected abstract void continueFlow() throws SBonitaException;
 
