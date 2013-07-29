@@ -23,7 +23,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsOfUserCanStartProcessDefinitions;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessInstance;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -33,7 +32,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
@@ -74,8 +72,6 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         if (processInstanceId == 0) {
             throw new SCommandParameterizationException("Mandatory parameter " + PROCESSINSTANCE_ID_KEY + " is missing or not convertible to Long.");
         }
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
 
         long processDefinitionId = 0;
         final ProcessInstanceService processInstanceService = this.tenantAccessor.getProcessInstanceService();
@@ -89,7 +85,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             transactionExecutor.execute(getProcessInstance);
         } catch (final SBonitaException e) {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                    persistenceService, searchEntitiesDescriptor, processInstanceId, 0, 5);
+                    searchEntitiesDescriptor, processInstanceId, 0, 5);
             try {
                 transactionExecutor.execute(getArchivedProcessInstanceList);
             } catch (final SBonitaException e1) {
@@ -138,7 +134,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 isHas = true;
             } else {
                 final SearchArchivedProcessInstancesInvolvingUser archivedSearcher = new SearchArchivedProcessInstancesInvolvingUser(userId,
-                        processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions, persistenceService);
+                        processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
                 try {
                     transactionExecutor.execute(archivedSearcher);
                 } catch (final SBonitaException e) {

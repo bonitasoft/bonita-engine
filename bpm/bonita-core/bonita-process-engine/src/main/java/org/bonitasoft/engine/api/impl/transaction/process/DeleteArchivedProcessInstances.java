@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl.transaction.process;
 
 import java.util.List;
 
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -25,13 +24,13 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Zhang Bole
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class DeleteArchivedProcessInstances implements TransactionContent {
 
@@ -41,12 +40,9 @@ public class DeleteArchivedProcessInstances implements TransactionContent {
 
     private final long processDefinitionId;
 
-    private final ArchiveService archiveService;
-
     public DeleteArchivedProcessInstances(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
         processInstanceService = tenantAccessor.getProcessInstanceService();
-        archiveService = tenantAccessor.getArchiveService();
     }
 
     @Override
@@ -57,18 +53,15 @@ public class DeleteArchivedProcessInstances implements TransactionContent {
     public void deleteArchivedProcessInstancesFromDefinition(final long processDefinitionId) throws SFlowNodeReadException,
             SProcessInstanceModificationException, SProcessInstanceReadException, SProcessInstanceNotFoundException, SLockException {
         List<Long> sourceProcessInstanceIds;
-        final ReadPersistenceService archivePersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        if (archivePersistenceService != null) {
-            do {
-                // from index always will be zero because elements will be deleted
-                sourceProcessInstanceIds = processInstanceService.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(archivePersistenceService,
-                        processDefinitionId, 0, BATCH_SIZE, OrderByType.DESC);
-                for (final Long orgProcessId : sourceProcessInstanceIds) {
-                    processInstanceService.deleteArchivedProcessInstanceElements(orgProcessId, processDefinitionId);
-                }
+        do {
+            // from index always will be zero because elements will be deleted
+            sourceProcessInstanceIds = processInstanceService.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, 0,
+                    BATCH_SIZE, OrderByType.DESC);
+            for (final Long orgProcessId : sourceProcessInstanceIds) {
+                processInstanceService.deleteArchivedProcessInstanceElements(orgProcessId, processDefinitionId);
+            }
 
-            } while (!sourceProcessInstanceIds.isEmpty());
-        }
+        } while (!sourceProcessInstanceIds.isEmpty());
     }
 
     protected long getProcessDefinitionId() {

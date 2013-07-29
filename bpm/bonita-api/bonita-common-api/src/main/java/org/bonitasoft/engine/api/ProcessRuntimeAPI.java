@@ -246,18 +246,58 @@ public interface ProcessRuntimeAPI {
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
 
     /**
-     * Delete all instances of a specified process definition.
-     * If the process definition id does not match anything, no exception is thrown, but nothing is deleted.
+     * Delete process instances by its process definition id
+     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
+     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
      * 
      * @param processDefinitionId
-     *            the identifier of the processDefinition.
+     *            Identifier of the processDefinition
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance cannot be deleted because of a parent that still exists.
-     * @throws DeletionException
-     *             if other deletion problem occurs.
+     *             if a process instance can't be deleted because of a parent that is still active
+     * 
      * @since 6.0
+     * 
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
+     *             {@link #deleteArchivedProcessInstances(long, int, int, ProcessInstanceCriterion)}
      */
+    @Deprecated
     void deleteProcessInstances(long processDefinitionId) throws DeletionException;
+
+    /**
+     * Delete active process instances of process definition given as input parameter respecting the pagination parameters
+     * 
+     * @param processDefinitionId
+     *            Identifier of the processDefinition
+     * @param startIndex
+     *            the index
+     * @param maxResults
+     *            the max number of elements to retrieve per page
+     * @return the number of elements that have been deleted
+     * @throws DeletionException
+     *             if a process instance can't be deleted because of a parent that is still active
+     * @since 6.1
+     */
+    long deleteProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
+
+    /**
+     * Delete archived process instances of process definition given as input parameter respecting the pagination parameters
+     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
+     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
+     * 
+     * @param processDefinitionId
+     *            Identifier of the processDefinition
+     * @param startIndex
+     *            the index
+     * @param maxResults
+     *            the max number of elements to retrieve per page
+     * @param criterion
+     *            the sort criterion
+     * @return the number of elements that have been deleted
+     * @throws DeletionException
+     *             if a process instance can't be deleted because of a parent that is still active
+     * @since 6.1
+     */
+    long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults, ProcessInstanceCriterion criterion) throws DeletionException;
 
     /**
      * Start an instance of the process definition having processDefinitionId, and using the current session user

@@ -19,6 +19,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
@@ -28,7 +29,6 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -75,24 +75,53 @@ public interface ProcessInstanceService {
      * 
      * @param processInstanceId
      *            identifier of process instance
-     * @return
      * @throws SProcessInstanceNotFoundException
      * @throws SProcessInstanceReadException
      * @throws SFlowNodeReadException
      * @throws SProcessInstanceModificationException
+     * @throws SProcessInstanceHierarchicalDeletionException
      */
     void deleteProcessInstance(long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
-            SProcessInstanceModificationException;
+            SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instance
      * 
      * @param processInstance
      *            the process instance
-     * @return the id of the process definition
+     * @throws SFlowNodeReadException
+     * @throws SProcessInstanceModificationException
+     * @throws SProcessInstanceHierarchicalDeletionException
      * @since 6.0
      */
-    void deleteProcessInstance(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceModificationException;
+    void deleteProcessInstance(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceModificationException,
+            SProcessInstanceHierarchicalDeletionException;
+
+    /**
+     * Delete the specified process instances with id, and their elements archived and not, if are not a subProcess
+     * 
+     * @param sProcessInstances
+     *            list of process instances to deleted
+     * @return Number of deleted process instances
+     * @since 6.1
+     */
+    long deleteParentProcessInstancesAndArchivedElements(List<SProcessInstance> sProcessInstances);
+
+    /**
+     * Delete the specified process instance with id, and its elements archived and not, if are not a subProcess
+     * 
+     * @param processInstanceId
+     *            identifier of process instance
+     * @param processInstanceId
+     * @throws SProcessInstanceReadException
+     * @throws SProcessInstanceNotFoundException
+     * @throws SFlowNodeReadException
+     * @throws SProcessInstanceHierarchicalDeletionException
+     * @throws SProcessInstanceModificationException
+     * @since 6.1
+     */
+    void deleteParentProcessInstanceAndArchivedElements(long processInstanceId) throws SProcessInstanceReadException,
+            SProcessInstanceNotFoundException, SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Get process instance by its id
@@ -199,24 +228,20 @@ public interface ProcessInstanceService {
      * 
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return number of archived process instances
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedProcessInstances(QueryOptions queryOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    long getNumberOfArchivedProcessInstances(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived process instance according to specific criteria
      * 
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return A list of all archived process instance according to specific criteria
      * @throws SBonitaSearchException
      */
-    List<SAProcessInstance> searchArchivedProcessInstances(QueryOptions queryOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    List<SAProcessInstance> searchArchivedProcessInstances(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get the latest archived process instance object for the specific process instance
@@ -224,12 +249,12 @@ public interface ProcessInstanceService {
      * @param archivedProcessInstanceId
      *            identifier of the archived process instance (not the process instance)
      * @param persistenceService
-     *            used to do retrieve
+     * 
      * @return an SAProcessInstance object
      * @throws SProcessInstanceReadException
      * @throws SProcessInstanceNotFoundException
      */
-    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId, ReadPersistenceService persistenceService)
+    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId)
             throws SProcessInstanceReadException, SProcessInstanceNotFoundException;
 
     /**
@@ -342,26 +367,20 @@ public interface ProcessInstanceService {
      * 
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return number of archived process instance satisfied to the search criteria
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedProcessInstancesWithoutSubProcess(QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    long getNumberOfArchivedProcessInstancesWithoutSubProcess(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived process instance according to the search criteria
      * 
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return a list of SAProcessInstance objects
      * @throws SBonitaSearchException
      */
-    List<SAProcessInstance> searchArchivedProcessInstancesWithoutSubProcess(QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    List<SAProcessInstance> searchArchivedProcessInstancesWithoutSubProcess(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of archived process instance for the specific supervisor
@@ -370,13 +389,10 @@ public interface ProcessInstanceService {
      *            identifier of user who is the supervisor of archived process instance.
      * @param countOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return number of archived process instance for the specific supervisor
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedProcessInstancesSupervisedBy(long userId, QueryOptions countOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    long getNumberOfArchivedProcessInstancesSupervisedBy(long userId, QueryOptions countOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived process instance for the specific supervisor
@@ -385,13 +401,10 @@ public interface ProcessInstanceService {
      *            identifier of user who is the supervisor of archived process instance.
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return a list of SAProcessInstance objects
      * @throws SBonitaSearchException
      */
-    List<SAProcessInstance> searchArchivedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    List<SAProcessInstance> searchArchivedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of archived process instance involving the specific user
@@ -400,13 +413,10 @@ public interface ProcessInstanceService {
      *            the identifier of user who is assignee of tasks of process instance
      * @param countOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return number of archived process instance involving the specific user
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedProcessInstancesInvolvingUser(long userId, QueryOptions countOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    long getNumberOfArchivedProcessInstancesInvolvingUser(long userId, QueryOptions countOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived process instance involving the specific user
@@ -415,13 +425,10 @@ public interface ProcessInstanceService {
      *            the identifier of user who is assignee of tasks of process instance
      * @param queryOptions
      *            the search criteria containing a map of specific parameters of a query
-     * @param persistenceService
-     *            used to do retrieve
      * @return a list of SAProcessInstance objects
      * @throws SBonitaSearchException
      */
-    List<SAProcessInstance> searchArchivedProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    List<SAProcessInstance> searchArchivedProcessInstancesInvolvingUser(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Update the specific process instance
@@ -453,7 +460,6 @@ public interface ProcessInstanceService {
             SProcessInstanceModificationException;
 
     /**
-     * @param persistenceService
      * @param processDefinitionId
      * @param fromIndex
      * @param maxResults
@@ -461,8 +467,8 @@ public interface ProcessInstanceService {
      * @return
      * @throws SProcessInstanceReadException
      */
-    List<Long> getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(ReadPersistenceService persistenceService, long processDefinitionId,
-            int fromIndex, int maxResults, OrderByType sortingOrder) throws SProcessInstanceReadException;
+    List<Long> getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(long processDefinitionId, int fromIndex, int maxResults, OrderByType sortingOrder)
+            throws SProcessInstanceReadException;
 
     /**
      * @param queryOptions

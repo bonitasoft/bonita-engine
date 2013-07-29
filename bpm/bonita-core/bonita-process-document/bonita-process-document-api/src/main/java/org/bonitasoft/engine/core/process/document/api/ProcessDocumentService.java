@@ -307,6 +307,12 @@ public interface ProcessDocumentService {
      */
     void removeDocument(SProcessDocument sProcessDocument) throws SProcessDocumentDeletionException;
 
+    /**
+     * 
+     * @param instanceId
+     * @throws SDocumentMappingDeletionException
+     * @since 6.0
+     */
     void deleteArchivedDocuments(long instanceId, ReadPersistenceService persistenceService) throws SDocumentMappingDeletionException;
 
 }

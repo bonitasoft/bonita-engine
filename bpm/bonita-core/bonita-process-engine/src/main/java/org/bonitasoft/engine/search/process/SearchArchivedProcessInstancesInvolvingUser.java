@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractArchivedProcessInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -32,26 +31,23 @@ public class SearchArchivedProcessInstancesInvolvingUser extends AbstractArchive
 
     private final ProcessInstanceService processInstanceService;
 
-    private final ReadPersistenceService persistenceService;
-
     private final long userId;
 
     public SearchArchivedProcessInstancesInvolvingUser(final long userId, final ProcessInstanceService processInstanceService,
-            final SearchEntityDescriptor searchDescriptor, final SearchOptions options, final ReadPersistenceService persistenceService) {
+            final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
         this.userId = userId;
         this.processInstanceService = processInstanceService;
-        this.persistenceService = persistenceService;
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processInstanceService.getNumberOfArchivedProcessInstancesInvolvingUser(userId, searchOptions, persistenceService);
+        return processInstanceService.getNumberOfArchivedProcessInstancesInvolvingUser(userId, searchOptions);
     }
 
     @Override
     public List<SAProcessInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processInstanceService.searchArchivedProcessInstancesInvolvingUser(userId, searchOptions, persistenceService);
+        return processInstanceService.searchArchivedProcessInstancesInvolvingUser(userId, searchOptions);
     }
 
 }
