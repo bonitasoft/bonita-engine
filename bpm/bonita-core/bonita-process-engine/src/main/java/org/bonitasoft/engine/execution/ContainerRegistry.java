@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -65,15 +64,13 @@ public class ContainerRegistry {
     }
 
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final String containerType, final long processInstanceId) throws SActivityReadException, SActivityExecutionFailedException,
-            SActivityExecutionException, WorkRegisterException {
+            final String containerType, final long processInstanceId) throws WorkRegisterException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
         workService.registerWork(new ExecuteFlowNodeWork(containerExecutor, flowNodeInstanceId, operations, contextDependency, processInstanceId));
     }
 
     public void executeFlowNodeInSameThread(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final String containerType, final Long processInstanceId) throws SActivityReadException, SFlowNodeExecutionException,
-            WorkRegisterException {
+            final String containerType, final Long processInstanceId) throws SActivityReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
         containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null);
     }
