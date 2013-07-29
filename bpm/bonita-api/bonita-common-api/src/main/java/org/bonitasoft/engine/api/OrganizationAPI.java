@@ -15,7 +15,9 @@ package org.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.ImportPolicy;
+import org.bonitasoft.engine.identity.OrganizationExportException;
 import org.bonitasoft.engine.identity.OrganizationImportException;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * Manages the Organization, that is the users, groups, roles, memberships, through import / export methods.
@@ -71,5 +73,19 @@ public interface OrganizationAPI {
      * @since6.0
      */
     void importOrganization(String organizationContent, ImportPolicy policy) throws OrganizationImportException;
+
+    /**
+     * Exports the organization.
+     * <b>
+     * An organization is composed by users, roles, groups and user memberships.
+     * 
+     * @return the organization contented in an XML format
+     * @throws OrganizationExportException
+     *             If an exception occurs during the organization export
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @since6.0
+     */
+    String exportOrganization() throws OrganizationExportException;
 
 }
