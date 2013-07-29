@@ -88,27 +88,21 @@ public class ServerAPIImpl implements ServerAPI {
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-        // System.err.println("Calling method " + methodName + " on class " + apiInterfaceName);
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         SessionAccessor sessionAccessor = null;
         try {
-            sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
-            final Session session = (Session) options.get("session");
-            return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
-        } catch (final ServerAPIRuntimeException e) {
-            final Throwable cause = e.getCause();
-            // if (cause instanceof BonitaRuntimeException || cause instanceof BonitaException) {
-            throw new ServerWrappedException(cause);
-            // }
-            // throw new ServerWrappedException(new BonitaRuntimeException(cause));
+            try { 
+                sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
+                final Session session = (Session) options.get("session");
+                return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
+            } catch (final ServerAPIRuntimeException e) {
+                throw e.getCause();
+            }
         } catch (final BonitaRuntimeException e) {
             throw new ServerWrappedException(e);
         } catch (final BonitaException e) {
             throw new ServerWrappedException(e);
         } catch (final Throwable e) {
-            if (e instanceof BonitaRuntimeException || e instanceof BonitaException) {
-                throw new ServerWrappedException(e);
-            }
             throw new ServerWrappedException(new BonitaRuntimeException(e));
         } finally {
             if (cleanSession) {
