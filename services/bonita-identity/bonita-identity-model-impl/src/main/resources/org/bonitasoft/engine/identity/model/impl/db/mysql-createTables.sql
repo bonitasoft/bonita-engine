@@ -75,9 +75,9 @@ CREATE TABLE user_contactinfo (
   UNIQUE (tenantid, userId, personal),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
-
 ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
 CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, personal);
+
 
 CREATE TABLE p_metadata_def (
   tenantid BIGINT NOT NULL,

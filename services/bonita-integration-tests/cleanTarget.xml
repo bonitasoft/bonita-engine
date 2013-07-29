@@ -1,10 +1,12 @@
 <project name="services" default="cleantarget">
 
+	<!-- After running this script, run test using param -Dbonita.services.folder=<project_folder>/target/test-classes/conf -->
+	
     <target name="cleantarget">
         <delete dir="${basedir}/target/server/platform/work" includes="**/*.db"/>
         <delete dir="${basedir}/target/conf" />
-    	<copy todir="target/conf">
-    		<fileset dir="../bonita-services-test-conf/src/test/resources/conf" />
+    	<copy todir="target/test-classes">
+    		<fileset dir="../bonita-services-test-conf/src/test/resources" />
     	</copy>
     </target>
 
