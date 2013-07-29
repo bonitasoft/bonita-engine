@@ -236,7 +236,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 for (final Long tenantId : tenantIds) {
                     long sessionId = -1;
                     try {
-                        sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService, executor);
+                        sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
                         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
                         final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
@@ -263,8 +263,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         final STenant defaultTenant = getDefaultTenantInstance.getResult();
                         final long tenantId = defaultTenant.getId();
                         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
-                        final TransactionExecutor transactionExecutor = tenantServiceAccessor.getTransactionExecutor();
-                        final long sessionId = createSessionAndMakeItActive(defaultTenant.getId(), sessionAccessor, sessionService, transactionExecutor);
+                        final long sessionId = createSessionAndMakeItActive(defaultTenant.getId(), sessionAccessor, sessionService);
                         for (final TenantRestartHandler restartHandler : platformConfiguration.getTenantRestartHandlers()) {
                             Callable<Void> callable = new Callable<Void>() {
 
@@ -366,15 +365,23 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new DeletionException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+        final TransactionService transactionService = platformAccessor.getTransactionService();
         final CleanPlatformTableContent clean = new CleanPlatformTableContent(platformService);
         final DeleteAllTenants deleteAll = new DeleteAllTenants(platformService);
         try {
-            final STenant tenant = getDefaultTenant();
-            deactiveTenant(tenant.getId());
-            transactionExecutor.execute(clean);
-            transactionExecutor.execute(deleteAll);
-        } catch (final SBonitaException e) {
+            transactionService.executeInTransaction(new Callable<Void>() {
+
+                @Override
+                public Void call() throws Exception {
+                    final STenant tenant = getDefaultTenant();
+                    deactiveTenant(tenant.getId());
+                    clean.execute();
+                    deleteAll.execute();
+
+                    return null;
+                }
+            });
+        } catch (Exception e) {
             throw new DeletionException(e);
         }
     }
@@ -570,7 +577,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void activateDefaultTenant() throws STenantActivationException {
-        // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
@@ -581,7 +587,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final STenant tenant = getDefaultTenant();
             final long tenantId = tenant.getId();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
@@ -590,10 +595,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
             schedulerService.start();
-            final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService, transactionExecutor);
+            final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
                     platformAccessor.getTechnicalLoggerService(), workService);
-            transactionExecutor.execute(activateTenant);
+            activateTenant.execute();
             sessionService.deleteSession(sessionId);
         } catch (final STenantActivationException stae) {
             log(platformAccessor, stae);
@@ -618,25 +623,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private Long createSession(final long tenantId, final SessionService sessionService, final TransactionExecutor transactionExecutor) throws SBonitaException {
-        final TransactionContentWithResult<Long> transaction = new TransactionContentWithResult<Long>() {
-
-            private long sessionId;
-
-            @Override
-            public void execute() throws SBonitaException {
-                final SSession session = sessionService.createSession(tenantId, "system"); // FIXME use technical user
-                this.sessionId = session.getId();
-            }
-
-            @Override
-            public Long getResult() {
-                return this.sessionId;
-            }
-        };
-
-        transactionExecutor.execute(transaction);
-        return transaction.getResult();
+    protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
+        return sessionService.createSession(tenantId, "system").getId();
     }
 
     private void log(final PlatformServiceAccessor platformAccessor, final Exception e) {
@@ -658,10 +646,9 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final WorkService workService = platformAccessor.getWorkService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService, transactionExecutor);
+            final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
             final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             sessionService.deleteSession(sessionId);
         } catch (final STenantDeactivationException stde) {
             log(platformAccessor, stde);
@@ -674,9 +661,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private long createSessionAndMakeItActive(final long tenantId, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final TransactionExecutor transactionExecutor) throws SBonitaException {
-        final long sessionId = createSession(tenantId, sessionService, transactionExecutor);
+    private long createSessionAndMakeItActive(final long tenantId, final SessionAccessor sessionAccessor, final SessionService sessionService) throws SBonitaException {
+        final long sessionId = createSession(tenantId, sessionService);
         sessionAccessor.setSessionInfo(sessionId, tenantId);
         return sessionId;
     }
@@ -701,24 +687,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private STenant getDefaultTenant() throws STenantNotFoundException {
-        PlatformServiceAccessor platformAccessor = null;
-        try {
-            platformAccessor = getPlatformAccessor();
-            final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-            final GetDefaultTenantInstance transactionContent = new GetDefaultTenantInstance(platformService);
-            transactionExecutor.execute(transactionContent);
-            return transactionContent.getResult();
-        } catch (final SBonitaException e) {
-            log(platformAccessor, e);
-            throw new STenantNotFoundException("Unable to retrieve the defaultTenant", e);
-        } catch (final Exception e) {
-            log(platformAccessor, e);
-            throw new STenantNotFoundException("Unable to retrieve the defaultTenant", e);
-        }
-    }
-
     @Override
     @CustomTransactions
     public PlatformState getPlatformState() throws PlatformNotFoundException {
@@ -734,6 +702,21 @@ public class PlatformAPIImpl implements PlatformAPI {
             return PlatformState.STOPPED;
         }
         return PlatformState.STARTED;
+    }
+
+    private STenant getDefaultTenant() throws STenantNotFoundException {
+        PlatformServiceAccessor platformAccessor = null;
+        try {
+            platformAccessor = getPlatformAccessor();
+            final PlatformService platformService = platformAccessor.getPlatformService();
+            return platformService.getDefaultTenant();
+        } catch (final SBonitaException e) {
+            log(platformAccessor, e);
+            throw new STenantNotFoundException("Unable to retrieve the defaultTenant", e);
+        } catch (final Exception e) {
+            log(platformAccessor, e);
+            throw new STenantNotFoundException("Unable to retrieve the defaultTenant", e);
+        }
     }
 
 }
