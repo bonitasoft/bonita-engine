@@ -10,8 +10,9 @@ package com.bonitasoft.engine.api;
 
 /**
  * @author Celine Souchet
- * 
+ * @author Matthieu Chaffotte
  */
-public interface IdentityAPI extends org.bonitasoft.engine.api.IdentityAPI, OrganizationAPI {
+public interface IdentityAPI extends org.bonitasoft.engine.api.IdentityAPI {
 
+    // In order to not have an API break, this interface is still present even if it has no methods.
 }
