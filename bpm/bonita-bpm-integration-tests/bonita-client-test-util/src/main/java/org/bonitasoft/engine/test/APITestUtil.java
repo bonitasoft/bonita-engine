@@ -569,6 +569,7 @@ public class APITestUtil {
     }
 
     protected void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
+        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 1000);
         getProcessAPI().disableAndDelete(processDefinitionId);
     }
 
@@ -1330,6 +1331,20 @@ public class APITestUtil {
         return messages;
     }
 
+    public List<String> checkExistenceOfArchivedProcessIntances() throws DeletionException {
+        final List<String> messages = new ArrayList<String>();
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
+        if (!archivedProcessInstances.isEmpty()) {
+            final StringBuilder stb = new StringBuilder("Archived process instances are still present: ");
+            for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
+                stb.append(archivedProcessInstance).append(", ");
+                getProcessAPI().deleteProcessInstance(archivedProcessInstance.getId());
+            }
+            messages.add(stb.toString());
+        }
+        return messages;
+    }
+
     public List<String> checkExistenceOfGroups() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final long numberOfGroups = getIdentityAPI().getNumberOfGroups();
@@ -1429,4 +1444,3 @@ public class APITestUtil {
     }
 
 }
-

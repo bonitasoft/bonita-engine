@@ -87,6 +87,7 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkExistenceOfRoles());
         messages.addAll(checkExistenceOfProcessDefinitions());
         messages.addAll(checkExistenceOfProcessIntances());
+        messages.addAll(checkExistenceOfArchivedProcessIntances());
         messages.addAll(checkExistenceOfFlowNodes());
         messages.addAll(checkExistenceOfCategories());
 

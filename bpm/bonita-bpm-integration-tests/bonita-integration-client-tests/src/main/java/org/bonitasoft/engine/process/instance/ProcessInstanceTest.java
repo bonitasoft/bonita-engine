@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,10 +46,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Celine Souchet
@@ -142,6 +142,33 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void deleteProcessInstances() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
+
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition.getId());
+        assertEquals(5, getProcessAPI().getNumberOfProcessInstances());
+
+        waitForUserTask("step1", processInstance1);
+        waitForUserTask("step1", processInstance2);
+        waitForUserTask("step1", processInstance3);
+        waitForUserTask("step1", processInstance4);
+        waitForUserTask("step1", processInstance5);
+        getProcessAPI().deleteProcessInstances(processDefinition.getId(), 0, 4);
+        assertEquals(1, getProcessAPI().getNumberOfProcessInstances());
+
+        // Clean up
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    @Deprecated
+    public void oldDeleteProcessInstances() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
