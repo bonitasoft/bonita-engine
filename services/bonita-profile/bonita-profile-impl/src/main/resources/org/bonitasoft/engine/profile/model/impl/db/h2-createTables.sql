@@ -23,7 +23,6 @@ CREATE TABLE profileentry (
   index_ BIGINT,
   type VARCHAR(50),
   page VARCHAR(50),
-  UNIQUE (tenantId, parentId, profileId, page),
   PRIMARY KEY (tenantId, id)
 );
 

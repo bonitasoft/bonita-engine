@@ -24,7 +24,6 @@ CREATE TABLE profileentry (
   index_ NUMERIC(19, 0),
   type NVARCHAR(50),
   page NVARCHAR(50),
-  UNIQUE (tenantId, parentId, profileId, page),
   PRIMARY KEY (tenantId, id)
 )
 GO
