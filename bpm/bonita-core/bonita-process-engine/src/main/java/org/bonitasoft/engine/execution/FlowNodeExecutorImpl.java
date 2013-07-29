@@ -197,8 +197,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 // reschedule the work
                 ExecuteFlowNodeWork runnable = new ExecuteFlowNodeWork(this, flowNodeInstanceId, operations, expressionContext, processInstanceId);
                 try {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
-                    Thread.sleep(50);
+                    int sleepTime = 50;
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + sleepTime + " ms to reexecute " + runnable.getDescription());
+                    Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
                 }
                 workService.registerWork(runnable);
