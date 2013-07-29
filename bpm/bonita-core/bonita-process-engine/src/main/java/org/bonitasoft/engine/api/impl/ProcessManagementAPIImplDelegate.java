@@ -19,8 +19,8 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-
-public class ProcessAPIImplDelegate {
+// Uncomment the "implements" when this delegate implements all the methods.
+public class ProcessManagementAPIImplDelegate /*implements ProcessManagementAPI*/ {
 
 	protected static TenantServiceAccessor getTenantAccessor() {
 		try {

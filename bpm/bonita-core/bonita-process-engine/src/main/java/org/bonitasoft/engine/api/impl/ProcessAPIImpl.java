@@ -452,10 +452,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private final ProcessAPIImplDelegate API_IMPL_DELEGATE = instantiateAPIDelegate();
+    private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate = instantiateProcessManagementAPIDelegate();
 
-    protected ProcessAPIImplDelegate instantiateAPIDelegate() {
-        return new ProcessAPIImplDelegate();
+    protected ProcessManagementAPIImplDelegate instantiateProcessManagementAPIDelegate() {
+        return new ProcessManagementAPIImplDelegate();
     }
 
     @Override
@@ -490,7 +490,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 throw new DeletionException("Some archived process instances are still found, process #" + processId + " can't be deleted.");
             }
 
-            API_IMPL_DELEGATE.deleteProcessDefinition(processId);
+            processManagementAPIImplDelegate.deleteProcessDefinition(processId);
         } catch (final BonitaHomeNotSetException e) {
             throw new DeletionException(e);
         } catch (final SBonitaException e) {
@@ -512,7 +512,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         // multiple tx here because we must lock instances when deleting them
         // but if the second tx crash we can relaunch delete process without issues
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        checkNoActiveTransaction(transactionExecutor);
         try {
             transactionExecutor.execute(new TransactionContent() {
 
@@ -527,7 +526,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 @Override
                 public void execute() throws SBonitaException {
                     try {
-                        API_IMPL_DELEGATE.deleteProcessDefinition(processId);
+                        processManagementAPIImplDelegate.deleteProcessDefinition(processId);
                     } catch (BonitaHomeNotSetException e) {
                         throw new SBonitaException(e) {
                         };
@@ -542,15 +541,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
-        }
-    }
-
-    /**
-     * @param transactionExecutor
-     */
-    protected void checkNoActiveTransaction(final TransactionExecutor transactionExecutor) {
-        if (transactionExecutor.isTransactionActive()) {
-            throw new RuntimeException("This method MUST NOT be called inside an existing transaction!");
         }
     }
 
@@ -673,7 +663,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Deprecated
     public void deleteProcesses(final List<Long> processIdList) throws DeletionException {
-        checkNoActiveTransaction(getTenantAccessor().getTransactionExecutor());
         for (final Long processId : processIdList) {
             deleteProcess(processId);
         }
@@ -832,13 +821,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Deprecated
     public void disableAndDelete(final long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
-        checkNoActiveTransaction(transactionExecutor);
         try {
             transactionExecutor.execute(new TransactionContent() {
 
                 @Override
                 public void execute() throws SBonitaException {
-                    API_IMPL_DELEGATE.disableProcess(processId);
+                    processManagementAPIImplDelegate.disableProcess(processId);
                 }
             });
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -859,7 +847,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void disableProcess(final long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException {
         try {
-            API_IMPL_DELEGATE.disableProcess(processId);
+            processManagementAPIImplDelegate.disableProcess(processId);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -887,22 +875,37 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
+        executeFlowNode(flownodeInstanceId, true);
+    }
+
+    protected void executeFlowNode(final long flownodeInstanceId, boolean wrapInTransaction) throws FlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        checkNoActiveTransaction(transactionExecutor);
-        try {
-            transactionExecutor.execute(new TransactionContent() {
+        TransactionContent transactionContent = new TransactionContent() {
 
-                @Override
-                public void execute() throws SBonitaException {
-                    SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-                    processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), getUserIdFromSession());
-                }
-            });
+            @Override
+            public void execute() throws SBonitaException {
+                SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+                processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), getUserIdFromSession());
+            }
+        };
+
+        try {
+            executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
+        }
+
+    }
+
+    private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent, final boolean wrapInTransaction)
+            throws SBonitaException {
+        if (wrapInTransaction) {
+            final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+            transactionExecutor.execute(transactionContent);
+        } else {
+            transactionContent.execute();
         }
     }
 
