@@ -392,7 +392,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : receiveProcess stop on catchEvent, sendProcess is finished, receiveProcess continue and reaches user task.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in an intermediate event of an other process.")
+            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process, and receive it in an intermediate event of an other process. Start Sender after Receiver", jira = "ENGINE-1652")
     @Test
     public void messageIntermediateCatchEventMessageSentAfterCatch() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
@@ -403,6 +403,31 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
+
+        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
+        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
+
+        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        assertEquals(1, taskInstances.size());
+        final HumanTaskInstance taskInstance = taskInstances.get(0);
+        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
+
+        disableAndDeleteProcess(sendMessageProcess);
+        disableAndDeleteProcess(receiveMessageProcess);
+    }
+
+    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
+            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process, and receive it in an intermediate event of an other process. Start Sender before Receiver", jira = "ENGINE-1652")
+    @Test
+    public void messageIntermediateCatchEventMessageSentBeforeCatch() throws Exception {
+        final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
+
+        final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
+        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
+
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
         assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
