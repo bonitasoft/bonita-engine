@@ -34,6 +34,8 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
@@ -275,6 +277,7 @@ public class UserFilterTest extends CommonAPITest {
         return resources;
     }
 
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void updateUserFilterAfterAUserDeletion() throws Exception {
         final String delivery = "Delivery men";
@@ -312,6 +315,7 @@ public class UserFilterTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test(expected = UpdateException.class)
     public void unableToUpdateActorsOnAGateway() throws Exception {
         final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("mycondition", "fzdfsdfsdfsdfsdf", Boolean.class.getName());
@@ -334,6 +338,7 @@ public class UserFilterTest extends CommonAPITest {
         }
     }
 
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void doNotUpateAHumanTaskIfNoUserFilterIsDefined() throws Exception {
         final String delivery = "Delivery men";
@@ -358,6 +363,7 @@ public class UserFilterTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void updateUserFilterAfterAUserAdd() throws Exception {
         final String delivery = "Delivery men";
