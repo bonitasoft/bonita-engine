@@ -34,18 +34,10 @@ public class ClusteredLockService implements LockService {
         }
     }
 
-    private String getKey(final long objectToLockId, final String objectType) throws SLockException {
-        final StringBuilder stb = new StringBuilder();
-        stb.append(objectType);
-        stb.append(SEPARATOR);
-        stb.append(objectToLockId);
-        return stb.toString();
-    }
-
     @Override
     public void unlock(final long objectToLockId, final String objectType) throws SLockException {
         try {
-            final ILock lock = hazelcastInstance.getLock(getKey(objectToLockId, objectType));
+            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
             lock.unlock();
         } catch (final Exception e) {
             throw new SLockException(e);
@@ -56,7 +48,7 @@ public class ClusteredLockService implements LockService {
     @Override
     public boolean tryLock(final long objectToLockId, final String objectType) throws SLockException {
         try {
-            final ILock lock = hazelcastInstance.getLock(getKey(objectToLockId, objectType));
+            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
             return lock.tryLock();
         } catch (final Exception e) {
             throw new SLockException(e);
@@ -66,12 +58,14 @@ public class ClusteredLockService implements LockService {
     @Override
     public void lock(final long objectToLockId, final String objectType) throws SLockException {
         try {
-            final ILock lock = hazelcastInstance.getLock(getKey(objectToLockId, objectType));
+            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
             lock.lock();
         } catch (final Exception e) {
             throw new SLockException(e);
         }
 
+    private String buildKey(final long objectToLockId, final String objectType) throws SLockException {
+        return objectType + SEPARATOR + objectToLockId;
     }
 
 }
