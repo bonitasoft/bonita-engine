@@ -1076,10 +1076,10 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
                 .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        taskDefinitionBuilder.addConnector("wait200ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(300));
-        taskDefinitionBuilder.addConnector("wait200msbis", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(2000));
+        taskDefinitionBuilder.addConnector("wait1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
+                new ExpressionBuilder().createConstantLongExpression(700));
+        taskDefinitionBuilder.addConnector("wait2", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
+                new ExpressionBuilder().createConstantLongExpression(500));
         taskDefinitionBuilder
                 .addConnector("myConnector2", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))

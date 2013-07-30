@@ -73,4 +73,11 @@ public interface NodeConfiguration {
      */
     String getCleanInvalidSessionsJobCron();
 
+    /**
+     * 
+     * @return
+     *         true if the sessions should be cleaned when the node is stopped
+     */
+    boolean shouldClearSessions();
+
 }

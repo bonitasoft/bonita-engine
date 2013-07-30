@@ -27,9 +27,12 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.WaitUntil;
@@ -57,7 +60,7 @@ public class RestartHandlersTests extends CommonAPITest {
     /*
      * This test is not synchronized correctly so there is the test below: we have more elements so some are restarted using restart handlers
      */
-    // @Test
+    @Test
     @Cover(classes = {}, concept = BPMNConcept.ACTIVITIES, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode" }, story = "elements must be restarted when they were not completed when the node was shut down")
     public void restartElements() throws Exception {
         final User user = createUser("john", "bpm");
@@ -92,9 +95,19 @@ public class RestartHandlersTests extends CommonAPITest {
         final ArrayList<String> names = new ArrayList<String>(28);
         for (int i = 2; i < 30; i++) {
             final String activityName = "step" + i;
+            AutomaticTaskDefinitionBuilder addUserTask = builder.addAutomaticTask(activityName);
+            if (i > 6) {
+                addUserTask.addOperation(new OperationBuilder().createSetDataOperation("data",
+                        new ExpressionBuilder().createGroovyScriptExpression("script", "Thread.sleep(50);return 10;", "java.lang.Integer")));
+                addUserTask.addIntegerData("data", new ExpressionBuilder().createConstantIntegerExpression(0));
+            }
+            builder.addTransition("step1", "step" + i);
+        }
+        for (int i = 2; i < 30; i++) {
+            final String activityName = "ustep" + i;
             names.add(activityName);
             builder.addUserTask(activityName, "actor");
-            builder.addTransition("step1", "step" + i);
+            builder.addTransition("step" + i, "ustep" + i);
         }
         Collections.sort(names);
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), "actor", user);
@@ -103,7 +116,7 @@ public class RestartHandlersTests extends CommonAPITest {
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        Thread.sleep(50);// wait that notify is executed at least
+        Thread.sleep(50);
         platformAPI.stopNode();
         Thread.sleep(50);
         platformAPI.startNode();
