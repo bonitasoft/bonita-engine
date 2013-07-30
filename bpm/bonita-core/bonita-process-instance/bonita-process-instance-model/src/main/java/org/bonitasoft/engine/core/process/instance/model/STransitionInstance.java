@@ -19,4 +19,5 @@ package org.bonitasoft.engine.core.process.instance.model;
 public interface STransitionInstance extends SFlowElementInstance {
 
     long getSource();
+
 }

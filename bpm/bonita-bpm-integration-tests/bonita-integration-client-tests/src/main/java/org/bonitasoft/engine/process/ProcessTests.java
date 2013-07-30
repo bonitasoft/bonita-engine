@@ -16,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ProcessExecutionTest.class,
         ProcessManagementTest.class,
         ProcessDeploymentTest.class,
+        ProcessDescriptionTest.class,
         GetProcessDefinitionTest.class,
         GatewayExecutionTest.class,
         ProcessCategoryTest.class,

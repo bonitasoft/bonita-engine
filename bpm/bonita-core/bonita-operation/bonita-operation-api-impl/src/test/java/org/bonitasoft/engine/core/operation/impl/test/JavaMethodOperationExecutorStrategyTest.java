@@ -46,11 +46,11 @@ public class JavaMethodOperationExecutorStrategyTest {
         when(leftOperand.isExternal()).thenReturn(true);
         when(operation.getRightOperand()).thenReturn(rightOperand);
         when(operation.getOperator()).thenReturn("=");
+        when(rightOperand.getReturnType()).thenReturn(Object.class.getName());
 
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         expressionContext.setInputValues(Collections.<String, Object> emptyMap());
-        strategy.execute(operation, "Update", 123L, DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
-
+        strategy.getValue(operation, "Update", 123L, DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
     }
 
 }

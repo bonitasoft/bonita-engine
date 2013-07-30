@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
@@ -22,8 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.joran.event.EndEvent;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class EndEventTest extends CommonAPITest {
 
@@ -43,7 +44,7 @@ public class EndEventTest extends CommonAPITest {
 
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start event", "End event" }, story = "Execute process with start and end events.")
     @Test
-    public void testExecuteStartAndEndEvents() throws Exception {
+    public void executeStartAndEndEvents() throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0")
                 .addStartEvent("startEvent").addAutomaticTask("step1").addEndEvent("endEvent").addTransition("startEvent", "step1")
                 .addTransition("step1", "endEvent").getProcess();
@@ -67,7 +68,7 @@ public class EndEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = { "Event",
             "Start event", "Incoming transition" }, story = "Check that a start event can't have an incoming transition.")
     @Test(expected = InvalidProcessDefinitionException.class)
-    public void testStartEventCannotHaveIncomingTransition() throws BonitaException {
+    public void startEventCannotHaveIncomingTransition() throws BonitaException {
         new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addStartEvent("startEvent").addAutomaticTask("step1")
                 .addTransition("step1", "startEvent").getProcess();
     }
@@ -75,7 +76,7 @@ public class EndEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = { "Event",
             "End event", "Outgoing transition" }, story = "Check that an end event can't have an outgoing transition.")
     @Test(expected = InvalidProcessDefinitionException.class)
-    public void testEndEventCannotHaveOutgoingTransition() throws BonitaException {
+    public void endEventCannotHaveOutgoingTransition() throws BonitaException {
         new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addAutomaticTask("step1").addEndEvent("endEvent")
                 .addTransition("endEvent", "step1").getProcess();
     }
@@ -95,7 +96,7 @@ public class EndEventTest extends CommonAPITest {
 
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "Start event", "End event", "Automatic task" }, story = "Execute a process with start event, terminate end event and automatic task.")
     @Test
-    public void testExecuteStartAndEndEventWithTask() throws Exception {
+    public void executeStartAndEndEventWithTask() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeStartAndEndEventWithTask", "1.0");
         builder.addStartEvent("start").addAutomaticTask("step1").addEndEvent("stop").addTerminateEventTrigger().addTransition("start", "step1")
                 .addTransition("step1", "stop");
@@ -191,7 +192,7 @@ public class EndEventTest extends CommonAPITest {
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Multi-instance",
             "End event", "Terminate event", "Parallel" }, story = "Execute a process with a terminate end event and parallel multi-instance.")
     @Test
-    public void testTerminateEventWithMultiInstanceParallel() throws Exception {
+    public void terminateEventWithMultiInstanceParallel() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
         builder.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
@@ -207,7 +208,7 @@ public class EndEventTest extends CommonAPITest {
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Multi-instance",
             "End event", "Terminate event", "Sequential", "User task" }, story = "Execute a process with a terminate end event and sequential multi-instance.")
     @Test
-    public void testTerminateEventWithMultiInstanceSequential() throws Exception {
+    public void terminateEventWithMultiInstanceSequential() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
         final String actorName = "actor";
 

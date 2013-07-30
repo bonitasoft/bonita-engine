@@ -12,10 +12,10 @@ CREATE TABLE job_param (
   id BIGINT NOT NULL,
   jobDescriptorId BIGINT NOT NULL,
   key_ VARCHAR(50) NOT NULL,
-  value_ BLOB NOT NULL,
+  value_ MEDIUMBLOB NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
 CREATE INDEX fk_job_param_jobId_idx ON job_param(jobDescriptorId ASC, tenantid ASC);
 CREATE INDEX fk_job_desc_Id_idx ON job_desc(id ASC, tenantid ASC);
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (jobDescriptorId, tenantid) REFERENCES job_desc(id, tenantid);
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id);

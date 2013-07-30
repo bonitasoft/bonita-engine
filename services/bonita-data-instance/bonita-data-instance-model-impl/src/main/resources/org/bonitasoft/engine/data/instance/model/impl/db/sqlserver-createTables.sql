@@ -4,7 +4,6 @@ CREATE TABLE data_instance (
 	name NVARCHAR(50),
 	description NVARCHAR(50),
 	transientData BIT,
-	className VARCHAR(100),
 	className NVARCHAR(100),
 	containerId NUMERIC(19, 0),
 	containerType NVARCHAR(60),

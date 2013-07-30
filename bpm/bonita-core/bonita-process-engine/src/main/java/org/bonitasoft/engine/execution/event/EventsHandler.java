@@ -314,53 +314,56 @@ public class EventsHandler {
      * @param triggeringElementID
      * @throws SBonitaException
      */
-    public void triggerCatchEvent(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
+    public void triggerCatchEvent(final SWaitingEvent waitingEvent, final Long triggeringElementID)
+            throws SBonitaException {
         final SBPMEventType eventType = waitingEvent.getEventType();
         final long processDefinitionId = waitingEvent.getProcessDefinitionId();
+        final long targetSFlowNodeDefinitionId = waitingEvent.getFlowNodeDefinitionId();
         final long flowNodeInstanceId = waitingEvent.getFlowNodeInstanceId();
         final OperationsWithContext operations = handlers.get(waitingEvent.getEventTriggerType()).getOperations(waitingEvent, triggeringElementID);
         if (SBPMEventType.EVENT_SUB_PROCESS.equals(waitingEvent.getEventType())) {
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final SStartEventDefinition startEvent = (SStartEventDefinition) processDefinition.getProcessContainer().getFlowNode(
                     waitingEvent.getFlowNodeDefinitionId());
-            triggerCatchStartEventSubProcess(waitingEvent.getEventTriggerType(), processDefinitionId, operations, waitingEvent.getSubProcessId(),
-                    waitingEvent.getParentProcessInstanceId(), waitingEvent.getRootProcessInstanceId(), startEvent.isInterrupting());
+            triggerCatchStartEventSubProcess(waitingEvent.getEventTriggerType(), processDefinitionId, targetSFlowNodeDefinitionId, operations,
+                    waitingEvent.getSubProcessId(), waitingEvent.getParentProcessInstanceId(), waitingEvent.getRootProcessInstanceId(),
+                    startEvent.isInterrupting());
         } else {
-            triggerCatchEvent(waitingEvent, eventType, processDefinitionId, flowNodeInstanceId, operations);
+            triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, waitingEvent, flowNodeInstanceId, operations);
         }
     }
 
-    private void triggerInTransaction(final SWaitingEvent waitingEvent, final SBPMEventType eventType, final Long processDefinitionId,
-            final Long flowNodeInstanceId, final OperationsWithContext operations) throws SBonitaException {
+    private void triggerInTransaction(final SBPMEventType eventType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
+            final SWaitingEvent waitingEvent, final Long flowNodeInstanceId, final OperationsWithContext operations) throws SBonitaException {
         final TransactionContent transactionContent = new TransactionContent() {
 
             @Override
             public void execute() throws SBonitaException {
-                triggerCatchEvent(waitingEvent, eventType, processDefinitionId, flowNodeInstanceId, operations);
+                triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, waitingEvent, flowNodeInstanceId, operations);
             }
         };
         transactionExecutor.execute(transactionContent);
     }
 
-    private void triggerInTransaction(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final OperationsWithContext operations,
-            final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId, final Boolean isInterrupting)
-            throws SBonitaException {
+    private void triggerInTransaction(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
+            final OperationsWithContext operations, final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId,
+            final Boolean isInterrupting) throws SBonitaException {
         final TransactionContent transactionContent = new TransactionContent() {
 
             @Override
             public void execute() throws SBonitaException {
-                triggerCatchStartEventSubProcess(eventTriggerType, processDefinitionId, operations, subProcessId, parentProcessInstanceId,
-                        rootProcessInstanceId, isInterrupting);
+                triggerCatchStartEventSubProcess(eventTriggerType, processDefinitionId, targetSFlowNodeDefinitionId, operations, subProcessId,
+                        parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
         };
         transactionExecutor.execute(transactionContent);
     }
 
-    private void triggerCatchEvent(final SWaitingEvent waitingEvent, final SBPMEventType eventType, final Long processDefinitionId,
-            final Long flowNodeInstanceId, final OperationsWithContext operations) throws SBonitaException {
+    private void triggerCatchEvent(final SBPMEventType eventType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
+            final SWaitingEvent waitingEvent, final Long flowNodeInstanceId, final OperationsWithContext operations) throws SBonitaException {
         switch (eventType) {
             case START_EVENT:
-                instantiate(processDefinitionId, operations);
+                instantiateProcess(processDefinitionId, targetSFlowNodeDefinitionId, operations);
                 break;
             default:
                 if (waitingEvent != null) { // is null if it's a timer
@@ -371,9 +374,9 @@ public class EventsHandler {
         }
     }
 
-    private void triggerCatchStartEventSubProcess(final SEventTriggerType triggerType, final Long processDefinitionId, final OperationsWithContext operations,
-            final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId, final Boolean isInterrupting)
-            throws SBonitaException {
+    private void triggerCatchStartEventSubProcess(final SEventTriggerType triggerType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
+            final OperationsWithContext operations, final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId,
+            final Boolean isInterrupting) throws SBonitaException {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(subProcessId);
         final SFlowNodeInstance subProcflowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinition, rootProcessInstanceId,
@@ -397,21 +400,23 @@ public class EventsHandler {
         }
         work.setCallerId(subProcflowNodeInstance.getId());
         work.setSubProcessId(subProcessId);
+        work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
         workService.registerWork(work);
     }
 
-    public void triggerCatchEvent(final String eventType, final Long processDefinitionId, final Long flowNodeInstanceId, final String containerType)
-            throws SBonitaException {
+    public void triggerCatchEvent(final String eventType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
+            final Long flowNodeInstanceId, final String containerType) throws SBonitaException {
         final SBPMEventType type = SBPMEventType.valueOf(eventType);
-        triggerInTransaction(null, type, processDefinitionId, flowNodeInstanceId, new OperationsWithContext(null, null, containerType));
+        triggerInTransaction(type, processDefinitionId, targetSFlowNodeDefinitionId, null, flowNodeInstanceId, new OperationsWithContext(null, null,
+                containerType));
     }
 
-    public void triggerCatchEvent(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final String containerType,
-            final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId, final Boolean isInterrupting)
-            throws SBonitaException {
-        triggerInTransaction(eventTriggerType, processDefinitionId, new OperationsWithContext(null, null, containerType), subProcessId,
-                parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
+    public void triggerCatchEvent(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
+            final String containerType, final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId,
+            final Boolean isInterrupting) throws SBonitaException {
+        triggerInTransaction(eventTriggerType, processDefinitionId, targetSFlowNodeDefinitionId, new OperationsWithContext(null, null, containerType),
+                subProcessId, parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
     private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations) throws SActivityReadException,
@@ -420,10 +425,11 @@ public class EventsHandler {
         // operations
     }
 
-    private void instantiate(final long processDefinitionId, final OperationsWithContext operations) throws WorkRegisterException,
-            SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+    private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
+            throws WorkRegisterException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations,
                 processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator, transactionExecutor);
+        work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
         workService.registerWork(work);
     }
 

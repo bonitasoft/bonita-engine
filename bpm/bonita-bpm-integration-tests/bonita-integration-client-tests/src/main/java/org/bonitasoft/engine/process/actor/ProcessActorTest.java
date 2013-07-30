@@ -1,5 +1,10 @@
 package org.bonitasoft.engine.process.actor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,11 +54,6 @@ import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class ProcessActorTest extends CommonAPITest {
 
@@ -789,7 +789,7 @@ public class ProcessActorTest extends CommonAPITest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForStep(20, 1500, "deliver", processInstance);
+        waitForUserTask("deliver", processInstance);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
@@ -851,6 +851,36 @@ public class ProcessActorTest extends CommonAPITest {
             DeletionException {
         getIdentityAPI().deleteGroup(group.getId());
         getIdentityAPI().deleteRole(role.getId());
+    }
+
+    @Cover(classes = { ProcessDeploymentInfo.class }, concept = BPMNConcept.PROCESS, keywords = { "Pagination", "process definition" }, jira = "ENGINE-1375")
+    @Test
+    public void getPaginatedStartableProcessesForActors() throws Exception {
+        final ProcessDefinition firstDefinition = getProcessDefinition("firstProcess");
+        final ProcessDefinition secondDefinition = getProcessDefinition("secondProcess");
+
+        final ActorInstance firstActorInstance = getProcessAPI().getActorInitiator(firstDefinition.getId());
+        final ActorInstance secondActorInstance = getProcessAPI().getActorInitiator(secondDefinition.getId());
+        final Set<Long> actorIds = new HashSet<Long>();
+        actorIds.add(firstActorInstance.getId());
+        actorIds.add(secondActorInstance.getId());
+
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getStartableProcessDeploymentInfosForActors(actorIds, 0, 1,
+                ProcessDeploymentInfoCriterion.NAME_ASC);
+        assertEquals(1, processDeploymentInfos.size());
+        assertEquals(firstDefinition.getId(), processDeploymentInfos.get(0).getProcessId());
+
+        disableAndDeleteProcess(firstDefinition);
+        disableAndDeleteProcess(secondDefinition);
+    }
+
+    private ProcessDefinition getProcessDefinition(final String processName) throws BonitaException {
+        final String delivery = "Delivery men";
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        processBuilder.addActor(delivery);
+        processBuilder.setActorInitiator(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        final DesignProcessDefinition designProcessDefinition = processBuilder.done();
+        return deployAndEnableWithActor(designProcessDefinition, delivery, john);
     }
 
 }

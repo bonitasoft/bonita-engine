@@ -19,7 +19,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
@@ -40,15 +39,12 @@ public class GetLastArchivedProcessInstance implements TransactionContentWithRes
 
     private final long processInstanceId;
 
-    private final ReadPersistenceService persistenceService;
-
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
 
     public GetLastArchivedProcessInstance(final ProcessInstanceService processInstanceService, final long processInstanceId,
-            final ReadPersistenceService persistenceService, final SearchEntitiesDescriptor searchEntitiesDescriptor) {
+            final SearchEntitiesDescriptor searchEntitiesDescriptor) {
         this.processInstanceService = processInstanceService;
         this.processInstanceId = processInstanceId;
-        this.persistenceService = persistenceService;
         this.searchEntitiesDescriptor = searchEntitiesDescriptor;
     }
 
@@ -60,7 +56,7 @@ public class GetLastArchivedProcessInstance implements TransactionContentWithRes
         searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
 
         final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptionsBuilder.done(), persistenceService);
+                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
         try {
             processInstance = searchArchivedProcessInstances.getResult().getResult().get(0);

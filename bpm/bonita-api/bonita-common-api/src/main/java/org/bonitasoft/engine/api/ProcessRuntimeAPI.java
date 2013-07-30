@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
@@ -54,14 +55,18 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * @author Baptiste Mesta
@@ -235,7 +240,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *            identifier of the process instance to delete
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still active
+     *             if a process instance can't be deleted because of a parent that is still existing.
      * @since 6.0
      */
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
@@ -249,9 +254,50 @@ public interface ProcessRuntimeAPI {
      *            Identifier of the processDefinition
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance can't be deleted because of a parent that is still active
+     * 
      * @since 6.0
+     * 
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
+     *             {@link #deleteArchivedProcessInstances(long, int, int, ProcessInstanceCriterion)}
      */
+    @Deprecated
     void deleteProcessInstances(long processDefinitionId) throws DeletionException;
+
+    /**
+     * Delete active process instances of process definition given as input parameter respecting the pagination parameters
+     * 
+     * @param processDefinitionId
+     *            Identifier of the processDefinition
+     * @param startIndex
+     *            the index
+     * @param maxResults
+     *            the max number of elements to retrieve per page
+     * @return the number of elements that have been deleted
+     * @throws DeletionException
+     *             if a process instance can't be deleted because of a parent that is still active
+     * @since 6.1
+     */
+    long deleteProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
+
+    /**
+     * Delete archived process instances of process definition given as input parameter respecting the pagination parameters
+     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
+     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
+     * 
+     * @param processDefinitionId
+     *            Identifier of the processDefinition
+     * @param startIndex
+     *            the index
+     * @param maxResults
+     *            the max number of elements to retrieve per page
+     * @param criterion
+     *            the sort criterion
+     * @return the number of elements that have been deleted
+     * @throws DeletionException
+     *             if a process instance can't be deleted because of a parent that is still active
+     * @since 6.1
+     */
+    long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults, ProcessInstanceCriterion criterion) throws DeletionException;
 
     /**
      * Start an instance of the process definition having processDefinitionId, and using the current session user

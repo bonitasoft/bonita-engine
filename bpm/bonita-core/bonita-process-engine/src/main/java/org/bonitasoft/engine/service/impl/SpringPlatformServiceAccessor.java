@@ -22,7 +22,6 @@ import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderAccessor;
@@ -61,8 +60,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private IdentityService identityService;
 
     private IdentityModelBuilder identityModelBuilder;
-
-    private PlatformMonitoringService platformMonitoringService;
 
     private TransactionExecutor transactionExecutor;
 
@@ -162,14 +159,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public PlatformMonitoringService getPlatformMonitoringService() {
-        if (platformMonitoringService == null) {
-            platformMonitoringService = SpringPlatformFileSystemBeanAccessor.getService(PlatformMonitoringService.class);
-        }
-        return platformMonitoringService;
-    }
-
-    @Override
     public TransactionExecutor getTransactionExecutor() {
         if (transactionExecutor == null) {
             transactionExecutor = SpringPlatformFileSystemBeanAccessor.getService(TransactionExecutor.class);
@@ -188,7 +177,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public ClassLoaderService getClassLoaderService() {
         if (classLoaderService == null) {
-            classLoaderService = SpringPlatformFileSystemBeanAccessor.getService(ClassLoaderService.class);
+            classLoaderService = SpringPlatformFileSystemBeanAccessor.getService("classLoaderService", ClassLoaderService.class);
         }
         return classLoaderService;
     }

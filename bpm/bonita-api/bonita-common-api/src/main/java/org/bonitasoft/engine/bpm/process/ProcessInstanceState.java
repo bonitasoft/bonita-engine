@@ -34,41 +34,17 @@ public enum ProcessInstanceState {
 
     public static ProcessInstanceState getFromId(final int id) {
         if (!map.containsKey(id)) {
-            ProcessInstanceState state;
-            switch (id) {
-                case 0:
-                    state = INITIALIZING;
-                    break;
-                case 1:
-                    state = STARTED;
-                    break;
-                case 2:
-                    state = SUSPENDED;
-                    break;
-                case 3:
-                    state = CANCELLED;
-                    break;
-                case 4:
-                    state = ABORTED;
-                    break;
-                case 5:
-                    state = COMPLETING;
-                    break;
-                case 6:
-                    state = COMPLETED;
-                    break;
-                case 7:
-                    state = ERROR;
-                    break;
-                case 11:
-                    state = ABORTING;
-                    break;
-                default:
-                    state = null;
-                    break;
-            }
-            map.put(id, state);
+            map.put(id, fromIdToProcessInstanceState(id));
         }
         return map.get(id);
     }
+
+	private static ProcessInstanceState fromIdToProcessInstanceState(final int id) {
+		for (ProcessInstanceState state : values()) {
+			if (id == state.getId()) {
+				return state;
+			}
+		}
+		return null;
+	}
 }

@@ -48,6 +48,11 @@ public interface ProcessExecutor extends ContainerExecutor {
             Map<String, Object> context) throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException,
             SActivityInterruptedException, SProcessInstanceCreationException;
 
+    SProcessInstance start(SProcessDefinition sProcessDefinition, long targetSFlowNodeDefinitionId, long starterId, long starterDelegateId,
+            SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
+            List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId) throws SProcessInstanceCreationException,
+            SActivityReadException, SActivityExecutionException;
+
     SProcessInstance start(SProcessDefinition sProcessDefinition, long starterId, long starterDelegateId, SExpressionContext expressionContext,
             List<SOperation> operations, Map<String, Object> context) throws SActivityReadException, SActivityExecutionFailedException,
             SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
@@ -55,11 +60,6 @@ public interface ProcessExecutor extends ContainerExecutor {
     SProcessInstance start(SProcessDefinition sProcessDefinition, long starterId, long starterDelegateId, SExpressionContext expressionContext,
             List<SOperation> operations, Map<String, Object> context, long callerId) throws SActivityReadException, SActivityExecutionFailedException,
             SActivityExecutionException, SActivityInterruptedException, SProcessInstanceCreationException;
-
-    SProcessInstance start(SProcessDefinition sProcessDefinition, long starterId, long starterDelegateId, SExpressionContext expressionContext,
-            List<SOperation> operations, Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectors, long callerId,
-            long subProcessId) throws SActivityReadException, SActivityExecutionException, SActivityInterruptedException,
-            SProcessInstanceCreationException;
 
     SProcessInstance start(SProcessDefinition sProcessDefinition, long starterId, long starterDelegateId, List<SOperation> sOperations,
             Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SActivityReadException,
@@ -74,8 +74,8 @@ public interface ProcessExecutor extends ContainerExecutor {
     SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance) throws SActivityReadException,
             SProcessInstanceCreationException, SActivityExecutionException;
 
-    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId) throws SActivityReadException,
-            SProcessInstanceCreationException, SActivityExecutionException;
+    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId,
+            final long targetSFlowNodeDefinitionId) throws SActivityReadException, SProcessInstanceCreationException, SActivityExecutionException;
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
             throws SBonitaException;

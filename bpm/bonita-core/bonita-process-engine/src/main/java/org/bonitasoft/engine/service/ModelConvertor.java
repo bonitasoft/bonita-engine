@@ -204,6 +204,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 import org.bonitasoft.engine.identity.ExportedUser;
+import org.bonitasoft.engine.identity.ExportedUserBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -280,9 +281,8 @@ public class ModelConvertor {
     }
 
     public static Platform toPlatform(final SPlatform sPlatform) {
-        final Platform platform = new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(),
-                sPlatform.getCreatedBy(), sPlatform.getCreated());
-        return platform;
+        return new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(), sPlatform.getCreatedBy(),
+                sPlatform.getCreated());
     }
 
     public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities, final FlowNodeStateManager flowNodeStateManager) {
@@ -733,6 +733,7 @@ public class ModelConvertor {
             case INTERMEDIATE_CATCH_EVENT:
             case INTERMEDIATE_THROW_EVENT:
             case START_EVENT:
+                throw new UnknownElementType("Events are not yet archived");
             default:
                 throw new UnknownElementType(sInstance.getType().name());
         }
@@ -1392,6 +1393,31 @@ public class ModelConvertor {
         return contactInfoBuilder.done();
     }
 
+    public static ExportedUser toExportedUser(final SUser sUser, final SContactInfo persoInfo, final SContactInfo proInfo, final String managerUserName) {
+        final ExportedUserBuilder clientUserbuilder = new ExportedUserBuilder().createNewInstance(sUser.getUserName(), sUser.getPassword());
+        // Do not export dates and id
+        clientUserbuilder.setPasswordEncrypted(true);
+        clientUserbuilder.setFirstName(sUser.getFirstName());
+        clientUserbuilder.setLastName(sUser.getLastName());
+        clientUserbuilder.setTitle(sUser.getTitle());
+        clientUserbuilder.setJobTitle(sUser.getJobTitle());
+        clientUserbuilder.setCreatedBy(sUser.getCreatedBy());
+        clientUserbuilder.setIconName(sUser.getIconName());
+        clientUserbuilder.setIconPath(sUser.getIconPath());
+        clientUserbuilder.setEnabled(sUser.isEnabled());
+
+        final long managerUserId = sUser.getManagerUserId();
+        clientUserbuilder.setManagerUserId(managerUserId);
+        clientUserbuilder.setManagerUserName(managerUserName);
+        if (persoInfo != null) {
+            clientUserbuilder.setPersonalData(toUserContactData(persoInfo));
+        }
+        if (proInfo != null) {
+            clientUserbuilder.setProfessionalData(toUserContactData(proInfo));
+        }
+        return clientUserbuilder.done();
+    }
+
     public static SRole constructSRole(final RoleCreator creator, final IdentityModelBuilder identityModelBuilder) {
         final long now = System.currentTimeMillis();
         final RoleBuilder roleBuilder = identityModelBuilder.getRoleBuilder();
@@ -1762,11 +1788,8 @@ public class ModelConvertor {
             case LOOP_ACTIVITY:
                 archiveFlowNodeInstance = toArchivedLoopActivityInstance((SALoopActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
-            case START_EVENT:
-            case INTERMEDIATE_CATCH_EVENT:
-            case INTERMEDIATE_THROW_EVENT:
-            case END_EVENT:
-                // archiveFlowNodeInstance = toArchivedEventInstance((SAEventInstance) saFlowNode, flowNodeStateManager);
+            case SUB_PROCESS:
+                archiveFlowNodeInstance = toArchivedSubProcessActivityInstance((SASubProcessActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case GATEWAY:
                 archiveFlowNodeInstance = toArchivedGatewayInstance((SAGatewayInstance) saFlowNode, flowNodeStateManager);
@@ -1775,7 +1798,11 @@ public class ModelConvertor {
                 archiveFlowNodeInstance = toArchivedMultiInstanceActivityInstance((SAMultiInstanceActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case BOUNDARY_EVENT:
-            case SUB_PROCESS:
+            case START_EVENT:
+            case INTERMEDIATE_CATCH_EVENT:
+            case INTERMEDIATE_THROW_EVENT:
+            case END_EVENT:
+                // archiveFlowNodeInstance = toArchivedEventInstance((SAEventInstance) saFlowNode, flowNodeStateManager);
                 break;
             default:
                 throw new UnknownElementType(saFlowNode.getType().name());

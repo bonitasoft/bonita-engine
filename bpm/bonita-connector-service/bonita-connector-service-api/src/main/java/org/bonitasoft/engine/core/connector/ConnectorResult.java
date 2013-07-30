@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.connector;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.connector.Connector;
@@ -59,7 +60,7 @@ public class ConnectorResult {
      * @return the result
      */
     public Map<String, Object> getResult() {
-        return result;
+        return Collections.unmodifiableMap(result);
     }
 
     /**

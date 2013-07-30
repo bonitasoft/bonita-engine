@@ -72,4 +72,5 @@ public interface SFlowNodeDefinition extends SNamedElement {
 
     List<SConnectorDefinition> getConnectors(ConnectorEvent connectorEvent);
 
+    int getTransitionIndex(String transitionName);
 }

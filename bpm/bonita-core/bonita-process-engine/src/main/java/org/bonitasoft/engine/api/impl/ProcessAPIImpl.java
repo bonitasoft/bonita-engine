@@ -68,9 +68,6 @@ import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategories
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveProcessDefinitionsOfCategory;
 import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
-import org.bonitasoft.engine.api.impl.transaction.command.expression.EvaluateExpressionsDefinitionLevel;
-import org.bonitasoft.engine.api.impl.transaction.command.expression.EvaluateExpressionsInstanceLevel;
-import org.bonitasoft.engine.api.impl.transaction.command.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
 import org.bonitasoft.engine.api.impl.transaction.comment.GetComments;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
@@ -90,6 +87,9 @@ import org.bonitasoft.engine.api.impl.transaction.document.GetDocumentContent;
 import org.bonitasoft.engine.api.impl.transaction.document.GetDocumentsOfProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.document.GetNumberOfDocumentsOfProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.event.GetEventInstances;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.HideTasks;
 import org.bonitasoft.engine.api.impl.transaction.flownode.IsTaskHidden;
@@ -254,6 +254,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
+import org.bonitasoft.engine.core.process.definition.model.builder.ProcessDefinitionDeployInfoBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
@@ -291,6 +292,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
@@ -341,11 +343,14 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
+import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.Order;
@@ -490,7 +495,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                final TransactionContent deleteTrancastionContent = getDeleteTrancastionContent(processDefinitionId);
+                final TransactionContent deleteTrancastionContent = getDeleteTransactionContent(processDefinitionId);
                 transactionExecutor.execute(deleteTrancastionContent);
                 final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
                 final File file = new File(processesFolder);
@@ -517,7 +522,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected TransactionContent getDeleteTrancastionContent(final long processDefinitionId) {
+    protected TransactionContent getDeleteTransactionContent(final long processDefinitionId) {
         return new DeleteProcess(getTenantAccessor(), processDefinitionId);
     }
 
@@ -526,24 +531,24 @@ public class ProcessAPIImpl implements ProcessAPI {
         List<ProcessInstance> processInstances;
         final int maxResults = 100;
         do {
-            processInstances = searchProcessInstancesFromProcessDefinition(tenantAccessor, processDefinitionId, maxResults);
+            processInstances = searchProcessInstancesFromProcessDefinition(tenantAccessor, processDefinitionId, 0, maxResults);
             final List<Long> processInstanceIds = new ArrayList<Long>(processInstances.size());
             for (final ProcessInstance processInstance : processInstances) {
                 processInstanceIds.add(processInstance.getId());
             }
             if (processInstanceIds.size() > 0) {
-                deleteProcessInstancesInsideLocks(tenantAccessor, true, processInstanceIds.toArray(new Long[processInstanceIds.size()]));
+                deleteProcessInstancesInsideLocks(tenantAccessor, true, processInstanceIds);
             }
         } while (!processInstances.isEmpty());
     }
 
     private void deleteProcessInstancesInsideLocks(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final Long... processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            final List<Long> processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         final List<Long> lockedProcesses = new ArrayList<Long>();
         try {
-            createLocks(lockService, objectType, lockedProcesses, processInstanceIds);
+            lockedProcesses.addAll(createLocks(lockService, objectType, processInstanceIds));
             deleteProcessInstancesInTransaction(tenantAccessor, ignoreProcessInstanceNotFound, processInstanceIds);
         } finally {
             final List<Long> unReleasedLocks = releaseLocks(tenantAccessor, lockService, objectType, lockedProcesses);
@@ -558,25 +563,26 @@ public class ProcessAPIImpl implements ProcessAPI {
         final List<Long> unReleasedLocks = new ArrayList<Long>(1);
         for (final Long lockedProcessId : lockedProcesses) {
             try {
-                lockService.releaseExclusiveLockAccess(lockedProcessId, objectType);
+                releaseLock(tenantAccessor, lockService, objectType, lockedProcessId);
             } catch (final SLockException e) {
                 unReleasedLocks.add(lockedProcessId);
-                log(tenantAccessor, e);
             }
         }
         return unReleasedLocks;
     }
 
-    private void createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses, final Long... processInstanceIds)
+    private void releaseLock(final TenantServiceAccessor tenantAccessor, final LockService lockService, final String objectType, final Long lockedProcessId)
             throws SLockException {
-        for (final Long processInstanceId : processInstanceIds) {
-            lockService.createExclusiveLockAccess(processInstanceId, objectType);
-            lockedProcesses.add(processInstanceId);
+        try {
+            lockService.releaseExclusiveLockAccess(lockedProcessId, objectType);
+        } catch (final SLockException e) {
+            log(tenantAccessor, e);
+            throw e;
         }
     }
 
     private void deleteProcessInstancesInTransaction(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final Long... processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            final List<Long> processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
@@ -596,18 +602,18 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
             final ArchiveService archiveService, final boolean ignoreProcessInstanceNotFound, final ActivityInstanceService activityInstanceService,
-            final Long... processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            final List<Long> processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         for (final Long processInstanceId : processInstanceIds) {
-            if (ignoreProcessInstanceNotFound) {
-                try {
-                    deleteProcessInstance(processInstanceService, processInstanceId, archiveService, activityInstanceService);
-                } catch (final SProcessInstanceNotFoundException e) {
+            try {
+                deleteProcessInstance(processInstanceService, processInstanceId, archiveService, activityInstanceService);
+            } catch (final SProcessInstanceNotFoundException e) {
+                if (ignoreProcessInstanceNotFound) {
                     if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                         logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage() + ". It has probably completed.");
                     }
+                } else {
+                    throw e;
                 }
-            } else {
-                deleteProcessInstance(processInstanceService, processInstanceId, archiveService, activityInstanceService);
             }
         }
     }
@@ -633,12 +639,24 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<ProcessInstance> searchProcessInstancesFromProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId,
-            final int maxResults) throws SProcessInstanceReadException, STransactionException, SearchException {
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, maxResults);
+            final int startIndex, final int maxResults) throws SProcessInstanceReadException, STransactionException,
+            SearchException {
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(startIndex, maxResults);
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
         searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.CALLER_ID, Order.ASC);
         return searchProcessInstances(tenantAccessor, searchOptionsBuilder.done()).getResult();
+    }
+
+    private List<SProcessInstance> searchProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,
+            final SProcessInstanceBuilder sProcessInstanceBuilder, final long processDefinitionId, final int startIndex, final int maxResults)
+            throws SBonitaSearchException {
+        final FilterOption filterOption = new FilterOption(SProcessInstance.class, sProcessInstanceBuilder.getProcessDefinitionIdKey(), processDefinitionId);
+        // Order by caller id ASC because we need to have parent process deleted before their sub processes
+        final OrderByOption order = new OrderByOption(SProcessInstance.class, sProcessInstanceBuilder.getCallerIdKey(), OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Collections.singletonList(order), Collections.singletonList(filterOption),
+                null);
+        return processInstanceService.searchProcessInstances(queryOptions);
     }
 
     @Override
@@ -977,10 +995,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ReadPersistenceService persistenceService = tenantAccessor.getArchiveService().getDefinitiveArchiveReadPersistenceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final GetArchivedProcessInstanceList getProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService, persistenceService,
-                searchEntitiesDescriptor, processInstanceId, startIndex, maxResults);
+        final GetArchivedProcessInstanceList getProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService, searchEntitiesDescriptor,
+                processInstanceId, startIndex, maxResults);
         try {
             transactionExecutor.execute(getProcessInstanceList);
         } catch (final SBonitaException e) {
@@ -995,12 +1012,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                final SAProcessInstance archivedProcessInstance = processInstanceService.getArchivedProcessInstance(id, persistenceService);
+                final SAProcessInstance archivedProcessInstance = processInstanceService.getArchivedProcessInstance(id);
                 return ModelConvertor.toArchivedProcessInstance(archivedProcessInstance);
             } catch (final SProcessInstanceNotFoundException e) {
                 throw new ArchivedProcessInstanceNotFoundException(e);
@@ -1019,10 +1034,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ReadPersistenceService readPersistenceService = tenantAccessor.getArchiveService().getDefinitiveArchiveReadPersistenceService();
 
         final GetLastArchivedProcessInstance getProcessInstance = new GetLastArchivedProcessInstance(processInstanceService, processInstanceId,
-                readPersistenceService, tenantAccessor.getSearchEntitiesDescriptor());
+                tenantAccessor.getSearchEntitiesDescriptor());
         try {
             transactionExecutor.execute(getProcessInstance);
         } catch (final SProcessInstanceNotFoundException e) {
@@ -1669,27 +1683,22 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private SearchArchivedProcessInstances searchArchivedProcessInstances(final TenantServiceAccessor tenantAccessor, final SearchOptions searchOptions)
             throws RetrieveException {
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        return new SearchArchivedProcessInstances(processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions,
-                readPersistenceService);
+        return new SearchArchivedProcessInstances(processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
     }
 
     @Override
     public long getNumberOfArchivedProcessInstances() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SAProcessInstanceBuilder saProcessInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSAProcessInstanceBuilder();
 
         try {
             final TransactionContentWithResult<Long> transactionContent = new GetNumberOfArchivedProcessInstance(processInstanceService,
-                    readPersistenceService, searchEntitiesDescriptor, saProcessInstanceBuilder);
+                    searchEntitiesDescriptor, saProcessInstanceBuilder);
             transactionExecutor.execute(transactionContent);
             return transactionContent.getResult();
         } catch (final SBonitaException e) {
@@ -1703,11 +1712,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchArchivedProcessInstancesWithoutSubProcess searchArchivedProcessInstances = new SearchArchivedProcessInstancesWithoutSubProcess(
-                processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions, persistenceService);
+                processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
         try {
             transactionExecutor.execute(searchArchivedProcessInstances);
         } catch (final SBonitaException e) {
@@ -3059,6 +3066,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ProcessDefinitionDeployInfoBuilder builder = tenantAccessor.getBPMDefinitionBuilders().getProcessDefinitionDeployInfoBuilder();
+
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
@@ -3069,8 +3078,56 @@ public class ProcessAPIImpl implements ProcessAPI {
                         processDefIds.add(sActor.getScopeId());
                     }
                 }
+
+                String field = null;
+                OrderByType order = null;
+                switch (sortingCriterion) {
+                    case DEFAULT:
+                        break;
+                    case LABEL_ASC:
+                        // field = processDefinitionDeployInfoKyeProvider.get
+                        // FIXME add label?
+                        break;
+                    case LABEL_DESC:
+                        break;
+                    case NAME_ASC:
+                        field = builder.getNameKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case NAME_DESC:
+                        field = builder.getNameKey();
+                        order = OrderByType.DESC;
+                        break;
+                    case ACTIVATION_STATE_ASC:
+                        field = builder.getActivationStateKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case ACTIVATION_STATE_DESC:
+                        field = builder.getActivationStateKey();
+                        order = OrderByType.DESC;
+                        break;
+                    case CONFIGURATION_STATE_ASC:
+                        field = builder.getConfigurationStateKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case CONFIGURATION_STATE_DESC:
+                        field = builder.getConfigurationStateKey();
+                        order = OrderByType.DESC;
+                        break;
+                    case VERSION_ASC:
+                        field = builder.getVersionKey();
+                        order = OrderByType.ASC;
+                        break;
+                    case VERSION_DESC:
+                        field = builder.getVersionKey();
+                        order = OrderByType.DESC;
+                        break;
+                    default:
+                        break;
+                }
+
                 final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = processDefinitionService.getProcessDeploymentInfos(new ArrayList<Long>(
-                        processDefIds));
+                        processDefIds), startIndex, maxResults, field, order);
                 return ModelConvertor.toProcessDeploymentInfo(processDefinitionDeployInfos);
             } catch (final SBonitaException e) {
                 // no rollback only read db
@@ -3523,6 +3580,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @Deprecated
     public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
@@ -3539,11 +3597,95 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    private void deleteProcessInstanceInTransaction(final TenantServiceAccessor tenantAccessor, final long processInstanceId) throws SBonitaException {
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+
+        final boolean txOpened = transactionExecutor.openTransaction();
+        try {
+            processInstanceService.deleteParentProcessInstanceAndArchivedElements(processInstanceId);
+        } catch (final SBonitaException e) {
+            transactionExecutor.setTransactionRollback();
+            throw e;
+        } finally {
+            transactionExecutor.completeTransaction(txOpened);
+        }
+    }
+
+    @Override
+    public long deleteProcessInstances(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SProcessInstanceBuilder sProcessInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                final List<SProcessInstance> sProcessInstances = searchProcessInstancesFromProcessDefinition(processInstanceService, sProcessInstanceBuilder,
+                        processDefinitionId, startIndex, maxResults);
+                if (!sProcessInstances.isEmpty()) {
+                    final LockService lockService = tenantAccessor.getLockService();
+                    final String objectType = SFlowElementsContainerType.PROCESS.name();
+                    final List<Long> lockedProcesses = new ArrayList<Long>();
+                    try {
+                        lockedProcesses.addAll(createLockProcessInstances(lockService, objectType, sProcessInstances));
+                        return processInstanceService.deleteParentProcessInstancesAndArchivedElements(sProcessInstances);
+                    } finally {
+                        final List<Long> unReleasedLocks = releaseLocks(tenantAccessor, lockService, objectType, lockedProcesses);
+                        if (!unReleasedLocks.isEmpty()) {
+                            throw new DeletionException("Some locks were not released. Object type: " + objectType + ", ids: " + unReleasedLocks);
+                        }
+                    }
+                }
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+            return 0;
+        } catch (final SBonitaException e) {
+            throw new DeletionException(e);
+        }
+    }
+
+    @Override
+    public long deleteArchivedProcessInstances(final long processDefinitionId, final int startIndex, final int maxResults,
+            final ProcessInstanceCriterion criterion) throws DeletionException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    private List<Long> createLockProcessInstances(final LockService lockService, final String objectType, final List<SProcessInstance> sProcessInstances)
+            throws SLockException {
+        final List<Long> lockedObjects = new ArrayList<Long>();
+        for (final SProcessInstance sProcessInstance : sProcessInstances) {
+            lockService.createExclusiveLockAccess(sProcessInstance.getId(), objectType);
+            lockedObjects.add(sProcessInstance.getId());
+        }
+        return lockedObjects;
+    }
+
+    private List<Long> createLocks(final LockService lockService, final String objectType, final List<Long> ids) throws SLockException {
+        final List<Long> lockedObjects = new ArrayList<Long>();
+        for (final Long id : ids) {
+            lockService.createExclusiveLockAccess(id, objectType);
+            lockedObjects.add(id);
+        }
+        return lockedObjects;
+    }
+
     @Override
     public void deleteProcessInstance(final long processInstanceId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final LockService lockService = tenantAccessor.getLockService();
+        final String objectType = SFlowElementsContainerType.PROCESS.name();
         try {
-            deleteProcessInstancesInsideLocks(tenantAccessor, false, processInstanceId);
+            lockService.createExclusiveLockAccess(processInstanceId, objectType);
+            deleteProcessInstanceInTransaction(tenantAccessor, processInstanceId);
+            releaseLock(tenantAccessor, lockService, objectType, processInstanceId);
+        } catch (final SLockException e) {
+            throw new DeletionException("Lock was not released. Object type: " + objectType + ", id: " + processInstanceId);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SProcessInstanceNotFoundException e) {
@@ -4004,10 +4146,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SearchArchivedProcessInstancesSupervisedBy searchArchivedProcessInstances = new SearchArchivedProcessInstancesSupervisedBy(userId,
-                processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions, persistenceService);
+                processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
         try {
             transactionExecutor.execute(searchArchivedProcessInstances);
             return searchArchivedProcessInstances.getResult();
@@ -4023,10 +4163,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SearchArchivedProcessInstancesInvolvingUser searchArchivedProcessInstances = new SearchArchivedProcessInstancesInvolvingUser(userId,
-                processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions, persistenceService);
+                processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
         try {
             transactionExecutor.execute(searchArchivedProcessInstances);
             return searchArchivedProcessInstances.getResult();
@@ -5653,22 +5791,20 @@ public class ProcessAPIImpl implements ProcessAPI {
     private ArchivedProcessInstance getStartedArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ReadPersistenceService readPersistenceService = getDefinitiveArchiveReadPersistenceService(tenantAccessor);
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
         final GetStartedArchivedProcessInstance searchArchivedProcessInstances = new GetStartedArchivedProcessInstance(processInstanceService,
-                readPersistenceService, searchEntitiesDescriptor, processInstanceId);
+                searchEntitiesDescriptor, processInstanceId);
         searchArchivedProcessInstances.execute();
         return searchArchivedProcessInstances.getResult();
     }
 
     private ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ReadPersistenceService readPersistenceService = getDefinitiveArchiveReadPersistenceService(tenantAccessor);
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final GetLastArchivedProcessInstance searchArchivedProcessInstances = new GetLastArchivedProcessInstance(processInstanceService, processInstanceId,
-                readPersistenceService, searchEntitiesDescriptor);
+                searchEntitiesDescriptor);
 
         searchArchivedProcessInstances.execute();
         return searchArchivedProcessInstances.getResult();

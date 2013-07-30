@@ -34,7 +34,6 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <ul>
  * <li>{@link PlatformAPI}</li>
  * <li>{@link PlatformCommandAPI}</li>
- * <li>{@link PlatformMonitoringAPI}</li>
  * <li>{@link PlatformLoginAPI}</li>
  * </ul>
  * 

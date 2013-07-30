@@ -17,15 +17,16 @@ CREATE TABLE profileentry (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   profileId BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(50),
   description TEXT,
   parentId BIGINT,
   index_ BIGINT,
   type VARCHAR(50),
   page VARCHAR(50),
-  UNIQUE (tenantId, parentId, profileId, name),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
+
+CREATE INDEX indexProfileEntry ON profileentry(tenantId, parentId, profileId);
 
 CREATE TABLE profilemember (
   tenantId BIGINT NOT NULL,

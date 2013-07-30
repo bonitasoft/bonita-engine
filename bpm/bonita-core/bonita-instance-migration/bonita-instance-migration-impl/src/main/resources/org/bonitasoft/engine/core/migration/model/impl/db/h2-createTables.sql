@@ -6,6 +6,6 @@ CREATE TABLE migration_plan (
   source_version VARCHAR(50) NOT NULL,
   target_name VARCHAR(50) NOT NULL,
   target_version VARCHAR(50) NOT NULL,
-  content BLOB NOT NULL,
+  content MEDIUMBLOB NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
