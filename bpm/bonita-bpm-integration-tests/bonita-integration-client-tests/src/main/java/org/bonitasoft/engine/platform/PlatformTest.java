@@ -1,5 +1,11 @@
 package org.bonitasoft.engine.platform;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -18,12 +24,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class PlatformTest {
 
@@ -96,6 +96,11 @@ public class PlatformTest {
 
         assertNotNull("can't find the platform", platform);
         assertEquals("platformAdmin", platform.getCreatedBy());
+        final String version = platform.getVersion();
+        assertTrue(version, version.equals("6.1.0-SNAPSHOT") || version.equals("6.1.0"));
+
+        final String initialVersion = platform.getInitialVersion();
+        assertTrue(version, initialVersion.equals("6.1.0-SNAPSHOT") || initialVersion.equals("6.1.0"));
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.")
