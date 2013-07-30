@@ -5,6 +5,7 @@
 		<constructor-arg name="rangeSizes">
 			<map>
 				<!-- Most used objects: range size depends on process design -->
+				<entry key="70" value="2000" /><!-- Job description -->
 				<entry key="30" value="10000" /><!-- queriable log -->
 				<entry key="31" value="200000" /><!-- queriable log parameter -->
 				<entry key="10010" value="1000" /><!-- ProcessInstance -->

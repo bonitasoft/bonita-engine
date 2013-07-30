@@ -13,7 +13,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.archive.model.Employee;
 import org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl;
 import org.bonitasoft.engine.events.EventService;
@@ -26,10 +25,12 @@ import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.AfterClass;
 import org.junit.Test;
 
+import com.bonitasoft.services.CommonServiceSPTest;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public class RecorderAndEventServiceTest extends CommonServiceTest {
+public class RecorderAndEventServiceTest extends CommonServiceSPTest {
 
     private static EventService eventService;
 

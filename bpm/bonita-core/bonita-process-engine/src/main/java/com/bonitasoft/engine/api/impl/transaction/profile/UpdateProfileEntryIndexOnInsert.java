@@ -3,7 +3,7 @@
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction.profile;
@@ -59,41 +59,30 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        int fromIndex = 0;
         List<SProfileEntry> profileEntryList;
+        Long loopIndex = 0L;
+
+        // loop on profile entry results because we get NUMBER_OF_RESULTS * i entries
+        Long i = 0L;
         do {
-            profileEntryList = searchProfileEntriesForParentIdAndProfileId(fromIndex);
+            profileEntryList = searchProfileEntriesForParentIdAndProfileId(loopIndex);
+
             for (final SProfileEntry profileEntry : profileEntryList) {
-                updateProfileEntryIndex(profileEntry, profileEntryList.indexOf(profileEntry) + fromIndex * NUMBER_OF_RESULTS);
+                // for every element of the set we update the index
+                try {
+                    updateProfileEntryIndex(profileEntry, i);
+                } catch (SProfileEntryNotFoundException e) {
+                    throw new SProfileEntryUpdateException(e.getCause());
+                } catch (SProfileEntryUpdateException e) {
+                    throw new SProfileEntryUpdateException(e.getCause());
+                }
+                i++;
             }
-            fromIndex++;
+            loopIndex++;
         } while (!profileEntryList.isEmpty());
     }
 
-    private void updateProfileEntryIndex(final SProfileEntry profileEntry, final int i) throws SProfileEntryNotFoundException,
-            SProfileEntryUpdateException {
-        final long insertedIndex = insertedProfileEntry.getIndex();
-        final long j = i * 2;
-        if (profileEntry.getId() != insertedProfileEntry.getId()) {
-            if (insertedIndex > j && profileEntry.getIndex() != j) {
-                updateProfileEntry(profileEntry, j);
-            }
-            if (insertedIndex == j) {
-                updateProfileEntry(profileEntry, j + 2);
-            }
-            if (insertedIndex < j) {
-                updateProfileEntry(profileEntry, j);
-            }
-        } else {
-            if (insertedIndex < 0) {
-                updateProfileEntry(profileEntry, Long.valueOf(0));
-            } else if (insertedIndex > j) {
-                updateProfileEntry(profileEntry, j);
-            }
-        }
-    }
-
-    private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final int fromIndex) throws SBonitaSearchException {
+    private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final Long fromIndex) throws SBonitaSearchException {
         Long profileId = null;
         Long parentId = null;
         if (insertedProfileEntry != null) {
@@ -106,14 +95,15 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PARENT_ID, parentId));
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(2);
         orderByOptions.add(new OrderByOption(SProfileEntry.class, ProfileEntrySearchDescriptor.INDEX, OrderByType.ASC));
-        final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex.intValue() * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
         return profileService.searchProfileEntries(queryOptions);
     }
 
-    private void updateProfileEntry(final SProfileEntry profileEntry, final Long profileEntryIndex) throws SProfileEntryNotFoundException,
+    private void updateProfileEntryIndex(final SProfileEntry profileEntry, final Long position) throws SProfileEntryNotFoundException,
             SProfileEntryUpdateException {
+        Long indexToSet = 2L * position;
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField(SProfileEntryBuilder.INDEX, profileEntryIndex);
+        entityUpdateDescriptor.addField(SProfileEntryBuilder.INDEX, indexToSet);
         profileService.updateProfileEntry(profileEntry, entityUpdateDescriptor);
     }
 }

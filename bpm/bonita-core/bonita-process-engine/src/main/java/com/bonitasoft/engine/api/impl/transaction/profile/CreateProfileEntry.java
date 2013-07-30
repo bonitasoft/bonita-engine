@@ -10,11 +10,11 @@ package com.bonitasoft.engine.api.impl.transaction.profile;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.profile.ProfileEntryCreator;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
+import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.service.SPModelConvertor;
 
 /**

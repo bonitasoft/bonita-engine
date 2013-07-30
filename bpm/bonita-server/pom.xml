@@ -82,6 +82,11 @@
 			<artifactId>bonita-classloader-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.classloader</groupId>
+			<artifactId>bonita-classloader-clustered</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Command -->
 		<dependency>
@@ -346,7 +351,7 @@
 
 		<!-- Monitoring -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
+			<groupId>com.bonitasoft.engine.monitoring</groupId>
 			<artifactId>bonita-monitoring-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -772,6 +777,7 @@
 									<!-- Classloader -->
 									<include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
 									<include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
+									<include>com.bonitasoft.engine.classloader:bonita-classloader-clustered</include>
 									<!-- Command -->
 									<include>org.bonitasoft.engine.command:bonita-command-model</include>
 									<include>org.bonitasoft.engine.command:bonita-command-model-impl</include>
@@ -866,8 +872,8 @@
 									<include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
 									<!-- Monitoring -->
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
+									<include>com.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
+									<include>com.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
 									<!-- Operation -->
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>
@@ -948,6 +954,9 @@
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
+									<!-- Security Manager -->
+									<include>com.bonitasoft.manager:manager</include>
+									<include>org.bonitasoft.security:sysUtil</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>

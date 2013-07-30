@@ -19,7 +19,6 @@ import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.profile.DeleteAllExistingProfiles;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfile;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileByName;
-import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileEntry;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -31,8 +30,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
-import org.bonitasoft.engine.profile.ProfileEntryCreator;
-import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
+import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -60,10 +58,11 @@ import com.bonitasoft.engine.api.impl.transaction.profile.ImportAndHandleSameNam
 import com.bonitasoft.engine.api.impl.transaction.profile.ImportProfileMember;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfile;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntry;
-import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnDelete;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnInsert;
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileCreator;
+import com.bonitasoft.engine.profile.ProfileEntryCreator;
+import com.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater.ProfileEntryUpdateField;
 import com.bonitasoft.engine.profile.ProfileUpdater;
@@ -396,7 +395,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public ProfileEntry createProfileEntry(final String name, final String description, final long profileId, final String type) throws CreationException {
-        final ProfileEntryCreator creator = new ProfileEntryCreator(name, profileId).setDescription(description).setType(type);
+        final ProfileEntryCreator creator = new ProfileEntryCreator(name, profileId).setName(name).setDescription(description).setType(type);
         return createProfileEntry(creator);
     }
 
@@ -413,26 +412,9 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
-        SProfileEntry sProfileEntry;
-
-        final GetProfileEntry getProfileEntryTransaction = new GetProfileEntry(profileService, id);
-        try {
-            transactionExecutor.execute(getProfileEntryTransaction);
-            sProfileEntry = getProfileEntryTransaction.getResult();
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
-
         final DeleteProfileEntry deleteProfileEntryTransaction = new DeleteProfileEntry(profileService, id);
         try {
             transactionExecutor.execute(deleteProfileEntryTransaction);
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
-
-        final UpdateProfileEntryIndexOnDelete updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnDelete(profileService, sProfileEntry);
-        try {
-            transactionExecutor.execute(updateProfileEntryIndexTransaction);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -467,7 +449,14 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             }
         }
 
-        return SPModelConvertor.toProfileEntry(sProfileEntry);
+        ProfileEntry updatedSProfileEntry = null;
+        try {
+            updatedSProfileEntry = getProfileEntry(id);
+        } catch (ProfileEntryNotFoundException e) {
+            throw new UpdateException(e.getCause());
+        }
+        return updatedSProfileEntry;
+
     }
 
     private ProfileCreator getProfileCreator(final ExportedProfile exportedProfile) {

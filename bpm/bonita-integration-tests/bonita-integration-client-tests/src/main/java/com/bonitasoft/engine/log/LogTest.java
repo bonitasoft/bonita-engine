@@ -8,6 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.log;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -58,11 +63,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.connector.APIAccessorConnector;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class LogTest extends CommonAPISPTest {
 
@@ -429,8 +429,8 @@ public class LogTest extends CommonAPISPTest {
         designProcessDefinition.addLongData(procInstIdData, dataDefaultValue);
         designProcessDefinition.addIntegerData(nbLogsData, new ExpressionBuilder().createConstantIntegerExpression(0));
         designProcessDefinition.addData(searchLogsData, SearchResult.class.getName(), null);
-        designProcessDefinition.addData(getLogsData, List.class.getName(), dataDefaultValue);
-        designProcessDefinition.addData(profileData, Profile.class.getName(), dataDefaultValue);
+        designProcessDefinition.addData(getLogsData, List.class.getName(), null);
+        designProcessDefinition.addData(profileData, Profile.class.getName(), null);
         designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
         designProcessDefinition.addUserTask("step0", delivery);
         designProcessDefinition

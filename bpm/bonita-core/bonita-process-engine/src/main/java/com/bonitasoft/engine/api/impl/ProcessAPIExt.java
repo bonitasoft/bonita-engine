@@ -83,6 +83,7 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
+import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -156,7 +157,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    protected TransactionContent getDeleteTrancastionContent(final long processDefinitionId) {
+    protected TransactionContent getDeleteTransactionContent(final long processDefinitionId) {
         return new DeleteProcessExt(getTenantAccessor(), processDefinitionId);
     }
 
@@ -562,6 +563,20 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final STransactionException e) {
             throw new UpdateException(e);
         }
+        // refresh classloader in an other transaction.
+        DependencyService dependencyService = getTenantAccessor().getDependencyService();
+        try {
+            final boolean txOpened = transactionExecutor.openTransaction();
+            try {
+                dependencyService.refreshClassLoader("process", processDefinitionId);
+            } catch (final SBonitaException e) {
+                throw new UpdateException(e);
+            } finally {
+                transactionExecutor.completeTransaction(txOpened);
+            }
+        } catch (final STransactionException e) {
+            throw new UpdateException(e);
+        }
     }
 
     @Override
@@ -709,8 +724,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -720,8 +733,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                        persistenceService, tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(),
-                        OrderByType.ASC);
+                        tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(), OrderByType.ASC);
                 getArchivedProcessInstanceList.execute();
                 final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
                 final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
@@ -861,7 +873,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 final SAActivityInstance aactivityInstance = activityInstanceService.getArchivedActivityInstance(activityInstanceId, persistenceService);
 
                 final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
-                        aactivityInstance.getRootContainerId(), persistenceService, tenantAccessor.getSearchEntitiesDescriptor());
+                        aactivityInstance.getRootContainerId(), tenantAccessor.getSearchEntitiesDescriptor());
                 getLastArchivedProcessInstance.execute();
 
                 final long processDefinitionId = getLastArchivedProcessInstance.getResult().getProcessDefinitionId();
@@ -928,7 +940,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
-                        processInstanceId, persistenceService, tenantAccessor.getSearchEntitiesDescriptor());
+                        processInstanceId, tenantAccessor.getSearchEntitiesDescriptor());
                 getLastArchivedProcessInstance.execute();
                 final ArchivedProcessInstance saprocessInstance = getLastArchivedProcessInstance.getResult();
                 final long processDefinitionId = saprocessInstance.getProcessDefinitionId();

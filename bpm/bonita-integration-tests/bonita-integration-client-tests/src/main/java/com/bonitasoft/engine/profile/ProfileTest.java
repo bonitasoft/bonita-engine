@@ -36,6 +36,7 @@ import com.bonitasoft.engine.api.ProfileAPI;
  * @author Julien Mege
  * @author Celine Souchet
  */
+@SuppressWarnings("javadoc")
 public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.")
@@ -140,7 +141,8 @@ public class ProfileTest extends AbstractProfileTest {
         updateDescriptor.description("Updated description");
         updateDescriptor.name("Updated Name");
         updateDescriptor.iconPath("Updated iconPath");
-        final Profile upDateProfileResult = getProfileAPI().updateProfile(createdProfile.getId(), updateDescriptor);
+        getProfileAPI().updateProfile(createdProfile.getId(), updateDescriptor);
+        final Profile upDateProfileResult = getProfileAPI().getProfile(createdProfile.getId());
         assertEquals("Updated Name", upDateProfileResult.getName());
         assertEquals("Updated description", upDateProfileResult.getDescription());
         assertEquals("Updated iconPath", upDateProfileResult.getIconPath());
