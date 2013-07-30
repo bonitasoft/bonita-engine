@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -94,12 +95,20 @@ public class MemoryLockService implements LockService {
 
         final long before = System.currentTimeMillis();
         locks.get(key).lock();
-        final long after = System.currentTimeMillis();
-        final long time = after - before;
+        final long time = System.currentTimeMillis() - before;
+        final TechnicalLogSeverity severity;
+
         if (time > 50) {
-            System.err.println("SHARED LOCK ON: " + key + " took " + time + "ms. Stack:");
-            Thread.dumpStack();
+            severity = TechnicalLogSeverity.DEBUG;
+        } else if (time > 150) {
+            severity = TechnicalLogSeverity.INFO;
+        } else {
+            severity = null;
+        }
+
+        logger.log(getClass(), severity, "Blocking call to lock " + key + " took " + time + "ms.");
+        if (TechnicalLogSeverity.DEBUG.equals(severity)) {
+            logger.log(getClass(), severity, new Exception("Stack trace lock time for the key " + key));
         }
     }
-
 }
