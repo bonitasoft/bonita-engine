@@ -19,7 +19,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -35,18 +34,15 @@ public class MemoryLockService implements LockService {
 
     private final TechnicalLoggerService logger;
 
-    private final boolean debugEnabled;
-
     public MemoryLockService(final TechnicalLoggerService logger) {
         this.logger = logger;
-        debugEnabled = logger.isLoggable(MemoryLockService.class, TechnicalLogSeverity.DEBUG);
     }
 
     private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
 
     private final Map<String, Long> lockCount = new HashMap<String, Long>();
 
-    private void ensureProcessHasLockObject(final String key) {
+    private void increaseLockCount(final String key) {
         synchronized (lock) {
             long updatedLockCount;
             if (!locks.containsKey(key)) {
@@ -60,22 +56,7 @@ public class MemoryLockService implements LockService {
         }
     }
 
-    private String getKey(final long objectToLockId, final String objectType) throws SLockException {
-        final StringBuilder stb = new StringBuilder();
-        stb.append(objectType);
-        stb.append(SEPARATOR);
-        stb.append(objectToLockId);
-        return stb.toString();
-    }
-
-    @Override
-    public void unlock(final long objectToLockId, final String objectType) throws SLockException {
-        final String key = getKey(objectToLockId, objectType);
-        locks.get(key).unlock();
-        removeFromMapIfPossible(key);
-    }
-
-    private void removeFromMapIfPossible(final String key) {
+    private void decreaseLockCount(final String key) {
         synchronized (lock) {
             if (lockCount.containsKey(key)) {
                 final Long count = lockCount.get(key) - 1;
@@ -88,17 +69,28 @@ public class MemoryLockService implements LockService {
         }
     }
 
+    private String buildKey(final long objectToLockId, final String objectType) throws SLockException {
+        return objectType + SEPARATOR + objectToLockId;
+    }
+
+    @Override
+    public void unlock(final long objectToLockId, final String objectType) throws SLockException {
+        final String key = buildKey(objectToLockId, objectType);
+        locks.get(key).unlock();
+        decreaseLockCount(key);
+    }
+
     @Override
     public boolean tryLock(final long objectToLockId, final String objectType) throws SLockException {
-        final String key = getKey(objectToLockId, objectType);
-        ensureProcessHasLockObject(key);
+        final String key = buildKey(objectToLockId, objectType);
+        increaseLockCount(key);
         return locks.get(key).tryLock();
     }
 
     @Override
-    public void lock(long objectToLockId, String objectType) throws SLockException {
-        final String key = getKey(objectToLockId, objectType);
-        ensureProcessHasLockObject(key);
+    public void lock(final long objectToLockId, final String objectType) throws SLockException {
+        final String key = buildKey(objectToLockId, objectType);
+        increaseLockCount(key);
 
         final long before = System.currentTimeMillis();
         locks.get(key).lock();
