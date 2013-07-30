@@ -235,6 +235,8 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.filter.FilterResult;
+import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
@@ -251,8 +253,10 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.builder.ProcessDefinitionDeployInfoBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
@@ -283,6 +287,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
@@ -639,8 +644,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<ProcessInstance> searchProcessInstancesFromProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId,
-            final int startIndex, final int maxResults) throws SProcessInstanceReadException, STransactionException,
-            SearchException {
+            final int startIndex, final int maxResults) throws SProcessInstanceReadException, STransactionException, SearchException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(startIndex, maxResults);
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
@@ -756,8 +760,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinition processDefinition = ModelConvertor.toProcessDefinition(sProcessDefinition);
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + getUserNameFromSession() + "> has installed process <" +
-                    sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                    "The user <" + getUserNameFromSession() + "> has installed process <" + sProcessDefinition.getName() + "> in version <"
+                            + sProcessDefinition.getVersion() + ">");
         }
         return processDefinition;
     }
@@ -2291,8 +2296,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void assignUserTask(final long userTaskId, final long userId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor;
-        tenantAccessor = getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SCommentService scommentService = tenantAccessor.getCommentService();
@@ -2307,6 +2311,73 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new UpdateException(sainfe);
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
+        }
+    }
+
+    @Override
+    public void updateActorsOfUserTask(final long userTaskId) throws UpdateException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        boolean openTransaction = false;
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        try {
+            openTransaction = transactionExecutor.openTransaction();
+            final SFlowNodeInstance flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(userTaskId);
+            if (!(flowNodeInstance instanceof SHumanTaskInstance)) {
+                throw new UpdateException("The identifier does not refer to a human task");
+            }
+            final SHumanTaskInstance humanTaskInstance = (SHumanTaskInstance) flowNodeInstance;
+            final long processDefinitionId = humanTaskInstance.getLogicalGroup(0);
+            final SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processDefinitionId);
+            final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) processDefinition.getProcessContainer().getFlowNode(
+                    humanTaskInstance.getFlowNodeDefinitionId());
+            if (humanTaskDefinition != null) {
+                final SUserFilterDefinition sUserFilterDefinition = humanTaskDefinition.getSUserFilterDefinition();
+                if (sUserFilterDefinition != null) {
+                    final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+                    // release
+                    if (humanTaskInstance.getAssigneeId() > 0) {
+                        activityInstanceService.assignHumanTask(userTaskId, 0);
+                    }
+                    final String actorName = humanTaskDefinition.getActorName();
+                    final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+                    final UserFilterService userFilterService = tenantAccessor.getUserFilterService();
+                    final BPMInstanceBuilders instanceBuilders = tenantAccessor.getBPMInstanceBuilders();
+                    final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+                    final SExpressionContext expressionContext = new SExpressionContext(humanTaskInstance.getId(),
+                            DataInstanceContainer.ACTIVITY_INSTANCE.name(), humanTaskInstance.getLogicalGroup(0));
+                    final FilterResult result = userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, sUserFilterDefinition.getInputs(),
+                            processClassloader, expressionContext, actorName);
+                    final List<Long> userIds = result.getResult();
+                    if (userIds == null || userIds.isEmpty() || userIds.contains(0l) || userIds.contains(-1l)) {
+                        throw new UpdateException("no user id returned by the user filter " + sUserFilterDefinition + " on activity "
+                                + humanTaskDefinition.getName());
+                    }
+                    for (final Long userId : userIds) {
+                        final SPendingActivityMapping mapping = instanceBuilders.getSPendingActivityMappingBuilder()
+                                .createNewInstanceForUser(humanTaskInstance.getId(), userId).done();
+                        activityInstanceService.addPendingActivityMappings(mapping);
+                    }
+                    if (userIds.size() == 1 && result.shouldAutoAssignTaskIfSingleResult()) {
+                        activityInstanceService.assignHumanTask(humanTaskInstance.getId(), userIds.get(0));
+                    }
+                }
+            }
+            final TechnicalLoggerService technicalLoggerService = tenantAccessor.getTechnicalLoggerService();
+            if (technicalLoggerService.isLoggable(ProcessAPIImpl.class, TechnicalLogSeverity.INFO)) {
+                final StringBuilder builder = new StringBuilder("User '");
+                builder.append(getUserNameFromSession()).append("' has re-executed assignation on activity ").append(humanTaskInstance.getId());
+                builder.append(" of process instance ").append(humanTaskInstance.getLogicalGroup(1)).append(" of process named '")
+                        .append(processDefinition.getName()).append("' in version ").append(processDefinition.getVersion());
+                technicalLoggerService.log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO, builder.toString());
+            }
+        } catch (final SBonitaException sbe) {
+            throw new UpdateException(sbe);
+        } finally {
+            try {
+                transactionExecutor.completeTransaction(openTransaction);
+            } catch (final STransactionException e) {
+                // NTD
+            }
         }
     }
 
@@ -3293,8 +3364,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance startProcess(final long userId, final long processDefinitionId, final List<Operation> operations,
-            final Map<String, Serializable> context)
-            throws ProcessDefinitionNotFoundException, UserNotFoundException, ProcessActivationException, ProcessExecutionException {
+            final Map<String, Serializable> context) throws ProcessDefinitionNotFoundException, UserNotFoundException, ProcessActivationException,
+            ProcessExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -3346,12 +3417,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             if (starterId == getUserIdFromSession()) {
-                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + getUserNameFromSession() + "> has started instance <"
-                        + processInstance.getId() + "> of process <" + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
-            }
-            else {
-                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user with id <" + starterId + "> has started instance <"
-                        + processInstance.getId() + "> of process <" + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+                logger.log(
+                        this.getClass(),
+                        TechnicalLogSeverity.INFO,
+                        "The user <" + getUserNameFromSession() + "> has started instance <" + processInstance.getId() + "> of process <"
+                                + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+            } else {
+                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user with id <" + starterId + "> has started instance <" + processInstance.getId()
+                        + "> of process <" + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
             }
         }
         return processInstance;
@@ -5810,8 +5883,4 @@ public class ProcessAPIImpl implements ProcessAPI {
         return searchArchivedProcessInstances.getResult();
     }
 
-    private ReadPersistenceService getDefinitiveArchiveReadPersistenceService(final TenantServiceAccessor tenantAccessor) {
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        return archiveService.getDefinitiveArchiveReadPersistenceService();
-    }
 }

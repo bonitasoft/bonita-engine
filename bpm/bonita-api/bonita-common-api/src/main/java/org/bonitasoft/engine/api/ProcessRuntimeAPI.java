@@ -254,9 +254,7 @@ public interface ProcessRuntimeAPI {
      *            Identifier of the processDefinition
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance can't be deleted because of a parent that is still active
-     * 
      * @since 6.0
-     * 
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
      *             {@link #deleteArchivedProcessInstances(long, int, int, ProcessInstanceCriterion)}
      */
@@ -604,6 +602,17 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     void assignUserTask(long userTaskId, long userId) throws UpdateException;
+
+    /**
+     * Updates the actors of the user task. It evaluates again the eligible users for that task.
+     * 
+     * @param userTaskId
+     *            the identifier of the user task
+     * @throws UpdateException
+     *             If an exception occurs during the evaluation of actors.
+     * @since 6.1
+     */
+    void updateActorsOfUserTask(long userTaskId) throws UpdateException;
 
     /**
      * Returns all data of a process instance
