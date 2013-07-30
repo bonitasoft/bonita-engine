@@ -46,21 +46,6 @@
 		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />
 	</bean>
 
-	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
-        <property name="shouldStartScheduler" value="true" />
-        <property name="shouldRestartElements" value="true" />
-        <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
-        <property name="cleanInvalidSessionsJobCron" value="${org.bonitasoft.engine.clean.invalid.sessions.cron}" />
-        <property name="shouldStartEventHandlingJob" value="true" />
-        <property name="TenantRestartHandlers" >
-        	<list>
-        		<bean class="org.bonitasoft.engine.restart.RestartTransitionsHandler" />
-        		<bean class="org.bonitasoft.engine.restart.RestartFlowsNodeHandler" />
-        		<bean class="org.bonitasoft.engine.restart.RestartProcessHandler" />
-        	</list>
-        </property>
-	</bean>
-
 	<bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">
 		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean> 
