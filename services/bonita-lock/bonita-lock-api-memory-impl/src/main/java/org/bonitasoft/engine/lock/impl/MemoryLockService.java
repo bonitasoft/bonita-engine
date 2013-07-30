@@ -70,7 +70,13 @@ public class MemoryLockService implements LockService {
         }
     }
 
-    private String buildKey(final long objectToLockId, final String objectType) throws SLockException {
+    Long getLockCount(final long objectToLockId, final String objectType) {
+        synchronized (lock) {
+            return lockCount.get(buildKey(objectToLockId, objectType));
+        }
+    }
+
+    private String buildKey(final long objectToLockId, final String objectType) {
         return objectType + SEPARATOR + objectToLockId;
     }
 
@@ -96,19 +102,24 @@ public class MemoryLockService implements LockService {
         final long before = System.currentTimeMillis();
         locks.get(key).lock();
         final long time = System.currentTimeMillis() - before;
-        final TechnicalLogSeverity severity;
 
-        if (time > 50) {
-            severity = TechnicalLogSeverity.DEBUG;
-        } else if (time > 150) {
-            severity = TechnicalLogSeverity.INFO;
-        } else {
-            severity = null;
+        final TechnicalLogSeverity severity = selectSeverity(time);
+        if (severity != null) {
+            logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
+            if (TechnicalLogSeverity.DEBUG.equals(severity)) {
+                logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
+            }
         }
+    }
 
-        logger.log(getClass(), severity, "Blocking call to lock " + key + " took " + time + "ms.");
-        if (TechnicalLogSeverity.DEBUG.equals(severity)) {
-            logger.log(getClass(), severity, new Exception("Stack trace lock time for the key " + key));
+    TechnicalLogSeverity selectSeverity(final long time) {
+        if (time > 150) {
+            return TechnicalLogSeverity.INFO;
+        } else if (time > 50) {
+            return TechnicalLogSeverity.DEBUG;
+        } else {
+            // No need to log anything
+            return null;
         }
     }
 }
