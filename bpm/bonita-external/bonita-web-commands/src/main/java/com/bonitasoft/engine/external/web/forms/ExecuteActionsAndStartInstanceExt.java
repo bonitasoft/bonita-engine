@@ -22,7 +22,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -115,7 +114,6 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             CreationException,
             RetrieveException, ProcessDefinitionNotEnabledException, OperationExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
@@ -130,7 +128,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessDefinition sDefinition;
         try {
             final GetProcessDeploymentInfo transactionContentWithResult = new GetProcessDeploymentInfo(processDefinitionId, processDefinitionService);
-            transactionExecutor.execute(transactionContentWithResult);
+            transactionContentWithResult.execute();
             final SProcessDefinitionDeployInfo deployInfo = transactionContentWithResult.getResult();
             if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
                 throw new ProcessDefinitionNotEnabledException(deployInfo.getName(), deployInfo.getVersion(), deployInfo.getProcessId());

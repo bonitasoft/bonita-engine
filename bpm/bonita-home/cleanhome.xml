@@ -40,10 +40,6 @@
 		<copy todir="${basedir}/target/home" overwrite="true">
 			<fileset dir="${basedir}/hibernate" excludes="**/.svn" />
 		</copy>
-		<echo>Copy specific "SP Performance edition" configuration files</echo>
-		<copy todir="${basedir}/target/home" overwrite="true">
-			<fileset dir="${basedir}/editions/performance" excludes="**/.svn" />
-		</copy>
 		<echo>Copy license file from your $HOME/lic folder</echo>
 		<copy todir="${basedir}/target/home/server/licenses" failonerror="true">
 			<fileset dir="${user.home}/lic" includes="*.lic" />

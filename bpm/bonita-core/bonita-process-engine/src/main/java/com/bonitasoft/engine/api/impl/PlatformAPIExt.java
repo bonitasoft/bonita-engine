@@ -169,10 +169,20 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         // 1 tx to create content and default tenant
         super.initializePlatform();
+        TransactionService transactionService = platformAccessor.getTransactionService();
         final long tenantId;
         try {
-            tenantId = getDefaultTenant().getId();
+            tenantId = transactionService.executeInTransaction(new Callable<Long>() {
+
+                @Override
+                public Long call() throws Exception {
+                    return getDefaultTenant().getId();
+                }
+            });
+
         } catch (TenantNotFoundException e) {
+            throw new CreationException(e);
+        } catch (Exception e) {
             throw new CreationException(e);
         }
         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
@@ -183,7 +193,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final SessionService sessionService = platformAccessor.getSessionService();
             final SSession session = sessionService.createSession(tenantId, -1L, "dummy", true);
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
-            final TransactionService transactionService = platformAccessor.getTransactionService();
 
             // This part is specific to SP: reporting.
             transactionService.executeInTransaction(new Callable<Void>() {
@@ -377,6 +386,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void deleteTenant(final long tenantId) throws DeletionException {
         PlatformServiceAccessor platformAccessor = null;
         try {
@@ -418,7 +428,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 throw new TenantActivationException("Tenant already activated.");
             }
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final WorkService workService = platformAccessor.getWorkService();
@@ -428,7 +437,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
                     platformAccessor.getTechnicalLoggerService(), workService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
@@ -469,12 +478,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final WorkService workService = platformAccessor.getWorkService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
@@ -497,7 +505,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         try {
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final STenantBuilder tenantBuilder = platformAccessor.getSTenantBuilder();
             String field = null;
             OrderByType order = null;
@@ -543,7 +550,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final OrderByType orderContent = order;
             final TransactionContentWithResult<List<STenant>> transactionContent = new GetTenantsWithOrder(platformService, startIndex, maxResults,
                     orderContent, fieldContent);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             final List<STenant> tenants = transactionContent.getResult();
             return SPModelConvertor.toTenants(tenants);
         } catch (final SBonitaException e) {
@@ -558,9 +565,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final GetTenantInstance transactionContent = new GetTenantInstance(tenantName, platformService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return SPModelConvertor.toTenant(transactionContent.getResult());
         } catch (final STenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
@@ -580,9 +586,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final GetDefaultTenantInstance transactionContent = new GetDefaultTenantInstance(platformService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return SPModelConvertor.toTenant(transactionContent.getResult());
         } catch (final SBonitaException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
@@ -599,9 +604,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final GetTenantInstance transactionContent = new GetTenantInstance(tenantId, platformService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return SPModelConvertor.toTenant(transactionContent.getResult());
         } catch (final STenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
@@ -625,9 +629,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         try {
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             final TransactionContentWithResult<Integer> transactionContent = new GetNumberOfTenants(platformService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return transactionContent.getResult();
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -646,7 +649,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new BonitaRuntimeException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
         // check existence for tenant
         Tenant tenant;
         try {
@@ -661,7 +663,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             // update tenant in database
             final EntityUpdateDescriptor changeDescriptor = getTenantUpdateDescriptor(udpater);
             final UpdateTenant updateTenant = new UpdateTenant(tenant.getId(), changeDescriptor, platformService);
-            transactionExecutor.execute(updateTenant);
+            updateTenant.execute();
             return getTenantById(tenantId);
         } catch (final TenantNotFoundException e) {
             throw new UpdateException(e);
@@ -723,12 +725,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
         final PlatformService platformService = platformAccessor.getPlatformService();
         final SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor = platformAccessor.getSearchPlatformEntitiesDescriptor();
         final SearchTenants searchTenants = new SearchTenants(platformService, searchPlatformEntitiesDescriptor.getSearchTenantDescriptor(), searchOptions);
         try {
-            transactionExecutor.execute(searchTenants);
+            searchTenants.execute();
             return searchTenants.getResult();
         } catch (final SBonitaException sbe) {
             throw new BonitaRuntimeException(sbe);
