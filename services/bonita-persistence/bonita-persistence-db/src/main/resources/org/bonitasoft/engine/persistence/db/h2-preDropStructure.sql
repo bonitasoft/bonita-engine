@@ -42,6 +42,8 @@ ALTER TABLE waiting_event DROP CONSTRAINT fk_waiting_event_tenantId;
 
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId;
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId;
+-- ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_process_instanceId;
+
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------

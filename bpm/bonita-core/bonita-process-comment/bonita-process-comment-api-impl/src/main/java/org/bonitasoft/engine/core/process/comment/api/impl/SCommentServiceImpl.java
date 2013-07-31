@@ -17,7 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentDeletionException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
@@ -25,6 +27,7 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
+import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommmentLogBuilder;
@@ -33,6 +36,9 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -60,6 +66,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * @author Hongwen Zang
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SCommentServiceImpl implements SCommentService {
 
@@ -87,9 +94,12 @@ public class SCommentServiceImpl implements SCommentService {
 
     private final EventService eventService;
 
+    private final ArchiveService archiveService;
+
     public SCommentServiceImpl(final SCommentBuilders commentBuilders, final Recorder recorder, final SEventBuilders eventBuilders,
-            final ReadPersistenceService persistenceService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
-            final Map<SystemCommentType, Boolean> systemCommentType, final QueriableLoggerService queriableLoggerService, final EventService eventService) {
+            final ReadPersistenceService persistenceService, final ArchiveService archiveService, final SessionService sessionService,
+            final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType,
+            final QueriableLoggerService queriableLoggerService, final EventService eventService) {
         super();
         this.commentBuilders = commentBuilders;
         this.recorder = recorder;
@@ -100,6 +110,7 @@ public class SCommentServiceImpl implements SCommentService {
         this.systemCommentType = systemCommentType;
         this.queriableLoggerService = queriableLoggerService;
         this.eventService = eventService;
+        this.archiveService = archiveService;
     }
 
     private SInsertEvent getInsertEvent(final Object obj) {
@@ -197,6 +208,14 @@ public class SCommentServiceImpl implements SCommentService {
         }
     }
 
+    @Override
+    public void deleteComments(final long processInstanceId) throws SBonitaException {
+        final List<SComment> sComments = getComments(processInstanceId);
+        for (final SComment sComment : sComments) {
+            delete(sComment);
+        }
+    }
+
     private long getUserId() throws SSessionNotFoundException, SessionIdNotSetException {
         final SSession session = sessionService.getSession(sessionAccessor.getSessionId());
         return session.getUserId();
@@ -263,7 +282,8 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
-    public long getNumberOfArchivedComments(final QueryOptions searchOptions, final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public long getNumberOfArchivedComments(final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.getNumberOfEntities(SAComment.class, searchOptions, null);
         } catch (final SBonitaReadException e) {
@@ -272,8 +292,8 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
-    public List<SAComment> searchArchivedComments(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
+    public List<SAComment> searchArchivedComments(final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.searchEntity(SAComment.class, searchOptions, null);
         } catch (final SBonitaReadException e) {
@@ -322,13 +342,31 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
-    public SAComment getArchivedComment(final long archivedCommentId, final ReadPersistenceService persistenceService) throws SCommentNotFoundException,
-            SBonitaReadException {
+    public SAComment getArchivedComment(final long archivedCommentId) throws SCommentNotFoundException, SBonitaReadException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SAComment selectById = persistenceService.selectById(new SelectByIdDescriptor<SAComment>("getArchivedCommentById", SAComment.class,
                 archivedCommentId));
         if (selectById == null) {
             throw new SCommentNotFoundException("Archived comment not found with id=" + archivedCommentId);
         }
         return selectById;
+    }
+
+    @Override
+    public void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
+        final SACommentBuilder archCommentKeyProvider = commentBuilders.getSACommentBuilder();
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, archCommentKeyProvider.getProcessInstanceIdKey(),
+                processInstanceId));
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, archCommentKeyProvider.getIdKey(),
+                OrderByType.ASC));
+        List<SAComment> searchArchivedComments = null;
+        // fromIndex always will be zero because the elements will be deleted
+        final QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions, filters, null);
+        do {
+            searchArchivedComments = searchArchivedComments(queryOptions);
+            for (final SAComment saComment : searchArchivedComments) {
+                archiveService.recordDelete(new DeleteRecord(saComment), null);
+            }
+        } while (!searchArchivedComments.isEmpty());
     }
 }

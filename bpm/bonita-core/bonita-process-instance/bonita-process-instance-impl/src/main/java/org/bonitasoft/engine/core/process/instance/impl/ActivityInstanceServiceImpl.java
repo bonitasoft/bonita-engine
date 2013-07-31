@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
@@ -112,10 +113,14 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger) {
+    private final ArchiveService archiveService;
+
+    public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final ArchiveService archiveService,
+            final EventService eventService, final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService,
+            final TechnicalLoggerService logger) {
         super(recorder, persistenceRead, eventService, instanceBuilders, queriableLoggerService, logger);
         this.queriableLoggerService = queriableLoggerService;
+        this.archiveService = archiveService;
         activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
         multiInstanceActivityInstanceKeyProvider = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
     }
@@ -311,8 +316,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final ReadPersistenceService persistenceService)
-            throws SActivityReadException, SActivityInstanceNotFoundException {
+    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId) throws SActivityReadException, SActivityInstanceNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SelectListDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityId(activityInstanceId);
         try {
             final List<SAActivityInstance> activities = persistenceService.selectList(descriptor);
@@ -326,8 +331,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public List<SAActivityInstance> getArchivedActivityInstances(final long rootContainerId, final ReadPersistenceService persistenceService,
-            final QueryOptions queryOptions) throws SActivityReadException {
+    public List<SAActivityInstance> getArchivedActivityInstances(final long rootContainerId, final QueryOptions queryOptions) throws SActivityReadException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final List<SAActivityInstance> activities = persistenceService.selectList(SelectDescriptorBuilder.getArchivedActivitiesFromProcessInstance(
                     rootContainerId, queryOptions));
@@ -442,8 +447,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final int stateId, final ReadPersistenceService persistenceService)
-            throws SActivityReadException, SActivityInstanceNotFoundException {
+    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final int stateId) throws SActivityReadException,
+            SActivityInstanceNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         SAActivityInstance selectOne;
         try {
             selectOne = persistenceService.selectOne(SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityIdAndStateId(activityInstanceId, stateId));
@@ -457,8 +463,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public long getNumberOfArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
+    public long getNumberOfArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
             return persistenceService.getNumberOfEntities(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
@@ -468,11 +474,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public List<SAHumanTaskInstance> searchArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public List<SAHumanTaskInstance> searchArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
-            return getPersistenceRead().searchEntity(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
+            return persistenceService.searchEntity(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaSearchException(bre);
         }
@@ -537,8 +543,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public List<SAHumanTaskInstance> searchArchivedTasks(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
+    public List<SAHumanTaskInstance> searchArchivedTasks(final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.searchEntity(SAHumanTaskInstance.class, searchOptions, null);
         } catch (final SBonitaReadException e) {
@@ -547,7 +553,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public long getNumberOfArchivedTasks(final QueryOptions searchOptions, final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public long getNumberOfArchivedTasks(final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.getNumberOfEntities(SAHumanTaskInstance.class, searchOptions, null);
         } catch (final SBonitaReadException bre) {
@@ -791,8 +798,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public long getNumberOfArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public long getNumberOfArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.getNumberOfEntities(entityClass, searchOptions, null);
         } catch (final SBonitaReadException e) {
@@ -802,8 +810,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<SAActivityInstance> searchArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public List<SAActivityInstance> searchArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return (List<SAActivityInstance>) persistenceService.searchEntity(entityClass, searchOptions, null);
         } catch (final SBonitaReadException e) {

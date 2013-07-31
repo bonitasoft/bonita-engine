@@ -20,8 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -35,8 +36,11 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
+import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -53,6 +57,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -104,6 +109,24 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         return logBuilder;
     }
 
+    private SFlowNodeInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SAFlowNodeInstance activityInstance) {
+        final SFlowNodeInstanceLogBuilder logBuilder = instanceBuilders.getActivityInstanceLogBuilder();
+        initializeLogBuilder(logBuilder, message);
+        updateLog(actionType, logBuilder);
+        logBuilder.processInstanceId(activityInstance.getRootContainerId());
+        return logBuilder;
+    }
+
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+        logBuilder.actionScope(String.valueOf(objectId));
+        logBuilder.actionStatus(sQueriableLogStatus);
+        logBuilder.objectId(objectId);
+        final SQueriableLog log = logBuilder.done();
+        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
+            queriableLoggerService.log(getClass().getName(), callerMethodName, log);
+        }
+    }
+
     @Override
     public void setState(final SFlowNodeInstance flowNodeInstance, final FlowNodeState state) throws SFlowNodeModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
@@ -126,7 +149,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -153,7 +177,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -208,7 +233,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(flowNodeInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+                .setObject(flowNodeInstance)
                 .done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -227,7 +253,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
             final SelectListDescriptor<SFlowNodeInstance> selectListDescriptor = SelectDescriptorBuilder.getActiveFlowNodes(rootContainerId);
             return persistenceRead.selectList(selectListDescriptor);
         } catch (final SBonitaReadException bre) {
-            throw new SActivityReadException(bre);
+            // TODO log the exception
+            throw new SFlowNodeReadException(bre);
         }
     }
 
@@ -235,7 +262,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public SFlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException {
         SFlowNodeInstance selectOne;
         try {
-            selectOne = persistenceRead.selectById(SelectDescriptorBuilder.getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
+            selectOne = persistenceRead.selectById(SelectDescriptorBuilder
+                    .getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
@@ -409,13 +437,39 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         return logger;
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(getClass().getName(), callerMethodName, log);
+    @Override
+    public void deleteFlowNodeInstance(final SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException {
+        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting flow node instance", sFlowNodeInstance);
+        try {
+            final DeleteRecord deleteRecord = new DeleteRecord(sFlowNodeInstance);
+            SDeleteEvent deleteEvent = null;
+            if (eventService.hasHandlers(FLOWNODE_INSTANCE, EventActionType.DELETED)) {
+                final SEventBuilder eventBuilder = eventService.getEventBuilder();
+                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(FLOWNODE_INSTANCE).setObject(sFlowNodeInstance).done();
+            }
+            recorder.recordDelete(deleteRecord, deleteEvent);
+            initiateLogBuilder(sFlowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteFlowNodeInstance");
+        } catch (final SBonitaException e) {
+            initiateLogBuilder(sFlowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteFlowNodeInstance");
+            throw new SFlowNodeDeletionException(e);
+        }
+    }
+
+    @Override
+    public void deleteArchivedFlowNodeInstance(final SAFlowNodeInstance saFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException {
+        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting archived flow node instance", saFlowNodeInstance);
+        final DeleteRecord deleteRecord = new DeleteRecord(saFlowNodeInstance);
+        SDeleteEvent deleteEvent = null;
+        if (eventService.hasHandlers(ARCHIVED_FLOWNODE_INSTANCE, EventActionType.DELETED)) {
+            final SEventBuilder eventBuilder = eventService.getEventBuilder();
+            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(ARCHIVED_FLOWNODE_INSTANCE).setObject(saFlowNodeInstance).done();
+        }
+        try {
+            recorder.recordDelete(deleteRecord, deleteEvent);
+            initiateLogBuilder(saFlowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteArchivedFlowNodeInstance");
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(saFlowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteArchivedFlowNodeInstance");
+            throw new SFlowNodeDeletionException(e);
         }
     }
 

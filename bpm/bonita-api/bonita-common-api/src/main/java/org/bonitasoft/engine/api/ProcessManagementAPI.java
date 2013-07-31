@@ -1558,7 +1558,7 @@ public interface ProcessManagementAPI {
      * @since 6.1
      */
     void deleteProcessDefinition(long processId) throws DeletionException;
-    
+
     /**
      * Deletes process definitions by giving their identifiers. If any speciofied identifier does not refer to a real process definition, or if an exception
      * occurs, no process definition is deleted. All instances of given processes must be deleted prior to calling this operation.
@@ -1571,7 +1571,7 @@ public interface ProcessManagementAPI {
      * @since 6.1
      */
     void deleteProcessDefinitions(List<Long> processIds) throws DeletionException;
-    
+
     /**
      * Disables and deletes the process.
      * 

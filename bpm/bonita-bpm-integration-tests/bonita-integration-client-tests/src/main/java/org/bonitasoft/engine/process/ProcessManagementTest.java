@@ -9,6 +9,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1600,6 +1601,31 @@ public class ProcessManagementTest extends CommonAPITest {
         return new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
                 .addDescription("Delivery all day and night long").addUserTask("step1", ACTOR_NAME)
                 .addShortTextData("dataName", new ExpressionBuilder().createConstantStringExpression("beforeUpdate")).getProcess();
+    }
+
+    @Cover(jira = "ENGINE-1601", classes = { DataInstance.class, ProcessInstance.class }, concept = BPMNConcept.DATA, keywords = { "initilize process data" })
+    @Test
+    public void startProcessUsingInitialVariableValues() throws Exception {
+        final User jack = createUserAndLogin(USERNAME, USERNAME);
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");
+        processBuilder.addActor(ACTOR_NAME).addDescription("Process to test archiving mechanism");
+        processBuilder.addDoubleData("D", new ExpressionBuilder().createConstantDoubleExpression(3.14));
+        processBuilder.addData("bigD", BigDecimal.class.getName(), null);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, jack);
+
+        final Map<String, Serializable> variables = new HashMap<String, Serializable>();
+        variables.put("bigD", new BigDecimal("3.141592653589793"));
+        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId(), variables);
+
+        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("bigD", instance.getId());
+        assertEquals(new BigDecimal("3.141592653589793"), dataInstance.getValue());
+        dataInstance = getProcessAPI().getProcessDataInstance("D", instance.getId());
+        assertEquals(Double.valueOf(3.14), dataInstance.getValue());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(jack.getId());
     }
 
 }

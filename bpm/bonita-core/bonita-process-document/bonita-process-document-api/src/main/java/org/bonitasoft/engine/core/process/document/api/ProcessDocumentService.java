@@ -24,7 +24,6 @@ import org.bonitasoft.engine.document.SDocumentException;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 /**
@@ -159,13 +158,10 @@ public interface ProcessDocumentService {
      *            name of document
      * @param time
      *            the archived time of document
-     * @param readPersistenceService
-     *            used to retrieve archived document
      * @return an SProcessDocument object archived in the specific time or not archived
      * @throws SDocumentNotFoundException
      */
-    SProcessDocument getDocument(long processInstanceId, String documentName, long time, ReadPersistenceService readPersistenceService)
-            throws SDocumentNotFoundException;
+    SProcessDocument getDocument(long processInstanceId, String documentName, long time) throws SDocumentNotFoundException;
 
     /**
      * Get total number of document according to the query criteria
@@ -216,24 +212,20 @@ public interface ProcessDocumentService {
      * 
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @param persistenceService
-     *            used to do retrieve
      * @return number of archived documents
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedDocuments(QueryOptions queryOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    long getNumberOfArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived documents according to the query criteria.
      * 
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @param persistenceService
-     *            used to do retrieve
      * @return a list of SAProcessDocument objects
      * @throws SBonitaSearchException
      */
-    List<SAProcessDocument> searchArchivedDocuments(QueryOptions queryOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    List<SAProcessDocument> searchArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of archived documents for the specific supervisor
@@ -242,13 +234,10 @@ public interface ProcessDocumentService {
      *            identifier of supervisor user
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @param persistenceService
-     *            used to do retrieve
      * @return number of archived documents for the specific supervisor
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    long getNumberOfArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived documents for the specific supervisor
@@ -257,39 +246,32 @@ public interface ProcessDocumentService {
      *            identifier of supervisor user
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @param persistenceService
-     *            used to do retrieve
      * @return a list of SAProcessDocument objects
      * @throws SBonitaSearchException
      */
-    List<SAProcessDocument> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    List<SAProcessDocument> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get the archived version corresponding to a document
      * 
      * @param documentId
      *            identifier of process document
-     * @param persistenceService
-     *            used to do retrieve
      * @return the archive of the corresponding document
      * @throws SDocumentNotFoundException
      *             when the document does not exist
      */
-    SAProcessDocument getArchivedVersionOfProcessDocument(long documentId, ReadPersistenceService persistenceService) throws SDocumentNotFoundException;
+    SAProcessDocument getArchivedVersionOfProcessDocument(long documentId) throws SDocumentNotFoundException;
 
     /**
      * Retrieve an archived document
      * 
      * @param archivedProcessDocumentId
      *            the id of the archived document
-     * @param persistenceService
-     *            the persistence service to use
      * @return the corresponding archive
      * @throws SDocumentNotFoundException
      *             when the archive does not exist
      */
-    SAProcessDocument getArchivedDocument(long archivedProcessDocumentId, ReadPersistenceService persistenceService) throws SDocumentNotFoundException;
+    SAProcessDocument getArchivedDocument(long archivedProcessDocumentId) throws SDocumentNotFoundException;
 
     /**
      * Remove documents
@@ -308,11 +290,21 @@ public interface ProcessDocumentService {
     void removeDocument(SProcessDocument sProcessDocument) throws SProcessDocumentDeletionException;
 
     /**
+     * Delete documents from a specified process instance
+     * 
+     * @param processInstanceId
+     * @throws SDocumentException
+     * @throws SProcessDocumentDeletionException
+     * @since 6.1
+     */
+    void deleteDocumentsFromProcessInstance(final Long processInstanceId) throws SDocumentException, SProcessDocumentDeletionException;
+
+    /**
      * 
      * @param instanceId
      * @throws SDocumentMappingDeletionException
      * @since 6.0
      */
-    void deleteArchivedDocuments(long instanceId, ReadPersistenceService persistenceService) throws SDocumentMappingDeletionException;
+    void deleteArchivedDocuments(long instanceId) throws SDocumentMappingDeletionException;
 
 }

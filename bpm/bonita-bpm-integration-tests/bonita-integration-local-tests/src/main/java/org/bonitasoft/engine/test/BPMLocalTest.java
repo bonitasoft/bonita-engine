@@ -232,7 +232,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
             @Override
             public void execute() throws SBonitaException {
-                numberOfTransitionInstances = commentService.getNumberOfArchivedComments(QueryOptions.defaultQueryOptions(), persistenceService);
+                numberOfTransitionInstances = commentService.getNumberOfArchivedComments(QueryOptions.defaultQueryOptions());
             }
 
             @Override

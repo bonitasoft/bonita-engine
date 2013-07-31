@@ -288,4 +288,15 @@ public class TransitionServiceImpl implements TransitionService {
             throw new STransitionDeletionException(e);
         }
     }
+
+    @Override
+    public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, STransitionReadException {
+        List<SATransitionInstance> transitionInstances;
+        do {
+            transitionInstances = getArchivedTransitionOfProcessInstance(processInstanceId, 0, 100);
+            for (final SATransitionInstance saTransitionInstance : transitionInstances) {
+                delete(saTransitionInstance);
+            }
+        } while (!transitionInstances.isEmpty());
+    }
 }

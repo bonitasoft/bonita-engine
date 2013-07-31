@@ -31,6 +31,8 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
+import org.bonitasoft.engine.bpm.comment.ArchivedComment;
+import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -569,8 +571,19 @@ public class APITestUtil {
     }
 
     protected void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
-        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 1000);
-        getProcessAPI().disableAndDelete(processDefinitionId);
+        // Delete all process instances
+        long nbDeletedProcessInstances;
+        do {
+            nbDeletedProcessInstances = getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 100);
+        } while (nbDeletedProcessInstances > 0);
+
+        // Delete all archived process instances
+        long nbDeletedArchivedProcessInstances;
+        do {
+            nbDeletedArchivedProcessInstances = getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 100);
+        } while (nbDeletedArchivedProcessInstances > 0);
+
+        getProcessAPI().disableAndDeleteProcessDefinition(processDefinitionId);
     }
 
     protected void disableAndDeleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
@@ -581,6 +594,23 @@ public class APITestUtil {
         if (processDefinitions != null) {
             for (final ProcessDefinition processDefinition : processDefinitions) {
                 disableAndDeleteProcess(processDefinition);
+            }
+        }
+    }
+
+    protected void deleteProcessInstanceAndArchived(final long processDefinitionId) throws BonitaException {
+        getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 1000);
+        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 1000);
+    }
+
+    protected void deleteProcessInstanceAndArchived(final ProcessDefinition... processDefinitions) throws BonitaException {
+        deleteProcessInstanceAndArchived(Arrays.asList(processDefinitions));
+    }
+
+    protected void deleteProcessInstanceAndArchived(final List<ProcessDefinition> processDefinitions) throws BonitaException {
+        if (processDefinitions != null) {
+            for (final ProcessDefinition processDefinition : processDefinitions) {
+                deleteProcessInstanceAndArchived(processDefinition.getId());
             }
         }
     }
@@ -1288,12 +1318,57 @@ public class APITestUtil {
     public List<String> checkExistenceOfFlowNodes() throws SearchException {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
-        final SearchResult<FlowNodeInstance> searchEvents = getProcessAPI().searchFlowNodeInstances(build.done());
-        final List<FlowNodeInstance> events = searchEvents.getResult();
-        if (searchEvents.getCount() > 0) {
+        final SearchResult<FlowNodeInstance> searchResult = getProcessAPI().searchFlowNodeInstances(build.done());
+        final List<FlowNodeInstance> flowNodeInstances = searchResult.getResult();
+        if (searchResult.getCount() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("FlowNodes are still present: ");
-            for (final FlowNodeInstance event : events) {
-                messageBuilder.append(event.getName()).append(", ");
+            for (final FlowNodeInstance flowNodeInstance : flowNodeInstances) {
+                messageBuilder.append(flowNodeInstance.getName()).append(", ");
+            }
+            messages.add(messageBuilder.toString());
+        }
+        return messages;
+    }
+
+    public List<String> checkExistenceOfArchivedFlowNodes() throws SearchException {
+        final List<String> messages = new ArrayList<String>();
+        final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
+        final SearchResult<ArchivedFlowNodeInstance> searchResult = getProcessAPI().searchArchivedFlowNodeInstances(build.done());
+        final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = searchResult.getResult();
+        if (searchResult.getCount() > 0) {
+            final StringBuilder messageBuilder = new StringBuilder("Archived flowNodes are still present: ");
+            for (final ArchivedFlowNodeInstance archivedFlowNodeInstance : archivedFlowNodeInstances) {
+                messageBuilder.append(archivedFlowNodeInstance.getName()).append(", ");
+            }
+            messages.add(messageBuilder.toString());
+        }
+        return messages;
+    }
+
+    public List<String> checkExistenceOfComments() throws SearchException {
+        final List<String> messages = new ArrayList<String>();
+        final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
+        final SearchResult<Comment> searchResult = getProcessAPI().searchComments(build.done());
+        final List<Comment> comments = searchResult.getResult();
+        if (searchResult.getCount() > 0) {
+            final StringBuilder messageBuilder = new StringBuilder("Comments are still present: ");
+            for (final Comment comment : comments) {
+                messageBuilder.append(comment.getContent()).append(", ");
+            }
+            messages.add(messageBuilder.toString());
+        }
+        return messages;
+    }
+
+    public List<String> checkExistenceOfArchivedComments() throws SearchException {
+        final List<String> messages = new ArrayList<String>();
+        final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
+        final SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(build.done());
+        final List<ArchivedComment> archivedComments = searchResult.getResult();
+        if (searchResult.getCount() > 0) {
+            final StringBuilder messageBuilder = new StringBuilder("Archived comments are still present: ");
+            for (final ArchivedComment archivedComment : archivedComments) {
+                messageBuilder.append(archivedComment.getName()).append(", ");
             }
             messages.add(messageBuilder.toString());
         }

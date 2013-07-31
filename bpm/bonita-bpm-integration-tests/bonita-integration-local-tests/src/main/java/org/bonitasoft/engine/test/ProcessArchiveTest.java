@@ -198,7 +198,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         transactionService.begin();
         assertEquals(3, commentService.getNumberOfComments(null));
-        assertEquals(0, commentService.getNumberOfArchivedComments(null, archiveService.getDefinitiveArchiveReadPersistenceService()));
+        assertEquals(0, commentService.getNumberOfArchivedComments(null));
         transactionService.complete();
         assignAndExecuteStep(step1, john.getId());
         waitForUserTaskAndExecuteIt("step1", p2, john.getId());
@@ -212,7 +212,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         transactionService.begin();
         assertEquals(0, commentService.getNumberOfComments(null));
         // 3 comments + 3 system comments
-        assertEquals(6, commentService.getNumberOfArchivedComments(null, archiveService.getDefinitiveArchiveReadPersistenceService()));
+        assertEquals(6, commentService.getNumberOfArchivedComments(null));
         transactionService.complete();
         disableAndDeleteProcess(processDefinition);
         assertEquals(initialNumberOfArchivedProcessInstance, getProcessAPI().getNumberOfArchivedProcessInstances());
@@ -220,7 +220,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         transactionService.begin();
         assertEquals(0, commentService.getNumberOfComments(null));
-        assertEquals(0, commentService.getNumberOfArchivedComments(null, archiveService.getDefinitiveArchiveReadPersistenceService()));
+        assertEquals(0, commentService.getNumberOfArchivedComments(null));
         transactionService.complete();
         cleanSession();
     }

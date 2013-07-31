@@ -88,7 +88,8 @@ public interface ConnectorInstanceService {
      * @param connectorId
      * @return
      * @throws SConnectorInstanceReadException
-     * @throws SConnectorInstanceNotFoundException TODO
+     * @throws SConnectorInstanceNotFoundException
+     *             TODO
      */
     SConnectorInstance getConnectorInstance(long connectorId) throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException;
 
@@ -162,5 +163,25 @@ public interface ConnectorInstanceService {
      * @throws SConnectorInstanceDeletionException
      */
     void deleteArchivedConnectorInstance(SAConnectorInstance sConnectorInstance) throws SConnectorInstanceDeletionException;
+
+    /**
+     * 
+     * @param containerId
+     * @param containerType
+     * @throws SBonitaSearchException
+     * @throws SConnectorInstanceDeletionException
+     * @since 6.1
+     */
+    void deleteConnectors(long containerId, String containerType) throws SBonitaSearchException, SConnectorInstanceDeletionException;
+
+    /**
+     * 
+     * @param containerId
+     * @param containerType
+     * @throws SBonitaSearchException
+     * @throws SConnectorInstanceDeletionException
+     * @since 6.1
+     */
+    void deleteArchivedConnectorInstances(long containerId, String containerType) throws SBonitaSearchException, SConnectorInstanceDeletionException;
 
 }
