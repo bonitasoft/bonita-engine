@@ -15,7 +15,7 @@ CREATE TABLE data_instance (
 	booleanValue BOOLEAN,
 	doubleValue NUMERIC(19,5),
 	floatValue REAL,
-	blobValue BLOB,
+	blobValue MEDIUMBLOB,
 	clobValue CLOB,
 	discriminant VARCHAR(50) NOT NULL,
 	PRIMARY KEY (tenantid, id)

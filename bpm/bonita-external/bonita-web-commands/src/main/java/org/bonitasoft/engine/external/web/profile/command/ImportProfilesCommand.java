@@ -27,10 +27,14 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.SValidationException;
 import org.bonitasoft.engine.xml.SXMLParseException;
@@ -79,7 +83,7 @@ public class ImportProfilesCommand extends TenantCommand {
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }
-        final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles);
+        final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, getUserIdFromSession());
         try {
             transactionExecutor.execute(importProfiles);
         } catch (final SBonitaException e) {
@@ -104,6 +108,20 @@ public class ImportProfilesCommand extends TenantCommand {
         } finally {
             reader.close();
         }
+    }
+
+    private long getUserIdFromSession() {
+        SessionAccessor sessionAccessor;
+        long userId;
+        try {
+            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final long sessionId = sessionAccessor.getSessionId();
+            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            userId = platformServiceAccessor.getSessionService().getSession(sessionId).getUserId();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+        return userId;
     }
 
 }

@@ -19,8 +19,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
@@ -37,17 +36,14 @@ public class GetStartedArchivedProcessInstance implements TransactionContentWith
 
     private final long processInstanceId;
 
-    private final ReadPersistenceService readPersistenceService;
-
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
 
     private ArchivedProcessInstance archivedProcessInstance;
 
-    public GetStartedArchivedProcessInstance(final ProcessInstanceService processInstanceService, final ReadPersistenceService readPersistenceService,
-            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId) {
+    public GetStartedArchivedProcessInstance(final ProcessInstanceService processInstanceService, final SearchEntitiesDescriptor searchEntitiesDescriptor,
+            final long processInstanceId) {
         this.processInstanceService = processInstanceService;
         this.processInstanceId = processInstanceId;
-        this.readPersistenceService = readPersistenceService;
         this.searchEntitiesDescriptor = searchEntitiesDescriptor;
     }
 
@@ -58,13 +54,13 @@ public class GetStartedArchivedProcessInstance implements TransactionContentWith
         searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
         searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID, ProcessInstanceState.STARTED.getId());
         final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptionsBuilder.done(), readPersistenceService);
+                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
 
         try {
             archivedProcessInstance = searchArchivedProcessInstances.getResult().getResult().get(0);
         } catch (final IndexOutOfBoundsException e) {
-            throw new SProcessInstanceNotFoundException(processInstanceId);
+            throw new SAProcessInstanceNotFoundException(processInstanceId, ProcessInstanceState.STARTED.name());
         }
     }
 

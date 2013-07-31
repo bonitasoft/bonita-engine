@@ -114,8 +114,8 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             throw new SGatewayCreationException(e);
         }
 
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Created gateway instance <" + gatewayInstance.getName() + "> with id <"
-                + gatewayInstance.getId() + ">");
+        logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+                "Created gateway instance <" + gatewayInstance.getName() + "> with id <" + gatewayInstance.getId() + ">");
     }
 
     @Override
@@ -160,22 +160,20 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SProcessDefinitionNotFoundException,
             SProcessDefinitionReadException {
-        boolean ret;
         final List<String> hitsBy = getHitByTransitionList(gatewayInstance);
         final List<STransitionDefinition> trans = getTransitionDefinitions(gatewayInstance, sDefinition);
-        ret = true;
-        for (final STransitionDefinition sTransitionDefinition : trans) {
-            ret = hitsBy.contains(sTransitionDefinition.getName());
-            if (!ret) {
-                break;
-            }
+        boolean go = true;
+        int i = 1;
+        while (go && i <= trans.size()) {
+            go = hitsBy.contains(String.valueOf(i));
+            i++;
         }
-        return ret;
+        return go;
     }
 
     /**
      * @return
-     *         the list of transition name that hit the gateway
+     *         the list of transition indexes that hit the gateway
      */
     private List<String> getHitByTransitionList(final SGatewayInstance gatewayInstance) {
         return Arrays.asList(gatewayInstance.getHitBys().split(","));
@@ -194,16 +192,14 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     @Override
-    public void hitTransition(final SGatewayInstance gatewayInstance, final String transitionDefinitionName) throws SGatewayModificationException,
+    public void hitTransition(final SGatewayInstance gatewayInstance, final long transitionIndex) throws SGatewayModificationException,
             SGatewayCreationException {
         final String hitBys = gatewayInstance.getHitBys();
         String columnValue;
         if (hitBys == null || hitBys.isEmpty()) {
-            columnValue = transitionDefinitionName;
-        }
-
-        else {
-            columnValue = hitBys + "," + transitionDefinitionName;
+            columnValue = String.valueOf(transitionIndex);
+        } else {
+            columnValue = hitBys + "," + String.valueOf(transitionIndex);
         }
         updateOneColum(gatewayInstance, sGatewayInstanceBuilder.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
@@ -251,7 +247,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         SGatewayInstance selectOne;
         try {
             selectOne = persistenceRead.selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(parentProcessInstanceId, name));// FIXME select more
-                                                                                                                                            // than
             // one and get the oldest
         } catch (final SBonitaReadException e) {
             throw new SGatewayReadException(e);
@@ -289,4 +284,5 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             throw new SGatewayReadException(e);
         }
     }
+
 }

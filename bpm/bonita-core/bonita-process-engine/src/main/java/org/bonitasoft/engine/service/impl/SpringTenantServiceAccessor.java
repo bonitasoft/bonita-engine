@@ -80,7 +80,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.TenantMonitoringService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -150,8 +149,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BPMDefinitionBuilders bpmDefinitionBuilders;
 
     private BPMInstanceBuilders bpmInstanceBuilders;
-
-    private TenantMonitoringService tenantMonitoringServie;
 
     private ActorMappingService actorMappingService;
 
@@ -389,14 +386,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public TenantMonitoringService getTenantMonitoringService() {
-        if (tenantMonitoringServie == null) {
-            tenantMonitoringServie = beanAccessor.getService(TenantMonitoringService.class);
-        }
-        return tenantMonitoringServie;
-    }
-
-    @Override
     public SQueriableLogModelBuilder getSQueriableLogModelBuilder() {
         if (logModelBuilder == null) {
             logModelBuilder = beanAccessor.getService(SQueriableLogModelBuilder.class);
@@ -479,7 +468,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public ClassLoaderService getClassLoaderService() {
         if (classLoaderService == null) {
-            classLoaderService = beanAccessor.getService(ClassLoaderService.class);
+            classLoaderService = beanAccessor.getService("classLoaderService", ClassLoaderService.class);
         }
         return classLoaderService;
     }

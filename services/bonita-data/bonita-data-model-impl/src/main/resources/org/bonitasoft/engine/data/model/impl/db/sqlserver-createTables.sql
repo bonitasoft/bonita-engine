@@ -1,10 +1,10 @@
 CREATE TABLE datasource (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  version VARCHAR(50) NOT NULL,
-  implementationclassname VARCHAR(100) NOT NULL,
-  state VARCHAR(50) NOT NULL,
+  name NVARCHAR(50) NOT NULL,
+  version NVARCHAR(50) NOT NULL,
+  implementationclassname NVARCHAR(100) NOT NULL,
+  state NVARCHAR(50) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
 GO
@@ -17,8 +17,8 @@ CREATE TABLE datasourceparameter (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   datasourceId NUMERIC(19, 0) NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  value_ VARCHAR(MAX) NOT NULL,
+  name NVARCHAR(50) NOT NULL,
+  value_ NVARCHAR(MAX) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
 GO

@@ -82,12 +82,12 @@ public interface GatewayInstanceService {
      * 
      * @param gatewayInstance
      *            the gateway instance will be updated
-     * @param transitionDefinitionName
+     * @param transitionIndex
      *            value will be added to hitBy of gatewayInstance
      * @throws SGatewayModificationException
      * @throws SGatewayCreationException
      */
-    void hitTransition(SGatewayInstance gatewayInstance, String transitionDefinitionName) throws SGatewayModificationException, SGatewayCreationException;
+    void hitTransition(SGatewayInstance gatewayInstance, long transitionIndex) throws SGatewayModificationException, SGatewayCreationException;
 
     /**
      * Get active gatewayInstance in the specific process instance

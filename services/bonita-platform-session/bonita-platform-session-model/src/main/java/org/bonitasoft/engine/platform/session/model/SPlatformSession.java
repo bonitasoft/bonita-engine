@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.platform.session.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SPlatformSession {
+public interface SPlatformSession extends Serializable {
 
     /**
      * Gets the session's id

@@ -1,5 +1,12 @@
 package org.bonitasoft.engine.process.data;
 
+import static org.bonitasoft.engine.matchers.NameMatcher.nameIs;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,12 +48,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.bonitasoft.engine.matchers.NameMatcher.nameIs;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class DataInstanceIntegrationTest extends CommonAPITest {
 
@@ -163,6 +164,24 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         assertEquals(1, processDataInstances.size());
         assertEquals("var1", processDataInstances.get(0).getName());
         assertEquals(true, processDataInstances.get(0).getValue());
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { Date.class, DataInstance.class, ProcessAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Date", "Data", "Expression" }, jira = "ENGINE-1559, ENGINE-1099")
+    @Test
+    public void getDateDataInstanceFromProcess() throws Exception {
+        final ProcessDefinition processDefinition = operateProcess(user, "var1",
+                new ExpressionBuilder().createConstantDateExpression("2013-07-18T14:49:26.86+02:00"),
+                Date.class.getName());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+
+        final List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10);
+        assertFalse(processDataInstances.isEmpty());
+        assertEquals(1, processDataInstances.size());
+        assertEquals("var1", processDataInstances.get(0).getName());
+        assertNotNull(processDataInstances.get(0).getValue());
 
         disableAndDeleteProcess(processDefinition);
     }

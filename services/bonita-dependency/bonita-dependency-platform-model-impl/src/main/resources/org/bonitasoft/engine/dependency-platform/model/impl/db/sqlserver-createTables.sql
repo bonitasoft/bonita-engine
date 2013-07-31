@@ -1,9 +1,9 @@
 CREATE TABLE pdependency (
   id NUMERIC(19, 0) NOT NULL,
-  name VARCHAR(50) NOT NULL UNIQUE,
-  version VARCHAR(50) NOT NULL,
-  description VARCHAR(MAX),
-  filename VARCHAR(255) NOT NULL,
+  name NVARCHAR(50) NOT NULL UNIQUE,
+  version NVARCHAR(50) NOT NULL,
+  description NVARCHAR(MAX),
+  filename NVARCHAR(255) NOT NULL,
   value_ VARBINARY(MAX) NOT NULL,
   PRIMARY KEY (id)
 )
@@ -16,7 +16,7 @@ GO
 CREATE TABLE pdependencymapping (
   id NUMERIC(19, 0) NOT NULL,
   artifactid NUMERIC(19, 0) NOT NULL,
-  artifacttype VARCHAR(50) NOT NULL,
+  artifacttype NVARCHAR(50) NOT NULL,
   dependencyid NUMERIC(19, 0) NOT NULL,
   UNIQUE (dependencyid, artifactid, artifacttype),
   PRIMARY KEY (id)

@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertFalse;
+
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
@@ -21,8 +23,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
 
 public class SignalBoundaryEventTest extends CommonAPITest {
 
@@ -63,7 +63,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "boundary",
             "event" }, jira = "ENGINE-502", story = "signal sent on a user task having a boundary catch signal event")
-    public void testSignalBoundaryEventTriggered() throws Exception {
+    public void signalBoundaryEventTriggered() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent("MySignal");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -85,7 +85,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "boundary",
             "event" }, jira = "ENGINE-502", story = "signal with wrong name sent on a user task having a boundary catch signal event")
-    public void testSignalBoundaryEventNotTriggered() throws Exception {
+    public void signalBoundaryEventNotTriggered() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent("MySignal1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -110,7 +110,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "boundary",
             "event" }, jira = "ENGINE-502", story = "signal sent on a call activity having a boundary catch signal event")
-    public void testSignalBoundaryEventOnCallActivityTriggered() throws Exception {
+    public void signalBoundaryEventOnCallActivityTriggered() throws Exception {
         final String signalName = "MySignal";
         final String actorName = "delivery";
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnCallActivity(signalName, actorName);
@@ -139,7 +139,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "boundary",
             "event" }, jira = "ENGINE-502", story = "signal sent on a call activity having a boundary catch signal event")
-    public void testSignalBoundaryEventOnCallActivityNotTriggered() throws Exception {
+    public void signalBoundaryEventOnCallActivityNotTriggered() throws Exception {
         final String signalName = "MySignal";
         final String actorName = "delivery";
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnCallActivity(signalName, actorName);
@@ -218,7 +218,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute signal boundary event triggered on sequential multi-instance.", jira = "ENGINE-547")
     @Test
-    public void testSignalBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
+    public void signalBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = true;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
@@ -243,7 +243,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute signal boundary event not triggered on sequential multi-instance", jira = "ENGINE-547")
     @Test
-    public void testSignalBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
+    public void signalBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 3;
         final boolean isSequential = true;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
@@ -271,7 +271,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute signal boundary event triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
-    public void testSignalBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
+    public void signalBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = false;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
@@ -296,7 +296,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute signal boundary event not triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
-    public void testSignalBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
+    public void signalBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 3;
         final boolean isSequential = false;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnMultiInstance(loopCardinality, isSequential);
@@ -341,7 +341,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { SignalEventTriggerDefinition.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
             "Boundary", "Loop activity" }, story = "Execute signal boundary event triggered on loop activity", jira = "ENGINE-547")
     @Test
-    public void testSignalBoundaryEventTriggeredOnLoopActivity() throws Exception {
+    public void signalBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 3;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnLoopActivity(loopMax);
 
@@ -365,7 +365,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { SignalEventTriggerDefinition.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
             "Boundary", "Loop activity" }, story = "Execute signal boundary event not triggered on loop activity", jira = "ENGINE-547")
     @Test
-    public void testSignalBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
+    public void signalBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 2;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEventOnLoopActivity(loopMax);
 

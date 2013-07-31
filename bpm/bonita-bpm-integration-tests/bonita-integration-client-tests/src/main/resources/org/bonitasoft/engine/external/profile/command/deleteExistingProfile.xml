@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
-	<profile name="Team Manager">
+	<profile name="Team Manager" isDefault="true">
 		<description>TM profile</description>
 		<iconPath>/profiles/profileTeamManager.png</iconPath>
 		<profileEntries>
@@ -9,7 +9,7 @@
 				<index>0</index>
 				<description>My team activitys dashboard</description>
 				<type>CurrentUserTeamTasksDashboard</type>
-				<page></page>
+				<page>6</page>
 			</parentProfileEntry>
 		</profileEntries>
 		<profileMapping>

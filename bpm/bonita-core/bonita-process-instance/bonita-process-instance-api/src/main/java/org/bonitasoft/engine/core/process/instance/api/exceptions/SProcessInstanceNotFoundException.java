@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,13 +18,18 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 /**
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class SProcessInstanceNotFoundException extends SBonitaException {
 
     private static final long serialVersionUID = 1956687311066803177L;
 
     public SProcessInstanceNotFoundException(final long processInstanceId) {
-        super("Process instance with id " + processInstanceId + " not found");
+        super("Process instance with id <" + processInstanceId + "> not found");
+    }
+
+    public SProcessInstanceNotFoundException(final long processInstanceId, final String state) {
+        super("Process instance with id <" + processInstanceId + "> and state <" + state + "> not found");
     }
 
     public SProcessInstanceNotFoundException(final String message) {

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.session.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -20,7 +21,7 @@ import java.util.Date;
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  */
-public interface SSession {
+public interface SSession extends Serializable {
 
     /**
      * Gets the tenantId associated to this session

@@ -32,15 +32,27 @@ public class SProfileBuilderImpl implements SProfileBuilder {
     }
 
     @Override
-    public SProfileBuilder createNewInstance(final String name) {
+    public SProfileBuilder createNewInstance(final String name, final boolean isDefault, final long creationDate, final long createdBy,
+            final long lastUpdateDate, final long lastUpdatedBy) {
         profile = new SProfileImpl();
         profile.setName(name);
+        profile.setDefault(isDefault);
+        profile.setCreationDate(creationDate);
+        profile.setCreatedBy(createdBy);
+        profile.setLastUpdateDate(lastUpdateDate);
+        profile.setLastUpdatedBy(lastUpdatedBy);
         return this;
     }
 
     @Override
     public SProfileBuilder setId(final long id) {
         profile.setId(id);
+        return this;
+    }
+
+    @Override
+    public SProfileBuilder setDefault(final boolean isDefault) {
+        profile.setDefault(isDefault);
         return this;
     }
 
@@ -53,6 +65,30 @@ public class SProfileBuilderImpl implements SProfileBuilder {
     @Override
     public SProfileBuilder setIconPath(final String iconPath) {
         profile.setIconPath(iconPath);
+        return this;
+    }
+
+    @Override
+    public SProfileBuilder setCreationDate(final long creationDate) {
+        profile.setCreationDate(creationDate);
+        return this;
+    }
+
+    @Override
+    public SProfileBuilder setCreatedBy(final long createdBy) {
+        profile.setCreatedBy(createdBy);
+        return this;
+    }
+
+    @Override
+    public SProfileBuilder setLastUpdateDate(final long lastUpdateDate) {
+        profile.setLastUpdateDate(lastUpdateDate);
+        return this;
+    }
+
+    @Override
+    public SProfileBuilder setLastUpdatedBy(final long lastUpdatedBy) {
+        profile.setLastUpdatedBy(lastUpdatedBy);
         return this;
     }
 

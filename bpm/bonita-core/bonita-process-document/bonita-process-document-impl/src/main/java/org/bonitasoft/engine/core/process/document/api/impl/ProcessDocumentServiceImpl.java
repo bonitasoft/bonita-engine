@@ -54,15 +54,15 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  */
 public class ProcessDocumentServiceImpl implements ProcessDocumentService {
 
-    private final SProcessDocumentBuilder processDocumentBuilder;
-
-    private final SAProcessDocumentBuilder archivedProcessDocumentBuilder;
-
     private final DocumentService documentService;
 
     private final DocumentMappingService documentMappingService;
 
     private final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor;
+
+    private final SProcessDocumentBuilder processDocumentBuilder;
+
+    private final SAProcessDocumentBuilder archivedProcessDocumentBuilder;
 
     private final SDocumentBuilder documentBuilder;
 
@@ -72,13 +72,13 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
             final DocumentMappingService documentMappingService, final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor,
             final SDocumentBuilder documentBuilder, final SDocumentDownloadURLProvider urlProvider,
             final SAProcessDocumentBuilder archivedProcessDocumentBuilder) {
-        this.processDocumentBuilder = processDocumentBuilder;
         this.documentService = documentService;
         this.documentMappingService = documentMappingService;
         this.documentMappingBuilderAccessor = documentMappingBuilderAccessor;
         this.documentBuilder = documentBuilder;
-        this.urlProvider = urlProvider;
+        this.processDocumentBuilder = processDocumentBuilder;
         this.archivedProcessDocumentBuilder = archivedProcessDocumentBuilder;
+        this.urlProvider = urlProvider;
     }
 
     @Override

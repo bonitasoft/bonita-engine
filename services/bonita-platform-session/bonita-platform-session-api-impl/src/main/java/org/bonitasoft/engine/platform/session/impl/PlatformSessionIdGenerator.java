@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.platform.session.impl;
 
-import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
+import java.security.SecureRandom;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -22,20 +22,13 @@ import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 public class PlatformSessionIdGenerator {
 
     public static long getNextId() {
-        // FIXME improve id generation
-        long id = getNextTime();
-        final PlatformSessionProvider sessionManager = PlatformSessionProvider.getInstance();
-        try {
-            while (sessionManager.getSession(id) != null) {
-                id = getNextTime();
-            }
-        } catch (final SSessionNotFoundException e) {
+        SecureRandom ng = numberGenerator;
+        if (ng == null) {
+            numberGenerator = ng = new SecureRandom();
         }
-        return id;
+        return ng.nextLong();
     }
 
-    private static long getNextTime() {
-        return System.currentTimeMillis();
-    }
+    private static volatile SecureRandom numberGenerator = null;
 
 }

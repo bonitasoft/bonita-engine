@@ -493,9 +493,9 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorsName, final User users)
+    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorsName, final User user)
             throws BonitaException {
-        return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorsName), Collections.singletonList(users));
+        return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorsName), Collections.singletonList(user));
     }
 
     protected ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
@@ -569,6 +569,7 @@ public class APITestUtil {
     }
 
     protected void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
+        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 1000);
         getProcessAPI().disableAndDelete(processDefinitionId);
     }
 
@@ -660,6 +661,15 @@ public class APITestUtil {
         return getActivityInstance(waitForTask);
     }
 
+    protected ActivityInstance waitForUserTask(final String taskName) throws Exception {
+        return waitForUserTask(taskName, DEFAULT_TIMEOUT);
+    }
+
+    protected ActivityInstance waitForUserTask(final String taskName, final int timeout) throws Exception {
+        final Long waitForTask = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getReadyTaskEvent(taskName), timeout);
+        return getActivityInstance(waitForTask);
+    }
+
     private ActivityInstance getActivityInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
         if (id != null) {
             return getProcessAPI().getActivityInstance(id);
@@ -721,6 +731,14 @@ public class APITestUtil {
             params = ClientEventUtil.getTaskInStateWithParentId(processInstanceId, state, flowNodeName);
         }
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
+    }
+
+    protected void waitForFlowNodeInReadyState(final ProcessInstance processInstance, final String flowNodeName, final boolean useRootProcessInstance)
+            throws Exception {
+        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.getReadyState(flowNodeName), flowNodeName, useRootProcessInstance,
+                DEFAULT_TIMEOUT);
+        final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
+        assertNotNull(flowNodeInstance);
     }
 
     protected void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
@@ -841,7 +859,7 @@ public class APITestUtil {
     }
 
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
-        return waitForEvent(50, 5000, processInstance, eventName, state);
+        return waitForEvent(100, 5000, processInstance, eventName, state);
     }
 
     public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String eventName, final String state)
@@ -1313,6 +1331,20 @@ public class APITestUtil {
         return messages;
     }
 
+    public List<String> checkExistenceOfArchivedProcessIntances() throws DeletionException {
+        final List<String> messages = new ArrayList<String>();
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
+        if (!archivedProcessInstances.isEmpty()) {
+            final StringBuilder stb = new StringBuilder("Archived process instances are still present: ");
+            for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
+                stb.append(archivedProcessInstance).append(", ");
+                getProcessAPI().deleteProcessInstance(archivedProcessInstance.getId());
+            }
+            messages.add(stb.toString());
+        }
+        return messages;
+    }
+
     public List<String> checkExistenceOfGroups() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final long numberOfGroups = getIdentityAPI().getNumberOfGroups();
@@ -1379,7 +1411,7 @@ public class APITestUtil {
         return processAPI;
     }
 
-    protected void setProcessAPI(ProcessAPI processAPI) {
+    protected void setProcessAPI(final ProcessAPI processAPI) {
         this.processAPI = processAPI;
     }
 
@@ -1387,7 +1419,7 @@ public class APITestUtil {
         return identityAPI;
     }
 
-    protected void setIdentityAPI(IdentityAPI identityAPI) {
+    protected void setIdentityAPI(final IdentityAPI identityAPI) {
         this.identityAPI = identityAPI;
     }
 
@@ -1395,7 +1427,7 @@ public class APITestUtil {
         return commandAPI;
     }
 
-    protected void setCommandAPI(CommandAPI commandAPI) {
+    protected void setCommandAPI(final CommandAPI commandAPI) {
         this.commandAPI = commandAPI;
     }
 
@@ -1403,11 +1435,11 @@ public class APITestUtil {
         return profileAPI;
     }
 
-    protected void setProfileAPI(ProfileAPI profileAPI) {
+    protected void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
     }
 
-    protected void setSession(APISession session) {
+    protected void setSession(final APISession session) {
         this.session = session;
     }
 

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.expression;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -105,6 +106,21 @@ public class ExpressionBuilder {
     public Expression createConstantBooleanExpression(final boolean value) throws InvalidExpressionException {
         createNewInstance(Boolean.toString(value)).setContent(value ? "true" : "false").setExpressionType(ExpressionType.TYPE_CONSTANT.name())
                 .setReturnType(Boolean.class.getName());
+        return done();
+    }
+
+    /**
+     * Build a constant expression with date type and value in ISO-8601 format
+     * 
+     * @param value
+     *            a date defined with the ISO-8601 format
+     * @return The corresponding expression
+     * @throws InvalidExpressionException
+     * @since 6.0
+     */
+    public Expression createConstantDateExpression(final String value) throws InvalidExpressionException {
+        createNewInstance(value).setContent(String.valueOf(value)).setExpressionType(ExpressionType.TYPE_CONSTANT.name())
+                .setReturnType(Date.class.getName());
         return done();
     }
 
@@ -454,4 +470,5 @@ public class ExpressionBuilder {
         setDependencies(Collections.singletonList(entityExpression));
         return done();
     }
+
 }

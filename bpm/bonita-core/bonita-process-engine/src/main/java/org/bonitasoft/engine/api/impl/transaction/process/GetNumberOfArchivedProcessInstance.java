@@ -26,7 +26,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
 
@@ -38,18 +37,15 @@ public class GetNumberOfArchivedProcessInstance implements TransactionContentWit
 
     private final ProcessInstanceService processInstanceService;
 
-    private final ReadPersistenceService readPersistenceService;
-
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
 
     private final SAProcessInstanceBuilder saProcessInstanceBuilder;
 
     private long number;
 
-    public GetNumberOfArchivedProcessInstance(final ProcessInstanceService processInstanceService, final ReadPersistenceService readPersistenceService,
-            final SearchEntitiesDescriptor searchEntitiesDescriptor, final SAProcessInstanceBuilder saProcessInstanceBuilder) {
+    public GetNumberOfArchivedProcessInstance(final ProcessInstanceService processInstanceService, final SearchEntitiesDescriptor searchEntitiesDescriptor,
+            final SAProcessInstanceBuilder saProcessInstanceBuilder) {
         this.processInstanceService = processInstanceService;
-        this.readPersistenceService = readPersistenceService;
         this.searchEntitiesDescriptor = searchEntitiesDescriptor;
         this.saProcessInstanceBuilder = saProcessInstanceBuilder;
     }
@@ -57,7 +53,7 @@ public class GetNumberOfArchivedProcessInstance implements TransactionContentWit
     @Override
     public void execute() throws SBonitaException {
         final SearchArchivedProcessInstances searchProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), null, readPersistenceService);
+                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), null);
         final List<FilterOption> filterOptions = new ArrayList<FilterOption>(2);
         filterOptions.add(new FilterOption(SAProcessInstance.class, saProcessInstanceBuilder.getStateIdKey(), ProcessInstanceState.COMPLETED.getId()));
         filterOptions.add(new FilterOption(SAProcessInstance.class, saProcessInstanceBuilder.getCallerIdKey(), -1));
