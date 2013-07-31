@@ -642,11 +642,6 @@
 
 		<!-- Transaction -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.transaction</groupId>
-			<artifactId>bonita-transaction-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.bonitasoft.engine.transaction</groupId>
 			<artifactId>bonita-transaction-impl-sp</artifactId>
 			<version>${project.version}</version>
@@ -990,7 +985,6 @@
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl</include>
 									<!-- Transaction -->
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
-									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
 									<include>com.bonitasoft.engine.transaction:bonita-transaction-impl-sp</include>
 									<!-- Transient Data -->
 									<include>org.bonitasoft.engine.core.data:bonita-data-instance-transient-data-source</include>
