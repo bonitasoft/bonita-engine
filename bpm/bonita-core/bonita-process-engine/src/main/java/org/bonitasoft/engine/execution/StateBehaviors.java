@@ -679,19 +679,16 @@ public class StateBehaviors {
 
     public void interruptSubActivities(final long parentActivityInstanceId, final SStateCategory stateCategory) throws SBonitaException {
         final int numberOfResults = 100;
-        long count = 0;
         List<SActivityInstance> childrenToEnd;
         final SUserTaskInstanceBuilder flowNodeKeyProvider = instanceBuilders.getUserTaskInstanceBuilder();
+        final List<FilterOption> filters = new ArrayList<FilterOption>(3);
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
+        final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
+        QueryOptions queryOptions = new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
         do {
-            final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
-            final List<FilterOption> filters = new ArrayList<FilterOption>(3);
-            filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
-            filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
-            filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-            final QueryOptions queryOptions = new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
-            final QueryOptions countOptions = new QueryOptions(0, numberOfResults, null, filters, null);
             childrenToEnd = activityInstanceService.searchActivityInstances(SActivityInstance.class, queryOptions);
-            count = activityInstanceService.getNumberOfActivityInstances(SActivityInstance.class, countOptions);
             for (final SActivityInstance child : childrenToEnd) {
                 activityInstanceService.setStateCategory(child, stateCategory);
                 if (child.isStable()) {
@@ -699,8 +696,8 @@ public class StateBehaviors {
                             child.getLogicalGroup(instanceBuilders.getSAAutomaticTaskInstanceBuilder().getParentProcessInstanceIndex()));
                 }
             }
-
-        } while (count > childrenToEnd.size());
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+        } while (childrenToEnd.size() == numberOfResults);
     }
 
     public void executeConnectorInWork(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
@@ -720,7 +717,7 @@ public class StateBehaviors {
 
         } finally {
             try {
-                workService.registerWork(work);    
+                workService.registerWork(work);
             } catch (final WorkRegisterException e) {
                 throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstance, e);
             }
@@ -822,7 +819,7 @@ public class StateBehaviors {
     }
 
     private void interruptWaitingEvents(final long instanceId, final SCatchEventDefinition catchEventDef) throws SBonitaSearchException,
-    SWaitingEventModificationException {
+            SWaitingEventModificationException {
         if (!catchEventDef.getEventTriggers().isEmpty()) {
             final SWaitingEventKeyProvider waitingEventKeyProvider = instanceBuilders.getSWaitingMessageEventBuilder();
             interruptWaitingEvents(instanceId, SWaitingEvent.class, waitingEventKeyProvider);
