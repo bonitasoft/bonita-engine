@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.filter.user;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,26 +12,35 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -251,6 +263,8 @@ public class UserFilterTest extends CommonAPITest {
         resources.add(new BarResource("TestFilterWithAutoAssign.jar", data));
         data = IOUtil.generateJar(TestFilterUsingActorName.class);
         resources.add(new BarResource("TestFilterUsingActorName.jar", data));
+        data = IOUtil.generateJar(GroupUserFilter.class);
+        resources.add(new BarResource("TestGroupUserFilter.jar", data));
         return resources;
     }
 
@@ -261,6 +275,132 @@ public class UserFilterTest extends CommonAPITest {
         inputStream.close();
         resources.add(new BarResource(filterName + ".impl", data));
         return resources;
+    }
+
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
+    @Test
+    public void updateUserFilterAfterAUserDeletion() throws Exception {
+        final String delivery = "Delivery men";
+
+        final Group group = createGroup("group1");
+        final Role role = createRole("role1");
+        createUserMembership(jack.getUserName(), "role1", "group1");
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithUserFilterWithAutoAssign", "1.0");
+        processBuilder.addActor(delivery);
+        processBuilder.addAutomaticTask("step1");
+        final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", delivery);
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput("groupId",
+                new ExpressionBuilder().createConstantLongExpression(group.getId()));
+        processBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), processBuilder, "GroupUserFilter");
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());
+        List<HumanTaskInstance> tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
+        assertEquals(1, tasks.size());
+        getIdentityAPI().deleteUser(jack.getId());
+        createUserMembership(john.getUserName(), "role1", "group1");
+        tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
+        assertEquals(1, tasks.size());
+        getProcessAPI().updateActorsOfUserTask(tasks.get(0).getId());
+        tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
+        assertEquals(0, tasks.size());
+        tasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
+        assertEquals(1, tasks.size());
+
+        deleteGroups(group);
+        deleteRoles(role);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
+    @Test(expected = UpdateException.class)
+    public void unableToUpdateActorsOnAGateway() throws Exception {
+        final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("mycondition", "fzdfsdfsdfsdfsdf", Boolean.class.getName());
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("My_Process_with_exclusive_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addDescription(DESCRIPTION)
+                .addAutomaticTask("step1").addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).addGateway("gateway1", GatewayType.EXCLUSIVE)
+                .addTransition("step1", "gateway1").addTransition("gateway1", "step2", scriptExpression).addDefaultTransition("gateway1", "step3").getProcess();
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+        final FlowNodeInstance failFlowNodeInstance = waitForFlowNodeToFail(processInstance);
+        assertEquals("gateway1", failFlowNodeInstance.getName());
+        try {
+            getProcessAPI().updateActorsOfUserTask(failFlowNodeInstance.getId());
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+        }
+    }
+
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
+    @Test
+    public void doNotUpateAHumanTaskIfNoUserFilterIsDefined() throws Exception {
+        final String delivery = "Delivery men";
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("doNotUpateAHumanTaskIfNoUserFilterIsDefined", "1.0");
+        processBuilder.addActor(delivery);
+        processBuilder.addAutomaticTask("step1");
+        processBuilder.addUserTask("step2", delivery);
+        processBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForUserTask("step2");
+        List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
+        assertEquals(1, tasks.size());
+        final HumanTaskInstance taskBefore = tasks.get(0);
+        getProcessAPI().updateActorsOfUserTask(tasks.get(0).getId());
+        tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
+        assertEquals(1, tasks.size());
+        assertEquals(taskBefore, tasks.get(0));
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
+    @Test
+    public void updateUserFilterAfterAUserAdd() throws Exception {
+        final String delivery = "Delivery men";
+
+        final Group group = createGroup("group1");
+        final Role role = createRole("role1");
+        createUserMembership(jack.getUserName(), "role1", "group1");
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("updateUserFilterAfterAUserAdd", "1.0");
+        processBuilder.addActor(delivery);
+        processBuilder.addAutomaticTask("step1");
+        final UserTaskDefinitionBuilder addUserTask = processBuilder.addUserTask("step2", delivery);
+        addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.GroupUserFilter", "1.0").addInput("groupId",
+                new ExpressionBuilder().createConstantLongExpression(group.getId()));
+        processBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(delivery, john.getId(), processBuilder, "GroupUserFilter");
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());
+        List<HumanTaskInstance> tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
+        assertEquals(1, tasks.size());
+        createUserMembership(john.getUserName(), "role1", "group1");
+        tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
+        assertEquals(1, tasks.size());
+        getProcessAPI().updateActorsOfUserTask(tasks.get(0).getId());
+
+        tasks = getProcessAPI().getPendingHumanTaskInstances(jack.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
+        assertEquals(1, tasks.size());
+        assertEquals(0, tasks.get(0).getAssigneeId());
+        tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
+        assertEquals(1, tasks.size());
+        assertEquals(0, tasks.get(0).getAssigneeId());
+
+        deleteGroups(group);
+        deleteRoles(role);
+        disableAndDeleteProcess(processDefinition);
     }
 
 }

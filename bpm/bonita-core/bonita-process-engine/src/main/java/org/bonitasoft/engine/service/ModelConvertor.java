@@ -204,6 +204,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 import org.bonitasoft.engine.identity.ExportedUser;
+import org.bonitasoft.engine.identity.ExportedUserBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -1390,6 +1391,31 @@ public class ModelConvertor {
             contactInfoBuilder.setZipCode(user.getProfessionalZipCode());
         }
         return contactInfoBuilder.done();
+    }
+
+    public static ExportedUser toExportedUser(final SUser sUser, final SContactInfo persoInfo, final SContactInfo proInfo, final String managerUserName) {
+        final ExportedUserBuilder clientUserbuilder = new ExportedUserBuilder().createNewInstance(sUser.getUserName(), sUser.getPassword());
+        // Do not export dates and id
+        clientUserbuilder.setPasswordEncrypted(true);
+        clientUserbuilder.setFirstName(sUser.getFirstName());
+        clientUserbuilder.setLastName(sUser.getLastName());
+        clientUserbuilder.setTitle(sUser.getTitle());
+        clientUserbuilder.setJobTitle(sUser.getJobTitle());
+        clientUserbuilder.setCreatedBy(sUser.getCreatedBy());
+        clientUserbuilder.setIconName(sUser.getIconName());
+        clientUserbuilder.setIconPath(sUser.getIconPath());
+        clientUserbuilder.setEnabled(sUser.isEnabled());
+
+        final long managerUserId = sUser.getManagerUserId();
+        clientUserbuilder.setManagerUserId(managerUserId);
+        clientUserbuilder.setManagerUserName(managerUserName);
+        if (persoInfo != null) {
+            clientUserbuilder.setPersonalData(toUserContactData(persoInfo));
+        }
+        if (proInfo != null) {
+            clientUserbuilder.setProfessionalData(toUserContactData(proInfo));
+        }
+        return clientUserbuilder.done();
     }
 
     public static SRole constructSRole(final RoleCreator creator, final IdentityModelBuilder identityModelBuilder) {

@@ -272,14 +272,12 @@ public interface ProcessRuntimeAPI {
      *            the index
      * @param maxResults
      *            the max number of elements to retrieve per page
-     * @param criterion
-     *            the sort criterion
      * @return the number of elements that have been deleted
      * @throws DeletionException
      *             if a process instance can't be deleted because of a parent that is still active
      * @since 6.1
      */
-    long deleteProcessInstances(long processDefinitionId, int startIndex, int maxResults, ProcessInstanceCriterion criterion) throws DeletionException;
+    long deleteProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
 
     /**
      * Delete archived process instances of process definition given as input parameter respecting the pagination parameters
@@ -608,6 +606,17 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     void assignUserTask(long userTaskId, long userId) throws UpdateException;
+
+    /**
+     * Updates the actors of the user task. It evaluates again the eligible users for that task.
+     * 
+     * @param userTaskId
+     *            the identifier of the user task
+     * @throws UpdateException
+     *             If an exception occurs during the evaluation of actors.
+     * @since 6.1
+     */
+    void updateActorsOfUserTask(long userTaskId) throws UpdateException;
 
     /**
      * Returns all data of a process instance

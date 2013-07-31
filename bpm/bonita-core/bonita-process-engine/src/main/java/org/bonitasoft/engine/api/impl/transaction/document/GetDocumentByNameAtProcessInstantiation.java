@@ -65,7 +65,7 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
     @Override
     public void execute() throws SBonitaException {
         final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                readPersistenceService, searchEntitiesDescriptor, processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(), OrderByType.ASC);
+                searchEntitiesDescriptor, processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(), OrderByType.ASC);
         getArchivedProcessInstanceList.execute();
         final ArchivedProcessInstance saProcessInstance = getArchivedProcessInstanceList.getResult().get(0);
         final Date startDate = saProcessInstance.getStartDate();

@@ -82,6 +82,7 @@ import org.bonitasoft.engine.identity.GroupUpdater.GroupField;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.MembershipNotFoundException;
+import org.bonitasoft.engine.identity.OrganizationExportException;
 import org.bonitasoft.engine.identity.OrganizationImportException;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.RoleCreator;
@@ -112,6 +113,7 @@ import org.bonitasoft.engine.identity.model.builder.RoleUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.UserUpdateBuilder;
 import org.bonitasoft.engine.identity.xml.DeleteOrganization;
+import org.bonitasoft.engine.identity.xml.ExportOrganization;
 import org.bonitasoft.engine.identity.xml.ImportOrganization;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -1394,4 +1396,15 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
+    @Override
+    public String exportOrganization() throws OrganizationExportException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService());
+        try {
+            exportOrganization.execute();
+            return exportOrganization.getResult();
+        } catch (final SBonitaException e) {
+            throw new OrganizationExportException(e);
+        }
+    }
 }

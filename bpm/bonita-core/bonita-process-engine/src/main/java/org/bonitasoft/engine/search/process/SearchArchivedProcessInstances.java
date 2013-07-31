@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractArchivedProcessInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -31,24 +30,20 @@ public class SearchArchivedProcessInstances extends AbstractArchivedProcessInsta
 
     private final ProcessInstanceService processInstanceService;
 
-    private final ReadPersistenceService persistenceService;
-
     public SearchArchivedProcessInstances(final ProcessInstanceService processInstanceService,
-            final SearchArchivedProcessInstancesDescriptor archivedProcessInstancesDescriptor,
-            final SearchOptions options, final ReadPersistenceService persistenceService) {
+            final SearchArchivedProcessInstancesDescriptor archivedProcessInstancesDescriptor, final SearchOptions options) {
         super(archivedProcessInstancesDescriptor, options);
         this.processInstanceService = processInstanceService;
-        this.persistenceService = persistenceService;
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
-        return processInstanceService.getNumberOfArchivedProcessInstances(queryOptions, persistenceService);
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+        return processInstanceService.getNumberOfArchivedProcessInstances(searchOptions);
     }
 
     @Override
-    public List<SAProcessInstance> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
-        return processInstanceService.searchArchivedProcessInstances(queryOptions, persistenceService);
+    public List<SAProcessInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+        return processInstanceService.searchArchivedProcessInstances(searchOptions);
     }
 
 }

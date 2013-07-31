@@ -303,10 +303,6 @@ public class UserTaskAssignationTest extends CommonAPITest {
     public void lastUpdateDateUpdate() throws Exception {
         final String delivery = "Delivery men";
 
-        // ------------------
-        // INIT
-        // ------------------
-
         // Run a process
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("test release user task", "1.0", delivery, "Delivery all day and night long");
         getProcessAPI().startProcess(processDefinition.getId());
@@ -318,10 +314,6 @@ public class UserTaskAssignationTest extends CommonAPITest {
         HumanTaskInstance task = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).get(0);
         final Long taskId = task.getId();
         Date previousUpdateDate = task.getLastUpdateDate();
-
-        // ------------------
-        // TEST
-        // ------------------
 
         // First assign
         getProcessAPI().assignUserTask(taskId, john.getId());
@@ -350,10 +342,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         task = getProcessAPI().getHumanTaskInstance(taskId);
         assertFalse("Last update date not updated during second assignment", previousUpdateDate.equals(task.getLastUpdateDate()));
 
-        // ------------------
-        // CLEANUP
-        // ------------------
-
         disableAndDeleteProcess(processDefinition);
     }
+
 }

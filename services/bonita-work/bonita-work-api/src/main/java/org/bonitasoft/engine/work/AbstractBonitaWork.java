@@ -62,7 +62,8 @@ public abstract class AbstractBonitaWork implements Runnable {
             handleError(e);
         } catch (final Exception e) {
             // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                    "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
         } finally {
             if (session != null) {
                 try {
@@ -79,6 +80,7 @@ public abstract class AbstractBonitaWork implements Runnable {
 
     protected void workInTransaction() throws Exception {
         final Callable<Void> runWork = new Callable<Void>() {
+
             @Override
             public Void call() throws Exception {
                 work();
@@ -93,7 +95,7 @@ public abstract class AbstractBonitaWork implements Runnable {
     protected abstract void work() throws Exception;
 
     protected void handleError(final SBonitaException e) {
-        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.");
+        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.", e);
     }
 
     public void setTechnicalLogger(final TechnicalLoggerService loggerService) {

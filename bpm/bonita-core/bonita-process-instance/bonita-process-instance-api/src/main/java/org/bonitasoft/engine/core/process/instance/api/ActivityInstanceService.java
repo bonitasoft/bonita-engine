@@ -498,7 +498,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @return the number of elements encountered
      * @throws SBonitaSearchException
      *             in case a search error occurs
-     * @author Emmanuel Duchastenier
      */
     long getNumberOfArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions, ReadPersistenceService persistenceService)
             throws SBonitaSearchException;
@@ -515,7 +514,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @return the elements encountered matching the specified options
      * @throws SBonitaSearchException
      *             in case a search error occurs
-     * @author Emmanuel Duchastenier
      */
     List<SAHumanTaskInstance> searchArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions, ReadPersistenceService persistenceService)
             throws SBonitaSearchException;
