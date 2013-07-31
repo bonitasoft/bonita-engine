@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -36,27 +37,34 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
 
     private final SProfileUpdateBuilder updateBuilder;
 
-    private SProfile profile = null;
+    private final long lastUpdatorId;
+
+    private SProfile sProfile = null;
 
     public UpdateProfile(final ProfileService profileService, final SProfileUpdateBuilder updateBuilder, final Long profileId,
-            final ProfileUpdater updateDescriptor) {
+            final ProfileUpdater updateDescriptor, final long lastUpdatorId) {
         super();
         this.profileService = profileService;
         this.profileId = profileId;
         this.updateDescriptor = updateDescriptor;
         this.updateBuilder = updateBuilder;
+        this.lastUpdatorId = lastUpdatorId;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        profile = profileService.getProfile(profileId);
-        profileService.updateProfile(profile, getProfileUpdateDescriptor());
-        profile = profileService.getProfile(profileId);
+        sProfile = profileService.getProfile(profileId);
+        if (!sProfile.isDefault()) {
+            profileService.updateProfile(sProfile, getProfileUpdateDescriptor());
+            sProfile = profileService.getProfile(profileId);
+        } else {
+            throw new SProfileUpdateException("Can't update a default profile. Profile id = <" + profileId + ">, name = <" + sProfile.getName() + ">");
+        }
     }
 
     @Override
     public SProfile getResult() {
-        return this.profile;
+        return this.sProfile;
     }
 
     private EntityUpdateDescriptor getProfileUpdateDescriptor() {
@@ -74,6 +82,7 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
                     break;
             }
         }
+        updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(lastUpdatorId);
         return updateBuilder.done();
     }
 

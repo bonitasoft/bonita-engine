@@ -7,8 +7,8 @@ CREATE TABLE report (
   installedBy BIGINT NOT NULL,
   provided BOOLEAN,
   lastModificationDate BIGINT NOT NULL,
-  screenshot BLOB,
-  content BLOB,
+  screenshot MEDIUMBLOB,
+  content LONGBLOB,
   UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;

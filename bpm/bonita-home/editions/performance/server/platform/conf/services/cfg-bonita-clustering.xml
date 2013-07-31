@@ -40,4 +40,5 @@
 		</constructor-arg>
 		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations"/>
 	</bean>
+	
 </beans>

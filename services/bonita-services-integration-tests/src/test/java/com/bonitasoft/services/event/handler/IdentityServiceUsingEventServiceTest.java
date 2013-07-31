@@ -11,7 +11,6 @@ package com.bonitasoft.services.event.handler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserUpdateEventHandler;
@@ -21,10 +20,12 @@ import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
+import com.bonitasoft.services.CommonServiceSPTest;
+
 /**
  * @author Elias Ricken de Medeiros
  */
-public class IdentityServiceUsingEventServiceTest extends CommonServiceTest {
+public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
 
     private static IdentityService identityService;
 

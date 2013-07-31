@@ -5,6 +5,7 @@
 		<constructor-arg name="rangeSizes">
 			<map>
 				<!-- Most used objects: range size depends on process design -->
+				<entry key="70" value="2000" /><!-- Job description -->
 				<entry key="30" value="10000" /><!-- queriable log -->
 				<entry key="31" value="200000" /><!-- queriable log parameter -->
 				<entry key="10010" value="1000" /><!-- ProcessInstance -->
@@ -26,37 +27,37 @@
 				<entry key="10080" value="20000" /><!-- SAComment -->
 				<entry key="10110" value="20000" /><!-- TokenCount -->
 
-				<!-- less used objects -->
-				<entry key="10012" value="100" /><!-- ProcessDefinition -->
-				<entry key="20" value="100" /><!-- user -->
-				<entry key="21" value="100" /><!-- group -->
-				<entry key="22" value="100" /><!-- role -->
-				<entry key="23" value="100" /><!-- user_memebership -->
-				<entry key="24" value="100" /><!-- P-metadata_def -->
-				<entry key="25" value="100" /><!-- P-metadata_val -->
-				<entry key="26" value="100" /><!-- user_contactinfo -->
-				<entry key="50" value="100" /><!-- dataSource -->
-				<entry key="51" value="100" /><!-- dataSourceParameter -->
-				<entry key="60" value="100" /><!-- employee -->
-				<entry key="61" value="100" /><!-- laptop -->
-				<entry key="62" value="100" /><!-- address -->
-				<entry key="63" value="100" /><!-- project -->
-				<entry key="64" value="100" /><!-- employeeprojectmapping -->
-				<entry key="65" value="100" /><!-- saemployee -->
-				<entry key="70" value="100" /><!-- jobDescriptor -->
-				<entry key="71" value="100" /><!-- jobParameter -->
-				<entry key="90" value="100" /><!-- command -->
-				<entry key="10000" value="100" /><!-- actor -->
-				<entry key="10001" value="100" /><!-- actorMapping -->
-				<entry key="10019" value="100" /><!-- Breakpoint -->
-				<entry key="10095" value="100" /><!-- HiddenTask -->
-				<entry key="10030" value="100" /><!-- category -->
-				<entry key="10040" value="100" /><!-- SDocumentMapping -->
-				<entry key="10050" value="100" /><!-- supervisor -->
-				<entry key="10070" value="100" /><!-- ExternalIdentityMapping -->
-				<entry key="10090" value="100" /><!-- document_content -->
-				<entry key="10100" value="100" /><!-- MigrationPlanDescriptor -->
-				<entry key="20040" value="100" /><!-- SADocumentMapping -->
+				<!-- less used objects : -->
+				<!-- <entry key="10012" value="100" />ProcessDefinition -->
+				<!-- <entry key="20" value="100" />user -->
+				<!-- <entry key="21" value="100" />group -->
+				<!-- <entry key="22" value="100" />role -->
+				<!-- <entry key="23" value="100" />user_memebership -->
+				<!-- <entry key="24" value="100" />P-metadata_def -->
+				<!-- <entry key="25" value="100" />P-metadata_val -->
+				<!-- <entry key="26" value="100" />user_contactinfo -->
+				<!-- <entry key="50" value="100" />dataSource -->
+				<!-- <entry key="51" value="100" />dataSourceParameter -->
+				<!-- <entry key="60" value="100" />employee -->
+				<!-- <entry key="61" value="100" />laptop -->
+				<!-- <entry key="62" value="100" />address -->
+				<!-- <entry key="63" value="100" />project -->
+				<!-- <entry key="64" value="100" />employeeprojectmapping -->
+				<!-- <entry key="65" value="100" />saemployee -->
+				<!-- <entry key="70" value="100" />jobDescriptor -->
+				<!-- <entry key="71" value="100" />jobParameter -->
+				<!-- <entry key="90" value="100" />command -->
+				<!-- <entry key="4" value="100" />platform command -->
+				<!-- <entry key="10000" value="100" />actor -->
+				<!-- <entry key="10001" value="100" />actorMapping -->
+				<!-- <entry key="10019" value="100" />Breakpoint -->
+				<!-- <entry key="10095" value="100" />HiddenTask -->
+				<!-- <entry key="10030" value="100" />category -->
+				<!-- <entry key="10040" value="100" />SDocumentMapping -->
+				<!-- <entry key="10050" value="100" />supervisor -->
+				<!-- <entry key="10070" value="100" />ExternalIdentityMapping -->
+				<!-- <entry key="10090" value="100" />document_content -->
+				<!-- <entry key="20040" value="100" />SADocumentMapping -->
 			</map>
 		</constructor-arg>
 		<constructor-arg name="defaultRangeSize" value="100" />

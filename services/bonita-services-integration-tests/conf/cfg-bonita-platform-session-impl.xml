@@ -2,6 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="platformSessionService" class="org.bonitasoft.engine.platform.session.impl.PlatformSessionServiceImpl">
+		<constructor-arg name="platformSessionProvider" ref="platformSessionProvider" />
 		<constructor-arg name="platformSessionModelBuilder" ref="platformSessionModelBuilder" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>

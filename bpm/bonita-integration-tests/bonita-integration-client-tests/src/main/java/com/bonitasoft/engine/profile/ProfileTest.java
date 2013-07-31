@@ -8,7 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+
 import java.io.IOException;
+import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -27,12 +32,11 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Julien Mege
  * @author Celine Souchet
  */
+@SuppressWarnings("javadoc")
 public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.")
@@ -57,24 +61,68 @@ public class ProfileTest extends AbstractProfileTest {
         assertEquals(USER_PROFILE_ENTRY_COUNT, searchedProfileEntries2.getCount());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Create", "Delete" }, story = "Create and delete profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Create", "Delete", "Profile", "Custom" }, story = "Create and delete custom profile.", jira = "ENGINE-1532")
     @Test
-    public void createAndDeleteProfile() throws BonitaException, IOException {
+    public void createAndDeleteCustomProfile() throws BonitaException, IOException {
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "iconPath");
 
         final Profile getProfileResult = getProfileAPI().getProfile(createdProfile.getId());
         assertEquals(createdProfile.getId(), getProfileResult.getId());
+        assertFalse(createdProfile.isDefault());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);
         Long profileCount = getProfileAPI().searchProfiles(builder.done()).getCount();
         assertEquals(Long.valueOf(5), profileCount);
 
-        // Delete profile1 using id
+        // Delete custom profile using id
         getProfileAPI().deleteProfile(getProfileResult.getId());
 
         profileCount = getProfileAPI().searchProfiles(builder.done()).getCount();
         assertEquals(Long.valueOf(4), profileCount);
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Create", "Profile", "Custom" }, story = "Create custom profile from an other profile.", jira = "ENGINE-1532")
+    @Test
+    public void createCustomProfileFromOtherProfile() throws BonitaException, IOException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
+        final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
+        assertEquals(1, profiles.size());
+        final Profile profile1 = profiles.get(0);
+
+        logout();
+        loginWith("userName1", "User1Pwd");
+        final ProfileCreator profileCreator = new ProfileCreator(profile1);
+        profileCreator.setName("name");
+        final Profile profile2 = getProfileAPI().createProfile(profileCreator);
+
+        // Profile1 is default
+        assertNotEquals(profile1.getId(), profile2.getId());
+        assertNotEquals(profile1.isDefault(), profile2.isDefault());
+        assertNotEquals(profile1.getCreatedBy(), profile2.getCreatedBy());
+        assertNotEquals(profile1.getCreationDate(), profile2.getCreationDate());
+        assertNotEquals(profile1.getLastUpdateDate(), profile2.getLastUpdateDate());
+        assertNotEquals(profile1.getLastUpdatedBy(), profile2.getLastUpdatedBy());
+        assertNotEquals(profile1.getName(), profile2.getName());
+        assertEquals(profile1.getDescription(), profile2.getDescription());
+        assertEquals(profile1.getIconPath(), profile2.getIconPath());
+        assertEquals("name", profile2.getName());
+
+        // Clean up
+        getProfileAPI().deleteProfile(profile2.getId());
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Can't", "Delete", "Default", "Profile" }, story = "Can't delete default profile.", jira = "ENGINE-1532")
+    @Test(expected = DeletionException.class)
+    public void cantDeleteDefaultProfile() throws BonitaException, IOException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
+        final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
+        assertEquals(1, profiles.size());
+
+        // Delete default profile
+        getProfileAPI().deleteProfile(profiles.get(0).getId());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Wrong parameter" }, jira = "ENGINE-548")
@@ -83,27 +131,47 @@ public class ProfileTest extends AbstractProfileTest {
         getProfileAPI().createProfile(null, null, null);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Update" }, story = "Update profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile.", jira = "ENGINE-1532")
     @Test
-    public void updateProfile() throws BonitaException, IOException {
+    public void updateCustomProfile() throws BonitaException, IOException {
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
 
+        // Update custom profile
         final ProfileUpdater updateDescriptor = new ProfileUpdater();
         updateDescriptor.description("Updated description");
         updateDescriptor.name("Updated Name");
         updateDescriptor.iconPath("Updated iconPath");
-        final Profile upDateProfileResult = getProfileAPI().updateProfile(createdProfile.getId(), updateDescriptor);
+        getProfileAPI().updateProfile(createdProfile.getId(), updateDescriptor);
+        final Profile upDateProfileResult = getProfileAPI().getProfile(createdProfile.getId());
         assertEquals("Updated Name", upDateProfileResult.getName());
         assertEquals("Updated description", upDateProfileResult.getDescription());
         assertEquals("Updated iconPath", upDateProfileResult.getIconPath());
+        assertEquals(createdProfile.isDefault(), upDateProfileResult.isDefault());
+        assertNotEquals(createdProfile.getLastUpdateDate(), upDateProfileResult.getLastUpdateDate());
 
-        // Delete profile1 using id
+        // Delete profile using id
         getProfileAPI().deleteProfile(createdProfile.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);
         final Long profileCount = getProfileAPI().searchProfiles(builder.done()).getCount();
         assertEquals(Long.valueOf(4), profileCount);
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Can't", "Update", "Default", "Profile" }, story = "Can't update default profile.", jira = "ENGINE-1532")
+    @Test(expected = UpdateException.class)
+    public void cantUpdateDefaultProfile() throws BonitaException, IOException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
+        final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
+        assertEquals(1, profiles.size());
+
+        // Update default profile
+        final ProfileUpdater updateDescriptor = new ProfileUpdater();
+        updateDescriptor.description("Updated description");
+        updateDescriptor.name("Updated Name");
+        updateDescriptor.iconPath("Updated iconPath");
+        getProfileAPI().updateProfile(profiles.get(0).getId(), updateDescriptor);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Wrong parameter" }, jira = "ENGINE-548")

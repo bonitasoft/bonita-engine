@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -45,17 +45,20 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
 
     private final List<ExportedProfile> profiles;
 
+    private final long importerId;
+
     private final List<String> warnings = new ArrayList<String>();
 
     private final ImportPolicy policy;
 
     public ImportAndHandleSameNameProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profiles,
-            final ImportPolicy policy) {
+            final ImportPolicy policy, final long importerId) {
         super();
         this.profileService = profileService;
         this.identityService = identityService;
         this.profiles = profiles;
         this.policy = policy;
+        this.importerId = importerId;
     }
 
     @Override
@@ -96,12 +99,14 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
         }
     }
 
-    private long insertProfile(final ExportedProfile profile) throws SProfileAlreadyExistsException, SProfileCreationException {
+    private long insertProfile(final ExportedProfile exportedProfile) throws SProfileAlreadyExistsException, SProfileCreationException {
         final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
-
-        final SProfile sProfile = profileBuilder.createNewInstance(profile.getName()).setDescription(profile.getDescription())
-                .setIconPath(profile.getIconPath()).done();
+        final long creationDate = System.currentTimeMillis();
+        final SProfile sProfile = profileBuilder
+                .createNewInstance(exportedProfile.getName(), exportedProfile.isDefault(), creationDate, importerId, creationDate, importerId)
+                .setDescription(exportedProfile.getDescription())
+                .setIconPath(exportedProfile.getIconPath()).done();
         return profileService.createProfile(sProfile).getId();
     }
 

@@ -83,6 +83,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
     protected XMLNode getProfileXmlNode(final SProfile sProfile) throws SBonitaException {
         final XMLNode profileNode = new XMLNode("profile");
         profileNode.addAttribute("name", sProfile.getName());
+        profileNode.addAttribute("isDefault", String.valueOf(sProfile.isDefault()));
         profileNode.addChild("description", sProfile.getDescription());
         profileNode.addChild("iconPath", sProfile.getIconPath());
 

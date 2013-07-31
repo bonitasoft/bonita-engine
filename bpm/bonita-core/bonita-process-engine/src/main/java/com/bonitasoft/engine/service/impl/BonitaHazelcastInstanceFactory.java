@@ -13,8 +13,7 @@
  **/
 package com.bonitasoft.engine.service.impl;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
@@ -30,21 +29,28 @@ import com.hazelcast.core.HazelcastInstance;
  */
 public class BonitaHazelcastInstanceFactory {
 
-    public static HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations) {
-        final Map<String, CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
-        for (final Entry<String, CacheConfiguration> cache : configurations.entrySet()) {
-            final CacheConfiguration cacheConfiguration = cache.getValue();
-            // use wildcard because name of caches are: "<tenant id>_<cache name>"
-            final MapConfig mapConfig = new MapConfig("*" + cache.getKey());
-            mapConfig.setTimeToLiveSeconds(cacheConfiguration.isEternal() ? 0 : new Long(cacheConfiguration.getTimeToLiveSeconds()).intValue());
-            final MaxSizeConfig maxSizeConfig = new MaxSizeConfig();
-            maxSizeConfig.setMaxSizePolicy("cluster_wide_map_size");
-            maxSizeConfig.setSize(cacheConfiguration.getMaxElementsInMemory());
-            mapConfig.setMaxSizeConfig(maxSizeConfig);
-            // can be: NONE (no eviction), LRU (Least Recently Used), LFU (Least Frequently Used). NONE is the default
-            mapConfig.setEvictionPolicy(cacheConfiguration.getEvictionPolicy());
-            config.addMapConfig(mapConfig);
+    private static HazelcastInstance hazelCastInstance;
+
+    public static synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations) {
+        if (hazelCastInstance == null) {
+            final List<CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
+            for (final CacheConfiguration cache : configurations) {
+                final CacheConfiguration cacheConfiguration = cache;
+                // use wildcard because name of caches are: "<tenant id>_<cache name>"
+                final MapConfig mapConfig = new MapConfig("*" + cache.getName());
+                mapConfig.setTimeToLiveSeconds(cacheConfiguration.isEternal() ? 0 : new Long(cacheConfiguration.getTimeToLiveSeconds()).intValue());
+                final MaxSizeConfig maxSizeConfig = new MaxSizeConfig();
+                maxSizeConfig.setMaxSizePolicy("cluster_wide_map_size");
+                maxSizeConfig.setSize(cacheConfiguration.getMaxElementsInMemory());
+                mapConfig.setMaxSizeConfig(maxSizeConfig);
+                // can be: NONE (no eviction), LRU (Least Recently Used), LFU (Least Frequently Used). NONE is the default
+                mapConfig.setEvictionPolicy(cacheConfiguration.getEvictionPolicy());
+                config.addMapConfig(mapConfig);
+            }
+            hazelCastInstance = Hazelcast.newHazelcastInstance(config);
+        } else {
+            throw new IllegalStateException("The hazelcast instance already exists");
         }
-        return Hazelcast.newHazelcastInstance(config);
+        return hazelCastInstance;
     }
 }

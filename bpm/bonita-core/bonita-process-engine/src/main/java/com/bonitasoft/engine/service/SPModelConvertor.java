@@ -17,18 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.identity.ExportedUser;
-import org.bonitasoft.engine.identity.ExportedUserBuilder;
-import org.bonitasoft.engine.identity.model.SContactInfo;
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.monitoring.SGcInfo;
-import org.bonitasoft.engine.monitoring.SMemoryUsage;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.profile.ProfileCreator;
-import org.bonitasoft.engine.profile.ProfileCreator.ProfileField;
-import org.bonitasoft.engine.profile.ProfileEntryCreator;
-import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -46,12 +36,18 @@ import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.log.impl.LogImpl;
 import com.bonitasoft.engine.monitoring.GcInfo;
 import com.bonitasoft.engine.monitoring.MemoryUsage;
+import com.bonitasoft.engine.monitoring.SGcInfo;
+import com.bonitasoft.engine.monitoring.SMemoryUsage;
 import com.bonitasoft.engine.monitoring.impl.GcInfoImpl;
 import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
 import com.bonitasoft.engine.platform.impl.TenantImpl;
+import com.bonitasoft.engine.profile.ProfileCreator;
+import com.bonitasoft.engine.profile.ProfileCreator.ProfileField;
+import com.bonitasoft.engine.profile.ProfileEntryCreator;
+import com.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportCreator.ReportField;
@@ -137,9 +133,11 @@ public final class SPModelConvertor extends ModelConvertor {
         return breakpoints;
     }
 
-    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder) {
+    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder, final boolean isDefault, final long createdBy) {
+        final long creationDate = System.currentTimeMillis();
         final Map<ProfileField, Serializable> fields = creator.getFields();
-        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME));
+        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME), isDefault, creationDate,
+                createdBy, creationDate, createdBy);
         final String description = (String) fields.get(ProfileField.DESCRIPTION);
         if (description != null) {
             newSProfileBuilder.setDescription(description);
@@ -214,31 +212,6 @@ public final class SPModelConvertor extends ModelConvertor {
         final long init = sMemoryUsage.getInit();
         final long used = sMemoryUsage.getUsed();
         return new MemoryUsageImpl(committed, max, init, used);
-    }
-
-    public static ExportedUser toExportedUser(final SUser sUser, final SContactInfo persoInfo, final SContactInfo proInfo, final String managerUserName) {
-        final ExportedUserBuilder clientUserbuilder = new ExportedUserBuilder().createNewInstance(sUser.getUserName(), sUser.getPassword());
-        // Do not export dates and id
-        clientUserbuilder.setPasswordEncrypted(true);
-        clientUserbuilder.setFirstName(sUser.getFirstName());
-        clientUserbuilder.setLastName(sUser.getLastName());
-        clientUserbuilder.setTitle(sUser.getTitle());
-        clientUserbuilder.setJobTitle(sUser.getJobTitle());
-        clientUserbuilder.setCreatedBy(sUser.getCreatedBy());
-        clientUserbuilder.setIconName(sUser.getIconName());
-        clientUserbuilder.setIconPath(sUser.getIconPath());
-        clientUserbuilder.setEnabled(sUser.isEnabled());
-
-        final long managerUserId = sUser.getManagerUserId();
-        clientUserbuilder.setManagerUserId(managerUserId);
-        clientUserbuilder.setManagerUserName(managerUserName);
-        if (persoInfo != null) {
-            clientUserbuilder.setPersonalData(toUserContactData(persoInfo));
-        }
-        if (proInfo != null) {
-            clientUserbuilder.setProfessionalData(toUserContactData(proInfo));
-        }
-        return clientUserbuilder.done();
     }
 
     public static Report toReport(final SReport sReport) {

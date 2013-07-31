@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
 
-	<profile name="Plop">
+	<profile name="Plop" isDefault="true">
 		<description>Plop profile</description>
 		<iconPath>/profiles/plop.png</iconPath>
 		<profileEntries>
@@ -20,7 +20,7 @@
 		</profileMapping>
 	</profile>
 
-	<profile name="Team Manager">
+	<profile name="Team Manager" isDefault="false">
 		<description>TM profile</description>
 		<iconPath>/profiles/profileTeamManager.png</iconPath>
 		<profileEntries>

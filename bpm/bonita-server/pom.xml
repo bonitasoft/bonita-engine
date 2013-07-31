@@ -87,6 +87,11 @@
 			<artifactId>bonita-classloader-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.classloader</groupId>
+			<artifactId>bonita-classloader-clustered</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Command -->
 		<dependency>
@@ -351,7 +356,7 @@
 
 		<!-- Monitoring -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
+			<groupId>com.bonitasoft.engine.monitoring</groupId>
 			<artifactId>bonita-monitoring-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -456,6 +461,11 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.session</groupId>
 			<artifactId>bonita-platform-session-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.platform.session</groupId>
+			<artifactId>bonita-platform-session-clustered-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -608,6 +618,11 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.session</groupId>
 			<artifactId>bonita-session-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.session</groupId>
+			<artifactId>bonita-session-clustered-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -768,6 +783,7 @@
 									<!-- Classloader -->
 									<include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
 									<include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
+									<include>com.bonitasoft.engine.classloader:bonita-classloader-clustered</include>
 									<!-- Command -->
 									<include>org.bonitasoft.engine.command:bonita-command-model</include>
 									<include>org.bonitasoft.engine.command:bonita-command-model-impl</include>
@@ -862,8 +878,8 @@
 									<include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
 									<!-- Monitoring -->
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
+									<include>com.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
+									<include>com.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
 									<!-- Operation -->
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>
@@ -905,6 +921,7 @@
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-model-impl</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api</include>
 									<include>org.bonitasoft.engine.platform.session:bonita-platform-session-api-impl</include>
+									<include>com.bonitasoft.engine.platform.session:bonita-platform-session-clustered-impl</include>
 									<!-- Process Comment -->
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model</include>
 									<include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-model-impl</include>
@@ -943,6 +960,9 @@
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
+									<!-- Security Manager -->
+									<include>com.bonitasoft.manager:manager</include>
+									<include>org.bonitasoft.security:sysUtil</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
@@ -959,6 +979,7 @@
 									<include>org.bonitasoft.engine.session:bonita-session-model-impl</include>
 									<include>org.bonitasoft.engine.session:bonita-session-api-impl</include>
 									<include>org.bonitasoft.engine.session:bonita-session-api</include>
+									<include>com.bonitasoft.engine.session:bonita-session-clustered-impl</include>
 									<!-- Session Accessor -->
 									<include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-read</include>
 									<include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-threadlocal</include>

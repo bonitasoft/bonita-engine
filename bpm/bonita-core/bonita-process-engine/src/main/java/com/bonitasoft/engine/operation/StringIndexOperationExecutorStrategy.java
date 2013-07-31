@@ -25,6 +25,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class StringIndexOperationExecutorStrategy implements OperationExecutorStrategy {
 
@@ -44,10 +45,25 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
     }
 
     @Override
-    public void execute(final SOperation operation, final Object value, final long containerId, final String containerType,
+    public String getOperationType() {
+        return TYPE_STRING_INDEX;
+    }
+
+    @Override
+    public boolean doUpdateData() {
+        return false;
+    }
+
+    @Override
+    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
+        return value;
+    }
+
+    @Override
+    public void update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
+            throws SOperationExecutionException {
         final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
-        final SLeftOperand leftOperand = operation.getLeftOperand();
         final String name = leftOperand.getName();
         Integer index;
         try {
@@ -55,8 +71,8 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
         } catch (final NumberFormatException e) {
             throw new SOperationExecutionException("name of left operand for string index operation must be 1,2,3,4 or 5 but was " + name);
         }
-        if (value != null && !(value instanceof String)) {
-            throw new SOperationExecutionException("expression of string index operation must return a string, was:" + value.getClass().getName());
+        if (newValue != null && !(newValue instanceof String)) {
+            throw new SOperationExecutionException("expression of string index operation must return a string, was:" + newValue.getClass().getName());
         }
         try {
             SProcessInstance processInstance;
@@ -66,7 +82,7 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(containerId);
                 processInstance = processInstanceService.getProcessInstance(flowNodeInstance.getRootContainerId());
             }
-            final String stringValue = (String) value;
+            final String stringValue = (String) newValue;
             switch (index) {
                 case 1:
                     updateBuilder.updateStringIndex1(stringValue);
@@ -92,8 +108,4 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
         }
     }
 
-    @Override
-    public String getOperationType() {
-        return TYPE_STRING_INDEX;
-    }
 }
