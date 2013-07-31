@@ -29,7 +29,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformTableContent;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeleteSessions;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
@@ -327,8 +326,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            final DeleteSessions deleteSessions = new DeleteSessions(platformAccessor);
-            platformAccessor.getTransactionExecutor().execute(deleteSessions);
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             shutdownScheduler(platformAccessor, schedulerService);
         } catch (final SBonitaException e) {

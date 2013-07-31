@@ -24,6 +24,8 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public class SSessionImpl implements SSession {
 
+    private static final long serialVersionUID = 1L;
+
     private long tenantId;
 
     private final long id;

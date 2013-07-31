@@ -32,7 +32,6 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link ProcessAPI}</li>
  * <li>{@link CommandAPI}</li>
  * <li>{@link IdentityAPI}</li>
- * <li>{@link MonitoringAPI}</li>
  * <li>{@link LoginAPI}</li>
  * </ul>
  * 
@@ -91,10 +90,6 @@ public final class TenantAPIAccessor {
 
     public static CommandAPI getCommandAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(CommandAPI.class, session);
-    }
-
-    public static ReportingAPI getReportingAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return getAPI(ReportingAPI.class, session);
     }
 
     public static ProfileAPI getProfileAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {

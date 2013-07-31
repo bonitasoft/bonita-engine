@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.expression.model;
 
+import java.io.Serializable;
+
 /**
  * Used to identify a kind of expression
  * e.g.
@@ -21,7 +23,9 @@ package org.bonitasoft.engine.expression.model;
  * 
  * @author Baptiste Mesta
  */
-public class ExpressionKind {
+public class ExpressionKind implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static final String NONE = "NONE";
 

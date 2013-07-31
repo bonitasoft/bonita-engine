@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.0.2-rc-01-SNAPSHOT</version>
+		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-server</artifactId>
@@ -303,13 +304,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Monitoring -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
-			<artifactId>bonita-monitoring-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Operation -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>
@@ -468,18 +462,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
 			<artifactId>bonita-recorder-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<!-- Reporting -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.reporting</groupId>
-			<artifactId>bonita-reporting-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.reporting</groupId>
-			<artifactId>bonita-reporting-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
@@ -740,9 +722,6 @@
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.log:bonita-log-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
-									<!-- Monitoring -->
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
-									<include>org.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
 									<!-- Operation -->
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>
@@ -807,10 +786,6 @@
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
-									<!-- Reporting -->
-									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
-									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
-									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>

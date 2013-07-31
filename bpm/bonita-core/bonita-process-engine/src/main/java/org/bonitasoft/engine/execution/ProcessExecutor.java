@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -39,26 +40,31 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  */
 public interface ProcessExecutor extends ContainerExecutor {
 
-    SProcessInstance start(long userId, SProcessDefinition sDefinition, final List<SOperation> operations, Map<String, Object> context)
-            throws SFlowNodeReadException, SActivityExecutionFailedException, SActivityExecutionException,
+    SProcessInstance start(SProcessDefinition sProcessDefinition, long starterId, long starterDelegateId, List<SOperation> operations,
+            Map<String, Object> context) throws SFlowNodeReadException, SActivityExecutionFailedException, SFlowNodeExecutionException,
             SProcessInstanceCreationException;
 
-    SProcessInstance start(long userId, SProcessDefinition sDefinition, SExpressionContext expressionContext, final List<SOperation> operations,
-            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectors, long callerId, final long subProcessId)
-            throws SFlowNodeReadException, SActivityExecutionException, SProcessInstanceCreationException;
+    SProcessInstance start(SProcessDefinition sProcessDefinition, long targetSFlowNodeDefinitionId, long starterId, long starterDelegateId,
+            SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
+            List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId) throws SProcessInstanceCreationException,
+            SFlowNodeReadException, SFlowNodeExecutionException;
 
-    SProcessInstance start(long userId, SProcessDefinition sDefinition, List<SOperation> sOperations, Map<String, Object> context,
-            List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SFlowNodeReadException, SActivityExecutionFailedException,
-            SActivityExecutionException, SProcessInstanceCreationException;
+    SProcessInstance start(SProcessDefinition processDefinition, long starterId, long starterDelegateId, List<SOperation> operations,
+            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SFlowNodeReadException,
+            SProcessInstanceCreationException, SFlowNodeExecutionException;
+
+    SProcessInstance start(SProcessDefinition sProcessDefinition, long starterId, long starterDelegateId, SExpressionContext expressionContext,
+            List<SOperation> operations, Map<String, Object> context) throws SFlowNodeReadException, SActivityExecutionFailedException,
+            SFlowNodeExecutionException, SProcessInstanceCreationException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
             ConnectorService connectorService) throws SBonitaException;
 
     SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance) throws SFlowNodeReadException,
-            SProcessInstanceCreationException, SActivityExecutionException;
+            SProcessInstanceCreationException, SFlowNodeExecutionException;
 
-    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId) throws SFlowNodeReadException,
-            SProcessInstanceCreationException, SActivityExecutionException;
+    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId,
+            final long targetSFlowNodeDefinitionId) throws SFlowNodeReadException, SProcessInstanceCreationException, SFlowNodeExecutionException;
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
             throws SBonitaException;

@@ -76,7 +76,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
 
         // Build target process
         final Expression defaultValueForEmployeeOnTStep1 = new ExpressionBuilder().createGroovyScriptExpression("initAddress",
-                "import org.bonitasoft.custom.Address; \n" + "return new Address(\"Santa Claus\", \"Tähtikuja 1\", \"96930\", \"Napapiiri\", \"Suomi\")",
+                "import org.bonitasoft.custom.Address; \n" + "return new Address(\"Santa Claus\", \"TÃ¤htikuja 1\", \"96930\", \"Napapiiri\", \"Suomi\")",
                 "org.bonitasoft.custom.Address");
         final ProcessDefinitionBuilder targetProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(targetProcessName, PROCESS_VERSION);
         targetProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("tStart");

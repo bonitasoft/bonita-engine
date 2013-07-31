@@ -37,6 +37,7 @@ import org.bonitasoft.engine.search.impl.SearchResultImpl;
  * 
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public abstract class AbstractSearchEntity<C extends Serializable, S extends PersistentObject> implements TransactionContentWithResult<SearchResult<C>> {
 
@@ -129,6 +130,15 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
     @Override
     public SearchResult<C> getResult() {
         return new SearchResultImpl<C>(count, clientObjects);
+    }
+
+    protected SearchFilter getSearchFilter(final SearchOptions searchOptions, final String searchedKey) {
+        for (final SearchFilter searchFilter : searchOptions.getFilters()) {
+            if (searchedKey.equals(searchFilter.getField())) {
+                return searchFilter;
+            }
+        }
+        return null;
     }
 
 }

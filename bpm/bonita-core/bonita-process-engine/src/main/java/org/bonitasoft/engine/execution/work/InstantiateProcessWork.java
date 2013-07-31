@@ -41,14 +41,6 @@ public class InstantiateProcessWork extends TxBonitaWork {
 
     private final SProcessDefinition processDefinition;
 
-    private long callerId = -1;
-
-    private long subProcessId = -1;
-
-    private Long idOfTheProcessToInterrupt;
-
-    private SFlowNodeInstance subProcflowNodeInstance;
-
     private final ProcessInstanceService processInstanceService;
 
     private final FlowNodeInstanceService flowNodeInstanceService;
@@ -58,6 +50,16 @@ public class InstantiateProcessWork extends TxBonitaWork {
     private final TechnicalLoggerService logger;
 
     private final BPMInstancesCreator bpmInstancesCreator;
+
+    private long callerId = -1;
+
+    private long subProcessId = -1;
+
+    private long targetSFlowNodeDefinitionId = -1;
+
+    private Long idOfTheProcessToInterrupt;
+
+    private SFlowNodeInstance subProcflowNodeInstance;
 
     public InstantiateProcessWork(final SProcessDefinition processDefinition, final OperationsWithContext operations, final ProcessExecutor processExecutor,
             final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final LockService lockService,
@@ -79,7 +81,8 @@ public class InstantiateProcessWork extends TxBonitaWork {
                     bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, flowNodeInstanceService, processExecutor, lockService, logger);
             interruptor.interruptProcessInstance(idOfTheProcessToInterrupt, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        processExecutor.start(0, processDefinition, getExpressionContext(), operations.getOperations(), null, null, callerId, subProcessId);
+        processExecutor.start(processDefinition, targetSFlowNodeDefinitionId, 0, 0, getExpressionContext(), operations.getOperations(), null, null, callerId,
+                subProcessId);
     }
 
     private SExpressionContext getExpressionContext() {
@@ -106,5 +109,9 @@ public class InstantiateProcessWork extends TxBonitaWork {
     protected String getDescription() {
         return getClass().getSimpleName() + ": Process of type " + processDefinition.getName() + " (" + processDefinition.getVersion() + ")"
                 + ((subProcflowNodeInstance != null) ? ", subProcflowNodeInstanceId:" + subProcflowNodeInstance.getId() : "");
-    }
+	}
+
+    public void setTargetSFlowNodeDefinitionId(long targetSFlowNodeDefinitionId) {
+        this.targetSFlowNodeDefinitionId = targetSFlowNodeDefinitionId;
+	}
 }

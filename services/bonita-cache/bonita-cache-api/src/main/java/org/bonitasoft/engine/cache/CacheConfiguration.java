@@ -18,15 +18,38 @@ package org.bonitasoft.engine.cache;
  */
 public class CacheConfiguration {
 
-    protected long timeToLiveSeconds = 60 * 60;
+    private String evictionPolicy = "LRU";
 
-    protected int maxElementsInMemory = 10000;
+    private long timeToLiveSeconds = 60 * 60;
 
-    protected int maxElementsOnDisk = 20000;
+    private int maxElementsInMemory = 10000;
 
-    protected boolean inMemoryOnly = false;
+    private int maxElementsOnDisk = 20000;
 
-    protected boolean eternal = false;
+    private boolean inMemoryOnly = false;
+
+    private boolean eternal = false;
+
+    private String name;
+
+    /**
+     * @return the evictionPolicy
+     */
+    public String getEvictionPolicy() {
+        return evictionPolicy;
+    }
+
+    /**
+     * most implementation support LRU and LFU
+     * some implementation (ehcache) support FIFO also
+     * by default set to LRU
+     * 
+     * @param evictionPolicy
+     *            the evictionPolicy to set
+     */
+    public void setEvictionPolicy(final String evictionPolicy) {
+        this.evictionPolicy = evictionPolicy;
+    }
 
     /**
      * true if the elements are never evicted automatically
@@ -112,6 +135,14 @@ public class CacheConfiguration {
      */
     public void setInMemoryOnly(final boolean inMemoryOnly) {
         this.inMemoryOnly = inMemoryOnly;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

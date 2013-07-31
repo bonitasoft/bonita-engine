@@ -13,7 +13,6 @@ import org.bonitasoft.engine.events.EventServiceTest;
 import org.bonitasoft.engine.exceptions.impl.ExceptionsManagerTests;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
 import org.bonitasoft.engine.identity.IdentityServiceTest;
-import org.bonitasoft.engine.monitoring.MonitoringTests;
 import org.bonitasoft.engine.persistence.PersistenceTests;
 import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
@@ -32,38 +31,36 @@ import org.junit.runners.Suite.SuiteClasses;
 // FIXME add platformtest suite
 @RunWith(Suite.class)
 @SuiteClasses({
-    CacheServiceTest.class,
-    PersistenceTests.class,
-    ArchiveServiceTest.class,
-    ClassLoaderServiceTest.class,
-    DataTest.class,
-    ExpressionServiceTest.class,
-    QueriableLoggerServiceTest.class,
-    IdentityServiceTest.class,
-    ExceptionManagerIntegrationTests.class,
-    EventServiceTest.class,
-    AuthenticationServiceTest.class,
-    PlatformAuthenticationServiceTest.class,
-    SessionServiceTest.class,
-    PlatformSessionServiceTest.class,
-    DataInstanceServiceTest.class,
-    DependencyServiceTest.class,
-    WorkServiceTest.class,
+        CacheServiceTest.class,
+        PersistenceTests.class,
+        ArchiveServiceTest.class,
+        ClassLoaderServiceTest.class,
+        DataTest.class,
+        ExpressionServiceTest.class,
+        QueriableLoggerServiceTest.class,
+        IdentityServiceTest.class,
+        ExceptionManagerIntegrationTests.class,
+        EventServiceTest.class,
+        AuthenticationServiceTest.class,
+        PlatformAuthenticationServiceTest.class,
+        SessionServiceTest.class,
+        PlatformSessionServiceTest.class,
+        DataInstanceServiceTest.class,
+        DependencyServiceTest.class,
+        WorkServiceTest.class,
 
-    // -- SqlTest.class,
-    // -- Tests using the scheduler
-    RecorderTest.class,
-    SchedulerAndQueriableLogTest.class,
-    QuartzSchedulerExecutorTest.class,
-    CommandServiceIntegrationTest.class,
-    // DocumentServiceTest.class,
-    PlatformCommandServiceIntegrationTest.class,
-    ProfileServiceTest.class,
-    ParserTest.class,
-    ExceptionsManagerTests.class,
-    // Last test suite in order to check the correct begin/complete transactions
-    MonitoringTests.class
- })
+        // -- SqlTest.class,
+        // -- Tests using the scheduler
+        RecorderTest.class,
+        SchedulerAndQueriableLogTest.class,
+        QuartzSchedulerExecutorTest.class,
+        CommandServiceIntegrationTest.class,
+        // DocumentServiceTest.class,
+        PlatformCommandServiceIntegrationTest.class,
+        ProfileServiceTest.class,
+        ParserTest.class,
+        ExceptionsManagerTests.class
+})
 /**
  * Do not run this test suite alone. Use AllTestsWithJNDI instead.
  * 

@@ -145,20 +145,16 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         final SLeftOperand leftOperand = sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
         final SExpression expression = sExpressionBuilders.getExpressionBuilder().createNewInstance().setContent(newConstantValue)
                 .setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
-        final SOperation operation;
-        operation = sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator("add:" + Object.class.getName()).setLeftOperand(leftOperand)
+        return sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator("add:" + Object.class.getName()).setLeftOperand(leftOperand)
                 .setType(SOperatorType.JAVA_METHOD).setRightOperand(expression).done();
-        return operation;
     }
 
     private SOperation buildAssignmentOperation(final String dataInstanceName, final String newConstantValue) throws SInvalidExpressionException {
         final SLeftOperand leftOperand = sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
         final SExpression expression = sExpressionBuilders.getExpressionBuilder().createNewInstance().setContent(newConstantValue)
                 .setReturnType(String.class.getName()).setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
-        final SOperation operation;
-        operation = sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand)
-                .setType(SOperatorType.ASSIGNMENT).setRightOperand(expression).done();
-        return operation;
+        return sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(SOperatorType.ASSIGNMENT)
+                .setRightOperand(expression).done();
     }
 
     private void executeOperation(final SOperation operation, final long containerId, final String containerType,
@@ -168,6 +164,8 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         transactionService.begin();
         final SExpressionContext sExpressionContext = new SExpressionContext();
         sExpressionContext.setSerializableInputValues(expressionContexts);
+        sExpressionContext.setContainerId(containerId);
+        sExpressionContext.setContainerType(containerType);
         operationService.execute(operation, containerId, containerType, sExpressionContext);
         transactionService.complete();
     }
@@ -196,9 +194,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create data instance
         final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition);
-        final SDataInstance dataInstance = dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).setValue(currentDataInstanceValue)
-                .done();
-        return dataInstance;
+        return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).setValue(currentDataInstanceValue).done();
     }
 
     private void insertDataInstance(final SDataInstance dataInstance) throws SBonitaException {
@@ -227,8 +223,8 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         dataDefinitionBuilder.setDefaultValue(expression);
     }
 
-    private void deleteDataInstance(final SDataInstance dataInstance) throws STransactionCommitException,
-            SBadTransactionStateException, FireEventException, STransactionCreationException, SDataInstanceException, STransactionRollbackException {
+    private void deleteDataInstance(final SDataInstance dataInstance) throws STransactionCommitException, SBadTransactionStateException, FireEventException,
+            STransactionCreationException, SDataInstanceException, STransactionRollbackException {
         transactionService.begin();
         dataInstanceService.deleteDataInstance(dataInstance);
         transactionService.complete();

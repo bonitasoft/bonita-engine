@@ -1,0 +1,16 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
+	</bean>
+	
+	<bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
+	</bean>
+
+</beans>

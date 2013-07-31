@@ -9,10 +9,10 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+        StartEventTest.class,
         EndEventTest.class,
         SignalEventTest.class,
         SendTaskTest.class,
-        BoundaryEventsDefinitionTest.class,
         SignalBoundaryEventTest.class,
         ErrorBoundaryEventTest.class,
         SignalEventSubProcessTest.class,

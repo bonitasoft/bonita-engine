@@ -10,9 +10,9 @@ CREATE TABLE dependency (
   PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_dependency_name ON dependency (name)
+CREATE INDEX idx_dependency_name ON dependency (name, id)
 GO
-CREATE INDEX idx_dependency_version ON dependency (version)
+CREATE INDEX idx_dependency_version ON dependency (version, id)
 GO
 
 CREATE TABLE dependencymapping (
@@ -25,7 +25,7 @@ CREATE TABLE dependencymapping (
   PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid)
+CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid, id)
 GO
 ALTER TABLE dependencymapping ADD CONSTRAINT fk_depmapping_depid FOREIGN KEY (tenantid, dependencyid) REFERENCES dependency(tenantid, id) ON DELETE CASCADE
 GO

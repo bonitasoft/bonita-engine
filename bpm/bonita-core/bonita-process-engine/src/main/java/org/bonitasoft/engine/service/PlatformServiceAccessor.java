@@ -23,7 +23,6 @@ import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderAccessor;
@@ -61,8 +60,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     IdentityModelBuilder getIdentityModelBuilder();
 
     TenantServiceAccessor getTenantServiceAccessor(long tenantId);
-
-    PlatformMonitoringService getPlatformMonitoringService();
 
     TransactionExecutor getTransactionExecutor();
 

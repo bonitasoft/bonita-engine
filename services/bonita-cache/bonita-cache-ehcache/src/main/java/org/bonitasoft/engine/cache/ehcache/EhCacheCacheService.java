@@ -16,9 +16,8 @@ package org.bonitasoft.engine.cache.ehcache;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.bonitasoft.engine.cache.CacheConfiguration;
+import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -30,15 +29,14 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
  */
-public class EhCacheCacheService extends
-        CommonEhCacheCacheService implements CacheService {
+public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
-    public EhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations,
-            URL configFile) {
+    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations,
+            final URL configFile) {
         super(logger, sessionAccessor, cacheConfigurations, configFile);
     }
 
-    public EhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations) {
+    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations) {
         super(logger, sessionAccessor, cacheConfigurations);
     }
 

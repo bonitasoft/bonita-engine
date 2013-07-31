@@ -189,7 +189,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.reporting.SReport;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -251,8 +250,6 @@ import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
-import org.bonitasoft.engine.reporting.Report;
-import org.bonitasoft.engine.reporting.impl.ReportImpl;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -283,9 +280,8 @@ public class ModelConvertor {
     }
 
     public static Platform toPlatform(final SPlatform sPlatform) {
-        final Platform platform = new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(),
-                sPlatform.getCreatedBy(), sPlatform.getCreated());
-        return platform;
+        return new PlatformImpl(sPlatform.getVersion(), sPlatform.getPreviousVersion(), sPlatform.getInitialVersion(), sPlatform.getCreatedBy(),
+                sPlatform.getCreated());
     }
 
     public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities, final FlowNodeStateManager flowNodeStateManager) {
@@ -317,6 +313,7 @@ public class ModelConvertor {
         flowNode.setDisplayDescription(sflowNode.getDisplayDescription());
         flowNode.setDescription(sflowNode.getDescription());
         flowNode.setExecutedBy(sflowNode.getExecutedBy());
+        flowNode.setExecutedByDelegate(sflowNode.getExecutedByDelegate());
         flowNode.setStateCategory(StateCategory.valueOf(sflowNode.getStateCategory().name()));
     }
 
@@ -542,6 +539,7 @@ public class ModelConvertor {
             clientProcessInstanceBuilder.setStartDate(sInstance.getStartDate());
         }
         clientProcessInstanceBuilder.setStartedBy(sInstance.getStartedBy());
+        clientProcessInstanceBuilder.setStartedByDelegate(sInstance.getStartedByDelegate());
         if (sInstance.getEndDate() > 0) {
             clientProcessInstanceBuilder.setEndDate(sInstance.getEndDate());
         }
@@ -662,7 +660,8 @@ public class ModelConvertor {
             aFlowNode.setArchiveDate(new Date(saFlowNode.getArchiveDate()));
         }
         aFlowNode.setExecutedBy(saFlowNode.getExecutedBy());
-        aFlowNode.setFlownodeDefinitionId(saFlowNode.getFlownodeDefinitionId());
+        aFlowNode.setExecutedByDelegate(saFlowNode.getExecutedByDelegate());
+        aFlowNode.setFlownodeDefinitionId(saFlowNode.getFlowNodeDefinitionId());
         aFlowNode.setTerminal(saFlowNode.isTerminal());
     }
 
@@ -733,6 +732,7 @@ public class ModelConvertor {
             case INTERMEDIATE_CATCH_EVENT:
             case INTERMEDIATE_THROW_EVENT:
             case START_EVENT:
+                throw new UnknownElementType("Events are not yet archived");
             default:
                 throw new UnknownElementType(sInstance.getType().name());
         }
@@ -750,7 +750,7 @@ public class ModelConvertor {
     private static ArchivedMultiInstanceActivityInstanceImpl toArchivedMultiInstanceActivityInstance(final SAMultiInstanceActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedMultiInstanceActivityInstanceImpl archivedMultiInstanceActivityInstanceImpl = new ArchivedMultiInstanceActivityInstanceImpl(
-                sInstance.getName(), sInstance.getFlownodeDefinitionId(), sInstance.isSequential(), sInstance.getLoopDataInputRef(),
+                sInstance.getName(), sInstance.getFlowNodeDefinitionId(), sInstance.isSequential(), sInstance.getLoopDataInputRef(),
                 sInstance.getLoopDataOutputRef(), sInstance.getDataInputItemRef(), sInstance.getDataOutputItemRef(), sInstance.getNumberOfActiveInstances(),
                 sInstance.getNumberOfCompletedInstances(), sInstance.getNumberOfTerminatedInstances(), sInstance.getLoopCardinality());
         updateArchivedActivityInstance(archivedMultiInstanceActivityInstanceImpl, flowNodeStateManager, sInstance);
@@ -1762,11 +1762,8 @@ public class ModelConvertor {
             case LOOP_ACTIVITY:
                 archiveFlowNodeInstance = toArchivedLoopActivityInstance((SALoopActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
-            case START_EVENT:
-            case INTERMEDIATE_CATCH_EVENT:
-            case INTERMEDIATE_THROW_EVENT:
-            case END_EVENT:
-                // archiveFlowNodeInstance = toArchivedEventInstance((SAEventInstance) saFlowNode, flowNodeStateManager);
+            case SUB_PROCESS:
+                archiveFlowNodeInstance = toArchivedSubProcessActivityInstance((SASubProcessActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case GATEWAY:
                 archiveFlowNodeInstance = toArchivedGatewayInstance((SAGatewayInstance) saFlowNode, flowNodeStateManager);
@@ -1775,7 +1772,11 @@ public class ModelConvertor {
                 archiveFlowNodeInstance = toArchivedMultiInstanceActivityInstance((SAMultiInstanceActivityInstance) saFlowNode, flowNodeStateManager);
                 break;
             case BOUNDARY_EVENT:
-            case SUB_PROCESS:
+            case START_EVENT:
+            case INTERMEDIATE_CATCH_EVENT:
+            case INTERMEDIATE_THROW_EVENT:
+            case END_EVENT:
+                // archiveFlowNodeInstance = toArchivedEventInstance((SAEventInstance) saFlowNode, flowNodeStateManager);
                 break;
             default:
                 throw new UnknownElementType(saFlowNode.getType().name());
@@ -1854,8 +1855,13 @@ public class ModelConvertor {
     public static Profile toProfile(final SProfile sProfile) {
         final ProfileImpl profileImpl = new ProfileImpl(sProfile.getName());
         profileImpl.setId(sProfile.getId());
+        profileImpl.setDefault(sProfile.isDefault());
         profileImpl.setDescription(sProfile.getDescription());
         profileImpl.setIconPath(sProfile.getIconPath());
+        profileImpl.setCreationDate(new Date(sProfile.getCreationDate()));
+        profileImpl.setCreatedBy(sProfile.getCreatedBy());
+        profileImpl.setLastUpdateDate(new Date(sProfile.getLastUpdateDate()));
+        profileImpl.setLastUpdatedBy(sProfile.getLastUpdatedBy());
         return profileImpl;
     }
 
@@ -1917,21 +1923,6 @@ public class ModelConvertor {
             newSProfileMemberBuilder.setUserId(userId);
         }
         return newSProfileMemberBuilder.done();
-    }
-
-    public static Report toReport(final SReport sReport) {
-        final ReportImpl report = new ReportImpl(sReport.getId(), sReport.getName(), sReport.getInstallationDate(), sReport.getInstalledBy());
-        report.setDescription(sReport.getDescription());
-        report.setProvided(sReport.isProvided());
-        return report;
-    }
-
-    public static List<Report> toReports(final List<SReport> sReports) {
-        final List<Report> reports = new ArrayList<Report>(sReports.size());
-        for (final SReport sReport : sReports) {
-            reports.add(toReport(sReport));
-        }
-        return reports;
     }
 
 }

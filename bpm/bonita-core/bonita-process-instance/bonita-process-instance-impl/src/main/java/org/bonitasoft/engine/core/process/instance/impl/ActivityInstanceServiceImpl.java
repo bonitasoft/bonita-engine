@@ -55,6 +55,7 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -135,6 +136,33 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createActivityInstance");
             throw new SActivityCreationException(e);
         }
+        getLogger().log(this.getClass(), TechnicalLogSeverity.INFO, "Created " + activityInstance.getType().getValue() + " <" + activityInstance.getName() +
+                "> with id <" + activityInstance.getId() + ">");
+    }
+
+    @Override
+    public SManualTaskInstance createManualUserTask(final long userTaskId, final String name, final long flowNodeDefinitionId, final String displayName,
+            final long userId, final String description, final long dueDate, final STaskPriority priority) throws SActivityCreationException,
+            SFlowNodeNotFoundException, SFlowNodeReadException {
+        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) getFlowNodeInstance(userTaskId);
+        final SManualTaskInstanceBuilder manualTaskInstanceBuilder = getInstanceBuilders().getSManualTaskInstanceBuilder();
+        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getProcessDefinitionIndex());
+        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getRootProcessInstanceIndex());
+        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getParentProcessInstanceIndex());
+        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilder.createNewManualTaskInstance(name, flowNodeDefinitionId,
+                parentUserTask.getRootContainerId(), userTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
+                parentProcessInstanceId);
+        createNewManualTaskInstance.setParentContainerId(userTaskId);
+        createNewManualTaskInstance.setParentActivityInstanceId(userTaskId);
+        createNewManualTaskInstance.setAssigneeId(userId);
+        createNewManualTaskInstance.setExpectedEndDate(dueDate);
+        createNewManualTaskInstance.setDescription(description);
+        createNewManualTaskInstance.setDisplayDescription(description);
+        createNewManualTaskInstance.setDisplayName(displayName);
+        createNewManualTaskInstance.setPriority(priority);
+        final SActivityInstance sActivityInstance = createNewManualTaskInstance.done();
+        createActivityInstance(sActivityInstance);
+        return (SManualTaskInstance) sActivityInstance;
     }
 
     protected SPendingActivityMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SPendingActivityMapping mapping) {
@@ -366,31 +394,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
         }
-    }
-
-    @Override
-    public SManualTaskInstance createManualUserTask(final long userTaskId, final String name, final long flowNodeDefinitionId, final String displayName,
-            final long userId, final String description, final long dueDate, final STaskPriority priority) throws SActivityCreationException,
-            SFlowNodeNotFoundException, SFlowNodeReadException {
-        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) getFlowNodeInstance(userTaskId);
-        final SManualTaskInstanceBuilder manualTaskInstanceBuilder = getInstanceBuilders().getSManualTaskInstanceBuilder();
-        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getProcessDefinitionIndex());
-        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getRootProcessInstanceIndex());
-        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getParentProcessInstanceIndex());
-        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilder.createNewManualTaskInstance(name, flowNodeDefinitionId,
-                parentUserTask.getRootContainerId(), userTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
-                parentProcessInstanceId);
-        createNewManualTaskInstance.setParentContainerId(userTaskId);
-        createNewManualTaskInstance.setParentActivityInstanceId(userTaskId);
-        createNewManualTaskInstance.setAssigneeId(userId);
-        createNewManualTaskInstance.setExpectedEndDate(dueDate);
-        createNewManualTaskInstance.setDescription(description);
-        createNewManualTaskInstance.setDisplayDescription(description);
-        createNewManualTaskInstance.setDisplayName(displayName);
-        createNewManualTaskInstance.setPriority(priority);
-        final SActivityInstance sActivityInstance = createNewManualTaskInstance.done();
-        createActivityInstance(sActivityInstance);
-        return (SManualTaskInstance) sActivityInstance;
     }
 
     @Override
@@ -708,14 +711,22 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void setLoopMax(final SLoopActivityInstance loopActivity, final Integer loopMap) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("loopMax", loopMap);
-        updateActivity(loopActivity, LOOPINSTANCE_LOOPMAX_MODIFIED, descriptor);
+        try {
+            updateFlowNode(loopActivity, LOOPINSTANCE_LOOPMAX_MODIFIED, descriptor);
+        } catch (SFlowNodeModificationException e) {
+            throw new SActivityModificationException(e);
+        }
     }
 
     @Override
     public void setLoopCardinality(final SFlowNodeInstance flowNodeInstance, final int intLoopCardinality) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getLoopCardinalityKey(), intLoopCardinality);
-        updateActivity(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
+        try {
+            updateFlowNode(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
+        } catch (SFlowNodeModificationException e) {
+            throw new SActivityModificationException(e);
+        }
     }
 
     @Override
@@ -723,7 +734,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
-        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+        try {
+            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+        } catch (SFlowNodeModificationException e) {
+            throw new SActivityModificationException(e);
+        }
     }
 
     @Override
@@ -733,7 +748,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfTerminatedInstancesKey(), flowNodeInstance.getNumberOfTerminatedInstances()
                 + number);
-        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+        try {
+            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+        } catch (SFlowNodeModificationException e) {
+            throw new SActivityModificationException(e);
+        }
     }
 
     @Override
@@ -743,7 +762,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
         descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
                 + number);
-        updateActivity(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+        try {
+            updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
+        } catch (SFlowNodeModificationException e) {
+            throw new SActivityModificationException(e);
+        }
     }
 
     @Override

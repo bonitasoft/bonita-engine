@@ -51,6 +51,7 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -106,6 +107,10 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             initiateLogBuilder(eventInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createEventInstance");
             throw new SEventInstanceCreationException(e);
         }
+
+        getLogger().log(this.getClass(), TechnicalLogSeverity.INFO,
+                "Created " + eventInstance.getType().getValue() + " <" + eventInstance.getName() + "> with id <"
+                        + eventInstance.getId() + ">");
     }
 
     @Override
@@ -166,7 +171,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             final InsertRecord insertRecord = new InsertRecord(eventTriggerInstance);
             SInsertEvent insertEvent = null;
             if (this.eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) this.eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance).done();
+                insertEvent = (SInsertEvent) this.eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance)
+                        .done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createEventTriggerInstance");

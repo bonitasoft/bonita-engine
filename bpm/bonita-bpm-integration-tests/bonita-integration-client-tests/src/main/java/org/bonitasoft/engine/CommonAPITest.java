@@ -1,5 +1,7 @@
 package org.bonitasoft.engine;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -18,8 +20,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertNotNull;
 
 public abstract class CommonAPITest extends APITestUtil {
 
@@ -51,7 +51,7 @@ public abstract class CommonAPITest extends APITestUtil {
             } catch (final Exception be) {
                 LOGGER.error("Unable to clean db", be);
             } finally {
-                LOGGER.info("-------------------------------------------------------------------------------------");
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
             }
         }
 
@@ -64,7 +64,7 @@ public abstract class CommonAPITest extends APITestUtil {
                 throw new BonitaRuntimeException(e);
             }
             LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.info("-------------------------------------------------------------------------------------");
+            LOGGER.info("-----------------------------------------------------------------------------------------------");
             if (!clean.isEmpty()) {
                 throw new BonitaRuntimeException(clean.toString());
             }

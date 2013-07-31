@@ -20,6 +20,8 @@ import org.bonitasoft.engine.data.definition.model.STextDataDefinition;
  */
 public class STextDefinitionImpl extends SDataDefinitionImpl implements STextDataDefinition {
 
+    private static final long serialVersionUID = 1L;
+
     private boolean isLongText;
 
     @Override

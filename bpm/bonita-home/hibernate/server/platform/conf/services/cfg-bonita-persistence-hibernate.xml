@@ -31,6 +31,7 @@
 				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>
 				<prop key="hibernate.transaction.manager_lookup_class">${hibernate.transaction.manager_lookup_class}</prop>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
+				<prop key="hibernate.interceptor">${hibernate.journal.interceptor}</prop>
 				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>
 				<prop key="hibernate.cache.use_query_cache">true</prop>
@@ -86,7 +87,6 @@
 				<entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
-				<entry key="org.bonitasoft.engine.core.reporting.SReport" value="org.bonitasoft.engine.core.reporting.SReportImpl" />
 
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
@@ -210,7 +210,6 @@
 				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bos-supervisor-mapping" />
 				<ref bean="hbm-bos-external-identity-mapping" />
-				<ref bean="hbm-bos-reporting-model" />
 			</list>
 		</property>
 	</bean>

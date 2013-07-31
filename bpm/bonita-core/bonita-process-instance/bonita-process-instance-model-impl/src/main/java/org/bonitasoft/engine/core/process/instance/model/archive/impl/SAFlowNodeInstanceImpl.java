@@ -49,9 +49,11 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
 
     private long executedBy;
 
+    private long executedByDelegate;
+
     private String kind;
 
-    private long flownodeDefinitionId;
+    private long flowNodeDefinitionId;
 
     public SAFlowNodeInstanceImpl() {
         super();
@@ -69,7 +71,8 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         displayDescription = flowNodeInstance.getDisplayDescription();
         description = flowNodeInstance.getDescription();
         executedBy = flowNodeInstance.getExecutedBy();
-        flownodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
+        executedByDelegate = flowNodeInstance.getExecutedByDelegate();
+        flowNodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
     }
 
     @Override
@@ -77,7 +80,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return stateId;
     }
 
-    public void setStateId(final int stateId) {
+    public void setStateId(int stateId) {
         this.stateId = stateId;
     }
 
@@ -86,8 +89,25 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return stateName;
     }
 
-    public void setStateName(final String stateName) {
+    public void setStateName(String stateName) {
         this.stateName = stateName;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(boolean terminal) {
+        this.terminal = terminal;
+    }
+
+    public boolean isStable() {
+        return stable;
+    }
+
+    public void setStable(boolean stable) {
+        this.stable = stable;
     }
 
     @Override
@@ -95,7 +115,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return reachedStateDate;
     }
 
-    public void setReachedStateDate(final long reachedStateDate) {
+    public void setReachedStateDate(long reachedStateDate) {
         this.reachedStateDate = reachedStateDate;
     }
 
@@ -104,41 +124,15 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(final long lastUpdateDate) {
+    public void setLastUpdateDate(long lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
-    }
-
-    public boolean isTerminal() {
-        return terminal;
-    }
-
-    public void setTerminal(final boolean terminal) {
-        this.terminal = terminal;
-    }
-
-    public boolean isStable() {
-        return stable;
-    }
-
-    public void setStable(final boolean stable) {
-        this.stable = stable;
-    }
-
-    @Override
-    public String getDisplayDescription() {
-        return displayDescription;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
     }
 
     public long getExpectedEndDate() {
         return expectedEndDate;
     }
 
-    public void setExpectedEndDate(final long expectedEndDate) {
+    public void setExpectedEndDate(long expectedEndDate) {
         this.expectedEndDate = expectedEndDate;
     }
 
@@ -147,15 +141,25 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return claimedDate;
     }
 
-    public void setClaimedDate(final long claimedDate) {
+    public void setClaimedDate(long claimedDate) {
         this.claimedDate = claimedDate;
     }
 
-    public void setDisplayDescription(final String displayDescription) {
+    @Override
+    public String getDisplayDescription() {
+        return displayDescription;
+    }
+
+    public void setDisplayDescription(String displayDescription) {
         this.displayDescription = displayDescription;
     }
 
-    public void setDisplayName(final String displayName) {
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
@@ -164,7 +168,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return description;
     }
 
-    public void setDescription(final String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -173,21 +177,35 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return executedBy;
     }
 
-    public void setExecutedBy(final long executedBy) {
+    public void setExecutedBy(long executedBy) {
         this.executedBy = executedBy;
     }
 
-    public void setKind(final String kind) {
+    @Override
+    public long getExecutedByDelegate() {
+        return executedByDelegate;
+    }
+
+    public void setExecutedByDelegate(long executedByDelegate) {
+        this.executedByDelegate = executedByDelegate;
+    }
+
+    @Override
+    public String getKind() {
+        return kind;
+    }
+
+    public void setKind(String kind) {
         this.kind = kind;
     }
 
     @Override
-    public long getFlownodeDefinitionId() {
-        return flownodeDefinitionId;
+    public long getFlowNodeDefinitionId() {
+        return flowNodeDefinitionId;
     }
 
-    public void setFlownodeDefinitionId(long flownodeDefinitionId) {
-        this.flownodeDefinitionId = flownodeDefinitionId;
+    public void setFlowNodeDefinitionId(long flownodeDefinitionId) {
+        this.flowNodeDefinitionId = flownodeDefinitionId;
     }
 
     @Override
@@ -198,6 +216,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
+        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
         result = prime * result + (int) (expectedEndDate ^ expectedEndDate >>> 32);
         result = prime * result + (kind == null ? 0 : kind.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
@@ -206,7 +225,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         result = prime * result + stateId;
         result = prime * result + (stateName == null ? 0 : stateName.hashCode());
         result = prime * result + (terminal ? 1231 : 1237);
-        result = prime * result + (int) (flownodeDefinitionId ^ flownodeDefinitionId >>> 32);
+        result = prime * result + (int) (flowNodeDefinitionId ^ flowNodeDefinitionId >>> 32);
         return result;
     }
 
@@ -246,6 +265,9 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         if (executedBy != other.executedBy) {
             return false;
         }
+        if (executedByDelegate != other.executedByDelegate) {
+            return false;
+        }
         if (expectedEndDate != other.expectedEndDate) {
             return false;
         }
@@ -278,7 +300,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         if (terminal != other.terminal) {
             return false;
         }
-        if (flownodeDefinitionId != other.flownodeDefinitionId) {
+        if (flowNodeDefinitionId != other.flowNodeDefinitionId) {
             return false;
         }
         return true;
@@ -289,7 +311,7 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         return "SAFlowNodeInstanceImpl [stateId=" + stateId + ", stateName=" + stateName + ", terminal=" + terminal + ", stable=" + stable
                 + ", reachedStateDate=" + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", expectedEndDate=" + expectedEndDate
                 + ", displayDescription=" + displayDescription + ", displayName=" + displayName + ", description=" + description + ", executedBy=" + executedBy
-                + ", kind=" + kind + ", flownodeDefinitionId=" + flownodeDefinitionId + "]";
+                + ", kind=" + kind + ", flownodeDefinitionId=" + flowNodeDefinitionId + "]";
     }
 
 }

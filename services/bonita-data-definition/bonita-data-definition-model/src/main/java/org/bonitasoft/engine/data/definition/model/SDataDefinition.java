@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.data.definition.model;
 
+import java.io.Serializable;
+
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
-public interface SDataDefinition {
+public interface SDataDefinition extends Serializable {
 
     String getName();
 

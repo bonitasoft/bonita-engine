@@ -153,6 +153,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("processDefinitionId", processDefinition.getId()).done());
         jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("containerType", SFlowElementsContainerType.PROCESS.name()).done());
         jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("eventType", eventDefinition.getType().name()).done());
+        jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId()).done());
         if (SFlowNodeType.START_EVENT.equals(eventDefinition.getType())) {
             final SStartEventDefinition startEvent = (SStartEventDefinition) eventDefinition;
             jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("isInterrupting", startEvent.isInterrupting()).done());

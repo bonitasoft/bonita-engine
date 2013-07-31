@@ -20,6 +20,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public interface SProcessInstance extends SFlowElementsContainer {
 
@@ -31,7 +32,17 @@ public interface SProcessInstance extends SFlowElementsContainer {
 
     long getStartDate();
 
+    /**
+     * @return id of the user who originally started the process
+     * @since 6.0.1
+     */
     long getStartedBy();
+
+    /**
+     * @return id of the user (delegate) who started the process for the original starter
+     * @since 6.0.1
+     */
+    long getStartedByDelegate();
 
     long getEndDate();
 

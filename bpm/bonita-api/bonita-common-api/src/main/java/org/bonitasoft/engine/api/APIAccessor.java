@@ -27,8 +27,6 @@ public interface APIAccessor extends Serializable {
 
     CommandAPI getCommandAPI();
 
-    ReportingAPI getReportingAPI();
-
     ProfileAPI getProfileAPI();
 
 }

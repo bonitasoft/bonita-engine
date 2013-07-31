@@ -40,10 +40,20 @@ public interface SAFlowNodeInstance extends SAFlowElementInstance {
 
     String getDescription();
 
+    /**
+     * @return id of the user who originally executed the flownode
+     * @since 6.0.1
+     */
     long getExecutedBy();
+
+    /**
+     * @return id of the user (delegate) who executed the flownode for the original executer
+     * @since 6.0.1
+     */
+    long getExecutedByDelegate();
 
     String getKind();
 
-    long getFlownodeDefinitionId();
+    long getFlowNodeDefinitionId();
 
 }

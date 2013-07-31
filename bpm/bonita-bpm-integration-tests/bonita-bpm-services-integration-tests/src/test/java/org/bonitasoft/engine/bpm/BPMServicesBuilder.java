@@ -54,7 +54,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.reporting.ReportingService;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -81,11 +80,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.PlatformMonitoringService;
-import org.bonitasoft.engine.monitoring.TenantMonitoringService;
-import org.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
-import org.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
-import org.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -274,18 +268,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return accessor.getInstanceOf(ClassLoaderService.class);
     }
 
-    public SServiceMXBean getServiceMXBean() {
-        return accessor.getInstanceOf(SServiceMXBean.class);
-    }
-
-    public SPlatformServiceMXBean getPlatformServiceMXBean() {
-        return accessor.getInstanceOf(SPlatformServiceMXBean.class);
-    }
-
-    public SJvmMXBean getJvmMXBean() {
-        return accessor.getInstanceOf(SJvmMXBean.class);
-    }
-
     @Override
     public EventService getEventService() {
         return accessor.getInstanceOf(EventService.class);
@@ -334,19 +316,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public LoginService getLoginService() {
         return accessor.getInstanceOf(LoginService.class);
-    }
-
-    public TenantMonitoringService getTenantMonitoringService(final boolean useCache) {
-        if (useCache) {
-            return accessor.getInstanceOf("monitoringServiceWithCache", TenantMonitoringService.class);
-        } else {
-            return accessor.getInstanceOf("monitoringService", TenantMonitoringService.class);
-        }
-    }
-
-    @Override
-    public PlatformMonitoringService getPlatformMonitoringService() {
-        return accessor.getInstanceOf(PlatformMonitoringService.class);
     }
 
     @Override
@@ -422,11 +391,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public FlowNodeStateManager getFlowNodeStateManager() {
         return accessor.getInstanceOf(FlowNodeStateManager.class);
-    }
-
-    @Override
-    public TenantMonitoringService getTenantMonitoringService() {
-        return accessor.getInstanceOf(TenantMonitoringService.class);
     }
 
     @Override
@@ -661,14 +625,13 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return accessor.getInstanceOf(class1);
     }
 
-    @Override
-    public DefaultCommandProvider getDefaultCommandProvider() {
-        return accessor.getInstanceOf(DefaultCommandProvider.class);
+    public <T> T getInstanceOf(final String name, final Class<T> class1) {
+        return accessor.getInstanceOf(name, class1);
     }
 
     @Override
-    public ReportingService getReportingService() {
-        return null;
+    public DefaultCommandProvider getDefaultCommandProvider() {
+        return accessor.getInstanceOf(DefaultCommandProvider.class);
     }
 
     @Override

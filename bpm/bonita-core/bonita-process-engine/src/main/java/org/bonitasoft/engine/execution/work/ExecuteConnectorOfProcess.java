@@ -53,7 +53,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     private final ProcessInstanceService processInstanceService;
 
-    private final SProcessInstance processInstance;
+    private final SProcessInstance sProcessInstance;
 
     private final ProcessExecutor processExecutor;
 
@@ -62,25 +62,25 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     public ExecuteConnectorOfProcess(final TransactionExecutor transactionExecutor, final ProcessInstanceService processInstanceService,
             final ClassLoaderService classLoaderService, final ConnectorService connectorService, final ConnectorInstanceService connectorInstanceService,
             final SProcessDefinition processDefinition, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition,
-            final Map<String, Object> inputParameters, final SProcessInstance processInstance, final ProcessExecutor processExecutor,
+            final Map<String, Object> inputParameters, final SProcessInstance sProcessInstance, final ProcessExecutor processExecutor,
             final ConnectorEvent activationEvent, final EventsHandler eventsHandler, final BPMInstanceBuilders bpmInstanceBuilders,
             final BPMInstancesCreator bpmInstancesCreator, final BPMDefinitionBuilders bpmDefinitionBuilders, final ContainerRegistry containerRegistry) {
         super(processDefinition, classLoaderService, transactionExecutor, connector, sConnectorDefinition, connectorService, connectorInstanceService,
                 inputParameters, eventsHandler, bpmInstanceBuilders, bpmInstancesCreator, bpmDefinitionBuilders);
         this.processInstanceService = processInstanceService;
-        this.processInstance = processInstance;
+        this.sProcessInstance = sProcessInstance;
         this.processExecutor = processExecutor;
         this.activationEvent = activationEvent;
     }
 
     @Override
     protected void evaluateOutput(final ConnectorResult result) throws SBonitaException {
-        evaluateOutput(result, processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+        evaluateOutput(result, sProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
     }
 
     @Override
     protected void continueFlow() throws SBonitaException {
-        final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstance.getId());
+        final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(sProcessInstance.getId());
         final boolean connectorTriggered = processExecutor.executeConnectors(processDefinition, intTxProcessInstance, activationEvent, connectorService);
         if (!connectorTriggered) {
             if (activationEvent == ConnectorEvent.ON_ENTER) {
@@ -93,15 +93,15 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     protected void setContainerInFail() throws SBonitaException {
-        final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstance.getId());
+        final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(sProcessInstance.getId());
         processInstanceService.setState(intTxProcessInstance, ProcessInstanceState.ERROR);
     }
 
     @Override
     protected SThrowEventInstance createThrowErrorEventInstance(final SEndEventDefinition eventDefinition) throws SBonitaException {
         final SFlowNodeInstance createFlowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinition,
-                processInstance.getRootProcessInstanceId(), processInstance.getId(), SFlowElementsContainerType.PROCESS, eventDefinition,
-                processInstance.getRootProcessInstanceId(), processInstance.getId(), false, -1, SStateCategory.NORMAL, -1, null);
+                sProcessInstance.getRootProcessInstanceId(), sProcessInstance.getId(), SFlowElementsContainerType.PROCESS, eventDefinition,
+                sProcessInstance.getRootProcessInstanceId(), sProcessInstance.getId(), false, -1, SStateCategory.NORMAL, -1, null);
         return (SThrowEventInstance) createFlowNodeInstance;
     }
 
@@ -127,7 +127,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     protected String getDescription() {
-        return getClass().getSimpleName() + ": processInstanceId:" + processInstance.getId();
+        return getClass().getSimpleName() + ": processInstanceId:" + sProcessInstance.getId();
     }
 
 }

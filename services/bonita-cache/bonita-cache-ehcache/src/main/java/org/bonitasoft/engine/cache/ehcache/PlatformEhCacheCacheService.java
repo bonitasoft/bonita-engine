@@ -16,9 +16,8 @@ package org.bonitasoft.engine.cache.ehcache;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.bonitasoft.engine.cache.CacheConfiguration;
+import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -29,15 +28,15 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
  * 
  * @author Baptiste Mesta
  */
-public class PlatformEhCacheCacheService extends
-        CommonEhCacheCacheService implements PlatformCacheService {
+public class PlatformEhCacheCacheService extends CommonEhCacheCacheService implements PlatformCacheService {
 
-    public PlatformEhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations,
-            URL configFile) {
+    public PlatformEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
+            final CacheConfigurations cacheConfigurations, final URL configFile) {
         super(logger, sessionAccessor, cacheConfigurations, configFile);
     }
 
-    public PlatformEhCacheCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, Map<String, CacheConfiguration> cacheConfigurations) {
+    public PlatformEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
+            final CacheConfigurations cacheConfigurations) {
         super(logger, sessionAccessor, cacheConfigurations);
     }
 

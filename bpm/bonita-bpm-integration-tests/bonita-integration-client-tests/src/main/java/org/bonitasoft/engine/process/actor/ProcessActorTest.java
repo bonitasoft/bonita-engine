@@ -789,7 +789,7 @@ public class ProcessActorTest extends CommonAPITest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForStep(20, 1500, "deliver", processInstance);
+        waitForUserTask("deliver", processInstance);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(0, tasks.size());

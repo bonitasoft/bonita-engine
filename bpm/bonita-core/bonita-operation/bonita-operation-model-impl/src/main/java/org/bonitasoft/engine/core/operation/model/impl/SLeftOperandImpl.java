@@ -21,6 +21,8 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
  */
 public class SLeftOperandImpl implements SLeftOperand {
 
+    private static final long serialVersionUID = 1L;
+
     private String name;
 
     private boolean external;

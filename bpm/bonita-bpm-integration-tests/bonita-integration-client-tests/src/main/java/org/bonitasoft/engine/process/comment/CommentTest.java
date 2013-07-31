@@ -35,7 +35,7 @@ public class CommentTest extends CommonAPITest {
     }
 
     @Test
-    public void testAddComment() throws Exception {
+    public void addComment() throws Exception {
         loginWith(USERNAME, PASSWORD);
         DesignProcessDefinition designProcessDefinition;
         designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"), Arrays.asList(true, true));
@@ -50,7 +50,7 @@ public class CommentTest extends CommonAPITest {
     }
 
     @Test
-    public void testGetComments() throws Exception {
+    public void getComments() throws Exception {
         loginWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);

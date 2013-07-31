@@ -219,7 +219,7 @@ public class SupervisorTest extends CommonAPITest {
     }
 
     @Test
-    public void testGetPendingTasksSupervisedBy() throws Exception {
+    public void getPendingTasksSupervisedBy() throws Exception {
         login();
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
@@ -257,7 +257,7 @@ public class SupervisorTest extends CommonAPITest {
     }
 
     @Test
-    public void testSearchProcessDefinitionsSupervisedBy() throws Exception {
+    public void searchProcessDefinitionsSupervisedBy() throws Exception {
         login();
 
         final String username = "matti";
@@ -341,7 +341,7 @@ public class SupervisorTest extends CommonAPITest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testSearchCommentsSupervisedBy() throws Exception {
+    public void searchCommentsSupervisedBy() throws Exception {
         login();
         // prepare commentContent
         final String commentContent1 = "commentContent1";

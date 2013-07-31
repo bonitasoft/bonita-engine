@@ -127,7 +127,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createDataInstance"));
         }
-
     }
 
     private DataInstanceDataSource getDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion) throws SDataInstanceException {
@@ -755,7 +754,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDataInstances", e));
             }
-            throw new SDataInstanceException("Unable to find the data in the data mapping", e);
+            throw new SDataInstanceException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId
+                    + ", containerType = " + containerType, e);
         }
     }
 

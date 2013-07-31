@@ -20,11 +20,14 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.execution.event.EventsHandler;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class EnableProcess implements TransactionContent {
 
@@ -34,23 +37,35 @@ public final class EnableProcess implements TransactionContent {
 
     private final EventsHandler eventsHandler;
 
-    public EnableProcess(final ProcessDefinitionService processDefinitionService, final long processId, final EventsHandler eventsHandler) {
+    private final TechnicalLoggerService logger;
+
+    private final String userName;
+
+    public EnableProcess(final ProcessDefinitionService processDefinitionService, final long processId, final EventsHandler eventsHandler,
+            final TechnicalLoggerService logger, final String userName) {
         this.processDefinitionService = processDefinitionService;
         this.processId = processId;
         this.eventsHandler = eventsHandler;
+        this.logger = logger;
+        this.userName = userName;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        handleStartEvents();
+        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processId);
+        handleStartEvents(sProcessDefinition);
         processDefinitionService.enableProcessDeploymentInfo(processId);
+
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + userName + "> has enabled process <" +
+                    sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+        }
     }
 
-    private void handleStartEvents() throws SBonitaException {
-        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processId);
-        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+    private void handleStartEvents(final SProcessDefinition sProcessDefinition) throws SBonitaException {
+        final SFlowElementContainerDefinition processContainer = sProcessDefinition.getProcessContainer();
         for (final SStartEventDefinition sStartEventDefinition : processContainer.getStartEvents()) {
-            eventsHandler.handleCatchEvent(processDefinition, sStartEventDefinition, null);
+            eventsHandler.handleCatchEvent(sProcessDefinition, sStartEventDefinition, null);
         }
     }
 

@@ -38,7 +38,7 @@ CREATE TABLE queriablelog_p (
 )
 GO
 
-CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId)
+CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId, id)
 GO
 ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id)
 GO

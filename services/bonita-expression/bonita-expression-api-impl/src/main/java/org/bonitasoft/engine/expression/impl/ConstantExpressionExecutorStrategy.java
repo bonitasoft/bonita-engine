@@ -15,9 +15,12 @@ package org.bonitasoft.engine.expression.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -33,6 +36,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Matthieu Chaffotte
  */
 public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStrategy {
+
+    private static final String REGEX_PARSE_DATE = "(\\d{4})(-([01]\\d)((-([0-3]\\d)(T(\\d\\d)\\:(\\d\\d)(((\\:(\\d\\d))?(\\.(\\d\\d))?(([\\+-])(\\d\\d)\\:(\\d\\d))?)?)?)?)?)?)?";
 
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
@@ -54,7 +59,6 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
         final String returnType = expression.getReturnType();
         // here need to improve
         try {
-
             if (Boolean.class.getName().equals(returnType)) {
                 result = Boolean.parseBoolean(expressionContent);
             } else if (Long.class.getName().equals(returnType)) {
@@ -68,7 +72,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
             } else if (String.class.getName().equals(returnType)) {
                 result = expressionContent;
             } else if (Date.class.getName().equals(returnType)) { // "2013-01-02T02:42:12.17+02:00"
-                result = new Date(); // FIXME: implement me
+                result = parseDate(expressionContent);
             } else {
                 throw new SExpressionEvaluationException("unknown return type: " + returnType);
             }
@@ -91,6 +95,62 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     @Override
     public boolean mustPutEvaluatedExpressionInContext() {
         return false;
+    }
+
+    /**
+     * 
+     * @param dateToParse
+     * @return null if not a Date, new Date with properties is ISO format is recognized
+     */
+    private Date parseDate(String dateToParse) {
+        if (dateToParse.matches(REGEX_PARSE_DATE)) {
+            final Calendar calendar = GregorianCalendar.getInstance();
+            final String year = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$1");
+            if (year != null && !year.isEmpty() && Integer.valueOf(year) > 1900) {
+                calendar.set(Calendar.YEAR, Integer.valueOf(year));
+            }
+
+            final String month = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$3");
+            if (month != null && !month.isEmpty() && Integer.valueOf(month) < 13) {
+                calendar.set(Calendar.MONTH, Integer.valueOf(month) - 1); // MONTH value from 0 to 11
+            }
+
+            final String day = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$6");
+            if (day != null && !day.isEmpty() && Integer.valueOf(day) < 32) {
+                calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(day));
+            }
+
+            final String hour = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$8");
+            if (hour != null && !hour.isEmpty() && Integer.valueOf(hour) < 24) {
+                calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(hour));
+            }
+
+            final String minutes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$9");
+            if (minutes != null && !minutes.isEmpty() && Integer.valueOf(minutes) < 60) {
+                calendar.set(Calendar.MINUTE, Integer.valueOf(minutes));
+            }
+
+            final String secondes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$13");
+            if (secondes != null && !secondes.isEmpty() && Integer.valueOf(secondes) < 60) {
+                calendar.set(Calendar.SECOND, Integer.valueOf(secondes));
+            }
+
+            final String fractional = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$15");
+            if (fractional != null && !fractional.isEmpty() && Integer.valueOf(fractional) < 60) {
+                calendar.set(Calendar.MILLISECOND, Integer.valueOf(fractional));
+            }
+
+            final String TZsign = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$17");
+            final String TZhour = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$18");
+            final String TZminutes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$19");
+            final TimeZone tz = TimeZone.getTimeZone("GMT" + TZsign + TZhour + TZminutes);
+            if (!TZsign.isEmpty() && !TZhour.isEmpty() && !TZminutes.isEmpty() && tz != null) {
+                calendar.setTimeZone(tz);
+            }
+
+            return calendar.getTime();
+        }
+        return null;
     }
 
 }

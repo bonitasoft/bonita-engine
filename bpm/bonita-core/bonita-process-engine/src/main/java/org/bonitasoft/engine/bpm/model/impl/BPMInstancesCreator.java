@@ -22,12 +22,12 @@ import java.util.Map;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.api.impl.transaction.EvaluateExpression;
 import org.bonitasoft.engine.api.impl.transaction.activity.CreateActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
 import org.bonitasoft.engine.api.impl.transaction.data.CreateSDataInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
+import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpression;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -98,6 +98,8 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -129,11 +131,13 @@ public class BPMInstancesCreator {
 
     private final DataInstanceService dataInstanceService;
 
+    private final TechnicalLoggerService logger;
+
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService, final BPMInstanceBuilders instanceBuilders,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService,
             final ConnectorInstanceService connectorInstanceService, final SDataInstanceBuilders sDataInstanceBuilders,
-            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService) {
+            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final TechnicalLoggerService logger) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.instanceBuilders = instanceBuilders;
@@ -144,6 +148,7 @@ public class BPMInstancesCreator {
         this.sDataInstanceBuilders = sDataInstanceBuilders;
         this.expressionResolverService = expressionResolverService;
         this.dataInstanceService = dataInstanceService;
+        this.logger = logger;
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final SProcessDefinition sProcessDefinition, final long rootContainerId,
@@ -556,6 +561,10 @@ public class BPMInstancesCreator {
                     instanceBuilders, processDefinition);
             transaction.execute();
         }
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Initialized variables for process instance <" + processInstance.getName() + "> with id <"
+                    + processInstance.getId() + ">");
+        }
     }
 
     private boolean hasLocalOrInheritedData(final SProcessDefinition processDefinition, final SFlowElementContainerDefinition processContainer) {
@@ -613,6 +622,10 @@ public class BPMInstancesCreator {
                 throw new SDataInstanceException(e);
             }
             dataInstanceService.createDataInstance(dataInstance);
+        }
+
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Initialized variables for " + containerType.getValue() + " with id <" + containerId + ">");
         }
     }
 

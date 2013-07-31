@@ -20,6 +20,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProcessInstance {
 
@@ -34,6 +35,8 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
     private long startDate;
 
     private long startedBy;
+
+    private long startedByDelegate;
 
     private long endDate;
 
@@ -66,6 +69,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         startDate = processInstance.getStartDate();
         endDate = processInstance.getEndDate();
         startedBy = processInstance.getStartedBy();
+        startedByDelegate = processInstance.getStartedByDelegate();
         lastUpdate = processInstance.getLastUpdate();
         stateId = processInstance.getStateId();
         rootProcessInstanceId = processInstance.getRootProcessInstanceId();
@@ -88,12 +92,16 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return processDefinitionId;
     }
 
+    public void setProcessDefinitionId(long processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
     @Override
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(final String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -102,7 +110,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stateId;
     }
 
-    public void setStateId(final int stateId) {
+    public void setStateId(int stateId) {
         this.stateId = stateId;
     }
 
@@ -111,7 +119,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return startDate;
     }
 
-    public void setStartDate(final long startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
@@ -120,8 +128,16 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return startedBy;
     }
 
-    public void setStartedBy(final long startedBy) {
+    public void setStartedBy(long startedBy) {
         this.startedBy = startedBy;
+    }
+
+    public long getStartedByDelegate() {
+        return startedByDelegate;
+    }
+
+    public void setStartedByDelegate(long startedByDelegate) {
+        this.startedByDelegate = startedByDelegate;
     }
 
     @Override
@@ -129,7 +145,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return endDate;
     }
 
-    public void setEndDate(final long endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 
@@ -138,12 +154,16 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return lastUpdate;
     }
 
+    public void setLastUpdate(long lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
     @Override
     public long getRootProcessInstanceId() {
         return rootProcessInstanceId;
     }
 
-    public void setRootProcessInstanceId(final long rootProcessInstanceId) {
+    public void setRootProcessInstanceId(long rootProcessInstanceId) {
         this.rootProcessInstanceId = rootProcessInstanceId;
     }
 
@@ -152,17 +172,8 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return callerId;
     }
 
-    public void setCallerId(final long callerId) {
+    public void setCallerId(long callerId) {
         this.callerId = callerId;
-    }
-
-    @Override
-    public long getMigrationPlanId() {
-        return migrationPlanId;
-    }
-
-    public void setMigrationPlanId(final long migrationPlanId) {
-        this.migrationPlanId = migrationPlanId;
     }
 
     @Override
@@ -170,7 +181,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex1;
     }
 
-    public void setStringIndex1(final String stringIndex1) {
+    public void setStringIndex1(String stringIndex1) {
         this.stringIndex1 = stringIndex1;
     }
 
@@ -179,7 +190,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex2;
     }
 
-    public void setStringIndex2(final String stringIndex2) {
+    public void setStringIndex2(String stringIndex2) {
         this.stringIndex2 = stringIndex2;
     }
 
@@ -188,7 +199,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex3;
     }
 
-    public void setStringIndex3(final String stringIndex3) {
+    public void setStringIndex3(String stringIndex3) {
         this.stringIndex3 = stringIndex3;
     }
 
@@ -197,7 +208,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex4;
     }
 
-    public void setStringIndex4(final String stringIndex4) {
+    public void setStringIndex4(String stringIndex4) {
         this.stringIndex4 = stringIndex4;
     }
 
@@ -206,8 +217,17 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex5;
     }
 
-    public void setStringIndex5(final String stringIndex5) {
+    public void setStringIndex5(String stringIndex5) {
         this.stringIndex5 = stringIndex5;
+    }
+
+    @Override
+    public long getMigrationPlanId() {
+        return migrationPlanId;
+    }
+
+    public void setMigrationPlanId(long migrationPlanId) {
+        this.migrationPlanId = migrationPlanId;
     }
 
     @Override
@@ -221,6 +241,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         result = prime * result + (int) (rootProcessInstanceId ^ rootProcessInstanceId >>> 32);
         result = prime * result + (int) (startDate ^ startDate >>> 32);
         result = prime * result + (int) (startedBy ^ startedBy >>> 32);
+        result = prime * result + (int) (startedByDelegate ^ startedByDelegate >>> 32);
         result = prime * result + stateId;
         result = prime * result + (stringIndex1 == null ? 0 : stringIndex1.hashCode());
         result = prime * result + (stringIndex2 == null ? 0 : stringIndex2.hashCode());
@@ -261,6 +282,9 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
             return false;
         }
         if (startedBy != other.startedBy) {
+            return false;
+        }
+        if (startedByDelegate != other.startedByDelegate) {
             return false;
         }
         if (stateId != other.stateId) {

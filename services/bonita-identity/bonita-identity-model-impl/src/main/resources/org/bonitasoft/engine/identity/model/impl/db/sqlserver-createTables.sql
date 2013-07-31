@@ -31,7 +31,7 @@ CREATE TABLE role (
 )
 GO
 
-CREATE INDEX idx_role_name ON role (tenantid, name)
+CREATE INDEX idx_role_name ON role (tenantid, name, id)
 GO
 
 CREATE TABLE user_ (
@@ -57,7 +57,7 @@ CREATE TABLE user_ (
 )
 GO
 
-CREATE INDEX idx_user_name ON user_ (tenantid, userName)
+CREATE INDEX idx_user_name ON user_ (tenantid, userName, id)
 GO
 
 CREATE TABLE user_contactinfo (
@@ -98,7 +98,7 @@ CREATE TABLE p_metadata_def (
 )
 GO
 
-CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name)
+CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name, id)
 GO
 
 CREATE TABLE p_metadata_val (

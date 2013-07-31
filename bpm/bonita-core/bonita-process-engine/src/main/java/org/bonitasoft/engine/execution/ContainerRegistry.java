@@ -22,8 +22,8 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
@@ -70,8 +70,8 @@ public class ContainerRegistry {
     }
 
     public void executeFlowNodeInSameThread(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final String containerType, final Long processInstanceId) throws SActivityReadException, SFlowNodeExecutionException {
+            final String containerType, final Long processInstanceId) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
-        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null);
+        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
     }
 }

@@ -14,15 +14,10 @@
 package org.bonitasoft.engine.core.operation.impl;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * AssignmentOperationExecutorStrategy is the default Bonita strategy to execute data assignment operations
@@ -30,17 +25,14 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Zhang Bole
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
-public class AssignmentOperationExecutorStrategy implements OperationExecutorStrategy {
+public class AssignmentOperationExecutorStrategy extends UpdateOperationExecutorStrategy {
 
     /**
      * The Operation type of this strategy, as a String
      */
     public static final String TYPE_ASSIGNMENT = "ASSIGNMENT";
-
-    private final DataInstanceService dataInstanceService;
-
-    private final SDataInstanceBuilders sDataInstanceBuilders;
 
     /**
      * Builds a new AssignmentOperationExecutorStrategy, which is the strategy to execute data assignment operations
@@ -51,59 +43,35 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
      *            <code>SDataInstanceBuilders</code> to build the updateDescriptor when updating the data
      */
     public AssignmentOperationExecutorStrategy(final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders) {
-        this.dataInstanceService = dataInstanceService;
-        this.sDataInstanceBuilders = sDataInstanceBuilders;
-    }
-
-    private void updateDataInstance(final SOperation operation, final long containerId, final String containerType, final Object expressionResult)
-            throws SOperationExecutionException {
-        final String dataInstanceName = operation.getLeftOperand().getName();
-        SDataInstance sDataInstance;
-        try {
-            sDataInstance = dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
-            checkReturnType(sDataInstance.getClassName(), expressionResult, operation.getRightOperand().getName());
-
-            final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(expressionResult);
-            dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
-        } catch (final SDataInstanceException e) {
-            throw new SOperationExecutionException(e);
-        }
-    }
-
-    private void checkReturnType(final String className, final Object result, final String rightOperandExpressionName) throws SOperationExecutionException {
-        if (result != null) {
-            try {
-                final Class<?> dataDeclaredType = Thread.currentThread().getContextClassLoader().loadClass(className);
-                final Class<?> evaluatedReturnedType = result.getClass();
-                if (!dataDeclaredType.isAssignableFrom(evaluatedReturnedType)) {
-                    throw new SOperationExecutionException("Incompatible assignment operation type: Left operand " + dataDeclaredType
-                            + " is not compatible with right operand " + evaluatedReturnedType + " for expression with name '" + rightOperandExpressionName
-                            + "'");
-                }
-            } catch (final ClassNotFoundException e) {
-                throw new SOperationExecutionException("Declared return type unknown: " + className + " for expression " + rightOperandExpressionName, e);
-            }
-        }
+        super(dataInstanceService, sDataInstanceBuilders);
     }
 
     @Override
-    public void execute(final SOperation operation, final Object value, final long containerId, final String containerType,
+    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
-        // Let's update the value if the variable to set is not external:
-        if (!operation.getLeftOperand().isExternal()) {
-            updateDataInstance(operation, containerId, containerType, value);
-        } else {
-            // set the new value of the external data in the list of input values:
-            expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
-        }
+        checkReturnType(value, operation, expressionContext);
+        // no processing on the value, just return it
+        return value;
     }
 
-    private EntityUpdateDescriptor getUpdateDescriptor(final Object newValue) {
-        // update data instance value
-        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        final SDataInstanceBuilder sDataInstanceBuilder = sDataInstanceBuilders.getDataInstanceBuilder();
-        updateDescriptor.addField(sDataInstanceBuilder.getValueKey(), newValue);
-        return updateDescriptor;
+    private void checkReturnType(final Object value, final SOperation operation, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
+        if (value != null) {
+            final String name = operation.getLeftOperand().getName();
+            final Object object = expressionContext.getInputValues().get(name);
+            /*
+             * if the object is null (data is not initialised) the return type is not checked
+             * but the data instance service should throw an exception
+             */
+            if (object != null) {
+                final Class<?> dataEffectiveType = object.getClass();
+                final Class<?> evaluatedReturnedType = value.getClass();
+                if (!dataEffectiveType.isAssignableFrom(evaluatedReturnedType)) {
+                    throw new SOperationExecutionException("Incompatible assignment operation type: Left operand " + dataEffectiveType +
+                            " is not compatible with right operand " + evaluatedReturnedType + " for expression with name '" + expressionContext + "'");
+                }
+            }
+        }
     }
 
     @Override

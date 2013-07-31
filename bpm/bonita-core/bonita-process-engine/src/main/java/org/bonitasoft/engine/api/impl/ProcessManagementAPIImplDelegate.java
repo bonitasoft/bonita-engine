@@ -19,57 +19,59 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+
 // Uncomment the "implements" when this delegate implements all the methods.
-public class ProcessManagementAPIImplDelegate /*implements ProcessManagementAPI*/ {
+public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */{
 
-	protected static TenantServiceAccessor getTenantAccessor() {
-		try {
-			final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-			final long tenantId = sessionAccessor.getTenantId();
-			return TenantServiceSingleton.getInstance(tenantId);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private static PlatformServiceAccessor getPlatformServiceAccessor() {
-		try {
-			return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    protected static TenantServiceAccessor getTenantAccessor() {
+        try {
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final long tenantId = sessionAccessor.getTenantId();
+            return TenantServiceSingleton.getInstance(tenantId);
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public void deleteProcessDefinition(final long processId) throws SBonitaException, BonitaHomeNotSetException, IOException {
-		final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+    private static PlatformServiceAccessor getPlatformServiceAccessor() {
+        try {
+            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-		DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processId);
-		deleteProcess.execute();
+    public void deleteProcessDefinition(final long processId) throws SBonitaException, BonitaHomeNotSetException, IOException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
-		final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
-		final File file = new File(processesFolder);
-		if (!file.exists()) {
-			file.mkdir();
-		}
+        DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processId);
+        deleteProcess.execute();
 
-		final File processFolder = new File(file, String.valueOf(processId));
-		IOUtil.deleteDir(processFolder);
+        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
+        final File file = new File(processesFolder);
+        if (!file.exists()) {
+            file.mkdir();
+        }
 
-	}
+        final File processFolder = new File(file, String.valueOf(processId));
+        IOUtil.deleteDir(processFolder);
+
+    }
 
     protected DeleteProcess instantiateDeleteProcessTransactionContent(final long processId) {
         return new DeleteProcess(getTenantAccessor(), processId);
     }
-	
-	public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
-		final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-		final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
-		final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-		final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
-		final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-		final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService);
-			transactionContent.execute();
-	}
+    public void disableProcess(final long processId, final String userName) throws SProcessDefinitionNotFoundException, SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+
+        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService,
+                tenantAccessor.getTechnicalLoggerService(), userName);
+        transactionContent.execute();
+    }
 
 }

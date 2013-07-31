@@ -401,7 +401,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
         final ProcessInstance[] procInstLevels = new ProcessInstance[nbLevel];
         procInstLevels[0] = getProcessAPI().startProcess(processDefLevels[0].getId(), operations, null);
-        checkNbOfProcessInstances(50, 1000 * nbLevel, nbLevel, ProcessInstanceCriterion.NAME_DESC);
+        checkNbOfProcessInstances(50, 5000 * nbLevel, nbLevel, ProcessInstanceCriterion.NAME_DESC);
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, nbLevel, ProcessInstanceCriterion.NAME_ASC); // if nbLevel>10 use
                                                                                                                                            // CREATION_DATE_ASC
         assertEquals(nbLevel, processInstances.size());
@@ -436,7 +436,7 @@ public class CallActivityTest extends CommonAPITest {
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
     @Test
-    public void testMultiLevelCallActivity() throws Exception {
+    public void multiLevelCallActivity() throws Exception {
         variableMultiLevelCallActivity(10);
     }
 
@@ -521,7 +521,7 @@ public class CallActivityTest extends CommonAPITest {
 
     @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" })
     @Test
-    public void testGetArchivedCallActivityInstance() throws Exception {
+    public void getArchivedCallActivityInstance() throws Exception {
 
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);

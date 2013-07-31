@@ -29,6 +29,12 @@ public class SProfileUpdateBuilderImpl implements SProfileUpdateBuilder {
     }
 
     @Override
+    public SProfileUpdateBuilder setName(final String name) {
+        descriptor.addField(SProfileBuilder.NAME, name);
+        return this;
+    }
+
+    @Override
     public SProfileUpdateBuilder setDescription(final String description) {
         descriptor.addField(SProfileBuilder.DESCRIPTION, description);
         return this;
@@ -41,8 +47,14 @@ public class SProfileUpdateBuilderImpl implements SProfileUpdateBuilder {
     }
 
     @Override
-    public SProfileUpdateBuilder setName(final String name) {
-        descriptor.addField(SProfileBuilder.NAME, name);
+    public SProfileUpdateBuilder setLastUpdateDate(final long lastUpdateDate) {
+        descriptor.addField(SProfileBuilder.LAST_UPDATE_DATE, lastUpdateDate);
+        return this;
+    }
+
+    @Override
+    public SProfileUpdateBuilder setLastUpdatedBy(final long lastUpdatedBy) {
+        descriptor.addField(SProfileBuilder.LAST_UPDATED_BY, lastUpdatedBy);
         return this;
     }
 

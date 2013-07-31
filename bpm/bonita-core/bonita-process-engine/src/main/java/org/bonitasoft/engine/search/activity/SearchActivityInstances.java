@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractActivityInstanceSearchEntity;
@@ -27,29 +26,26 @@ import org.bonitasoft.engine.search.descriptor.SearchActivityInstanceDescriptor;
 
 /**
  * @author Yanyan Liu
+ * @author Celine Souchet
  */
 public class SearchActivityInstances extends AbstractActivityInstanceSearchEntity {
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final Class<? extends PersistentObject> entityClass;
-
     public SearchActivityInstances(final ActivityInstanceService activityInstanceService, final FlowNodeStateManager flowNodeStateManager,
-            final SearchActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions, final Class<? extends PersistentObject> entityClass) {
+            final SearchActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions, flowNodeStateManager);
         this.activityInstanceService = activityInstanceService;
-        this.entityClass = entityClass;
-
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.getNumberOfActivityInstances(entityClass, searchOptions);
+        return activityInstanceService.getNumberOfActivityInstances(getEntityClass(), searchOptions);
     }
 
     @Override
     public List<SActivityInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.searchActivityInstances(entityClass, searchOptions);
+        return activityInstanceService.searchActivityInstances(getEntityClass(), searchOptions);
     }
 
 }

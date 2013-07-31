@@ -24,6 +24,7 @@
 			<xsd:element name="profileMapping" type="profileMapping" minOccurs="0"/>
 		</xsd:all>		
 		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="isDefault" type="xsd:boolean" use="required" />
 	</xsd:complexType>
 	
 	<xsd:complexType name="ProfileEntries">

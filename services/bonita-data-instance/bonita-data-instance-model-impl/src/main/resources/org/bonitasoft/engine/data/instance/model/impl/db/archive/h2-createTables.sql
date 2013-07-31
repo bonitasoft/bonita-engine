@@ -15,7 +15,7 @@ CREATE TABLE arch_data_instance (
 	booleanValue BOOLEAN,
 	doubleValue NUMERIC(19,5),
 	floatValue REAL,
-	blobValue BLOB,
+	blobValue MEDIUMBLOB,
 	clobValue CLOB,
 	discriminant VARCHAR(50) NOT NULL,
 	archiveDate BIGINT NOT NULL,

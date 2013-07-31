@@ -17,6 +17,7 @@
 		<property name="description" column="description" />
 		<property name="startDate" column="startDate" />
 		<property name="startedBy" column="startedBy" />
+		<property name="startedByDelegate" column="startedByDelegate" />
 		<property name="endDate" column="endDate" />
 		<property name="archiveDate" column="archiveDate" />
 		<property name="sourceObjectId" column="sourceObjectId" type="long" />
@@ -38,7 +39,7 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<discriminator column="kind" type="string" />
-		<property name="flownodeDefinitionId" column="flownodeDefinitionId" />
+		<property name="flowNodeDefinitionId" column="flownodeDefinitionId" />
 		<property name="kind" column="kind" insert="false" update="false" />
 		<property name="rootContainerId" column="rootContainerId" />
 		<property name="parentContainerId" column="parentContainerId" />
@@ -62,6 +63,7 @@
 		<property name="logicalGroup4" column="logicalGroup4" type="long" />
 		<property name="description" column="description" />
 		<property name="executedBy" column="executedBy" />
+		<property name="executedByDelegate" column="executedByDelegate" />
 		<filter name="tenantFilter" />
 	</class>
 

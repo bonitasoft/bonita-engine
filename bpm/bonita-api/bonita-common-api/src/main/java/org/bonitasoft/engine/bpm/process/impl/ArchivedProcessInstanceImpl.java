@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class ArchivedProcessInstanceImpl extends NamedElementImpl implements ArchivedProcessInstance {
 
@@ -33,6 +34,8 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
     private Date startDate;
 
     private long startedBy;
+
+    private long startedByDelegate;
 
     private Date endDate;
 
@@ -61,7 +64,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return state;
     }
 
-    public void setState(final String state) {
+    public void setState(String state) {
         this.state = state;
     }
 
@@ -70,9 +73,26 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return startDate;
     }
 
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
     @Override
     public long getStartedBy() {
         return startedBy;
+    }
+
+    public void setStartedBy(long startedBy) {
+        this.startedBy = startedBy;
+    }
+
+    @Override
+    public long getStartedByDelegate() {
+        return startedByDelegate;
+    }
+
+    public void setStartedByDelegate(long startedByDelegate) {
+        this.startedByDelegate = startedByDelegate;
     }
 
     @Override
@@ -80,15 +100,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return endDate;
     }
 
-    public void setStartDate(final Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setStartedBy(final long startedBy) {
-        this.startedBy = startedBy;
-    }
-
-    public void setEndDate(final Date endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
@@ -97,7 +109,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return archiveDate;
     }
 
-    public void setArchiveDate(final Date archiveDate) {
+    public void setArchiveDate(Date archiveDate) {
         this.archiveDate = archiveDate;
     }
 
@@ -106,27 +118,8 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return lastUpdate;
     }
 
-    public void setLastUpdate(final Date lastUpdate) {
+    public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
-    }
-
-    @Override
-    public long getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public int getStateId() {
-        return stateId;
     }
 
     @Override
@@ -134,16 +127,35 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return sourceObjectId;
     }
 
-    public void setSourceObjectId(final long processInstanceId) {
-        sourceObjectId = processInstanceId;
+    public void setSourceObjectId(long sourceObjectId) {
+        this.sourceObjectId = sourceObjectId;
     }
 
-    public void setStateId(final int stateId) {
+    @Override
+    public int getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(int stateId) {
         this.stateId = stateId;
     }
 
-    public void setProcessDefinitionId(final long processDefinitionId) {
+    @Override
+    public long getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -151,7 +163,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return rootProcessInstanceId;
     }
 
-    public void setRootProcessInstanceId(final long rootProcessInstanceId) {
+    public void setRootProcessInstanceId(long rootProcessInstanceId) {
         this.rootProcessInstanceId = rootProcessInstanceId;
     }
 
@@ -160,7 +172,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return callerId;
     }
 
-    public void setCallerId(final long callerId) {
+    public void setCallerId(long callerId) {
         this.callerId = callerId;
     }
 
@@ -177,6 +189,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         result = prime * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
         result = prime * result + (startDate == null ? 0 : startDate.hashCode());
         result = prime * result + (int) (startedBy ^ startedBy >>> 32);
+        result = prime * result + (int) (startedByDelegate ^ startedByDelegate >>> 32);
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + stateId;
         return result;
@@ -237,6 +250,9 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         if (startedBy != other.startedBy) {
             return false;
         }
+        if (startedByDelegate != other.startedByDelegate) {
+            return false;
+        }
         if (state == null) {
             if (other.state != null) {
                 return false;
@@ -249,4 +265,5 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         }
         return true;
     }
+
 }

@@ -96,7 +96,7 @@ public class ConnectorServiceImplTest {
         final DependencyService dependencyService = mock(DependencyService.class);
 
         connectorService = new ConnectorServiceImpl(mock(CacheService.class), mock(ConnectorExecutor.class), parserFactory, mock(ReadSessionAccessor.class),
-                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyBuilderAccessor, dependencyService);
+                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyBuilderAccessor, dependencyService, null);
     }
 
     @Test(expected = SInvalidConnectorImplementationException.class)

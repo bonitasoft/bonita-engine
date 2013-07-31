@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,7 @@ import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SProfileImpl implements SProfile {
 
@@ -26,11 +27,21 @@ public class SProfileImpl implements SProfile {
 
     private long tenantId;
 
+    private boolean isDefault;
+
     private String name;
 
     private String description;
 
     private String iconPath;
+
+    private long creationDate;
+
+    private long createdBy;
+
+    private long lastUpdateDate;
+
+    private long lastUpdatedBy;
 
     public SProfileImpl() {
         super();
@@ -39,9 +50,19 @@ public class SProfileImpl implements SProfile {
     public SProfileImpl(final SProfile profile) {
         super();
         id = profile.getId();
+        isDefault = profile.isDefault();
         name = profile.getName();
         description = profile.getDescription();
         iconPath = profile.getIconPath();
+        creationDate = profile.getCreationDate();
+        createdBy = profile.getCreatedBy();
+        lastUpdateDate = profile.getLastUpdateDate();
+        lastUpdatedBy = profile.getLastUpdatedBy();
+    }
+
+    @Override
+    public String getDiscriminator() {
+        return SProfileImpl.class.getName();
     }
 
     public long getTenantId() {
@@ -64,8 +85,12 @@ public class SProfileImpl implements SProfile {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SProfileImpl.class.getName();
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(final boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     @Override
@@ -96,14 +121,55 @@ public class SProfileImpl implements SProfile {
     }
 
     @Override
+    public long getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(final long creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    @Override
+    public long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(final long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @Override
+    public long getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(final long lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    @Override
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(final long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
+        result = prime * result + (int) (id ^ id >>> 32);
+        result = prime * result + (isDefault ? 1231 : 1237);
+        result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
+        result = prime * result + (int) (creationDate ^ creationDate >>> 32);
+        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
+        result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
+        result = prime * result + (int) (lastUpdatedBy ^ lastUpdatedBy >>> 32);
         return result;
     }
 
@@ -119,6 +185,22 @@ public class SProfileImpl implements SProfile {
             return false;
         }
         final SProfileImpl other = (SProfileImpl) obj;
+        if (tenantId != other.tenantId) {
+            return false;
+        }
+        if (id != other.id) {
+            return false;
+        }
+        if (isDefault != other.isDefault) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
         if (description == null) {
             if (other.description != null) {
                 return false;
@@ -133,19 +215,19 @@ public class SProfileImpl implements SProfile {
         } else if (!iconPath.equals(other.iconPath)) {
             return false;
         }
-        if (id != other.id) {
+        if (creationDate != other.creationDate) {
             return false;
         }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
+        if (createdBy != other.createdBy) {
             return false;
         }
-        if (tenantId != other.tenantId) {
+        if (lastUpdateDate != other.lastUpdateDate) {
             return false;
         }
+        if (lastUpdatedBy != other.lastUpdatedBy) {
+            return false;
+        }
+
         return true;
     }
 

@@ -241,20 +241,21 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *            identifier of the process instance to delete
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still active
+     *             if a process instance can't be deleted because of a parent that is still existing.
      * @since 6.0
      */
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
 
     /**
-     * Delete process instances by its process definition id
-     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
-     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
+     * Delete all instances of a specified process definition.
+     * If the process definition id does not match anything, no exception is thrown, but nothing is deleted.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            the identifier of the processDefinition.
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still active
+     *             if a process instance cannot be deleted because of a parent that still exists.
+     * @throws DeletionException
+     *             if other deletion problem occurs.
      * @since 6.0
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
      *             {@link #deleteArchivedProcessInstances(long, int, int, ProcessInstanceCriterion)}
@@ -340,10 +341,12 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ProcessDefinitionNotFoundException;
 
     /**
-     * Start the process on behalf of a given user name
+     * Start an instance of the process definition on behalf of a given user
+     * If userId equals 0, the logged-in user is declared as the starter of the process.
+     * The user, who started the process on behalf of a given user, is declared as a starter delegate.
      * 
      * @param userId
-     *            the user id of the user starting the process
+     *            the identifier of the user for which you want to start the process
      * @param processDefinitionId
      *            Identifier of the processDefinition
      * @return The ProcessInstance Objects
@@ -356,9 +359,11 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process definition on behalf of a given user, and set the initial values of the data with the given operations.
+     * If userId equals 0, the logged-in user is declared as the starter of the process.
+     * The user, who started the process on behalf of a given user, is declared as a starter delegate.
      * 
      * @param userId
-     *            the id of the user to start the process on behalf of
+     *            the identifier of the user for which you want to start the process
      * @param processDefinitionId
      *            Identifier of the process definition will be started
      * @param operations
@@ -382,16 +387,32 @@ public interface ProcessRuntimeAPI {
             throws UserNotFoundException, ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Execute an activity that is is a non stable state
-     * Will make the activity go in the next stable state and then continue the execution of the process
+     * Execute an flowNode that is is a non stable state
+     * Will make the flow node go in the next stable state and then continue the execution of the process
      * 
      * @param flownodeInstanceId
-     *            id of the flow node to execute
+     *            the identifier of the flow node to execute
      * @throws FlowNodeExecutionException
      *             if an execution exception occurs
      * @since 6.0
      */
     void executeFlowNode(long flownodeInstanceId) throws FlowNodeExecutionException;
+
+    /**
+     * Start an flow node that is is a non stable state on behalf of a given user
+     * Will make the flow node go in the next stable state and then continue the execution of the process
+     * If userId equals 0, the logged-in user is declared as the executer of the flow node.
+     * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
+     * 
+     * @param userId
+     *            the identifier of the user for which you want to execute the flow node
+     * @param flownodeInstanceId
+     *            the identifier of the flow node to execute
+     * @throws FlowNodeExecutionException
+     *             if an execution exception occurs
+     * @since 6.0.1
+     */
+    void executeFlowNode(long userId, long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
      * Returns all currently active activities of a process instance.

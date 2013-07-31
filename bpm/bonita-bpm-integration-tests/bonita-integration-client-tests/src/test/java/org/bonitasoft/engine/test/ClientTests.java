@@ -14,21 +14,15 @@
  */
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.builder.expression.ExpressionBuilderTest;
 import org.bonitasoft.engine.client.BonitaClientXMLTest;
-import org.bonitasoft.engine.event.EventSubProcessDefinitionTest;
-import org.bonitasoft.engine.event.MessageEventsDefinitionTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ 
-    BonitaClientXMLTest.class,
-    ExpressionBuilderTest.class,
-    EventSubProcessDefinitionTest.class,
-    MessageEventsDefinitionTest.class
-    })
+@SuiteClasses({
+        BonitaClientXMLTest.class
+})
 public class ClientTests {
 
 }

@@ -22,6 +22,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SDataDefinitionImpl implements SDataDefinition {
 
+    private static final long serialVersionUID = 1L;
+
     private String name;
 
     private String description;

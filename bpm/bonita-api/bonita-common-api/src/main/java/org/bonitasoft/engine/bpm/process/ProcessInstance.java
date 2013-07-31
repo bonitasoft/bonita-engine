@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.NamedElement;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface ProcessInstance extends NamedElement, BaseElement {
 
@@ -28,7 +29,17 @@ public interface ProcessInstance extends NamedElement, BaseElement {
 
     Date getStartDate();
 
+    /**
+     * @return id of the user who originally started the process
+     * @since 6.0.1
+     */
     long getStartedBy();
+
+    /**
+     * @return id of the user (delegate) who started the process for the original starter
+     * @since 6.0.1
+     */
+    long getStartedByDelegate();
 
     Date getEndDate();
 
@@ -56,7 +67,7 @@ public interface ProcessInstance extends NamedElement, BaseElement {
      * get the label of the string index
      * 
      * @param index
-     * @return
+     * @return label of the string index
      */
     String getStringIndexLabel(int index);
 

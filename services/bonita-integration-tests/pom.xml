@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.0.2-rc-01-SNAPSHOT</version>
+		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tests</artifactId>
@@ -306,14 +307,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Monitoring -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
-			<artifactId>bonita-monitoring-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Persistence -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
@@ -585,10 +578,41 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-services-test-conf</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine</groupId>
+									<artifactId>bonita-services-test-conf</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/test-classes/</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -600,7 +624,7 @@
 						</property>
 					</properties>
 					<systemPropertyVariables>
-						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/AllTestsWithJNDI.java</include>

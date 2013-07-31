@@ -543,8 +543,8 @@ public class StateBehaviors {
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
         final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
         final OperationsWithContext operations = new OperationsWithContext(context, operationList);
-        final SProcessDefinition targetPRocessDefinition = processDefinitionService.getProcessDefinition(targetProcessDefinitionId);
-        final InstantiateProcessWork instantiateProcessWork = new InstantiateProcessWork(targetPRocessDefinition, operations, processExecutor,
+        final SProcessDefinition targetSProcessDefinition = processDefinitionService.getProcessDefinition(targetProcessDefinitionId);
+        final InstantiateProcessWork instantiateProcessWork = new InstantiateProcessWork(targetSProcessDefinition, operations, processExecutor,
                 processInstanceService, activityInstanceService, null, logger, bpmInstancesCreator);
         instantiateProcessWork.setCallerId(callerId);
         workService.registerWork(instantiateProcessWork);
@@ -626,9 +626,7 @@ public class StateBehaviors {
                 final List<SOperation> sOperations = activityDefinition.getSOperations();
                 final SExpressionContext sExpressionContext = new SExpressionContext(activityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                         processDefinition.getId());
-                for (final SOperation sOperation : sOperations) {
-                    operationService.execute(sOperation, sExpressionContext);
-                }
+                operationService.execute(sOperations, sExpressionContext);
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);

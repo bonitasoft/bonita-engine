@@ -59,7 +59,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.reporting.ReportingService;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -81,7 +80,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.monitoring.TenantMonitoringService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
@@ -154,8 +152,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BPMDefinitionBuilders bpmDefinitionBuilders;
 
     private BPMInstanceBuilders bpmInstanceBuilders;
-
-    private TenantMonitoringService tenantMonitoringServie;
 
     private ActorMappingService actorMappingService;
 
@@ -250,8 +246,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private DependencyResolver dependencyResolver;
 
     private DefaultCommandProvider commandProvider;
-
-    private ReportingService reportingService;
 
     private WorkService workService;
     
@@ -417,14 +411,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public TenantMonitoringService getTenantMonitoringService() {
-        if (tenantMonitoringServie == null) {
-            tenantMonitoringServie = beanAccessor.getService(TenantMonitoringService.class);
-        }
-        return tenantMonitoringServie;
-    }
-
-    @Override
     public SQueriableLogModelBuilder getSQueriableLogModelBuilder() {
         if (logModelBuilder == null) {
             logModelBuilder = beanAccessor.getService(SQueriableLogModelBuilder.class);
@@ -507,7 +493,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public ClassLoaderService getClassLoaderService() {
         if (classLoaderService == null) {
-            classLoaderService = beanAccessor.getService(ClassLoaderService.class);
+            classLoaderService = beanAccessor.getService("classLoaderService", ClassLoaderService.class);
         }
         return classLoaderService;
     }
@@ -855,7 +841,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public CacheService getCacheService() {
         if (cacheService == null) {
-            cacheService = beanAccessor.getService(CacheService.class);
+            cacheService = beanAccessor.getService("cacheService", CacheService.class);
         }
         return cacheService;
     }
@@ -874,14 +860,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             commandProvider = beanAccessor.getService(DefaultCommandProvider.class);
         }
         return commandProvider;
-    }
-
-    @Override
-    public ReportingService getReportingService() {
-        if (reportingService == null) {
-            reportingService = beanAccessor.getService(ReportingService.class);
-        }
-        return reportingService;
     }
 
     @Override

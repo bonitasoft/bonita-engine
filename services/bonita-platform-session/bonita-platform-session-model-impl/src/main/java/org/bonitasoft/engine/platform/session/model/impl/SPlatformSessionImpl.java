@@ -23,6 +23,8 @@ import org.bonitasoft.engine.platform.session.model.SPlatformSession;
  */
 public class SPlatformSessionImpl implements SPlatformSession {
 
+    private static final long serialVersionUID = 1L;
+
     private final long id;
 
     private Date creationDate;
@@ -100,12 +102,12 @@ public class SPlatformSessionImpl implements SPlatformSession {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
-        result = prime * result + (int) (duration ^ (duration >>> 32));
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((lastRenewDate == null) ? 0 : lastRenewDate.hashCode());
-        result = prime * result + (int) (userId ^ (userId >>> 32));
-        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+        result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
+        result = prime * result + (int) (duration ^ duration >>> 32);
+        result = prime * result + (int) (id ^ id >>> 32);
+        result = prime * result + (lastRenewDate == null ? 0 : lastRenewDate.hashCode());
+        result = prime * result + (int) (userId ^ userId >>> 32);
+        result = prime * result + (userName == null ? 0 : userName.hashCode());
         return result;
     }
 

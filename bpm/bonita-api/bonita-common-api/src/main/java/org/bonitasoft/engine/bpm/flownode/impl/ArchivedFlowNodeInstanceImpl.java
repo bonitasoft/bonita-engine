@@ -48,21 +48,23 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
 
     private long executedBy;
 
+    private long executedByDelegate;
+
     private long flownodeDefinitionId;
 
     private boolean terminal;
 
-    @Override
-    public boolean isTerminal() {
-        return terminal;
-    }
-
-    public void setTerminal(final boolean terminal) {
-        this.terminal = terminal;
-    }
-
     public ArchivedFlowNodeInstanceImpl(final String name) {
         super(name);
+    }
+
+    @Override
+    public long getParentContainerId() {
+        return parentContainerId;
+    }
+
+    public void setParentContainerId(long parentContainerId) {
+        this.parentContainerId = parentContainerId;
     }
 
     @Override
@@ -70,7 +72,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return archiveDate;
     }
 
-    public void setArchiveDate(final Date archiveDate) {
+    public void setArchiveDate(Date archiveDate) {
         this.archiveDate = archiveDate;
     }
 
@@ -79,17 +81,8 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return state;
     }
 
-    public void setState(final String state) {
+    public void setState(String state) {
         this.state = state;
-    }
-
-    @Override
-    public long getParentContainerId() {
-        return parentContainerId;
-    }
-
-    public void setParentContainerId(final long parentContainerId) {
-        this.parentContainerId = parentContainerId;
     }
 
     @Override
@@ -97,7 +90,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return rootContainerId;
     }
 
-    public void setRootContainerId(final long rootContainerId) {
+    public void setRootContainerId(long rootContainerId) {
         this.rootContainerId = rootContainerId;
     }
 
@@ -106,7 +99,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return processDefinitionId;
     }
 
-    public void setProcessDefinitionId(final long processDefinitionId) {
+    public void setProcessDefinitionId(long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
@@ -115,16 +108,8 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return processInstanceId;
     }
 
-    public void setProcessInstanceId(final long processInstanceId) {
+    public void setProcessInstanceId(long processInstanceId) {
         this.processInstanceId = processInstanceId;
-    }
-
-    public void setDisplayName(final String displayName) {
-        this.displayName = displayName;
-    }
-
-    public void setDisplayDescription(final String displayDescription) {
-        this.displayDescription = displayDescription;
     }
 
     @Override
@@ -132,13 +117,17 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return displayName;
     }
 
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
     @Override
     public String getDisplayDescription() {
         return displayDescription;
     }
 
-    public void setSourceObjectId(final long sourceObjectId) {
-        this.sourceObjectId = sourceObjectId;
+    public void setDisplayDescription(String displayDescription) {
+        this.displayDescription = displayDescription;
     }
 
     @Override
@@ -146,12 +135,16 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return sourceObjectId;
     }
 
+    public void setSourceObjectId(long sourceObjectId) {
+        this.sourceObjectId = sourceObjectId;
+    }
+
     @Override
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(final String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -160,8 +153,17 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return executedBy;
     }
 
-    public void setExecutedBy(final long executedBy) {
+    public void setExecutedBy(long executedBy) {
         this.executedBy = executedBy;
+    }
+
+    @Override
+    public long getExecutedByDelegate() {
+        return executedByDelegate;
+    }
+
+    public void setExecutedByDelegate(long executedByDelegate) {
+        this.executedByDelegate = executedByDelegate;
     }
 
     @Override
@@ -169,8 +171,17 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         return flownodeDefinitionId;
     }
 
-    public void setFlownodeDefinitionId(final long flownodeDefinitionId) {
+    public void setFlownodeDefinitionId(long flownodeDefinitionId) {
         this.flownodeDefinitionId = flownodeDefinitionId;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(boolean terminal) {
+        this.terminal = terminal;
     }
 
     @Override
@@ -182,6 +193,7 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
+        result = prime * result + (int) (executedByDelegate ^ executedByDelegate >>> 32);
         result = prime * result + (int) (flownodeDefinitionId ^ flownodeDefinitionId >>> 32);
         result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
         result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
@@ -234,6 +246,9 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
             return false;
         }
         if (executedBy != other.executedBy) {
+            return false;
+        }
+        if (executedByDelegate != other.executedByDelegate) {
             return false;
         }
         if (flownodeDefinitionId != other.flownodeDefinitionId) {

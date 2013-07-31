@@ -113,12 +113,12 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private final TransactionService transactionService;
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-            final OperationService operationService, final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders,
-            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
-            final SCommentService commentService, final ProcessInstanceService processInstanceService, final LockService lockService,
-            final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, WorkService workService, TransactionService transactionService) {
+            final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
+            final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger,
+            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
+            final ProcessInstanceService processInstanceService, final LockService lockService, final EventInstanceService eventInstanceService,
+            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final WorkService workService,
+            final TransactionService transactionService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -142,12 +142,12 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-            final OperationService operationService, final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders,
-            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
-            final SCommentService commentService, final ProcessInstanceService processInstanceService, final LockService lockService,
-            final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, WorkService workService, TransactionService transactionService, final int setInFailThreadTimeout) {
+            final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
+            final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger,
+            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
+            final ProcessInstanceService processInstanceService, final LockService lockService, final EventInstanceService eventInstanceService,
+            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final WorkService workService,
+            final TransactionService transactionService, final int setInFailThreadTimeout) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -191,7 +191,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState stepForward(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            long processInstanceId, final Long executedBy) throws SFlowNodeExecutionException {
+            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
         try {
             if (!lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name())) {
                 // reschedule the work
@@ -228,8 +228,11 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 if (!fFlowNodeInstance.isStateExecuting()) {
                     archiveFlowNodeInstance(fFlowNodeInstance, false, processDefinition);
-                    if (executedBy != null && executedBy > 0 && fFlowNodeInstance.getExecutedBy() != executedBy) {
-                        activityInstanceService.setExecutedBy(fFlowNodeInstance, executedBy);
+                    if (executerId != null && executerId > 0 && fFlowNodeInstance.getExecutedBy() != executerId) {
+                        activityInstanceService.setExecutedBy(fFlowNodeInstance, executerId);
+                    }
+                    if (executerDelegateId != null && executerDelegateId > 0 && fFlowNodeInstance.getExecutedByDelegate() != executerDelegateId) {
+                        activityInstanceService.setExecutedByDelegate(fFlowNodeInstance, executerDelegateId);
                     }
                     if (operations != null) {
                         for (final SOperation operation : operations) {
@@ -281,8 +284,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void setFlowNodeFailedInTransaction(final SFlowNodeInstance fFlowNodeInstance, final SProcessDefinition processDefinition,
-            final SBonitaException sbe) throws SFlowNodeExecutionException {
+    public void setFlowNodeFailedInTransaction(final SFlowNodeInstance fFlowNodeInstance, final SProcessDefinition processDefinition, final SBonitaException sbe)
+            throws SFlowNodeExecutionException {
         long flowNodeInstanceId = fFlowNodeInstance.getId();
         // we put the step in failed if the boundary attached to it fails
         if (SFlowNodeType.BOUNDARY_EVENT.equals(fFlowNodeInstance.getType())) {
@@ -382,8 +385,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         if (hit) {// we continue parent if hit of the parent return true
 
             // in a new work?
-            stepForward(parentId, null, null, child.getParentProcessInstanceId(),
-                    null);
+            stepForward(parentId, null, null, child.getParentProcessInstanceId(), null, null);
         }
     }
 
@@ -421,8 +423,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final long processInstanceId, final Long executedBy) throws SFlowNodeExecutionException, SActivityReadException {
-        return stepForward(flowNodeInstanceId, null, null, processInstanceId, executedBy);
+            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException, SActivityReadException {
+        return stepForward(flowNodeInstanceId, null, null, processInstanceId, executerId, executerDelegateId);
     }
 
     @Override

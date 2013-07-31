@@ -118,12 +118,12 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         }
     }
 
-    protected void executeActivity(final long activityInstanceId, long processDefinitionID) throws BonitaException {
+    protected void executeActivity(final long activityInstanceId, final long processDefinitionID) throws BonitaException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         try {
             final long userId = getUserIdFromSession();
-            processExecutor.executeFlowNode(activityInstanceId, null, null, processDefinitionID, userId);
+            processExecutor.executeFlowNode(activityInstanceId, null, null, processDefinitionID, userId, userId);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new BonitaException(e.getMessage());

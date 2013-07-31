@@ -868,7 +868,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForStep(50, 500, "step1", processInstance);
+        waitForStep(50, 1000, "step1", processInstance);
 
         final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>(getProcessAPI().getActivities(processInstance.getId(), 0, 20));
         final ActivityInstance activityInstance = activityInstances.get(activityInstances.size() - 1);

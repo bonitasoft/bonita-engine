@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.expression.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ import java.util.List;
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */
-public interface SExpression {
+public interface SExpression extends Serializable {
 
     String TYPE_CONSTANT = "TYPE_CONSTANT";
 

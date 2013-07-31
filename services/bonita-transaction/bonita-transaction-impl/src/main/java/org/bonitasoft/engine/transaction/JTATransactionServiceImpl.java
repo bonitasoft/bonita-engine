@@ -104,7 +104,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             final Transaction tx = txManager.getTransaction();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Completing  transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Completing transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
             }
 
             final int status = txManager.getStatus();
@@ -112,6 +112,10 @@ public class JTATransactionServiceImpl implements TransactionService {
             if (status == Status.STATUS_MARKED_ROLLBACK) {
                 try {
                     txManager.rollback();
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                                "Rollbacking transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+                    }
                 } catch (final IllegalStateException e) {
                     throw new STransactionRollbackException("", e);
                 } catch (final SecurityException e) {

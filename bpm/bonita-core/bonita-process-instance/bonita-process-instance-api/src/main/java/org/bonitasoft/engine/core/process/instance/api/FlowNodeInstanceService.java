@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.api;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -33,62 +32,152 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface FlowNodeInstanceService {
 
-    String ACTIVITYINSTANCE_STATE = "ACTIVITYINSTANCE_STATE";
+    static final String ACTIVITYINSTANCE_STATE = "ACTIVITYINSTANCE_STATE";
 
-    String ACTIVITY_INSTANCE_TOKEN_COUNT = "ACTIVITY_INSTANCE_TOKEN_COUNT";
+    static final String ACTIVITY_INSTANCE_TOKEN_COUNT = "ACTIVITY_INSTANCE_TOKEN_COUNT";
 
-    String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION";
+    static final String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION";
 
-    String LOOPINSTANCE_LOOPMAX_MODIFIED = "LOOPINSTANCE_LOOPMAX_MODIFIED";
+    static final String LOOPINSTANCE_LOOPMAX_MODIFIED = "LOOPINSTANCE_LOOPMAX_MODIFIED";
 
-    String MULTIINSTANCE_LOOPCARDINALITY_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
+    static final String MULTIINSTANCE_LOOPCARDINALITY_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
 
-    String MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
+    static final String MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
 
-    String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED";
+    static final String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED";
 
-    String ACTIVITYINSTANCE_DISPLAY_NAME = "ACTIVITYINSTANCE_DISPLAY_NAME";
+    static final String ACTIVITYINSTANCE_DISPLAY_NAME = "ACTIVITYINSTANCE_DISPLAY_NAME";
 
-    String STATE_CATEGORY = "STATE_CATEGORY";
+    static final String STATE_CATEGORY = "STATE_CATEGORY";
 
-    String EXECUTED_BY_MODIFIED = "EXECUTED_BY_MODIFIED";
+    static final String EXECUTED_BY_MODIFIED = "EXECUTED_BY_MODIFIED";
 
-    String EXPECTED_END_DATE_MODIFIED = "EXPECTED_END_DATE_MODIFIED";
+    static final String EXECUTED_BY_DELEGATE_MODIFIED = "EXECUTED_BY_DELEGATE_MODIFIED";
 
+    static final String EXPECTED_END_DATE_MODIFIED = "EXPECTED_END_DATE_MODIFIED";
+
+    /**
+     * 
+     * @param flowNodeInstanceId
+     * @return
+     * @throws SFlowNodeNotFoundException
+     * @throws SFlowNodeReadException
+     * @since 6.0
+     */
     SFlowNodeInstance getFlowNodeInstance(long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException;
 
+    /**
+     * 
+     * @param rootContainerId
+     * @param fromIndex
+     * @param maxResults
+     * @return
+     * @throws SFlowNodeReadException
+     * @since 6.0
+     */
     List<SFlowNodeInstance> getFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
 
+    /**
+     * 
+     * @param flowNodeInstance
+     * @param state
+     * @throws SFlowNodeModificationException
+     * @since 6.0
+     */
     void setState(SFlowNodeInstance flowNodeInstance, FlowNodeState state) throws SFlowNodeModificationException;
 
+    /**
+     * 
+     * @param rootContainerId
+     * @return
+     * @throws SFlowNodeReadException
+     * @since 6.0
+     */
     List<SFlowNodeInstance> getActiveFlowNodes(long rootContainerId) throws SFlowNodeReadException;
 
+    /**
+     * 
+     * @param flowNodeInstance
+     * @param priority
+     * @throws SFlowNodeModificationException
+     * @since 6.0
+     */
     void setTaskPriority(SFlowNodeInstance flowNodeInstance, STaskPriority priority) throws SFlowNodeModificationException;
 
+    /**
+     * 
+     * @param flowNodeInstance
+     * @param displayDescription
+     * @throws SFlowNodeModificationException
+     * @since 6.0
+     */
     void updateDisplayDescription(SFlowNodeInstance flowNodeInstance, String displayDescription) throws SFlowNodeModificationException;
 
+    /**
+     * 
+     * @param flowNodeInstance
+     * @param displayName
+     * @throws SFlowNodeModificationException
+     * @since 6.0
+     */
     void updateDisplayName(SFlowNodeInstance flowNodeInstance, String displayName) throws SFlowNodeModificationException;
 
+    /**
+     * 
+     * @param flowElementInstance
+     * @param stateCategory
+     * @throws SFlowNodeModificationException
+     * @since 6.0
+     */
     void setStateCategory(SFlowElementInstance flowElementInstance, SStateCategory stateCategory) throws SFlowNodeModificationException;
 
+    /**
+     * 
+     * @param entityClass
+     * @param countOptions
+     * @return
+     * @throws SBonitaSearchException
+     * @since 6.0
+     */
     long getNumberOfFlowNodeInstances(Class<? extends PersistentObject> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
 
+    /**
+     * 
+     * @param entityClass
+     * @param searchOptions
+     * @return
+     * @throws SBonitaSearchException
+     * @since 6.0
+     */
     List<SFlowNodeInstance> searchFlowNodeInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
-     * Set execute by for the specific activity instance
+     * Set execute by for the specific flow node instance
      * 
      * @param flowNodeInstance
      *            the flowNodeInstance will be updated
      * @param userId
-     *            value of user name
-     * @throws SActivityModificationException
+     *            value for executedBy
+     * @throws SFlowNodeModificationException
      * @since 6.0
      */
-    void setExecutedBy(SFlowNodeInstance flowNodeInstance, long userId) throws SActivityModificationException;
+    void setExecutedBy(SFlowNodeInstance sFlowNodeInstance, long userId) throws SFlowNodeModificationException;
+
+    /**
+     * Set execute by delegate for the specific flow node instance
+     * 
+     * @param flowNodeInstance
+     *            the flowNodeInstance will be updated
+     * @param executerDelegateId
+     *            value for executedByDelegate
+     * @throws SFlowNodeModificationException
+     * @since 6.0.1
+     */
+    void setExecutedByDelegate(SFlowNodeInstance sFlowNodeInstance, long executerDelegateId) throws SFlowNodeModificationException;
 
     /**
      * Retrieve the total number of the archived flow nodes matching the given search criteria.
@@ -118,9 +207,9 @@ public interface FlowNodeInstanceService {
     /**
      * @param flowNodeInstance
      * @param dueDate
-     * @throws SActivityModificationException
+     * @throws SFlowNodeModificationException
      */
-    void setExpectedEndDate(SFlowNodeInstance flowNodeInstance, long dueDate) throws SActivityModificationException;
+    void setExpectedEndDate(SFlowNodeInstance flowNodeInstance, long dueDate) throws SFlowNodeModificationException;
 
     /**
      * @param rootContainerId
@@ -131,6 +220,15 @@ public interface FlowNodeInstanceService {
      */
     List<SAFlowNodeInstance> getArchivedFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
 
+    /**
+     * 
+     * @param archivedFlowNodeInstanceId
+     * @param persistenceService
+     * @return
+     * @throws SFlowNodeReadException
+     * @throws SFlowNodeNotFoundException
+     * @since 6.0
+     */
     SAFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId, ReadPersistenceService persistenceService) throws SFlowNodeReadException,
             SFlowNodeNotFoundException;
 

@@ -46,8 +46,6 @@ public class SequenceRunnableExecutor extends NotifyingRunnable {
                 } catch (Throwable t) {
                     loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Error while executing one work in the list of works: " + work.getDescription(),
                             t);
-                    // TODO: do we need to stack again here?:
-                    t.printStackTrace();
                 }
             }
         }

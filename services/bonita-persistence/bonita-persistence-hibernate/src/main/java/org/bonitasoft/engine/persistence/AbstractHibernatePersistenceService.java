@@ -46,6 +46,7 @@ import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
+import org.hibernate.Interceptor;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -100,6 +101,20 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             } else if (dialect.contains("SQLServer")) {
                 configuration.setInterceptor(new SQLServerInterceptor());
             }
+        }
+        final String className = configuration.getProperty("hibernate.interceptor");
+        if (className != null && !className.isEmpty()) {
+            try {
+                final Interceptor interceptor = (Interceptor) Class.forName(className).newInstance();
+                configuration.setInterceptor(interceptor);
+            } catch (final ClassNotFoundException cnfe) {
+                throw new SPersistenceException(cnfe);
+            } catch (InstantiationException e) {
+                throw new SPersistenceException(e);
+            } catch (IllegalAccessException e) {
+                throw new SPersistenceException(e);
+            }
+
         }
 
         sessionFactory = configuration.buildSessionFactory();

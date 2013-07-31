@@ -23,7 +23,6 @@ import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.ReportingAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -146,8 +145,6 @@ public class APITestUtil {
 
     private ProfileAPI profileAPI;
 
-    private ReportingAPI reportingAPI;
-
     public static final String DEFAULT_TENANT = "default";
 
     public static final String ACTOR_NAME = "Employee actor";
@@ -183,7 +180,6 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
     }
 
     protected void login() throws BonitaException {
@@ -192,7 +188,6 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
     }
 
     protected void logout() throws BonitaException {
@@ -665,6 +660,15 @@ public class APITestUtil {
         return getActivityInstance(waitForTask);
     }
 
+    protected ActivityInstance waitForUserTask(final String taskName) throws Exception {
+        return waitForUserTask(taskName, DEFAULT_TIMEOUT);
+    }
+
+    protected ActivityInstance waitForUserTask(final String taskName, final int timeout) throws Exception {
+        final Long waitForTask = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getReadyTaskEvent(taskName), timeout);
+        return getActivityInstance(waitForTask);
+    }
+
     private ActivityInstance getActivityInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
         if (id != null) {
             return getProcessAPI().getActivityInstance(id);
@@ -726,6 +730,14 @@ public class APITestUtil {
             params = ClientEventUtil.getTaskInStateWithParentId(processInstanceId, state, flowNodeName);
         }
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
+    }
+
+    protected void waitForFlowNodeInReadyState(final ProcessInstance processInstance, final String flowNodeName, final boolean useRootProcessInstance)
+            throws Exception {
+        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.getReadyState(flowNodeName), flowNodeName, useRootProcessInstance,
+                DEFAULT_TIMEOUT);
+        final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
+        assertNotNull(flowNodeInstance);
     }
 
     protected void waitForProcessToFinish(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state) throws Exception {
@@ -846,7 +858,7 @@ public class APITestUtil {
     }
 
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
-        return waitForEvent(50, 5000, processInstance, eventName, state);
+        return waitForEvent(100, 5000, processInstance, eventName, state);
     }
 
     public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String eventName, final String state)
@@ -1412,16 +1424,9 @@ public class APITestUtil {
         this.profileAPI = profileAPI;
     }
 
-    protected ReportingAPI getReportingAPI() {
-        return reportingAPI;
-    }
-
-    protected void setReportingAPI(final ReportingAPI reportingAPI) {
-        this.reportingAPI = reportingAPI;
-    }
-
     protected void setSession(final APISession session) {
         this.session = session;
     }
 
 }
+

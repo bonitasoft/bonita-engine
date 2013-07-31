@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>bonita-bpm-integration-tests</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.0.2-rc-01-SNAPSHOT</version>
+		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-bpm-services-integration-tests</artifactId>
@@ -108,10 +109,22 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- platform command -->
+		<!-- platform-command -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>
 			<artifactId>bonita-platform-command-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -422,14 +435,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.login</groupId>
 			<artifactId>bonita-login-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Monitoring -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.monitoring</groupId>
-			<artifactId>bonita-monitoring-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -799,6 +804,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-services-test-conf</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -845,7 +857,51 @@
 						<configuration>
 							<target name="copy-bos-home">
 								<copy todir="${bonita.home}">
-									<fileset dir="${basedir}/home" excludes="**/.svn" />
+									<fileset dir="${basedir}/home" />
+								</copy>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>initialize test conf setup</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine</groupId>
+									<artifactId>bonita-services-test-conf</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>complete test conf setup</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target name="copy-bpm-test-conf">
+								<copy todir="${project.build.directory}/conf" overwrite="true">
+									<fileset dir="${basedir}/src/test/resources/conf" />
 								</copy>
 							</target>
 						</configuration>
@@ -858,7 +914,7 @@
 				<configuration>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
-						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/bpm/test/AllBPMTestsWithJNDI.java</include>
