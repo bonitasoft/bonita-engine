@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,12 +22,11 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class GetArchivedActivityInstance implements TransactionContentWithResult<SAActivityInstance> {
 
     private final ActivityInstanceService activityInstanceService;
-
-    private final ReadPersistenceService persistenceService;
 
     private final int stateId;
 
@@ -35,11 +34,9 @@ public class GetArchivedActivityInstance implements TransactionContentWithResult
 
     private SAActivityInstance activity;
 
-    public GetArchivedActivityInstance(final ActivityInstanceService activityInstanceService, final long activityInstanceId,
-            final ReadPersistenceService persistenceService) {
+    public GetArchivedActivityInstance(final ActivityInstanceService activityInstanceService, final long activityInstanceId) {
         this.activityInstanceService = activityInstanceService;
         this.activityInstanceId = activityInstanceId;
-        this.persistenceService = persistenceService;
         stateId = -1;
     }
 
@@ -48,15 +45,14 @@ public class GetArchivedActivityInstance implements TransactionContentWithResult
         this.activityInstanceId = activityInstanceId;
         this.stateId = stateId;
         this.activityInstanceService = activityInstanceService;
-        this.persistenceService = persistenceService;
     }
 
     @Override
     public void execute() throws SBonitaException {
         if (stateId > -1) {
-            activity = activityInstanceService.getArchivedActivityInstance(activityInstanceId, stateId, persistenceService);
+            activity = activityInstanceService.getArchivedActivityInstance(activityInstanceId, stateId);
         } else {
-            activity = activityInstanceService.getArchivedActivityInstance(activityInstanceId, persistenceService);
+            activity = activityInstanceService.getArchivedActivityInstance(activityInstanceId);
         }
     }
 

@@ -143,7 +143,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     @Override
     public SDocumentMapping get(final long documentMappingId) throws SDocumentMappingNotFoundException {
         try {
-            final SDocumentMapping documentMapping = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SDocumentMapping.class, "DocumentMapping",
+            final SDocumentMapping documentMapping = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SDocumentMapping.class,
+                    "DocumentMapping",
                     documentMappingId));
             if (documentMapping == null) {
                 throw new SDocumentMappingNotFoundException("Cannot get documentMapping with id: " + documentMappingId);
@@ -222,10 +223,10 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public SADocumentMapping get(final long processInstanceId, final String documentName, final long time, final ReadPersistenceService persistence)
-            throws SDocumentMappingNotFoundException {
+    public SADocumentMapping get(final long processInstanceId, final String documentName, final long time) throws SDocumentMappingNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
-            final List<SADocumentMapping> docMapping = persistence.selectList(SelectDescriptorBuilder.getArchivedDocumentByName(processInstanceId,
+            final List<SADocumentMapping> docMapping = persistenceService.selectList(SelectDescriptorBuilder.getArchivedDocumentByName(processInstanceId,
                     documentName, time));
             if (docMapping.isEmpty()) {
                 throw new SDocumentMappingNotFoundException("can't find the archived document named " + documentName + " on process instance with id "
@@ -348,7 +349,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public long getNumberOfArchivedDocuments(final QueryOptions queryOptions, final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public long getNumberOfArchivedDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.getNumberOfEntities(SADocumentMapping.class, queryOptions, null);
         } catch (final SBonitaReadException bre) {
@@ -357,8 +359,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public List<SADocumentMapping> searchArchivedDocuments(final QueryOptions queryOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
+    public List<SADocumentMapping> searchArchivedDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.searchEntity(SADocumentMapping.class, queryOptions, null);
         } catch (final SBonitaReadException bre) {
@@ -367,8 +369,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
+    public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
         try {
             return persistenceService.getNumberOfEntities(SADocumentMapping.class, SUPERVISED_BY, queryOptions, parameters);
@@ -378,8 +380,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public List<SADocumentMapping> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public List<SADocumentMapping> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
             return persistenceService.searchEntity(SADocumentMapping.class, SUPERVISED_BY, queryOptions, parameters);
@@ -389,8 +391,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public SADocumentMapping getArchivedDocument(final long archivedDocumentId, final ReadPersistenceService persistenceService)
-            throws SDocumentMappingNotFoundException {
+    public SADocumentMapping getArchivedDocument(final long archivedDocumentId) throws SDocumentMappingNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final SADocumentMapping docMapping = persistenceService.selectById(SelectDescriptorBuilder.getArchivedDocumentById(archivedDocumentId));
             if (docMapping == null) {
@@ -403,8 +405,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public SADocumentMapping getArchivedVersionOfDocument(final long documentId, final ReadPersistenceService persistenceService)
-            throws SDocumentMappingNotFoundException {
+    public SADocumentMapping getArchivedVersionOfDocument(final long documentId) throws SDocumentMappingNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final SADocumentMapping docMapping = persistenceService.selectOne(SelectDescriptorBuilder.getArchivedVersionOdDocument(documentId));
             if (docMapping == null) {

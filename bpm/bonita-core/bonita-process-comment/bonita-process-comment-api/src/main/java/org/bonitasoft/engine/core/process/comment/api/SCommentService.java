@@ -16,10 +16,10 @@ package org.bonitasoft.engine.core.process.comment.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
@@ -165,23 +165,19 @@ public interface SCommentService {
      * Search number of archived Comments
      * 
      * @param searchOptions
-     * @param persistenceService
-     * @return number of archived Comments
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedComments(QueryOptions searchOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    long getNumberOfArchivedComments(QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
      * Search archived Comments
      * 
      * @param searchOptions
      *            a QueryOptions object, containing some query conditions
-     * @param persistenceService
-     *            persistenceService object
      * @return a list with archived Comments
      * @throws SBonitaSearchException
      */
-    List<SAComment> searchArchivedComments(QueryOptions searchOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    List<SAComment> searchArchivedComments(QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
      * Returning true if the system comments are enabled for the specific SystemCommentType.
@@ -206,6 +202,24 @@ public interface SCommentService {
      * @throws SCommentNotFoundException
      * @throws SBonitaReadException
      */
-    SAComment getArchivedComment(long archivedCommentId, ReadPersistenceService persistenceService) throws SCommentNotFoundException, SBonitaReadException;
+    SAComment getArchivedComment(long archivedCommentId) throws SCommentNotFoundException, SBonitaReadException;
+
+    /**
+     * Delete archived comments for a specified process instance
+     * 
+     * @param processInstanceId
+     * @throws SBonitaException
+     * @since 6.1
+     */
+    void deleteArchivedComments(long processInstanceId) throws SBonitaException;
+
+    /**
+     * Delete comments for a specified process instance
+     * 
+     * @param processInstanceId
+     * @throws SBonitaException
+     * @since 6.1
+     */
+    void deleteComments(long processInstanceId) throws SBonitaException;
 
 }

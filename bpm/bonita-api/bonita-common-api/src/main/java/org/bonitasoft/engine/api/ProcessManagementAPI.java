@@ -161,7 +161,10 @@ public interface ProcessManagementAPI {
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance cannot be deleted because of a parent that is still active
      * @since 6.0
+     * @see #deleteProcessDefinition(long)
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinition(long)}
      */
+    @Deprecated
     void deleteProcess(long processId) throws DeletionException;
 
     /**
@@ -175,10 +178,36 @@ public interface ProcessManagementAPI {
      *             if an exception occurs during process deletion.
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance cannot be deleted because of a parent that is still active
-     * @see #deleteProcess(long)
+     * @see #deleteProcessDefinitions(List<Long>)
      * @since 6.0
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinitions(List<Long>)}
      */
+    @Deprecated
     void deleteProcesses(List<Long> processIds) throws DeletionException;
+
+    /**
+     * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled and it has no more existing process instances.
+     * 
+     * @param processId
+     *            the identifier of the process definition.
+     * @throws DeletionException
+     *             if an exception occurs during process deletion.
+     * @since 6.1
+     */
+    void deleteProcessDefinition(long processId) throws DeletionException;
+
+    /**
+     * Deletes process definitions by giving their identifiers. If any speciofied identifier does not refer to a real process definition, or if an exception
+     * occurs, no process definition is deleted. All instances of given processes must be deleted prior to calling this operation.
+     * 
+     * @param processIds
+     *            the list of identifiers of process definitions.
+     * @throws DeletionException
+     *             if an exception occurs during process deletion.
+     * @see #deleteProcess(long)
+     * @since 6.1
+     */
+    void deleteProcessDefinitions(List<Long> processIds) throws DeletionException;
 
     /**
      * Deploys, enables and returns a process.

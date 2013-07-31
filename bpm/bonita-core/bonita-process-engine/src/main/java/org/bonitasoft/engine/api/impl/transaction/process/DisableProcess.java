@@ -27,8 +27,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 
@@ -36,7 +34,6 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
 public final class DisableProcess implements TransactionContent {
 
@@ -48,40 +45,29 @@ public final class DisableProcess implements TransactionContent {
 
     private final SchedulerService scheduler;
 
-    private final TechnicalLoggerService logger;
-
-    private final String userName;
-
     public DisableProcess(final ProcessDefinitionService processDefinitionService, final long processId, final EventInstanceService eventInstanceService,
-            final SchedulerService scheduler, final TechnicalLoggerService logger, final String userName) {
+            final SchedulerService scheduler) {
         this.processDefinitionService = processDefinitionService;
         this.eventInstanceService = eventInstanceService;
         this.processId = processId;
         this.scheduler = scheduler;
-        this.logger = logger;
-        this.userName = userName;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processId);
         processDefinitionService.disableProcessDeploymentInfo(processId);
-        disableStartEvents(sProcessDefinition);
-
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + userName + "> has disabled process <" +
-                    sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
-        }
+        disableStartEvents();
     }
 
-    private void disableStartEvents(final SProcessDefinition sProcessDefinition) throws SBonitaException {
+    private void disableStartEvents() throws SBonitaException {
         deleteWaitingEvents();
-        deleteJobs(sProcessDefinition);
+        deleteJobs();
+
     }
 
-    private void deleteJobs(final SProcessDefinition sProcessDefinition) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException,
-            SSchedulerException {
-        final List<SStartEventDefinition> startEvents = sProcessDefinition.getProcessContainer().getStartEvents();
+    private void deleteJobs() throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException, SSchedulerException {
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processId);
+        final List<SStartEventDefinition> startEvents = processDefinition.getProcessContainer().getStartEvents();
         for (final SStartEventDefinition startEvent : startEvents) {
             if (!startEvent.getTimerEventTriggerDefinitions().isEmpty()) {
                 scheduler.delete(JobNameBuilder.getTimerEventJobName(processId, startEvent, null));

@@ -40,7 +40,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInst
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
@@ -56,6 +55,8 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     String ACTIVITYINSTANCE = "ACTIVITYINSTANCE";
+
+    String ARCHIVED_ACTIVITYINSTANCE = "ARCHIVED_ACTIVITYINSTANCE";
 
     String PENDINGACTIVITYMAPPING = "PENDINGACTIVITYMAPPING";
 
@@ -171,14 +172,11 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * 
      * @param activityInstanceId
      *            identifier of activity instance
-     * @param persistenceService
-     *            the persistence service to retrieve the archived activity instance
      * @return an SAActivityInstance object
      * @throws SActivityReadException
      * @throws SActivityInstanceNotFoundException
      */
-    SAActivityInstance getArchivedActivityInstance(long activityInstanceId, ReadPersistenceService persistenceService) throws SActivityReadException,
-            SActivityInstanceNotFoundException;
+    SAActivityInstance getArchivedActivityInstance(long activityInstanceId) throws SActivityReadException, SActivityInstanceNotFoundException;
 
     /**
      * Get pending tasks for the user in specific actors. This is used for pagination
@@ -225,15 +223,12 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * 
      * @param rootContainerId
      *            identifier of root container, the root container can be process instance
-     * @param persistenceService
-     *            the persistence service to retrieve the archived activity instance
      * @param queryOptions
      *            a map of specific parameters of a query
      * @return a list of SAActivityInstance objects
      * @throws SActivityReadException
      */
-    List<SAActivityInstance> getArchivedActivityInstances(long rootContainerId, ReadPersistenceService persistenceService, QueryOptions queryOptions)
-            throws SActivityReadException;
+    List<SAActivityInstance> getArchivedActivityInstances(long rootContainerId, QueryOptions queryOptions) throws SActivityReadException;
 
     /**
      * Get total number of open activity instances for the specific process instance
@@ -436,7 +431,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityInstanceNotFoundException
      */
 
-    SAActivityInstance getArchivedActivityInstance(long activityInstanceId, int stateId, ReadPersistenceService persistenceService)
+    SAActivityInstance getArchivedActivityInstance(long activityInstanceId, int stateId)
             throws SActivityReadException, SActivityInstanceNotFoundException;
 
     /**
@@ -449,7 +444,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @return a list of SAHumanTaskInstance objects
      * @throws SBonitaSearchException
      */
-    List<SAHumanTaskInstance> searchArchivedTasks(QueryOptions searchOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    List<SAHumanTaskInstance> searchArchivedTasks(QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of archived tasks according to specific search criteria
@@ -461,7 +456,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @return
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedTasks(QueryOptions searchOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    long getNumberOfArchivedTasks(QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
      * Get total number of assigned tasks managed by the specific manager
@@ -499,7 +494,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SBonitaSearchException
      *             in case a search error occurs
      */
-    long getNumberOfArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions, ReadPersistenceService persistenceService)
+    long getNumberOfArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions)
             throws SBonitaSearchException;
 
     /**
@@ -509,14 +504,11 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *            the userId of the manager
      * @param searchOptions
      *            the search options to paginate, filter, sort ...
-     * @param persistenceService
-     *            the persistence service to search for archived elements
      * @return the elements encountered matching the specified options
      * @throws SBonitaSearchException
      *             in case a search error occurs
      */
-    List<SAHumanTaskInstance> searchArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    List<SAHumanTaskInstance> searchArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
      * Search all pending human task instances for the specific supervisor
@@ -702,13 +694,10 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *            to indicate which type of class will be retrieved
      * @param searchOptions
      *            the search options to paginate, filter, sort ...
-     * @param persistenceService
-     *            used to do query
      * @return number of archived activity instances for the specific entity class
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedActivityInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions,
-            ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    long getNumberOfArchivedActivityInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
 
     /***
      * Search all archived activity instances for the specific entity class
@@ -717,13 +706,11 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *            to indicate which type of class will be retrieved
      * @param searchOptions
      *            the search options to paginate, filter, sort ...
-     * @param persistenceService
-     *            used to do query
      * @return a list of SAActivityInstance objects
      * @throws SBonitaSearchException
      */
-    List<SAActivityInstance> searchArchivedActivityInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions,
-            ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    List<SAActivityInstance> searchArchivedActivityInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions)
+            throws SBonitaSearchException;
 
     /**
      * Set tokenCount for the specific activity instance
@@ -848,6 +835,13 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      */
     void deleteArchivedPendingMappings(long flowNodeInstanceId) throws SActivityModificationException;
 
+    /**
+     * 
+     * @param activityInstance
+     * @param boundaryEventId
+     * @throws SActivityModificationException
+     * @since 6.0
+     */
     void setAbortedByBoundaryEvent(SActivityInstance activityInstance, long boundaryEventId) throws SActivityModificationException;
 
     /**
