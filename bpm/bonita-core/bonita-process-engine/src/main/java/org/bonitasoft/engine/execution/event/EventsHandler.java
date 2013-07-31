@@ -427,6 +427,7 @@ public class EventsHandler {
             throws WorkRegisterException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations,
                 processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator);
+        work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
         workService.registerWork(work);
     }
 
