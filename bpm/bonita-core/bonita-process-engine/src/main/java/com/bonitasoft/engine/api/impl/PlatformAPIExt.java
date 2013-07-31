@@ -159,6 +159,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void initializePlatform() throws CreationException {
         PlatformServiceAccessor platformAccessor;
         try {

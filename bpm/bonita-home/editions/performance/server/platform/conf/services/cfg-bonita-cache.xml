@@ -17,6 +17,14 @@
 			</list>
 		</constructor-arg>
 	</bean>
+	
+
+	<bean id="platformCacheService" class="com.bonitasoft.engine.cache.impl.DelegatingCacheService">
+		<constructor-arg name="localCache" ref="localCacheService" />
+		<constructor-arg name="distributedCache" ref="distributedCacheService" />
+		<constructor-arg name="localOnlyCaches">
+		</constructor-arg>
+	</bean>
 
 	<bean id="localCacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
