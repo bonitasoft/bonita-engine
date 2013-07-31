@@ -310,6 +310,27 @@ public interface ProcessRuntimeAPI {
     ProcessInstance startProcess(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
+     * Instantiates a process.
+     * <b>
+     * The process variables will be initialized by the initialVariables.
+     * 
+     * @param processDefinitionId
+     *            the identifier of the processDefinition
+     * @param initialVariables
+     *            the couples of initial variable/value
+     * @return a ProcessInstance object
+     * @throws ProcessDefinitionNotFoundException
+     *             If the identifier of process definition does not refer to any existing process definition
+     * @throws ProcessExecutionException
+     *             If the process fails to start
+     * @throws ProcessActivationException
+     *             If the process is disable
+     * @since 6.1
+     */
+    ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
+            ProcessActivationException, ProcessExecutionException;
+
+    /**
      * Start a process by process definition id
      * 
      * @param processDefinitionId
@@ -324,13 +345,12 @@ public interface ProcessRuntimeAPI {
      *             The process definition corresponding to processDefinitionId is not found
      * @return a ProcessInstance object
      * @throws ProcessExecutionException
-     * @throws ProcessDefinitionNotFoundException
      * @throws ProcessActivationException
      *             if the process is disabled
      * @since 6.0
      */
     ProcessInstance startProcess(long processDefinitionId, List<Operation> operations, Map<String, Serializable> context)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ProcessDefinitionNotFoundException;
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process definition on behalf of a given user

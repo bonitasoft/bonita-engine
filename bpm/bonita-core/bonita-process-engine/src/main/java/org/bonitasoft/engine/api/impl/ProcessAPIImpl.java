@@ -216,6 +216,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
+import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -330,7 +331,10 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -348,6 +352,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -3349,6 +3354,34 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SProcessDefinition sProcessDefinition = getProcessDefinition.getResult();
         final SFlowElementContainerDefinition processContainer = sProcessDefinition.getProcessContainer();
         return processContainer.getDataDefinitions().size();
+    }
+
+    @Override
+    public ProcessInstance startProcess(final long processDefinitionId, final Map<String, Serializable> initialVariables)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
+        final ClassLoaderService classLoaderService = getTenantAccessor().getClassLoaderService();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final List<Operation> operations = new ArrayList<Operation>();
+        try {
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            Thread.currentThread().setContextClassLoader(localClassLoader);
+            if (initialVariables != null) {
+                for (final Entry<String, Serializable> initialVariable : initialVariables.entrySet()) {
+                    final String name = initialVariable.getKey();
+                    final Serializable value = initialVariable.getValue();
+                    final Expression expression = new ExpressionBuilder().createExpression(name, name, value.getClass().getName(), ExpressionType.TYPE_INPUT);
+                    final Operation operation = new OperationBuilder().createSetDataOperation(name, expression);
+                    operations.add(operation);
+                }
+            }
+        } catch (final ClassLoaderException cle) {
+            throw new ProcessExecutionException(cle);
+        } catch (final InvalidExpressionException iee) {
+            throw new ProcessExecutionException(iee);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+        return startProcess(processDefinitionId, operations, initialVariables);
     }
 
     @Override
