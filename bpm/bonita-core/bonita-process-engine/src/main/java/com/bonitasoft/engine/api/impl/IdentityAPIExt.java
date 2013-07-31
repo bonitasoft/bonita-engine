@@ -12,10 +12,10 @@ import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.OrganizationExportException;
+import org.bonitasoft.engine.identity.xml.ExportOrganization;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.IdentityAPI;
-import com.bonitasoft.engine.identity.xml.ExportOrganization;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -24,8 +24,11 @@ import com.bonitasoft.manager.Features;
 
 /**
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class IdentityAPIExt extends IdentityAPIImpl implements IdentityAPI {
+
+    // In order to not have an API break, this interface is still present even if it has no methods.
 
     @Override
     protected TenantServiceAccessor getTenantAccessor() {

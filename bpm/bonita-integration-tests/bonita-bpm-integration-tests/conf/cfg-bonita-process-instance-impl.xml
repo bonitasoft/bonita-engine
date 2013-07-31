@@ -4,6 +4,7 @@
 	<bean id="activityInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl">
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
+		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
@@ -26,7 +27,6 @@
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="processDocumentService" ref="processDocumentService" />
-        <constructor-arg name="documentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="commentBuilders" ref="commentBuilders" />
         <constructor-arg name="tokenService" ref="tokenService" />
