@@ -32,7 +32,6 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.GetReportContent;
 import com.bonitasoft.engine.api.impl.transaction.reporting.SearchReports;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReport;
-import com.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import com.bonitasoft.engine.reporting.Report;
@@ -65,18 +64,18 @@ public class ReportingAPIExt implements ReportingAPI {
         return userId;
     }
 
-    protected CreationException handleReportDuplication(final String name, final TenantServiceAccessor tenantAccessor, final SBonitaException sbe) {
+    protected void checkReportAlreadyExists(final String name, final TenantServiceAccessor tenantAccessor) throws AlreadyExistsException {
         // Check if the problem is primary key duplication:
         try {
             final GetReport getReport = new GetReport(tenantAccessor, name);
             getReport.execute();
             if (getReport.getResult() != null) {
-                return new AlreadyExistsException("A report already exists with the name " + name);
+                throw new AlreadyExistsException("A report already exists with the name " + name);
             }
         } catch (SBonitaException e) {
             // ignore it
         }
-        return new CreationException(sbe);
+
     }
 
     @Override
@@ -87,14 +86,13 @@ public class ReportingAPIExt implements ReportingAPI {
         final SReportBuilder reportBuilder = reportingService.getReportBuilder();
         reportBuilder.createNewInstance(name, userId, false, description, null);
         SReport report = reportBuilder.done();
+        checkReportAlreadyExists(name, tenantAccessor);
         final AddReport addReport = new AddReport(reportingService, report, content);
         try {
             addReport.execute();
             return SPModelConvertor.toReport(addReport.getResult());
-        } catch (final SReportAlreadyExistsException sraee) {
-            throw new AlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
-            throw handleReportDuplication(name, tenantAccessor, sbe);
+            throw new CreationException(sbe);
         }
     }
 
@@ -106,13 +104,12 @@ public class ReportingAPIExt implements ReportingAPI {
         final SReportBuilder reportBuilder = reportingService.getReportBuilder();
         final SReport sReport = SPModelConvertor.constructSReport(reportCreator, reportBuilder, userId);
         final AddReport addReport = new AddReport(reportingService, sReport, content);
+        checkReportAlreadyExists((String) reportCreator.getFields().get(ReportCreator.ReportField.NAME), tenantAccessor);
         try {
             addReport.execute();
             return SPModelConvertor.toReport(addReport.getResult());
-        } catch (final SReportAlreadyExistsException sraee) {
-            throw new AlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
-            throw handleReportDuplication((String) reportCreator.getFields().get(ReportCreator.ReportField.NAME), tenantAccessor, sbe);
+            throw new CreationException(sbe);
         }
     }
 
