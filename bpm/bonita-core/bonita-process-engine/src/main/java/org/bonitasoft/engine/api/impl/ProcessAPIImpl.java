@@ -493,32 +493,48 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void deleteProcessDefinition(final long processId) throws DeletionException {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
-        builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processId);
-        final SearchOptions searchOptions = builder.done();
+        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor(); // TODO : To delete after refactoring of transaction
+        try { // TODO : To delete after refactoring of transaction
+            final boolean txOpened = transactionExecutor.openTransaction();// TODO : To delete after refactoring of transaction
 
-        try {
-            boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
-            if (hasOpenProcessInstances) {
-                throw new DeletionException("Some active process instances are still found, process #" + processId + " can't be deleted.");
-            }
-            boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
-            if (hasArchivedProcessInstances) {
-                throw new DeletionException("Some archived process instances are still found, process #" + processId + " can't be deleted.");
-            }
+            final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
+            builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processId);
+            final SearchOptions searchOptions = builder.done();
 
-            processManagementAPIImplDelegate.deleteProcessDefinition(processId);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new DeletionException(e);
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        } catch (final IOException e) {
-            throw new DeletionException(e);
-        } catch (RetrieveException e) {
-            throw new DeletionException(e);
-        } catch (SearchException e) {
-            throw new DeletionException(e);
-        }
+            try {
+                boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
+                if (hasOpenProcessInstances) {
+                    transactionExecutor.setTransactionRollback();// TODO : To delete after refactoring of transaction
+                    throw new DeletionException("Some active process instances are still found, process #" + processId + " can't be deleted.");
+                }
+                boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
+                if (hasArchivedProcessInstances) {
+                    transactionExecutor.setTransactionRollback();// TODO : To delete after refactoring of transaction
+                    throw new DeletionException("Some archived process instances are still found, process #" + processId + " can't be deleted.");
+                }
+
+                processManagementAPIImplDelegate.deleteProcessDefinition(processId);
+            } catch (final BonitaHomeNotSetException e) {
+                transactionExecutor.setTransactionRollback();// TODO : To delete after refactoring of transaction
+                throw new DeletionException(e);
+            } catch (final SBonitaException e) {
+                transactionExecutor.setTransactionRollback();// TODO : To delete after refactoring of transaction
+                throw new DeletionException(e);
+            } catch (final IOException e) {
+                transactionExecutor.setTransactionRollback();// TODO : To delete after refactoring of transaction
+                throw new DeletionException(e);
+            } catch (RetrieveException e) {
+                transactionExecutor.setTransactionRollback();// TODO : To delete after refactoring of transaction
+                throw new DeletionException(e);
+            } catch (SearchException e) {
+                transactionExecutor.setTransactionRollback();// TODO : To delete after refactoring of transaction
+                throw new DeletionException(e);
+            } finally {// TODO : To delete after refactoring of transaction
+                transactionExecutor.completeTransaction(txOpened);// TODO : To delete after refactoring of transaction
+            }
+        } catch (final STransactionException e) {// TODO : To delete after refactoring of transaction
+            throw new DeletionException(e);// TODO : To delete after refactoring of transaction
+        }// TODO : To delete after refactoring of transaction
     }
 
     @Override
@@ -867,10 +883,18 @@ public class ProcessAPIImpl implements ProcessAPI {
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
     }
 
+    @Deprecated
     @Override
     public void disableAndDelete(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
         disableProcess(processDefinitionId);
         deleteProcess(processDefinitionId);
+    }
+
+    @Override
+    public void disableAndDeleteProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException,
+            DeletionException {
+        disableProcess(processDefinitionId);;
+        deleteProcessDefinition(processDefinitionId);
     }
 
     @Override

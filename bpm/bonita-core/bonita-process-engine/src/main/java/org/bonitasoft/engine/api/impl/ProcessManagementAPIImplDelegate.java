@@ -3,7 +3,7 @@ package org.bonitasoft.engine.api.impl;
 import java.io.File;
 import java.io.IOException;
 
-import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
+import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -41,11 +41,17 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
-    public void deleteProcessDefinition(final long processId) throws SBonitaException, BonitaHomeNotSetException, IOException {
+    public void deleteProcessDefinition(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processId);
-        deleteProcess.execute();
+        actorMappingService.deleteActors(processDefinitionId);
+        try {
+            processDefinitionService.delete(processDefinitionId);
+        } catch (final SProcessDefinitionNotFoundException spdnfe) {
+            // ignore
+        }
 
         final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
         final File file = new File(processesFolder);
@@ -53,22 +59,17 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             file.mkdir();
         }
 
-        final File processFolder = new File(file, String.valueOf(processId));
+        final File processFolder = new File(file, String.valueOf(processDefinitionId));
         IOUtil.deleteDir(processFolder);
-
-    }
-
-    protected DeleteProcess instantiateDeleteProcessTransactionContent(final long processId) {
-        return new DeleteProcess(getTenantAccessor(), processId);
     }
 
     public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+
         final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService);
         transactionContent.execute();
     }

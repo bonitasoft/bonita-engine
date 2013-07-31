@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.process;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -18,15 +19,19 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.impl.DocumentDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -73,7 +78,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "delete process" }, jira = "")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" }, jira = "")
     public void deleteProcessInstanceStopsCreatingNewActivities() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
@@ -89,7 +94,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "delete process" }, jira = "")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" }, jira = "")
     public void deleteProcessInstanceAlsoDeleteArchivedElements() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
@@ -107,7 +112,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "delete process" }, jira = "")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" }, jira = "")
     public void deleteArchivedProcessInstanceAlsoDeleteArchivedElements() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
@@ -125,7 +130,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "delete process" })
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" })
     public void deleteProcessDefinitionStopsCreatingNewActivities() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -136,7 +141,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "call activities" }, jira = "ENGINE-257")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "call activities" }, jira = "ENGINE-257")
     public void deleteProcessInstanceAlsoDeleteChildrenProcesses() throws Exception {
         // deploy a simple process P1
         final String simpleStepName = "simpleStep";
@@ -182,9 +187,10 @@ public class ProcessDeletionTest extends CommonAPITest {
         assertEquals(3, taskInstances.size());
     }
 
+    @Deprecated
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "call activities" }, jira = "ENGINE-257")
-    public void deleteProcessDefinitionAlsoDeleteArchivedChildrenProcesses() throws Exception {
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "call activities" }, jira = "ENGINE-257")
+    public void deleteProcessDefinitionAlsoArchivedChildrenProcesses() throws Exception {
         // deploy a simple process P1
         final String simpleStepName = "simpleStep";
         final ProcessDefinition simpleProcess = deployAndEnableSimpleProcess("simpleProcess", simpleStepName);
@@ -268,7 +274,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "call activities" }, jira = "ENGINE-257")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "call activities" }, jira = "ENGINE-257")
     public void deleteProcessInstanceAlsoDeleteArchivedChildrenProcesses() throws Exception {
         // deploy a simple process P1
         final String simpleStepName = "simpleStep";
@@ -315,7 +321,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete archived process instance", "call activities" }, jira = "ENGINE-1641")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete archived process instance", "call activities" }, jira = "ENGINE-1641")
     public void deleteArchivedProcessInstanceAndChildrenProcesses() throws Exception {
         // deploy a simple process P1
         final String simpleStepName = "simpleStep";
@@ -362,7 +368,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process instance", "event sub-process" }, jira = "ENGINE-257")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "event sub-process" }, jira = "ENGINE-257")
     public void deleteProcessInstanceAlsoDeleteEventSubProcesses() throws Exception {
         final String parentTaskName = "step1";
         final String childTaskName = "subStep";
@@ -410,9 +416,10 @@ public class ProcessDeletionTest extends CommonAPITest {
         return deployAndEnableWithActor(processDefinition, "mainActor", pedro);
     }
 
+    @Deprecated
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process", "archived process instance" }, jira = "ENGINE-257")
-    public void deleteProcessDefinitionAndNotProcessIntances() throws Exception {
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "Archived", "Process instance" }, jira = "ENGINE-257")
+    public void deleteProcessDefinitionAlsoArchivedProcessIntances() throws Exception {
         // deploy a simple process
         final String userTaskName = "step1";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("myProcess", userTaskName);
@@ -437,19 +444,74 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // check number of process instances and archived process instances
         processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
-        archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
-        assertEquals(0, processInstances.size());
-        assertEquals(0, archivedProcessInstances.size());
+        assertTrue(processInstances.isEmpty());
 
         List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(processInstanceToArchive.getId(), 0, 10);
-        assertEquals(0, archivedProcessInstanceList.size());
+        assertTrue(archivedProcessInstanceList.isEmpty());
 
         archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(activeProcessInstance.getId(), 0, 10);
-        assertEquals(0, archivedProcessInstanceList.size());
+        assertTrue(archivedProcessInstanceList.isEmpty());
+    }
+
+    @Test(expected = DeletionException.class)
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Can't", "Delete", "Process definition", "With",
+            "Process instances" }, jira = "ENGINE-1636")
+    public void deleteJustProcessDefinition() throws Exception {
+        // deploy a simple process
+        final String userTaskName = "step1";
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("myProcess", userTaskName);
+        processDefinitions.add(processDefinition); // To clean in the end
+
+        // start a process and execute it until end
+        final ProcessInstance processInstanceToArchive = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToArchive, pedro.getId());
+        waitForProcessToFinish(processInstanceToArchive);
+
+        // start a process non completed process
+        final ProcessInstance activeProcessInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(userTaskName, activeProcessInstance);
+
+        // check number of process instances and archived process instances
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
+        List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
+        assertEquals(1, processInstances.size());
+        assertEquals(1, archivedProcessInstances.size());
+
+        // delete definition
+        try {
+            getProcessAPI().disableAndDeleteProcessDefinition(processDefinition.getId());
+        } finally {
+            // check number of process instances and archived process instances
+            processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
+            assertFalse(processInstances.isEmpty());
+
+            List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(processInstanceToArchive.getId(), 0, 10);
+            assertFalse(archivedProcessInstanceList.isEmpty());
+
+            archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(activeProcessInstance.getId(), 0, 10);
+            assertFalse(archivedProcessInstanceList.isEmpty());
+        }
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process", "archived process instance" }, jira = "ENGINE-257")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition" }, jira = "ENGINE-1636")
+    public void deleteProcessDefinition() throws Exception {
+        // deploy a simple process
+        final String userTaskName = "step1";
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("myProcess", userTaskName);
+
+        // delete definition
+        getProcessAPI().disableAndDeleteProcessDefinition(processDefinition.getId());
+
+        final SearchOptionsBuilder optsBuilder = new SearchOptionsBuilder(0, 5);
+        optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.DEPLOYMENT_DATE, Order.DESC);
+        final SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
+        assertEquals(0, searchResult.getCount());
+        assertTrue(searchResult.getResult().isEmpty());
+    }
+
+    @Test
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "Archived", "Process instance" }, jira = "ENGINE-257")
     public void deleteProcessInstanceAndNotArchivedProcessIntances() throws Exception {
         // deploy a simple process
         final String userTaskName = "step1";
@@ -469,7 +531,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process", "archived process instance" }, jira = "ENGINE-1641")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "Archived", "Process instance" }, jira = "ENGINE-1641")
     public void deleteArchivedProcessInstances() throws Exception {
         // deploy a simple process
         final String userTaskName = "step1";
@@ -489,12 +551,12 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process", "documents" }, jira = "ENGINE-257")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "Documents" }, jira = "ENGINE-257")
     public void deleteProcessInstanceAlsoDeleteDocuments() throws Exception {
         // deploy and instantiate a process containing data and documents
         final String userTaskName = "step1";
         final String url = "http://intranet.bonitasoft.com/private/docStorage/anyValue";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithDocument("myProcess", userTaskName, "doc", url);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithDocument("myProcess", userTaskName, "Doc", url);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(userTaskName, processInstance.getId());
@@ -526,7 +588,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process", "comments" }, jira = "ENGINE-257")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "comments" }, jira = "ENGINE-257")
     public void deleteProcessInstanceAlsoDeleteComments() throws Exception {
         // deploy and start a simple process
         final String userTaskName = "step1";
@@ -550,7 +612,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process", "archived comments" })
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "archived comments" })
     public void deleteProcessInstanceAndComments() throws Exception {
         // deploy and start a simple process
         final String userTaskName = "etapa1";
@@ -575,7 +637,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "delete process", "archived comments" })
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "archived comments" })
     public void deleteArchivedProcessInstanceAndComments() throws Exception {
         // deploy and start a simple process
         final String userTaskName = "etapa1";

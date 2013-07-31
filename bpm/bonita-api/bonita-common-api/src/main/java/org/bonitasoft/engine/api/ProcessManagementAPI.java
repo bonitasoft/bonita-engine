@@ -273,9 +273,28 @@ public interface ProcessManagementAPI {
      *             if an exception occurs while deleting the process.
      * @see #disableProcess(long)
      * @see #deleteProcess(long)
+     * @deprecated As of release 6.1, replaced by {@link #disableAndDeleteProcessDefinition(long)}
      * @since 6.0
      */
+    @Deprecated
     void disableAndDelete(long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
+
+    /**
+     * Disables and deletes the process.
+     * 
+     * @param processDefinitionId
+     *            the process definition identifier.
+     * @throws ProcessDefinitionNotFoundException
+     *             if the identifier does not refer to an existing process definition.
+     * @throws ProcessActivationException
+     *             if an exception occurs while disabling the process.
+     * @throws DeletionException
+     *             if an exception occurs while deleting the process.
+     * @see #disableProcess(long)
+     * @see #deleteProcess(long)
+     * @since 6.1
+     */
+    void disableAndDeleteProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
 
     /**
      * Gets the current number of process definitions in all states.
