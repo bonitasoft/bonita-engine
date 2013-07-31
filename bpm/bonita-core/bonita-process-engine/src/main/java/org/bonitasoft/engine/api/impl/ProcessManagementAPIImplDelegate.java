@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
+import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -52,6 +53,25 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         } catch (final SProcessDefinitionNotFoundException spdnfe) {
             // ignore
         }
+
+        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
+        final File file = new File(processesFolder);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+
+        final File processFolder = new File(file, String.valueOf(processDefinitionId));
+        IOUtil.deleteDir(processFolder);
+    }
+
+    @Deprecated
+    public void deleteProcess(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+
+        final DeleteProcess deleteProcess = new DeleteProcess(getTenantAccessor(), processDefinitionId);
+        deleteProcess.execute();
 
         final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
         final File file = new File(processesFolder);
