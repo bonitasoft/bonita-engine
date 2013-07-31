@@ -28,7 +28,7 @@ public class NodeAPIImpl implements NodeAPI {
     @NoSessionRequired
     public LicenseInfo getLicenseInfo() {
         final Manager manager = Manager.getInstance();
-		final Map<String, String> info = manager.getInfo();
+        final Map<String, String> info = manager.getInfo();
         final String edition = info.get("subscriptionType");
         final String licensee = info.get("customerName");
         final List<String> features = manager.activeFeatures();
