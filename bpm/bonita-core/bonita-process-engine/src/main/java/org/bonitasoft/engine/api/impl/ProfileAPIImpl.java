@@ -257,6 +257,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     @Override
     public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId) throws CreationException,
             AlreadyExistsException {
+        System.out.println("ProfileAPIImpl.createProfileMember() pid=" + profileId + " userId" + userId + " gid=" + groupId + " roleId" + roleId);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
@@ -264,15 +265,16 @@ public class ProfileAPIImpl implements ProfileAPI {
         final MemberType memberType = getMemberType(userId, groupId, roleId);
         final CreateProfileMember createProfileMember = new CreateProfileMember(profileService, identityService, profileId, userId, groupId, roleId, memberType);
         try {
+            checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType);
+        } catch (final SBonitaException e1) {
+            throw new AlreadyExistsException(e1);
+        }
+        try {
             createProfileMember.execute();
-            return ModelConvertor.toProfileMember(createProfileMember.getResult());
+            ProfileMember profileMember = ModelConvertor.toProfileMember(createProfileMember.getResult());
+            return profileMember;
         } catch (final SBonitaException e) {
-            try {
-                checkIfProfileMemberExists(tenantAccessor, profileService, profileId, userId, groupId, roleId, memberType, e);
-            } catch (final SBonitaException e1) {
-                throw new CreationException(e1);
-            }
-            throw new AlreadyExistsException(e);
+            throw new CreationException(e);
         }
     }
 
@@ -289,7 +291,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     protected void checkIfProfileMemberExists(final TenantServiceAccessor tenantAccessor, final ProfileService profileService, final Long profileId,
-            final Long userId, final Long groupId, final Long roleId, final MemberType memberType, final SBonitaException e) throws SBonitaException {
+            final Long userId, final Long groupId, final Long roleId, final MemberType memberType) throws SBonitaException {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchEntityDescriptor searchDescriptor = searchEntitiesDescriptor.getProfileMemberUserDescriptor();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
@@ -300,36 +302,40 @@ public class ProfileAPIImpl implements ProfileAPI {
         switch (memberType) {
             case USER:
                 searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForUser", profileService, searchDescriptor, searchOptionsBuilder.done());
+                searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.USER_ID, userId);
                 searchProfileMembersForProfile.execute();
-
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SUserProfileMemberAlreadyExistsException("A profileMember with userId \"" + userId + "\" already exists", e);
+                    throw new SUserProfileMemberAlreadyExistsException("A profileMember with userId \"" + userId + "\" already exists");
                 }
                 break;
             case GROUP:
                 searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForGroup", profileService, searchDescriptor, searchOptionsBuilder.done());
+                searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.GROUP_ID, groupId);
                 searchProfileMembersForProfile.execute();
 
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SGroupProfileMemberAlreadyExistsException("A profileMember with groupId \"" + groupId + "\" already exists", e);
+                    throw new SGroupProfileMemberAlreadyExistsException("A profileMember with groupId \"" + groupId + "\" already exists");
                 }
                 break;
             case ROLE:
                 searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForRole", profileService, searchDescriptor, searchOptionsBuilder.done());
+                searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.ROLE_ID, roleId);
                 searchProfileMembersForProfile.execute();
 
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
-                    throw new SRoleProfileMemberAlreadyExistsException("A profileMember with roleId \"" + roleId + "\" already exists", e);
+                    throw new SRoleProfileMemberAlreadyExistsException("A profileMember with roleId \"" + roleId + "\" already exists");
                 }
                 break;
             default:
                 searchProfileMembersForProfile = new SearchProfileMembersForProfile("ForRoleAndGroup", profileService, searchDescriptor,
                         searchOptionsBuilder.done());
+                searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.ROLE_ID, roleId);
+                searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.GROUP_ID, groupId);
                 searchProfileMembersForProfile.execute();
 
                 if (searchProfileMembersForProfile.getResult().getCount() != 0) {
                     throw new SUserMembershipProfileMemberAlreadyExistsException("A profileMember with groupId \"" + groupId + "\" and roleId \"" + roleId
-                            + "\" already exists", e);
+                            + "\" already exists");
                 }
                 break;
         }
