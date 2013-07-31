@@ -381,7 +381,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         final int tokenCount = activityInstance.getTokenCount() - 1;
         activityInstanceService.setTokenCount(activityInstance, tokenCount);
         hit = flowNodeStateManager.getState(fParent.getStateId()).hit(processDefinition, fParent, fChild);
-        System.out.println("A hit=" + hit + " on " + fParent.getType() + "  id=" + fParent.getId());
         if (hit) {// we continue parent if hit of the parent return true
 
             // in a new work?
