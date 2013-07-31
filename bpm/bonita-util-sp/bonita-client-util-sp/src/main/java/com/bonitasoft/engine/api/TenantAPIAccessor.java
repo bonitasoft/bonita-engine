@@ -27,6 +27,16 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
+ * <b>Accessor class that retrieve APIs</b>
+ * <p>
+ * <ul>
+ * <li>{@link ProcessAPI}</li>
+ * <li>{@link CommandAPI}</li>
+ * <li>{@link IdentityAPI}</li>
+ * <li>{@link MonitoringAPI}</li>
+ * <li>{@link LoginAPI}</li>
+ * </ul>
+ * 
  * @author Matthieu Chaffotte
  */
 public final class TenantAPIAccessor {

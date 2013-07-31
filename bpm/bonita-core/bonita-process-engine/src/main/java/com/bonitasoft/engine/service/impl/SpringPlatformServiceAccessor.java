@@ -10,14 +10,18 @@ package com.bonitasoft.engine.service.impl;
 
 import org.bonitasoft.engine.service.impl.SpringPlatformFileSystemBeanAccessor;
 
+import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SpringPlatformServiceAccessor extends org.bonitasoft.engine.service.impl.SpringPlatformServiceAccessor implements PlatformServiceAccessor {
+
+    private PlatformMonitoringService platformMonitoringService;
 
     private SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor;
 
@@ -35,4 +39,11 @@ public class SpringPlatformServiceAccessor extends org.bonitasoft.engine.service
         return instance;
     }
 
+    @Override
+    public PlatformMonitoringService getPlatformMonitoringService() {
+        if (platformMonitoringService == null) {
+            platformMonitoringService = SpringPlatformFileSystemBeanAccessor.getService(PlatformMonitoringService.class);
+        }
+        return platformMonitoringService;
+    }
 }

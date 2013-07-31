@@ -27,7 +27,17 @@ import java.util.Map;
 public class TenantCreator {
 
     public enum TenantField {
-        NAME, DESCRIPTION, ICON_NAME, ICON_PATH, DEFAULT_TENANT, USERNAME, PASSWORD;
+        NAME, DESCRIPTION, ICON_NAME, ICON_PATH, DEFAULT_TENANT,
+
+        /**
+         * Username for the tenant technical user
+         */
+        USERNAME,
+
+        /**
+         * Password for the tenant technical user
+         */
+        PASSWORD;
     }
 
     private final Map<TenantField, Serializable> fields;

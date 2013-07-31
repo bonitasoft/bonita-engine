@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:proFiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.0">
 
-	<profile name="Process owner">
+	<profile name="Process owner" isDefault="true">
 			<description>Process profile</description>
 			<iconPath>/profiles/profileAdmin.png</iconPath>
 			<profileEntries>
@@ -32,7 +32,7 @@
 			  </profileMapping>
 	</profile>
 
-    <profile name="Team Manager">
+    <profile name="Team Manager" isDefault="false">
 		<description>TM profile2</description>
 		<iconPath>/profiles/profileTeamManager2.png</iconPath>
 		<profileEntries>

@@ -5,6 +5,7 @@
 		<constructor-arg name="rangeSizes">
 			<map>
 				<!-- Most used objects: range size depends on process design -->
+				<entry key="70" value="2000" /><!-- Job description -->
 				<entry key="30" value="10000" /><!-- queriable log -->
 				<entry key="31" value="200000" /><!-- queriable log parameter -->
 				<entry key="10010" value="1000" /><!-- ProcessInstance -->
@@ -153,6 +154,8 @@
 				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" value="10110" />
+				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" value="500" />
+
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

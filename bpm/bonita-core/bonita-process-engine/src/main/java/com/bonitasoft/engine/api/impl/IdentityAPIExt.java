@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -24,7 +24,6 @@ import com.bonitasoft.manager.Features;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class IdentityAPIExt extends IdentityAPIImpl implements IdentityAPI {
 

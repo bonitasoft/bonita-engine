@@ -2,6 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
+		<constructor-arg name="sessionProvider" ref="sessionProvider" />
 		<constructor-arg name="sessionModelBuilder" ref="sessionModelBuilder" />
 		<constructor-arg name="platformService" ref="platformService" />
 		<constructor-arg name="applicationName" value="BPM" />

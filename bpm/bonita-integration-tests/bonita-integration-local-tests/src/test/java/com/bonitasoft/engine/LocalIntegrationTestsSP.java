@@ -20,6 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -44,6 +46,8 @@ public class LocalIntegrationTestsSP {
         try {
             APITestSPUtil.createPlatformStructure();
         } catch (Exception e) {
+            Logger logger = LoggerFactory.getLogger(LocalIntegrationTestsSP.class);
+            logger.error("unable to create platform", e);
             final PlatformSession session = APITestSPUtil.loginPlatform();
             final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.stopNode();

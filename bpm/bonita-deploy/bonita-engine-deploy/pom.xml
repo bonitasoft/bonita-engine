@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-deploy</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.0.2-rc-01-SNAPSHOT</version>
+		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-engine-deploy</artifactId>
@@ -45,6 +45,20 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-home-sp</artifactId>
+			<version>${project.version}</version>
+			<classifier>efficiency</classifier>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
+			<artifactId>bonita-home-sp</artifactId>
+			<version>${project.version}</version>
+			<classifier>performance</classifier>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-deploy-ear2-sp</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
@@ -79,6 +93,8 @@
 							<descriptors>
 								<descriptor>assembly-mybatis-performance.xml</descriptor>
 								<descriptor>assembly-hibernate-teamwork.xml</descriptor>
+								<descriptor>assembly-hibernate-efficiency.xml</descriptor>
+								<descriptor>assembly-hibernate-performance.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>

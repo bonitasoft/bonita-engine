@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.VariableStorage;
@@ -31,6 +30,7 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
@@ -82,13 +82,13 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
 
-        boolean txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
         List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), "process",
                 QueryOptions.defaultQueryOptions());
-        transactionExecutor.completeTransaction(txOpened);
+        transactionService.complete();
         assertEquals(2, dependencyIds.size());
         assertEquals(2, dependencyMappings.size());
 
@@ -98,11 +98,11 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
         getProcessAPI().setConnectorImplementation(processDefinition.getId(), connectorId, connectorVersion, connectorImplementationArchive);
 
-        txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
         dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
-        transactionExecutor.completeTransaction(txOpened);
+        transactionService.complete();
         assertEquals(1, dependencyIds.size());
         assertEquals(1, dependencyMappings.size());
 

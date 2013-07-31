@@ -13,6 +13,12 @@ import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.core.reporting.ReportingService;
+import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
+import com.bonitasoft.engine.monitoring.TenantMonitoringService;
+import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
+import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
+import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
@@ -40,6 +46,11 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     }
 
     @Override
+    public ReportingService getReportingService() {
+        return this.getInstanceOf(ReportingService.class);
+    }
+
+    @Override
     public SearchPlatformEntitiesDescriptor getSearchPlatformEntitiesDescriptor() {
         return this.getInstanceOf(SearchPlatformEntitiesDescriptor.class);
     }
@@ -57,5 +68,35 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     @Override
     public TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
         return this;
+    }
+
+    @Override
+    public PlatformMonitoringService getPlatformMonitoringService() {
+        return getInstanceOf(PlatformMonitoringService.class);
+    }
+
+    @Override
+    public TenantMonitoringService getTenantMonitoringService() {
+        return getInstanceOf(TenantMonitoringService.class);
+    }
+
+    public SServiceMXBean getServiceMXBean() {
+        return getInstanceOf(SServiceMXBean.class);
+    }
+
+    public SPlatformServiceMXBean getPlatformServiceMXBean() {
+        return getInstanceOf(SPlatformServiceMXBean.class);
+    }
+
+    public SJvmMXBean getJvmMXBean() {
+        return getInstanceOf(SJvmMXBean.class);
+    }
+
+    public TenantMonitoringService getTenantMonitoringService(final boolean useCache) {
+        if (useCache) {
+            return getInstanceOf("monitoringServiceWithCache", TenantMonitoringService.class);
+        } else {
+            return getInstanceOf("monitoringService", TenantMonitoringService.class);
+        }
     }
 }

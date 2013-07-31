@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
 		<artifactId>bonita-engine-sp</artifactId>
-		<version>6.0.2-rc-01-SNAPSHOT</version>
+		<version>6.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>services</artifactId>
@@ -13,6 +13,8 @@
 
 	<modules>
 		<module>bonita-archive</module>
+        <module>bonita-cache</module>
+        <module>bonita-classloader</module>
 		<module>bonita-command</module>
 		<module>bonita-data</module>
 		<module>bonita-data-instance</module>
@@ -23,6 +25,7 @@
 		<module>bonita-expression</module>
 		<module>bonita-external-identity-mapping</module>
 		<module>bonita-identity</module>
+        <module>bonita-lock</module>
 		<module>bonita-log</module>
 		<module>bonita-persistence</module>
 		<module>bonita-platform</module>
@@ -31,6 +34,9 @@
 		<module>bonita-scheduler</module>
 		<module>bonita-work</module>
 		<module>bonita-connector-executor-timedout</module>
+		<module>bonita-session</module>
+		<module>bonita-platform-session</module>
+		<module>bonita-monitoring</module>
 	</modules>
 
 	<profiles>

@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.licence;
 
 import org.apache.commons.log.ConfigurationError;
@@ -11,13 +19,13 @@ public class LicenseTest {
 
     @Test
     public void validateLicence() {
-        Manager manager = new Manager();
-        Assert.assertTrue("The license should be valid because of: " + manager.getErrorMessage(), manager.isValid());
+       final Manager manager = Manager.getInstance();
+		Assert.assertTrue("The license should be valid because of: " + manager.getErrorMessage(), manager.isValid());
     }
 
     private void valideFeature(final String feature) {
         try {
-            Assert.assertTrue("The feature: ' " + feature + "' is not active.", new Manager().isFeatureActive(feature));
+            Assert.assertTrue("The feature: ' " + feature + "' is not active.",Manager.getInstance().isFeatureActive(feature));
         } catch (final ConfigurationError exception) {
             Assert.assertTrue("The feature : '" + feature + "' is not supported due to an invalid license.", false);
         }

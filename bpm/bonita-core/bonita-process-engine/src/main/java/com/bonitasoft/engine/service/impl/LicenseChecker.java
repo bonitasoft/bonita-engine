@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -57,7 +57,7 @@ public class LicenseChecker {
     }
 
     public boolean checkLicence() {
-        if (!new Manager().isValid()) {
+        if (!Manager.getInstance().isValid()) {
             stopNode();
             return false;
         }
@@ -66,7 +66,7 @@ public class LicenseChecker {
 
     public void checkLicenceAndFeature(final String feature) throws IllegalStateException {
         checkLicence();
-        if (!new Manager().isFeatureActive(feature)) {
+        if (!Manager.getInstance().isFeatureActive(feature)) {
             final String message = exceptions.get(feature);
             throw new IllegalStateException(message);
         }
@@ -100,7 +100,7 @@ public class LicenseChecker {
      * @return the license error message, if any.
      */
     public String getErrorMessage() {
-        return new Manager().getErrorMessage();
+        return Manager.getInstance().getErrorMessage();
     }
 
 }

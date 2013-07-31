@@ -27,6 +27,16 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
+ * <b>Accessor class that retrieve Platform APIs</b>
+ * <p>
+ * All APIs given by this class are relevant to the platform only.
+ * <ul>
+ * <li>{@link PlatformAPI}</li>
+ * <li>{@link PlatformCommandAPI}</li>
+ * <li>{@link PlatformMonitoringAPI}</li>
+ * <li>{@link PlatformLoginAPI}</li>
+ * </ul>
+ * 
  * @author Matthieu Chaffotte
  */
 public class PlatformAPIAccessor {

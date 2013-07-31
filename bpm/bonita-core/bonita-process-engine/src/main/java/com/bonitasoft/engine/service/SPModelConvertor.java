@@ -21,14 +21,8 @@ import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.ExportedUserBuilder;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.monitoring.SGcInfo;
-import org.bonitasoft.engine.monitoring.SMemoryUsage;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.profile.ProfileCreator;
-import org.bonitasoft.engine.profile.ProfileCreator.ProfileField;
-import org.bonitasoft.engine.profile.ProfileEntryCreator;
-import org.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -39,17 +33,29 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
+import com.bonitasoft.engine.core.reporting.SReport;
+import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.log.impl.LogImpl;
 import com.bonitasoft.engine.monitoring.GcInfo;
 import com.bonitasoft.engine.monitoring.MemoryUsage;
+import com.bonitasoft.engine.monitoring.SGcInfo;
+import com.bonitasoft.engine.monitoring.SMemoryUsage;
 import com.bonitasoft.engine.monitoring.impl.GcInfoImpl;
 import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
 import com.bonitasoft.engine.platform.impl.TenantImpl;
+import com.bonitasoft.engine.profile.ProfileCreator;
+import com.bonitasoft.engine.profile.ProfileCreator.ProfileField;
+import com.bonitasoft.engine.profile.ProfileEntryCreator;
+import com.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
+import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportCreator;
+import com.bonitasoft.engine.reporting.ReportCreator.ReportField;
+import com.bonitasoft.engine.reporting.impl.ReportImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -131,9 +137,11 @@ public final class SPModelConvertor extends ModelConvertor {
         return breakpoints;
     }
 
-    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder) {
+    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder, final boolean isDefault, final long createdBy) {
+        final long creationDate = System.currentTimeMillis();
         final Map<ProfileField, Serializable> fields = creator.getFields();
-        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME));
+        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME), isDefault, creationDate,
+                createdBy, creationDate, createdBy);
         final String description = (String) fields.get(ProfileField.DESCRIPTION);
         if (description != null) {
             newSProfileBuilder.setDescription(description);
@@ -234,4 +242,41 @@ public final class SPModelConvertor extends ModelConvertor {
         }
         return clientUserbuilder.done();
     }
+
+    public static Report toReport(final SReport sReport) {
+        final ReportImpl report = new ReportImpl(sReport.getId(), sReport.getName(), sReport.getInstallationDate(), sReport.getInstalledBy());
+        report.setDescription(sReport.getDescription());
+        report.setProvided(sReport.isProvided());
+        report.setLastModificationDate(new Date(sReport.getLastModificationDate()));
+        report.setScreenshot(sReport.getScreenshot());
+        return report;
+    }
+
+    public static List<Report> toReports(final List<SReport> sReports) {
+        final List<Report> reports = new ArrayList<Report>(sReports.size());
+        for (final SReport sReport : sReports) {
+            reports.add(toReport(sReport));
+        }
+        return reports;
+    }
+
+    public static SReport constructSReport(final ReportCreator creator, final SReportBuilder sReportBuilder, final long creatorUserId) {
+        final Map<ReportField, Serializable> fields = creator.getFields();
+        final String name = (String) fields.get(ReportField.NAME);
+        // Boolean isProvided = (Boolean) fields.get(ReportField.PROVIDED);
+        // if (isProvided == null) {
+        // isProvided = false;
+        // }
+        final SReportBuilder newSReportBuilder = sReportBuilder.createNewInstance(name, System.currentTimeMillis(), creatorUserId, false);
+        final String description = (String) fields.get(ReportField.DESCRIPTION);
+        if (description != null) {
+            newSReportBuilder.setDescription(description);
+        }
+        final byte[] screenshot = (byte[]) fields.get(ReportField.SCREENSHOT);
+        if (screenshot != null) {
+            newSReportBuilder.setScreenshot(screenshot);
+        }
+        return newSReportBuilder.done();
+    }
+
 }

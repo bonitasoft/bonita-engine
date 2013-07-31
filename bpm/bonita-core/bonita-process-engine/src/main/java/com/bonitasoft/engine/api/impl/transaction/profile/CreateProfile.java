@@ -10,11 +10,11 @@ package com.bonitasoft.engine.api.impl.transaction.profile;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.profile.ProfileCreator;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.model.SProfile;
 
+import com.bonitasoft.engine.profile.ProfileCreator;
 import com.bonitasoft.engine.service.SPModelConvertor;
 
 /**
@@ -29,18 +29,25 @@ public class CreateProfile implements TransactionContentWithResult<SProfile> {
 
     private final ProfileCreator creator;
 
+    private final boolean isDefault;
+
+    private final long createdBy;
+
     private SProfile profile;
 
-    public CreateProfile(final ProfileService profileService, final SProfileBuilder sProfileBuilder, final ProfileCreator creator) {
+    public CreateProfile(final ProfileService profileService, final SProfileBuilder sProfileBuilder, final ProfileCreator creator,
+            final boolean isDefault, final long createdBy) {
         super();
         this.profileService = profileService;
         this.sProfileBuilder = sProfileBuilder;
         this.creator = creator;
+        this.isDefault = isDefault;
+        this.createdBy = createdBy;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, sProfileBuilder));
+        profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, sProfileBuilder, isDefault, createdBy));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.profile;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -47,12 +48,20 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final byte[] profilebytes = getProfileAPI().exportAllProfiles();
 
         final String xmlStr = new String(profilebytes);
-        final String[] strs = xmlStr.split("profile name=\"");
+        final String[] isDefaults = xmlStr.split("profile isDefault=\"");
+        assertEquals(5, isDefaults.length);
+        assertEquals("true", isDefaults[1].substring(0, isDefaults[1].indexOf('\"')));
+        assertEquals("false", isDefaults[2].substring(0, isDefaults[2].indexOf('\"')));
+        assertEquals("true", isDefaults[3].substring(0, isDefaults[3].indexOf('\"')));
+        assertEquals("false", isDefaults[4].substring(0, isDefaults[4].indexOf('\"')));
+
+        final String[] strs = xmlStr.split("profile isDefault=.*name=\"");
         assertEquals(5, strs.length);
         assertEquals("Administrator", strs[1].substring(0, strs[1].indexOf('\"')));
         assertEquals("Process owner", strs[2].substring(0, strs[2].indexOf('\"')));
         // assertEquals("Process owner", strs[3].substring(0, strs[3].indexOf("\"")));
         // assertEquals("User", strs[4].substring(0, strs[4].indexOf("\"")));
+
         final File f = new File("AllProfiles.xml");
         if (!f.exists()) {
             f.createNewFile();
@@ -80,7 +89,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         final byte[] profilebytes = getProfileAPI().exportProfilesWithIdsSpecified(profIds);
 
         final String xmlStr = new String(profilebytes);
-        final String[] strs = xmlStr.split("profile name=\"");
+        final String[] strs = xmlStr.split("profile isDefault=.*name=\"");
         assertEquals(2, strs.length);
         assertEquals("User", strs[1].substring(0, strs[1].indexOf('\"')));
 
@@ -306,13 +315,17 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         assertEquals(4, searchedProfiles.getResult().size());
         assertEquals(4l, searchedProfiles.getCount());
         assertEquals("Administrator", searchedProfiles.getResult().get(0).getName());
-        assertEquals("Team Manager", searchedProfiles.getResult().get(1).getName());
-        assertEquals("Process owner", searchedProfiles.getResult().get(2).getName());
-        assertEquals("User", searchedProfiles.getResult().get(3).getName());
         assertEquals("Administrator profile", searchedProfiles.getResult().get(0).getDescription());
+        assertTrue(searchedProfiles.getResult().get(0).isDefault());
+        assertEquals("Team Manager", searchedProfiles.getResult().get(1).getName());
         assertEquals("Team Manager profile", searchedProfiles.getResult().get(1).getDescription());
+        assertTrue(searchedProfiles.getResult().get(1).isDefault());
+        assertEquals("Process owner", searchedProfiles.getResult().get(2).getName());
         assertEquals("Process owner profile", searchedProfiles.getResult().get(2).getDescription());
+        assertFalse(searchedProfiles.getResult().get(2).isDefault());
+        assertEquals("User", searchedProfiles.getResult().get(3).getName());
         assertEquals("User profile", searchedProfiles.getResult().get(3).getDescription());
+        assertFalse(searchedProfiles.getResult().get(3).isDefault());
 
         // check profile entries and their attributes
         for (final long i : Arrays.asList(olderid1, olderid2, olderid3, olderid4)) {

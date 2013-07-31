@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -27,8 +27,8 @@ public class NodeAPIImpl implements NodeAPI {
     @Override
     @NoSessionRequired
     public LicenseInfo getLicenseInfo() {
-        Manager manager = new Manager();
-        final Map<String, String> info = manager.getInfo();
+        final Manager manager = Manager.getInstance();
+		final Map<String, String> info = manager.getInfo();
         final String edition = info.get("subscriptionType");
         final String licensee = info.get("customerName");
         final List<String> features = manager.activeFeatures();
