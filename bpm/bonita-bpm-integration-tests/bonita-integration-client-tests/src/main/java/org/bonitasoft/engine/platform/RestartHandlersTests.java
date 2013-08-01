@@ -30,9 +30,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.WaitUntil;
@@ -96,11 +94,11 @@ public class RestartHandlersTests extends CommonAPITest {
         for (int i = 2; i < 30; i++) {
             final String activityName = "step" + i;
             AutomaticTaskDefinitionBuilder addUserTask = builder.addAutomaticTask(activityName);
-            if (i > 6) {
-                addUserTask.addOperation(new OperationBuilder().createSetDataOperation("data",
-                        new ExpressionBuilder().createGroovyScriptExpression("script", "Thread.sleep(50);return 10;", "java.lang.Integer")));
-                addUserTask.addIntegerData("data", new ExpressionBuilder().createConstantIntegerExpression(0));
-            }
+            // if (i > 6) {
+            // addUserTask.addOperation(new OperationBuilder().createSetDataOperation("data",
+            // new ExpressionBuilder().createGroovyScriptExpression("script", "Thread.sleep(5);return 10;", "java.lang.Integer")));
+            // addUserTask.addIntegerData("data", new ExpressionBuilder().createConstantIntegerExpression(0));
+            // }
             builder.addTransition("step1", "step" + i);
         }
         for (int i = 2; i < 30; i++) {
