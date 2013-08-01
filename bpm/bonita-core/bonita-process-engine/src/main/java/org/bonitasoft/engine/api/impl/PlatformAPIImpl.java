@@ -228,6 +228,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
+        WorkService workService = platformAccessor.getWorkService();
         try {
             try {
                 final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
@@ -248,7 +249,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         sessionService.deleteSession(sessionId);
                     }
                 }
-
+                workService.startup();
                 if (!isPlatformStarted(platformAccessor)) {
                     if (platformConfiguration.shouldStartScheduler()) {
                         schedulerService.start();
@@ -332,7 +333,16 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            shutdownScheduler(platformAccessor, schedulerService);
+            NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            if (plaformConfiguration.shouldStartScheduler()) {
+                // we shutdown the scheduler only if we are also responsible of starting it
+                shutdownScheduler(platformAccessor, schedulerService);
+            }
+            WorkService workService = platformAccessor.getWorkService();
+            workService.shutdown();
+            if (plaformConfiguration.shouldClearSessions()) {
+                platformAccessor.getSessionService().deleteSessions();
+            }
         } catch (final SBonitaException e) {
             throw new StopNodeException(e);
         } catch (final BonitaHomeNotSetException e) {
@@ -347,6 +357,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new StopNodeException(e);
         } catch (final BonitaHomeConfigurationException e) {
             throw new StopNodeException(e.getMessage());
+        } catch (final Exception e) {
+            throw new StopNodeException(e);
         }
     }
 
@@ -419,7 +431,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    @CustomTransactions
     public void cleanAndDeletePlaftorm() throws DeletionException {
         cleanPlatform();
         deletePlatform();
@@ -427,7 +438,6 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @Deprecated
-    @CustomTransactions
     public Platform getPlatform() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -579,6 +589,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void activateDefaultTenant() throws STenantActivationException {
+        // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
@@ -589,6 +600,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final STenant tenant = getDefaultTenant();
             final long tenantId = tenant.getId();
             final PlatformService platformService = platformAccessor.getPlatformService();
+            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();

@@ -6,10 +6,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -94,13 +99,21 @@ public class PlatformTest {
     public void getPlatform() throws BonitaException {
         final Platform platform = platformAPI.getPlatform();
 
+        final String platformVersionToTest = "6.1.0";
+
         assertNotNull("can't find the platform", platform);
         assertEquals("platformAdmin", platform.getCreatedBy());
         final String version = platform.getVersion();
-        assertTrue(version, version.equals("6.1.0-SNAPSHOT") || version.equals("6.1.0"));
+        assertTrue(
+                version,
+                version.equals(platformVersionToTest + "-SNAPSHOT") || version.equals(platformVersionToTest + "")
+                        || version.startsWith(platformVersionToTest + "-rc"));
 
         final String initialVersion = platform.getInitialVersion();
-        assertTrue(version, initialVersion.equals("6.1.0-SNAPSHOT") || initialVersion.equals("6.1.0"));
+        assertTrue(
+                version,
+                initialVersion.equals(platformVersionToTest + "-SNAPSHOT") || initialVersion.equals(platformVersionToTest + "")
+                        || initialVersion.startsWith(platformVersionToTest + "-rc"));
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.")
@@ -146,6 +159,24 @@ public class PlatformTest {
         platformAPI.stopNode();
         platformAPI.stopNode();
         platformAPI.cleanAndDeletePlaftorm();
+    }
+
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "stop node then start it with same session.")
+    @Test
+    public void stopNodeAndStartNode() throws Exception {
+        LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        APISession tenantSession = loginAPI.login("install", "install");
+        IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(tenantSession);
+        identityAPI.getNumberOfUsers();
+        platformAPI.stopNode();
+        platformAPI.startNode();
+        try {
+            identityAPI.getNumberOfUsers();
+            fail("session should not work");
+        } catch (InvalidSessionException e) {
+            // ok
+            e.printStackTrace();
+        }
     }
 
 }

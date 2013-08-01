@@ -44,6 +44,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Celine Souchet
+ * 
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ServerAPIImpl.class })
