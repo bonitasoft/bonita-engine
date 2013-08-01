@@ -17,6 +17,7 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -376,4 +377,20 @@ public class CommandTest extends CommonAPITest {
         getCommandAPI().unregister("intReturn");
         getCommandAPI().removeDependency("commands");
     }
+
+    @Test(expected = BonitaRuntimeException.class)
+    public void executeCommandThrowsANPE() throws BonitaException, IOException {
+        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/npe-command-jar.bak");
+        assertNotNull(stream);
+        final byte[] byteArray = IOUtils.toByteArray(stream);
+        getCommandAPI().addDependency("commands", byteArray);
+        getCommandAPI().register("NPEReturns", "Throws a NPE", "org.bonitasoft.engine.command.NPECommand");
+        try {
+            getCommandAPI().execute("NPEReturns", null);
+        } finally {
+            getCommandAPI().unregister("NPEReturns");
+            getCommandAPI().removeDependency("commands");
+        }
+    }
+
 }

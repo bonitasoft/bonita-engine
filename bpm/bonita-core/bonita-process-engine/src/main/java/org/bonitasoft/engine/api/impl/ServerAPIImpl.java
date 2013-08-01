@@ -100,20 +100,20 @@ public class ServerAPIImpl implements ServerAPI {
                 sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
                 final Session session = (Session) options.get("session");
                 return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
-            } catch (final ServerAPIRuntimeException e) {
-                throw e.getCause();
+            } catch (final ServerAPIRuntimeException sapire) {
+                throw sapire.getCause();
             }
-        } catch (final BonitaRuntimeException e) {
-            throw new ServerWrappedException(e);
-        } catch (final BonitaException e) {
-            throw new ServerWrappedException(e);
-        } catch (final UndeclaredThrowableException e) {
+        } catch (final BonitaRuntimeException bre) {
+            throw new ServerWrappedException(bre);
+        } catch (final BonitaException be) {
+            throw new ServerWrappedException(be);
+        } catch (final UndeclaredThrowableException ute) {
             if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+                technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, ute);
             }
-            throw new ServerWrappedException(e);
-        } catch (final Throwable e) {
-            throw new ServerWrappedException(new BonitaRuntimeException(e));
+            throw new ServerWrappedException(ute);
+        } catch (final Throwable cause) {
+            throw new ServerWrappedException(new BonitaRuntimeException(cause));
         } finally {
             if (cleanSession) {
                 // clean session id
@@ -130,8 +130,8 @@ public class ServerAPIImpl implements ServerAPI {
 
         private static final long serialVersionUID = -5675131531953146131L;
 
-        ServerAPIRuntimeException(final Throwable t) {
-            super(t);
+        ServerAPIRuntimeException(final Throwable cause) {
+            super(cause);
 
         }
     }
@@ -214,7 +214,7 @@ public class ServerAPIImpl implements ServerAPI {
         if (session == null) {
             throw new BonitaRuntimeException("session is null");
         }
-        TransactionService transactionService = selectTransactionService(session, getSessionType(session));
+        final TransactionService transactionService = selectTransactionService(session, getSessionType(session));
 
         final Callable<Object> callable = new Callable<Object>() {
 
@@ -222,8 +222,8 @@ public class ServerAPIImpl implements ServerAPI {
             public Object call() throws Exception {
                 try {
                     return invokeAPI(parametersValues, apiImpl, method);
-                } catch (Throwable e) {
-                    throw new ServerAPIRuntimeException(e);
+                } catch (final Throwable cause) {
+                    throw new ServerAPIRuntimeException(cause);
                 }
             }
         };
@@ -231,17 +231,6 @@ public class ServerAPIImpl implements ServerAPI {
         return transactionService.executeInTransaction(callable);
     }
 
-    /**
-     * @param session
-     * @param sessionType
-     * @return
-     * @throws BonitaHomeNotSetException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     * @throws IOException
-     * @throws BonitaHomeConfigurationException
-     */
     protected TransactionService selectTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
             InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         TransactionService transactionService = null;
@@ -264,7 +253,7 @@ public class ServerAPIImpl implements ServerAPI {
     private Object invokeAPI(final Object[] parametersValues, final Object apiImpl, final Method method) throws Throwable {
         try {
             return method.invoke(apiImpl, parametersValues);
-        } catch (InvocationTargetException e) {
+        } catch (final InvocationTargetException e) {
             throw e.getCause();
         }
     }

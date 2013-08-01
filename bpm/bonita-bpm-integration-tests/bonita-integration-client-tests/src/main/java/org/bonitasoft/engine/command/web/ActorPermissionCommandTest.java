@@ -28,7 +28,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -336,7 +335,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Actor permission", "Wrong parameter" }, story = "Execute actor permission command with wrong parameter", jira = "ENGINE-586")
-    @Test(expected = BonitaRuntimeException.class)
+    @Test(expected = CommandParameterizationException.class)
     public void testIsAllowedToSeeOverviewFormCommandWithWrongParameter() throws Exception {
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();

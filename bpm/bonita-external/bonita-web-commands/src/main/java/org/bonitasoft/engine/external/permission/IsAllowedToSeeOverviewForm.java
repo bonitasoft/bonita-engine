@@ -61,8 +61,8 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         this.tenantAccessor = tenantAccessor;
         boolean isHas = false;
 
-        final long userId = (Long) parameters.get(USER_ID_KEY);
-        if (userId == 0) {
+        final Long userId = (Long) parameters.get(USER_ID_KEY);
+        if (userId == null || userId == 0) {
             throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to Long.");
         }
 
