@@ -31,6 +31,7 @@ import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
+import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
@@ -163,7 +164,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 switch (gateway.getGatewayType()) {
                     case PARALLEL:
                         if (transition.getCondition() != null) {
-                            designErrors.add("The parallel gateway can't have conditional outgoing transitions: " + gateway);
+                            designErrors.add("The parallel gateway can't have conditional outgoing transitions : " + gateway);
                         }
                         break;
                     default:
@@ -181,19 +182,19 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
                 if (((SubProcessDefinition) activity).isTriggeredByEvent()) {
                     if (subProcessContainer.getStartEvents().size() != 1) {
-                        designErrors.add("an event sub process must have one and only one start events, but " + subProcessContainer.getStartEvents().size()
-                                + " were found: " + activity);
+                        designErrors.add("An event sub process must have one and only one start events, but " + subProcessContainer.getStartEvents().size()
+                                + " were found : " + activity);
                     }
                     if (!subProcessContainer.getStartEvents().isEmpty()) {
                         if (subProcessContainer.getStartEvents().get(0).getEventTriggers().isEmpty()) {
-                            designErrors.add("the event sub process have no start event with a not NONE trigger: " + activity);
+                            designErrors.add("The event sub process have no start event with a not NONE trigger : " + activity);
                         }
                     }
                     if (activity.getIncomingTransitions().size() > 0) {
-                        designErrors.add("an event sub process cannot have incomming transitions: " + activity);
+                        designErrors.add("An event sub process cannot have incoming transitions : " + activity);
                     }
                     if (activity.getOutgoingTransitions().size() > 0) {
-                        designErrors.add("an event sub process cannot have outgoing transitions: " + activity);
+                        designErrors.add("An event sub process cannot have outgoing transitions : " + activity);
                     }
                 }
                 validateProcess(subProcessContainer, false);
@@ -205,6 +206,15 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateStartEvents(flowElementContainer, isRootContainer);
         validateEndEvents(flowElementContainer);
         validateBoundaryEvents(flowElementContainer);
+        validateIntermediateCatchEvents(flowElementContainer);
+    }
+
+    private void validateIntermediateCatchEvents(final FlowElementContainerDefinition flowElementContainer) {
+        for (final IntermediateCatchEventDefinition intermediateCatchEventDefinition : flowElementContainer.getIntermediateCatchEvents()) {
+            if (intermediateCatchEventDefinition.getIncomingTransitions().isEmpty()) {
+                designErrors.add("An intermediate catch event must have incoming transitions: " + intermediateCatchEventDefinition);
+            }
+        }
     }
 
     private void validateEndEvents(final FlowElementContainerDefinition processContainer) {
@@ -218,7 +228,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateStartEvents(final FlowElementContainerDefinition processContainer, final boolean isRootContainer) {
         for (final StartEventDefinition startEvent : processContainer.getStartEvents()) {
             if (!startEvent.getIncomingTransitions().isEmpty()) {
-                designErrors.add("A start event can't have incomming transitions: on start event" + startEvent);
+                designErrors.add("A start event can't have incoming transitions: on start event" + startEvent);
             }
             validateMessageStartEvent(startEvent, isRootContainer);
         }

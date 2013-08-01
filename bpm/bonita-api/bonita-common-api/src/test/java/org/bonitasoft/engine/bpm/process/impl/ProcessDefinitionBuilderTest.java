@@ -603,7 +603,7 @@ public class ProcessDefinitionBuilderTest {
     // MessageEventsDefinitionTest
     @Cover(classes = { CatchMessageEventTriggerDefinitionBuilder.class }, concept = BPMNConcept.EVENTS, keywords = { "Correlation", "Message start event" })
     @Test(expected = InvalidProcessDefinitionException.class)
-    public void testCannotHaveCorrelationInStartMessageOfRootProcess() throws Exception {
+    public void cannotHaveCorrelationInStartMessageOfRootProcess() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
         final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger = builder.addStartEvent("startMessage").addMessageEventTrigger("m1");
         messageEventTrigger.addCorrelation(new ExpressionBuilder().createConstantStringExpression("key"),
@@ -614,4 +614,14 @@ public class ProcessDefinitionBuilderTest {
         builder.addTransition("auto1", "end");
         builder.done();
     }
+
+    @Cover(classes = { CatchMessageEventTriggerDefinitionBuilder.class }, concept = BPMNConcept.EVENTS, keywords = { "Message", "Intermediate catch event" }, jira = "ENGINE-1652")
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void cannotStartOnIntermediateCatchEventMessage() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
+        processBuilder.createNewInstance("processName", "1.0");
+        processBuilder.addIntermediateCatchEvent("name").addMessageEventTrigger("messageName");
+        processBuilder.done();
+    }
+
 }
