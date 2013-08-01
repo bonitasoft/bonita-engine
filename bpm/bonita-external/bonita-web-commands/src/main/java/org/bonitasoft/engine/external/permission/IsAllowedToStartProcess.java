@@ -26,7 +26,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -55,7 +54,6 @@ public class IsAllowedToStartProcess extends TenantCommand {
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
         ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
-        final TransactionExecutor transactionExecutor = this.serviceAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = this.serviceAccessor.getProcessDefinitionService();
         
         Set<Long> actorIds = (Set<Long>) parameters.get(ACTOR_IDS_KEY);
@@ -69,13 +67,13 @@ public class IsAllowedToStartProcess extends TenantCommand {
         final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
         boolean isAllowedToStartProcess = false;
         try{
-            transactionExecutor.execute(getProcessDefinition);
+            getProcessDefinition.execute();
             final SProcessDefinition definition = getProcessDefinition.getResult();
             SActorDefinition sActorDefinition = definition.getActorInitiator();
 
             final String name = sActorDefinition.getName();
             final GetActor getActor = new GetActor(actorMappingService, name, processDefinitionId);
-            transactionExecutor.execute(getActor);
+            getActor.execute();
             final SActor sActor = getActor.getResult();
             if(sActor!=null){
                 for(long actorId : actorIds){
@@ -85,7 +83,7 @@ public class IsAllowedToStartProcess extends TenantCommand {
                     }
                 }
             }            
-        }catch(final SBonitaException e){
+        } catch(final SBonitaException e) {
             throw new SCommandExecutionException("Can't get actors For Initiator."+e);
         }
         return isAllowedToStartProcess;

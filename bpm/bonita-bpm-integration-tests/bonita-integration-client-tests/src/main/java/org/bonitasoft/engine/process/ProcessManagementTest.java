@@ -1434,7 +1434,7 @@ public class ProcessManagementTest extends CommonAPITest {
         userTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
         assertEquals(ActivityStates.FAILED_STATE, userTaskInstance.getState());
         getProcessAPI().retryTask(activityInstanceId);
-
+        waitForProcessToFinish(pi0);
         disableAndDeleteProcess(processDefinition);
         deleteUser(user.getId());
     }

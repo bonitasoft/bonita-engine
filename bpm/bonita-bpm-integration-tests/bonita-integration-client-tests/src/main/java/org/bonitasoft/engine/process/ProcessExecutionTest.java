@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -144,8 +143,10 @@ public class ProcessExecutionTest extends CommonAPITest {
         assertEquals(TestStates.getReadyState(step1), step1.getState());
         assignAndExecuteStep(step1, getSession().getUserId());
         try {
-            getProcessAPI().getActivityInstance(step1.getId());
-            fail("should not be able to retrieve the step");
+            ActivityInstance activityInstance = getProcessAPI().getActivityInstance(step1.getId());
+            if (!activityInstance.getState().equalsIgnoreCase("completed")) {
+                fail("the step should be completed");
+            }
         } catch (final ActivityInstanceNotFoundException e) {
             // ok
         } finally {

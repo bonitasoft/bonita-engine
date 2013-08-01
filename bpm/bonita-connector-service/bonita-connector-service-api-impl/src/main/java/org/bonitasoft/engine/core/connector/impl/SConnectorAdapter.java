@@ -44,7 +44,7 @@ public class SConnectorAdapter implements SConnector {
 
     @Override
     public void setInputParameters(final Map<String, Object> parameters) {
-        final APIAccessor apiAccessor = (APIAccessor) parameters.remove("apiAccessor");
+        final APIAccessor apiAccessor = (APIAccessor) parameters.remove("connectorApiAccessor");
         final EngineExecutionContext executionContext = (EngineExecutionContext) parameters.remove("engineExecutionContext");
         if (connector instanceof AbstractConnector) {
             ((AbstractConnector) connector).setAPIAccessor(apiAccessor);

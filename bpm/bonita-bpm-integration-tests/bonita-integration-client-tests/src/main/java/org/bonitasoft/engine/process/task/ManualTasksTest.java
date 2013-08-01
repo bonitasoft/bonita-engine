@@ -10,6 +10,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -52,7 +53,7 @@ public class ManualTasksTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), delivery, john);
 
-        getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 2500, false, 1, john).waitUntil());
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
@@ -65,7 +66,7 @@ public class ManualTasksTest extends CommonAPITest {
         assertEquals(john.getId(), humanTaskInstance.getAssigneeId());
 
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
-
+        waitForProcessToFinish(startProcess.getId());
         disableAndDeleteProcess(processDefinition);
     }
 

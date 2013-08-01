@@ -462,6 +462,7 @@ public class OrganizationTest extends CommonAPITest {
         final UserUpdater updateDescriptor = new UserUpdater();
         updateDescriptor.setEnabled(true);
         getIdentityAPI().updateUser(userToDisable.getId(), updateDescriptor);
+        assertEquals(2, getIdentityAPI().getNumberOfUsers());
         try {
             importOrganizationWithPolicy("simpleOrganizationDuplicates2.xml", policy);
         } catch (final OrganizationImportException e) {

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.transaction;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.omg.CORBA.SystemException;
 
@@ -58,6 +59,7 @@ public interface TransactionService {
      */
     TransactionState getState() throws STransactionException;
 
+    @Deprecated
     boolean isTransactionActive() throws STransactionException;
 
     /**
@@ -73,6 +75,16 @@ public interface TransactionService {
      *                encounters an unexpected error condition.
      */
     void setRollbackOnly() throws STransactionException;
+
+    boolean isRollbackOnly() throws STransactionException;
+
+    /**
+     * Execute the given callable inside a transaction.
+     * @param callable
+     * @return
+     * @throws Exception
+     */
+    <T> T executeInTransaction(Callable<T> callable) throws Exception;
 
     /**
      * Register a synchronization object for the transaction currently
@@ -96,9 +108,7 @@ public interface TransactionService {
      *                encounters an unexpected error condition.
      */
     void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException;
-
+    
     List<BonitaTransactionSynchronization> getBonitaSynchronizations();
-
-    boolean isRollbackOnly() throws STransactionException;
 
 }

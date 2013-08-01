@@ -27,7 +27,7 @@ public interface WorkService {
      * @throws WorkRegisterException
      * @since 6.0
      */
-    void registerWork(final BonitaWork runnable) throws WorkRegisterException;
+    void registerWork(final AbstractBonitaWork runnable) throws WorkRegisterException;
 
     void stop(Long tenantId);
 

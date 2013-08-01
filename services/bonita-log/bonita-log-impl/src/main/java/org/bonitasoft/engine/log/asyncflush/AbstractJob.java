@@ -42,9 +42,4 @@ public abstract class AbstractJob implements StatelessJob {
         name = (String) attributes.get("name");
     }
 
-    @Override
-    public boolean isWrappedInTransaction() {
-        return true;
-    }
-
 }

@@ -23,7 +23,7 @@ import org.bonitasoft.engine.persistence.SRetryableException;
 public interface TenantPersistenceService extends PersistenceService {
 
     /**
-     * Delete the tenant by given tenant id, Both in hibernate and mybatis.
+     * Delete the tenant by given tenant id.
      * 
      * @param tenantId
      *            the tenant id

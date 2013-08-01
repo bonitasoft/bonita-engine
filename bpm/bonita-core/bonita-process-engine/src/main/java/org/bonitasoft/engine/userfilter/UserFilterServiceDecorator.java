@@ -67,13 +67,13 @@ public class UserFilterServiceDecorator implements UserFilterService {
         SExpression apiAccessorExpression;
         SExpression engineExecutionContext;
         try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getAPIAccessorExpression(expressionbuilder);
+            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilder);
             engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext(expressionbuilder);
         } catch (final SInvalidExpressionException e) {
             throw new SUserFilterExecutionException(e);
         }
         final Map<String, SExpression> enrichedInputs = new HashMap<String, SExpression>(inputs);
-        enrichedInputs.put("apiAccessor", apiAccessorExpression);
+        enrichedInputs.put("connectorApiAccessor", apiAccessorExpression);
         enrichedInputs.put("engineExecutionContext", engineExecutionContext);
         return userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, enrichedInputs, classLoader, expressionContext, actorName);
     }

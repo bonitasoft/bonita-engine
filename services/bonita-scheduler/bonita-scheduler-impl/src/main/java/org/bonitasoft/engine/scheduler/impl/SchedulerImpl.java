@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -28,7 +29,6 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -402,81 +402,14 @@ public class SchedulerImpl implements SchedulerService {
         }
         SSession session = null;
         try {
-            transactionService.begin();
-            // this.saveTenantId2Session(jobIdentifier.getTenantId()); // TODO: (HUI) set tenantID here
-            session = sessionService.createSession(jobIdentifier.getTenantId(), "scheduler");// FIXME get the technical user of the tenant
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
-
-            final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(new SelectByIdDescriptor<SJobDescriptorImpl>("getSJobDescriptorImplById",
-                    SJobDescriptorImpl.class, jobIdentifier.getId()));
-            // FIXME do something here if the job does not exists
-            final String jobClassName = sJobDescriptor.getJobClassName();
-            final Class<?> jobClass = Class.forName(jobClassName);
-            final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
-
-            final List<SJobParameterImpl> parameters = readPersistenceService.selectList(new SelectListDescriptor<SJobParameterImpl>(
-                    "getSJobParameterImplByJobId", CollectionUtil.buildSimpleMap("jobDescriptorId", jobIdentifier.getId()), SJobParameterImpl.class));
-            final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
-            for (final SJobParameterImpl sJobParameterImpl : parameters) {
-                parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
-            }
-            statelessJob.setAttributes(parameterMap);
-            final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), transactionService, queriableLogService, statelessJob, logger,
-                    jobIdentifier.getTenantId(), eventService, jobTruster, sessionService, sessionAccessor);
-            if (traceEnabled) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPersistedJob"));
-            }
-            return jobWrapper;
-        } catch (final SBonitaReadException e) {
-            if (traceEnabled) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e));
-            }
-            try {
-                transactionService.setRollbackOnly();
-            } catch (final STransactionException e1) {
-                if (errorEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
-                }
-            }
-            throw new SSchedulerException("Unable to find the job descriptor", e);
-        } catch (final ClassNotFoundException e) {
-            if (traceEnabled) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e));
-            }
-            try {
-                transactionService.setRollbackOnly();
-            } catch (final STransactionException e1) {
-                if (errorEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
-                }
-            }
-            throw new SSchedulerException("The job class couldn't be found", e);
+            session = sessionService.createSession(jobIdentifier.getTenantId(), "scheduler");
+            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+            
+            Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier, traceEnabled);
+            return transactionService.executeInTransaction(callable);
         } catch (final Exception e) {
-            if (traceEnabled) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e));
-            }
-            try {
-                transactionService.setRollbackOnly();
-            } catch (final STransactionException e1) {
-                if (traceEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e1));
-                }
-                if (errorEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
-                }
-            }
             throw new SSchedulerException("The job class couldn't be instantiated", e);
         } finally {
-            try {
-                transactionService.complete();
-            } catch (final Exception e) {
-                if (traceEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getPersistedJob", e));
-                }
-                if (errorEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-                }
-            }
             if (session != null) {
                 try {
                     sessionAccessor.deleteSessionId();
@@ -491,6 +424,42 @@ public class SchedulerImpl implements SchedulerService {
                 }
             }
         }
+    }
+    
+    /**
+     * @param jobIdentifier
+     * @param traceEnabled
+     * @return
+     */
+    private Callable<JobWrapper> buildGetPersistedJobCallable(final JobIdentifier jobIdentifier, final boolean traceEnabled) {
+        return new Callable<JobWrapper>() {
+            @Override
+            public JobWrapper call() throws Exception {
+                final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(new SelectByIdDescriptor<SJobDescriptorImpl>("getSJobDescriptorImplById",
+                        SJobDescriptorImpl.class, jobIdentifier.getId()));
+                // FIXME do something here if the job does not exist
+                if (sJobDescriptor == null) {
+                    return null;
+                }
+                final String jobClassName = sJobDescriptor.getJobClassName();
+                final Class<?> jobClass = Class.forName(jobClassName);
+                final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
+
+                final List<SJobParameterImpl> parameters = readPersistenceService.selectList(new SelectListDescriptor<SJobParameterImpl>(
+                        "getSJobParameterImplByJobId", CollectionUtil.buildSimpleMap("jobDescriptorId", jobIdentifier.getId()), SJobParameterImpl.class));
+                final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
+                for (final SJobParameterImpl sJobParameterImpl : parameters) {
+                    parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
+                }
+                statelessJob.setAttributes(parameterMap);
+                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger, jobIdentifier.getTenantId(),
+                        eventService, jobTruster, sessionService, sessionAccessor);
+                if (traceEnabled) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPersistedJob"));
+                }
+                return jobWrapper;
+            }
+        };
     }
 
     @Override

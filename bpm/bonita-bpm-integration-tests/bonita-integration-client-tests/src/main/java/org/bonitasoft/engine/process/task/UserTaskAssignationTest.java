@@ -60,7 +60,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final String actorName = "Commercial";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("getAssignedHumanTasksWithStartedState", "0.12", actorName, "Trade business");
 
-        getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
@@ -70,7 +70,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         // Task is in STARTED state so should not be retrieved:
         assertEquals(0, toDoTasks.size());
-
+        waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(processDefinition);
     }
 

@@ -54,6 +54,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -246,14 +247,15 @@ public interface ProcessRuntimeAPI {
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
 
     /**
-     * Delete process instances by its process definition id
-     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
-     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
+     * Delete all instances of a specified process definition.
+     * If the process definition id does not match anything, no exception is thrown, but nothing is deleted.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            the identifier of the processDefinition.
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still active
+     *             if a process instance cannot be deleted because of a parent that still exists.
+     * @throws DeletionException
+     *             if other deletion problem occurs.
      * @since 6.0
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
      *             {@link #deleteArchivedProcessInstances(long, int, int)}
@@ -427,7 +429,7 @@ public interface ProcessRuntimeAPI {
     void executeFlowNode(long userId, long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
-     * Returns all activities (active and finished) of a process instance.
+     * Returns all currently active activities of a process instance.
      * 
      * @param processInstanceId
      *            Identifier of the process instance
@@ -441,11 +443,13 @@ public interface ProcessRuntimeAPI {
     List<ActivityInstance> getActivities(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Get an instance of process with its processInstance id.
+     * Get an instance of process from its processInstance ID.
      * 
      * @param processInstanceId
      *            Identifier of the process instance
      * @return the matching instance of process
+     * @throws ProcessInstanceNotFoundException
+     *             if no process instance can be found with the provided ID.
      * @since 6.0
      */
     ProcessInstance getProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException;

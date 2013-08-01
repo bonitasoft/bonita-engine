@@ -22,7 +22,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -42,8 +41,7 @@ public abstract class UpdateVariableValuesThroughOperations extends TenantComman
         final ClassLoaderService classLoaderService = getServiceAccessor().getClassLoaderService();
         final TransactionContent tc = new UpdateVariableValues(operations, operationsInputValues, currentVariableValues, containerInstanceId,
                 classLoaderService);
-        final TransactionExecutor transactionExecutor = getServiceAccessor().getTransactionExecutor();
-        transactionExecutor.execute(tc);
+        tc.execute();
     }
 
     /**

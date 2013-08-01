@@ -15,16 +15,15 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.execution.ContainerExecutor;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
  */
-public class ExecuteFlowNodeWork extends BonitaWork {
+public class ExecuteFlowNodeWork extends TxBonitaWork {
 
     private final ContainerExecutor containerExecutor;
 
@@ -37,7 +36,7 @@ public class ExecuteFlowNodeWork extends BonitaWork {
     private final Long processInstanceId;
 
     public ExecuteFlowNodeWork(final ContainerExecutor containerExecutor, final long flowNodeInstanceId, final List<SOperation> operations,
-            final SExpressionContext contextDependency, final Long processInstanceId) {
+            final SExpressionContext contextDependency, final long processInstanceId) {
         this.containerExecutor = containerExecutor;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.operations = operations;
@@ -46,7 +45,12 @@ public class ExecuteFlowNodeWork extends BonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
-        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId);
+    protected void work() throws Exception {
+        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
+    }
+
+    @Override
+    public String getDescription() {
+        return getClass().getSimpleName() + ": processInstanceId:" + processInstanceId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 }

@@ -148,7 +148,6 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             final int numberOfCompletedInstances = miActivity.getNumberOfCompletedInstances();
             final int numberOfTerminatedInstances = miActivity.getNumberOfTerminatedInstances();
             final int numberOfInstances = miActivity.getNumberOfInstances();
-
             if (miActivity.isSequential()) {
                 // only instantiate when we are in sequence
                 List<SFlowNodeInstance> createInnerInstances = null;

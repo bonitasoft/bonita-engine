@@ -186,30 +186,6 @@ public interface ProcessManagementAPI {
     void deleteProcesses(List<Long> processIds) throws DeletionException;
 
     /**
-     * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled and it has no more existing process instances.
-     * 
-     * @param processId
-     *            the identifier of the process definition.
-     * @throws DeletionException
-     *             if an exception occurs during process deletion.
-     * @since 6.1
-     */
-    void deleteProcessDefinition(long processId) throws DeletionException;
-
-    /**
-     * Deletes process definitions by giving their identifiers. If any speciofied identifier does not refer to a real process definition, or if an exception
-     * occurs, no process definition is deleted. All instances of given processes must be deleted prior to calling this operation.
-     * 
-     * @param processIds
-     *            the list of identifiers of process definitions.
-     * @throws DeletionException
-     *             if an exception occurs during process deletion.
-     * @see #deleteProcess(long)
-     * @since 6.1
-     */
-    void deleteProcessDefinitions(List<Long> processIds) throws DeletionException;
-
-    /**
      * Deploys, enables and returns a process.
      * 
      * @param designProcessDefinition
@@ -226,7 +202,6 @@ public interface ProcessManagementAPI {
      * @see #deploy(DesignProcessDefinition)
      * @see #enableProcess(long)
      * @since 6.0
-     *        FIXME check exceptions
      */
     ProcessDefinition deployAndEnableProcess(DesignProcessDefinition designProcessDefinition) throws ProcessDeployException, ProcessEnablementException,
             AlreadyExistsException, InvalidProcessDefinitionException;
@@ -278,23 +253,6 @@ public interface ProcessManagementAPI {
      */
     @Deprecated
     void disableAndDelete(long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
-
-    /**
-     * Disables and deletes the process.
-     * 
-     * @param processDefinitionId
-     *            the process definition identifier.
-     * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
-     * @throws ProcessActivationException
-     *             if an exception occurs while disabling the process.
-     * @throws DeletionException
-     *             if an exception occurs while deleting the process.
-     * @see #disableProcess(long)
-     * @see #deleteProcess(long)
-     * @since 6.1
-     */
-    void disableAndDeleteProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
 
     /**
      * Gets the current number of process definitions in all states.
@@ -640,7 +598,6 @@ public interface ProcessManagementAPI {
 
     /**
      * Imports into the process definition an actor mapping in XML format.
-     * FIXME where is the XSD?
      * 
      * @param processId
      *            the identifier of the process.
@@ -1560,7 +1517,6 @@ public interface ProcessManagementAPI {
     SearchResult<User> searchUsersWhoCanStartProcessDefinition(long processDefinitionId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * FIXME in ProcessRuntimeAPI?
      * Get process deployment information from a list of processInstance id
      * 
      * @param processInstanceIds
@@ -1571,7 +1527,6 @@ public interface ProcessManagementAPI {
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromProcessInstanceIds(List<Long> processInstanceIds);
 
     /**
-     * FIXME in ProcessRuntimeAPI?
      * Get process deployment information from a list of archived processInstance ids
      * 
      * @param archivedProcessInstantsIds
@@ -1582,7 +1537,6 @@ public interface ProcessManagementAPI {
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromArchivedProcessInstanceIds(List<Long> archivedProcessInstantsIds);
 
     /**
-     * FIXME What is the need?
      * Export processes of bar under home by a processDefinition id
      * 
      * @param processDefinitionId
@@ -1594,4 +1548,44 @@ public interface ProcessManagementAPI {
      */
     byte[] exportBarProcessContentUnderHome(long processDefinitionId) throws ProcessExportException;
 
+    /**
+     * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled and it has no more existing process instances.
+     * 
+     * @param processId
+     *            the identifier of the process definition.
+     * @throws DeletionException
+     *             if an exception occurs during process deletion.
+     * @since 6.1
+     */
+    void deleteProcessDefinition(long processId) throws DeletionException;
+
+    /**
+     * Deletes process definitions by giving their identifiers. If any speciofied identifier does not refer to a real process definition, or if an exception
+     * occurs, no process definition is deleted. All instances of given processes must be deleted prior to calling this operation.
+     * 
+     * @param processIds
+     *            the list of identifiers of process definitions.
+     * @throws DeletionException
+     *             if an exception occurs during process deletion.
+     * @see #deleteProcess(long)
+     * @since 6.1
+     */
+    void deleteProcessDefinitions(List<Long> processIds) throws DeletionException;
+
+    /**
+     * Disables and deletes the process.
+     * 
+     * @param processId
+     *            the process definition identifier.
+     * @throws ProcessDefinitionNotFoundException
+     *             if the identifier does not refer to an existing process definition.
+     * @throws ProcessActivationException
+     *             if an exception occurs while disabling the process.
+     * @throws DeletionException
+     *             if an exception occurs while deleting the process.
+     * @see #disableProcess(long)
+     * @see #deleteProcess(long)
+     * @since 6.1
+     */
+    void disableAndDeleteProcessDefinition(long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
 }

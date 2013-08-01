@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.parse.SAXParser;
@@ -59,7 +63,27 @@ public class ConnectorExecutorTest {
     }
 
     private ConnectorExecutor getConnectorExecutor() {
-        return new ConnectorExecutorImpl();
+        return new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, new SessionAccessor() {
+
+            @Override
+            public long getTenantId() throws TenantIdNotSetException {
+                return 0;
+            }
+
+            @Override
+            public long getSessionId() throws SessionIdNotSetException {
+                return 0;
+            }
+
+            @Override
+            public void setSessionInfo(long sessionId, long tenantId) {
+
+            }
+
+            @Override
+            public void deleteSessionId() {
+            }
+        });
     }
 
     @Test

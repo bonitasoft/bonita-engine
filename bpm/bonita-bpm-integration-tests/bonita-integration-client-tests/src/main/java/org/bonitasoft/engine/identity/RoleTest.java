@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +14,7 @@ import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -21,10 +26,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class RoleTest extends CommonAPITest {
 
@@ -230,7 +231,7 @@ public class RoleTest extends CommonAPITest {
         identityAPI.deleteRoles(roleIds);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = DeletionException.class)
     public void cannotDeleteNullRoles() throws BonitaException {
         identityAPI.deleteRoles(null);
     }

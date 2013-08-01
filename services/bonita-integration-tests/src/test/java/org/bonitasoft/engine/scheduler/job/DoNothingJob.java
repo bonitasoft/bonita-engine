@@ -34,9 +34,4 @@ public class DoNothingJob implements StatelessJob {
 
     }
 
-    @Override
-    public boolean isWrappedInTransaction() {
-        return false;
-    }
-
 }

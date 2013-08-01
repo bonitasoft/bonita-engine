@@ -2,6 +2,7 @@ package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,8 +22,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -43,6 +44,7 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -87,7 +89,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void checkTransitionAreArchived() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransitionService transitionInstanceService = tenantAccessor.getTransitionInstanceService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
         processDef.addStartEvent("start");
         processDef.addUserTask("step1", "delivery");
@@ -111,12 +113,12 @@ public class BPMLocalTest extends CommonAPILocalTest {
                 return numberOfTransitionInstances;
             }
         };
-        transactionExecutor.execute(getNumberOfTr);
+        executeInTransaction(transactionService, getNumberOfTr);
         assertEquals(0, (long) getNumberOfTr.getResult());
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        transactionExecutor.execute(getNumberOfTr);
+        executeInTransaction(transactionService, getNumberOfTr);
         assertEquals(0, (long) getNumberOfTr.getResult());// transition instance should be archived
         assignAndExecuteStep(waitForUserTask, john.getId());
         waitForProcessToFinish(processInstance);
@@ -129,7 +131,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void checkTransitionWhenNextFlowNodeIsActivity() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransitionService transitionInstanceService = tenantAccessor.getTransitionInstanceService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
         processDef.addStartEvent("start");
         processDef.addUserTask("step1", "delivery");
@@ -157,7 +159,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
                 return numberOfTransitionInstances;
             }
         };
-        transactionExecutor.execute(getNumberOfTr);
+        executeInTransaction(transactionService, getNumberOfTr);
         assertEquals(0, (long) getNumberOfTr.getResult());
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
@@ -185,7 +187,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
                 return searchArchivedTransitions;
             }
         };
-        transactionExecutor.execute(searchArchivedTransitions);
+        executeInTransaction(transactionService, searchArchivedTransitions);
         final List<SATransitionInstance> result = searchArchivedTransitions.getResult();
         assertEquals(3, result.size());
         assertTrue(result.get(2).getId() > result.get(0).getId());
@@ -198,7 +200,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void checkProcessCommentAreArchived() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SCommentService commentService = tenantAccessor.getCommentService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final ArchiveService archiveService = tenantAccessor.getArchiveService();
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestComment", "1.0");
@@ -238,39 +240,45 @@ public class BPMLocalTest extends CommonAPILocalTest {
                 return numberOfTransitionInstances;
             }
         };
-        transactionExecutor.execute(getNumberOfComment);
-        transactionExecutor.execute(getNumberOfArchivedComment);
+        executeInTransaction(transactionService, getNumberOfComment);
+        executeInTransaction(transactionService, getNumberOfArchivedComment);
         assertEquals(0, (long) getNumberOfComment.getResult());
         final long numberOfInitialArchivedComments = getNumberOfArchivedComment.getResult();
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         getProcessAPI().addComment(processInstance.getId(), "kikoo lol");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        transactionExecutor.execute(getNumberOfComment);
-        transactionExecutor.execute(getNumberOfArchivedComment);
+        executeInTransaction(transactionService, getNumberOfComment);
+        executeInTransaction(transactionService, getNumberOfArchivedComment);
         assertEquals(1, (long) getNumberOfComment.getResult());
         assertEquals(numberOfInitialArchivedComments, (long) getNumberOfArchivedComment.getResult());
         getProcessAPI().assignUserTask(waitForUserTask.getId(), john.getId());
         getProcessAPI().executeFlowNode(waitForUserTask.getId());
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        transactionExecutor.execute(getNumberOfComment);
-        transactionExecutor.execute(getNumberOfArchivedComment);
+        executeInTransaction(transactionService, getNumberOfComment);
+        executeInTransaction(transactionService, getNumberOfArchivedComment);
         assertEquals(2, (long) getNumberOfComment.getResult());// claim add a comment...
         assertEquals(numberOfInitialArchivedComments, (long) getNumberOfArchivedComment.getResult());
         waitForProcessToFinish(processInstance);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        transactionExecutor.execute(getNumberOfComment);
-        transactionExecutor.execute(getNumberOfArchivedComment);
+        executeInTransaction(transactionService, getNumberOfComment);
+        executeInTransaction(transactionService, getNumberOfArchivedComment);
         assertEquals(0, (long) getNumberOfComment.getResult());
         assertEquals(numberOfInitialArchivedComments + 2, (long) getNumberOfArchivedComment.getResult());
         disableAndDeleteProcess(definition);
+    }
+
+    private static void executeInTransaction(TransactionService transactionService, TransactionContent tc) throws SBonitaException {
+        transactionService.begin();
+        tc.execute();
+        transactionService.complete();
     }
 
     @Test
     public void checkPendingMappingAreDeleted() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestComment", "1.0");
         processDef.addShortTextData("kikoo", new ExpressionBuilder().createConstantStringExpression("lol"));
         processDef.addStartEvent("start");
@@ -301,13 +309,13 @@ public class BPMLocalTest extends CommonAPILocalTest {
             }
 
         };
-        transactionExecutor.execute(getPendingMappings);
+        executeInTransaction(transactionService, getPendingMappings);
         List<SPendingActivityMapping> mappings = getPendingMappings.getResult();
         assertEquals(1, mappings.size());
         assignAndExecuteStep(waitForUserTask, john.getId());
         waitForUserTask("step2", processInstance);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        transactionExecutor.execute(getPendingMappings);
+        executeInTransaction(transactionService, getPendingMappings);
         mappings = getPendingMappings.getResult();
         assertEquals(0, mappings.size());
         disableAndDeleteProcess(definition);
@@ -317,7 +325,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void checkDependenciesAreDeletedWhenProcessIsDeleted() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
         processDef.addStartEvent("start");
         processDef.addUserTask("step1", "delivery");
@@ -331,24 +339,24 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final ProcessDefinition definition = deployAndEnableWithActor(businessArchive, "delivery", john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
-        boolean txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         List<Long> dependencyIds = dependencyService.getDependencyIds(definition.getId(), "process", QueryOptions.defaultQueryOptions());
-        transactionExecutor.completeTransaction(txOpened);
+        transactionService.complete();
         assertEquals(1, dependencyIds.size());
-        txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         final SDependency dependency = dependencyService.getDependency(dependencyIds.get(0));
-        transactionExecutor.completeTransaction(txOpened);
+        transactionService.complete();
         assertTrue(dependency.getName().endsWith("myDep"));
         assertTrue(Arrays.equals(content, dependency.getValue()));
 
         assignAndExecuteStep(waitForUserTask, john.getId());
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(definition);
-        txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         dependencyIds = dependencyService.getDependencyIds(definition.getId(), "process", QueryOptions.defaultQueryOptions());
-        transactionExecutor.completeTransaction(txOpened);
+        transactionService.complete();
         assertEquals(0, dependencyIds.size());
     }
 
@@ -356,7 +364,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void checkMoreThan20DependenciesAreDeletedWhenProcessIsDeleted() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
         processDef.addStartEvent("start");
         processDef.addUserTask("step1", "delivery");
@@ -373,26 +381,29 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        boolean txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         List<Long> dependencyIds = dependencyService.getDependencyIds(definition.getId(), "process", QueryOptions.allResultsQueryOptions());
-        transactionExecutor.completeTransaction(txOpened);
+        transactionService.complete();
         assertEquals(25, dependencyIds.size());
-        txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         final SDependency dependency = dependencyService.getDependency(dependencyIds.get(0));
-        transactionExecutor.completeTransaction(txOpened);
+        assertNotNull(dependency);
+        transactionService.complete();
 
         assignAndExecuteStep(waitForUserTask, john.getId());
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(definition);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        txOpened = transactionExecutor.openTransaction();
+        transactionService.begin();
         dependencyIds = dependencyService.getDependencyIds(definition.getId(), "process", QueryOptions.defaultQueryOptions());
-        transactionExecutor.completeTransaction(txOpened);
+        transactionService.complete();
         assertEquals(0, dependencyIds.size());
     }
 
     @Test
     public void deletingProcessDeletesActors() throws Exception {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final String userTaskName = "actNaturally";
         final ProcessDefinition definition = deployAndEnableProcessWithOneHumanTask("deletingProcessDeletesActors", "CandidateForOscarReward", userTaskName);
 
@@ -402,9 +413,9 @@ public class BPMLocalTest extends CommonAPILocalTest {
         disableAndDeleteProcess(definition);
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final boolean tx = getTransactionExecutor().openTransaction();
+        transactionService.begin();
         final List<SActor> actors = getTenantAccessor().getActorMappingService().getActors(definition.getId());
-        getTransactionExecutor().completeTransaction(tx);
+        transactionService.complete();
 
         // Check there is no actor left:
         assertEquals(0, actors.size());
@@ -412,6 +423,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
     @Test
     public void deletingProcessDeletesActorMappings() throws Exception {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
         final String userTaskName = "actNaturally";
         final ProcessDefinition definition = deployAndEnableProcessWithOneHumanTask("deletingProcessDeletesActorMappings", "CandidateForOscarReward",
                 userTaskName);
@@ -422,9 +435,9 @@ public class BPMLocalTest extends CommonAPILocalTest {
         disableAndDeleteProcess(definition);
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final boolean tx = getTransactionExecutor().openTransaction();
+        transactionService.begin();
         final List<SActorMember> actorMembers = getTenantAccessor().getActorMappingService().getActorMembersOfUser(john.getId());
-        getTransactionExecutor().completeTransaction(tx);
+        transactionService.complete();
 
         // Check there is no actor left:
         assertEquals(0, actorMembers.size());
@@ -443,7 +456,4 @@ public class BPMLocalTest extends CommonAPILocalTest {
         return deployAndEnableWithActor(processBuilder.done(), actorName, john);
     }
 
-    private TransactionExecutor getTransactionExecutor() {
-        return getTenantAccessor().getTransactionExecutor();
-    }
 }

@@ -164,8 +164,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     protected Session getSession(final boolean useTenant) throws SPersistenceException {
         logStats();
-        final org.hibernate.classic.Session currentSession = sessionFactory.getCurrentSession();
-        return currentSession;
+        try {
+            final org.hibernate.classic.Session currentSession = sessionFactory.getCurrentSession();
+            return currentSession;
+        } catch (HibernateException e) {
+            throw new SPersistenceException(e);
+        }
     }
 
     protected void flushStatements(final boolean useTenant) throws SPersistenceException {

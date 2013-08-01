@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.search;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,10 +29,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Celine Souchet
@@ -61,7 +61,7 @@ public class SearchCommentTest extends CommonAPITest {
         getProcessAPI().addComment(processInstance.getId(), commentContent1);
         final ActivityInstance activityInstance = waitForStep.getResult();
         assignAndExecuteStep(activityInstance, user.getId());
-
+        waitForProcessToFinish(processInstance);
         final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
         builder2.filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId());
         final SearchResult<ArchivedComment> archivedCommentsResult = getProcessAPI().searchArchivedComments(builder2.done());

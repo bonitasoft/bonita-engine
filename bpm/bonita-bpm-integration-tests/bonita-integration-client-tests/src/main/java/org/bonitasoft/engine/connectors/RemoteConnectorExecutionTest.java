@@ -84,7 +84,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForConnectorExecution;
+import org.bonitasoft.engine.test.wait.WaitForVariableValue;
 import org.junit.Test;
 
 @SuppressWarnings("javadoc")
@@ -895,7 +895,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         waitForUserTask("errorTask", startProcess);
-
+        System.out.println("before delete");
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -1091,7 +1091,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector("actor", johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, johnUser.getId());
-        final WaitForConnectorExecution waitForConnector = new WaitForConnectorExecution(getProcessAPI(), processInstance.getId(), "data", "value1");
+        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
@@ -1129,7 +1129,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // start check value1,stop, check still value1, start, check value 2, check step2 is active
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector("actor", johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForConnectorExecution waitForConnector = new WaitForConnectorExecution(getProcessAPI(), processInstance.getId(), "data", "value1");
+        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
@@ -1144,6 +1144,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // connector restarted
         assertEquals("value2", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         assignAndExecuteStep(step1, johnUserId);
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition.getId());
     }
 
@@ -1242,11 +1243,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
         final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-        // .addData(
-        // "data",
-        // "org.bonitasoft.dfgdfg.Restaurant",
-        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()",
-        // "org.bonitasoft.dfgdfg.Restaurant"))
+                // .addData(
+                // "data",
+                // "org.bonitasoft.dfgdfg.Restaurant",
+                // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
+                // "org.bonitasoft.dfgdfg.Restaurant"))
                 .addUserTask("step1", "actor");
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));

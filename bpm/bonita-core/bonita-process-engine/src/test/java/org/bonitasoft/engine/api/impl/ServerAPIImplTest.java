@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doCallRealMethod;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
@@ -41,7 +44,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ServerAPIImpl.class })
@@ -69,13 +71,18 @@ public class ServerAPIImplTest {
         final ServerAPIImpl mockedServerAPIImpl = mock(ServerAPIImpl.class);
         doReturn(mock(SessionAccessor.class)).when(mockedServerAPIImpl, "beforeInvokeMethod", options, apiInterfaceName);
         final TechnicalLoggerService technicalLogger = mock(TechnicalLoggerService.class);
-        doCallRealMethod().when(mockedServerAPIImpl, "setTechnicalLogger", technicalLogger);
+        when(technicalLogger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG))).thenReturn(true);
         doThrow(new UndeclaredThrowableException(null, "")).when(mockedServerAPIImpl, "invokeAPI", apiInterfaceName, methodName, classNameParameters,
-                parametersValues);
+                parametersValues, null);
 
+        doCallRealMethod().when(mockedServerAPIImpl, "setTechnicalLogger", technicalLogger);
         // Let's call it for real:
         doCallRealMethod().when(mockedServerAPIImpl).invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        mockedServerAPIImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        verify(technicalLogger, VerificationModeFactory.atLeastOnce()).log(ServerAPIImpl.class, TechnicalLogSeverity.DEBUG, Mockito.anyString());
+        try {
+            mockedServerAPIImpl.setTechnicalLogger(technicalLogger);
+            mockedServerAPIImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        } finally {
+            verify(technicalLogger, VerificationModeFactory.atLeastOnce()).log(any(Class.class), eq(TechnicalLogSeverity.DEBUG), Mockito.any(Throwable.class));
+        }
     }
 }

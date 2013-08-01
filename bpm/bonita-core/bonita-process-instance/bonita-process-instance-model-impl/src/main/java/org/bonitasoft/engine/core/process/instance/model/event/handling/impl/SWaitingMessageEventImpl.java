@@ -30,6 +30,8 @@ public class SWaitingMessageEventImpl extends SWaitingEventImpl implements SWait
 
     private boolean locked = false;
 
+    private int progress = 0;
+
     private String correlation1;
 
     private String correlation2;
@@ -102,6 +104,15 @@ public class SWaitingMessageEventImpl extends SWaitingEventImpl implements SWait
         return correlation5;
     }
 
+    @Override
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(final int progress) {
+        this.progress = progress;
+    }
+
     /**
      * @param correlation1
      *            the correlation1 to set
@@ -146,80 +157,68 @@ public class SWaitingMessageEventImpl extends SWaitingEventImpl implements SWait
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (correlation1 == null ? 0 : correlation1.hashCode());
-        result = prime * result + (correlation2 == null ? 0 : correlation2.hashCode());
-        result = prime * result + (correlation3 == null ? 0 : correlation3.hashCode());
-        result = prime * result + (correlation4 == null ? 0 : correlation4.hashCode());
-        result = prime * result + (correlation5 == null ? 0 : correlation5.hashCode());
+        result = prime * result + ((correlation1 == null) ? 0 : correlation1.hashCode());
+        result = prime * result + ((correlation2 == null) ? 0 : correlation2.hashCode());
+        result = prime * result + ((correlation3 == null) ? 0 : correlation3.hashCode());
+        result = prime * result + ((correlation4 == null) ? 0 : correlation4.hashCode());
+        result = prime * result + ((correlation5 == null) ? 0 : correlation5.hashCode());
         result = prime * result + (locked ? 1231 : 1237);
-        result = prime * result + (messageName == null ? 0 : messageName.hashCode());
+        result = prime * result + ((messageName == null) ? 0 : messageName.hashCode());
+        result = prime * result + progress;
         return result;
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj))
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (getClass() != obj.getClass())
             return false;
-        }
-        final SWaitingMessageEventImpl other = (SWaitingMessageEventImpl) obj;
+        SWaitingMessageEventImpl other = (SWaitingMessageEventImpl) obj;
         if (correlation1 == null) {
-            if (other.correlation1 != null) {
+            if (other.correlation1 != null)
                 return false;
-            }
-        } else if (!correlation1.equals(other.correlation1)) {
+        } else if (!correlation1.equals(other.correlation1))
             return false;
-        }
         if (correlation2 == null) {
-            if (other.correlation2 != null) {
+            if (other.correlation2 != null)
                 return false;
-            }
-        } else if (!correlation2.equals(other.correlation2)) {
+        } else if (!correlation2.equals(other.correlation2))
             return false;
-        }
         if (correlation3 == null) {
-            if (other.correlation3 != null) {
+            if (other.correlation3 != null)
                 return false;
-            }
-        } else if (!correlation3.equals(other.correlation3)) {
+        } else if (!correlation3.equals(other.correlation3))
             return false;
-        }
         if (correlation4 == null) {
-            if (other.correlation4 != null) {
+            if (other.correlation4 != null)
                 return false;
-            }
-        } else if (!correlation4.equals(other.correlation4)) {
+        } else if (!correlation4.equals(other.correlation4))
             return false;
-        }
         if (correlation5 == null) {
-            if (other.correlation5 != null) {
+            if (other.correlation5 != null)
                 return false;
-            }
-        } else if (!correlation5.equals(other.correlation5)) {
+        } else if (!correlation5.equals(other.correlation5))
             return false;
-        }
-        if (locked != other.locked) {
+        if (locked != other.locked)
             return false;
-        }
         if (messageName == null) {
-            if (other.messageName != null) {
+            if (other.messageName != null)
                 return false;
-            }
-        } else if (!messageName.equals(other.messageName)) {
+        } else if (!messageName.equals(other.messageName))
             return false;
-        }
+        if (progress != other.progress)
+            return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "SWaitingMessageEventImpl [messageName=" + messageName + ", locked=" + locked + ", correlation1=" + correlation1 + ", correlation2="
-                + correlation2 + ", correlation3=" + correlation3 + ", correlation4=" + correlation4 + ", correlation5=" + correlation5 + "]";
+        return "SWaitingMessageEventImpl [messageName=" + messageName + ", locked=" + locked + ", progress=" + progress + ", correlation1=" + correlation1
+                + ", correlation2=" + correlation2 + ", correlation3=" + correlation3 + ", correlation4=" + correlation4 + ", correlation5=" + correlation5
+                + "]";
     }
 
 }

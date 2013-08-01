@@ -101,10 +101,6 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     @Override
     public void execute() throws ImportDuplicateInOrganizationException {
-        importOrganizationWithDuplicates();
-    }
-
-    private void importOrganizationWithDuplicates() throws ImportDuplicateInOrganizationException {
         try {
             parser.setSchema(this.getClass().getResourceAsStream("/bos-organization.xsd"));
             parser.validate(new StringReader(organizationContent));
@@ -126,6 +122,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
             // UserMemberships
             importMemberships(memberships, userNameToSUsers, roleNameToIdMap, groupPathToIdMap);
+        } catch (final ImportDuplicateInOrganizationException e) {
+            throw e;
         } catch (final Exception e) {
             throw new ImportDuplicateInOrganizationException(e);
         }
@@ -203,8 +201,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, Long> importGroups(final List<GroupCreator> groupCreators) throws ImportDuplicateInOrganizationException,
-            SIdentityException {
+    private Map<String, Long> importGroups(final List<GroupCreator> groupCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
         final Map<String, Long> groupPathToIdMap = new HashMap<String, Long>(groupCreators.size());
         for (final GroupCreator groupCreator : groupCreators) {
             SGroup sGroup;
@@ -231,8 +228,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, Long> importRoles(final List<RoleCreator> roleCreators) throws ImportDuplicateInOrganizationException,
-            SIdentityException {
+    private Map<String, Long> importRoles(final List<RoleCreator> roleCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
         final Map<String, Long> roleNameToIdMap = new HashMap<String, Long>(roleCreators.size());
         for (final RoleCreator roleCreator : roleCreators) {
             SRole sRole;
@@ -247,8 +243,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         return roleNameToIdMap;
     }
 
-    private void updateManagerId(final List<ExportedUser> users, final Map<String, SUser> userNameToSUsers)
-            throws SUserUpdateException {
+    private void updateManagerId(final List<ExportedUser> users, final Map<String, SUser> userNameToSUsers) throws SUserUpdateException {
         for (final ExportedUser user : users) {
             final String managerUserName = user.getManagerUserName();
             if (managerUserName != null && managerUserName.trim().length() > 0 && userNameToSUsers.get(managerUserName) != null) {
@@ -267,8 +262,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, SUser> importUsers(final List<ExportedUser> users)
-            throws ImportDuplicateInOrganizationException, SIdentityException {
+    private Map<String, SUser> importUsers(final List<ExportedUser> users) throws ImportDuplicateInOrganizationException, SIdentityException {
         final Map<String, SUser> userNameToSUsers = new HashMap<String, SUser>((int) Math.min(Integer.MAX_VALUE, identityService.getNumberOfUsers()));
         for (final ExportedUser user : users) {
             SUser sUser;

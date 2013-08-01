@@ -35,6 +35,7 @@ public interface LoginAPI {
      * @throws LoginException
      *             occurs when an exception is thrown during login
      */
+	@NoSessionRequired
     APISession login(String userName, String password) throws LoginException;
 
     /**
@@ -47,6 +48,7 @@ public interface LoginAPI {
      * @throws LogoutException
      *             occurs when an exception is thrown during the logout
      */
+	@NoSessionRequired
     void logout(APISession session) throws SessionNotFoundException, LogoutException;
 
 }

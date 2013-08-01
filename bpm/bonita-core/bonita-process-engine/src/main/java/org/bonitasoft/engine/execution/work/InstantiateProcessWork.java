@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
@@ -27,7 +25,7 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
@@ -35,7 +33,7 @@ import org.bonitasoft.engine.work.BonitaWork;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class InstantiateProcessWork extends BonitaWork {
+public class InstantiateProcessWork extends TxBonitaWork {
 
     private final OperationsWithContext operations;
 
@@ -53,8 +51,6 @@ public class InstantiateProcessWork extends BonitaWork {
 
     private final BPMInstancesCreator bpmInstancesCreator;
 
-    private final TransactionExecutor transactionExecutor;
-
     private long callerId = -1;
 
     private long subProcessId = -1;
@@ -67,7 +63,7 @@ public class InstantiateProcessWork extends BonitaWork {
 
     public InstantiateProcessWork(final SProcessDefinition processDefinition, final OperationsWithContext operations, final ProcessExecutor processExecutor,
             final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final LockService lockService,
-            final TechnicalLoggerService logger, final BPMInstancesCreator bpmInstancesCreator, final TransactionExecutor transactionExecutor) {
+            final TechnicalLoggerService logger, final BPMInstancesCreator bpmInstancesCreator) {
         this.processDefinition = processDefinition;
         this.operations = operations;
         this.processExecutor = processExecutor;
@@ -76,15 +72,13 @@ public class InstantiateProcessWork extends BonitaWork {
         this.lockService = lockService;
         this.logger = logger;
         this.bpmInstancesCreator = bpmInstancesCreator;
-        this.transactionExecutor = transactionExecutor;
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         if (idOfTheProcessToInterrupt != null) {
             final TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(
-                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, flowNodeInstanceService, transactionExecutor, processExecutor,
-                    lockService, logger);
+                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, flowNodeInstanceService, processExecutor, lockService, logger);
             interruptor.interruptProcessInstance(idOfTheProcessToInterrupt, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinition, targetSFlowNodeDefinitionId, 0, 0, getExpressionContext(), operations.getOperations(), null, null, callerId,
@@ -111,7 +105,13 @@ public class InstantiateProcessWork extends BonitaWork {
         this.idOfTheProcessToInterrupt = idOfTheProcessToInterrupt;
     }
 
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": Process of type " + processDefinition.getName() + " (" + processDefinition.getVersion() + ")"
+                + ((subProcflowNodeInstance != null) ? ", subProcflowNodeInstanceId:" + subProcflowNodeInstance.getId() : "");
+	}
+
     public void setTargetSFlowNodeDefinitionId(long targetSFlowNodeDefinitionId) {
         this.targetSFlowNodeDefinitionId = targetSFlowNodeDefinitionId;
-    }
+	}
 }

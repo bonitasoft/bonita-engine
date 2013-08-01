@@ -10,25 +10,18 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.execution.work;
+ */
+package org.bonitasoft.engine.cache;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.work.BonitaWork;
 
 /**
+ * Service that helps you to cache objects on a pltform level
+ * Objects must be stored in a specific cache and this cache must exists
+ * 
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
+ * @since 6.0
  */
-public class HandleErrorEventOnFail extends BonitaWork {
+public interface PlatformCacheService extends CommonCacheService {
 
-    private final ExecuteConnectorOfActivity executeConnectorOfActivity;
-
-    HandleErrorEventOnFail(final ExecuteConnectorOfActivity executeConnectorOfActivity) {
-        this.executeConnectorOfActivity = executeConnectorOfActivity;
-    }
-
-    @Override
-    protected void work() throws SBonitaException {
-        executeConnectorOfActivity.handleErrorEventOnFail();
-    }
 }

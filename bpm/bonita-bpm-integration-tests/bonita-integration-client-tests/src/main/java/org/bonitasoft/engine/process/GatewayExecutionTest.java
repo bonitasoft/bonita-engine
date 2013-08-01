@@ -439,12 +439,8 @@ public class GatewayExecutionTest extends CommonAPITest {
         final GatewayInstance flowNodeInstance = (GatewayInstance) searchFlowNodeInstances.getResult().get(0);
         assertTrue(flowNodeInstance instanceof GatewayInstance);
         // retry the gateway
-        try {
-            getProcessAPI().retryTask(gateway.getId());
-            fail("should not work");
-        } catch (final ActivityExecutionException e) {
-            // ok
-        }
+        getProcessAPI().retryTask(gateway.getId());
+        waitForFlowNodeToFail(processInstance);
         // should still be in failed
         final SearchResult<FlowNodeInstance> searchFlowNodeInstances2 = getProcessAPI().searchFlowNodeInstances(searchOptions);
         assertEquals("failed", searchFlowNodeInstances2.getResult().get(0).getState());
@@ -987,7 +983,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
         if (expected.length == 1 && expected[0].isEmpty()) {
-            assertTrue(new WaitUntil(100, 1000) {
+            assertTrue("Expected a task in fail state, there was none or more than one", new WaitUntil(100, 1000) {
 
                 @Override
                 protected boolean check() throws Exception {

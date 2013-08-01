@@ -21,6 +21,7 @@ import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
@@ -98,6 +99,7 @@ import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
@@ -631,5 +633,17 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     public DefaultCommandProvider getDefaultCommandProvider() {
         return accessor.getInstanceOf(DefaultCommandProvider.class);
     }
+
+    @Override
+    public PlatformCacheService getPlatformCacheService() {
+        return accessor.getInstanceOf(PlatformCacheService.class);
+    }
+    
+    @Override
+    public ReadSessionAccessor getReadSessionAccessor() {
+    	return accessor.getInstanceOf(ReadSessionAccessor.class);
+    }
+
+    
 
 }

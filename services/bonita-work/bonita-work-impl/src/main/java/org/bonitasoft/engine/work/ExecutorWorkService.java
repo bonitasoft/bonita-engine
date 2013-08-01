@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
@@ -66,7 +65,7 @@ public class ExecutorWorkService implements WorkService, RunnableListener {
     }
 
     @Override
-    public void registerWork(final BonitaWork work) throws WorkRegisterException {
+    public void registerWork(final AbstractBonitaWork work) throws WorkRegisterException {
         final AbstractWorkSynchronization synchro = getContinuationSynchronization();
         synchro.addWork(work);
     }
@@ -77,13 +76,8 @@ public class ExecutorWorkService implements WorkService, RunnableListener {
             synchro = workSynchronizationFactory.getWorkSynchronization(threadPoolExecutor, loggerService, sessionAccessor, sessionService, transactionService,
                     this);
             try {
-                if (!transactionService.isTransactionActive()) {
-                    throw new WorkRegisterException("Can't register work on not active transaction");
-                }
                 transactionService.registerBonitaSynchronization(synchro);
             } catch (final STransactionNotFoundException e) {
-                throw new WorkRegisterException(e.getMessage(), e);
-            } catch (STransactionException e) {
                 throw new WorkRegisterException(e.getMessage(), e);
             }
             synchronizations.set(synchro);

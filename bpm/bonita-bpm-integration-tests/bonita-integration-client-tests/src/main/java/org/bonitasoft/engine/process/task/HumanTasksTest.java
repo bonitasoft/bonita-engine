@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.process.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -9,7 +13,6 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -32,11 +35,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class HumanTasksTest extends CommonAPITest {
 
@@ -102,7 +100,7 @@ public class HumanTasksTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Task failure", "FlowNodeExecutor" }, jira = "ENGINE-1134")
-    @Test(expected = FlowNodeExecutionException.class)
+    @Test
     public void taskExecutionFailureLogsPrettyMessage() throws Exception {
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance("taskExecutionFailureLogsPrettyMessage", "1.01");
         definitionBuilder.addStartEvent("start");
@@ -117,12 +115,14 @@ public class HumanTasksTest extends CommonAPITest {
         logout();
         loginWith(USERNAME, PASSWORD);
         final ActivityInstance task = waitForUserTask("initTask", processInstance);
+        getProcessAPI().assignUserTask(task.getId(), user.getId());
         try {
-            getProcessAPI().assignUserTask(task.getId(), user.getId());
             getProcessAPI().executeFlowNode(task.getId());
-        } finally {
-            disableAndDeleteProcess(processDef);
+        } catch (FlowNodeExecutionException e) {
+            assertTrue("wrong exception message", e.getMessage().contains("Incompatible assignment operation type"));
         }
+        waitForTaskToFail(processInstance);
+        disableAndDeleteProcess(processDef);
     }
 
     @Cover(classes = { ProcessAPI.class, HumanTaskInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Last", "Human", "Task Instance" }, jira = "ENGINE-772", exceptions = { NotFoundException.class })
@@ -385,12 +385,8 @@ public class HumanTasksTest extends CommonAPITest {
         assertEquals(ActivityStates.CANCELLING_SUBTASKS_STATE, humanTaskInstance.getState());
 
         getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.SKIPPED_STATE);
-        try {
-            getProcessAPI().getHumanTaskInstance(activityInstanceId);
-            fail("Should throw ActivityInstanceNotFoundException");
-        } catch (final ActivityInstanceNotFoundException e) {
-            // Ok here
-        }
+        // will skip task and finish process
+        waitForProcessToFinish(pi0.getId());
 
         disableAndDeleteProcess(processDefinition);
     }

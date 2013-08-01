@@ -161,8 +161,9 @@ public class SupervisorTest extends CommonAPITest {
     public void superviseMyArchivedTask() throws Exception {
         init();
         final List<HumanTaskInstance> instanceList = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
+        HumanTaskInstance humanTaskInstance = instanceList.get(0);
         // one archive tasks
-        final long activityInstanceId = instanceList.get(0).getId();
+        final long activityInstanceId = humanTaskInstance.getId();
 
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>(1);
         fieldValues.put("field_fieldId1", "Excel");
@@ -175,7 +176,7 @@ public class SupervisorTest extends CommonAPITest {
         executeParameters.put("OPERATIONS_LIST_KEY", (Serializable) operationsMap);
         executeParameters.put("OPERATIONS_INPUT_KEY", (Serializable) fieldValues);
         getCommandAPI().execute("executeActionsAndTerminate", executeParameters);
-
+        waitForProcessToFinish(humanTaskInstance.getParentProcessInstanceId());
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedHumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
 
