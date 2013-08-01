@@ -2107,7 +2107,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void removeAllCategoriesFromProcessDefinition(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
                 .getSProcessCategoryMappingBuilder();
         final TransactionContent transactionContent = new RemoveProcessDefinitionsOfCategory(processDefinitionId, sProcessCategoryMappingBuilder,
@@ -2124,12 +2123,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void removeAllProcessDefinitionsFromCategory(final long categoryId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
                 .getSProcessCategoryMappingBuilder();
         final RemoveProcessDefinitionsOfCategory remove = new RemoveProcessDefinitionsOfCategory(categoryService, sProcessCategoryMappingBuilder, categoryId);
         try {
-            transactionExecutor.execute(remove);
+            remove.execute();;
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -2139,7 +2137,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public long removeCategoriesFromProcessDefinition(long processDefinitionId, int startIndex, int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
                 .getSProcessCategoryMappingBuilder();
 
@@ -2160,7 +2157,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public long removeProcessDefinitionsFromCategory(long categoryId, int startIndex, int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
                 .getSProcessCategoryMappingBuilder();
 
