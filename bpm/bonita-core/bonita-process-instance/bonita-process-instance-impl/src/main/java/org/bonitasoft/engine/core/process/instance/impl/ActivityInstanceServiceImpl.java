@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInst
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
@@ -58,6 +59,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -72,6 +74,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.Action
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -107,9 +110,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     private static final int BATCH_SIZE = 100;
 
-    private final SUserTaskInstanceBuilder activityInstanceKeyProvider;
+    private final SUserTaskInstanceBuilder sUserTaskInstanceBuilder;
 
-    private final SMultiInstanceActivityInstanceBuilder multiInstanceActivityInstanceKeyProvider;
+    private final SMultiInstanceActivityInstanceBuilder sMultiInstanceActivityInstanceBuilder;
 
     private final QueriableLoggerService queriableLoggerService;
 
@@ -121,8 +124,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         super(recorder, persistenceRead, eventService, instanceBuilders, queriableLoggerService, logger);
         this.queriableLoggerService = queriableLoggerService;
         this.archiveService = archiveService;
-        activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
-        multiInstanceActivityInstanceKeyProvider = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
+        sUserTaskInstanceBuilder = instanceBuilders.getSUserTaskInstanceBuilder();
+        sMultiInstanceActivityInstanceBuilder = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
     }
 
     @Override
@@ -223,6 +226,17 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             }
         } catch (final SActivityReadException e) {
             throw new SActivityModificationException(e);
+        }
+    }
+
+    @Override
+    public void deleteAllPendingMappings() throws SActivityModificationException {
+        try {
+            final FilterOption filterOption = new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilder.ACTOR_ID, -1);
+            final DeleteAllRecord record = new DeleteAllRecord(SPendingActivityMapping.class, Collections.singletonList(filterOption));
+            getRecorder().recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SActivityModificationException("Can't delete all pending mappings not attached to an actor.", e);
         }
     }
 
@@ -408,13 +422,13 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         if (flowNodeInstance instanceof SHumanTaskInstance) {
             final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-            descriptor.addField(activityInstanceKeyProvider.getAssigneeIdKey(), userId);
+            descriptor.addField(sUserTaskInstanceBuilder.getAssigneeIdKey(), userId);
             if (userId > 0) {
                 // if this action is a Assign action:
-                descriptor.addField(activityInstanceKeyProvider.getClaimedDateKey(), System.currentTimeMillis());
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), System.currentTimeMillis());
             } else {
                 // if this action is a Release action:
-                descriptor.addField(activityInstanceKeyProvider.getClaimedDateKey(), 0);
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0);
             }
 
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
@@ -728,7 +742,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     @Override
     public void setLoopCardinality(final SFlowNodeInstance flowNodeInstance, final int intLoopCardinality) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getLoopCardinalityKey(), intLoopCardinality);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getLoopCardinalityKey(), intLoopCardinality);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
         } catch (SFlowNodeModificationException e) {
@@ -740,7 +754,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void addMultiInstanceNumberOfActiveActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
         } catch (SFlowNodeModificationException e) {
@@ -752,8 +766,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void addMultiInstanceNumberOfTerminatedActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfTerminatedInstancesKey(), flowNodeInstance.getNumberOfTerminatedInstances()
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfTerminatedInstancesKey(), flowNodeInstance.getNumberOfTerminatedInstances()
                 + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
@@ -766,8 +780,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void addMultiInstanceNumberOfCompletedActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
                 + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
@@ -824,7 +838,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void setTokenCount(final SActivityInstance activityInstance, final int tokenCount) throws SFlowNodeModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance token count", activityInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getTokenCountKey(), tokenCount);
+        descriptor.addField(sUserTaskInstanceBuilder.getTokenCountKey(), tokenCount);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
 
         SUpdateEvent updateEvent = null;
@@ -958,14 +972,15 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         }
     }
 
-    // @Override
-    // public List<SHiddenTaskInstance> getAllSHiddenTasks() throws STaskVisibilityException {
-    // try {
-    // return getPersistenceRead().selectList(SelectDescriptorBuilder.getAllSHiddenTasks());
-    // } catch (SBonitaReadException e) {
-    // throw new STaskVisibilityException("Error listing all hidden tasks", e);
-    // }
-    // }
+    @Override
+    public void deleteAllHiddenTasks() throws STaskVisibilityException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SHiddenTaskInstance.class, null);
+            getRecorder().recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new STaskVisibilityException("Can't delete all hidden tasks.", e);
+        }
+    }
 
     @Override
     public long getNumberOfPendingHiddenTasks(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
@@ -1085,7 +1100,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void setAbortedByBoundaryEvent(final SActivityInstance activityInstance, final long boundaryEventId) throws SActivityModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "update aborted by boundary", activityInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getAbortedByBoundaryEventIdKey(), boundaryEventId);
+        descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(STATE_CATEGORY).setObject(activityInstance)

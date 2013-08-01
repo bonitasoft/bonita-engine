@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,6 +34,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -126,6 +127,16 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
         } catch (final SRecorderException e) {
             initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");
             throw new SSupervisorDeletionException("Can't delete process supervisor " + supervisor, e);
+        }
+    }
+
+    @Override
+    public void deleteAllSupervisors() throws SSupervisorDeletionException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SProcessSupervisor.class, null);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SSupervisorDeletionException("Can't delete all process supervisors.", e);
         }
     }
 
