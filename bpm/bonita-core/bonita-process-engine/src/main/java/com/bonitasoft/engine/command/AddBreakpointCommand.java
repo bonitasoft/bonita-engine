@@ -14,7 +14,6 @@ import java.util.Map;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 
 import com.bonitasoft.engine.api.impl.transaction.AddBreakpoint;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
@@ -34,7 +33,6 @@ public class AddBreakpointCommand extends TenantCommand {
         final String elementName = getStringMandadoryParameter(parameters, "elementName");
         final int idOfTheStateToInterrupt = getIntegerMandadoryParameter(parameters, "idOfTheStateToInterrupt");
         final int idOfTheInterruptingState = getIntegerMandadoryParameter(parameters, "idOfTheInterruptingState");
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
         final BPMInstanceBuilders breakpointBuilder = tenantAccessor.getBPMInstanceBuilders();
         final AddBreakpoint addBreakpoint;
@@ -46,7 +44,7 @@ public class AddBreakpointCommand extends TenantCommand {
                     idOfTheInterruptingState);
         }
         try {
-            transactionExecutor.execute(addBreakpoint);
+            addBreakpoint.execute();
         } catch (final SBonitaException sbe) {
             throw new SCommandExecutionException(sbe);
         }

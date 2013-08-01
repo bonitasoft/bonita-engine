@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.NoSessionRequired;
+
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.platform.LicenseInfo;
 import com.bonitasoft.engine.platform.impl.LicenseInfoImpl;
@@ -23,9 +25,10 @@ import com.bonitasoft.manager.Manager;
 public class NodeAPIImpl implements NodeAPI {
 
     @Override
+    @NoSessionRequired
     public LicenseInfo getLicenseInfo() {
         final Manager manager = Manager.getInstance();
-		final Map<String, String> info = manager.getInfo();
+        final Map<String, String> info = manager.getInfo();
         final String edition = info.get("subscriptionType");
         final String licensee = info.get("customerName");
         final List<String> features = manager.activeFeatures();

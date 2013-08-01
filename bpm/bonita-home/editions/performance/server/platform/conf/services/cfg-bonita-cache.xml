@@ -17,6 +17,11 @@
 			</list>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="platformCacheService" class="com.bonitasoft.engine.cache.impl.PlatformClusteredCacheService">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+	</bean>
 
 	<bean id="localCacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
 		<constructor-arg name="logger" ref="technicalLoggerService" />

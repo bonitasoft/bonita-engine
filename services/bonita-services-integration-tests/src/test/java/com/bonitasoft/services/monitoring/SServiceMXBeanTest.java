@@ -33,6 +33,7 @@ import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.impl.SServiceMXBeanImpl;
 import com.bonitasoft.services.CommonServiceSPTest;
 
+@SuppressWarnings("javadoc")
 public class SServiceMXBeanTest extends CommonServiceSPTest {
 
     private static SchedulerService schedulerService;
