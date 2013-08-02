@@ -431,13 +431,13 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     public void cleanAndDeletePlaftorm() throws DeletionException {
         cleanPlatform();
         deletePlatform();
     }
 
     @Override
-    @Deprecated
     public Platform getPlatform() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -446,10 +446,9 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new PlatformNotFoundException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
         final GetPlatformContent transactionContent = new GetPlatformContent(platformService);
         try {
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
         } catch (final SBonitaException e) {
             throw new PlatformNotFoundException(e);
         }
@@ -600,7 +599,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final STenant tenant = getDefaultTenant();
             final long tenantId = tenant.getId();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
             schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();

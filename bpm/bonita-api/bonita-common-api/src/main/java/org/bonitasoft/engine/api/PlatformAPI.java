@@ -161,7 +161,6 @@ public interface PlatformAPI {
      * @throws PlatformNotFoundException
      *             occurs when the identifier does not refer to an existing platform
      */
-    @Deprecated
     Platform getPlatform() throws PlatformNotFoundException;
 
     /**
