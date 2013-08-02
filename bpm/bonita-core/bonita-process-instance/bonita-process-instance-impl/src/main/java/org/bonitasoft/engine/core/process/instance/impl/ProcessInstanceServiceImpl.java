@@ -166,8 +166,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final EventInstanceService bpmEventInstanceService, final DataInstanceService dataInstanceService, final ArchiveService archiveService,
             final QueriableLoggerService queriableLoggerService, final TransitionService transitionService,
             final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ProcessDocumentService processDocumentService,
-            final SCommentService commentService, final SCommentBuilders commentBuilders, final TokenService tokenService) {
+            final ClassLoaderService classLoaderService, final ProcessDocumentService processDocumentService, final SCommentService commentService,
+            final SCommentBuilders commentBuilders, final TokenService tokenService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.eventService = eventService;
@@ -244,41 +244,41 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
             try {
                 deleteParentProcessInstanceAndElements(sProcessInstance);
+                nbDeleted++;
             } catch (SBonitaException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage() + ". It has probably completed.");
                 }
             }
-            nbDeleted = +1;
         }
         return nbDeleted;
     }
 
     @Override
-    public void deleteParentProcessInstanceAndElements(final long processInstanceId) throws SProcessInstanceReadException,
-            SProcessInstanceNotFoundException, SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
+    public void deleteParentProcessInstanceAndElements(final long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException,
+            SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         final SProcessInstance sProcessInstance = getProcessInstance(processInstanceId);
         deleteParentProcessInstanceAndElements(sProcessInstance);
     }
 
-    private void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
+    protected void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(sProcessInstance.getCallerId());
         deleteProcessInstance(sProcessInstance);
     }
 
     @Override
-    public long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) {
+    public long deleteParentArchivedProcessInstancesAndElements(final List<SAProcessInstance> saProcessInstances) {
         long nbDeleted = 0;
         for (final SAProcessInstance saProcessInstance : saProcessInstances) {
             try {
                 deleteParentArchivedProcessInstanceAndElements(saProcessInstance);
+                nbDeleted++;
             } catch (SBonitaException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
                 }
             }
-            nbDeleted = +1;
         }
         return nbDeleted;
     }

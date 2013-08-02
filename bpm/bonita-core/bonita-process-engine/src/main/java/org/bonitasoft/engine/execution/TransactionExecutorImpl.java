@@ -24,14 +24,13 @@ import org.bonitasoft.engine.transaction.TransactionService;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * 
- * @deprecated Use {@link org.bonitasoft.engine.transaction.TransactionService.executeInTransaction(Callable<T>)} instead.
+ * @deprecated Use {@link org.bonitasoft.engine.transaction.TransactionService#executeInTransaction(Callable)} instead.
  */
 @Deprecated
 public class TransactionExecutorImpl implements TransactionExecutor {
 
     private final TransactionService transactionService;
-    
+
     public TransactionExecutorImpl(final TransactionService transactionService) {
         this.transactionService = transactionService;
     }
@@ -48,7 +47,7 @@ public class TransactionExecutorImpl implements TransactionExecutor {
         };
 
         try {
-            this.transactionService.executeInTransaction(txContentCallable);
+            transactionService.executeInTransaction(txContentCallable);
         } catch (SBonitaException e) {
             throw e;
         } catch (Exception e) {

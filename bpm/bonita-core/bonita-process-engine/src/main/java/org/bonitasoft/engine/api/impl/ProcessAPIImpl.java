@@ -3440,29 +3440,51 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public long deleteProcessInstances(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SProcessInstanceBuilder sProcessInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final TransactionService txService = tenantAccessor.getTransactionService();
         try {
-            final List<SProcessInstance> sProcessInstances = searchProcessInstancesFromProcessDefinition(processInstanceService, sProcessInstanceBuilder,
-                    processDefinitionId, startIndex, maxResults);
-            if (!sProcessInstances.isEmpty()) {
-                final LockService lockService = tenantAccessor.getLockService();
-                final String objectType = SFlowElementsContainerType.PROCESS.name();
-                final List<Long> lockedProcesses = new ArrayList<Long>();
-                try {
-                    lockedProcesses.addAll(createLockProcessInstances(lockService, objectType, sProcessInstances));
-                    return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
-                } finally {
-                    final List<Long> unReleasedLocks = releaseLocks(tenantAccessor, lockService, objectType, lockedProcesses);
-                    if (!unReleasedLocks.isEmpty()) {
-                        throw new DeletionException("Some locks were not released. Object type: " + objectType + ", ids: " + unReleasedLocks);
-                    }
-                }
-            } else {
+            txService.begin();
+            final List<SProcessInstance> sProcessInstances;
+            try {
+                sProcessInstances = searchProcessInstancesFromProcessDefinition(processInstanceService, sProcessInstanceBuilder, processDefinitionId,
+                        startIndex, maxResults);
+            } catch (final SBonitaSearchException e) {
+                txService.setRollbackOnly();
+                throw e;
+            } finally {
+                txService.complete();
+            }
+
+            if (sProcessInstances.isEmpty()) {
                 return 0;
             }
+
+            final LockService lockService = tenantAccessor.getLockService();
+            final String objectType = SFlowElementsContainerType.PROCESS.name();
+            final List<Long> lockedProcesses = new ArrayList<Long>();
+            try {
+                lockedProcesses.addAll(createLockProcessInstances(lockService, objectType, sProcessInstances));
+                txService.begin();
+                try {
+                    return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
+                } catch (final Exception e) {
+                    txService.setRollbackOnly();
+                    throw new DeletionException(e);
+                } finally {
+                    txService.complete();
+                }
+            } finally {
+                final List<Long> unReleasedLocks = releaseLocks(tenantAccessor, lockService, objectType, lockedProcesses);
+                if (!unReleasedLocks.isEmpty()) {
+                    throw new DeletionException("Some locks were not released. Object type: " + objectType + ", ids: " + unReleasedLocks);
+                }
+
+            }
+
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

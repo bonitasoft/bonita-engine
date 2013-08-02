@@ -109,7 +109,6 @@ public interface ProcessInstanceService {
      * 
      * @param processInstanceId
      *            identifier of process instance
-     * @param processInstanceId
      * @throws SProcessInstanceReadException
      * @throws SProcessInstanceNotFoundException
      * @throws SFlowNodeReadException
@@ -117,8 +116,8 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      * @since 6.1
      */
-    void deleteParentProcessInstanceAndElements(long processInstanceId) throws SProcessInstanceReadException,
-            SProcessInstanceNotFoundException, SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    void deleteParentProcessInstanceAndElements(long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException,
+            SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Get process instance by its id
@@ -256,13 +255,11 @@ public interface ProcessInstanceService {
      * @param archivedProcessInstanceId
      *            identifier of the archived process instance (not the process instance)
      * @param persistenceService
-     * 
      * @return an SAProcessInstance object
      * @throws SProcessInstanceReadException
      * @throws SProcessInstanceNotFoundException
      */
-    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId)
-            throws SProcessInstanceReadException, SProcessInstanceNotFoundException;
+    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException;
 
     /**
      * Get total number of process instances
@@ -485,7 +482,6 @@ public interface ProcessInstanceService {
     List<SProcessInstance> getProcessInstancesInState(QueryOptions queryOptions, ProcessInstanceState state) throws SProcessInstanceReadException;
 
     /**
-     * 
      * @param processInstanceId
      * @throws SBonitaException
      * @since 6.1
