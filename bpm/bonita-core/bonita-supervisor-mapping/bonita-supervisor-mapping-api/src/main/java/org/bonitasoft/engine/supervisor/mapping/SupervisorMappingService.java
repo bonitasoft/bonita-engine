@@ -24,7 +24,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  * @since 6.0
  */
 public interface SupervisorMappingService {
@@ -70,14 +69,6 @@ public interface SupervisorMappingService {
      * @throws SSupervisorDeletionException
      */
     void deleteSupervisor(SProcessSupervisor supervisor) throws SSupervisorDeletionException;
-
-    /**
-     * Delete all supervisors for the connected tenant
-     * 
-     * @throws SSupervisorDeletionException
-     * @since 6.1
-     */
-    void deleteAllSupervisors() throws SSupervisorDeletionException;
 
     /**
      * Verify if the id specified user is the supervisor of id specified process definition

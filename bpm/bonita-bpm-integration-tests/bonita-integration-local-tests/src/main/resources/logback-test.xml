@@ -8,8 +8,6 @@
 	</appender>
 
 	<logger name="org.bonitasoft" level="INFO" />
-	<!--<logger name="org.bonitasoft.engine.recorder.impl.RecorderImpl" level="TRACE" />
-	<logger name="bitronix.tm.twopc.Preparer" level="ERROR" />-->
 
 
 	<root level="WARN">

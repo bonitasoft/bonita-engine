@@ -24,10 +24,7 @@ import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.exception.SIndexOutOfRangeException;
 import org.bonitasoft.engine.core.category.exception.SPageOutOfRangeException;
 import org.bonitasoft.engine.core.category.model.SCategory;
-import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -206,6 +203,27 @@ public interface CategoryService {
             SIndexOutOfRangeException;
 
     /**
+     * Remove process definitions from specific category
+     * 
+     * @param categoryId
+     *            Identifier of the category
+     * @throws SCategoryNotFoundException
+     *             Error thrown if no category have an id corresponding to the parameter.
+     * @throws SCategoryException
+     */
+    void removeProcessDefinitionsOfCategory(long categoryId) throws SCategoryNotFoundException, SCategoryException;
+
+    /**
+     * Delete process category mapping for specific process
+     * 
+     * @param processId
+     *            Identifier of the process definition
+     * @throws SCategoryException
+     * @since 6.0
+     */
+    void removeProcessIdOfCategories(long processId) throws SCategoryException;
+
+    /**
      * Get number of categorized processes
      * 
      * @param processIds
@@ -258,23 +276,5 @@ public interface CategoryService {
      *             Error thrown if has exception during the category number retrieve action
      */
     long getNumberOfCategoriesUnrelatedToProcess(long processDefinitionId) throws SCategoryException;
-
-    /**
-     * Search process category mappings corresponding to criteria
-     * 
-     * @param queryOptions
-     * @return List of process category mappings
-     * @throws SBonitaSearchException
-     * @since 6.1
-     */
-    List<SProcessCategoryMapping> searchProcessCategoryMappings(QueryOptions queryOptions) throws SBonitaSearchException;
-
-    /**
-     * 
-     * @param mappings
-     * @return Number of deleted category mapping
-     * @since 6.1
-     */
-    long deleteProcessCategoryMappings(List<SProcessCategoryMapping> mappings);
 
 }

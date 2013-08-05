@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SRetryableException;
@@ -140,6 +139,32 @@ public interface PersistenceService extends ReadPersistenceService {
     void purge(String classToPurge) throws SPersistenceException;
 
     /**
+     * Delete a record from the table by id and its class type.
+     * 
+     * @param id
+     *            entity's id
+     * @param entityClass
+     *            The class which extends persistentObject
+     * @throws SPersistenceException
+     * @throws SRetryableException
+     * @since 6.0
+     */
+    void delete(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException;
+
+    /**
+     * Delete records from the table.
+     * 
+     * @param ids
+     *            A list contains entity ids
+     * @param entityClass
+     *            The class which extends persistentObject
+     * @throws SPersistenceException
+     * @throws SRetryableException
+     * @since 6.0
+     */
+    void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass) throws SPersistenceException;
+
+    /**
      * Delete all records belong to the given entity class from the table.
      * 
      * @param entityClass
@@ -149,18 +174,6 @@ public interface PersistenceService extends ReadPersistenceService {
      * @since 6.0
      */
     void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException;
-
-    /**
-     * Delete all elements of a specific table for a specific tenant
-     * 
-     * @param entityClass
-     *            Entity class corresponding to the table to empty
-     * @param filters
-     *            Filters
-     * @throws SPersistenceException
-     * @since 6.1
-     */
-    void deleteByTenant(Class<? extends PersistentObject> entityClass, List<FilterOption> filters) throws SPersistenceException;
 
     /**
      * @param desc

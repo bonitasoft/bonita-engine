@@ -112,15 +112,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     void deletePendingMappings(long humanTaskInstanceId) throws SActivityModificationException;
 
     /**
-     * 
-     * Delete all pending mappings for the connected tenant
-     * 
-     * @throws SActivityModificationException
-     * @since 6.1
-     */
-    void deleteAllPendingMappings() throws SActivityModificationException;
-
-    /**
      * Get activityInstance by its id
      * 
      * @param activityInstanceId
@@ -770,14 +761,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @since 6.0
      */
     void deleteHiddenTasksForActivity(long activityInstanceId) throws STaskVisibilityException;
-
-    /**
-     * Delete all hidden tasks for the connected tenant
-     * 
-     * @throws STaskVisibilityException
-     * @since 6.1
-     */
-    void deleteAllHiddenTasks() throws STaskVisibilityException;
 
     /**
      * @param userId

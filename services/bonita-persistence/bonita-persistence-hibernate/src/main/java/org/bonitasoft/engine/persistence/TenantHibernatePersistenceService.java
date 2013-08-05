@@ -27,7 +27,6 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StaleStateException;
 import org.hibernate.exception.LockAcquisitionException;
@@ -37,7 +36,6 @@ import org.hibernate.exception.LockAcquisitionException;
  * @author Nicolas Chabanoles
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
 public class TenantHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
@@ -173,27 +171,4 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         }
     }
 
-    @Override
-    public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) throws SPersistenceException {
-        // try {
-        // final Query query = getSession(true).createQuery("DELETE FROM " + entityClass.getCanonicalName() + " WHERE tenantId= :tenantId");
-        // query.setLong("tenantId", getTenantId());
-        // query.executeUpdate();
-        // logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
-        // } catch (TenantIdNotSetException e) {
-        // throw new SPersistenceException(e);
-        // }
-
-        try {
-            final Session session = getSession(true);
-            final String entityClassName = entityClass.getCanonicalName();
-            final Query query = session.createQuery(getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName)
-                    + " WHERE tenantId= :tenantId", filters, null));
-            query.setLong("tenantId", getTenantId());
-            query.executeUpdate();
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
-        } catch (TenantIdNotSetException e) {
-            throw new SPersistenceException(e);
-        }
-    }
 }

@@ -62,7 +62,6 @@ import org.hibernate.stat.Statistics;
  * @author Nicolas Chabanoles
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
 public abstract class AbstractHibernatePersistenceService extends AbstractDBPersistenceService {
 
@@ -204,9 +203,52 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
+    public void delete(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
+        final Query query = getSession(true).getNamedQuery("delete" + mappedClass.getSimpleName());
+        query.setLong("id", id);
+        try {
+            query.executeUpdate();
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
+        }
+    }
+
+    // @Override
+    // public void deleteById(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+    // final Query query = getSession(true).createQuery("DELETE FROM " + entityClass.getName() + " WHERE id = :id");
+    // query.setLong("id", id);
+    // query.executeUpdate();
+    // }
+
+    @Override
     public void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
         final Query query = getSession(true).getNamedQuery("deleteAll" + mappedClass.getSimpleName());
+        try {
+            query.executeUpdate();
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
+        }
+    }
+
+    @Override
+    public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
+        final Query query = getSession(true).getNamedQuery("deleteByIds" + mappedClass.getSimpleName());
+        query.setParameterList("ids", ids);
         try {
             query.executeUpdate();
         } catch (final AssertionFailure af) {
@@ -367,7 +409,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final Query query = session.getNamedQuery(selectDescriptor.getQueryName());
         setQueryCache(query, selectDescriptor.getQueryName());
         if (parameters != null) {
-            setPramaters(query, parameters);
+            for (final Map.Entry<String, Object> entry : parameters.entrySet()) {
+                final Object value = entry.getValue();
+                if (value instanceof Collection<?>) {
+                    query.setParameterList(entry.getKey(), (Collection<?>) value);
+                } else {
+                    query.setParameter(entry.getKey(), value);
+                }
+            }
         }
         query.setMaxResults(1);
         try {
@@ -383,7 +432,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected <T> String getQueryWithFilters(final String query, final List<FilterOption> filters, SearchFields multipleFilter) {
+    private <T> String getQueryWithFilters(final String query, final SelectListDescriptor<T> selectDescriptor) {
+        final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
+        final List<FilterOption> filters = queryOptions.getFilters();
         final StringBuilder builder = new StringBuilder(query);
         final Set<String> specificFilters = new HashSet<String>(filters.size());
         FilterOption previousFilter = null;
@@ -412,11 +463,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             }
             builder.append(")");
         }
+        final SearchFields multipleFilter = queryOptions.getMultipleFilter();
         if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
             final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
             final Set<String> fields = new HashSet<String>();
             for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
-                final String alias = getClassAliasMappings().get(entry.getKey().getName());
+                final String alias = classAliasMappings.get(entry.getKey().getName());
                 for (final String field : entry.getValue()) {
                     final StringBuilder aliasBuilder = new StringBuilder(alias);
                     aliasBuilder.append('.').append(field);
@@ -459,7 +511,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final FilterOperationType type = filterOption.getFilterOperationType();
         StringBuilder completeField = null;
         if (filterOption.getPersistentClass() != null) {
-            completeField = new StringBuilder(getClassAliasMappings().get(filterOption.getPersistentClass().getName())).append('.').append(
+            completeField = new StringBuilder(classAliasMappings.get(filterOption.getPersistentClass().getName())).append('.').append(
                     filterOption.getFieldName());
         }
         Object fieldValue = filterOption.getValue();
@@ -557,7 +609,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz) throws SBonitaReadException {
         final String className = clazz.getName();
-        final String classAlias = getClassAliasMappings().get(className);
+        final String classAlias = classAliasMappings.get(className);
         if (classAlias == null || classAlias.trim().isEmpty()) {
             throw new SBonitaReadException("No class alias found for class " + className);
         }
@@ -581,8 +633,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
 
             if (selectDescriptor.hasAFilter()) {
-                final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                query = session.createQuery(getQueryWithFilters(query.getQueryString(), queryOptions.getFilters(), queryOptions.getMultipleFilter()));
+                query = session.createQuery(getQueryWithFilters(query.getQueryString(), selectDescriptor));
             }
             if (selectDescriptor.hasOrderByParameters()) {
                 query = session.createQuery(getQueryWithOrderByClause(query.getQueryString(), selectDescriptor));
@@ -590,7 +641,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             setQueryCache(query, selectDescriptor.getQueryName());
 
             if (selectDescriptor != null) {
-                setPramaters(query, selectDescriptor.getInputParameters());
+                for (final Map.Entry<String, Object> entry : selectDescriptor.getInputParameters().entrySet()) {
+                    final Object value = entry.getValue();
+                    if (value instanceof Collection<?>) {
+                        query.setParameterList(entry.getKey(), (Collection<?>) value);
+                    } else {
+                        query.setParameter(entry.getKey(), value);
+                    }
+                }
             }
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());
@@ -611,17 +669,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throw new SBonitaReadException(e, selectDescriptor);
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
-        }
-    }
-
-    protected void setPramaters(Query query, final Map<String, Object> inputParameters) {
-        for (final Map.Entry<String, Object> entry : inputParameters.entrySet()) {
-            final Object value = entry.getValue();
-            if (value instanceof Collection<?>) {
-                query.setParameterList(entry.getKey(), (Collection<?>) value);
-            } else {
-                query.setParameter(entry.getKey(), value);
-            }
         }
     }
 
@@ -719,10 +766,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             trimmedCommand = trimmedCommand.replaceAll(stringToReplace, value);
         }
         return trimmedCommand;
-    }
-
-    public Map<String, String> getClassAliasMappings() {
-        return classAliasMappings;
     }
 
 }

@@ -413,8 +413,8 @@ public class APITestUtil {
         deleteProcess(definition);
     }
 
-    protected void deleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
-        deleteProcess(processDefinition.getId());
+    protected void deleteProcess(final ProcessDefinition definition) throws BonitaException {
+        deleteProcess(definition.getId());
     }
 
     protected void deleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
@@ -430,8 +430,7 @@ public class APITestUtil {
     }
 
     protected void deleteProcess(final long processDefinitionId) throws BonitaException {
-        deleteProcessInstanceAndArchived(processDefinitionId);
-        getProcessAPI().deleteProcessDefinition(processDefinitionId);
+        getProcessAPI().deleteProcess(processDefinitionId);
     }
 
     protected void deleteUser(final String userName) throws BonitaException {

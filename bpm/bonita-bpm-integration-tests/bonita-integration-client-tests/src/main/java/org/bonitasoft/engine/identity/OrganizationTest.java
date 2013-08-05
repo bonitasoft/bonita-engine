@@ -20,14 +20,16 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -375,12 +377,9 @@ public class OrganizationTest extends CommonAPITest {
         getIdentityAPI().deleteOrganization();
     }
 
-    @Cover(classes = { ActorMember.class, Group.class, Role.class, User.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-808, ENGINE-1635", keywords = {
-            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Hidden activity", "Supervisor",
-            "External identity mapping", "Pending mapping " })
     @Test
     public void deleteOrganization() throws Exception {
-        // Create records for user role, group and membership
+        // create records for user role, group and membership
         final User persistedUser1 = getIdentityAPI().createUser("liuyanyan", "bpm");
         final User persistedUser2 = getIdentityAPI().createUser("anthony.birembault", "bpm");
 
@@ -406,78 +405,37 @@ public class OrganizationTest extends CommonAPITest {
         assertEquals(2, getIdentityAPI().getNumberOfGroups());
         assertEquals(2, getIdentityAPI().getNumberOfUsers());
         assertEquals(2, getIdentityAPI().getNumberOfRoles());
-
-        // Create process that is mapped to user of organization
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("deleteAllHuman", "1.1").addActor(ACTOR_NAME, true).addUserTask("human", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, persistedUser1);
-        final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(), "human");
-        assignAndExecuteStep(startProcessUntilStep.getActivityInstance(), persistedUser1.getId());
-        waitForProcessToFinish(startProcessUntilStep.getProcessInstance());
-
         // delete organization and do check
         getIdentityAPI().deleteOrganization();
         assertEquals(0, getIdentityAPI().getNumberOfGroups());
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
         assertEquals(0, getIdentityAPI().getNumberOfRoles());
         assertEquals(0, getIdentityAPI().getNumberOfUserMemberships(persistedUser1.getId()));
-
-        // reload the process deploy info:
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
-
-        // Clean up
-        disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ActorMember.class, Group.class, Role.class, User.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-1635", keywords = {
-            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Hidden activity", "Supervisor",
-            "External identity mapping", "Pending mapping " })
-    @Test(expected = DeletionException.class)
-    public void cantDeleteOrganizationWhenProcessInstanceIsActive() throws Exception {
-        // Create records for user role, group and membership
-        final User persistedUser1 = getIdentityAPI().createUser("liuyanyan", "bpm");
-        final User persistedUser2 = getIdentityAPI().createUser("anthony.birembault", "bpm");
-
-        final RoleCreator rc1 = new RoleCreator("Developer");
-        rc1.setDisplayName("roleDisplayName");
-        final Role persistedRole1 = getIdentityAPI().createRole(rc1);
-        final RoleCreator rc2 = new RoleCreator("Manager");
-        rc2.setDisplayName("roleDisplayName");
-        final Role persistedRole2 = getIdentityAPI().createRole(rc2);
-
-        final GroupCreator groupCreator1 = new GroupCreator("Engine");
-        groupCreator1.setDisplayName("engine team");
-        final Group persistedGroup1 = getIdentityAPI().createGroup(groupCreator1);
-
-        final GroupCreator groupCreator2 = new GroupCreator("Web");
-        groupCreator2.setDisplayName("web team");
-        final Group persistedGroup2 = getIdentityAPI().createGroup(groupCreator2);
-
-        getIdentityAPI().addUserMembership(persistedUser1.getId(), persistedGroup1.getId(), persistedRole1.getId());
-        getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
-
-        assertEquals(1, getIdentityAPI().getNumberOfUserMemberships(persistedUser1.getId()));
-        assertEquals(2, getIdentityAPI().getNumberOfGroups());
-        assertEquals(2, getIdentityAPI().getNumberOfUsers());
-        assertEquals(2, getIdentityAPI().getNumberOfRoles());
-
-        // Create process that is mapped to user of organization
+    @Cover(classes = { ActorMember.class, Group.class, Role.class, User.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-808", keywords = { "delete organization actor mapping" })
+    @Test
+    public void deleteOrganizationRemoveActorMapping() throws BonitaException {
+        // create process and organization
+        // process is mapped to user of organization
+        final User mixmasterSpike = getIdentityAPI().createUser("mixmaster.spike", "123456789");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
-        builder.createNewInstance("deleteAllHuman", "1.1").addActor(ACTOR_NAME, true).addUserTask("human", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, persistedUser1);
-        final StartProcessUntilStep startProcessUntilStep = startProcessAndWaitForTask(processDefinition.getId(), "human");
+        final String actor = "robot";
+        builder.createNewInstance("deleteAllHuman", "1.1").addActor(actor, true).addUserTask("human", actor);
+        final DesignProcessDefinition processDefinition = builder.done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
+        final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
+        getProcessAPI().addUserToActor(initiator.getId(), mixmasterSpike.getId());
+        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
-        // delete organization and do check
-        try {
-            getIdentityAPI().deleteOrganization();
-        } finally {
-            // Clean up
-            assignAndExecuteStep(startProcessUntilStep.getActivityInstance(), persistedUser1.getId());
-            waitForProcessToFinish(startProcessUntilStep.getProcessInstance());
-            getIdentityAPI().deleteOrganization();
-            disableAndDeleteProcess(processDefinition);
-        }
+        //
+        getIdentityAPI().deleteOrganization();
+        // reload the process deploy info:
+        processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
+        deleteProcess(definition.getId());
     }
 
     @Cover(classes = { IdentityAPI.class, ImportPolicy.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Import", "Policy" }, story = "Import a new organization keep the old, if duplicates elements fail import", jira = "ENGINE-428")

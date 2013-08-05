@@ -22,7 +22,6 @@ import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -106,8 +105,8 @@ public class ServicesBuilder {
         return getAccessor().getInstanceOf(DependencyMappingBuilder.class);
     }
 
-    public TenantHibernatePersistenceService buildTenantPersistenceService() {
-        return getAccessor().getInstanceOf(TenantHibernatePersistenceService.class);
+    public PersistenceService buildPersistence() {
+        return this.buildPersistence("persistenceService");
     }
 
     public PersistenceService buildPersistence(final String name) {
@@ -115,7 +114,7 @@ public class ServicesBuilder {
     }
 
     public PersistenceService buildJournal() {
-        return this.buildTenantPersistenceService();
+        return this.buildPersistence();
     }
 
     public PersistenceService buildHistory() {

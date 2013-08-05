@@ -244,7 +244,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
             try {
                 deleteParentProcessInstanceAndElements(sProcessInstance);
-                nbDeleted = +1;
+                nbDeleted++;
             } catch (SBonitaException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage() + ". It has probably completed.");
@@ -273,7 +273,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         for (final SAProcessInstance saProcessInstance : saProcessInstances) {
             try {
                 deleteParentArchivedProcessInstanceAndElements(saProcessInstance);
-                nbDeleted = +1;
+                nbDeleted++;
             } catch (SBonitaException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());

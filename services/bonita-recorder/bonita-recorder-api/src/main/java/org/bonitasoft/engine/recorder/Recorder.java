@@ -17,7 +17,6 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.recorder.model.BatchInsertRecord;
-import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
@@ -66,15 +65,5 @@ public interface Recorder {
      * @throws SRecorderException
      */
     void recordBatchInsert(BatchInsertRecord record, SInsertEvent insertEvent) throws SRecorderException;
-
-    /**
-     * Delete all records for a table from database, for the connected tenant
-     * 
-     * @param record
-     *            table to clean
-     * @throws SRecorderException
-     * @since 6.1
-     */
-    void recordDeleteAll(DeleteAllRecord record) throws SRecorderException;
 
 }

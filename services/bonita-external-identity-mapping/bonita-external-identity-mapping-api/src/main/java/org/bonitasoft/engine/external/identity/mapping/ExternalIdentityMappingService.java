@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,7 +21,6 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 /**
  * @author Emmanuel Duchastenier
- * @author Celine Souchet
  * @since 6.0
  */
 public interface ExternalIdentityMappingService {
@@ -123,14 +122,6 @@ public interface ExternalIdentityMappingService {
      * @throws SExternalIdentityMappingDeletionException
      */
     void deleteExternalIdentityMapping(SExternalIdentityMapping externalIdentityMapping) throws SExternalIdentityMappingDeletionException;
-
-    /**
-     * Delete all external identity mapping for the connected tenant
-     * 
-     * @throws SExternalIdentityMappingDeletionException
-     * @since 6.1
-     */
-    void deleteAllExternalIdentityMappings() throws SExternalIdentityMappingDeletionException;
 
     /**
      * Get all externalIdentityMappings for specific kind according to the queryOptions. use querySuffix to indicate what the displayNamePart is related to

@@ -68,7 +68,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
-import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -368,8 +367,7 @@ public class ProfileServiceImpl implements ProfileService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getEntriesOfProfile"));
         }
         try {
-            final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, field, order,
-                    fromIndex,
+            final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, field, order, fromIndex,
                     numberOfProfileEntries));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getEntriesOfProfile"));
@@ -390,8 +388,7 @@ public class ProfileServiceImpl implements ProfileService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getEntriesOfProfileByParentId"));
         }
         try {
-            final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, parentId, field,
-                    order,
+            final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, parentId, field, order,
                     fromIndex, numberOfProfileEntries));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getEntriesOfProfileByParentId"));
@@ -791,8 +788,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
         try {
             final Map<String, Object> emptyMap = Collections.singletonMap("profileIds", (Object) profileIds);
-            final List<SProfileMember> results = persistenceService.selectList(new SelectListDescriptor<SProfileMember>("getProfileMembersFromProfileIds",
-                    emptyMap,
+            final List<SProfileMember> results = persistenceService.selectList(new SelectListDescriptor<SProfileMember>("getProfileMembersFromProfileIds", emptyMap,
                     SProfileMember.class));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getNumberOfProfileMembers"));
@@ -818,11 +814,16 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteAllProfileMembers() throws SProfileMemberDeletionException {
+        List<SProfileMember> profileMembers;
         try {
-            final DeleteAllRecord record = new DeleteAllRecord(SProfileMember.class, null);
-            recorder.recordDeleteAll(record);
-        } catch (final SRecorderException e) {
-            throw new SProfileMemberDeletionException("Can't delete all profile members.", e);
+            do {
+                profileMembers = getProfileMembers(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, null, null);
+                for (final SProfileMember profileMember : profileMembers) {
+                    deleteProfileMember(profileMember);
+                }
+            } while (profileMembers.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+        } catch (final SBonitaReadException e) {
+            throw new SProfileMemberDeletionException(e);
         }
     }
 

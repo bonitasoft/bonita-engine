@@ -62,10 +62,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -73,7 +70,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataUpdater;
 import org.bonitasoft.engine.identity.ContactDataUpdater.ContactDataField;
@@ -116,6 +112,7 @@ import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.RoleUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.UserUpdateBuilder;
+import org.bonitasoft.engine.identity.xml.DeleteOrganization;
 import org.bonitasoft.engine.identity.xml.ExportOrganization;
 import org.bonitasoft.engine.identity.xml.ImportOrganization;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -135,7 +132,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 
 /**
  * @author Matthieu Chaffotte
@@ -1237,7 +1233,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            identityService.deleteLightUserMembership(identityService.getLightUserMembership(userId, groupId, roleId));
+            identityService.deleteUserMembership(identityService.getLightUserMembership(userId, groupId, roleId));
         } catch (final SIdentityException e) {
             throw new DeletionException(e);
         }
@@ -1250,7 +1246,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         try {
             for (final long userId : userIds) {
                 final SUserMembership userMembership = identityService.getLightUserMembership(userId, groupId, roleId);
-                identityService.deleteLightUserMembership(userMembership);
+                identityService.deleteUserMembership(userMembership);
             }
         } catch (final SIdentityException e) {
             throw new DeletionException(e);
@@ -1377,35 +1373,9 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ProfileService profileService = tenantAccessor.getProfileService();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final SupervisorMappingService supervisorService = tenantAccessor.getSupervisorService();
-        final ExternalIdentityMappingService externalIdentityMappingService = tenantAccessor.getExternalIdentityMappingService();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final SCommentService commentService = tenantAccessor.getCommentService();
-
-        final QueryOptions queryOptions = new QueryOptions(0, 1);
         try {
-            if (processInstanceService.getNumberOfProcessInstances(queryOptions) == 0 &&
-                    activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0) { // FIXME : Delete when fix bug ENGINE-1658
-
-                // FIXME : Uncomment when fix bug ENGINE-1658
-                // activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0 &&
-                // commentService.getNumberOfComments(queryOptions) == 0) {
-                actorMappingService.deleteAllActorMembers();
-                profileService.deleteAllProfileMembers();
-                activityInstanceService.deleteAllPendingMappings();
-                activityInstanceService.deleteAllHiddenTasks();
-                supervisorService.deleteAllSupervisors();
-                externalIdentityMappingService.deleteAllExternalIdentityMappings();
-                identityService.deleteAllUserMemberships();
-                identityService.deleteAllGroups();
-                identityService.deleteAllRoles();
-                identityService.deleteAllUsers();
-
-                updateActorProcessDependenciesForAllActors(tenantAccessor);
-            } else {
-                throw new DeletionException("Can't delete a organization when a process, a human tasks, or a comment is active !!.");
-            }
+            new DeleteOrganization(identityService, profileService, actorMappingService).execute();
+            updateActorProcessDependenciesForAllActors(tenantAccessor);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

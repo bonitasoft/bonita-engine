@@ -1,10 +1,5 @@
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +14,11 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Yanyan Liu
@@ -38,7 +38,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void createCategory() throws Exception {
+    public void testCreateCategory() throws Exception {
         final String name = "categoryName";
         final String description = "test create category";
         transactionService.begin();
@@ -51,7 +51,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SCategoryAlreadyExistsException.class)
-    public void createCategoryWithSCategoryAlreadyExistsException() throws Exception {
+    public void testCreateCategoryWithSCategoryAlreadyExistsException() throws Exception {
         final String name = "categoryTestExceptionName";
         final String description = "test create category with SCategoryAlreadyExistsException";
         transactionService.begin();
@@ -67,7 +67,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SCategoryCreationException.class)
-    public void createCategoryWithSCategoryCreationException() throws Exception {
+    public void testCreateCategoryWithSCategoryCreationException() throws Exception {
         final String name = null;
         final String description = "test create category with SCategoryCreationException";
         transactionService.begin();
@@ -79,7 +79,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getCategory() throws Exception {
+    public void testGetCategory() throws Exception {
         final String name = "categoryName";
         final String description = "test retrieve category";
         transactionService.begin();
@@ -97,7 +97,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getCategoryByName() throws Exception {
+    public void testGetCategoryByName() throws Exception {
         final String name = "categoryName";
         final String description = "test get category by name";
         transactionService.begin();
@@ -116,7 +116,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void updateCategory() throws Exception {
+    public void testUpdateCategory() throws Exception {
         final String name = "categoryName";
         final String description = "test update category";
         transactionService.begin();
@@ -145,7 +145,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SCategoryNotFoundException.class)
-    public void updateCategoryWithSCategoryNotFoundException() throws Exception {
+    public void testUpdateCategoryWithSCategoryNotFoundException() throws Exception {
         final long categoryId = 1;
         final String newName = "updatedName";
         final String newDescription = "updatedDescription";
@@ -158,8 +158,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void deleteCategory() throws Exception {
-        final String name = "categoryName_delete";
+    public void testDeleteCategory() throws Exception {
+        final String name = "categoryName_testDelete";
         final String description = "test delete category";
         transactionService.begin();
         // create
@@ -181,7 +181,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getNumberOfCategories() throws Exception {
+    public void testGetNumberOfCategories() throws Exception {
         transactionService.begin();
         long count = categoryService.getNumberOfCategories();
         assertEquals(0, count);
@@ -202,7 +202,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
 
     @Test
     // this should be client test
-    public void getCategoriesInOrder() throws Exception {
+    public void testGetCategoriesInOrder() throws Exception {
         final String name = "categoryName";
         final String description = "test get categories in order";
         transactionService.begin();
@@ -248,7 +248,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void addProcessDefinitionToCategory() throws Exception {
+    public void testAddProcessDefinitionToCategory() throws Exception {
         // generate the meaningful of ProcessDefinition id
         final SProcessDefinition processDefinition = createSProcessDefinition("processName", "test category");
 
@@ -276,7 +276,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SCategoryNotFoundException.class)
-    public void addProcessDefinitionToCategoryWithSCategoryNotFoundException() throws Exception {
+    public void testAddProcessDefinitionToCategoryWithSCategoryNotFoundException() throws Exception {
         // generate the meaningful of ProcessDefinition id
         final SProcessDefinition processDefinition = createSProcessDefinition("processName", "test category not found exceptioin");
 
@@ -292,7 +292,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void addprocessDefinitionsToCategory() throws Exception {
+    public void testAddprocessDefinitionsToCategory() throws Exception {
         // generate a meaningful processDefinition ids
         final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(3, "processName", "test add process definitions to Category");
 
@@ -321,7 +321,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getNumberOfCategories4Process() throws Exception {
+    public void testGetNumberOfCategories4Process() throws Exception {
         // generate a meaningful processDefinitionId
         final long processDefinitionId = createSProcessDefinition("processName", "test get number of categories of process").getId();
 
@@ -353,7 +353,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getNumberOfCategoriesUnrelatedToProcess() throws Exception {
+    public void testGetNumberOfCategoriesUnrelatedToProcess() throws Exception {
         final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(2, "processName", "test get number of categories of process");
 
         transactionService.begin();
@@ -390,7 +390,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getCategoriesUnrelatedToProcess() throws Exception {
+    public void testGetCategoriesUnrelatedToProcess() throws Exception {
         final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(2, "processName", "test get number of categories of process");
 
         transactionService.begin();
@@ -433,7 +433,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getProcessDefinitionIdsOfCategory() throws Exception {
+    public void testGetProcessDefinitionIdsOfCategory() throws Exception {
         final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(3, "processName", "test get process definition ids of category");
 
         final String name = "categoryName";
@@ -463,7 +463,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getProcessDefinitionIdsOfUnknowCategory() throws Exception {
+    public void testGetProcessDefinitionIdsOfUnknowCategory() throws Exception {
         final long categoryId = 1;
 
         transactionService.begin();
@@ -473,7 +473,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void getCategoriesOfProcessDefinition() throws Exception {
+    public void testGetCategoriesOfProcessDefinition() throws Exception {
         final SProcessDefinition processDefinition = createSProcessDefinitions(1, "processName", "test get categores of process definition").get(0);
 
         transactionService.begin();
@@ -528,6 +528,82 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         assertEquals("categoryName3", categoryList5.get(2).getName());
 
         // delete categories and process
+        for (final SCategory category : categoryList) {
+            categoryService.deleteCategory(category.getId());
+        }
+        transactionService.complete();
+
+        // Clean-up
+        deleteSProcessDefinition(processDefinitionId);
+    }
+
+    @Test
+    public void testRemoveProcessDefinitionOfCategory() throws Exception {
+        final List<SProcessDefinition> processDefinitions = createSProcessDefinitions(3, "processName", "test remove process definitions of category");
+
+        transactionService.begin();
+        final String name = "categoryName";
+        final String description = "test remove process definitons of category";
+        // create category
+        final SCategory category = categoryService.createCategory(name, description);
+        final long categoryId = category.getId();
+        // generate the meaningful processDefinitionIds, add them to category
+        for (final SProcessDefinition processDefinition : processDefinitions) {
+            categoryService.addProcessDefinitionToCategory(categoryId, processDefinition.getId());
+        }
+
+        // test
+        List<Long> processDefinitionIdList = categoryService.getProcessDefinitionIdsOfCategory(categoryId);
+        assertNotNull(processDefinitionIdList);
+        assertEquals(3, processDefinitionIdList.size());
+
+        categoryService.removeProcessDefinitionsOfCategory(categoryId);
+        processDefinitionIdList = categoryService.getProcessDefinitionIdsOfCategory(categoryId);
+        assertEquals(0, processDefinitionIdList.size());
+
+        // delete category
+        categoryService.deleteCategory(categoryId);
+        transactionService.complete();
+
+        // Clean-up
+        deleteSProcessDefinitions(processDefinitions);
+    }
+
+    @Test
+    public void testRemoveProcessDefinitionsOfUnknownCategoryDoesntThrowsException() throws Exception {
+        transactionService.begin();
+        categoryService.removeProcessDefinitionsOfCategory(Long.MAX_VALUE);
+        transactionService.complete();
+    }
+
+    @Test
+    public void testRemoveProcessDefinitionFromCategory() throws Exception {
+        // generate a meaningful processDefinitionId
+        final long processDefinitionId = createSProcessDefinition("test remove process definitions from all categories", "1.0").getId();
+
+        transactionService.begin();
+        long count = categoryService.getNumberOfCategoriesOfProcess(processDefinitionId);
+        assertEquals(0, count);
+
+        final String name = "categoryName";
+        final String description = "category description : test remove process definitions from all categories";
+        // create category
+        final List<SCategory> categoryList = createCategories(2, name, description);
+        assertNotNull(categoryList);
+        assertEquals(2, categoryList.size());
+        // add process definition info to category
+        for (final SCategory category : categoryList) {
+            categoryService.addProcessDefinitionToCategory(category.getId(), processDefinitionId);
+        }
+        // check
+        count = categoryService.getNumberOfCategoriesOfProcess(processDefinitionId);
+        assertEquals(2, count);
+
+        categoryService.removeProcessIdOfCategories(processDefinitionId);
+        count = categoryService.getNumberOfCategoriesOfProcess(processDefinitionId);
+        assertEquals(0, count);
+
+        // delete category
         for (final SCategory category : categoryList) {
             categoryService.deleteCategory(category.getId());
         }

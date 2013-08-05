@@ -5,11 +5,8 @@
     <target name="cleantarget">
         <delete dir="${basedir}/target/server/platform/work" includes="**/*.db"/>
         <delete dir="${basedir}/target/test-classes/conf" />
-    	<copy todir="${basedir}/target/test-classes">
-    		<fileset dir="${basedir}/../bonita-services-test-conf/src/test/resources" />
-    	</copy>
-    	<copy todir="${basedir}/target/test-classes/conf">
-    	    <fileset dir="${basedir}/src\test\resources\conf" />
+    	<copy todir="target/test-classes">
+    		<fileset dir="../bonita-services-test-conf/src/test/resources" />
     	</copy>
     </target>
 

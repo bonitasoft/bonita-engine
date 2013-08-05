@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2013 BonitaSoft S.A.
+ * Copyright (C) 2011 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,7 +17,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Baptiste Mesta
- * @author Celine Souchet
  */
 public class SActivityModificationException extends SBonitaException {
 
@@ -25,10 +24,6 @@ public class SActivityModificationException extends SBonitaException {
 
     public SActivityModificationException(final Throwable cause) {
         super(cause);
-    }
-
-    public SActivityModificationException(final String message, final Throwable e) {
-        super(message, e);
     }
 
 }

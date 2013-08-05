@@ -1,7 +1,6 @@
 -- ------------------------------------------------ Foreign Keys -----------------------------------------------
 ALTER TABLE actor DROP FOREIGN KEY fk_actor_tenantId;
 ALTER TABLE actormember DROP FOREIGN KEY fk_actormember_tenantId;
-ALTER TABLE actormember DROP FOREIGN KEY fk_actormember_actorId;
 -- ALTER TABLE queriable_log DROP FOREIGN KEY fk_queriable_log_tenantId;
 ALTER TABLE queriablelog_p DROP FOREIGN KEY fk_queriablelog_p_tenantId;
 ALTER TABLE category DROP FOREIGN KEY fk_category_tenantId;
@@ -27,7 +26,6 @@ ALTER TABLE message_instance DROP FOREIGN KEY fk_message_instance_tenantId;
 ALTER TABLE p_metadata_def DROP FOREIGN KEY fk_p_metadata_def_tenantId;
 ALTER TABLE p_metadata_val DROP FOREIGN KEY fk_p_metadata_val_tenantId;
 ALTER TABLE pending_mapping DROP FOREIGN KEY fk_pending_mapping_tenantId;
-ALTER TABLE pending_mapping DROP FOREIGN KEY fk_pending_mapping_flownode_instanceId;
 ALTER TABLE processcategorymapping DROP FOREIGN KEY fk_processcategorymapping_tenantId;
 ALTER TABLE process_comment DROP FOREIGN KEY fk_process_comment_tenantId;
 ALTER TABLE process_definition DROP FOREIGN KEY fk_process_definition_tenantId;

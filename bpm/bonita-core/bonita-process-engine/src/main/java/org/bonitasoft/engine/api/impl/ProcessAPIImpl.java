@@ -224,10 +224,8 @@ import org.bonitasoft.engine.core.category.exception.SCategoryAlreadyExistsExcep
 import org.bonitasoft.engine.core.category.exception.SCategoryInProcessAlreadyExistsException;
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
-import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryUpdateBuilder;
-import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilder;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -2020,6 +2018,19 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public void removeAllProcessDefinitionsFromCategory(final long categoryId) throws DeletionException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final CategoryService categoryService = tenantAccessor.getCategoryService();
+
+        final RemoveProcessDefinitionsOfCategory remove = new RemoveProcessDefinitionsOfCategory(categoryService, categoryId);
+        try {
+            remove.execute();
+        } catch (final SBonitaException sbe) {
+            throw new DeletionException(sbe);
+        }
+    }
+
+    @Override
     public long getNumberOfUncategorizedProcessDefinitions() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
@@ -2102,74 +2113,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Deprecated
     @Override
     public void removeAllCategoriesFromProcessDefinition(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
-                .getSProcessCategoryMappingBuilder();
-        final TransactionContent transactionContent = new RemoveProcessDefinitionsOfCategory(processDefinitionId, sProcessCategoryMappingBuilder,
-                categoryService);
+
+        final TransactionContent transactionContent = new RemoveProcessDefinitionsOfCategory(processDefinitionId, categoryService);
         try {
             transactionContent.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
-        }
-    }
-
-    @Deprecated
-    @Override
-    public void removeAllProcessDefinitionsFromCategory(final long categoryId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
-                .getSProcessCategoryMappingBuilder();
-        final RemoveProcessDefinitionsOfCategory remove = new RemoveProcessDefinitionsOfCategory(categoryService, sProcessCategoryMappingBuilder, categoryId);
-        try {
-            remove.execute();;
-        } catch (final SBonitaException sbe) {
-            throw new DeletionException(sbe);
-        }
-    }
-
-    @Override
-    public long removeCategoriesFromProcessDefinition(long processDefinitionId, int startIndex, int maxResults) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
-                .getSProcessCategoryMappingBuilder();
-
-        try {
-            final FilterOption filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getProcessIdKey(),
-                    processDefinitionId);
-            final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getIdKey(), OrderByType.ASC);
-            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Collections.singletonList(order),
-                    Collections.singletonList(filterOption), null);
-            final List<SProcessCategoryMapping> processCategoryMappings = categoryService.searchProcessCategoryMappings(queryOptions);
-            return categoryService.deleteProcessCategoryMappings(processCategoryMappings);
-        } catch (SBonitaException e) {
-            throw new DeletionException(e);
-        }
-    }
-
-    @Override
-    public long removeProcessDefinitionsFromCategory(long categoryId, int startIndex, int maxResults) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
-                .getSProcessCategoryMappingBuilder();
-
-        try {
-            final FilterOption filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getCategoryIdKey(),
-                    categoryId);
-            final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getIdKey(), OrderByType.ASC);
-            final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Collections.singletonList(order),
-                    Collections.singletonList(filterOption), null);
-            final List<SProcessCategoryMapping> processCategoryMappings = categoryService.searchProcessCategoryMappings(queryOptions);
-            return categoryService.deleteProcessCategoryMappings(processCategoryMappings);
-        } catch (SBonitaException e) {
-            throw new DeletionException(e);
         }
     }
 

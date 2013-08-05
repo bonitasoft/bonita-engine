@@ -851,14 +851,6 @@ public interface IdentityService {
     void deleteUser(long userId) throws SUserDeletionException;
 
     /**
-     * Delete all users for the connected tenant
-     * 
-     * @throws SUserDeletionException
-     * @since 6.1
-     */
-    void deleteAllUsers() throws SUserDeletionException;
-
-    /**
      * Delete the specific profileMetadataDefinition
      * 
      * @param metadataDefinition
@@ -915,14 +907,6 @@ public interface IdentityService {
     void deleteRole(long roleId) throws SRoleNotFoundException, SRoleDeletionException;
 
     /**
-     * Delete all roles for the connected tenant
-     * 
-     * @throws SRoleDeletionException
-     * @since 6.1
-     */
-    void deleteAllRoles() throws SRoleDeletionException;
-
-    /**
      * Delete the specific group
      * 
      * @param group
@@ -943,47 +927,22 @@ public interface IdentityService {
     void deleteGroup(long groupId) throws SGroupNotFoundException, SGroupDeletionException;
 
     /**
-     * Delete all groups for the connected tenant
-     * 
-     * @throws SGroupDeletionException
-     * @since 6.1
-     */
-    void deleteAllGroups() throws SGroupDeletionException;
-
-    /**
      * Delete the specific userMembership
      * 
      * @param userMembership
      *            The userMembership will be deleted
-     * @throws SMembershipDeletionException
+     * @throws SIdentityException
      */
-    void deleteUserMembership(SUserMembership userMembership) throws SMembershipDeletionException;
-
-    /**
-     * Delete the specific light userMembership
-     * 
-     * @param userMembership
-     * @throws SMembershipDeletionException
-     * @since 6.1
-     */
-    void deleteLightUserMembership(SUserMembership userMembership) throws SMembershipDeletionException;
+    void deleteUserMembership(SUserMembership userMembership) throws SIdentityException;
 
     /**
      * Delete the id specified userMembership
      * 
      * @param userMembershipId
      *            The identifier of userMembership
-     * @throws SMembershipDeletionException
+     * @throws SIdentityException
      */
-    void deleteUserMembership(long userMembershipId) throws SMembershipDeletionException;
-
-    /**
-     * Delete all user memberships for the connected tenant
-     * 
-     * @throws SMembershipDeletionException
-     * @since 6.1
-     */
-    void deleteAllUserMemberships() throws SMembershipDeletionException;
+    void deleteUserMembership(long userMembershipId) throws SIdentityException;
 
     /**
      * Get total number of users according to specific query options
