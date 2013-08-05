@@ -63,7 +63,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         loggerService = getServicesBuilder().buildQueriableLogger("syncQueriableLoggerService");
         logModelBuilder = getServicesBuilder().getInstanceOf(SQueriableLogModelBuilder.class);
         logbuilder = logModelBuilder.getQueriableLogBuilder();
-        persistenceService = getServicesBuilder().buildPersistence();
+        persistenceService = getServicesBuilder().buildTenantPersistenceService();
         qlSessionProvider = getServicesBuilder().getInstanceOf(MockQueriableLogSessionProviderImpl.class);
     }
 

@@ -27,6 +27,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public interface ProfileService {
 
@@ -440,7 +441,10 @@ public interface ProfileService {
             throws SProfileNotFoundException;
 
     /**
+     * Delete all profile members for the connected tenant
      * 
+     * @throws SProfileMemberDeletionException
+     * @since 6.1
      */
     void deleteAllProfileMembers() throws SProfileMemberDeletionException;
 

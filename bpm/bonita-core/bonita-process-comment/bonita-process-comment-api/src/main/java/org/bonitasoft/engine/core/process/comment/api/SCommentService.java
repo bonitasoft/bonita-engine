@@ -48,12 +48,12 @@ public interface SCommentService {
     /**
      * Number of all comments related to the specified query options.
      * 
-     * @param options
+     * @param queryOptions
      *            a QueryOptions object, containing some query conditions
      * @return number of all comments corresponding to the criteria.
      * @throws SBonitaSearchException
      */
-    long getNumberOfComments(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfComments(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Add a comment on process instance

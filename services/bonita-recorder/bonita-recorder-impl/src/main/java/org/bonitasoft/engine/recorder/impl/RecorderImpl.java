@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011,2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -25,6 +25,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.BatchInsertRecord;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
@@ -34,6 +35,7 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
 /**
  * @author Charles Souillard
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class RecorderImpl implements Recorder {
 
@@ -95,6 +97,20 @@ public class RecorderImpl implements Recorder {
     }
 
     @Override
+    public void recordDeleteAll(final DeleteAllRecord record) throws SRecorderException {
+        final String methodName = "recordDeleteAll";
+
+        traceBeforeMethod(methodName);
+        try {
+            persistenceService.deleteByTenant(record.getEntityClass(), record.getFilters());
+            traceAfterMethod(methodName);
+        } catch (final Exception e) {
+            traceException(methodName, e);
+            throw new SRecorderException(e);
+        }
+    }
+
+    @Override
     public void recordUpdate(final UpdateRecord record, final SUpdateEvent updateEvent) throws SRecorderException {
         String methodName = "recordUpdate";
 
@@ -120,11 +136,11 @@ public class RecorderImpl implements Recorder {
     private boolean isTraceLoggable() {
         return this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
     }
-    
+
     private void logTrace(String text) {
         this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, text);
     }
-    
+
     private void traceException(String methodName, final Exception e) {
         if (isTraceLoggable()) {
             logTrace(LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));

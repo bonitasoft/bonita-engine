@@ -1,6 +1,7 @@
 -- ------------------------------------------------ Foreign Keys -----------------------------------------------
 ALTER TABLE actor ADD CONSTRAINT fk_actor_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE actormember ADD CONSTRAINT fk_actormember_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
+ALTER TABLE actormember ADD CONSTRAINT fk_actormember_actorId FOREIGN KEY (actorId, tenantid) REFERENCES actor(id, tenantid);
 ALTER TABLE queriable_log ADD CONSTRAINT fk_queriable_log_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriablelog_p_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE category ADD CONSTRAINT fk_category_tenantId FOREIGN KEY (tenantid) REFERENCES tenant (id);
@@ -26,6 +27,7 @@ ALTER TABLE message_instance ADD CONSTRAINT fk_message_instance_tenantId FOREIGN
 ALTER TABLE p_metadata_def ADD CONSTRAINT fk_p_metadata_def_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE p_metadata_val ADD CONSTRAINT fk_p_metadata_val_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE pending_mapping ADD CONSTRAINT fk_pending_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
+ALTER TABLE pending_mapping ADD CONSTRAINT fk_pending_mapping_flownode_instanceId FOREIGN KEY (activityId, tenantid) REFERENCES flownode_instance(id, tenantid);
 ALTER TABLE processcategorymapping ADD CONSTRAINT fk_processcategorymapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE process_comment ADD CONSTRAINT fk_process_comment_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE process_definition ADD CONSTRAINT fk_process_definition_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
@@ -43,7 +45,6 @@ ALTER TABLE waiting_event ADD CONSTRAINT fk_waiting_event_tenantId FOREIGN KEY (
 ALTER TABLE profileentry ADD CONSTRAINT fk_profileentry_profileId FOREIGN KEY (tenantId, profileId) REFERENCES profile(tenantId, id);
 ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_profileId FOREIGN KEY (tenantId, profileId) REFERENCES profile(tenantId, id);
 -- ALTER TABLE process_comment	ADD	CONSTRAINT fk_process_comment_process_instanceId FOREIGN KEY (processInstanceId, tenantid) REFERENCES process_instance(id, tenantid);
-
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------

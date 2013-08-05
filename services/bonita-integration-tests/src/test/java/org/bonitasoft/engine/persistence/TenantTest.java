@@ -21,7 +21,7 @@ import org.bonitasoft.engine.persistence.model.Car;
 import org.bonitasoft.engine.persistence.model.Child;
 import org.bonitasoft.engine.persistence.model.Human;
 import org.bonitasoft.engine.persistence.model.Parent;
-import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.TenantPersistenceService;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
@@ -29,10 +29,10 @@ import org.junit.Test;
 
 public class TenantTest extends CommonServiceTest {
 
-    private static PersistenceService persistenceService;
+    private static TenantPersistenceService persistenceService;
 
     static {
-        persistenceService = getServicesBuilder().buildPersistence();
+        persistenceService = getServicesBuilder().buildTenantPersistenceService();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testSimpleStorage() throws Exception {
+    public void simpleStorage() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -58,7 +58,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testSelectById() throws Exception {
+    public void selectById() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -72,7 +72,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testSequence() throws Exception {
+    public void sequence() throws Exception {
 
         // Sequence id must be reinitialized.
         TestUtil.deleteDefaultTenantAndPlatForm(getTransactionService(), getPlatformService(), getSessionAccessor(), getSessionService());
@@ -113,7 +113,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testSequenceLimit() throws Exception {
+    public void sequenceLimit() throws Exception {
         getTransactionService().begin();
 
         final int numberOfInserts = 105;
@@ -129,7 +129,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testDeleteEntityFromObject() throws Exception {
+    public void deleteEntityFromObject() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -143,7 +143,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testDeleteEntityFromIdInSameTransaction() throws Exception {
+    public void deleteEntityFromIdInSameTransaction() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -157,27 +157,39 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testDeleteEntityFromIdInSeparateTransaction() throws Exception {
+    public void deleteEntitiesByTenantIdInSeparateTransaction() throws Exception {
+        // First create the entities in the DB
         getTransactionService().begin();
-        final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
-        persistenceService.insert(human);
+        final Human human1 = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
+        persistenceService.insert(human1);
+        final Human human2 = PersistenceTestUtil.buildHuman("parent2FN", "parent2LN", 54);
+        persistenceService.insert(human2);
+        final Human human3 = PersistenceTestUtil.buildHuman("parent3FN", "parent3LN", 459);
+        persistenceService.insert(human3);
         getTransactionService().complete();
 
+        // Ensure in a separate transaction that they are correctly inserted
         getTransactionService().begin();
-        assertNotNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human.getId())));
+        assertNotNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
+        assertNotNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human2.getId())));
+        assertNotNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human3.getId())));
         getTransactionService().complete();
 
+        // Delete them all.
         getTransactionService().begin();
-        persistenceService.delete(human.getId(), Human.class);
+        persistenceService.deleteByTenant(Human.class, new ArrayList<FilterOption>());
         getTransactionService().complete();
 
+        // Ensure in a separate transaction that they are correctly deleted
         getTransactionService().begin();
-        assertNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human.getId())));
+        assertNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
+        assertNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human2.getId())));
+        assertNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human3.getId())));
         getTransactionService().complete();
     }
 
     @Test
-    public void testDeleteAllInSameTransaction() throws Exception {
+    public void deleteAllInSameTransaction() throws Exception {
         // First create the entities in the DB
         getTransactionService().begin();
         final Human human1 = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -199,7 +211,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testDeleteAllInSeparateTransaction() throws Exception {
+    public void deleteAllInSeparateTransaction() throws Exception {
         // First create the entities in the DB
         getTransactionService().begin();
         final Human human1 = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -227,7 +239,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testDeleteByIdsInSameTransaction() throws Exception {
+    public void deleteByIdsInSameTransaction() throws Exception {
         getTransactionService().begin();
 
         final Human human1 = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -249,32 +261,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testDeleteByIdsInSeparateTransaction() throws Exception {
-        final Human human1 = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
-        final Human human2 = PersistenceTestUtil.buildHuman("parent2FN", "parent2LN", 54);
-        getTransactionService().begin();
-        persistenceService.insert(human1);
-        persistenceService.insert(human2);
-        getTransactionService().complete();
-
-        getTransactionService().begin();
-        assertNotNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
-        assertNotNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human2.getId())));
-        getTransactionService().complete();
-
-        final List<Long> ids = Arrays.asList(human1.getId(), human2.getId());
-        getTransactionService().begin();
-        persistenceService.delete(ids, Human.class);
-        getTransactionService().complete();
-
-        getTransactionService().begin();
-        assertNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
-        assertNull(persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human2.getId())));
-        getTransactionService().complete();
-    }
-
-    @Test
-    public void testVerySimpleStorage() throws Exception {
+    public void verySimpleStorage() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -287,7 +274,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testGetOnlyChildren() throws Exception {
+    public void getOnlyChildren() throws Exception {
         getTransactionService().begin();
 
         final Parent parent = PersistenceTestUtil.buildParent("paretnFN", "parentLN", 12);
@@ -306,7 +293,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testGetAllHumans() throws Exception {
+    public void getAllHumans() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("humanFN", "humanLN", 12);
@@ -327,7 +314,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testOrderByAsc() throws Exception {
+    public void orderByAsc() throws Exception {
         getTransactionService().begin();
         final Human human1 = PersistenceTestUtil.buildHuman("aaa1", "humanLN", 12);
         final Human human2 = PersistenceTestUtil.buildHuman("aaa2", "humanLN", 12);
@@ -353,7 +340,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testInsertInBatch() throws Exception {
+    public void insertInBatch() throws Exception {
         getTransactionService().begin();
 
         final Human human1 = PersistenceTestUtil.buildHuman("aaa1", "humanLN", 12);
@@ -382,7 +369,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testOrderByDesc() throws Exception {
+    public void orderByDesc() throws Exception {
         getTransactionService().begin();
 
         final Human human1 = PersistenceTestUtil.buildHuman("aaa1", "humanLN", 12);
@@ -412,7 +399,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testInsertAndDelete() throws Exception {
+    public void insertAndDelete() throws Exception {
         getTransactionService().begin();
 
         final Human human1 = PersistenceTestUtil.buildHuman("Homer", "Simpson", 42);
@@ -441,7 +428,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testMultiOrderBy() throws Exception {
+    public void multiOrderBy() throws Exception {
         getTransactionService().begin();
 
         final Human human1 = PersistenceTestUtil.buildHuman("aaa3", "bbb1", 12);
@@ -473,7 +460,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testOrderByOtherTable() throws Exception {
+    public void orderByOtherTable() throws Exception {
         // checks if we can order by a column on another table than the object we retrieve
         // example: retrieve all parents order by child.firstname
         getTransactionService().begin();
@@ -560,7 +547,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testGetNumberOf() throws Exception {
+    public void getNumberOf() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("humanFN", "humanLN", 12);
@@ -582,7 +569,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testUpdateEntityField() throws Exception {
+    public void updateEntityField() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -599,7 +586,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testUpdateEntityFieldToEmpty() throws Exception {
+    public void updateEntityFieldToEmpty() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -619,7 +606,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testUpdateEntityFieldToNull() throws Exception {
+    public void updateEntityFieldToNull() throws Exception {
         getTransactionService().begin();
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
         persistenceService.insert(human);
@@ -635,7 +622,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testUpdateEntityFields() throws Exception {
+    public void updateEntityFields() throws Exception {
         getTransactionService().begin();
 
         final Human human = PersistenceTestUtil.buildHuman("parent1FN", "parent1LN", 45);
@@ -663,7 +650,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testParentRelation() throws Exception {
+    public void parentRelation() throws Exception {
         getTransactionService().begin();
 
         final Parent parent = PersistenceTestUtil.buildParent("parent1FN", "parent1LN", 45);
@@ -712,7 +699,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testGetListWithCollectionParameter() throws Exception {
+    public void getListWithCollectionParameter() throws Exception {
         getTransactionService().begin();
 
         final Parent parent = PersistenceTestUtil.buildParent("parent1FN", "parent1LN", 45);
@@ -856,7 +843,7 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void testPurge() throws Exception {
+    public void purge() throws Exception {
         getTransactionService().begin();
         final Human human = PersistenceTestUtil.buildHuman("Matti", "Makela", 27);
         human.setDeleted(true);

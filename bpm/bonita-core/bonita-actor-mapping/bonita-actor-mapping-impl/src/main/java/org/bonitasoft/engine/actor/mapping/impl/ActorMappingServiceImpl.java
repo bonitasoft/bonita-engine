@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,7 +40,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -54,6 +53,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -479,18 +479,11 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public void deleteAllActorMembers() throws SActorMemberDeletionException {
-        List<SActorMember> actorMembers;
         try {
-            do {
-                actorMembers = getActorMembers(0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, null, null);
-                for (final SActorMember actorMember : actorMembers) {
-                    removeActorMember(actorMember.getId());
-                }
-            } while (actorMembers.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-        } catch (final SBonitaReadException e) {
-            throw new SActorMemberDeletionException(e);
-        } catch (final SActorMemberNotFoundException e) {
-            throw new SActorMemberDeletionException(e);
+            final DeleteAllRecord record = new DeleteAllRecord(SActorMember.class, null);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SActorMemberDeletionException("Can't delete all actor members.", e);
         }
     }
 
