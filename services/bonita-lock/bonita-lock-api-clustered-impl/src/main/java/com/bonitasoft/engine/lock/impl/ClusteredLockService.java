@@ -18,7 +18,7 @@ import com.hazelcast.core.ILock;
 
 /**
  * create and release locks using hazelcast
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ClusteredLockService implements LockService {
@@ -63,6 +63,7 @@ public class ClusteredLockService implements LockService {
         } catch (final Exception e) {
             throw new SLockException(e);
         }
+    }
 
     private String buildKey(final long objectToLockId, final String objectType) throws SLockException {
         return objectType + SEPARATOR + objectToLockId;
