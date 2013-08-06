@@ -31,10 +31,6 @@ public class ExecuteTransitionWork extends TxBonitaWork {
 
     private final ContainerExecutor containerExecutor;
 
-    /**
-     * @param sDefinition
-     * @param sTransitionInstance
-     */
     public ExecuteTransitionWork(final ContainerExecutor containerExecutor, final SProcessDefinition sDefinition, final STransitionInstance sTransitionInstance) {
         this.containerExecutor = containerExecutor;
         this.sDefinition = sDefinition;
@@ -50,4 +46,5 @@ public class ExecuteTransitionWork extends TxBonitaWork {
     public String getDescription() {
         return getClass().getSimpleName() + ": transitionInstanceId:" + sTransitionInstance.getId();
     }
+
 }
