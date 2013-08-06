@@ -537,6 +537,18 @@
 		AND s.eventType = 'START_EVENT'
 	</query>
 
+	<query name="getInProgressMessageInstances">
+		SELECT m
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
+		WHERE m.handled = true
+	</query>
+
+	<query name="getInProgressWaitingEvents">
+		SELECT s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s
+		WHERE s.progress = 1
+	</query>
+
 	<query name="getNumberOfSWaitingEvent">
 		SELECT COUNT(s)
 		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s

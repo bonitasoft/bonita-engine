@@ -105,8 +105,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         try {
             final InsertRecord insertRecord = new InsertRecord(eventInstance);
             SInsertEvent insertEvent = null;
-            if (this.eventService.hasHandlers(EVENT_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) this.eventBuilders.getEventBuilder().createInsertEvent(EVENT_INSTANCE).setObject(eventInstance).done();
+            if (eventService.hasHandlers(EVENT_INSTANCE, EventActionType.CREATED)) {
+                insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(EVENT_INSTANCE).setObject(eventInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(eventInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createEventInstance");
@@ -116,8 +116,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         }
 
         getLogger().log(this.getClass(), TechnicalLogSeverity.INFO,
-                "Created " + eventInstance.getType().getValue() + " <" + eventInstance.getName() + "> with id <"
-                        + eventInstance.getId() + ">");
+                "Created " + eventInstance.getType().getValue() + " <" + eventInstance.getName() + "> with id <" + eventInstance.getId() + ">");
     }
 
     @Override
@@ -177,9 +176,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         try {
             final InsertRecord insertRecord = new InsertRecord(eventTriggerInstance);
             SInsertEvent insertEvent = null;
-            if (this.eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) this.eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance)
-                        .done();
+            if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.CREATED)) {
+                insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createEventTriggerInstance");
@@ -233,8 +231,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         try {
             final InsertRecord insertRecord = new InsertRecord(waitingEvent);
             SInsertEvent insertEvent = null;
-            if (this.eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) this.eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent).done();
+            if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.CREATED)) {
+                insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(waitingEvent.getId(), SQueriableLog.STATUS_OK, logBuilder, "createWaitingEvent");
@@ -273,8 +271,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         try {
             final InsertRecord insertRecord = new InsertRecord(messageInstance);
             SInsertEvent insertEvent = null;
-            if (this.eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) this.eventBuilders.getEventBuilder().createInsertEvent(MESSAGE_INSTANCE).setObject(messageInstance).done();
+            if (eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.CREATED)) {
+                insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(MESSAGE_INSTANCE).setObject(messageInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
@@ -286,8 +284,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
     public void deleteMessageInstance(final SMessageInstance messageInstance) throws SMessageModificationException {
         try {
             SDeleteEvent deleteEvent = null;
-            if (this.eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) this.eventBuilders.getEventBuilder().createDeleteEvent(MESSAGE_INSTANCE).setObject(messageInstance).done();
+            if (eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.DELETED)) {
+                deleteEvent = (SDeleteEvent) eventBuilders.getEventBuilder().createDeleteEvent(MESSAGE_INSTANCE).setObject(messageInstance).done();
             }
             getRecorder().recordDelete(new DeleteRecord(messageInstance), deleteEvent);
         } catch (final SRecorderException e) {
@@ -300,7 +298,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         final SWaitingEventLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting wating event");
         try {
             SDeleteEvent deleteEvent = null;
-            if (this.eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.DELETED)) {
+            if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.DELETED)) {
                 deleteEvent = (SDeleteEvent) getEventService().getEventBuilder().createDeleteEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent).done();
             }
             final DeleteRecord deleteRecord = new DeleteRecord(waitingEvent);
@@ -360,8 +358,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             final SWaitingMessageEvent oldWaitingMessage = getInstanceBuilders().getSWaitingMessageEventBuilder().createNewInstance(waitingMessageEvent).done();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(waitingMessageEvent, descriptor);
             SUpdateEvent updateEvent = null;
-            if (this.eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) this.eventBuilders.getEventBuilder().createUpdateEvent(MESSAGE_INSTANCE).setObject(waitingMessageEvent).done();
+            if (eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) eventBuilders.getEventBuilder().createUpdateEvent(MESSAGE_INSTANCE).setObject(waitingMessageEvent).done();
                 updateEvent.setOldObject(oldWaitingMessage);
             }
             getRecorder().recordUpdate(updateRecord, updateEvent);
@@ -378,8 +376,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             final SMessageInstance oldMessage = getInstanceBuilders().getSMessageInstanceBuilder().createNewInstance(messageInstance).done();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(messageInstance, descriptor);
             SUpdateEvent updateEvent = null;
-            if (this.eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) this.eventBuilders.getEventBuilder().createUpdateEvent(MESSAGE_INSTANCE).setObject(oldMessage).done();
+            if (eventService.hasHandlers(MESSAGE_INSTANCE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) eventBuilders.getEventBuilder().createUpdateEvent(MESSAGE_INSTANCE).setObject(oldMessage).done();
                 updateEvent.setOldObject(oldMessage);
             }
             getRecorder().recordUpdate(updateRecord, updateEvent);
@@ -395,6 +393,29 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             return getPersistenceRead().selectList(descriptor);
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
+        }
+    }
+
+    @Override
+    public List<SMessageInstance> getInProgressMessageInstances() throws SMessageInstanceReadException {
+        try {
+            return getPersistenceRead()
+                    .selectList(
+                            new SelectListDescriptor<SMessageInstance>("getInProgressMessageInstances", Collections.<String, Object> emptyMap(),
+                                    SMessageInstance.class));
+        } catch (final SBonitaReadException e) {
+            throw new SMessageInstanceReadException(e);
+        }
+    }
+
+    @Override
+    public List<SWaitingMessageEvent> getInProgressWaitingMessageEvents() throws SWaitingEventReadException {
+        try {
+            return getPersistenceRead().selectList(
+                    new SelectListDescriptor<SWaitingMessageEvent>("getInProgressWaitingEvents", Collections.<String, Object> emptyMap(),
+                            SWaitingMessageEvent.class));
+        } catch (final SBonitaReadException e) {
+            throw new SWaitingEventReadException(e);
         }
     }
 
@@ -465,8 +486,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
         final SQueriableLog log = logBuilder.done();
-        if (this.queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            this.queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
+        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
+            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 
@@ -506,8 +527,8 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
     public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException {
         final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, getInstanceBuilders().getSWaitingMessageEventBuilder().getFlowNodeNameKey(),
                 OrderByType.ASC);
-        final FilterOption filterOption = new FilterOption(SWaitingEvent.class,
-                getInstanceBuilders().getSWaitingMessageEventBuilder().getFlowNodeInstanceIdKey(), flowNodeInstance.getId());
+        final FilterOption filterOption = new FilterOption(SWaitingEvent.class, getInstanceBuilders().getSWaitingMessageEventBuilder()
+                .getFlowNodeInstanceIdKey(), flowNodeInstance.getId());
         final List<FilterOption> filters = Collections.singletonList(filterOption);
         try {
             QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption), filters, null);
