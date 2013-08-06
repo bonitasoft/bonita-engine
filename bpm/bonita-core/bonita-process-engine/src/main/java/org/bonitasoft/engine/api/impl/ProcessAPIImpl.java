@@ -3220,7 +3220,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            startedInstance = processExecutor.start(sProcessDefinition, starterId, getUserIdFromSession(), sOperations, operationContext);
+            startedInstance = processExecutor.start(sProcessDefinition, starterId, getUserIdFromSession(), sOperations, operationContext, null);
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }// FIXME in case process instance creation exception -> put it in failed
@@ -3436,7 +3436,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(activityInstance.getLogicalGroup(0), processDefinitionService);
             getProcessDefinition.execute();
             // set state
-            flowNodeExecutor.setStateByStateId(getProcessDefinition.getResult(), activityInstance, stateId);
+            flowNodeExecutor.setStateByStateId(getProcessDefinition.getResult(), activityInstance.getId(), stateId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
@@ -4832,7 +4832,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     + " that was in state " + flowNodeState);
         }
         try {
-            flowNodeExecutor.setStateByStateId(processDefinition, activity, stateId);
+            flowNodeExecutor.setStateByStateId(processDefinition, activity.getId(), stateId);
             // execute the flow node only if it is not the final state
             if (!state.isTerminal()) {
                 final long userIdFromSession = getUserIdFromSession();

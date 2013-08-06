@@ -166,8 +166,6 @@ public class StateBehaviors {
 
     private final OperationService operationService;
 
-    private ProcessExecutor processExecutor;
-
     private final WorkService workService;
 
     private final ContainerRegistry containerRegistry;
@@ -543,9 +541,7 @@ public class StateBehaviors {
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
         final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
         final OperationsWithContext operations = new OperationsWithContext(context, operationList);
-        final SProcessDefinition targetSProcessDefinition = processDefinitionService.getProcessDefinition(targetProcessDefinitionId);
-        final InstantiateProcessWork instantiateProcessWork = new InstantiateProcessWork(targetSProcessDefinition, operations, processExecutor,
-                processInstanceService, activityInstanceService, null, logger, bpmInstancesCreator);
+        final InstantiateProcessWork instantiateProcessWork = new InstantiateProcessWork(targetProcessDefinitionId, operations);
         instantiateProcessWork.setCallerId(callerId);
         workService.registerWork(instantiateProcessWork);
     }
@@ -654,10 +650,6 @@ public class StateBehaviors {
                 throw new SActivityStateExecutionException("unable to handle throw event " + flowNodeInstance, e);
             }
         }
-    }
-
-    public void setProcessExecutor(final ProcessExecutor processExecutor) {
-        this.processExecutor = processExecutor;
     }
 
     public void executeChildrenActivities(final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {

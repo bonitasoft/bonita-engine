@@ -70,6 +70,7 @@ import org.bonitasoft.engine.exceptions.ExceptionsManager;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -389,6 +390,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
+    public TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor() {
+        return accessor.getInstanceOf(TransactionalProcessInstanceInterruptor.class);
+    }
+
+    @Override
     public FlowNodeStateManager getFlowNodeStateManager() {
         return accessor.getInstanceOf(FlowNodeStateManager.class);
     }
@@ -638,12 +644,10 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     public PlatformCacheService getPlatformCacheService() {
         return accessor.getInstanceOf(PlatformCacheService.class);
     }
-    
+
     @Override
     public ReadSessionAccessor getReadSessionAccessor() {
-    	return accessor.getInstanceOf(ReadSessionAccessor.class);
+        return accessor.getInstanceOf(ReadSessionAccessor.class);
     }
-
-    
 
 }

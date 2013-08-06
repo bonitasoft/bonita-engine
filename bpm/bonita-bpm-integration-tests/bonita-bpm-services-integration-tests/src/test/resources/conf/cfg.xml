@@ -224,6 +224,15 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 	
+	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
+		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="processInstanceService" ref="processInstanceService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+		<constructor-arg name="processExecutor" ref="processExecutor" />
+		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+	</bean>
+	
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
         <property name="shouldStartScheduler" value="true" />
         <property name="shouldRestartElements" value="true" />

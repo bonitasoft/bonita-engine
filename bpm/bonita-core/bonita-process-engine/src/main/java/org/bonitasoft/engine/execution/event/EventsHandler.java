@@ -65,7 +65,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.work.InstantiateProcessWork;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
@@ -100,8 +99,6 @@ public class EventsHandler {
     private final ProcessDefinitionService processDefinitionService;
 
     private final TokenService tokenService;
-
-    private ProcessExecutor processExecutor;
 
     private final EventInstanceService eventInstanceService;
 
@@ -140,14 +137,6 @@ public class EventsHandler {
                 containerRegistry, lockService, logger));
         handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(instanceBuilders, eventInstanceService, processInstanceService, containerRegistry,
                 lockService, processDefinitionService, this, logger));
-    }
-
-    /**
-     * @param processExecutor
-     *            the processExecutor to set
-     */
-    public void setProcessExecutor(final ProcessExecutor processExecutor) {
-        this.processExecutor = processExecutor;
     }
 
     /**
@@ -341,7 +330,7 @@ public class EventsHandler {
     }
 
     private void triggerInTransaction(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
-            final OperationsWithContext operations, final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId,
+            final OperationsWithContext operations, final long subProcessId, final long parentProcessInstanceId, final Long rootProcessInstanceId,
             final Boolean isInterrupting) throws SBonitaException {
         final TransactionContent transactionContent = new TransactionContent() {
 
@@ -373,7 +362,7 @@ public class EventsHandler {
     }
 
     private void triggerCatchStartEventSubProcess(final SEventTriggerType triggerType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
-            final OperationsWithContext operations, final long subProcessId, final Long parentProcessInstanceId, final Long rootProcessInstanceId,
+            final OperationsWithContext operations, final long subProcessId, final long parentProcessInstanceId, final Long rootProcessInstanceId,
             final Boolean isInterrupting) throws SBonitaException {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(subProcessId);
@@ -383,9 +372,7 @@ public class EventsHandler {
         // FIXME: the token count will be inconsistent if a ProcessExecutor.childReachedState is called at same time.
         final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
         tokenService.createToken(parentProcessInstanceId, parentProcessInstance.getProcessDefinitionId(), null);
-        final InstantiateProcessWork work;
-        work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations, processExecutor,
-                processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator);
+        final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionId, operations);
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
@@ -393,8 +380,8 @@ public class EventsHandler {
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         } else if (isInterrupting) {
             // other interrupting catch
-            work.setIdOfTheProcessToInterrupt(parentProcessInstanceId);
-            work.setSubProcflowNodeInstance(subProcflowNodeInstance);
+            work.setProcessToInterruptId(parentProcessInstanceId);
+            work.setSubProcflowNodeInstanceId(subProcflowNodeInstance.getId());
         }
         work.setCallerId(subProcflowNodeInstance.getId());
         work.setSubProcessId(subProcessId);
@@ -425,8 +412,7 @@ public class EventsHandler {
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
             throws WorkRegisterException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations,
-                processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator);
+        final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionId, operations);
         work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
         workService.registerWork(work);
     }
