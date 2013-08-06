@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.event;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -21,8 +22,11 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
-public class OperationsWithContext {
+public class OperationsWithContext implements Serializable {
+
+    private static final long serialVersionUID = 6034976719148086546L;
 
     private final SExpressionContext context;
 

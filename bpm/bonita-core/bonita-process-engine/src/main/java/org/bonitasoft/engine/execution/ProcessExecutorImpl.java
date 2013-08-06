@@ -50,6 +50,8 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
@@ -75,7 +77,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
@@ -222,7 +223,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.tokenService = tokenService;
         this.bpmDefinitionBuilders = bpmDefinitionBuilders;
         this.transactionService = transactionService;
-        flowNodeStateManager.setProcessExecutor(this);
         this.logger = logger;
         this.flowNodeExecutor = flowNodeExecutor;
         this.transactionExecutor = transactionExecutor;
@@ -242,7 +242,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.lockService = lockService;
         this.eventsHandler = eventsHandler;
-        eventsHandler.setProcessExecutor(this);
         for (final Entry<String, SProcessInstanceHandler<SEvent>> handler : handlers.entrySet()) {
             try {
                 handler.getValue().setProcessInstanceService(processInstanceService);
@@ -503,21 +502,21 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 instanceBuilders, bpmInstancesCreator, bpmDefinitionBuilders, containerRegistry);
     }
 
-    private void initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final SProcessDefinition sDefinition,
+    private void initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final SProcessDefinition sProcessDefinition,
             final long flowNodeDefinitionId, final long targetSFlowNodeDefinitionId) {
         try {
             List<SFlowNodeDefinition> flownNodeDefinitions;
             if (flowNodeDefinitionId == -1) {
-                flownNodeDefinitions = getStartNodes(sDefinition, targetSFlowNodeDefinitionId);// FIXME replace by the real search
+                flownNodeDefinitions = getStartNodes(sProcessDefinition, targetSFlowNodeDefinitionId);// FIXME replace by the real search
             } else {
-                flownNodeDefinitions = getStartNodes(sDefinition, flowNodeDefinitionId, targetSFlowNodeDefinitionId);
+                flownNodeDefinitions = getStartNodes(sProcessDefinition, flowNodeDefinitionId, targetSFlowNodeDefinitionId);
             }
             long rootProcessInstanceId = sProcessInstance.getRootProcessInstanceId();
             if (rootProcessInstanceId <= 0) {
                 rootProcessInstanceId = sProcessInstance.getId();
             }
-            bpmInstancesCreator.createFlowNodeInstances(sDefinition, rootProcessInstanceId, sProcessInstance.getId(), flownNodeDefinitions,
-                    rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL, sDefinition.getId());
+            bpmInstancesCreator.createFlowNodeInstances(sProcessDefinition, rootProcessInstanceId, sProcessInstance.getId(), flownNodeDefinitions,
+                    rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL, sProcessDefinition.getId());
         } catch (final SBonitaException e) {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             throw new RuntimeException(e);
@@ -691,23 +690,23 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected boolean initialize(final long userId, final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance,
+    protected boolean initialize(final long userId, final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
             throws SProcessInstanceCreationException {
         try {
             // Create SDataInstances
-            bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sDefinition, expressionContext, operations, context);
-            createDocuments(sDefinition, sProcessInstance, userId);
+            bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
+            createDocuments(sProcessDefinition, sProcessInstance, userId);
             if (connectors != null) {
-                executeConnectors(sDefinition, sProcessInstance, connectors);
+                executeConnectors(sProcessDefinition, sProcessInstance, connectors);
             }
             executeOperations(operations, context, sProcessInstance);
 
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
 
-            return executeConnectors(sDefinition, sProcessInstance, ConnectorEvent.ON_ENTER, connectorService);
+            return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER, connectorService);
         } catch (final SProcessInstanceCreationException e) {
             throw e;
         } catch (final SBonitaException e) {
@@ -783,14 +782,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public void childFinished(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final FlowNodeState state, final long parentId)
-            throws SBonitaException {
-        SProcessInstance sProcessInstance;
+    public void childFinished(long processDefinitionId, long flowNodeInstanceId, final int stateId, final long parentId) throws SBonitaException {
+        final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SUserTaskInstanceBuilder flowNodeKeyProvider = bpmInstancesCreator.getBPMInstanceBuilders().getUserTaskInstanceBuilder();
-        final long processInstanceId = child.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
+        final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
         if (!lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name())) {// lock process in order to avoid hit 2 times at the same time
-            NotifyChildFinishedWork runnable = new NotifyChildFinishedWork(containerRegistry, sProcessDefinition, child, state);
+            final NotifyChildFinishedWork runnable = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId,
+                    sFlowNodeInstanceChild.getParentContainerId(), sFlowNodeInstanceChild.getParentContainerType().name(), stateId);
             try {
                 logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
                 Thread.sleep(50);
@@ -802,13 +802,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, processInstanceId, SFlowElementsContainerType.PROCESS.name()));
         try {
-            sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-
-            final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, child, sProcessInstance);
+            SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+            final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
             if (tokensOfProcess == 0) {
                 boolean hasActionsToExecute = false;
                 if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
-                    hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, child);
+                    hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, sFlowNodeInstanceChild);
                     // the process instance has maybe changed
                     if (hasActionsToExecute) {
                         sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
@@ -818,7 +817,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 handleProcessCompletion(sProcessDefinition, sProcessInstance, hasActionsToExecute);
             }
         } catch (SBonitaException e) {
-            flowNodeExecutor.setFlowNodeFailedInTransaction(child, sProcessDefinition, e);
+            flowNodeExecutor.setFlowNodeFailedInTransaction(sFlowNodeInstanceChild, sProcessDefinition, e);
         }
     }
 
@@ -1110,30 +1109,32 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
-            final List<SOperation> operations, final Map<String, Object> context) throws SFlowNodeReadException, SActivityExecutionFailedException,
-            SFlowNodeExecutionException, SProcessInstanceCreationException {
-        return start(sProcessDefinition, -1, starterId, starterDelegateId, null, operations, context, null, -1, -1);
-    }
-
-    @Override
-    public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long starterId, final long starterDelegateId,
-            final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context) throws SFlowNodeReadException,
-            SActivityExecutionFailedException, SFlowNodeExecutionException, SProcessInstanceCreationException {
-        return start(sProcessDefinition, -1, starterId, starterDelegateId, expressionContext, operations, context, null, -1, -1);
-    }
-
-    @Override
-    public SProcessInstance start(final SProcessDefinition processDefinition, final long starterId, final long starterDelegateId,
             final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
-            throws SFlowNodeReadException, SProcessInstanceCreationException, SFlowNodeExecutionException {
-        return start(processDefinition, -1, starterId, starterDelegateId, null, operations, context, connectorsWithInput, -1, -1);
+            throws SProcessInstanceCreationException {
+        return start(sProcessDefinition, -1, starterId, starterDelegateId, null, operations, context, connectorsWithInput, -1, -1);
+    }
+
+    @Override
+    public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final long starterId,
+            final long starterDelegateId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
+            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId, final long subProcessDefinitionId)
+            throws SProcessInstanceCreationException {
+        try {
+            final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            return start(sProcessDefinition, targetSFlowNodeDefinitionId, starterId, starterDelegateId, expressionContext, operations, context,
+                    connectorsWithInput, callerId, subProcessDefinitionId);
+        } catch (final SProcessDefinitionNotFoundException e) {
+            throw new SProcessInstanceCreationException(e);
+        } catch (final SProcessDefinitionReadException e) {
+            throw new SProcessInstanceCreationException(e);
+        }
     }
 
     @Override
     public SProcessInstance start(final SProcessDefinition sProcessDefinition, final long targetSFlowNodeDefinitionId, final long starterId,
             final long starterDelegateId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final long subProcessDefinitionId)
-            throws SProcessInstanceCreationException, SFlowNodeReadException, SFlowNodeExecutionException {
+            throws SProcessInstanceCreationException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", sProcessDefinition.getId());
@@ -1221,13 +1222,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public SProcessInstance startElements(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance)
-            throws SProcessInstanceCreationException, SFlowNodeReadException, SFlowNodeExecutionException {
+            throws SProcessInstanceCreationException, SFlowNodeExecutionException, SFlowNodeReadException {
         return startElements(sDefinition, sProcessInstance, -1, -1);
     }
 
     @Override
     public SProcessInstance startElements(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long subProcessDefinitionId,
-            final long targetSFlowNodeDefinitionId) throws SFlowNodeReadException, SProcessInstanceCreationException, SFlowNodeExecutionException {
+            final long targetSFlowNodeDefinitionId) throws SProcessInstanceCreationException, SFlowNodeExecutionException, SFlowNodeReadException {
         initializeFirstExecutableElements(sProcessInstance, sDefinition, subProcessDefinitionId, targetSFlowNodeDefinitionId);
         // process is initialized and now the engine trigger jobs to execute other activities, give the hand back
         final List<SFlowNodeInstance> flowNodeInstances = activityInstanceService.getActiveFlowNodes(sProcessInstance.getId());

@@ -70,6 +70,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -112,6 +113,8 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
+ * 
  */
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
@@ -248,10 +251,12 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private DefaultCommandProvider commandProvider;
 
     private WorkService workService;
-    
+
     private SessionService sessionService;
-    
+
     private ReadSessionAccessor readSessionAccessor;
+
+    private TransactionalProcessInstanceInterruptor transactionalProcessInstanceInterruptor;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -260,20 +265,20 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public ReadSessionAccessor getReadSessionAccessor() {
-    	if (readSessionAccessor == null) {
-    		readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
+        if (readSessionAccessor == null) {
+            readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
         }
         return readSessionAccessor;
     }
-    
+
     @Override
     public SessionService getSessionService() {
-    	if (sessionService == null) {
-    		sessionService = beanAccessor.getService(SessionService.class);
+        if (sessionService == null) {
+            sessionService = beanAccessor.getService(SessionService.class);
         }
         return sessionService;
     }
-    
+
     @Override
     public IdentityModelBuilder getIdentityModelBuilder() {
         if (identityModelBuilder == null) {
@@ -392,6 +397,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             processExecutor = beanAccessor.getService(ProcessExecutor.class);
         }
         return processExecutor;
+    }
+
+    @Override
+    public TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor() {
+        if (transactionalProcessInstanceInterruptor == null) {
+            transactionalProcessInstanceInterruptor = beanAccessor.getService(TransactionalProcessInstanceInterruptor.class);
+        }
+        return transactionalProcessInstanceInterruptor;
     }
 
     @Override
