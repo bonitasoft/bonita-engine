@@ -840,4 +840,31 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throw new SDeleteDataInstanceException("Impossible to delete data instance", e);
         }
     }
+
+    @Override
+    public void deleteLocalArchivedDataInstances(final long containerId, final String dataInstanceContainerType) throws SDataInstanceException {
+        List<SADataInstance> sDataInstances;
+        do {
+            sDataInstances = getLocalSADataInstances(containerId, dataInstanceContainerType, 0, 100);
+            for (final SADataInstance sDataInstance : sDataInstances) {
+                deleteSADataInstance(sDataInstance);
+            }
+        } while (!sDataInstances.isEmpty());
+    }
+
+    @Override
+    public void deleteLocalDataInstances(final long containerId, final String dataInstanceContainerType, final boolean dataPresent)
+            throws SDataInstanceException {
+        if (dataPresent) {
+            final int deleteBatchSize = 80;
+            List<SDataInstance> sDataInstances = getLocalDataInstances(containerId, dataInstanceContainerType, 0, deleteBatchSize);
+            while (sDataInstances.size() > 0) {
+                for (final SDataInstance sDataInstance : sDataInstances) {
+                    deleteDataInstance(sDataInstance);
+                }
+                sDataInstances = getLocalDataInstances(containerId, dataInstanceContainerType, 0, deleteBatchSize);
+            }
+        }
+        removeContainer(containerId, dataInstanceContainerType);
+    }
 }

@@ -8,6 +8,7 @@
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="systemCommentType">
             <map>
                 <entry key="STATE_CHANGE" value="true" />

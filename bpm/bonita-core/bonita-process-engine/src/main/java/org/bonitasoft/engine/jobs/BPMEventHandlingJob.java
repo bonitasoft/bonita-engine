@@ -15,46 +15,57 @@ package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.bonitasoft.engine.api.impl.transaction.event.GetMessageEventCouples;
-import org.bonitasoft.engine.api.impl.transaction.event.HandleMessageEventCouple;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
-public class BPMEventHandlingJob extends InternalJob {
+public class BPMEventHandlingJob extends InternalJob implements Serializable {
 
-    private static final long serialVersionUID = 5095357357278143665L;
+    /**
+     * List of BPMN Event types that can be triggered multiple times for a single instance
+     */
+    private static final List<SBPMEventType> START_WAITING_MESSAGE_LIST = Arrays.asList(SBPMEventType.START_EVENT/*
+                                                                                                                  * , SBPMEventType.EVENT_SUB_PROCESS
+                                                                                                                  * // EVENT_SUB_PROCESS of type non-interrupted
+                                                                                                                  * should be considered as well, as soon as we
+                                                                                                                  * support them
+                                                                                                                  */);
+
+    private static final long serialVersionUID = 8929044925208984537L;
 
     private transient EventInstanceService eventInstanceService;
-
-    private transient TransactionExecutor transactionExecutor;
-
-    // FIXME improve lock mechanism by tenant map<tenant, lock>
-    private static transient Object lock = new Object();
 
     private transient BPMInstanceBuilders instanceBuilders;
 
     private EventsHandler enventsHandler;
 
-    private TechnicalLoggerService logger;
+    private WorkService workService;
 
     @Override
     public String getName() {
@@ -68,40 +79,80 @@ public class BPMEventHandlingJob extends InternalJob {
 
     @Override
     public void execute() throws JobExecutionException, FireEventException {
-        synchronized (lock) {
-            try {
-                final GetMessageEventCouples getMessageEventCouplesTransaction = new GetMessageEventCouples(eventInstanceService);
-                transactionExecutor.execute(getMessageEventCouplesTransaction);
-                final List<SMessageEventCouple> messageCouples = getMessageEventCouplesTransaction.getResult();
+        try {
+            final List<SMessageEventCouple> potentialMessageCouples = eventInstanceService.getMessageEventCouples();
 
-                final Map<SMessageInstance, List<SWaitingMessageEvent>> messageMapping = new HashMap<SMessageInstance, List<SWaitingMessageEvent>>();
-                for (final SMessageEventCouple sMessageEventCouple : messageCouples) {
-                    final SWaitingMessageEvent waitingMessage = sMessageEventCouple.getWaitingMessage();
-                    final SMessageInstance messageInstance = sMessageEventCouple.getMessageInstance();
-                    if (!messageMapping.keySet().contains(messageInstance)) {
-                        messageMapping.put(messageInstance, new ArrayList<SWaitingMessageEvent>());
-                    }
-                    messageMapping.get(messageInstance).add(waitingMessage);
+            //
+            final List<SMessageEventCouple> uniqueCouples = makeMessageUniqueCouples(potentialMessageCouples);
+
+            for (final SMessageEventCouple couple : uniqueCouples) {
+                final SMessageInstance messageInstance = couple.getMessageInstance();
+                final SWaitingMessageEvent waitingMessage = couple.getWaitingMessage();
+
+                // Mark messages that will be treated as "treatment in progress":
+                markMessageAsInProgress(messageInstance);
+                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
+                    markWaitingMessageAsInProgress(waitingMessage);
                 }
-                for (final Entry<SMessageInstance, List<SWaitingMessageEvent>> entry : messageMapping.entrySet()) {
-                    final HandleMessageEventCouple handleMessageEventCouple = new HandleMessageEventCouple(entry.getKey(), entry.getValue(),
-                            eventInstanceService, instanceBuilders, enventsHandler, logger);
-                    transactionExecutor.execute(handleMessageEventCouple);
+                workService.registerWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId(), eventInstanceService, instanceBuilders,
+                        enventsHandler));
+            }
+        } catch (final SBonitaException e) {
+            throw new JobExecutionException(e);
+        }
+    }
+
+    /**
+     * From a list of couples that may contain duplicate waiting message candidates, select only one waiting message for each message instance: the first
+     * matching waiting message is arbitrary chosen.
+     * In the case of <code>SWaitingMessageEvent</code> of types {@link SBPMEventType#START_EVENT} or {@link SBPMEventType#EVENT_SUB_PROCESS}, it can be
+     * selected several times to trigger multiple instances.
+     * 
+     * @param messageCouples
+     *            all the possible couples that match the potential correlation.
+     * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
+     */
+    protected List<SMessageEventCouple> makeMessageUniqueCouples(final List<SMessageEventCouple> messageCouples) {
+        List<Long> takenMessages = new ArrayList<Long>(messageCouples.size());
+        List<Long> takenWaitings = new ArrayList<Long>(messageCouples.size());
+        List<SMessageEventCouple> pairs = new ArrayList<SMessageEventCouple>();
+        for (SMessageEventCouple couple : messageCouples) {
+            final SMessageInstance messageInstance = couple.getMessageInstance();
+            final SWaitingMessageEvent waitingMessage = couple.getWaitingMessage();
+            if (!takenMessages.contains(messageInstance.getId()) && !takenWaitings.contains(waitingMessage.getId())) {
+                takenMessages.add(messageInstance.getId());
+                // Starting events and Starting event sub-processes must not be considered as taken if they appear several times:
+                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
+                    takenWaitings.add(waitingMessage.getId());
                 }
-                // TODO unlock message instances and waiting messages
-            } catch (final SBonitaException e) {
-                throw new JobExecutionException(e);
+                pairs.add(couple);
             }
         }
+        return pairs;
     }
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         eventInstanceService = getTenantServiceAccessor().getEventInstanceService();
-        transactionExecutor = getTenantServiceAccessor().getTransactionExecutor();
         instanceBuilders = getTenantServiceAccessor().getBPMInstanceBuilders();
         enventsHandler = getTenantServiceAccessor().getEventsHandler();
-        logger = getTenantServiceAccessor().getTechnicalLoggerService();
+        workService = getTenantServiceAccessor().getWorkService();
+    }
+
+    private void markMessageAsInProgress(final SMessageInstance messageInstanceToUpdate) throws SMessageModificationException,
+            SMessageInstanceNotFoundException, SMessageInstanceReadException {
+        final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceToUpdate.getId());
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(instanceBuilders.getSMessageInstanceBuilder().getHandledKey(), true);
+        eventInstanceService.updateMessageInstance(messageInstance, descriptor);
+    }
+
+    private void markWaitingMessageAsInProgress(final SWaitingMessageEvent waitingMessage) throws SWaitingEventModificationException,
+            SWaitingEventNotFoundException, SWaitingEventReadException {
+        final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessage.getId());
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(instanceBuilders.getSWaitingMessageEventBuilder().getProgressKey(), SWaitingMessageEventBuilder.PROGRESS_IN_TREATMENT_KEY);
+        eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 
 }

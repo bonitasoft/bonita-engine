@@ -25,6 +25,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  * @since 6.0
  */
 public interface ActorMappingService {
@@ -348,6 +349,12 @@ public interface ActorMappingService {
      */
     long getNumberOfMembershipsOfActor(long actorId);
 
+    /**
+     * Delete all actor members for the connected tenant
+     * 
+     * @throws SActorMemberDeletionException
+     * @since 6.1
+     */
     void deleteAllActorMembers() throws SActorMemberDeletionException;
 
 }

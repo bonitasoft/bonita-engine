@@ -2,10 +2,9 @@ package org.bonitasoft.engine.continuation;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.NonTxBonitaWork;
 
-public class ListAdder extends BonitaWork {
+public class ListAdder extends NonTxBonitaWork {
 
     private final List<String> list;
 
@@ -20,7 +19,7 @@ public class ListAdder extends BonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         try {
             Thread.sleep(delay);
         } catch (final InterruptedException e) {
@@ -29,4 +28,8 @@ public class ListAdder extends BonitaWork {
         list.add(toAdd);
     }
 
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString() + " after (ms) " + delay;
+    }
 }

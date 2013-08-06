@@ -161,7 +161,10 @@ public interface ProcessManagementAPI {
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance cannot be deleted because of a parent that is still active
      * @since 6.0
+     * @see #deleteProcessDefinition(long)
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinition(long)}
      */
+    @Deprecated
     void deleteProcess(long processId) throws DeletionException;
 
     /**
@@ -175,10 +178,36 @@ public interface ProcessManagementAPI {
      *             if an exception occurs during process deletion.
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance cannot be deleted because of a parent that is still active
-     * @see #deleteProcess(long)
+     * @see #deleteProcessDefinitions(List<Long>)
      * @since 6.0
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinitions(List<Long>)}
      */
+    @Deprecated
     void deleteProcesses(List<Long> processIds) throws DeletionException;
+
+    /**
+     * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled and it has no more existing process instances.
+     * 
+     * @param processDefinitionId
+     *            the identifier of the process definition.
+     * @throws DeletionException
+     *             if an exception occurs during process deletion.
+     * @since 6.1
+     */
+    void deleteProcessDefinition(long processDefinitionId) throws DeletionException;
+
+    /**
+     * Deletes process definitions by giving their identifiers. If any speciofied identifier does not refer to a real process definition, or if an exception
+     * occurs, no process definition is deleted. All instances of given processes must be deleted prior to calling this operation.
+     * 
+     * @param processDefinitionIds
+     *            the list of identifiers of process definitions.
+     * @throws DeletionException
+     *             if an exception occurs during process deletion.
+     * @see #deleteProcess(long)
+     * @since 6.1
+     */
+    void deleteProcessDefinitions(List<Long> processDefinitionIds) throws DeletionException;
 
     /**
      * Deploys, enables and returns a process.
@@ -197,7 +226,6 @@ public interface ProcessManagementAPI {
      * @see #deploy(DesignProcessDefinition)
      * @see #enableProcess(long)
      * @since 6.0
-     *        FIXME check exceptions
      */
     ProcessDefinition deployAndEnableProcess(DesignProcessDefinition designProcessDefinition) throws ProcessDeployException, ProcessEnablementException,
             AlreadyExistsException, InvalidProcessDefinitionException;
@@ -244,8 +272,10 @@ public interface ProcessManagementAPI {
      *             if an exception occurs while deleting the process.
      * @see #disableProcess(long)
      * @see #deleteProcess(long)
+     * @deprecated As of release 6.1, replaced by {@link #disableAndDeleteProcessDefinition(long)}
      * @since 6.0
      */
+    @Deprecated
     void disableAndDelete(long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
 
     /**
@@ -592,7 +622,6 @@ public interface ProcessManagementAPI {
 
     /**
      * Imports into the process definition an actor mapping in XML format.
-     * FIXME where is the XSD?
      * 
      * @param processId
      *            the identifier of the process.
@@ -801,8 +830,27 @@ public interface ProcessManagementAPI {
      * @throws DeletionException
      *             if an error occurs while removing the process definitions of category.
      * @since 6.0
+     * @deprecated As of release 6.1, replaced by {@link #removeProcessDefinitionsFromCategory(long, int, int)}
      */
+    @Deprecated
     void removeAllProcessDefinitionsFromCategory(long categoryId) throws DeletionException;
+
+    /**
+     * Deletes the associations of all the process definitions related to the category given as input parameter respecting the pagination parameters.
+     * It does not delete the associated process definitions.
+     * 
+     * @param categoryId
+     *            the identifier of the category.
+     * @param startIndex
+     *            the index
+     * @param maxResults
+     *            the max number of elements to retrieve per page
+     * @return the number of elements that have been removed
+     * @throws DeletionException
+     *             if an error occurs while removing the process definitions of category.
+     * @since 6.1
+     */
+    long removeProcessDefinitionsFromCategory(long categoryId, int startIndex, int maxResults) throws DeletionException;
 
     /**
      * Deletes the associations of all categories related the process definition.
@@ -814,8 +862,27 @@ public interface ProcessManagementAPI {
      * @throws DeletionException
      *             if an error occurs while removing the process definition from category.
      * @since 6.0
+     * @deprecated As of release 6.1, replaced by {@link #removeCategoriesFromProcessDefinition(long, int, int)}
      */
+    @Deprecated
     void removeAllCategoriesFromProcessDefinition(long processDefinitionId) throws DeletionException;
+
+    /**
+     * Deletes the associations of categories related the process definition given as input parameter respecting the pagination parameters.
+     * The process definition and categories are not deleted, but there is no longer an association between them.
+     * 
+     * @param processDefinitionId
+     *            the identifier of the process definition.
+     * @param startIndex
+     *            the index
+     * @param maxResults
+     *            the max number of elements to retrieve per page
+     * @return the number of elements that have been removed
+     * @throws DeletionException
+     *             if an error occurs while removing the process definition from category.
+     * @since 6.1
+     */
+    long removeCategoriesFromProcessDefinition(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
 
     /**
      * Counts the number of process definitions which have no category.
@@ -1512,7 +1579,6 @@ public interface ProcessManagementAPI {
     SearchResult<User> searchUsersWhoCanStartProcessDefinition(long processDefinitionId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * FIXME in ProcessRuntimeAPI?
      * Get process deployment information from a list of processInstance id
      * 
      * @param processInstanceIds
@@ -1523,7 +1589,6 @@ public interface ProcessManagementAPI {
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromProcessInstanceIds(List<Long> processInstanceIds);
 
     /**
-     * FIXME in ProcessRuntimeAPI?
      * Get process deployment information from a list of archived processInstance ids
      * 
      * @param archivedProcessInstantsIds
@@ -1534,7 +1599,6 @@ public interface ProcessManagementAPI {
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromArchivedProcessInstanceIds(List<Long> archivedProcessInstantsIds);
 
     /**
-     * FIXME What is the need?
      * Export processes of bar under home by a processDefinition id
      * 
      * @param processDefinitionId
@@ -1546,4 +1610,20 @@ public interface ProcessManagementAPI {
      */
     byte[] exportBarProcessContentUnderHome(long processDefinitionId) throws ProcessExportException;
 
+    /**
+     * Disables and deletes the process.
+     * 
+     * @param processId
+     *            the process definition identifier.
+     * @throws ProcessDefinitionNotFoundException
+     *             if the identifier does not refer to an existing process definition.
+     * @throws ProcessActivationException
+     *             if an exception occurs while disabling the process.
+     * @throws DeletionException
+     *             if an exception occurs while deleting the process.
+     * @see #disableProcess(long)
+     * @see #deleteProcess(long)
+     * @since 6.1
+     */
+    void disableAndDeleteProcessDefinition(long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
 }

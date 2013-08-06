@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.api;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
@@ -54,10 +55,6 @@ public interface ProcessInstanceService {
     String PROCESSINSTANCE_STATE_UPDATED = "PROCESSINSTANCE_STATE_UPDATED";
 
     String PROCESSINSTANCE_TOKEN_COUNT = "ACTIVITY_INSTANCE_TOKEN_COUNT";
-
-    String ACTIVITYINSTANCE = "ACTIVITYINSTANCE";
-
-    String ARCHIVED_ACTIVITYINSTANCE = "ARCHIVED_ACTIVITYINSTANCE";
 
     String EVENT_TRIGGER_INSTANCE = "EVENT_TRIGGER_INSTANCE";
 
@@ -105,14 +102,13 @@ public interface ProcessInstanceService {
      * @return Number of deleted process instances
      * @since 6.1
      */
-    long deleteParentProcessInstancesAndArchivedElements(List<SProcessInstance> sProcessInstances);
+    long deleteParentProcessInstanceAndElements(List<SProcessInstance> sProcessInstances);
 
     /**
      * Delete the specified process instance with id, and its elements archived and not, if are not a subProcess
      * 
      * @param processInstanceId
      *            identifier of process instance
-     * @param processInstanceId
      * @throws SProcessInstanceReadException
      * @throws SProcessInstanceNotFoundException
      * @throws SFlowNodeReadException
@@ -120,8 +116,8 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      * @since 6.1
      */
-    void deleteParentProcessInstanceAndArchivedElements(long processInstanceId) throws SProcessInstanceReadException,
-            SProcessInstanceNotFoundException, SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    void deleteParentProcessInstanceAndElements(long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException,
+            SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Get process instance by its id
@@ -170,6 +166,16 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void deleteArchivedProcessInstance(SAProcessInstance archivedProcessInstance) throws SProcessInstanceModificationException, SFlowNodeReadException;
+
+    /**
+     * Delete specified archived process instances
+     * 
+     * @param saProcessInstances
+     *            List of archived process instances to delete
+     * @return Number of deleted archived process instances
+     * @since 6.1
+     */
+    long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances);
 
     /**
      * Delete all archived elements related to the specified process instance, even the archived process instances
@@ -249,13 +255,11 @@ public interface ProcessInstanceService {
      * @param archivedProcessInstanceId
      *            identifier of the archived process instance (not the process instance)
      * @param persistenceService
-     * 
      * @return an SAProcessInstance object
      * @throws SProcessInstanceReadException
      * @throws SProcessInstanceNotFoundException
      */
-    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId)
-            throws SProcessInstanceReadException, SProcessInstanceNotFoundException;
+    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException;
 
     /**
      * Get total number of process instances
@@ -476,5 +480,12 @@ public interface ProcessInstanceService {
      * @return
      */
     List<SProcessInstance> getProcessInstancesInState(QueryOptions queryOptions, ProcessInstanceState state) throws SProcessInstanceReadException;
+
+    /**
+     * @param processInstanceId
+     * @throws SBonitaException
+     * @since 6.1
+     */
+    void deleteArchivedProcessInstancesOfProcessInstance(long processInstanceId) throws SBonitaException;
 
 }

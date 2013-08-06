@@ -63,12 +63,12 @@ public class ConnectorServiceDecorator implements ConnectorService {
             throws SConnectorException {
         final SExpression apiAccessorExpression;
         try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getAPIAccessorExpression(expressionbuilder);
+            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilder);
         } catch (final SInvalidExpressionException e) {
             throw new SConnectorException("Error creation apiAccessor Expression", e);
         }
         final Map<String, SExpression> parameters = new HashMap<String, SExpression>(connectorInputParameters);
-        parameters.put("apiAccessor", apiAccessorExpression);
+        parameters.put("connectorApiAccessor", apiAccessorExpression);
         return connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, parameters, inputValues,
                 classLoader, sexpContext);
     }
@@ -102,10 +102,10 @@ public class ConnectorServiceDecorator implements ConnectorService {
             SExpressionDependencyMissingException, SInvalidExpressionException {
         SExpression apiAccessorExpression;
         SExpression engineExecutionContext;
-        apiAccessorExpression = EngineConstantExpressionBuilder.getAPIAccessorExpression(expressionbuilder);
+        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilder);
         engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext(expressionbuilder);
         final Map<String, SExpression> newParameters = new HashMap<String, SExpression>(parameters);
-        newParameters.put("apiAccessor", apiAccessorExpression);
+        newParameters.put("connectorApiAccessor", apiAccessorExpression);
         newParameters.put("engineExecutionContext", engineExecutionContext);
         return connectorService.evaluateInputParameters(newParameters, sExpressionContext, inputValues);
     }

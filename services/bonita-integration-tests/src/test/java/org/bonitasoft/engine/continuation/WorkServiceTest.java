@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,9 +13,21 @@ import java.util.logging.Logger;
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class WorkServiceTest extends CommonServiceTest {
+
+    @Before
+    public void before() {
+        getWorkService().startup();
+    }
+
+    @After
+    public void after() throws TimeoutException {
+        getWorkService().shutdown();
+    }
 
     @Test
     public void testContinuation() throws Exception {

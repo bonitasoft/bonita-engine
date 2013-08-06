@@ -23,7 +23,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -57,25 +56,19 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         try {
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
             final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
-            final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
-            final boolean txOpened = transactionExecutor.openTransaction();
             final ClassLoader processClassloader;
             final long processDefinitionID;
+            final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
+            processDefinitionID = flowNodeInstance.getLogicalGroup(0);
+            processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
+            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
-                processDefinitionID = flowNodeInstance.getLogicalGroup(0);
-                processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
-                final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-                try {
-                    Thread.currentThread().setContextClassLoader(processClassloader);
-                    updateActivityInstanceVariables(operations, operationsContext, sActivityInstanceID, processDefinitionID);
-                } finally {
-                    Thread.currentThread().setContextClassLoader(contextClassLoader);
-                }
+                Thread.currentThread().setContextClassLoader(processClassloader);
+                updateActivityInstanceVariables(operations, operationsContext, sActivityInstanceID, processDefinitionID);
             } finally {
-                transactionExecutor.completeTransaction(txOpened);
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-            executeActivity(sActivityInstanceID);
+            executeActivity(sActivityInstanceID, processDefinitionID);
         } catch (final BonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminateTask(List<Operation>, Map<String, Serializable>, long activityInstanceId)'",
@@ -125,11 +118,12 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         }
     }
 
-    protected void executeActivity(final long activityInstanceId) throws BonitaException {
+    protected void executeActivity(final long activityInstanceId, final long processDefinitionID) throws BonitaException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         try {
-            processExecutor.executeActivity(activityInstanceId, getUserIdFromSession(), getUserIdFromSession());
+            final long userId = getUserIdFromSession();
+            processExecutor.executeFlowNode(activityInstanceId, null, null, processDefinitionID, userId, userId);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new BonitaException(e.getMessage());

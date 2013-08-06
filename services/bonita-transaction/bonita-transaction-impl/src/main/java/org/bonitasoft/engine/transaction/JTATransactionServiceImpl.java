@@ -15,6 +15,7 @@ package org.bonitasoft.engine.transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
@@ -33,7 +34,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class JTATransactionServiceImpl implements TransactionService {
 
-    private final TechnicalLoggerService logger;
+    protected final TechnicalLoggerService logger;
 
     private final TransactionManager txManager;
 
@@ -58,9 +59,11 @@ public class JTATransactionServiceImpl implements TransactionService {
     public void begin() throws STransactionCreationException {
         try {
             if (txManager.getStatus() == Status.STATUS_NO_TRANSACTION) {
+                boolean transactionStarted = false;
+                boolean mustRollback = false;
                 try {
                     txManager.begin();
-
+                    transactionStarted = true;
                     final Transaction tx = txManager.getTransaction();
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                         logger.log(getClass(), TechnicalLogSeverity.DEBUG,
@@ -79,8 +82,13 @@ public class JTATransactionServiceImpl implements TransactionService {
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
-                } catch (final FireEventException e) {
-                    throw new STransactionCreationException(e);
+                } catch (final Throwable t) {
+                    mustRollback = true;
+                    throw new STransactionCreationException(t);
+                } finally {
+                    if (transactionStarted && mustRollback) {
+                        txManager.rollback();
+                    }
                 }
             } else {
                 throw new STransactionCreationException("We do not support nested transaction.");
@@ -207,7 +215,11 @@ public class JTATransactionServiceImpl implements TransactionService {
     @Override
     public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
         try {
-            txManager.getTransaction().registerSynchronization(new JTATransactionWrapper(txSync));
+            final Transaction transaction = txManager.getTransaction();
+            if (transaction == null) {
+                throw new STransactionNotFoundException("No active transaction");
+            }
+            transaction.registerSynchronization(new JTATransactionWrapper(txSync));
             synchronizations.add(txSync);
         } catch (final IllegalStateException e) {
             throw new STransactionNotFoundException(e.getMessage());
@@ -221,6 +233,19 @@ public class JTATransactionServiceImpl implements TransactionService {
     @Override
     public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
         return synchronizations;
+    }
+
+    @Override
+    public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+        begin();
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            setRollbackOnly();
+            throw e;
+        } finally {
+            complete();
+        }
     }
 
 }

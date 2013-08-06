@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.process.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,10 +11,13 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
@@ -18,15 +25,13 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbPendingTasksForUserUsingSearch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+@SuppressWarnings("javadoc")
 public class HiddenTaskTest extends CommonAPITest {
 
     private ProcessDefinition processDefinition;
@@ -51,8 +56,7 @@ public class HiddenTaskTest extends CommonAPITest {
         final long id = processDefinition.getId();
         getProcessAPI().startProcess(id);
 
-        final SearchOptionsBuilder hBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptions = hBuilder.done();
+        searchOptions = new SearchOptionsBuilder(0, 10).done();
 
         checkNbOPendingTasks = new CheckNbPendingTasksForUserUsingSearch(getProcessAPI(), 50, 3000, true, 2, user.getId(),
                 new SearchOptionsBuilder(0, 100).done());
@@ -113,6 +117,30 @@ public class HiddenTaskTest extends CommonAPITest {
         final HumanTaskInstance task1 = pendingTasks.get(0);
         getProcessAPI().hideTasks(user.getId(), task1.getId());
         getProcessAPI().hideTasks(user.getId(), task1.getId());
+    }
+
+    @Test
+    public void hideTwoTasksInOneCall() throws Exception {
+        final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance("hideTwoTasksInOneCall", "1.71");
+        definitionBuilder.addStartEvent("start");
+        final String actorName = "actor";
+        definitionBuilder.addActor(actorName).addUserTask("humanTask_1", actorName).addUserTask("humanTask_2", actorName);
+        final DesignProcessDefinition designProcessDef = definitionBuilder.done();
+        final ProcessDefinition processDef = deployAndEnableWithActor(designProcessDef, actorName, user);
+
+        final long id = processDef.getId();
+        final ProcessInstance procInstance = getProcessAPI().startProcess(id);
+
+        final ActivityInstance task1 = waitForTaskInState("humanTask_1", procInstance, TestStates.getReadyState(null));
+        final ActivityInstance task2 = waitForTaskInState("humanTask_2", procInstance, TestStates.getReadyState(null));
+
+        getProcessAPI().hideTasks(user.getId(), task1.getId(), task2.getId());
+
+        // search Hidden tasks:
+        final SearchResult<HumanTaskInstance> humanTasks = getProcessAPI().searchPendingHiddenTasks(user.getId(), searchOptions);
+        assertEquals(2, humanTasks.getCount());
+
+        disableAndDeleteProcess(processDef);
     }
 
     @Test

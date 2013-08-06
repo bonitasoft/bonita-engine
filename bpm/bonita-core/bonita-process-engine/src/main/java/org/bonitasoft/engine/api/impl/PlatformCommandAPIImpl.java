@@ -39,7 +39,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandNotFoundException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
@@ -77,14 +76,13 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final DependencyBuilderAccessor dependencyBuilderAccessor = platformAccessor.getDependencyBuilderAccessor();
         final DependencyService dependencyService = platformAccessor.getDependencyService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         final long artifactId = classLoaderService.getGlobalClassLoaderId();
         final String artifactType = classLoaderService.getGlobalClassLoaderType();
         final AddSPlatformCommandDependency addSDependency = new AddSPlatformCommandDependency(dependencyService, dependencyBuilderAccessor, name, jar,
                 artifactId, artifactType);
         try {
-            transactionExecutor.execute(addSDependency);
+            addSDependency.execute();
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
@@ -94,10 +92,10 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     public void removeDependency(final String name) throws DependencyNotFoundException, DeletionException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final DependencyService dependencyService = platformAccessor.getDependencyService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
         final DeleteSDependency deleteSDependency = new DeleteSDependency(dependencyService, name);
         try {
-            transactionExecutor.execute(deleteSDependency);
+            deleteSDependency.execute();
         } catch (final SDependencyNotFoundException sdnfe) {
             throw new DependencyNotFoundException(sdnfe);
         } catch (final SBonitaException sbe) {
@@ -119,12 +117,12 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         }
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
         final SPlatformCommandBuilder platformCommandBuilder = platformAccessor.getSPlatformCommandBuilderAccessor().getSPlatformCommandBuilder();
         final SPlatformCommand sPlatformCommand = platformCommandBuilder.createNewInstance(name, description, implementation).done();
         try {
             final CreateSPlatformCommand createPlatformCommand = new CreateSPlatformCommand(platformCommandService, sPlatformCommand);
-            transactionExecutor.execute(createPlatformCommand);
+            createPlatformCommand.execute();
             return ModelConvertor.toCommandDescriptor(sPlatformCommand);
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
@@ -134,16 +132,15 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     @Override
     public Serializable execute(final String platformCommandName, final Map<String, Serializable> parameters) throws CommandNotFoundException,
             CommandParameterizationException, CommandExecutionException {
-        // TODO : Reduce number of transactions
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
         try {
             final GetSPlatformCommand getPlatformCmdTx = new GetSPlatformCommand(platformCommandService, platformCommandName);
-            transactionExecutor.execute(getPlatformCmdTx);
+            getPlatformCmdTx.execute();
             final SPlatformCommand sPlatformCommand = getPlatformCmdTx.getResult();
             final GetPlatformCommand getPlatformCommand = new GetPlatformCommand(sPlatformCommand.getImplementation());
-            transactionExecutor.execute(getPlatformCommand);
+            getPlatformCommand.execute();
             final PlatformCommand command = getPlatformCommand.getResult();
             return command.execute(parameters, platformAccessor);
         } catch (final SPlatformCommandNotFoundException scnfe) {
@@ -165,9 +162,9 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
             final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
             final DeleteSPlatformCommand deletePlatformCommand = new DeleteSPlatformCommand(platformCommandService, platformCommandName);
-            transactionExecutor.execute(deletePlatformCommand);
+            deletePlatformCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new CommandNotFoundException(scnfe);
         } catch (final SBonitaException sbe) {
@@ -178,11 +175,11 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     @Override
     public CommandDescriptor get(final String platformCommandName) throws CommandNotFoundException, CreationException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
         try {
             final GetSPlatformCommand getPlatformComandByName = new GetSPlatformCommand(platformCommandService, platformCommandName);
-            transactionExecutor.execute(getPlatformComandByName);
+            getPlatformComandByName.execute();
             final SPlatformCommand sPlatformCommand = getPlatformComandByName.getResult();
             return ModelConvertor.toCommandDescriptor(sPlatformCommand);
         } catch (final SBonitaException e) {
@@ -194,10 +191,10 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     public List<CommandDescriptor> getCommands(final int startIndex, final int maxResults, final CommandCriterion sort) {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
         try {
             final GetSPlatformCommands getPlatformCommands = new GetSPlatformCommands(platformCommandService, startIndex, maxResults, sort);
-            transactionExecutor.execute(getPlatformCommands);
+            getPlatformCommands.execute();
             return ModelConvertor.toPlatformCommandDescriptors(getPlatformCommands.getResult());
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -211,13 +208,13 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         }
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+
         final SPlatformCommandUpdateBuilder platformCommandUpdateBuilder = platformAccessor.getSPlatformCommandBuilderAccessor()
                 .getSPlatformCommandUpdateBuilder();
         try {
             final UpdateSPlatformCommand updatePlatformCommand = new UpdateSPlatformCommand(platformCommandService, platformCommandUpdateBuilder,
                     platformCommandName, updater);
-            transactionExecutor.execute(updatePlatformCommand);
+            updatePlatformCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new UpdateException(scnfe);
         } catch (final SBonitaException e) {

@@ -21,6 +21,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  */
 public interface SWaitingMessageEventBuilder extends SWaitingEventKeyProvider, SCorrelationContainerBuilder {
 
+    public static final int PROGRESS_FREE_KEY = 0;
+
+    public static final int PROGRESS_IN_TREATMENT_KEY = 1;
+
     SWaitingMessageEventBuilder createNewWaitingMessageStartEventInstance(long processdefinitionId, final String messageName, final String processName,
             final long flowNodeDefinitionId, final String flowNodeName);
 
@@ -41,5 +45,7 @@ public interface SWaitingMessageEventBuilder extends SWaitingEventKeyProvider, S
     String getMessageNameKey();
 
     String getLockedKey();
+
+    String getProgressKey();
 
 }

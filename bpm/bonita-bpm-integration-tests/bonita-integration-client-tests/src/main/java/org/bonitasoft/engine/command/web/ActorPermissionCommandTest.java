@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.command.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,10 +36,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Zhao Na
@@ -306,11 +306,10 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
         assignAndExecuteStep(pendingTask, user.getId());
+        waitForUserTask("step3", processInstance);
 
         // after execute
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
-
-        waitForUserTask("step3", processInstance);
 
         cleanup(user.getId(), Arrays.asList(processDefinition.getId()));
     }
@@ -336,7 +335,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Actor permission", "Wrong parameter" }, story = "Execute actor permission command with wrong parameter", jira = "ENGINE-586")
-    @Test(expected = NullPointerException.class)
+    @Test(expected = CommandParameterizationException.class)
     public void testIsAllowedToSeeOverviewFormCommandWithWrongParameter() throws Exception {
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();

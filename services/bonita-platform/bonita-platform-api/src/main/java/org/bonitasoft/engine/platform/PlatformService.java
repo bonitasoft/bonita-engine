@@ -41,7 +41,8 @@ public interface PlatformService {
     String ACTIVATED = "ACTIVATED";
 
     /**
-     * Get the existed sPlatform
+     * Retrieve the platform from the cache
+     * No need to be in a transaction
      * 
      * @return sPlatform
      * @throws SPlatformNotFoundException

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@ import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class GetDocumentByNameAtActivityCompletion implements TransactionContentWithResult<SProcessDocument> {
 
@@ -36,23 +36,20 @@ public class GetDocumentByNameAtActivityCompletion implements TransactionContent
 
     private final String documentName;
 
-    private final ReadPersistenceService readPersistenceService;
-
     private final ActivityInstanceService activityInstanceService;
 
     public GetDocumentByNameAtActivityCompletion(final ProcessDocumentService processDocumentService, final long activityInstanceId, final String documentName,
-            final ReadPersistenceService readPersistenceService, final ActivityInstanceService activityInstanceService) {
+            final ActivityInstanceService activityInstanceService) {
         this.processDocumentService = processDocumentService;
         this.activityInstanceId = activityInstanceId;
         this.documentName = documentName;
-        this.readPersistenceService = readPersistenceService;
         this.activityInstanceService = activityInstanceService;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        final SAActivityInstance aactivity = activityInstanceService.getArchivedActivityInstance(activityInstanceId, readPersistenceService);
-        result = processDocumentService.getDocument(aactivity.getRootContainerId(), documentName, aactivity.getArchiveDate(), readPersistenceService);
+        final SAActivityInstance aactivity = activityInstanceService.getArchivedActivityInstance(activityInstanceId);
+        result = processDocumentService.getDocument(aactivity.getRootContainerId(), documentName, aactivity.getArchiveDate());
     }
 
     @Override

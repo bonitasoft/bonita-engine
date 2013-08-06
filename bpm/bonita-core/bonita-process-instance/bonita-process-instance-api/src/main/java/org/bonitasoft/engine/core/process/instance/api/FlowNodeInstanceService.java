@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.instance.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -35,6 +36,10 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  * @author Celine Souchet
  */
 public interface FlowNodeInstanceService {
+
+    static final String FLOWNODE_INSTANCE = "FLOWNODE_INSTANCE";
+
+    static final String ARCHIVED_FLOWNODE_INSTANCE = "ARCHIVED_FLOWNODE_INSTANCE";
 
     static final String ACTIVITYINSTANCE_STATE = "ACTIVITYINSTANCE_STATE";
 
@@ -244,5 +249,23 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      */
     List<SFlowNodeInstance> getFlowNodeInstancesToRestart(QueryOptions queryOptions) throws SFlowNodeReadException;
+
+    /**
+     * 
+     * @param saFlowNodeInstance
+     * @throws SFlowNodeReadException
+     * @throws SFlowNodeDeletionException
+     * @since 6.1
+     */
+    void deleteArchivedFlowNodeInstance(SAFlowNodeInstance saFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException;
+
+    /**
+     * 
+     * @param sFlowNodeInstance
+     * @throws SFlowNodeReadException
+     * @throws SFlowNodeDeletionException
+     * @since 6.1
+     */
+    void deleteFlowNodeInstance(SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException;
 
 }

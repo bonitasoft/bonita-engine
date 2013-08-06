@@ -13,15 +13,16 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.event;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class CreateEventInstance implements TransactionContent {
+public class CreateEventInstance implements Callable<Void> {
 
     private final SEventInstance eventInstance;
 
@@ -33,8 +34,9 @@ public class CreateEventInstance implements TransactionContent {
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public Void call() throws SBonitaException {
         this.eventInstanceService.createEventInstance(eventInstance);
+        return null;
     }
 
 }

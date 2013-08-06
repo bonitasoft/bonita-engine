@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.activity;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 
@@ -22,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public final class CreateActivityInstance implements TransactionContent {
+public final class CreateActivityInstance implements Callable<Void> {
 
     private final SActivityInstance sInstance;
 
@@ -34,8 +35,9 @@ public final class CreateActivityInstance implements TransactionContent {
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public Void call() throws SBonitaException {
         activityInstanceService.createActivityInstance(sInstance);
+        return null;
     }
 
 }

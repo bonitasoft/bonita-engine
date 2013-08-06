@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,9 +20,10 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * @author Julien Mege
+ * @author Matthieu Chaffotte
  */
 public class HttpAPIServletCall extends ServletCall {
 
@@ -78,17 +80,17 @@ public class HttpAPIServletCall extends ServletCall {
             final String parametersClasses = this.getParameter(CLASS_NAME_PARAMETERS);
             final XStream xstream = new XStream();
 
-            TreeMap<String, Serializable> myOptions = new TreeMap<String, Serializable>();
+            Map<String, Serializable> myOptions = new HashMap<String, Serializable>();
             if (options != null && !options.isEmpty()) {
-                myOptions = this.<TreeMap<String, Serializable>> fromXML(options, xstream);
+                myOptions = fromXML(options, xstream);
             }
             List<String> myClassNameParameters = new ArrayList<String>();
             if (parametersClasses != null && !parametersClasses.isEmpty() && !parametersClasses.equals(ARRAY)) {
-                myClassNameParameters = this.<List<String>> fromXML(parametersClasses, xstream);
+                myClassNameParameters = fromXML(parametersClasses, xstream);
             }
             Object[] myParametersValues = new Object[0];
             if (parametersValues != null && !parametersValues.isEmpty() && !parametersValues.equals(NULL)) {
-                myParametersValues = this.<Object[]> fromXML(parametersValues, xstream);
+                myParametersValues = fromXML(parametersValues, xstream);
                 if (myParametersValues != null && !(myParametersValues.length == 0)) {
                     final Iterator<byte[]> binaryParameters = getBinaryParameters().iterator();
                     for (int i = 0; i < myParametersValues.length; i++) {

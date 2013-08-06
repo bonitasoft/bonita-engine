@@ -16,12 +16,14 @@ package org.bonitasoft.engine.api.impl;
 import java.util.Date;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.PlatformLogoutException;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -29,15 +31,16 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class PlatformLoginAPIImpl implements PlatformLoginAPI {
+public class PlatformLoginAPIImpl extends
+        AbstractLoginApiImpl implements PlatformLoginAPI {
 
     @Override
+    @CustomTransactions
     public PlatformSession login(final String userName, final String password) throws PlatformLoginException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -47,6 +50,11 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
             throw new PlatformLoginException(e.getMessage());
         }
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
+        PlatformService platformService = platformAccessor.getPlatformService();
+
+        // first call before create session: put the platform in cache if necessary
+        putPlatformInCacheIfNecessary(platformAccessor, platformService);
+
         try {
             final SPlatformSession platformSession = platformLoginService.login(userName, password);
             final long id = platformSession.getId();
@@ -64,6 +72,7 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
     }
 
     @Override
+    @CustomTransactions
     public void logout(final PlatformSession session) throws PlatformLogoutException, SessionNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -72,21 +81,11 @@ public class PlatformLoginAPIImpl implements PlatformLoginAPI {
             e.printStackTrace();// no logger available yet
             throw new PlatformLogoutException(e.getMessage());
         }
-        final TransactionService transactionService = platformAccessor.getTransactionService();
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
         try {
-            transactionService.begin();
             platformLoginService.logout(session.getId());
         } catch (final SSessionNotFoundException e) {
             throw new SessionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new PlatformLogoutException(e.getMessage());
-        } finally {
-            try {
-                transactionService.complete();
-            } catch (final SBonitaException e) {
-                throw new PlatformLogoutException(e.getMessage());
-            }
         }
     }
 

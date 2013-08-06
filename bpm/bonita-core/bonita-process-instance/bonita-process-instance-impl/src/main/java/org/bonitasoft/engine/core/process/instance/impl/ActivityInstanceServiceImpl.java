@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
@@ -46,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInst
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
@@ -57,6 +59,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -71,6 +74,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.Action
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -106,18 +110,22 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     private static final int BATCH_SIZE = 100;
 
-    private final SUserTaskInstanceBuilder activityInstanceKeyProvider;
+    private final SUserTaskInstanceBuilder sUserTaskInstanceBuilder;
 
-    private final SMultiInstanceActivityInstanceBuilder multiInstanceActivityInstanceKeyProvider;
+    private final SMultiInstanceActivityInstanceBuilder sMultiInstanceActivityInstanceBuilder;
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger) {
+    private final ArchiveService archiveService;
+
+    public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final ArchiveService archiveService,
+            final EventService eventService, final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService,
+            final TechnicalLoggerService logger) {
         super(recorder, persistenceRead, eventService, instanceBuilders, queriableLoggerService, logger);
         this.queriableLoggerService = queriableLoggerService;
-        activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
-        multiInstanceActivityInstanceKeyProvider = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
+        this.archiveService = archiveService;
+        sUserTaskInstanceBuilder = instanceBuilders.getSUserTaskInstanceBuilder();
+        sMultiInstanceActivityInstanceBuilder = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
     }
 
     @Override
@@ -221,6 +229,17 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         }
     }
 
+    @Override
+    public void deleteAllPendingMappings() throws SActivityModificationException {
+        try {
+            final FilterOption filterOption = new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilder.ACTOR_ID, -1);
+            final DeleteAllRecord record = new DeleteAllRecord(SPendingActivityMapping.class, Collections.singletonList(filterOption));
+            getRecorder().recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SActivityModificationException("Can't delete all pending mappings not attached to an actor.", e);
+        }
+    }
+
     /**
      * @param humanTaskInstanceId
      * @param queryOptions
@@ -311,8 +330,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final ReadPersistenceService persistenceService)
-            throws SActivityReadException, SActivityInstanceNotFoundException {
+    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId) throws SActivityReadException, SActivityInstanceNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SelectListDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityId(activityInstanceId);
         try {
             final List<SAActivityInstance> activities = persistenceService.selectList(descriptor);
@@ -326,8 +345,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public List<SAActivityInstance> getArchivedActivityInstances(final long rootContainerId, final ReadPersistenceService persistenceService,
-            final QueryOptions queryOptions) throws SActivityReadException {
+    public List<SAActivityInstance> getArchivedActivityInstances(final long rootContainerId, final QueryOptions queryOptions) throws SActivityReadException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final List<SAActivityInstance> activities = persistenceService.selectList(SelectDescriptorBuilder.getArchivedActivitiesFromProcessInstance(
                     rootContainerId, queryOptions));
@@ -403,13 +422,13 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         if (flowNodeInstance instanceof SHumanTaskInstance) {
             final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-            descriptor.addField(activityInstanceKeyProvider.getAssigneeIdKey(), userId);
+            descriptor.addField(sUserTaskInstanceBuilder.getAssigneeIdKey(), userId);
             if (userId > 0) {
                 // if this action is a Assign action:
-                descriptor.addField(activityInstanceKeyProvider.getClaimedDateKey(), System.currentTimeMillis());
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), System.currentTimeMillis());
             } else {
                 // if this action is a Release action:
-                descriptor.addField(activityInstanceKeyProvider.getClaimedDateKey(), 0);
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0);
             }
 
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
@@ -442,8 +461,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final int stateId, final ReadPersistenceService persistenceService)
-            throws SActivityReadException, SActivityInstanceNotFoundException {
+    public SAActivityInstance getArchivedActivityInstance(final long activityInstanceId, final int stateId) throws SActivityReadException,
+            SActivityInstanceNotFoundException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         SAActivityInstance selectOne;
         try {
             selectOne = persistenceService.selectOne(SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityIdAndStateId(activityInstanceId, stateId));
@@ -457,8 +477,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public long getNumberOfArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
+    public long getNumberOfArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
             return persistenceService.getNumberOfEntities(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
@@ -468,11 +488,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public List<SAHumanTaskInstance> searchArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public List<SAHumanTaskInstance> searchArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
-            return getPersistenceRead().searchEntity(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
+            return persistenceService.searchEntity(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaSearchException(bre);
         }
@@ -537,8 +557,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public List<SAHumanTaskInstance> searchArchivedTasks(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
+    public List<SAHumanTaskInstance> searchArchivedTasks(final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.searchEntity(SAHumanTaskInstance.class, searchOptions, null);
         } catch (final SBonitaReadException e) {
@@ -547,7 +567,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public long getNumberOfArchivedTasks(final QueryOptions searchOptions, final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public long getNumberOfArchivedTasks(final QueryOptions searchOptions) throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.getNumberOfEntities(SAHumanTaskInstance.class, searchOptions, null);
         } catch (final SBonitaReadException bre) {
@@ -721,7 +742,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     @Override
     public void setLoopCardinality(final SFlowNodeInstance flowNodeInstance, final int intLoopCardinality) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getLoopCardinalityKey(), intLoopCardinality);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getLoopCardinalityKey(), intLoopCardinality);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
         } catch (SFlowNodeModificationException e) {
@@ -733,7 +754,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void addMultiInstanceNumberOfActiveActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
         } catch (SFlowNodeModificationException e) {
@@ -745,8 +766,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void addMultiInstanceNumberOfTerminatedActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfTerminatedInstancesKey(), flowNodeInstance.getNumberOfTerminatedInstances()
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfTerminatedInstancesKey(), flowNodeInstance.getNumberOfTerminatedInstances()
                 + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
@@ -759,8 +780,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void addMultiInstanceNumberOfCompletedActivities(final SMultiInstanceActivityInstance flowNodeInstance, final int number)
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
-        descriptor.addField(multiInstanceActivityInstanceKeyProvider.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
+        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
                 + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
@@ -791,8 +812,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public long getNumberOfArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public long getNumberOfArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return persistenceService.getNumberOfEntities(entityClass, searchOptions, null);
         } catch (final SBonitaReadException e) {
@@ -802,8 +824,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<SAActivityInstance> searchArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
+    public List<SAActivityInstance> searchArchivedActivityInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             return (List<SAActivityInstance>) persistenceService.searchEntity(entityClass, searchOptions, null);
         } catch (final SBonitaReadException e) {
@@ -815,7 +838,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void setTokenCount(final SActivityInstance activityInstance, final int tokenCount) throws SFlowNodeModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance token count", activityInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getTokenCountKey(), tokenCount);
+        descriptor.addField(sUserTaskInstanceBuilder.getTokenCountKey(), tokenCount);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
 
         SUpdateEvent updateEvent = null;
@@ -949,14 +972,15 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         }
     }
 
-    // @Override
-    // public List<SHiddenTaskInstance> getAllSHiddenTasks() throws STaskVisibilityException {
-    // try {
-    // return getPersistenceRead().selectList(SelectDescriptorBuilder.getAllSHiddenTasks());
-    // } catch (SBonitaReadException e) {
-    // throw new STaskVisibilityException("Error listing all hidden tasks", e);
-    // }
-    // }
+    @Override
+    public void deleteAllHiddenTasks() throws STaskVisibilityException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SHiddenTaskInstance.class, null);
+            getRecorder().recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new STaskVisibilityException("Can't delete all hidden tasks.", e);
+        }
+    }
 
     @Override
     public long getNumberOfPendingHiddenTasks(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
@@ -1076,7 +1100,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     public void setAbortedByBoundaryEvent(final SActivityInstance activityInstance, final long boundaryEventId) throws SActivityModificationException {
         final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "update aborted by boundary", activityInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(activityInstanceKeyProvider.getAbortedByBoundaryEventIdKey(), boundaryEventId);
+        descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(STATE_CATEGORY).setObject(activityInstance)

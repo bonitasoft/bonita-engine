@@ -68,19 +68,19 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
             final String kind, final MemberType memberType) throws SBonitaException {
         final SExternalIdentityMappingBuilder builder = serviceAccessor.getExternalIdentityMappingBuilders().getSExternalIdentityMappingBuilder()
                 .createNewInstance(externalId).setGroupId(groupId).setKind(kind).setRoleId(roleId).setUserId(userId);
-        final CreateExternalIdentityMapping transaction = new CreateExternalIdentityMapping(builder, memberType, userId, groupId, roleId);
+        final CreateExternalIdentityMapping transactionContent = new CreateExternalIdentityMapping(builder, memberType, userId, groupId, roleId);
         try {
-            serviceAccessor.getTransactionExecutor().execute(transaction);
+            transactionContent.execute();
         } catch (final SBonitaException e) {
             throw new SExternalIdentityMappingCreationException(e);
         }
-        return transaction.getResult();
+        return transactionContent.getResult();
     }
 
     protected void removeExternalIdentityMapping(final long sExtIdentityMappingId) throws SExternalIdentityMappingDeletionException {
-        final RemoveExternalIdentityMapping transaction = new RemoveExternalIdentityMapping(sExtIdentityMappingId);
+        final RemoveExternalIdentityMapping transactionContent = new RemoveExternalIdentityMapping(sExtIdentityMappingId);
         try {
-            serviceAccessor.getTransactionExecutor().execute(transaction);
+            transactionContent.execute();
         } catch (final SBonitaException e) {
             throw new SExternalIdentityMappingDeletionException(e);
         }
@@ -97,9 +97,9 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
      *             in case a deletion problem occurs
      */
     protected void deleteExternalIdentityMappings(final String externalId, final String kind) throws SExternalIdentityMappingDeletionException {
-        final DeleteExternalIdentityMappings transaction = new DeleteExternalIdentityMappings(kind, externalId);
+        final DeleteExternalIdentityMappings transactionContent = new DeleteExternalIdentityMappings(kind, externalId);
         try {
-            serviceAccessor.getTransactionExecutor().execute(transaction);
+            transactionContent.execute();
         } catch (final SBonitaException e) {
             throw new SExternalIdentityMappingDeletionException(e);
         }

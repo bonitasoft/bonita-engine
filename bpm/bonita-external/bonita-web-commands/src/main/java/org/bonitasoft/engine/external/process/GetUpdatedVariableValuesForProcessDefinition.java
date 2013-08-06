@@ -22,7 +22,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -82,9 +81,8 @@ public class GetUpdatedVariableValuesForProcessDefinition extends UpdateVariable
     private void checkProcessDef(final long processDefinitionId) throws SProcessDefinitionNotFoundException {
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final GetProcessDefinition transaction = new GetProcessDefinition(processDefinitionId, processDefinitionService);
-        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(transaction);
+            transaction.execute();
         } catch (final SBonitaException e) {
             throw new SProcessDefinitionNotFoundException(e);
         }

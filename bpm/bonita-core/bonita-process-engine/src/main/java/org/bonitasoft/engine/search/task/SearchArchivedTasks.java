@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractArchivedHumanTaskInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -28,29 +27,26 @@ import org.bonitasoft.engine.search.descriptor.SearchArchivedHumanTaskInstanceDe
 
 /**
  * @author Zhang Bole
+ * @author Celine Souchet
  */
 public class SearchArchivedTasks extends AbstractArchivedHumanTaskInstanceSearchEntity {
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final ReadPersistenceService persistenceService;
-
     public SearchArchivedTasks(final ActivityInstanceService activityInstanceService, final FlowNodeStateManager flowNodeStateManager,
-            final SearchArchivedHumanTaskInstanceDescriptor searchArchivedTasksDescriptor, final SearchOptions options,
-            final ReadPersistenceService persistenceService) {
+            final SearchArchivedHumanTaskInstanceDescriptor searchArchivedTasksDescriptor, final SearchOptions options) {
         super(searchArchivedTasksDescriptor, options, flowNodeStateManager);
         this.activityInstanceService = activityInstanceService;
-        this.persistenceService = persistenceService;
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.getNumberOfArchivedTasks(searchOptions, persistenceService);
+        return activityInstanceService.getNumberOfArchivedTasks(searchOptions);
     }
 
     @Override
     public List<SAHumanTaskInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.searchArchivedTasks(searchOptions, persistenceService);
+        return activityInstanceService.searchArchivedTasks(searchOptions);
     }
 
 }

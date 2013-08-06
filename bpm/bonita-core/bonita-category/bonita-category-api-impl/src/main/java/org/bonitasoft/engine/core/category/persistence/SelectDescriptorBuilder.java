@@ -61,16 +61,6 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<Long>("getProcessIdsOfCategory", parameters, SProcessCategoryMapping.class, Long.class);
     }
 
-    public static SelectListDescriptor<SProcessCategoryMapping> getProcessCategoryMappingsOfCategory(final long categoryId) {
-        final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
-        return new SelectListDescriptor<SProcessCategoryMapping>("getProcessCategoryMappingsOfCategory", parameters, SProcessCategoryMapping.class);
-    }
-
-    public static SelectListDescriptor<SProcessCategoryMapping> getProcessCategoryMappingsOfProcess(final long processId) {
-        final Map<String, Object> parameters = Collections.singletonMap(PROCESS_ID, (Object) processId);
-        return new SelectListDescriptor<SProcessCategoryMapping>("getProcessCategoryMappingsOfProcess", parameters, SProcessCategoryMapping.class);
-    }
-
     public static SelectListDescriptor<SCategory> getCategoriesOfProcess(final long processId, final int fromIndex, final int numberOfCategories,
             final OrderByType order) {
         final Map<String, Object> parameters = Collections.singletonMap(PROCESS_ID, (Object) processId);
@@ -110,6 +100,13 @@ public class SelectDescriptorBuilder {
         parameters.put("categoryId", categoryId);
         parameters.put("processDefinitionId", processDefinitionId);
         return new SelectOneDescriptor<Long>("isCategoryExistsInProcess", parameters, SProcessCategoryMapping.class);
+    }
+
+    public static SelectListDescriptor<SProcessCategoryMapping> getCategoryMappingOfProcessAndCategories(long processDefinitionId, List<Long> categoryIds) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("categoryIds", categoryIds);
+        parameters.put("processDefinitionId", processDefinitionId);
+        return new SelectListDescriptor<SProcessCategoryMapping>("getCategoryMappingOfProcessAndCategories", parameters, SProcessCategoryMapping.class);
     }
 
 }
