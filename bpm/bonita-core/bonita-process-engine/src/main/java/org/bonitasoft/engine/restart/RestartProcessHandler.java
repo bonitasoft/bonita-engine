@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
@@ -28,10 +27,11 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.work.WorkRegisterException;
 
 /**
@@ -41,58 +41,52 @@ public class RestartProcessHandler implements TenantRestartHandler {
 
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
-        final TransactionExecutor transactionExecutor = tenantServiceAccessor.getTransactionExecutor();
         QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
         List<SProcessInstance> processInstances;
         final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
         final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         final ConnectorService connectorService = tenantServiceAccessor.getConnectorService();
+        TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+        // get all process in initializing
+        // call executeConnectors on enter on them (only case they can be in initializing)
+        // get all process in completing
+        // call executeConnectors on finish on them (only case they can be in completing)
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting connectors of process...");
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
-            // get all process in initializing
-            // call executeConnectors on enter on them (only case they can be in initializing)
-            // get all process in completing
-            // call executeConnectors on finish on them (only case they can be in completing)
-            try {
-                do {
-                    processInstances = processInstanceService.getProcessInstancesInState(queryOptions, ProcessInstanceState.INITIALIZING);
-                    queryOptions = QueryOptions.getNextPage(queryOptions);
-                    for (final SProcessInstance processInstance : processInstances) {
-                        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-                        processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_ENTER, connectorService);
-                    }
-                } while (processInstances.size() == queryOptions.getNumberOfResults());
-                do {
-                    processInstances = processInstanceService.getProcessInstancesInState(queryOptions, ProcessInstanceState.COMPLETING);
-                    queryOptions = QueryOptions.getNextPage(queryOptions);
-                    for (final SProcessInstance processInstance : processInstances) {
-                        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-                        processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_ENTER, connectorService);
-                    }
-                } while (processInstances.size() == queryOptions.getNumberOfResults());
-            } catch (final WorkRegisterException e) {
-                handleException(transactionExecutor, e, "Unable to restart flowNodes: can't register work");
-            } catch (final SProcessInstanceReadException e) {
-                handleException(transactionExecutor, e, "Unable to restart flowNodes: can't read process instances");
-            } catch (final SProcessDefinitionNotFoundException e) {
-                handleException(transactionExecutor, e, "Unable to restart flowNodes: can't find process definition");
-            } catch (final SProcessDefinitionReadException e) {
-                handleException(transactionExecutor, e, "Unable to restart flowNodes: can't read process definition");
-            } catch (final SBonitaException e) {
-                handleException(transactionExecutor, e, "Unable to restart flowNodes: can't execute connectors");
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
-            throw new RestartException("Unable to restart transitions: issue with transaction", e);
+            do {
+                processInstances = processInstanceService.getProcessInstancesInState(queryOptions, ProcessInstanceState.INITIALIZING);
+                queryOptions = QueryOptions.getNextPage(queryOptions);
+                for (final SProcessInstance processInstance : processInstances) {
+                    final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "executing on enter connectors of process " + processInstance);
+                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_ENTER, connectorService);
+                }
+            } while (processInstances.size() == queryOptions.getNumberOfResults());
+            do {
+                processInstances = processInstanceService.getProcessInstancesInState(queryOptions, ProcessInstanceState.COMPLETING);
+                queryOptions = QueryOptions.getNextPage(queryOptions);
+                for (final SProcessInstance processInstance : processInstances) {
+                    final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "executing on finish connectors of process " + processInstance);
+                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_FINISH, connectorService);
+                }
+            } while (processInstances.size() == queryOptions.getNumberOfResults());
+        } catch (final WorkRegisterException e) {
+            handleException(e, "Unable to restart flowNodes: can't register work");
+        } catch (final SProcessInstanceReadException e) {
+            handleException(e, "Unable to restart flowNodes: can't read process instances");
+        } catch (final SProcessDefinitionNotFoundException e) {
+            handleException(e, "Unable to restart flowNodes: can't find process definition");
+        } catch (final SProcessDefinitionReadException e) {
+            handleException(e, "Unable to restart flowNodes: can't read process definition");
+        } catch (final SBonitaException e) {
+            handleException(e, "Unable to restart flowNodes: can't execute connectors");
         }
 
     }
 
-    private void handleException(final TransactionExecutor transactionExecutor, final Exception e, final String message) throws STransactionException,
-            RestartException {
-        transactionExecutor.setTransactionRollback();
+    private void handleException(final Exception e, final String message) throws RestartException {
         throw new RestartException(message, e);
     }
 }

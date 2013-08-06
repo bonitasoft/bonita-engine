@@ -1127,7 +1127,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
             final long activityInstanceId = activityInstance.getId();
             getProcessAPI().setActivityStateById(activityInstanceId, 12);
         }
-
+        waitForProcessToFinish(processInstance);
         // Search Archived process
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10).searchTerm("Na'");
         final SearchResult<ArchivedProcessInstance> searchProcessInstanceResult = getProcessAPI().searchArchivedProcessInstances(builder.done());

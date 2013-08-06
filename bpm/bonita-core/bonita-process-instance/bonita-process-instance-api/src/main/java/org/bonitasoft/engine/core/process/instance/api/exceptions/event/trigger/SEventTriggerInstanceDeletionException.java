@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,17 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.api.exceptions;
-
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+package org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger;
 
 /**
- * @author Baptiste Mesta
- *         The activity execution was interupted. the activity is in an interrupted state.
- *         The execution can be resumed by calling continue method or step forward.
+ * @author Elias Ricken de Medeiros
  */
-public class SActivityInterruptedException extends SBonitaException {
+public class SEventTriggerInstanceDeletionException extends SEventTriggerInstanceException {
 
-    private static final long serialVersionUID = 4900686671903497426L;
+    private static final long serialVersionUID = -3184254325049610898L;
+
+    public SEventTriggerInstanceDeletionException(final Throwable cause) {
+        super(cause);
+    }
 
 }

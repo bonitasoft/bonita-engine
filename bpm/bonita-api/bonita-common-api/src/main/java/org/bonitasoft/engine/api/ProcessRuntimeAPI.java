@@ -54,6 +54,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -246,25 +247,24 @@ public interface ProcessRuntimeAPI {
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
 
     /**
-     * Delete process instances by its process definition id
-     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
-     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
+     * Delete all instances of a specified process definition.
+     * If the process definition id does not match anything, no exception is thrown, but nothing is deleted.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            the identifier of the processDefinition.
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still active
-     * 
+     *             if a process instance cannot be deleted because of a parent that still exists.
+     * @throws DeletionException
+     *             if other deletion problem occurs.
      * @since 6.0
-     * 
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
-     *             {@link #deleteArchivedProcessInstances(long, int, int, ProcessInstanceCriterion)}
+     *             {@link #deleteArchivedProcessInstances(long, int, int)}
      */
     @Deprecated
     void deleteProcessInstances(long processDefinitionId) throws DeletionException;
 
     /**
-     * Delete active process instances of process definition given as input parameter respecting the pagination parameters
+     * Delete active process instances, and their elements, of process definition given as input parameter respecting the pagination parameters
      * 
      * @param processDefinitionId
      *            Identifier of the processDefinition
@@ -281,8 +281,6 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete archived process instances of process definition given as input parameter respecting the pagination parameters
-     * If process having the id is not found, it will thrown ProcessDefinitionNotFoundException
-     * If process having the id is enabled, it will thrown DeletingEnabledProcessException
      * 
      * @param processDefinitionId
      *            Identifier of the processDefinition
@@ -290,14 +288,12 @@ public interface ProcessRuntimeAPI {
      *            the index
      * @param maxResults
      *            the max number of elements to retrieve per page
-     * @param criterion
-     *            the sort criterion
      * @return the number of elements that have been deleted
      * @throws DeletionException
      *             if a process instance can't be deleted because of a parent that is still active
      * @since 6.1
      */
-    long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults, ProcessInstanceCriterion criterion) throws DeletionException;
+    long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
 
     /**
      * Start an instance of the process definition having processDefinitionId, and using the current session user
@@ -316,6 +312,27 @@ public interface ProcessRuntimeAPI {
     ProcessInstance startProcess(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
+     * Instantiates a process.
+     * <b>
+     * The process variables will be initialized by the initialVariables.
+     * 
+     * @param processDefinitionId
+     *            the identifier of the processDefinition
+     * @param initialVariables
+     *            the couples of initial variable/value
+     * @return a ProcessInstance object
+     * @throws ProcessDefinitionNotFoundException
+     *             If the identifier of process definition does not refer to any existing process definition
+     * @throws ProcessExecutionException
+     *             If the process fails to start
+     * @throws ProcessActivationException
+     *             If the process is disable
+     * @since 6.1
+     */
+    ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
+            ProcessActivationException, ProcessExecutionException;
+
+    /**
      * Start a process by process definition id
      * 
      * @param processDefinitionId
@@ -330,13 +347,12 @@ public interface ProcessRuntimeAPI {
      *             The process definition corresponding to processDefinitionId is not found
      * @return a ProcessInstance object
      * @throws ProcessExecutionException
-     * @throws ProcessDefinitionNotFoundException
      * @throws ProcessActivationException
      *             if the process is disabled
      * @since 6.0
      */
     ProcessInstance startProcess(long processDefinitionId, List<Operation> operations, Map<String, Serializable> context)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ProcessDefinitionNotFoundException;
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process definition on behalf of a given user
@@ -413,7 +429,7 @@ public interface ProcessRuntimeAPI {
     void executeFlowNode(long userId, long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
-     * Returns all activities (active and finished) of a process instance.
+     * Returns all currently active activities of a process instance.
      * 
      * @param processInstanceId
      *            Identifier of the process instance
@@ -427,11 +443,13 @@ public interface ProcessRuntimeAPI {
     List<ActivityInstance> getActivities(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Get an instance of process with its processInstance id.
+     * Get an instance of process from its processInstance ID.
      * 
      * @param processInstanceId
      *            Identifier of the process instance
      * @return the matching instance of process
+     * @throws ProcessInstanceNotFoundException
+     *             if no process instance can be found with the provided ID.
      * @since 6.0
      */
     ProcessInstance getProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException;
@@ -604,6 +622,17 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     void assignUserTask(long userTaskId, long userId) throws UpdateException;
+
+    /**
+     * Updates the actors of the user task. It evaluates again the eligible users for that task.
+     * 
+     * @param userTaskId
+     *            the identifier of the user task
+     * @throws UpdateException
+     *             If an exception occurs during the evaluation of actors.
+     * @since 6.1
+     */
+    void updateActorsOfUserTask(long userTaskId) throws UpdateException;
 
     /**
      * Returns all data of a process instance

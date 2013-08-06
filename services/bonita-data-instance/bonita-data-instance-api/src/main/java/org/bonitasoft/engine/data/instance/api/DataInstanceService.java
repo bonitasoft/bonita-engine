@@ -270,4 +270,25 @@ public interface DataInstanceService {
      */
     void deleteSADataInstance(SADataInstance sDataInstance) throws SDeleteDataInstanceException;
 
+    /**
+     * Delete all local archived data instances for a specified container
+     * 
+     * @param containerId
+     * @param dataInstanceContainerType
+     * @throws SDataInstanceException
+     * @since 6.1
+     */
+    void deleteLocalArchivedDataInstances(long containerId, String dataInstanceContainerType) throws SDataInstanceException;
+
+    /**
+     * Delete all local active data instances for a specified container
+     * 
+     * @param containerId
+     * @param dataInstanceContainerType
+     * @param dataPresent
+     * @throws SDataInstanceException
+     * @since 6.1
+     */
+    void deleteLocalDataInstances(long containerId, String dataInstanceContainerType, boolean dataPresent) throws SDataInstanceException;
+
 }

@@ -19,7 +19,7 @@ import org.bonitasoft.engine.test.WaitUntil;
 /**
  * @author Sébastien Chevassu
  */
-public class WaitForConnectorExecution extends WaitUntil {
+public class WaitForVariableValue extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
@@ -29,7 +29,7 @@ public class WaitForConnectorExecution extends WaitUntil {
 
     private final String valueExpected;
 
-    public WaitForConnectorExecution(final ProcessAPI processAPI, final long processInstanceId, final String variableName, final String valueExpected) {
+    public WaitForVariableValue(final ProcessAPI processAPI, final long processInstanceId, final String variableName, final String valueExpected) {
         super(40, 1000);
         this.processAPI = processAPI;
         this.processInstanceId = processInstanceId;

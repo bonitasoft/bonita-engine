@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.work;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -23,13 +25,11 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
- * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
-public abstract class BonitaWork implements Runnable {
+public abstract class AbstractBonitaWork implements Runnable {
 
-    private TechnicalLoggerService loggerService;
-
-    private TransactionService transactionService;
+    protected TechnicalLoggerService loggerService;
 
     private SessionService sessionService;
 
@@ -37,43 +37,65 @@ public abstract class BonitaWork implements Runnable {
 
     private long tenantId;
 
-    protected abstract void work() throws SBonitaException;
+    protected TransactionService transactionService;
+
+    protected abstract String getDescription();
+
+    public AbstractBonitaWork() {
+        super();
+    }
 
     @Override
-    public void run() {
+    public final void run() {
         SSession session = null;
         try {
-            session = createSession();// FIXME get the technical user of the tenant
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
-            work();
+            session = sessionService.createSession(tenantId, "workservice");
+            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+            if (isTransactional()) {
+                workInTransaction();
+            } else {
+                work();
+            }
         } catch (final SBonitaException e) {
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Error while executing work", e);
-        } catch (final Throwable e) {
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work", e);
+            handleError(e);
+        } catch (final Exception e) {
+            // Edge case we cannot manage
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                    "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
         } finally {
             if (session != null) {
                 try {
                     sessionAccessor.deleteSessionId();
                     sessionService.deleteSession(session.getId());
                 } catch (final SSessionNotFoundException e) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
+                    loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
                 }
             }
         }
     }
 
-    private SSession createSession() throws SBonitaException {
-        SSession session = null;
-        try {
-            transactionService.begin();
-            session = sessionService.createSession(tenantId, "scheduler");
-        } catch (final SBonitaException e) {
-            transactionService.setRollbackOnly();
-            throw e;
-        } finally {
-            transactionService.complete();
-        }
-        return session;
+    protected abstract boolean isTransactional();
+
+    protected void workInTransaction() throws Exception {
+        final Callable<Void> runWork = new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                work();
+                return null;
+            }
+        };
+
+        // Call the method work() wrapped in a transaction.
+        transactionService.executeInTransaction(runWork);
+    }
+
+    protected abstract void work() throws Exception;
+
+    protected void handleError(final SBonitaException e) {
+        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.", e);
     }
 
     public void setTechnicalLogger(final TechnicalLoggerService loggerService) {
@@ -95,4 +117,5 @@ public abstract class BonitaWork implements Runnable {
     public void setTransactionService(final TransactionService transactionService) {
         this.transactionService = transactionService;
     }
+
 }

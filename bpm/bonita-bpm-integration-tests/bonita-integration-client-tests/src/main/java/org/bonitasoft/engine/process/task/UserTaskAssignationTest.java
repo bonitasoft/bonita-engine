@@ -1,5 +1,12 @@
 package org.bonitasoft.engine.process.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Date;
 import java.util.List;
 
@@ -21,13 +28,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class UserTaskAssignationTest extends CommonAPITest {
 
@@ -60,7 +60,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final String actorName = "Commercial";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("getAssignedHumanTasksWithStartedState", "0.12", actorName, "Trade business");
 
-        getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
@@ -70,7 +70,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         // Task is in STARTED state so should not be retrieved:
         assertEquals(0, toDoTasks.size());
-
+        waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -303,10 +303,6 @@ public class UserTaskAssignationTest extends CommonAPITest {
     public void lastUpdateDateUpdate() throws Exception {
         final String delivery = "Delivery men";
 
-        // ------------------
-        // INIT
-        // ------------------
-
         // Run a process
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("test release user task", "1.0", delivery, "Delivery all day and night long");
         getProcessAPI().startProcess(processDefinition.getId());
@@ -318,10 +314,6 @@ public class UserTaskAssignationTest extends CommonAPITest {
         HumanTaskInstance task = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).get(0);
         final Long taskId = task.getId();
         Date previousUpdateDate = task.getLastUpdateDate();
-
-        // ------------------
-        // TEST
-        // ------------------
 
         // First assign
         getProcessAPI().assignUserTask(taskId, john.getId());
@@ -350,10 +342,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         task = getProcessAPI().getHumanTaskInstance(taskId);
         assertFalse("Last update date not updated during second assignment", previousUpdateDate.equals(task.getLastUpdateDate()));
 
-        // ------------------
-        // CLEANUP
-        // ------------------
-
         disableAndDeleteProcess(processDefinition);
     }
+
 }

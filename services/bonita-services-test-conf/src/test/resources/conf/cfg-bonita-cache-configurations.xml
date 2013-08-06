@@ -16,5 +16,12 @@
 		<property name="inMemoryOnly" value="true" />
 		<property name="eternal" value="true" />
 	</bean>
+	
+	<bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="PLATFORM" />
+		<property name="maxElementsInMemory" value="100" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="eternal" value="true" />
+	</bean>
 
 </beans>

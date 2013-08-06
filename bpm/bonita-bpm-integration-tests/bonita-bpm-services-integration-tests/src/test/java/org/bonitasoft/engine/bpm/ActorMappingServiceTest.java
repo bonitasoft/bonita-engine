@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.bpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -18,15 +22,12 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupNotFoundException;
 import org.bonitasoft.engine.identity.Role;
+import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ActorMappingServiceTest extends CommonBPMServicesTest {
 
@@ -53,7 +54,14 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
 
     @After
     public void tearDown() throws GroupNotFoundException, DeletionException {
-        new IdentityAPIImpl().deleteGroups(Arrays.asList(childGroup.getId(), parentGroup.getId(), mainGroup.getId()));
+        try {
+            transactionService.begin();
+            new IdentityAPIImpl().deleteGroups(Arrays.asList(childGroup.getId(), parentGroup.getId(), mainGroup.getId()));
+            transactionService.complete();
+        } catch (STransactionException e) {
+            throw new DeletionException(e);
+        }
+
     }
 
     public ActorMappingServiceTest() {
@@ -385,11 +393,13 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void getNumberOfRolesOfActorShouldNotCountMemberships() throws Exception {
         final long scopId = 12;
+        transactionService.begin();
         final IdentityAPIImpl identityAPI = new IdentityAPIImpl();
         final Role role1 = identityAPI.createRole("roletest");
         final Role role2 = identityAPI.createRole("role2test");
-        SActor actor = sActorBuilder.create("ActorRoleTest", scopId, false).getActor();
+        transactionService.complete();
 
+        SActor actor = sActorBuilder.create("ActorRoleTest", scopId, false).getActor();
         transactionService.begin();
         actor = actorMappingService.addActor(actor);
 
@@ -400,13 +410,16 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         actorMappingService.addRoleToActor(actor.getId(), role2.getId());
 
         final long numberOfActorMembers = actorMappingService.getNumberOfRolesOfActor(actor.getId());
+        transactionService.complete();
+
         assertEquals(1L, numberOfActorMembers);
 
+        // clean-up:
+        transactionService.begin();
         actorMappingService.deleteActors(12);
-
-        transactionService.complete();
         identityAPI.deleteRole(role1.getId());
         identityAPI.deleteRole(role2.getId());
+        transactionService.complete();
     }
 
     @Test

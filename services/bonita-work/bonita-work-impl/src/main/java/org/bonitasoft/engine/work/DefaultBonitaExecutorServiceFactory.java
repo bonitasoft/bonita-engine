@@ -34,18 +34,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
 
-    private final ThreadPoolExecutor threadPoolExecutor;
+    private final int corePoolSize;
+
+    private final int queueCapacity;
+
+    private final int maximumPoolSize;
+
+    private final long keepAliveTimeSeconds;
 
     public DefaultBonitaExecutorServiceFactory(final int corePoolSize, final int queueCapacity, final int maximumPoolSize, final long keepAliveTimeSeconds) {
-        final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
-        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker");
-        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
+        this.corePoolSize = corePoolSize;
+        this.queueCapacity = queueCapacity;
+        this.maximumPoolSize = maximumPoolSize;
+        this.keepAliveTimeSeconds = keepAliveTimeSeconds;
     }
 
     @Override
     public ThreadPoolExecutor createExecutorService() {
-        return threadPoolExecutor;
+        final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
+        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
+        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker");
+        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {

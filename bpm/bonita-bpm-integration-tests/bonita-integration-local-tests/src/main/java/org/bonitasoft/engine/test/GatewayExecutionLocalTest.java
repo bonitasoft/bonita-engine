@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
@@ -22,9 +25,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class GatewayExecutionLocalTest extends CommonAPITest {
 
@@ -71,8 +71,8 @@ public class GatewayExecutionLocalTest extends CommonAPITest {
         }
         final String logs = myOut.toString();
         System.out.println(logs);
-        assertTrue("Should have written in logs : SFlowNodeExecutionException", logs.contains("SFlowNodeExecutionException"));
-        assertTrue("Should have written in logs : Error while finishing element", logs.contains("Error while finishing element"));
+        assertTrue("Should have written in logs : SFlowNodeExecutionException",
+                logs.contains("fzdfsdfsdfsdfsdf depends on fzdfsdfsdfsdfsdf is neither defined in the script nor in dependencies"));
     }
 
 }

@@ -14,6 +14,7 @@
 				<prop key="org.quartz.dataSource.managedDS.jndiURL">${database.journal.datasource.name}</prop>
 				<prop key="org.quartz.dataSource.notManagedDS.jndiURL">${database.sequence.manager.datasource.name}</prop>
 				<prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
+				<prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
 			</props>
 		</property>
 	</bean>

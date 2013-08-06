@@ -24,4 +24,8 @@ public class WorkException extends Exception {
     public WorkException(final String message, final Throwable t) {
         super(message, t);
     }
+
+    public WorkException(String message) {
+        super(message);
+    }
 }

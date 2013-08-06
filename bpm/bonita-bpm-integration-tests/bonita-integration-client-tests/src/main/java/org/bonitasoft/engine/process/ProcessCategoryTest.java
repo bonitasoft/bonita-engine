@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,17 +32,11 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class ProcessCategoryTest extends CommonAPITest {
 
@@ -50,84 +48,92 @@ public class ProcessCategoryTest extends CommonAPITest {
 
     private final String description = "description";
 
+    List<Category> categories;
+
+    List<ProcessDefinition> processDefinitions;
+
     @After
     public void afterTest() throws BonitaException {
+        for (final Category category : categories) {
+            getProcessAPI().deleteCategory(category.getId());
+        }
+        for (final ProcessDefinition processDefinitionId : processDefinitions) {
+            deleteProcess(processDefinitionId);
+        }
         logout();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
         login();
+        categories = new ArrayList<Category>();
+        processDefinitions = new ArrayList<ProcessDefinition>();
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category" })
     @Test
-    public void testCreateCategory() throws Exception {
+    public void createCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         assertNotNull(category);
         assertEquals(name, category.getName());
         final long categoryId = category.getId();
         final Category rCategory = getProcessAPI().getCategory(categoryId);
         assertNotNull(rCategory);
         assertEquals(name, rCategory.getName());
-        getProcessAPI().deleteCategory(categoryId);
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class, User.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category", "Creator" }, jira = "ENGINE-619")
     @Test
-    public void testCreateCategoryWithCreatorAsAnID() throws Exception {
+    public void createCategoryWithCreatorAsAnID() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         logout();
         loginWith(USERNAME, PASSWORD);
 
         final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         assertNotNull(category);
         assertEquals(name, category.getName());
         assertEquals(user.getId(), category.getCreator());
 
-        getProcessAPI().deleteCategory(category.getId());
         deleteUser(user.getId());
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class, AlreadyExistsException.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category",
             "Exception" })
     @Test(expected = AlreadyExistsException.class)
-    public void testCreateCategoryWithCategoryAlreadyExistException() throws Exception {
+    public void createCategoryWithCategoryAlreadyExistException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         assertNotNull(category);
         assertEquals(name, category.getName());
-        final long categoryId = category.getId();
-        try {
-            getProcessAPI().createCategory(name, description);
-        } finally {
-            getProcessAPI().deleteCategory(categoryId);
-        }
+        getProcessAPI().createCategory(name, description);
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class, CreationException.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category",
             "Exception" })
     @Test(expected = CreationException.class)
-    public void testCreateCategoryWithCategoryCreationException() throws Exception {
+    public void createCategoryWithCategoryCreationException() throws Exception {
         getProcessAPI().createCategory(null, description);
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Number", "Category" })
     @Test
-    public void testGetNumberOfCategories() throws Exception {
+    public void getNumberOfCategories() throws Exception {
         final Category category1 = getProcessAPI().createCategory(name + 1, description);
+        categories.add(category1);
         final Category category2 = getProcessAPI().createCategory(name + 2, description);
+        categories.add(category2);
 
         final long categoriesCount = getProcessAPI().getNumberOfCategories();
         assertEquals(2, categoriesCount);
-
-        getProcessAPI().deleteCategory(category1.getId());
-        getProcessAPI().deleteCategory(category2.getId());
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed" })
     @Test
-    public void testGetCategory() throws Exception {
+    public void getCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         assertNotNull(category);
         assertEquals(name, category.getName());
         final long categoryId = category.getId();
@@ -136,241 +142,202 @@ public class ProcessCategoryTest extends CommonAPITest {
         assertEquals(categoryId, rCategory.getId());
         assertEquals(name, rCategory.getName());
         assertEquals(description, rCategory.getDescription());
-        getProcessAPI().deleteCategory(categoryId);
     }
 
     @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception" })
     @Test(expected = CategoryNotFoundException.class)
-    public void testGetCategoryWithCategoryNotFoundException() throws Exception {
+    public void getCategoryWithCategoryNotFoundException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         assertNotNull(category);
         assertEquals(name, category.getName());
-        final long categoryId = category.getId();
-        try {
-            getProcessAPI().getCategory(categoryId + 1);
-
-        } finally {
-            getProcessAPI().deleteCategory(categoryId);
-        }
+        getProcessAPI().getCategory(category.getId() + 1);
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed", "Several" })
     @Test
-    public void testGetCategories() throws Exception {
+    public void getCategories() throws Exception {
         final Category category1 = getProcessAPI().createCategory("category1", description);
+        categories.add(category1);
         final Category category2 = getProcessAPI().createCategory("category2", description);
+        categories.add(category2);
         final Category category3 = getProcessAPI().createCategory("category3", description);
+        categories.add(category3);
         final Category category4 = getProcessAPI().createCategory("category4", description);
+        categories.add(category4);
         final Category category5 = getProcessAPI().createCategory("category5", description);
+        categories.add(category5);
 
         List<Category> categoriesNameAsc = getProcessAPI().getCategories(0, 2, CategoryCriterion.NAME_ASC);
         assertEquals(2, categoriesNameAsc.size());
-        assertEquals("category1", categoriesNameAsc.get(0).getName());
-        assertEquals("category2", categoriesNameAsc.get(1).getName());
+        assertEquals(category1.getName(), categoriesNameAsc.get(0).getName());
+        assertEquals(category2.getName(), categoriesNameAsc.get(1).getName());
 
         categoriesNameAsc = getProcessAPI().getCategories(2, 2, CategoryCriterion.NAME_ASC);
         assertEquals(2, categoriesNameAsc.size());
-        assertEquals("category3", categoriesNameAsc.get(0).getName());
-        assertEquals("category4", categoriesNameAsc.get(1).getName());
+        assertEquals(category3.getName(), categoriesNameAsc.get(0).getName());
+        assertEquals(category4.getName(), categoriesNameAsc.get(1).getName());
 
         categoriesNameAsc = getProcessAPI().getCategories(4, 2, CategoryCriterion.NAME_ASC);
         assertEquals(1, categoriesNameAsc.size());
-        assertEquals("category5", categoriesNameAsc.get(0).getName());
+        assertEquals(category5.getName(), categoriesNameAsc.get(0).getName());
 
         categoriesNameAsc = getProcessAPI().getCategories(6, 2, CategoryCriterion.NAME_ASC);
         assertEquals(0, categoriesNameAsc.size());
-
-        getProcessAPI().deleteCategory(category1.getId());
-        getProcessAPI().deleteCategory(category2.getId());
-        getProcessAPI().deleteCategory(category3.getId());
-        getProcessAPI().deleteCategory(category4.getId());
-        getProcessAPI().deleteCategory(category5.getId());
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Update" })
     @Test
-    public void testUpdateCategory() throws Exception {
+    public void updateCategory() throws Exception {
         final Category oldCategory = getProcessAPI().createCategory(name, description);
+        categories.add(oldCategory);
+
         final String newName = "updatedName";
         final String newDescription = "updatedDescription";
-
-        final long categoryId = oldCategory.getId();
         final CategoryUpdater updater = new CategoryUpdater();
         updater.setName(newName).setDescription(newDescription);
-
         getProcessAPI().updateCategory(oldCategory.getId(), updater);
-        final Category categoryUpdated = getProcessAPI().getCategory(categoryId);
+
+        final Category categoryUpdated = getProcessAPI().getCategory(oldCategory.getId());
         assertNotNull(categoryUpdated);
         assertEquals(newName, categoryUpdated.getName());
         assertEquals(newDescription, categoryUpdated.getDescription());
-        getProcessAPI().deleteCategory(categoryId);
     }
 
     @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception",
             "Update" })
     @Test(expected = CategoryNotFoundException.class)
-    public void testUpdateCategoryWithCategoryNotFoundException() throws Exception {
+    public void updateCategoryWithCategoryNotFoundException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
-        final long categoryId = category.getId();
-        try {
-            final String newName = "updatedName";
-            final String newDescription = "updatedDescription";
-            final CategoryUpdater updater = new CategoryUpdater();
-            updater.setName(newName).setDescription(newDescription);
-            getProcessAPI().updateCategory(categoryId + 1, updater);
-        } finally {
-            getProcessAPI().deleteCategory(categoryId);
-        }
+        categories.add(category);
+        final CategoryUpdater updater = new CategoryUpdater();
+        updater.setName("updatedName").setDescription("updatedDescription");
+        getProcessAPI().updateCategory(category.getId() + 1, updater);
     }
 
     @Cover(classes = { ProcessAPI.class, UpdateException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Update" })
     @Test(expected = UpdateException.class)
-    public void testUpdateCategoryWithCategoryUpdateException() throws Exception {
-        final long categoryId = 0;
-        getProcessAPI().updateCategory(categoryId, null);
+    public void updateCategoryWithCategoryUpdateException() throws Exception {
+        getProcessAPI().updateCategory(0, null);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Delete" })
-    @Test
-    public void testDeleteCategory() throws Exception {
+    @Test(expected = CategoryNotFoundException.class)
+    public void deleteCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
         getProcessAPI().deleteCategory(category.getId());
-        Category category1 = null;
-        try {
-            category1 = getProcessAPI().getCategory(category.getId());
-        } catch (final CategoryNotFoundException e) {
-        } finally {
-            assertNull(category1);
-        }
+        getProcessAPI().getCategory(category.getId());
     }
 
     @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception",
             "Delete" })
     @Test(expected = DeletionException.class)
-    public void testDeleteCategoryWithCategoryNotFoundException() throws Exception {
+    public void deleteCategoryWithCategoryNotFoundException() throws Exception {
         getProcessAPI().deleteCategory(Long.MAX_VALUE);
     }
 
     @Cover(classes = { ProcessAPI.class, DeletionException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Delete" })
     @Test(expected = DeletionException.class)
-    public void testDeleteCategoryWithCategoryDeletionException() throws Exception {
-        final long categoryId = 0;
-        getProcessAPI().deleteCategory(categoryId);
+    public void deleteCategoryWithCategoryDeletionException() throws Exception {
+        getProcessAPI().deleteCategory(0);
     }
 
     @Test
-    public void testProcessDefinitionWithCategoryPagination() throws Exception {
-        // generate category id;
-        final long categoryId = getProcessAPI().createCategory(name, description).getId();
+    public void processDefinitionWithCategoryPagination() throws Exception {
+        final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         // test
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
         assertEquals(0, processDeploymentInfos.size());
-        // delete category and process definition
-        getProcessAPI().deleteCategory(categoryId);
     }
 
     @Test
-    public void testRemoveSeveralCategoriesToProcessDefinition() throws Exception {
+    public void removeSeveralCategoriesToProcessDefinition() throws Exception {
         // generate category id;
-        final long categoryId1 = getProcessAPI().createCategory("Human resources", "Category for personnel Management").getId();
-        final long categoryId2 = getProcessAPI().createCategory("Travel Service", "Category for all related travel matters").getId();
-        final long categoryId3 = getProcessAPI().createCategory("Cleaning Service", "Category for all related travel matters").getId();
+        final Category category1 = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        categories.add(category1);
+        final Category category2 = getProcessAPI().createCategory("Travel Service", "Category for all related travel matters");
+        categories.add(category2);
+        final Category category3 = getProcessAPI().createCategory("Cleaning Service", "Category for all related travel matters");
+        categories.add(category3);
         // generate process definition id
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
+        processDefinitions.add(processDefinition);
         final long processDefinitionId = processDefinition.getId();
 
         // test number of current categories form this process:
-        getProcessAPI().addCategoriesToProcess(processDefinitionId, Arrays.asList(new Long[] { categoryId1, categoryId2, categoryId3 }));
+        getProcessAPI().addCategoriesToProcess(processDefinitionId, Arrays.asList(new Long[] { category1.getId(), category2.getId(), category3.getId() }));
         List<Category> categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_DESC);
         assertEquals(3, categories.size());
 
-        getProcessAPI().removeCategoriesFromProcess(processDefinitionId, Arrays.asList(new Long[] { categoryId1, categoryId3 }));
+        getProcessAPI().removeCategoriesFromProcess(processDefinitionId, Arrays.asList(new Long[] { category1.getId(), category3.getId() }));
         // test number of current categories form this process:
         categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_DESC);
         assertEquals(1, categories.size());
         // check if the remaining one is the good one:
-        assertEquals(categoryId2, categories.get(0).getId());
-
-        // delete category and process definition
-        getProcessAPI().deleteCategory(categoryId1);
-        getProcessAPI().deleteCategory(categoryId2);
-        getProcessAPI().deleteCategory(categoryId3);
-        getProcessAPI().deleteProcess(processDefinitionId);
+        assertEquals(category2.getId(), categories.get(0).getId());
     }
 
     @Test
-    public void testAddSeveralCategoriesToProcessDefinition() throws Exception {
-        // generate category id;
-        final long categoryId1 = getProcessAPI().createCategory("Human resources", "Category for personnel Management").getId();
-        final long categoryId2 = getProcessAPI().createCategory("Travel Service", "Category for all related travel matters").getId();
-        // generate process definition id
+    public void addSeveralCategoriesToProcessDefinition() throws Exception {
+        final Category category1 = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        categories.add(category1);
+        final Category category2 = getProcessAPI().createCategory("Travel Service", "Category for all related travel matters");
+        categories.add(category2);
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
-        final long processDefinitionId = processDefinition.getId();
+        processDefinitions.add(processDefinition);
         // test
-        getProcessAPI().addCategoriesToProcess(processDefinitionId, Arrays.asList(new Long[] { categoryId1, categoryId2 }));
-        final List<Category> categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_DESC);
+        getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(new Long[] { category1.getId(), category2.getId() }));
+        final List<Category> categories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinition.getId(), 0, 10, CategoryCriterion.NAME_DESC);
         assertEquals(2, categories.size());
-        assertEquals(categoryId1, categories.get(1).getId());
-        assertEquals(categoryId2, categories.get(0).getId());
-        // delete category and process definition
-        getProcessAPI().deleteCategory(categoryId1);
-        getProcessAPI().deleteCategory(categoryId2);
-        getProcessAPI().deleteProcess(processDefinitionId);
+        assertEquals(category1.getId(), categories.get(1).getId());
+        assertEquals(category2.getId(), categories.get(0).getId());
     }
 
     @Test
-    public void testAddProcessDefinitionToCategory() throws Exception {
+    public void addProcessDefinitionToCategory() throws Exception {
         // generate category id;
-        final long categoryId = getProcessAPI().createCategory(name, description).getId();
+        final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
+        final long categoryId = category.getId();
         // generate process definition id
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
-        final long processDefinitionId = processDefinition.getId();
+        processDefinitions.add(processDefinition);
         // test
-        getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinitionId);
+        getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinition.getId());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null).get(0);
         assertEquals(processDefinition.getName(), processDeploymentInfo.getName());
         assertEquals(processDefinition.getVersion(), processDeploymentInfo.getVersion());
-        // delete category and process definition
-        getProcessAPI().deleteCategory(categoryId);
-        getProcessAPI().deleteProcess(processDefinitionId); // TODO should modify the categories.xml file
     }
 
     @Test(expected = CreationException.class)
-    public void testAddProcessDefinitionToUnknownCategory() throws Exception {
-        // generate wrong category id;
-        final long categoryId = 0;
+    public void addProcessDefinitionToUnknownCategory() throws Exception {
         // generate process definition id
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
-        final long processDefinitionId = processDefinition.getId();
+        processDefinitions.add(processDefinition);
         // test
-        try {
-            getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinitionId);
-        } finally {
-            getProcessAPI().deleteProcess(processDefinitionId);
-        }
+        getProcessAPI().addProcessDefinitionToCategory(0, processDefinition.getId());
     }
 
     @Test(expected = CreationException.class)
-    public void testAddUnknowProcessDefinitionToCategory() throws Exception {
+    public void addUnknowProcessDefinitionToCategory() throws Exception {
         // generate category id;
-        final long categoryId = getProcessAPI().createCategory(name, description).getId();
-        final long processDefinitionId = 0;
+        final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         // test
-        try {
-            getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinitionId);
-        } finally {
-            getProcessAPI().deleteCategory(categoryId);
-        }
+        getProcessAPI().addProcessDefinitionToCategory(category.getId(), 0);
     }
 
     @Test
-    public void testAddProcessDefinitionosToCategory() throws Exception {
+    public void addProcessDefinitionosToCategory() throws Exception {
         // generate category id;
-        final long categoryId = getProcessAPI().createCategory(name, description).getId();
+        final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
+        final long categoryId = category.getId();
         // generate process definition id
-        final List<ProcessDefinition> processDefinitionList = generateProcessDefinition(3, "process", "version");
+        processDefinitions = generateProcessDefinition(3, "process", "version");
         final List<Long> processDefinitionIds = new ArrayList<Long>();
-        for (final ProcessDefinition processDefinition : processDefinitionList) {
+        for (final ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionIds.add(processDefinition.getId());
         }
         // test
@@ -378,73 +345,61 @@ public class ProcessCategoryTest extends CommonAPITest {
         final List<ProcessDeploymentInfo> processDeploymentInfoList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null);
         assertNotNull(processDeploymentInfoList);
         assertEquals(3, processDeploymentInfoList.size());
-        // delete
-        getProcessAPI().deleteCategory(categoryId);
-        for (final Long processDefinitionId : processDefinitionIds) {
-            getProcessAPI().deleteProcess(processDefinitionId);
-        }
     }
 
     @Test
-    public void testGetNumberOfCategoriesByProcessDefinition() throws Exception {
+    public void getNumberOfCategoriesByProcessDefinition() throws Exception {
         // generate categories
-        final List<Category> categoryList = generateCategory(3, "categoryName", "test get number of categories by process definition");
+        categories = generateCategory(3, "categoryName", "test get number of categories by process definition");
         // generate process definition
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
+        processDefinitions.add(processDefinition);
         final long processDefinitionId = processDefinition.getId();
         // test
-        for (final Category category : categoryList) {
+        for (final Category category : categories) {
             getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
         }
         final long categoryNumber = getProcessAPI().getNumberOfCategories(processDefinitionId);
         assertEquals(3, categoryNumber);
-        // delete
-        for (final Category category : categoryList) {
-            getProcessAPI().deleteCategory(category.getId());
-        }
-        getProcessAPI().deleteProcess(processDefinitionId);
     }
 
     @Test
-    public void testGetNumberOfCategoriesOfInexistentProcess() throws Exception {
+    public void getNumberOfCategoriesOfInexistentProcess() throws Exception {
         final long numberOfCategories = getProcessAPI().getNumberOfCategories(Long.MAX_VALUE);
         assertEquals(0, numberOfCategories);
     }
 
     @Test
-    public void testGetNumberOfProcessesInCategory() throws Exception {
+    public void getNumberOfProcessesInCategory() throws Exception {
         // generate categories
         final Category category = generateCategory(1, "categoryName", "test get number of processes in category").get(0);
+        categories.add(category);
         // generate process definition
-        final List<ProcessDefinition> processDefinitionList = generateProcessDefinition(3, "processName", "version");
-        final long categoryId = category.getId();
+        processDefinitions = generateProcessDefinition(3, "processName", "version");
         // test
-        for (final ProcessDefinition processDefinition : processDefinitionList) {
-            getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinition.getId());
+        for (final ProcessDefinition processDefinition : processDefinitions) {
+            getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinition.getId());
         }
-        final long processNumber = getProcessAPI().getNumberOfProcessDefinitionsOfCategory(categoryId);
+        final long processNumber = getProcessAPI().getNumberOfProcessDefinitionsOfCategory(category.getId());
         assertEquals(3, processNumber);
-        // delete category and process definitions
-        getProcessAPI().deleteCategory(categoryId);
-        for (final ProcessDefinition processDefinition : processDefinitionList) {
-            getProcessAPI().deleteProcess(processDefinition.getId());
-        }
     }
 
     @Test
-    public void testGetNumberOfProcessesInCategoryWithInexistentCategory() throws Exception {
+    public void getNumberOfProcessesInCategoryWithInexistentCategory() throws Exception {
         final long processesInCategory = getProcessAPI().getNumberOfProcessDefinitionsOfCategory(Long.MAX_VALUE);
         assertEquals(0, processesInCategory);
     }
 
     @Test
-    public void testGetProcessDeploymentInfosOfCategory() throws Exception {
+    public void getProcessDeploymentInfosOfCategory() throws Exception {
         // generate category
-        final long categoryId = getProcessAPI().createCategory(name, description).getId();
+        final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
+        final long categoryId = category.getId();
         // generate process definitions
-        final List<ProcessDefinition> processDefinitionList = generateProcessDefinition(3, "process", "version");
+        processDefinitions = generateProcessDefinition(3, "process", "version");
         final List<Long> processDefinitionIds = new ArrayList<Long>();
-        for (final ProcessDefinition processDefinition : processDefinitionList) {
+        for (final ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionIds.add(processDefinition.getId());
         }
         // add process definitions to category
@@ -469,24 +424,19 @@ public class ProcessCategoryTest extends CommonAPITest {
         final List<ProcessDeploymentInfo> outOfRangeList = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 3, 3,
                 ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(0, outOfRangeList.size());
-
-        // delete
-        getProcessAPI().deleteCategory(categoryId);
-        for (final Long processDefinitionId : processDefinitionIds) {
-            getProcessAPI().deleteProcess(processDefinitionId);
-        }
     }
 
     @Test
-    public void testGetCategoriesOfProcessDefinition() throws Exception {
+    public void getCategoriesOfProcessDefinition() throws Exception {
         // generate categories
-        final List<Category> categoryList = generateCategory(3, "category", "test get categories of process definition ");
+        categories = generateCategory(3, "category", "test get categories of process definition ");
         // generate process definition
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "process", "version").get(0);
+        processDefinitions.add(processDefinition);
         final long processDefinitionId = processDefinition.getId();
 
         // add
-        for (final Category category : categoryList) {
+        for (final Category category : categories) {
             getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
         }
         // test
@@ -506,27 +456,21 @@ public class ProcessCategoryTest extends CommonAPITest {
 
         final List<Category> outOfRangeCategories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 3, 10, CategoryCriterion.NAME_ASC);
         assertEquals(0, outOfRangeCategories.size());
-
-        // delete
-        for (final Category category : categoryList) {
-            getProcessAPI().deleteCategory(category.getId());
-        }
-        getProcessAPI().deleteProcess(processDefinitionId);
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "Category", "ProcessDefinition" })
     @Test
-    public void testGetCategoriesUnrelatedToProcessDefinition() throws Exception {
+    public void getCategoriesUnrelatedToProcessDefinition() throws Exception {
         // generate categories
-        final List<Category> categoryList = generateCategory(3, "category", "test get categories of process definition ");
+        categories = generateCategory(3, "category", "test get categories of process definition ");
         // generate process definition
-        final List<ProcessDefinition> processDefinitions = generateProcessDefinition(3, "process", "version");
+        processDefinitions = generateProcessDefinition(3, "process", "version");
         final long processDefinitionId = processDefinitions.get(0).getId();
 
         // add
-        getProcessAPI().addProcessDefinitionToCategory(categoryList.get(1).getId(), processDefinitions.get(1).getId());
-        getProcessAPI().addProcessDefinitionToCategory(categoryList.get(1).getId(), processDefinitions.get(2).getId());
-        getProcessAPI().addProcessDefinitionToCategory(categoryList.get(2).getId(), processDefinitions.get(2).getId());
+        getProcessAPI().addProcessDefinitionToCategory(categories.get(1).getId(), processDefinitions.get(1).getId());
+        getProcessAPI().addProcessDefinitionToCategory(categories.get(1).getId(), processDefinitions.get(2).getId());
+        getProcessAPI().addProcessDefinitionToCategory(categories.get(2).getId(), processDefinitions.get(2).getId());
 
         // Test : No category related
         final List<Category> categoryList_ASC = getProcessAPI().getCategoriesUnrelatedToProcessDefinition(processDefinitionId, 0, 10,
@@ -543,31 +487,23 @@ public class ProcessCategoryTest extends CommonAPITest {
         assertNotNull(categoryList_DESC);
         assertEquals(1, categoryList_DESC.size());
         assertEquals("category1", categoryList_DESC.get(0).getName());
-
-        // delete
-        for (final Category category : categoryList) {
-            getProcessAPI().deleteCategory(category.getId());
-        }
-        for (final ProcessDefinition processDefinition : processDefinitions) {
-            getProcessAPI().deleteProcess(processDefinition.getId());
-        }
     }
 
     @Test
-    public void testSearchCategoriesNotOfProcessDefinition() throws Exception {
+    public void searchCategoriesNotOfProcessDefinition() throws Exception {
         // generate categories
-        final List<Category> categoryList = generateCategory(3, "category", "test get categories of process definition ");
+        categories = generateCategory(3, "category", "test get categories of process definition ");
         // generate process definition
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "process", "version").get(0);
+        processDefinitions.add(processDefinition);
         final long processDefinitionId = processDefinition.getId();
 
         // add
-        for (final Category category : categoryList) {
+        for (final Category category : categories) {
             getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
         }
 
         // test
-
         final List<Category> categoryList_ASC = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 0, 10, CategoryCriterion.NAME_ASC);
         assertNotNull(categoryList_ASC);
         assertEquals(3, categoryList_ASC.size());
@@ -584,76 +520,137 @@ public class ProcessCategoryTest extends CommonAPITest {
 
         final List<Category> outOfRangeCategories = getProcessAPI().getCategoriesOfProcessDefinition(processDefinitionId, 3, 10, CategoryCriterion.NAME_ASC);
         assertEquals(0, outOfRangeCategories.size());
-
-        // delete
-        for (final Category category : categoryList) {
-            getProcessAPI().deleteCategory(category.getId());
-        }
-        getProcessAPI().deleteProcess(processDefinitionId);
     }
 
     @Test
-    public void testRemoveProcessDefinitionsOfCategory() throws Exception {
+    @Deprecated
+    public void oldRemoveProcessDefinitionsOfCategory() throws Exception {
         // generate category
-        final long categoryId = getProcessAPI().createCategory(name, description).getId();
+        final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         // generate process definitions
-        final List<ProcessDefinition> processDefinitionList = generateProcessDefinition(3, "process", "version");
+        processDefinitions = generateProcessDefinition(3, "process", "version");
         final List<Long> processDefinitionIds = new ArrayList<Long>();
-        for (final ProcessDefinition processDefinition : processDefinitionList) {
+        for (final ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionIds.add(processDefinition.getId());
         }
         // add process definitions to category
-        getProcessAPI().addProcessDefinitionsToCategory(categoryId, processDefinitionIds);
+        getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
         // test
-        getProcessAPI().removeAllProcessDefinitionsFromCategory(categoryId);
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(categoryId, 0, 10, null);
+        getProcessAPI().removeAllProcessDefinitionsFromCategory(category.getId());
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
         assertNotNull(processDeploymentInfos);
         assertEquals(0, processDeploymentInfos.size());
-        // delete
-        getProcessAPI().deleteCategory(categoryId);
-        for (final Long processDefinitionId : processDefinitionIds) {
-            getProcessAPI().deleteProcess(processDefinitionId);
-        }
     }
 
     @Test
-    public void testRemoveProcessDefinitionsOfUnknownCategoryDoesntThrowException() throws Exception {
+    public void removeProcessDefinitionsOfCategory() throws Exception {
+        // generate category
+        final Category category = getProcessAPI().createCategory(name, description);
+        categories.add(category);
         // generate process definitions
-        final List<ProcessDefinition> processDefinitionList = generateProcessDefinition(3, "process", "version");
+        processDefinitions = generateProcessDefinition(3, "process", "version");
         final List<Long> processDefinitionIds = new ArrayList<Long>();
-        for (final ProcessDefinition processDefinition : processDefinitionList) {
+        for (final ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionIds.add(processDefinition.getId());
         }
+        // add process definitions to category
+        getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
         // test
-        try {
-            getProcessAPI().removeAllProcessDefinitionsFromCategory(Long.MAX_VALUE);
-        } finally {
-            for (final Long processDefinitionId : processDefinitionIds) {
-                getProcessAPI().deleteProcess(processDefinitionId);
-            }
-        }
+        getProcessAPI().removeProcessDefinitionsFromCategory(category.getId(), 0, 2);
+        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10, null);
+        assertNotNull(processDeploymentInfos);
+        assertEquals(1, processDeploymentInfos.size());
     }
 
     @Test
-    public void testGetNumberOfUnCategoriedProcessesDefinitions() throws Exception {
+    @Deprecated
+    public void oldRemoveProcessDefinitionsOfUnknownCategoryDoesntThrowException() throws Exception {
+        // generate process definitions
+        processDefinitions = generateProcessDefinition(3, "process", "version");
+        // test
+        getProcessAPI().removeAllProcessDefinitionsFromCategory(Long.MAX_VALUE);
+    }
+
+    @Test
+    public void removeProcessDefinitionsOfUnknownCategoryDoesntThrowException() throws Exception {
+        // generate process definitions
+        processDefinitions = generateProcessDefinition(3, "process", "version");
+        // test
+        getProcessAPI().removeProcessDefinitionsFromCategory(Long.MAX_VALUE, 0, 0);
+    }
+
+    @Test
+    @Deprecated
+    public void oldRemoveProcessDefinitionFromCategory() throws Exception {
+        // generate categories
+        categories = generateCategory(3, "category", "test remove one specified process definition from all categories ");
+        // generate process definition
+        final ProcessDefinition processDefinition = generateProcessDefinition(1, "process", "version").get(0);
+        processDefinitions.add(processDefinition);
+        final long processDefinitionId = processDefinition.getId();
+
+        // add
+        for (final Category category : categories) {
+            getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
+        }
+        long count = getProcessAPI().getNumberOfCategories(processDefinitionId);
+        assertEquals(3, count);
+        // test
+        getProcessAPI().removeAllCategoriesFromProcessDefinition(processDefinitionId);
+        count = getProcessAPI().getNumberOfCategories(processDefinitionId);
+        assertEquals(0, count);
+    }
+
+    @Test
+    public void removeProcessDefinitionFromCategory() throws Exception {
+        // generate categories
+        categories = generateCategory(3, "category", "test remove one specified process definition from all categories ");
+        // generate process definition
+        final ProcessDefinition processDefinition = generateProcessDefinition(1, "process", "version").get(0);
+        processDefinitions.add(processDefinition);
+        final long processDefinitionId = processDefinition.getId();
+
+        // add
+        for (final Category category : categories) {
+            getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
+        }
+        long count = getProcessAPI().getNumberOfCategories(processDefinitionId);
+        assertEquals(3, count);
+        // test
+        getProcessAPI().removeCategoriesFromProcessDefinition(processDefinitionId, 0, 2);
+        count = getProcessAPI().getNumberOfCategories(processDefinitionId);
+        assertEquals(1, count);
+    }
+
+    @Test
+    @Deprecated
+    public void oldRemoveUnknowProcessDefinitionFromCategoryDontThrowsException() throws Exception {
+        getProcessAPI().removeAllCategoriesFromProcessDefinition(0);
+    }
+
+    @Test
+    public void removeUnknowProcessDefinitionFromCategoryDontThrowsException() throws Exception {
+        getProcessAPI().removeCategoriesFromProcessDefinition(0, 0, 1);
+    }
+
+    @Test
+    public void getNumberOfUnCategoriedProcessesDefinitions() throws Exception {
         long processDefinitionCount = getProcessAPI().getNumberOfUncategorizedProcessDefinitions();
         assertEquals(0, processDefinitionCount);
 
         final ProcessDefinition processDefinition = generateProcessDefinition(1, "processName", "version").get(0);
+        processDefinitions.add(processDefinition);
         final long processDefinitionId = processDefinition.getId();
         processDefinitionCount = getProcessAPI().getNumberOfUncategorizedProcessDefinitions();
         assertEquals(1, processDefinitionCount);
 
-        getProcessAPI().deleteProcess(processDefinitionId);
+        deleteProcess(processDefinitionId);
     }
 
     @Test
-    public void testGetUnCategoriedProcesses() throws Exception {
-        final List<ProcessDefinition> processDefinitionList = generateProcessDefinition(3, "process", "version");
-        final List<Long> processDefinitionIds = new ArrayList<Long>();
-        for (final ProcessDefinition processDefinition : processDefinitionList) {
-            processDefinitionIds.add(processDefinition.getId());
-        }
+    public void getUnCategoriedProcesses() throws Exception {
+        processDefinitions = generateProcessDefinition(3, "process", "version");
         final List<ProcessDeploymentInfo> processDeploymentInfoList_NameASC = getProcessAPI().getUncategorizedProcessDeploymentInfos(0, 3,
                 ProcessDeploymentInfoCriterion.NAME_ASC);
         assertNotNull(processDeploymentInfoList_NameASC);
@@ -672,41 +669,6 @@ public class ProcessCategoryTest extends CommonAPITest {
         final List<ProcessDeploymentInfo> outOfRangeProcesses = getProcessAPI().getUncategorizedProcessDeploymentInfos(3, 3,
                 ProcessDeploymentInfoCriterion.NAME_DESC);
         assertEquals(0, outOfRangeProcesses.size());
-
-        for (final Long processDefinitionId : processDefinitionIds) {
-            getProcessAPI().deleteProcess(processDefinitionId);
-        }
-    }
-
-    @Test
-    public void testRemoveProcessDefinitionFromCategory() throws Exception {
-        // generate categories
-        final List<Category> categoryList = generateCategory(3, "category", "test remove one specified process definition from all categories ");
-        // generate process definition
-        final ProcessDefinition processDefinition = generateProcessDefinition(1, "process", "version").get(0);
-        final long processDefinitionId = processDefinition.getId();
-
-        // add
-        for (final Category category : categoryList) {
-            getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
-        }
-        long count = getProcessAPI().getNumberOfCategories(processDefinitionId);
-        assertEquals(3, count);
-        // test
-        getProcessAPI().removeAllCategoriesFromProcessDefinition(processDefinitionId);
-        count = getProcessAPI().getNumberOfCategories(processDefinitionId);
-        assertEquals(0, count);
-        // delete
-        for (final Category category : categoryList) {
-            getProcessAPI().deleteCategory(category.getId());
-        }
-        getProcessAPI().deleteProcess(processDefinitionId);
-    }
-
-    @Test
-    public void testRemoveUnknowProcessDefinitionFromCategoryDontThrowsException() throws Exception {
-        final long processDefinitionId = 0;
-        getProcessAPI().removeAllCategoriesFromProcessDefinition(processDefinitionId);
     }
 
     private List<Category> generateCategory(final int count, final String categoryName, final String description) throws AlreadyExistsException,
@@ -723,7 +685,7 @@ public class ProcessCategoryTest extends CommonAPITest {
             ActorMappingImportException, AlreadyExistsException {
         final List<ProcessDefinition> processDefinitionList = new ArrayList<ProcessDefinition>();
         for (int i = 1; i <= count; i++) {
-            final DesignProcessDefinition designProcessDefinition = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, version + i,
+            final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, version + i,
                     Arrays.asList("step1"), Arrays.asList(true));
             final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
                     .done();
@@ -732,38 +694,32 @@ public class ProcessCategoryTest extends CommonAPITest {
         return processDefinitionList;
     }
 
-    @Test
+    @Test(expected = AlreadyExistsException.class)
     public void cannotAddTheSameCategoryToAProcess() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9").addAutomaticTask("step1").getProcess();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(definition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        final long categoryId = getProcessAPI().createCategory("Human resources", "Category for personnel Management").getId();
-        getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(categoryId));
-        try {
-            getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(categoryId));
-            fail("It is not allowed to add twice the same category to a process");
-        } catch (final AlreadyExistsException cipaee) {
-            getProcessAPI().deleteCategory(categoryId);
-            getProcessAPI().deleteProcess(processDefinition.getId());
-        }
+        processDefinitions.add(processDefinition);
+        final Category category = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        categories.add(category);
+        getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(category.getId()));
+        getProcessAPI().addCategoriesToProcess(processDefinition.getId(), Arrays.asList(category.getId()));
+        fail("It is not allowed to add twice the same category to a process");
     }
 
-    @Test
+    @Test(expected = AlreadyExistsException.class)
     public void cannotAddTheSameCategoryToAProcessList() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9").addAutomaticTask("step1").getProcess();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(definition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        final long categoryId = getProcessAPI().createCategory("Human resources", "Category for personnel Management").getId();
-        getProcessAPI().addProcessDefinitionsToCategory(categoryId, Arrays.asList(processDefinition.getId()));
-        try {
-            getProcessAPI().addProcessDefinitionsToCategory(categoryId, Arrays.asList(processDefinition.getId()));
-            fail("It is not allowed to add twice the same category to a process");
-        } catch (final AlreadyExistsException cipaee) {
-            getProcessAPI().deleteCategory(categoryId);
-            getProcessAPI().deleteProcess(processDefinition.getId());
-        }
+        processDefinitions.add(processDefinition);
+        final Category category = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        categories.add(category);
+        getProcessAPI().addProcessDefinitionsToCategory(category.getId(), Arrays.asList(processDefinition.getId()));
+        getProcessAPI().addProcessDefinitionsToCategory(category.getId(), Arrays.asList(processDefinition.getId()));
+        fail("It is not allowed to add twice the same category to a process");
     }
 
     @Cover(classes = { Category.class, ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-1047", keywords = { "Category", "Process" })
@@ -773,15 +729,12 @@ public class ProcessCategoryTest extends CommonAPITest {
         final DesignProcessDefinition definition = processBuilder.createNewInstance("category", "0.9").addAutomaticTask("step1").getProcess();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(definition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        final long categoryId = getProcessAPI().createCategory("Human resources", "Category for personnel Management").getId();
-        getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinition.getId());
-        try {
-            getProcessAPI().addProcessDefinitionToCategory(categoryId, processDefinition.getId());
-            fail("It is not allowed to add twice the same category to a process");
-        } finally {
-            getProcessAPI().deleteCategory(categoryId);
-            getProcessAPI().deleteProcess(processDefinition.getId());
-        }
+        processDefinitions.add(processDefinition);
+        final Category category = getProcessAPI().createCategory("Human resources", "Category for personnel Management");
+        categories.add(category);
+        getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinition.getId());
+        getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinition.getId());
+        fail("It is not allowed to add twice the same category to a process");
     }
 
 }

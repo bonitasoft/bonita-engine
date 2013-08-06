@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMappin
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 /**
@@ -136,12 +135,10 @@ public interface DocumentMappingService {
      *            name of document
      * @param time
      *            the archive time
-     * @param persistence
-     *            a ReadPersistenceService object
      * @return the archived document mapping suit to the criteria
      * @throws SDocumentMappingNotFoundException
      */
-    SADocumentMapping get(long processInstanceId, String documentName, long time, ReadPersistenceService persistence) throws SDocumentMappingNotFoundException;
+    SADocumentMapping get(long processInstanceId, String documentName, long time) throws SDocumentMappingNotFoundException;
 
     /**
      * archive the specific document mapping in the archive date
@@ -208,19 +205,17 @@ public interface DocumentMappingService {
      * @return number of archived documents suit to the query criteria
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedDocuments(QueryOptions queryOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    long getNumberOfArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived documents suit to the query criteria
      * 
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @param persistenceService
-     *            persistenceService used to do the search
      * @return a list of SDocumentMapping objects
      * @throws SBonitaSearchException
      */
-    List<SADocumentMapping> searchArchivedDocuments(QueryOptions queryOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    List<SADocumentMapping> searchArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get number of archived documents supervised by the specific user and suit to the query criteria
@@ -229,13 +224,10 @@ public interface DocumentMappingService {
      *            identifier of user
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @param persistenceService
-     *            persistenceService used to do the search
      * @return number of archived documents suit to the query criteria
      * @throws SBonitaSearchException
      */
-    long getNumberOfArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    long getNumberOfArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Search all archived documents supervised by the specific user and suit to the query criteria
@@ -244,38 +236,31 @@ public interface DocumentMappingService {
      *            identifier of user
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
-     * @param persistenceService
-     *            persistenceService used to do the search
      * @return a list of SDocumentMapping objects
      * @throws SBonitaSearchException
      */
-    List<SADocumentMapping> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+    List<SADocumentMapping> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Get archived document mapping by its id
      * 
      * @param documentId
      *            identifier of the archived document mapping
-     * @param persistenceService
-     *            persistenceService used to do the search
      * @return the archived document mapping object
      * @throws SDocumentMappingNotFoundException
      */
-    SADocumentMapping getArchivedDocument(long documentId, ReadPersistenceService persistenceService) throws SDocumentMappingNotFoundException;
+    SADocumentMapping getArchivedDocument(long documentId) throws SDocumentMappingNotFoundException;
 
     /**
      * Retrieve the archive of a version of a document
      * 
      * @param documentId
      *            the document id of the document to retrieve
-     * @param persistenceService
-     *            the persistence service to use
      * @return the corresponding document mapping
      * @throws SDocumentMappingNotFoundException
      *             when the document does not exists
      */
-    SADocumentMapping getArchivedVersionOfDocument(long documentId, ReadPersistenceService persistenceService) throws SDocumentMappingNotFoundException;
+    SADocumentMapping getArchivedVersionOfDocument(long documentId) throws SDocumentMappingNotFoundException;
 
     /**
      * Delete the specific document mapping

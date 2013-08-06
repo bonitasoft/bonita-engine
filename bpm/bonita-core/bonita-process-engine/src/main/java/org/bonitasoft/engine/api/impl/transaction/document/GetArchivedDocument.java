@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,10 +17,10 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 
 /**
  * @author Zhang Bole
+ * @author Celine Souchet
  */
 public class GetArchivedDocument implements TransactionContentWithResult<SAProcessDocument> {
 
@@ -28,19 +28,16 @@ public class GetArchivedDocument implements TransactionContentWithResult<SAProce
 
     private final ProcessDocumentService processDocumentService;
 
-    private final ReadPersistenceService persistenceService;
-
     private final long documentId;
 
-    public GetArchivedDocument(final ProcessDocumentService processDocumentService, final long documentId, final ReadPersistenceService persistenceService) {
+    public GetArchivedDocument(final ProcessDocumentService processDocumentService, final long documentId) {
         this.processDocumentService = processDocumentService;
         this.documentId = documentId;
-        this.persistenceService = persistenceService;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        sAProcessDocument = processDocumentService.getArchivedVersionOfProcessDocument(documentId, persistenceService);
+        sAProcessDocument = processDocumentService.getArchivedVersionOfProcessDocument(documentId);
     }
 
     @Override

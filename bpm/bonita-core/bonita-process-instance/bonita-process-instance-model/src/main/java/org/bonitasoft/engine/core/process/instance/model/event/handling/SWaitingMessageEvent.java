@@ -32,4 +32,6 @@ public interface SWaitingMessageEvent extends SWaitingEvent {
 
     String getCorrelation5();
 
+    int getProgress();
+
 }

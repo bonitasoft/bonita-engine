@@ -32,7 +32,6 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -74,12 +73,11 @@ public class GetActorIdsForUserIdIncludingTeam extends TenantCommand {
     }
 
     private Map<Long, Set<Long>> getActorIdsForUserIdIncludingTeam(final long managerId) throws SBonitaException {
-        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
 
         // Let's retrieve the list of all users of whom managerId is a manager:
         final TransactionContentWithResult<List<SUser>> getUsersByManager = new GetUsersByManager(serviceAccessor.getIdentityService(), managerId);
-        transactionExecutor.execute(getUsersByManager);
+        getUsersByManager.execute();
         final List<SUser> users = getUsersByManager.getResult();
 
         // Let's construct the list of all user Ids:
@@ -96,7 +94,7 @@ public class GetActorIdsForUserIdIncludingTeam extends TenantCommand {
         // GetAllProcessDefinitionsIds getAllPD = new GetAllProcessDefinitionsIds(fromIndex, numberOfResult);
         // while ((processDefinitionIds = processDefinitionService.getProcessDefinitionIds(fromIndex, numberOfResult)).size() > 0) {
         final GetAllProcessDefinitionsIds getAllPD = new GetAllProcessDefinitionsIds(processDefinitionService);
-        transactionExecutor.execute(getAllPD);
+        getAllPD.execute();
         final List<Long> processDefinitionIds = getAllPD.getResult();
 
         // For each process definition:
@@ -105,7 +103,7 @@ public class GetActorIdsForUserIdIncludingTeam extends TenantCommand {
             // for each user (manager included):
             for (final long userId : userIds) {
                 final GetActors getActors = new GetActors(processDefinition, userId, serviceAccessor.getActorMappingService());
-                transactionExecutor.execute(getActors);
+                getActors.execute();
                 final List<Long> actorIds = getActors.getResult();
                 actorIdsForProcessDef.addAll(actorIds);
             }

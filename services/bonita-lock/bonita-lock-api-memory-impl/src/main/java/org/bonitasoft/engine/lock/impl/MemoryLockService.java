@@ -15,7 +15,7 @@ package org.bonitasoft.engine.lock.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
@@ -35,23 +35,20 @@ public class MemoryLockService implements LockService {
 
     private final TechnicalLoggerService logger;
 
-    private final boolean debugEnabled;
-
     public MemoryLockService(final TechnicalLoggerService logger) {
         this.logger = logger;
-        debugEnabled = logger.isLoggable(MemoryLockService.class, TechnicalLogSeverity.DEBUG);
     }
 
-    private final Map<String, ReentrantReadWriteLock> readWriteLock = new HashMap<String, ReentrantReadWriteLock>();
+    private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
 
     private final Map<String, Long> lockCount = new HashMap<String, Long>();
 
-    private void ensureProcessHasLockObject(final String key) {
+    private void increaseLockCount(final String key) {
         synchronized (lock) {
             long updatedLockCount;
-            if (!readWriteLock.containsKey(key)) {
+            if (!locks.containsKey(key)) {
                 // use fair mode?
-                readWriteLock.put(key, new ReentrantReadWriteLock());
+                locks.put(key, new ReentrantLock());
                 updatedLockCount = 0L;
             } else {
                 updatedLockCount = lockCount.get(key);
@@ -60,71 +57,69 @@ public class MemoryLockService implements LockService {
         }
     }
 
-    @Override
-    public void createExclusiveLockAccess(final long objectToLockId, final String objectType) throws SLockException {
-        if (debugEnabled) {
-            logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]request X id=" + objectToLockId + ", type=" + objectType);
-        }
-        final String key = getKey(objectToLockId, objectType);
-        ensureProcessHasLockObject(key);
-        readWriteLock.get(key).writeLock().lock();
-        if (debugEnabled) {
-            logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]acquired X id=" + objectToLockId + ", type=" + objectType);
-        }
-    }
-
-    private String getKey(final long objectToLockId, final String objectType) throws SLockException {
-        final StringBuilder stb = new StringBuilder();
-        stb.append(objectType);
-        stb.append(SEPARATOR);
-        stb.append(objectToLockId);
-        return stb.toString();
-    }
-
-    @Override
-    public void releaseExclusiveLockAccess(final long objectToLockId, final String objectType) throws SLockException {
-        if (debugEnabled) {
-            logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]release X id=" + objectToLockId + ", type=" + objectType);
-        }
-        final String key = getKey(objectToLockId, objectType);
-        readWriteLock.get(key).writeLock().unlock();
-        removeFromMapIfPossible(key);
-    }
-
-    @Override
-    public void createSharedLockAccess(final long objectToLockId, final String objectType) throws SLockException {
-        if (debugEnabled) {
-            logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]request S id=" + objectToLockId + ", type=" + objectType);
-        }
-        final String key = getKey(objectToLockId, objectType);
-        ensureProcessHasLockObject(key);
-        readWriteLock.get(key).readLock().lock();
-        if (debugEnabled) {
-            logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]acquired S id=" + objectToLockId + ", type=" + objectType);
-        }
-    }
-
-    @Override
-    public void releaseSharedLockAccess(final long objectToLockId, final String objectType) throws SLockException {
-        if (debugEnabled) {
-            logger.log(MemoryLockService.class, TechnicalLogSeverity.DEBUG, "[LOCK]release S id=" + objectToLockId + ", type=" + objectType);
-        }
-        final String key = getKey(objectToLockId, objectType);
-        readWriteLock.get(key).readLock().unlock();
-        removeFromMapIfPossible(key);
-    }
-
-    private void removeFromMapIfPossible(final String key) {
+    private void decreaseLockCount(final String key) {
         synchronized (lock) {
             if (lockCount.containsKey(key)) {
                 final Long count = lockCount.get(key) - 1;
                 lockCount.put(key, count);
                 if (count <= 0) {
-                    readWriteLock.remove(key);
+                    locks.remove(key);
                     lockCount.remove(key);
                 }
             }
         }
     }
 
+    Long getLockCount(final long objectToLockId, final String objectType) {
+        synchronized (lock) {
+            return lockCount.get(buildKey(objectToLockId, objectType));
+        }
+    }
+
+    private String buildKey(final long objectToLockId, final String objectType) {
+        return objectType + SEPARATOR + objectToLockId;
+    }
+
+    @Override
+    public void unlock(final long objectToLockId, final String objectType) throws SLockException {
+        final String key = buildKey(objectToLockId, objectType);
+        locks.get(key).unlock();
+        decreaseLockCount(key);
+    }
+
+    @Override
+    public boolean tryLock(final long objectToLockId, final String objectType) throws SLockException {
+        final String key = buildKey(objectToLockId, objectType);
+        increaseLockCount(key);
+        return locks.get(key).tryLock();
+    }
+
+    @Override
+    public void lock(final long objectToLockId, final String objectType) throws SLockException {
+        final String key = buildKey(objectToLockId, objectType);
+        increaseLockCount(key);
+
+        final long before = System.currentTimeMillis();
+        locks.get(key).lock();
+        final long time = System.currentTimeMillis() - before;
+
+        final TechnicalLogSeverity severity = selectSeverity(time);
+        if (severity != null) {
+            logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
+            if (TechnicalLogSeverity.DEBUG.equals(severity)) {
+                logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
+            }
+        }
+    }
+
+    TechnicalLogSeverity selectSeverity(final long time) {
+        if (time > 150) {
+            return TechnicalLogSeverity.INFO;
+        } else if (time > 50) {
+            return TechnicalLogSeverity.DEBUG;
+        } else {
+            // No need to log anything
+            return null;
+        }
+    }
 }

@@ -29,7 +29,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.search.SearchResult;
@@ -60,11 +59,10 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor tenantAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.tenantAccessor = tenantAccessor;
-        final TransactionExecutor transactionExecutor = this.tenantAccessor.getTransactionExecutor();
         boolean isHas = false;
 
-        final long userId = (Long) parameters.get(USER_ID_KEY);
-        if (userId == 0) {
+        final Long userId = (Long) parameters.get(USER_ID_KEY);
+        if (userId == null || userId == 0) {
             throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to Long.");
         }
 
@@ -82,12 +80,12 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
                 processInstanceId);
         try {
-            transactionExecutor.execute(getProcessInstance);
+            getProcessInstance.execute();
         } catch (final SBonitaException e) {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
                     searchEntitiesDescriptor, processInstanceId, 0, 5);
             try {
-                transactionExecutor.execute(getArchivedProcessInstanceList);
+                getArchivedProcessInstanceList.execute();
             } catch (final SBonitaException e1) {
                 throw new SCommandExecutionException("No processInstance and archived ProcessInstance with id: " + processInstanceId
                         + " during executing command isAllowedToSeeOverviewForm.", e);
@@ -107,7 +105,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             final GetActorsOfUserCanStartProcessDefinitions checker = new GetActorsOfUserCanStartProcessDefinitions(actorMappingService, processDefinitionId,
                     userId);
             try {
-                transactionExecutor.execute(checker);
+                checker.execute();
             } catch (final SBonitaException e) {
                 throw new SCommandExecutionException("No actorInitiator of user who can start the processDefinition with id:" + processDefinitionId, e);
             }
@@ -124,7 +122,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                     searchEntitiesDescriptor.getProcessInstanceDescriptor(), userId, searchOptions, processDefinitionService);
             SearchResult<ProcessInstance> processInstanceRes = null;
             try {
-                transactionExecutor.execute(searchOpenProcessInstances);
+                searchOpenProcessInstances.execute();
                 processInstanceRes = searchOpenProcessInstances.getResult();
             } catch (final SBonitaException sbe) {
                 throw new SCommandExecutionException("No processInstance that involves user :" + userId
@@ -136,7 +134,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 final SearchArchivedProcessInstancesInvolvingUser archivedSearcher = new SearchArchivedProcessInstancesInvolvingUser(userId,
                         processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
                 try {
-                    transactionExecutor.execute(archivedSearcher);
+                    archivedSearcher.execute();
                 } catch (final SBonitaException e) {
                     throw new SCommandExecutionException("No archived processInstance that involves user :" + userId
                             + " found during execution of method IsAllowedToSeeOverviewForm.", e);

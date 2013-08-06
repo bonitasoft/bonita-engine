@@ -31,8 +31,6 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Matthieu Chaffotte
@@ -42,8 +40,6 @@ public class JobWrapper implements StatelessJob {
     private static final long serialVersionUID = 7145451610635400449L;
 
     private final StatelessJob statelessJob;
-
-    private final TransactionService transactionService;
 
     private final TechnicalLoggerService logger;
 
@@ -61,20 +57,16 @@ public class JobWrapper implements StatelessJob {
 
     private final SessionService sessionService;
 
-    private final boolean wrapInTransaction;
-
-    public JobWrapper(final String name, final TransactionService transactionService, final QueriableLoggerService logService, final StatelessJob statelessJob,
-            final TechnicalLoggerService logger, final long tenantId, final EventService eventService, final JobTruster jobTruster,
-            final SessionService sessionService, final SessionAccessor sessionAccessor) {
+    public JobWrapper(final String name, final QueriableLoggerService logService, final StatelessJob statelessJob, final TechnicalLoggerService logger,
+            final long tenantId, final EventService eventService, final JobTruster jobTruster, final SessionService sessionService,
+            final SessionAccessor sessionAccessor) {
         this.name = name;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
-        this.transactionService = transactionService;
         this.statelessJob = statelessJob;
         this.logger = logger;
         this.tenantId = tenantId;
         this.eventService = eventService;
-        wrapInTransaction = statelessJob.isWrappedInTransaction();
         jobExecuting = eventService.getEventBuilder().createNewInstance(JOB_EXECUTING).done();
         jobCompleted = eventService.getEventBuilder().createNewInstance(JOB_COMPLETED).done();
         if (jobTruster.isTrusted(statelessJob)) {// FIXME
@@ -115,9 +107,6 @@ public class JobWrapper implements StatelessJob {
                 jobExecuting.setObject(this);
                 eventService.fireEvent(jobExecuting);
             }
-            if (wrapInTransaction) {
-                transactionService.begin();
-            }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "start execution of " + statelessJob.getName());
             }
@@ -126,16 +115,9 @@ public class JobWrapper implements StatelessJob {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "finished execution of " + statelessJob.getName());
             }
         } catch (final Exception e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error executing job " + name + " exception was thrown:" + e.getMessage());
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error executing job " + name + " exception was thrown:" + e.getMessage(), e);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-            }
-            if (wrapInTransaction) {
-                try {
-                    transactionService.setRollbackOnly();
-                } catch (final STransactionException te) {
-                    throw new JobExecutionException(te);
-                }
             }
             throw new JobExecutionException(e);
         } finally {
@@ -143,45 +125,24 @@ public class JobWrapper implements StatelessJob {
                 jobCompleted.setObject(this);
                 eventService.fireEvent(jobCompleted);
             }
-            try {
-                if (wrapInTransaction) {
-                    transactionService.complete();
-                }
-            } catch (final Exception e) {
-                throw new JobExecutionException(e);
-            } finally {
-                if (session != null) {
-                    try {
-                        sessionAccessor.deleteSessionId();
-                        sessionService.deleteSession(session.getId());
-                    } catch (final SSessionNotFoundException e) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
-                    }
+            if (session != null) {
+                try {
+                    sessionAccessor.deleteSessionId();
+                    sessionService.deleteSession(session.getId());
+                } catch (final SSessionNotFoundException e) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
                 }
             }
         }
     }
 
     private SSession createSession() throws Exception {
-        try {
-            transactionService.begin();
-            return sessionService.createSession(tenantId, "scheduler");
-        } catch (final Exception e) {
-            transactionService.setRollbackOnly();
-            throw e;
-        } finally {
-            transactionService.complete();
-        }
+        return sessionService.createSession(tenantId, "scheduler");
     }
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         statelessJob.setAttributes(attributes);
-    }
-
-    @Override
-    public boolean isWrappedInTransaction() {
-        return false;
     }
 
 }

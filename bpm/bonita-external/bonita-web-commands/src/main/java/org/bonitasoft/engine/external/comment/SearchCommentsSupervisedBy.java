@@ -20,7 +20,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.external.comment.transaction.SearchCommentsSupervisedByTransaction;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -49,13 +48,12 @@ public class SearchCommentsSupervisedBy extends TenantCommand {
             throw new SCommandParameterizationException("SEARCH_OPTIONS_KEY is missing");
         }
 
-        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
         final SCommentService commentService = serviceAccessor.getCommentService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchCommentsSupervisedByTransaction searchTransaction = new SearchCommentsSupervisedByTransaction(supervisorId, commentService,
                 searchEntitiesDescriptor.getCommentDescriptor(), searchOptions);
         try {
-            transactionExecutor.execute(searchTransaction);
+            searchTransaction.execute();
         } catch (final SBonitaException sbe) {
             throw new SCommandExecutionException(sbe);
         }

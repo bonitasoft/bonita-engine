@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 
 /**
@@ -38,8 +37,6 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     private final ProcessInstanceService processInstanceService;
 
-    private final ReadPersistenceService readPersistenceService;
-
     private final SAProcessInstanceBuilder saProcessInstanceBuilder;
 
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
@@ -50,13 +47,12 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     private final String documentName;
 
-    public GetDocumentByNameAtProcessInstantiation(final ProcessDocumentService processDocumentService, final ReadPersistenceService readPersistenceService,
-            final ProcessInstanceService processInstanceService, final SAProcessInstanceBuilder saProcessInstanceBuilder,
-            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId, final String documentName) {
+    public GetDocumentByNameAtProcessInstantiation(final ProcessDocumentService processDocumentService, final ProcessInstanceService processInstanceService,
+            final SAProcessInstanceBuilder saProcessInstanceBuilder, final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
+            final String documentName) {
         this.processDocumentService = processDocumentService;
         this.processInstanceId = processInstanceId;
         this.documentName = documentName;
-        this.readPersistenceService = readPersistenceService;
         this.processInstanceService = processInstanceService;
         this.saProcessInstanceBuilder = saProcessInstanceBuilder;
         this.searchEntitiesDescriptor = searchEntitiesDescriptor;
@@ -70,7 +66,7 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
         final ArchivedProcessInstance saProcessInstance = getArchivedProcessInstanceList.getResult().get(0);
         final Date startDate = saProcessInstance.getStartDate();
         final long startTime = startDate != null ? startDate.getTime() : 0;
-        result = processDocumentService.getDocument(processInstanceId, documentName, startTime, readPersistenceService);
+        result = processDocumentService.getDocument(processInstanceId, documentName, startTime);
     }
 
     @Override

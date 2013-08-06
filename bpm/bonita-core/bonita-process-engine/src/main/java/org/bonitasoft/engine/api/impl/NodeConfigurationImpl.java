@@ -132,4 +132,9 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         this.cleanInvalidSessionsJobCron = cleanInvalidSessionsJobCron;
     }
 
+    @Override
+    public boolean shouldClearSessions() {
+        return true;
+    }
+
 }

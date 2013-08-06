@@ -75,6 +75,7 @@ import org.junit.Test;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@SuppressWarnings("javadoc")
 public class CallActivityTest extends CommonAPITest {
 
     private User cebolinha;
@@ -444,8 +445,7 @@ public class CallActivityTest extends CommonAPITest {
         final WaitForStep waitForStep = waitForStep(50, 5000, userTaskName, rootProcessInstance, TestStates.getReadyState(null));
         if (childProcessInstances != null) {
             for (final ProcessInstance childProcessInstance : childProcessInstances) {
-                assertTrue("target process was not archived: " + childProcessInstance.getName(),
-                        waitProcessToFinishAndBeArchived(childProcessInstance));
+                assertTrue("target process was not archived: " + childProcessInstance.getName(), waitProcessToFinishAndBeArchived(childProcessInstance));
             }
         }
 

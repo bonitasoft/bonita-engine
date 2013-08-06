@@ -89,6 +89,11 @@ public class SWaitingMessageEventBuilderImpl extends SWaitingEventKeyProviderImp
     }
 
     @Override
+    public String getProgressKey() {
+        return "progress";
+    }
+
+    @Override
     public SWaitingMessageEventBuilder setCorrelation(final int index, final String correlation) {
         switch (index) {
             case 1:
