@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -23,16 +22,12 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Emmanuel Duchastenier
- * @author Celine Souchet
  */
-public abstract class AbstractBonitaWork implements Runnable, Serializable {
-
-    private static final long serialVersionUID = -3346630968791356467L;
+public abstract class AbstractBonitaWork implements Runnable {
 
     protected TechnicalLoggerService loggerService;
 
@@ -43,6 +38,8 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
     private long tenantId;
 
     protected TransactionService transactionService;
+
+    protected abstract String getDescription();
 
     public AbstractBonitaWork() {
         super();
@@ -81,10 +78,6 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
 
     protected abstract boolean isTransactional();
 
-    protected abstract String getDescription();
-
-    protected abstract void work() throws Exception;
-
     protected void workInTransaction() throws Exception {
         final Callable<Void> runWork = new Callable<Void>() {
 
@@ -99,31 +92,29 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
         transactionService.executeInTransaction(runWork);
     }
 
+    protected abstract void work() throws Exception;
+
     protected void handleError(final SBonitaException e) {
         throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.", e);
     }
 
-    protected long getTenantId() throws TenantIdNotSetException {
-        return tenantId;
+    public void setTechnicalLogger(final TechnicalLoggerService loggerService) {
+        this.loggerService = loggerService;
+    }
+
+    public void setSessionAccessor(final SessionAccessor sessionAccessor) {
+        this.sessionAccessor = sessionAccessor;
+    }
+
+    public void setSessionService(final SessionService sessionService) {
+        this.sessionService = sessionService;
     }
 
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
 
-    public void setTechnicalLogger(TechnicalLoggerService loggerService) {
-        this.loggerService = loggerService;
-    }
-
-    public void setSessionService(SessionService sessionService) {
-        this.sessionService = sessionService;
-    }
-
-    public void setSessionAccessor(SessionAccessor sessionAccessor) {
-        this.sessionAccessor = sessionAccessor;
-    }
-
-    public void setTransactionService(TransactionService transactionService) {
+    public void setTransactionService(final TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 

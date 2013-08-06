@@ -40,11 +40,8 @@ import org.bonitasoft.engine.work.NonTxBonitaWork;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
 public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
-
-    private static final long serialVersionUID = 9031279948838300081L;
 
     /**
      * @author Emmanuel Duchastenier

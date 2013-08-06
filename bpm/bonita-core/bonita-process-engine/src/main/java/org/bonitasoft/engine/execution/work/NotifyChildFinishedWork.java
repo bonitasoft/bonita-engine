@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,55 +13,44 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
- * @author Celine Souchet
  */
 public class NotifyChildFinishedWork extends TxBonitaWork {
 
-    private static final long serialVersionUID = -8987586943379865375L;
+    private final ContainerRegistry containerRegistry;
 
-    private final long processDefinitionId;
+    private final SProcessDefinition processDefinition;
 
-    private final long flowNodeInstanceId;
+    private final SFlowNodeInstance flowNodeInstance;
 
-    private final String parentType;
+    private final FlowNodeState state;
 
-    private final int stateId;
-
-    private final long parentId;
-
-    public NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType,
-            final int stateId) {
+    public NotifyChildFinishedWork(ContainerRegistry containerRegistry, SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
+            FlowNodeState state) {
         super();
-        this.processDefinitionId = processDefinitionId;
-        this.flowNodeInstanceId = flowNodeInstanceId;
-        this.parentId = parentId;
-        this.parentType = parentType;
-        this.stateId = stateId;
+        this.containerRegistry = containerRegistry;
+        this.processDefinition = processDefinition;
+        this.flowNodeInstance = flowNodeInstance;
+        this.state = state;
     }
 
     @Override
     protected void work() throws Exception {
-        final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
-        containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
+        containerRegistry.nodeReachedState(processDefinition, flowNodeInstance, state, flowNodeInstance.getParentContainerId(), flowNodeInstance
+                .getParentContainerType().name());
+
     }
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
-    }
-
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+        return getClass().getSimpleName() + ": processInstanceId:" + flowNodeInstance.getParentContainerId() + ", flowNodeInstanceId: "
+                + flowNodeInstance.getId();
     }
 }

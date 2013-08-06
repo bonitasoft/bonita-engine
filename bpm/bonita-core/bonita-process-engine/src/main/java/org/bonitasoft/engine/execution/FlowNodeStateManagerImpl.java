@@ -99,7 +99,6 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Zhang Bole
- * @author Celine Souchet
  */
 public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
@@ -580,6 +579,11 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             stateNames.add(state.getName());
         }
         return stateNames;
+    }
+
+    @Override
+    public void setProcessExecutor(final ProcessExecutor processExecutor) {
+        stateBehaviors.setProcessExecutor(processExecutor);
     }
 
 }

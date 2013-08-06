@@ -173,8 +173,8 @@ public class ProcessExecutorImplTest {
                 sProcessInstance);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(sProcessDefinition, starterId, starterDelegateId, operations, context, null);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(sProcessDefinition, starterId, starterDelegateId, operations, context, null);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(sProcessDefinition, starterId, starterDelegateId, null, operations, context);
+        final SProcessInstance result = mockedProcessExecutorImpl.start(sProcessDefinition, starterId, starterDelegateId, null, operations, context);
 
         assertNotNull(result);
         assertEquals(sProcessInstance, result);

@@ -36,40 +36,11 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  */
 public interface FlowNodeExecutor extends ContainerExecutor {
 
-    /**
-     * 
-     * @param flowNodeInstanceId
-     * @param expressionContext
-     * @param operations
-     * @param processInstanceId
-     * @param executerId
-     * @param executerDelegateId
-     * @return
-     * @throws SFlowNodeExecutionException
-     * @since 6.0
-     */
     FlowNodeState stepForward(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, long processInstanceId,
             Long executerId, Long executerDelegateId) throws SFlowNodeExecutionException;
 
-    /**
-     * 
-     * @param processDefinition
-     * @param flowNodeInstanceId
-     * @param stateId
-     * @throws SActivityStateExecutionException
-     * @since 6.1
-     */
-    void setStateByStateId(SProcessDefinition processDefinition, long flowNodeInstanceId, int stateId) throws SActivityStateExecutionException;
+    void setStateByStateId(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, int stateId) throws SActivityStateExecutionException;
 
-    /**
-     * 
-     * @param childProcDef
-     * @param childProcInst
-     * @param childState
-     * @param hasActionToExecute
-     * @throws SBonitaException
-     * @since 6.0
-     */
     void childReachedState(SProcessDefinition childProcDef, SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionToExecute)
             throws SBonitaException;
 
@@ -104,14 +75,6 @@ public interface FlowNodeExecutor extends ContainerExecutor {
     StateCode executeState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, FlowNodeState state)
             throws SActivityStateExecutionException, SActivityExecutionException;
 
-    /**
-     * 
-     * @param fFlowNodeInstance
-     * @param processDefinition
-     * @param sbe
-     * @throws SFlowNodeExecutionException
-     * @since 6.0
-     */
     void setFlowNodeFailedInTransaction(SFlowNodeInstance fFlowNodeInstance, SProcessDefinition processDefinition, SBonitaException sbe)
             throws SFlowNodeExecutionException;
 

@@ -57,7 +57,6 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -88,16 +87,15 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Hongwen Zang
- * @author Celine Souchet
  */
 public interface TenantServiceAccessor extends ServiceAccessor {
 
     long getTenantId();
 
     SessionService getSessionService();
-
+    
     ReadSessionAccessor getReadSessionAccessor();
-
+    
     IdentityModelBuilder getIdentityModelBuilder();
 
     IdentityService getIdentityService();
@@ -233,7 +231,5 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DefaultCommandProvider getDefaultCommandProvider();
 
     WorkService getWorkService();
-
-    TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor();
 
 }

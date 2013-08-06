@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,10 +16,13 @@ package org.bonitasoft.engine.restart;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -32,40 +35,43 @@ import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
- * @author Celine Souchet
  */
 public class RestartFlowsNodeHandler implements TenantRestartHandler {
 
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
+        QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
+        List<SFlowNodeInstance> flowNodes;
         final WorkService workService = platformServiceAccessor.getWorkService();
         final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
-        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+        FlowNodeStateManager flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
+        ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
+        ContainerRegistry containerRegistry = tenantServiceAccessor.getContainerRegistry();
+        TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
             final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
             final int processInstanceIndex = bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex();
-            QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
-            List<SFlowNodeInstance> sFlowNodeInstances;
             do {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow nodes...");
-                sFlowNodeInstances = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
+                flowNodes = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
-                for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
-                    if (sFlowNodeInstance.isTerminal()) {
+                for (final SFlowNodeInstance flowNodeInstance : flowNodes) {
+                    if (flowNodeInstance.isTerminal()) {
                         // if it is terminal it means the notify was not called yet
-                        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":"
-                                + sFlowNodeInstance.getId());
-                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getId(),
-                                sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
+                        long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + flowNodeInstance.getName() + ":"
+                                + flowNodeInstance.getId());
+                        workService.registerWork(new NotifyChildFinishedWork(containerRegistry, processDefinitionService
+                                .getProcessDefinition(processDefinitionId), flowNodeInstance, flowNodeStateManager.getState(flowNodeInstance.getStateId())));
                     } else {
-                        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":"
-                                + sFlowNodeInstance.getId());
-                        workService.registerWork(new ExecuteFlowNodeWork(processExecutor, sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + flowNodeInstance.getName() + ":"
+                                + flowNodeInstance.getId());
+                        workService.registerWork(new ExecuteFlowNodeWork(processExecutor, flowNodeInstance.getId(), null, null, flowNodeInstance
                                 .getLogicalGroup(processInstanceIndex)));
                     }
                 }
-            } while (sFlowNodeInstances.size() == queryOptions.getNumberOfResults());
+            } while (flowNodes.size() == queryOptions.getNumberOfResults());
         } catch (final WorkRegisterException e) {
             handleException(e, "Unable to restart flowNodes: can't register work");
         } catch (final SBonitaException e) {

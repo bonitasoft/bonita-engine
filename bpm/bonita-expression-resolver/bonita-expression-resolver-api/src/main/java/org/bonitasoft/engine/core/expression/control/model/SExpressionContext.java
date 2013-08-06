@@ -27,11 +27,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
-public class SExpressionContext implements Serializable {
-
-    private static final long serialVersionUID = 6417383664862870145L;
+public class SExpressionContext {
 
     public static final String containerIdKey = "containerId";
 
@@ -64,7 +61,7 @@ public class SExpressionContext implements Serializable {
     public SExpressionContext() {
         inputValues = new HashMap<String, Object>();
     }
-
+    
     public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId) {
         this.containerId = containerId;
         this.containerType = containerType;
@@ -115,6 +112,8 @@ public class SExpressionContext implements Serializable {
     public void setTime(final long time) {
         this.time = time;
     }
+
+
 
     public void setContainerId(final Long containerId) {
         this.containerId = containerId;

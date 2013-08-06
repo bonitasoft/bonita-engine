@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 
 /**
@@ -33,13 +34,9 @@ public interface ContainerExecutor {
     /**
      * method called to notify this container executor that a child reached the given state
      * 
-     * @param processDefinitionId
-     * @param flowNodeInstanceId
-     * @param stateId
-     * @param parentId
-     * @throws SBonitaException
+     * @param processDefinition
      */
-    void childFinished(long processDefinitionId, long flowNodeInstanceId, int stateId, long parentId) throws SBonitaException;
+    void childFinished(SProcessDefinition processDefinition, SFlowNodeInstance child, FlowNodeState state, long parentId) throws SBonitaException;
 
     /**
      * execute a flow node in the context of this container executor

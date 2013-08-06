@@ -103,7 +103,6 @@ public class SProcessInstanceBuilderImpl implements SProcessInstanceBuilder {
         return this;
     }
 
-    @Deprecated
     @Override
     public SProcessInstanceBuilder setContainerId(final long id) {
         entity.setContainerId(id);
