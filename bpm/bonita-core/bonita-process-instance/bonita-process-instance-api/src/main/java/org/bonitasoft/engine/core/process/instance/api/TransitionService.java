@@ -151,4 +151,14 @@ public interface TransitionService {
      */
     void delete(SATransitionInstance saTransitionInstance) throws STransitionDeletionException;
 
+    /**
+     * Deleted all archived transitions for a specified process instance
+     * 
+     * @param processInstanceId
+     * @throws STransitionDeletionException
+     * @throws STransitionReadException
+     * @since 6.1
+     */
+    void deleteArchivedTransitionsOfProcessInstance(long processInstanceId) throws STransitionDeletionException, STransitionReadException;
+
 }

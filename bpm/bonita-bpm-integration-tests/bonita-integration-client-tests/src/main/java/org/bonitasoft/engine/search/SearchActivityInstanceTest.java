@@ -1,5 +1,14 @@
 package org.bonitasoft.engine.search;
 
+import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
+import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.stateAre;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,15 +66,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.stateAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -179,7 +179,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         skipTask(stepId4);
         skipTask(stepId5);
         skipTask(stepId6);
-
+        waitForProcessToFinish(pi0);
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         // filter only userTask1:
         builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.NAME, "userTask1");
@@ -557,6 +557,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
             final long activityInstanceId = activityInstance.getId();
             getProcessAPI().setActivityStateById(activityInstanceId, 12);
         }
+        waitForProcessToFinish(pi1);
 
         final List<ActivityInstance> openedActivityInstances2 = getProcessAPI().getOpenActivityInstances(pi2.getId(), 0, 20, ActivityInstanceCriterion.DEFAULT);
         assertEquals(3, openedActivityInstances2.size());
@@ -564,7 +565,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
             final long activityInstanceId = activityInstance.getId();
             getProcessAPI().setActivityStateById(activityInstanceId, 12);
         }
-
+        waitForProcessToFinish(pi2);
         // each automatic task will have four-state archived instance
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
         searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
@@ -673,6 +674,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
 
         getProcessAPI().setActivityStateById(step1.getId(), 12);
         getProcessAPI().setActivityStateById(step2.getId(), 12);
+        waitForProcessToFinish(pi0);
         builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
         builder.sort(ArchivedHumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
@@ -717,6 +719,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME).addTransition("userTask2", "userTask3")
                 .getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
@@ -724,7 +727,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         getProcessAPI().assignUserTask(step1.getId(), user.getId());
         final ActivityInstance step2 = waitForUserTask("userTask2", pi0);
         assignAndExecuteStep(step2, user.getId());
-
+        waitForUserTask("userTask3", pi0);
         SearchOptionsBuilder builder;
         builder = new SearchOptionsBuilder(0, 10).filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
         SearchResult<ArchivedFlowNodeInstance> searchFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
@@ -757,7 +760,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
             final long activityInstanceId = activityInstance.getId();
             getProcessAPI().setActivityStateById(activityInstanceId, 12);
         }
-
+        waitForProcessToFinish(pi0);
         final SearchResult<ArchivedHumanTaskInstance> taskInstanceSearchResult = getProcessAPI().searchArchivedHumanTasks(
                 new SearchOptionsBuilder(0, 10).searchTerm("'").done());
         assertEquals(1, taskInstanceSearchResult.getCount());

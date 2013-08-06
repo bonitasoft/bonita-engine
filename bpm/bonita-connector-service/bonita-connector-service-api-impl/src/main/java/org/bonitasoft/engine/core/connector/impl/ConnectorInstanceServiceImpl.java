@@ -14,6 +14,8 @@
  */
 package org.bonitasoft.engine.core.connector.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,10 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -334,4 +339,51 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
     }
 
+    @Override
+    public void deleteArchivedConnectorInstances(final long containerId, final String containerType) throws SBonitaSearchException,
+            SConnectorInstanceDeletionException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType, true);
+        final SConnectorInstanceBuilder connectorKeyProvider = instanceBuilders.getSConnectorInstanceBuilder();
+        final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, connectorKeyProvider.getIdKey(), OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
+        List<SAConnectorInstance> connectorInstances = null;
+        do {
+            connectorInstances = searchArchivedConnectorInstance(queryOptions, persistenceService);
+            for (final SAConnectorInstance sConnectorInstance : connectorInstances) {
+                deleteArchivedConnectorInstance(sConnectorInstance);
+            }
+        } while (connectorInstances != null && !connectorInstances.isEmpty());
+
+    }
+
+    @Override
+    public void deleteConnectors(final long containerId, final String containerType) throws SBonitaSearchException, SConnectorInstanceDeletionException {
+        final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType, false);
+        final SConnectorInstanceBuilder connectorKeyProvider = instanceBuilders.getSConnectorInstanceBuilder();
+        final OrderByOption orderBy = new OrderByOption(SConnectorInstance.class, connectorKeyProvider.getIdKey(), OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
+        List<SConnectorInstance> connetorInstances;
+        do {
+            // the QueryOptions always will use 0 as start index because the retrieved results will be deleted
+            connetorInstances = searchConnetorInstances(queryOptions);
+            for (final SConnectorInstance sConnectorInstance : connetorInstances) {
+                deleteConnectorInstance(sConnectorInstance);
+            }
+        } while (!connetorInstances.isEmpty());
+    }
+
+    private List<FilterOption> buildFiltersForConnectors(final long containerId, final String containerType, final boolean archived) {
+        final SConnectorInstanceBuilder connectorKeyProvider = instanceBuilders.getSConnectorInstanceBuilder();
+        final List<FilterOption> filters = new ArrayList<FilterOption>(2);
+        Class<? extends PersistentObject> persistentClass;
+        if (archived) {
+            persistentClass = SAConnectorInstance.class;
+        } else {
+            persistentClass = SConnectorInstance.class;
+        }
+        filters.add(new FilterOption(persistentClass, connectorKeyProvider.getContainerIdKey(), containerId));
+        filters.add(new FilterOption(persistentClass, connectorKeyProvider.getContainerTypeKey(), containerType));
+        return filters;
+    }
 }

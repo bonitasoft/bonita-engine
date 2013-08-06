@@ -21,7 +21,6 @@ import java.util.Set;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
@@ -47,7 +46,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInterruptedException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
@@ -95,8 +93,6 @@ public class EventsHandler {
 
     private final Map<SEventTriggerType, EventHandlerStrategy> handlers;
 
-    private final TransactionExecutor transactionExecutor;
-
     private final ContainerRegistry containerRegistry;
 
     private final WorkService workService;
@@ -122,12 +118,11 @@ public class EventsHandler {
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders, final BPMDefinitionBuilders bpmDefinitionBuilders,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final TransactionExecutor transactionExecutor, final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final WorkService workService, final ProcessInstanceService processInstanceService, final LockService lockService, final TokenService tokenService,
+            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry, final WorkService workService,
+            final ProcessInstanceService processInstanceService, final LockService lockService, final TokenService tokenService,
             final TechnicalLoggerService logger) {
         this.bpmDefinitionBuilders = bpmDefinitionBuilders;
         this.eventInstanceService = eventInstanceService;
-        this.transactionExecutor = transactionExecutor;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
         this.workService = workService;
@@ -314,8 +309,7 @@ public class EventsHandler {
      * @param triggeringElementID
      * @throws SBonitaException
      */
-    public void triggerCatchEvent(final SWaitingEvent waitingEvent, final Long triggeringElementID)
-            throws SBonitaException {
+    public void triggerCatchEvent(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
         final SBPMEventType eventType = waitingEvent.getEventType();
         final long processDefinitionId = waitingEvent.getProcessDefinitionId();
         final long targetSFlowNodeDefinitionId = waitingEvent.getFlowNodeDefinitionId();
@@ -342,7 +336,7 @@ public class EventsHandler {
                 triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, waitingEvent, flowNodeInstanceId, operations);
             }
         };
-        transactionExecutor.execute(transactionContent);
+        transactionContent.execute();
     }
 
     private void triggerInTransaction(final SEventTriggerType eventTriggerType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
@@ -356,7 +350,7 @@ public class EventsHandler {
                         parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
         };
-        transactionExecutor.execute(transactionContent);
+        transactionContent.execute();
     }
 
     private void triggerCatchEvent(final SBPMEventType eventType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
@@ -366,10 +360,13 @@ public class EventsHandler {
                 instantiateProcess(processDefinitionId, targetSFlowNodeDefinitionId, operations);
                 break;
             default:
-                if (waitingEvent != null) { // is null if it's a timer
+                if (waitingEvent != null) {
                     eventInstanceService.deleteWaitingEvent(waitingEvent);
+                    executeFlowNode(flowNodeInstanceId, operations, waitingEvent.getParentProcessInstanceId());
+                } else { // is null if it's a timer
+                    long processInstanceId = eventInstanceService.getFlowNodeInstance(flowNodeInstanceId).getParentProcessInstanceId();
+                    executeFlowNode(flowNodeInstanceId, operations, processInstanceId);
                 }
-                executeFlowNode(flowNodeInstanceId, operations);
                 break;
         }
     }
@@ -387,7 +384,7 @@ public class EventsHandler {
         tokenService.createToken(parentProcessInstanceId, parentProcessInstance.getProcessDefinitionId(), null);
         final InstantiateProcessWork work;
         work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations, processExecutor,
-                processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator, transactionExecutor);
+                processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator);
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
@@ -419,16 +416,16 @@ public class EventsHandler {
                 subProcessId, parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
-    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations) throws SActivityReadException,
-            SActivityExecutionFailedException, SActivityExecutionException, SActivityInterruptedException, WorkRegisterException {
-        containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(), null);// FIXME
-        // operations
+    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, final long processInstanceId)
+            throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException, WorkRegisterException {
+        containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
+                processInstanceId);
     }
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
             throws WorkRegisterException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionService.getProcessDefinition(processDefinitionId), operations,
-                processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator, transactionExecutor);
+                processExecutor, processInstanceService, eventInstanceService, lockService, logger, bpmInstancesCreator);
         work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
         workService.registerWork(work);
     }

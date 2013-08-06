@@ -26,7 +26,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 /**
  * This is the manager of all the events triggered by other services. Handlers are registered into the Event service. When a
  * service fire an event, it calls the right handler corresponding to the given Event.
- * 
+ *
  * @author Christophe Havard
  * @author Baptiste Mesta
  * @since 6.0
@@ -35,7 +35,7 @@ public interface EventService {
 
     /**
      * Fire the specified Event to the registered handlers.
-     * 
+     *
      * @param event
      *            A specific Event
      */
@@ -43,7 +43,7 @@ public interface EventService {
 
     /**
      * Allows to check if an handler is listening to this event type
-     * 
+     *
      * @param eventType
      *            the type of the event
      * @return
@@ -53,7 +53,8 @@ public interface EventService {
 
     /**
      * Add the given handler to the Event Manager's handlers list. It guarantees no duplication in the handlers' list
-     * 
+     *
+     * @param eventType The type of the event the handler is interested in.
      * @param userHandler
      *            The handler to register in the Event Manager
      * @throws HandlerRegistrationException
@@ -62,7 +63,7 @@ public interface EventService {
 
     /**
      * Remove the given handler from the Event Service's handlers lists.
-     * 
+     *
      * @param handler
      *            The handler to remove
      */
@@ -70,7 +71,7 @@ public interface EventService {
 
     /**
      * Remove the given handler from the given event type filter
-     * 
+     *
      * @param handler
      *            The handler to remove from the given event type
      */
@@ -83,15 +84,16 @@ public interface EventService {
 
     /**
      * Get all registered handlers
-     * 
+     *
      * @return The list of all registered handlers with their associated event type.
      */
     Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers();
 
     /**
      * Get the event model builder
-     * 
+     *
      * @return the event model builder
      */
     SEventBuilder getEventBuilder();
+
 }

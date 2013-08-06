@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.service;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
@@ -79,5 +80,7 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     NodeConfiguration getPlaformConfiguration();
 
     WorkService getWorkService();
+
+    PlatformCacheService getPlatformCacheService();
 
 }

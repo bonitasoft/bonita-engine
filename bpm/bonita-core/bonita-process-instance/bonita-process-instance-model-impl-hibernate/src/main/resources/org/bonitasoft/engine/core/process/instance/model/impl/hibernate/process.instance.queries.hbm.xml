@@ -56,9 +56,9 @@
 
 	<query name="getFlowNodeInstancesToRestart">
 		SELECT a
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS a
 		WHERE a.deleted = FALSE
-		AND (a.stateExecuting = TRUE OR a.stable = FALSE)
+		AND (a.stateExecuting = TRUE OR a.stable = FALSE OR a.terminal = TRUE)
 	</query>
 
 	<query name="getActiveGatewayInstanceOfProcess">
@@ -507,7 +507,7 @@
 	<query name="getMessageEventCouples">
 		SELECT new org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl(s.id, s.eventType, s.processDefinitionId, s.processName, s.flowNodeDefinitionId, s.flowNodeName, 
 				s.messageName, m.id, m.messageName, m.targetProcess, m.targetFlowNode, m.processDefinitionId, m.flowNodeName)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s, 
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s,
 			 org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
 		WHERE m.messageName = s.messageName
 		AND m.targetProcess = s.processName
@@ -516,6 +516,7 @@
 		AND s.locked = false
 		AND m.handled = false
 		AND s.active = true
+		AND s.progress = 0
 		AND s.correlation1 = m.correlation1
 		AND s.correlation2 = m.correlation2
 		AND s.correlation3 = m.correlation3

@@ -27,7 +27,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -53,7 +52,6 @@ public class IsAllowedToStartProcesses extends TenantCommand {
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
         ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
-        final TransactionExecutor transactionExecutor = this.serviceAccessor.getTransactionExecutor();
         Map<Long, Boolean> resMap = new HashMap<Long, Boolean>();
 
         List<Long> processDefinitionIds = (List<Long>) parameters.get(PROCESSDEFINITION_IDS_KEY);
@@ -68,7 +66,7 @@ public class IsAllowedToStartProcesses extends TenantCommand {
         final IdentityService identityService = this.serviceAccessor.getIdentityService();
         final GetSUser getSUser = new GetSUser(identityService, userId);
         try {
-            transactionExecutor.execute(getSUser);
+            getSUser.execute();
         } catch (SBonitaException e) {
             throw new SCommandParameterizationException("No such user refer to this userId:" + userId, e);
         }
@@ -78,7 +76,7 @@ public class IsAllowedToStartProcesses extends TenantCommand {
             for (Long pid : processDefinitionIds) {
                 final GetActorsOfUserCanStartProcessDefinitions checker = new GetActorsOfUserCanStartProcessDefinitions(actorMappingService, pid, userId);
                 try {
-                    transactionExecutor.execute(checker);
+                    checker.execute();;
                 } catch (SBonitaException e) {
                     throw new SCommandExecutionException("No actor of user who can start the processDefinition with id:" + pid, e);
                 }

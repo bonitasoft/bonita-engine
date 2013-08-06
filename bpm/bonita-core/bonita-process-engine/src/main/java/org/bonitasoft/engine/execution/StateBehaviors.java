@@ -545,7 +545,7 @@ public class StateBehaviors {
         final OperationsWithContext operations = new OperationsWithContext(context, operationList);
         final SProcessDefinition targetSProcessDefinition = processDefinitionService.getProcessDefinition(targetProcessDefinitionId);
         final InstantiateProcessWork instantiateProcessWork = new InstantiateProcessWork(targetSProcessDefinition, operations, processExecutor,
-                processInstanceService, activityInstanceService, null, logger, bpmInstancesCreator, transactionExecutor);
+                processInstanceService, activityInstanceService, null, logger, bpmInstancesCreator);
         instantiateProcessWork.setCallerId(callerId);
         workService.registerWork(instantiateProcessWork);
     }
@@ -679,19 +679,16 @@ public class StateBehaviors {
 
     public void interruptSubActivities(final long parentActivityInstanceId, final SStateCategory stateCategory) throws SBonitaException {
         final int numberOfResults = 100;
-        long count = 0;
         List<SActivityInstance> childrenToEnd;
         final SUserTaskInstanceBuilder flowNodeKeyProvider = instanceBuilders.getUserTaskInstanceBuilder();
+        final List<FilterOption> filters = new ArrayList<FilterOption>(3);
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
+        final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
+        QueryOptions queryOptions = new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
         do {
-            final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
-            final List<FilterOption> filters = new ArrayList<FilterOption>(3);
-            filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
-            filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
-            filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-            final QueryOptions queryOptions = new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
-            final QueryOptions countOptions = new QueryOptions(0, numberOfResults, null, filters, null);
             childrenToEnd = activityInstanceService.searchActivityInstances(SActivityInstance.class, queryOptions);
-            count = activityInstanceService.getNumberOfActivityInstances(SActivityInstance.class, countOptions);
             for (final SActivityInstance child : childrenToEnd) {
                 activityInstanceService.setStateCategory(child, stateCategory);
                 if (child.isStable()) {
@@ -699,8 +696,8 @@ public class StateBehaviors {
                             child.getLogicalGroup(instanceBuilders.getSAAutomaticTaskInstanceBuilder().getParentProcessInstanceIndex()));
                 }
             }
-
-        } while (count > childrenToEnd.size());
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+        } while (childrenToEnd.size() == numberOfResults);
     }
 
     public void executeConnectorInWork(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
@@ -709,33 +706,37 @@ public class StateBehaviors {
 
         final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 processDefinition.getId());
-        Map<String, Object> inputParameters = null;
+        ExecuteConnectorWork work = null;
         try {
+            Map<String, Object> inputParameters = null;
             inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), sExpressionContext, null);
+            work = buildWorkToExecuteConnector(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters);
+
         } catch (final SBonitaException sbe) {
+            work = buildWorkToSetConnectorFailed(processDefinition, flowNodeInstance, connector, sConnectorDefinition, sbe);
+
+        } finally {
             try {
-                final ExecuteConnectorWork work = getWork(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters);
-                work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
                 workService.registerWork(work);
-            } catch (final WorkRegisterException e) {
-                throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstance, e);
-            }
-        }
-        if (inputParameters != null) {
-            try {
-                workService.registerWork(getWork(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters));
             } catch (final WorkRegisterException e) {
                 throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstance, e);
             }
         }
     }
 
-    private ExecuteConnectorOfActivity getWork(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+    private ExecuteConnectorOfActivity buildWorkToExecuteConnector(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
         return new ExecuteConnectorOfActivity(containerRegistry, transactionExecutor, processInstanceService, archiveService, instanceBuilders,
                 dataInstanceService, dataInstanceBuilders, activityInstanceService, flowNodeStateManager, classLoaderService, connectorService,
                 connectorInstanceService, processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters, eventsHandler,
                 bpmInstancesCreator, bpmDefinitionBuilders, eventInstanceService, workService);
+    }
+
+    private ExecuteConnectorOfActivity buildWorkToSetConnectorFailed(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+            final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition, SBonitaException sbe) {
+        final ExecuteConnectorOfActivity work = buildWorkToExecuteConnector(processDefinition, flowNodeInstance, connector, sConnectorDefinition, null);
+        work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
+        return work;
     }
 
     public void createAttachedBoundaryEvents(final SProcessDefinition processDefinition, final SActivityInstance activityInstance)

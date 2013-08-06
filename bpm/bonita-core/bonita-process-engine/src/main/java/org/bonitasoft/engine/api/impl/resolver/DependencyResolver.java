@@ -91,34 +91,23 @@ public class DependencyResolver {
     }
 
     public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor, final ProcessDependencyResolver... resolvers) {
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                boolean resolved = true;
-                for (final ProcessDependencyResolver dependencyResolver : resolvers) {
-                    final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-                    resolved &= dependencyResolver.checkResolution(tenantAccessor, processDefinition).isEmpty();
-                }
-                changeResolutionStatus(processDefinitionId, tenantAccessor, processDefinitionService, dependencyService, dependencyBuilderAccessor, resolved);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                loggerService.log(DependencyResolver.class, TechnicalLogSeverity.DEBUG, e);
-                loggerService.log(DependencyResolver.class, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of "
-                        + e.getMessage() + ". Please retry it manually");
-            } catch (final BonitaHomeNotSetException e) {
-                throw new BonitaRuntimeException("Bonita home not set", e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+            boolean resolved = true;
+            for (final ProcessDependencyResolver dependencyResolver : resolvers) {
+                final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                resolved &= dependencyResolver.checkResolution(tenantAccessor, processDefinition).isEmpty();
             }
-        } catch (final STransactionException e) {
+            changeResolutionStatus(processDefinitionId, tenantAccessor, processDefinitionService, dependencyService, dependencyBuilderAccessor, resolved);
+        } catch (final SBonitaException e) {
             loggerService.log(DependencyResolver.class, TechnicalLogSeverity.DEBUG, e);
-            loggerService.log(DependencyResolver.class, TechnicalLogSeverity.WARNING,
-                    "Unable to resolve dependencies after they were modified. Please retry it manually");
+            loggerService.log(DependencyResolver.class, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of "
+                    + e.getMessage() + ". Please retry it manually");
+        } catch (final BonitaHomeNotSetException e) {
+            throw new BonitaRuntimeException("Bonita home not set", e);
         }
     }
 

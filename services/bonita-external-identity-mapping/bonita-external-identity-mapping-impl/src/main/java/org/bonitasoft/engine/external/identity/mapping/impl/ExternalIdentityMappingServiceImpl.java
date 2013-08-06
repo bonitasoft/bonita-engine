@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -46,12 +46,14 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappingService {
 
@@ -208,6 +210,16 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             }
             initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_FAIL, queriableLog, "deleteExternalIdentityMapping");
             throw new SExternalIdentityMappingDeletionException("Can't delete process external identity mapping " + externalIdentityMapping, e);
+        }
+    }
+
+    @Override
+    public void deleteAllExternalIdentityMappings() throws SExternalIdentityMappingDeletionException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SExternalIdentityMapping.class, null);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SExternalIdentityMappingDeletionException("Can't delete all process external identity mappings ", e);
         }
     }
 
@@ -380,4 +392,5 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
+
 }

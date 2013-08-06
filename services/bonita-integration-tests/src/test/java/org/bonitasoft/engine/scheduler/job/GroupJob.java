@@ -25,9 +25,4 @@ public abstract class GroupJob implements StatelessJob {
         jobName = (String) attributes.get("jobName");
     }
 
-    @Override
-    public boolean isWrappedInTransaction() {
-        return true;
-    }
-
 }

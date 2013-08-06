@@ -18,11 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
-import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -50,8 +45,7 @@ public class DeleteArchivedProcessInstances implements TransactionContent {
         deleteArchivedProcessInstancesFromDefinition(processDefinitionId);
     }
 
-    public void deleteArchivedProcessInstancesFromDefinition(final long processDefinitionId) throws SFlowNodeReadException,
-            SProcessInstanceModificationException, SProcessInstanceReadException, SProcessInstanceNotFoundException, SLockException {
+    public void deleteArchivedProcessInstancesFromDefinition(final long processDefinitionId) throws SBonitaException {
         List<Long> sourceProcessInstanceIds;
         do {
             // from index always will be zero because elements will be deleted
@@ -59,6 +53,7 @@ public class DeleteArchivedProcessInstances implements TransactionContent {
                     BATCH_SIZE, OrderByType.DESC);
             for (final Long orgProcessId : sourceProcessInstanceIds) {
                 processInstanceService.deleteArchivedProcessInstanceElements(orgProcessId, processDefinitionId);
+                processInstanceService.deleteArchivedProcessInstancesOfProcessInstance(orgProcessId);
             }
 
         } while (!sourceProcessInstanceIds.isEmpty());

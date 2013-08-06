@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.work;
 
+import java.util.concurrent.TimeoutException;
+
 /**
  * This service allows to trigger the execution of work asynchronously
  * Any runnable registered on the service will be launched in other thread at the end of the transaction.
@@ -27,10 +29,38 @@ public interface WorkService {
      * @throws WorkRegisterException
      * @since 6.0
      */
-    void registerWork(final BonitaWork runnable) throws WorkRegisterException;
+    void registerWork(final AbstractBonitaWork runnable) throws WorkRegisterException;
 
+    /**
+     * 
+     * Stop the execution of jobs for a tenant
+     * 
+     * @param tenantId
+     */
     void stop(Long tenantId);
 
+    /**
+     * 
+     * Allow to start works of this tenant
+     * 
+     * @param tenantId
+     */
     void start(Long tenantId);
+
+    /**
+     * 
+     * Stop the execution of work for this local work service
+     * 
+     * @throws TimeoutException
+     */
+    void shutdown() throws TimeoutException;
+
+    /**
+     * 
+     * start the execution of work for this local work service
+     * 
+     * @throws TimeoutException
+     */
+    void startup();
 
 }

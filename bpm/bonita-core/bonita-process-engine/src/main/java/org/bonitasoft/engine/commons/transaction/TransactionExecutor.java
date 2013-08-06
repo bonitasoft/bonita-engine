@@ -13,28 +13,16 @@
  **/
 package org.bonitasoft.engine.commons.transaction;
 
-import java.util.List;
-
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.transaction.STransactionException;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @author Laurent Vaills
  */
 public interface TransactionExecutor {
 
     void execute(TransactionContent transactionContent) throws SBonitaException;
-
-    void execute(List<TransactionContent> transactionContents) throws SBonitaException;
-
-    void execute(TransactionContent... transactionContents) throws SBonitaException;
-
-    boolean openTransaction() throws STransactionException;
-
-    void completeTransaction(boolean txOpened) throws STransactionException;
-
-    void setTransactionRollback() throws STransactionException;
 
 }

@@ -13,10 +13,19 @@
  **/
 package org.bonitasoft.engine.platform;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -24,9 +33,6 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.platform.SPlatformNotFoundException;
-import org.bonitasoft.engine.platform.STenantException;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.impl.PlatformServiceImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -35,13 +41,6 @@ import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -60,6 +59,9 @@ public class PlatformServiceImplTest {
 
     @Mock
     private TechnicalLoggerService logger;
+
+    @Mock
+    private PlatformCacheService platformCacheService;
 
     @InjectMocks
     private PlatformServiceImpl platformServiceImpl;
@@ -134,26 +136,26 @@ public class PlatformServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getPlatform()}.
+     * 
+     * @throws CacheException
      */
     @Test
-    public final void getPlatform() throws SBonitaReadException, SPlatformNotFoundException {
+    public final void getPlatform() throws SBonitaReadException, SPlatformNotFoundException, CacheException {
         final SPlatform sPlatform = mock(SPlatform.class);
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(sPlatform);
-
+        when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
         Assert.assertEquals(sPlatform, platformServiceImpl.getPlatform());
     }
 
     @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatformNotExists() throws SBonitaReadException, SPlatformNotFoundException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+    public final void getPlatformNotExists() throws SBonitaReadException, SPlatformNotFoundException, CacheException {
+        when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
         platformServiceImpl.getPlatform();
     }
 
     @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatformThrowException() throws SBonitaReadException, SPlatformNotFoundException {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-
+    public final void getPlatformThrowException() throws SPlatformNotFoundException, CacheException {
+        doThrow(new CacheException("")).when(platformCacheService).get(anyString(), anyString());
         platformServiceImpl.getPlatform();
     }
 
@@ -265,26 +267,26 @@ public class PlatformServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#isPlatformCreated()}.
+     * 
+     * @throws CacheException
      */
     @Test
-    public final void isPlatformCreated() throws SBonitaReadException {
+    public final void isPlatformCreated() throws SBonitaReadException, CacheException {
         final SPlatform sPlatform = mock(SPlatform.class);
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(sPlatform);
-
+        when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
         Assert.assertTrue(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
-    public final void isPlatformNotCreated() throws SBonitaReadException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+    public final void isPlatformNotCreated() throws SBonitaReadException, CacheException {
+        when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
         Assert.assertFalse(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
-    public final void isPlatformNotCreatedThrowException() throws SBonitaReadException {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-
+    public final void isPlatformNotCreatedThrowException() throws CacheException {
+        doThrow(new CacheException("")).when(platformCacheService).get(anyString(), anyString());
         Assert.assertFalse(platformServiceImpl.isPlatformCreated());
     }
 

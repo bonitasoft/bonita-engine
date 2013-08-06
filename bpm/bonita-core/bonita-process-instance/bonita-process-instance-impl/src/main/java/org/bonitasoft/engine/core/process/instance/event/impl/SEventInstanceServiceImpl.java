@@ -13,13 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.event.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
@@ -31,6 +34,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.impl.FlowNodeInstanceServiceImpl;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventLogBuilder;
@@ -50,9 +54,12 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -495,4 +502,52 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         return waitingError;
     }
 
+    @Override
+    public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException {
+        final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, getInstanceBuilders().getSWaitingMessageEventBuilder().getFlowNodeNameKey(),
+                OrderByType.ASC);
+        final FilterOption filterOption = new FilterOption(SWaitingEvent.class,
+                getInstanceBuilders().getSWaitingMessageEventBuilder().getFlowNodeInstanceIdKey(), flowNodeInstance.getId());
+        final List<FilterOption> filters = Collections.singletonList(filterOption);
+        try {
+            QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption), filters, null);
+            List<SWaitingEvent> waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
+
+            do {
+                for (final SWaitingEvent sWaitingEvent : waitingEvents) {
+                    deleteWaitingEvent(sWaitingEvent);
+                }
+                queryOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption), filters, null);
+                waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
+            } while (waitingEvents.size() > 0);
+        } catch (final SBonitaSearchException e) {
+            throw new SFlowNodeReadException(e); // To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    @Override
+    public void deleteEventTriggerInstances(final long eventInstanceId) throws SEventTriggerInstanceReadException, SEventTriggerInstanceDeletionException {
+        final List<SEventTriggerInstance> triggerInstances = getEventTriggerInstances(eventInstanceId);
+        for (final SEventTriggerInstance eventTriggerInstance : triggerInstances) {
+            deleteEventTriggerInstance(eventTriggerInstance);
+        }
+    }
+
+    @Override
+    public void deleteEventTriggerInstance(final SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException {
+        final SEventTriggerInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting eventTrigger instance", eventTriggerInstance);
+        try {
+            final DeleteRecord deleteRecord = new DeleteRecord(eventTriggerInstance);
+            SDeleteEvent deleteEvent = null;
+            if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.DELETED)) {
+                final SEventBuilder eventBuilder = eventService.getEventBuilder();
+                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance).done();
+            }
+            getRecorder().recordDelete(deleteRecord, deleteEvent);
+            initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteEventTriggerInstance");
+        } catch (final SRecorderException e) {
+            initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteEventTriggerInstance");
+            throw new SEventTriggerInstanceDeletionException(e);
+        }
+    }
 }

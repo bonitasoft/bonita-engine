@@ -24,7 +24,6 @@ public class IncrementVariableJobWithMultiTenancy extends GroupJob {
 
     @Override
     public void execute() throws JobExecutionException {
-        System.out.println("  µµµµ IncrementVariableJobWithMultiTenancy start");
         synchronized (IncrementVariableJobWithMultiTenancy.class) {
 
             VariableStorage storage;
@@ -42,7 +41,6 @@ public class IncrementVariableJobWithMultiTenancy extends GroupJob {
                 storage.setVariable(variableName, value + 1);
             }
         }
-        System.out.println("  µµµµ IncrementVariableJobWithMultiTenancy end");
     }
 
     @Override

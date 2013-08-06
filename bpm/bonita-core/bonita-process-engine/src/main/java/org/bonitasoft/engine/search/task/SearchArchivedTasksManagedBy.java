@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractArchivedHumanTaskInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -27,32 +26,29 @@ import org.bonitasoft.engine.search.descriptor.SearchArchivedHumanTaskInstanceDe
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class SearchArchivedTasksManagedBy extends AbstractArchivedHumanTaskInstanceSearchEntity {
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final ReadPersistenceService persistenceService;
-
     private final long managerUserId;
 
     public SearchArchivedTasksManagedBy(final long managerUserId, final SearchOptions options, final ActivityInstanceService activityInstanceService,
-            final FlowNodeStateManager flowNodeStateManager, final SearchArchivedHumanTaskInstanceDescriptor searchArchivedHumanTaskInstanceDescriptor,
-            final ReadPersistenceService persistenceService) {
+            final FlowNodeStateManager flowNodeStateManager, final SearchArchivedHumanTaskInstanceDescriptor searchArchivedHumanTaskInstanceDescriptor) {
         super(searchArchivedHumanTaskInstanceDescriptor, options, flowNodeStateManager);
         this.managerUserId = managerUserId;
         this.activityInstanceService = activityInstanceService;
-        this.persistenceService = persistenceService;
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.getNumberOfArchivedTasksManagedBy(managerUserId, searchOptions, persistenceService);
+        return activityInstanceService.getNumberOfArchivedTasksManagedBy(managerUserId, searchOptions);
     }
 
     @Override
     public List<SAHumanTaskInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.searchArchivedTasksManagedBy(managerUserId, searchOptions, persistenceService);
+        return activityInstanceService.searchArchivedTasksManagedBy(managerUserId, searchOptions);
     }
 
 }

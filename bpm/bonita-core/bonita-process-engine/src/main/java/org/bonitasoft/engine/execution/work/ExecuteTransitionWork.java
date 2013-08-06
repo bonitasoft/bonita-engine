@@ -13,16 +13,15 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.execution.ContainerExecutor;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
  */
-public class ExecuteTransitionWork extends BonitaWork {
+public class ExecuteTransitionWork extends TxBonitaWork {
 
     private final SProcessDefinition sDefinition;
 
@@ -41,7 +40,12 @@ public class ExecuteTransitionWork extends BonitaWork {
     }
 
     @Override
-    protected void work() throws SBonitaException {
+    protected void work() throws Exception {
         containerExecutor.executeTransition(sDefinition, sTransitionInstance);
+    }
+
+    @Override
+    public String getDescription() {
+        return getClass().getSimpleName() + ": transitionInstanceId:" + sTransitionInstance.getId();
     }
 }

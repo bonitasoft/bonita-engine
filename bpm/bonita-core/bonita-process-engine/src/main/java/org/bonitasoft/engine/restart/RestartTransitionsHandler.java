@@ -15,7 +15,6 @@ package org.bonitasoft.engine.restart;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -28,7 +27,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -39,7 +37,6 @@ public class RestartTransitionsHandler implements TenantRestartHandler {
 
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
-        final TransactionExecutor transactionExecutor = tenantServiceAccessor.getTransactionExecutor();
         final TransitionService transitionInstanceService = tenantServiceAccessor.getTransitionInstanceService();
         final int processDefinitionIndex = tenantServiceAccessor.getBPMInstanceBuilders().getSTransitionInstanceBuilder().getProcessDefinitionIndex();
         QueryOptions searchOptions = QueryOptions.defaultQueryOptions();
@@ -48,38 +45,28 @@ public class RestartTransitionsHandler implements TenantRestartHandler {
         final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         try {
-            boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                do {
-                    search = transitionInstanceService.search(searchOptions);
-                    searchOptions = QueryOptions.getNextPage(searchOptions);
-                    for (final STransitionInstance transitionInstance : search) {
-                        final long processDefinitionId = transitionInstance.getLogicalGroup(processDefinitionIndex);
-                        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-                        workService.registerWork(new ExecuteTransitionWork(processExecutor, processDefinition, transitionInstance));
-                    }
-
-                } while (search.size() == searchOptions.getNumberOfResults());
-            } catch (final SBonitaSearchException e) {
-                handleException(transactionExecutor, e, "Unable to restart transitions: can't get them from database");
-            } catch (final SProcessDefinitionNotFoundException e) {
-                handleException(transactionExecutor, e, "Unable to restart transitions: process definition of a transition not found");
-            } catch (final SProcessDefinitionReadException e) {
-                handleException(transactionExecutor, e, "Unable to restart transitions: can't read process definition");
-            } catch (final WorkRegisterException e) {
-                handleException(transactionExecutor, e, "Unable to restart transitions: can't read process definition");
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
-            throw new RestartException("Unable to restart transitions: issue with transaction", e);
+            do {
+                search = transitionInstanceService.search(searchOptions);
+                searchOptions = QueryOptions.getNextPage(searchOptions);
+                for (final STransitionInstance transitionInstance : search) {
+                    final long processDefinitionId = transitionInstance.getLogicalGroup(processDefinitionIndex);
+                    final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                    workService.registerWork(new ExecuteTransitionWork(processExecutor, processDefinition, transitionInstance));
+                }
+                
+            } while (search.size() == searchOptions.getNumberOfResults());
+        } catch (final SBonitaSearchException e) {
+            handleException(e, "Unable to restart transitions: can't get them from database");
+        } catch (final SProcessDefinitionNotFoundException e) {
+            handleException(e, "Unable to restart transitions: process definition of a transition not found");
+        } catch (final SProcessDefinitionReadException e) {
+            handleException(e, "Unable to restart transitions: can't read process definition");
+        } catch (final WorkRegisterException e) {
+            handleException(e, "Unable to restart transitions: can't read process definition");
         }
-
     }
 
-    private void handleException(final TransactionExecutor transactionExecutor, final Exception e, final String message) throws STransactionException,
-            RestartException {
-        transactionExecutor.setTransactionRollback();
+    private void handleException(final Exception e, final String message) throws RestartException {
         throw new RestartException(message, e);
     }
 }

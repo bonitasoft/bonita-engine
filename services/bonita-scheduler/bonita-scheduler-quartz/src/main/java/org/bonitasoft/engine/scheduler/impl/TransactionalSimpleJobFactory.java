@@ -49,25 +49,6 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
             } catch (final SSchedulerException e) {
                 throw new org.quartz.SchedulerException("unable to create the BOS job", e);
             }
-            // FIXME what to do with that
-            // if (jobTruster.isTrusted(jobIdentifier)) {
-            // try {
-            // final Method method = jobIdentifier.getClass().getMethod("setQueriableLoggerService", QueriableLoggerService.class);
-            // try {
-            // method.invoke(jobIdentifier, logService);
-            // } catch (final IllegalArgumentException e) {
-            // e.printStackTrace();
-            // } catch (final IllegalAccessException e) {
-            // e.printStackTrace();
-            // } catch (final InvocationTargetException e) {
-            // e.printStackTrace();
-            // }
-            // } catch (final SecurityException e) {
-            // e.printStackTrace();
-            // } catch (final NoSuchMethodException e) {
-            // e.printStackTrace();
-            // }
-            // }
 
             return quartzJob;
         }

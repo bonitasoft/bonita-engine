@@ -1,59 +1,125 @@
 package org.bonitasoft.engine.execution;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.identity.SUserNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionCommitException;
+import org.bonitasoft.engine.transaction.STransactionCreationException;
+import org.bonitasoft.engine.transaction.STransactionException;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.STransactionRollbackException;
+import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.TransactionState;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class TransactionExecutorImplTest {
 
-    @Test(expected = SBonitaException.class)
-    public void failTransaction() throws SBonitaException {
-        final TransactionService transactionService = mock(TransactionService.class);
-        final TransactionContent transactionContent = mock(TransactionContent.class);
-        final TransactionExecutorImpl executor = new TransactionExecutorImpl(transactionService);
-        doAnswer(new Answer<Object>() {
-
-            @Override
-            public Object answer(final InvocationOnMock invocation) throws Throwable {
-                throw new SUserNotFoundException(5);
-            }
-        }).when(transactionContent).execute();
-        executor.execute(transactionContent);
-
-        verify(transactionService, times(1)).begin();
-        verify(transactionService, times(1)).setRollbackOnly();
-        verify(transactionService, times(1)).complete();
-    }
-
+    @SuppressWarnings("unchecked")
     @Test
-    public void executeTransaction() throws SBonitaException {
+    public void executeTransaction() throws Exception {
         final TransactionService transactionService = mock(TransactionService.class);
         final TransactionContent transactionContent = mock(TransactionContent.class);
         final TransactionExecutorImpl executor = new TransactionExecutorImpl(transactionService);
-        final CountAnswer count = new CountAnswer();
 
-        doAnswer(count).when(transactionContent).execute();
         executor.execute(transactionContent);
 
-        verify(transactionService, times(1)).begin();
-        verify(transactionService, never()).setRollbackOnly();
-        verify(transactionService, times(1)).complete();
-        assertEquals(1, count.getCount());
+        verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
     }
+    
+    @SuppressWarnings("unchecked")
+    @Test(expected=SBonitaException.class)
+    public void executeTransactionWithSBonitaException() throws Exception {
+        // To keep compatibility the SBonitaException has to be rethrown 
+       
+        final TransactionService transactionService = new MockTransactionService();
+        final TransactionContent transactionContent = mock(TransactionContent.class);
+        @SuppressWarnings("deprecation")
+        final TransactionExecutorImpl executor = new TransactionExecutorImpl(transactionService);
 
+        Mockito.doThrow(new SBonitaException() {}).when(transactionContent).execute();
+        
+        executor.execute(transactionContent);
+
+        verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
+    }
+ 
+    
+    // Minimal implementation of a TransactionService (we do not (and don't want !)) to see the JTATransactionServiceImpl 
+    class MockTransactionService implements TransactionService {
+
+        @Override
+        public void begin() throws STransactionCreationException {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void complete() throws STransactionCommitException, STransactionRollbackException {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public TransactionState getState() throws STransactionException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean isTransactionActive() throws STransactionException {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void setRollbackOnly() throws STransactionException {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public boolean isRollbackOnly() throws STransactionException {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+            begin();
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                setRollbackOnly();
+                throw e;
+            } finally {
+                complete();
+            }
+        }
+
+        @Override
+        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
+    
 }

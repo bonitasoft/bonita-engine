@@ -13,20 +13,20 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @deprecated Use {@link org.bonitasoft.engine.transaction.TransactionService#executeInTransaction(Callable)} instead.
  */
+@Deprecated
 public class TransactionExecutorImpl implements TransactionExecutor {
 
     private final TransactionService transactionService;
@@ -37,53 +37,22 @@ public class TransactionExecutorImpl implements TransactionExecutor {
 
     @Override
     public void execute(final TransactionContent transactionContent) throws SBonitaException {
-        execute(Arrays.asList(transactionContent));
-    }
+        Callable<Void> txContentCallable = new Callable<Void>() {
 
-    @Override
-    public void execute(final TransactionContent... transactionContents) throws SBonitaException {
-        execute(Arrays.asList(transactionContents));
-    }
-
-    @Override
-    public void execute(final List<TransactionContent> transactionContents) throws SBonitaException {
-        final boolean txOpened = openTransaction();
-        try {
-            for (final TransactionContent transactionContent : transactionContents) {
+            @Override
+            public Void call() throws Exception {
                 transactionContent.execute();
+                return null;
             }
-        } catch (final SBonitaException sbe) {
-            setTransactionRollback();
-            throw sbe;
-        } finally {
-            completeTransaction(txOpened);
-        }
-    }
+        };
 
-    @Override
-    public boolean openTransaction() throws STransactionException {
-        if (transactionService.isTransactionActive()) {
-            return false;
-        } else {
-            try {
-                transactionService.begin();
-                return true;
-            } catch (final STransactionCreationException e) {
-                throw new STransactionException("Unable to open transaction, transaction state is " + transactionService.getState(), e);
-            }
+        try {
+            transactionService.executeInTransaction(txContentCallable);
+        } catch (SBonitaException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new SBonitaRuntimeException(e);
         }
-    }
-
-    @Override
-    public void completeTransaction(final boolean txOpened) throws STransactionException {
-        if (txOpened) {
-            transactionService.complete();
-        }
-    }
-
-    @Override
-    public void setTransactionRollback() throws STransactionException {
-        transactionService.setRollbackOnly();
     }
 
 }

@@ -29,7 +29,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
@@ -152,10 +151,9 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
     protected SActivityInstance getActivityInstance(final TenantServiceAccessor tenantAccessor, final long activityInstanceId)
             throws ActivityInstanceNotFoundException {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final GetActivityInstance getActivityInstance = new GetActivityInstance(activityInstanceService, activityInstanceId);
         try {
-            transactionExecutor.execute(getActivityInstance);
+            getActivityInstance.execute();
         } catch (final SBonitaException e) {
             throw new ActivityInstanceNotFoundException(activityInstanceId);
         }
@@ -165,14 +163,13 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
     protected ProcessInstance getProcessInstance(final TenantServiceAccessor tenantAccessor, final long processInstanceId)
             throws ProcessInstanceNotFoundException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getProcessInstanceDescriptor();
 
         final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
                 processInstanceId);
         try {
-            transactionExecutor.execute(getProcessInstance);
+            getProcessInstance.execute();
         } catch (final SBonitaException e) {
             throw new ProcessInstanceNotFoundException(processInstanceId);
         }
@@ -188,12 +185,12 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         }
     }
 
-    protected SProcessDefinition getServerProcessDefinition(final TransactionExecutor transactionExecutor, final long processDefinitionUUID,
+    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID,
             final ProcessDefinitionService processDefinitionService) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionUUID,
                 processDefinitionService);
         try {
-            transactionExecutor.execute(transactionContentWithResult);
+            transactionContentWithResult.execute();
             return transactionContentWithResult.getResult();
         } catch (final SProcessDefinitionNotFoundException e) {
             throw e;
@@ -235,10 +232,9 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
     protected SProcessDefinition getProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId)
             throws InvalidProcessDefinitionException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
         try {
-            transactionExecutor.execute(getProcessDefinition);
+            getProcessDefinition.execute();
         } catch (final SBonitaException e) {
             throw new InvalidProcessDefinitionException("invalid processDefinition with id:" + processDefinitionId);
         }

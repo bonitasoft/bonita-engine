@@ -40,8 +40,8 @@ ALTER TABLE user_ ADD CONSTRAINT fk_user__tenantId FOREIGN KEY (tenantid) REFERE
 ALTER TABLE user_membership ADD CONSTRAINT fk_user_membership_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE waiting_event ADD CONSTRAINT fk_waiting_event_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 
-ALTER TABLE profileentry ADD CONSTRAINT fk_profileentry_profileId FOREIGN KEY (profileId, tenantId) REFERENCES profile(id, tenantId);
-ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_profileId FOREIGN KEY (profileId, tenantId) REFERENCES profile(id, tenantId);
+ALTER TABLE profileentry ADD CONSTRAINT fk_profileentry_profileId FOREIGN KEY (tenantId, profileId) REFERENCES profile(tenantId, id);
+ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_profileId FOREIGN KEY (tenantId, profileId) REFERENCES profile(tenantId, id);
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------

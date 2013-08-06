@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractArchiveActivityInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -33,23 +32,20 @@ public class SearchArchivedActivityInstances extends AbstractArchiveActivityInst
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final ReadPersistenceService persistenceService;
-
     public SearchArchivedActivityInstances(final ActivityInstanceService activityInstanceService, final FlowNodeStateManager flowNodeStateManager,
-            final SearchArchivedActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions, final ReadPersistenceService persistenceService) {
+            final SearchArchivedActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions) {
         super(searchDescriptor, searchOptions, flowNodeStateManager);
         this.activityInstanceService = activityInstanceService;
-        this.persistenceService = persistenceService;
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.getNumberOfArchivedActivityInstances(getEntityClass(), searchOptions, persistenceService);
+        return activityInstanceService.getNumberOfArchivedActivityInstances(getEntityClass(), searchOptions);
     }
 
     @Override
     public List<SAActivityInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return activityInstanceService.searchArchivedActivityInstances(getEntityClass(), searchOptions, persistenceService);
+        return activityInstanceService.searchArchivedActivityInstances(getEntityClass(), searchOptions);
     }
 
 }

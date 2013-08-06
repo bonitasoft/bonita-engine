@@ -28,9 +28,8 @@ public class NullCheckingUtil {
      * 
      * @param params
      *            the parameters to check
-     * @throws an
-     *             IllegalArgumentException if at least one of the parameters is
-     *             null
+     * @throws IllegalArgumentException
+     *             if at least one of the parameters is null
      */
     public static void checkArgsNotNull(final Object... params) {
         checkArgsNotNull(1, params);
@@ -46,9 +45,8 @@ public class NullCheckingUtil {
      *            the offset to use in the stack trace to produce error message
      * @param params
      *            the parameters to check
-     * @throws an
-     *             IllegalArgumentException if at least one of the parameters is
-     *             null
+     * @throws IllegalArgumentException
+     *             if at least one of the parameters is null
      */
     private static void checkArgsNotNull(final int offset, final Object... params) {
         final NullCheckResult result = findNull(params);
@@ -172,7 +170,7 @@ public class NullCheckingUtil {
          * @see #findNull(Object...)
          */
         public boolean hasNull() {
-            return this.bitSet.cardinality() != 0;
+            return bitSet.cardinality() != 0;
         }
 
         /**
@@ -182,7 +180,7 @@ public class NullCheckingUtil {
          * @see #findNull(Object...)
          */
         public int getSize() {
-            return this.size;
+            return size;
         }
 
         /**
@@ -193,7 +191,7 @@ public class NullCheckingUtil {
          * @return true if the i th parameter given to {@link #findNull(Object...)} was null.
          */
         public boolean isNull(final int i) {
-            return this.bitSet.get(i);
+            return bitSet.get(i);
         }
     }
 }

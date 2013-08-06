@@ -38,10 +38,7 @@ public class ProcessInstanceHandler extends AbstractUpdateHandler {
     @Override
     public boolean isInterested(final SEvent event) {
         final Object object = event.getObject();
-        if (!(object instanceof SProcessInstance)) {
-            return false;
-        }
-        return true;
+        return (object instanceof SProcessInstance);
     }
 
 }

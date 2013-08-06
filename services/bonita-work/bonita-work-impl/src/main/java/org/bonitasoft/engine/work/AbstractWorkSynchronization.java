@@ -27,13 +27,13 @@ import org.bonitasoft.engine.transaction.TransactionState;
 
 public abstract class AbstractWorkSynchronization implements BonitaTransactionSynchronization {
 
-    private final Collection<BonitaWork> works;
+    private final Collection<AbstractBonitaWork> works;
 
     protected final ExecutorService executorService;
 
     private boolean executed = false;
 
-    private final TechnicalLoggerService loggerService;
+    protected final TechnicalLoggerService loggerService;
 
     private final SessionAccessor sessionAccessor;
 
@@ -55,7 +55,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.transactionService = transactionService;
-        works = new HashSet<BonitaWork>();
+        works = new HashSet<AbstractBonitaWork>();
         try {
             tenantId = sessionAccessor.getTenantId();
         } catch (final TenantIdNotSetException e) {
@@ -67,7 +67,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         return tenantId;
     }
 
-    public void addWork(final BonitaWork work) {
+    public void addWork(final AbstractBonitaWork work) {
         works.add(work);
     }
 
@@ -79,7 +79,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
     @Override
     public void afterCompletion(final TransactionState transactionStatus) {
         if (TransactionState.COMMITTED == transactionStatus) {
-            for (final BonitaWork work : works) {
+            for (final AbstractBonitaWork work : works) {
                 work.setTechnicalLogger(loggerService);
                 work.setSessionAccessor(sessionAccessor);
                 work.setSessionService(sessionService);
@@ -93,7 +93,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         executed = true;
     }
 
-    protected abstract void executeRunnables(Collection<BonitaWork> works);
+    protected abstract void executeRunnables(Collection<AbstractBonitaWork> works);
 
     public boolean isExecuted() {
         return executed;

@@ -10,6 +10,7 @@
 		</constructor-arg>
 		<constructor-arg ref="tenantBuilder" />
 		<constructor-arg ref="technicalLoggerService" />
+		<constructor-arg ref="platformCacheService" />
 	</bean>
 
 </beans>

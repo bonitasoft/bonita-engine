@@ -33,6 +33,7 @@ import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupDeletionException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
+import org.bonitasoft.engine.identity.SMembershipDeletionException;
 import org.bonitasoft.engine.identity.SRoleDeletionException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
 import org.bonitasoft.engine.identity.SUserCreationException;
@@ -75,6 +76,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -342,6 +344,16 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
+    public void deleteAllGroups() throws SGroupDeletionException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SGroup.class, null);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SGroupDeletionException("Can't delete all groups.", e);
+        }
+    }
+
+    @Override
     public List<Long> deleteChildrenGroup(final long groupId) throws SGroupDeletionException, SGroupNotFoundException {
         final ArrayList<Long> deletedGroups = new ArrayList<Long>();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -509,6 +521,16 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
+    public void deleteAllRoles() throws SRoleDeletionException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SRole.class, null);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SRoleDeletionException("Can't delete all roles.", e);
+        }
+    }
+
+    @Override
     public void deleteUser(final long userId) throws SUserDeletionException {
         SUser user;
         try {
@@ -543,9 +565,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void deleteUserMembership(final long userMembershipId) throws SIdentityException {
-        final SUserMembership userMembership = getLightUserMembership(userMembershipId);
-        this.deleteUserMembership(userMembership);
+    public void deleteAllUsers() throws SUserDeletionException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SUser.class, null);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SUserDeletionException("Can't delete all users.", e);
+        }
     }
 
     @Override
@@ -572,7 +598,30 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void deleteUserMembership(SUserMembership userMembership) throws SIdentityException {
+    public void deleteUserMembership(SUserMembership userMembership) throws SMembershipDeletionException {
+        try {
+            // fat object, hibernate won't delete id
+            if (userMembership.getGroupName() != null || userMembership.getUsername() != null || userMembership.getRoleName() != null) {
+                userMembership = getLightUserMembership(userMembership.getId());
+            }
+            deleteLightUserMembership(userMembership);
+        } catch (SIdentityException e) {
+            throw new SMembershipDeletionException("Can't delete membership " + userMembership, e);
+        }
+    }
+
+    @Override
+    public void deleteUserMembership(final long id) throws SMembershipDeletionException {
+        try {
+            final SUserMembership userMembership = getLightUserMembership(id);
+            deleteLightUserMembership(userMembership);
+        } catch (SIdentityException e) {
+            throw new SMembershipDeletionException("Can't delete membership with id " + id, e);
+        }
+    }
+
+    @Override
+    public void deleteLightUserMembership(SUserMembership userMembership) throws SMembershipDeletionException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteUserMembership"));
         }
@@ -580,10 +629,6 @@ public class IdentityServiceImpl implements IdentityService {
                 + " in group " + userMembership.getGroupName();
         final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.DELETED, message, userMembership);
         try {
-            if (userMembership.getGroupName() != null || userMembership.getUsername() != null || userMembership.getRoleName() != null) {// fat object, hibernate
-                                                                                                                                        // won't delete id
-                userMembership = getLightUserMembership(userMembership.getId());
-            }
             final DeleteRecord deleteRecord = new DeleteRecord(userMembership);
             final SDeleteEvent deleteEvent = getDeleteEvent(userMembership, USERMEMBERSHIP);
             recorder.recordDelete(deleteRecord, deleteEvent);
@@ -596,7 +641,17 @@ public class IdentityServiceImpl implements IdentityService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteUserMembership", e));
             }
             initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteUserMembership");
-            throw new SIdentityException("Can't delete membership " + userMembership, e);
+            throw new SMembershipDeletionException("Can't delete membership " + userMembership, e);
+        }
+    }
+
+    @Override
+    public void deleteAllUserMemberships() throws SMembershipDeletionException {
+        try {
+            final DeleteAllRecord record = new DeleteAllRecord(SUserMembership.class, null);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SMembershipDeletionException("Can't delete all user memberships.", e);
         }
     }
 
@@ -1733,6 +1788,7 @@ public class IdentityServiceImpl implements IdentityService {
         updateUser(user, descriptor, false);
     }
 
+    @Deprecated
     @Override
     public void updateUser(final SUser user, final EntityUpdateDescriptor descriptor, final boolean isPasswordEncrypted) throws SUserUpdateException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {

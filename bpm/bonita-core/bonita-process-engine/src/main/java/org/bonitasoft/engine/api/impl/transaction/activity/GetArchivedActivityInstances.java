@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011,2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,18 +21,16 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class GetArchivedActivityInstances implements TransactionContentWithResult<List<SAActivityInstance>> {
 
     private final ActivityInstanceService activityInstanceService;
 
     private final long processInstanceId;
-
-    private final ReadPersistenceService persistenceService;
 
     private final int pageIndex;
 
@@ -45,10 +43,9 @@ public class GetArchivedActivityInstances implements TransactionContentWithResul
     private List<SAActivityInstance> archivedActivityInstances;
 
     public GetArchivedActivityInstances(final ActivityInstanceService activityInstanceService, final long processInstanceId,
-            final ReadPersistenceService persistenceService, final int pageIndex, final int numberPerPage, final String field, final OrderByType order) {
+            final int pageIndex, final int numberPerPage, final String field, final OrderByType order) {
         this.activityInstanceService = activityInstanceService;
         this.processInstanceId = processInstanceId;
-        this.persistenceService = persistenceService;
         this.pageIndex = pageIndex;
         this.numberPerPage = numberPerPage;
         this.field = field;
@@ -58,7 +55,7 @@ public class GetArchivedActivityInstances implements TransactionContentWithResul
     @Override
     public void execute() throws SBonitaException {
         final QueryOptions queryOptions = new QueryOptions(pageIndex * numberPerPage, numberPerPage, SAActivityInstance.class, field, order);
-        archivedActivityInstances = activityInstanceService.getArchivedActivityInstances(processInstanceId, persistenceService, queryOptions);
+        archivedActivityInstances = activityInstanceService.getArchivedActivityInstances(processInstanceId, queryOptions);
     }
 
     @Override

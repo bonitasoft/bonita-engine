@@ -24,6 +24,12 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
  */
 public final class EngineConstantExpressionBuilder {
 
+	public static SExpression getConnectorAPIAccessorExpression(final SExpressionBuilder expressionbuilder) throws SInvalidExpressionException {
+        final SExpressionBuilder builder = expressionbuilder.createNewInstance();
+        builder.setContent("connectorApiAccessor").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(APIAccessor.class.getName());
+        return builder.done();
+    }
+	
     public static SExpression getAPIAccessorExpression(final SExpressionBuilder expressionbuilder) throws SInvalidExpressionException {
         final SExpressionBuilder builder = expressionbuilder.createNewInstance();
         builder.setContent("apiAccessor").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(APIAccessor.class.getName());

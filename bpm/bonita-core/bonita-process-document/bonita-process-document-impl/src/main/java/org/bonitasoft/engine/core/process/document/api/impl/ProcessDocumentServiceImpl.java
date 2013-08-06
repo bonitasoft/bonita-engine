@@ -44,7 +44,6 @@ import org.bonitasoft.engine.document.model.SDocumentBuilder;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 /**
@@ -116,6 +115,16 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         } catch (final SBonitaException e) {
             throw new SProcessDocumentDeletionException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void deleteDocumentsFromProcessInstance(final Long processInstanceId) throws SDocumentException, SProcessDocumentDeletionException {
+        final SDocumentMappingBuilder documentMappingKeyProvider = documentMappingBuilderAccessor.getSDocumentMappingBuilder();
+        List<SProcessDocument> sProcessDocuments;
+        do {
+            sProcessDocuments = getDocumentsOfProcessInstance(processInstanceId, 0, 100, documentMappingKeyProvider.getDocumentNameKey(), OrderByType.ASC);
+            removeDocuments(sProcessDocuments);
+        } while (!sProcessDocuments.isEmpty());
     }
 
     private SProcessDocument toProcessDocument(final SDocumentMapping docMapping) {
@@ -253,12 +262,11 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     @Override
-    public SProcessDocument getDocument(final long processInstanceId, final String documentName, final long time,
-            final ReadPersistenceService readPersistenceService) throws SDocumentNotFoundException {
+    public SProcessDocument getDocument(final long processInstanceId, final String documentName, final long time) throws SDocumentNotFoundException {
         SADocumentMapping archDocMapping;
         try {
             try {
-                archDocMapping = documentMappingService.get(processInstanceId, documentName, time, readPersistenceService);
+                archDocMapping = documentMappingService.get(processInstanceId, documentName, time);
             } catch (final SDocumentMappingNotFoundException e) {
                 archDocMapping = null;
             }
@@ -381,14 +389,14 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     @Override
-    public long getNumberOfArchivedDocuments(final QueryOptions queryOptions, final ReadPersistenceService persistenceService) throws SBonitaSearchException {
-        return documentMappingService.getNumberOfArchivedDocuments(queryOptions, persistenceService);
+    public long getNumberOfArchivedDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
+        return documentMappingService.getNumberOfArchivedDocuments(queryOptions);
     }
 
     @Override
-    public List<SAProcessDocument> searchArchivedDocuments(final QueryOptions queryOptions, final ReadPersistenceService persistenceService)
+    public List<SAProcessDocument> searchArchivedDocuments(final QueryOptions queryOptions)
             throws SBonitaSearchException {
-        final List<SADocumentMapping> docMappings = documentMappingService.searchArchivedDocuments(queryOptions, persistenceService);
+        final List<SADocumentMapping> docMappings = documentMappingService.searchArchivedDocuments(queryOptions);
         final List<SAProcessDocument> result = new ArrayList<SAProcessDocument>(docMappings.size());
         if (!docMappings.isEmpty()) {
             for (final SADocumentMapping docMapping : docMappings) {
@@ -399,15 +407,13 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     @Override
-    public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
-        return documentMappingService.getNumberOfArchivedDocumentsSupervisedBy(userId, queryOptions, persistenceService);
+    public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        return documentMappingService.getNumberOfArchivedDocumentsSupervisedBy(userId, queryOptions);
     }
 
     @Override
-    public List<SAProcessDocument> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions,
-            final ReadPersistenceService persistenceService) throws SBonitaSearchException {
-        final List<SADocumentMapping> docMappings = documentMappingService.searchArchivedDocumentsSupervisedBy(userId, queryOptions, persistenceService);
+    public List<SAProcessDocument> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+        final List<SADocumentMapping> docMappings = documentMappingService.searchArchivedDocumentsSupervisedBy(userId, queryOptions);
         final List<SAProcessDocument> result = new ArrayList<SAProcessDocument>(docMappings.size());
         if (!docMappings.isEmpty()) {
             for (final SADocumentMapping docMapping : docMappings) {
@@ -418,11 +424,10 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     @Override
-    public SAProcessDocument getArchivedVersionOfProcessDocument(final long documentId, final ReadPersistenceService persistenceService)
-            throws SDocumentNotFoundException {
+    public SAProcessDocument getArchivedVersionOfProcessDocument(final long documentId) throws SDocumentNotFoundException {
         SADocumentMapping aDocMapping;
         try {
-            aDocMapping = documentMappingService.getArchivedVersionOfDocument(documentId, persistenceService);
+            aDocMapping = documentMappingService.getArchivedVersionOfDocument(documentId);
             return toAProcessDocument(aDocMapping);
         } catch (final SDocumentMappingNotFoundException e) {
             throw new SDocumentNotFoundException("Document not found with identifer: " + documentId, e);
@@ -430,11 +435,10 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     @Override
-    public SAProcessDocument getArchivedDocument(final long archivedProcessDocumentId, final ReadPersistenceService persistenceService)
-            throws SDocumentNotFoundException {
+    public SAProcessDocument getArchivedDocument(final long archivedProcessDocumentId) throws SDocumentNotFoundException {
         SADocumentMapping aDocMapping;
         try {
-            aDocMapping = documentMappingService.getArchivedDocument(archivedProcessDocumentId, persistenceService);
+            aDocMapping = documentMappingService.getArchivedDocument(archivedProcessDocumentId);
             return toAProcessDocument(aDocMapping);
         } catch (final SDocumentMappingNotFoundException e) {
             throw new SDocumentNotFoundException("Document not found with identifer: " + archivedProcessDocumentId, e);
@@ -442,14 +446,14 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     @Override
-    public void deleteArchivedDocuments(final long instanceId, final ReadPersistenceService persistenceService) throws SDocumentMappingDeletionException {
+    public void deleteArchivedDocuments(final long instanceId) throws SDocumentMappingDeletionException {
         final FilterOption filterOption = new FilterOption(SADocumentMapping.class, "processInstanceId", instanceId);
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(filterOption);
         final QueryOptions queryOptions = new QueryOptions(filters, null);
         List<SADocumentMapping> documents;
         try {
-            documents = documentMappingService.searchArchivedDocuments(queryOptions, persistenceService);
+            documents = documentMappingService.searchArchivedDocuments(queryOptions);
         } catch (final SBonitaSearchException e) {
             throw new SDocumentMappingDeletionException(e);
         }

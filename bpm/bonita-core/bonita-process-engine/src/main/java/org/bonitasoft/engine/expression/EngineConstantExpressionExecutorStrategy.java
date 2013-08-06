@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
+import org.bonitasoft.engine.connector.ConnectorAPIAccessorImpl;
 import org.bonitasoft.engine.connector.EngineExecutionContext;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -39,6 +41,7 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
@@ -52,9 +55,9 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     private final ProcessInstanceService processInstanceService;
 
-    private final ReadSessionAccessor sessionAccessor;
+    protected final ReadSessionAccessor sessionAccessor;
 
-    private final SessionService sessionService;
+    protected final SessionService sessionService;
 
     public EngineConstantExpressionExecutorStrategy(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final SessionService sessionService, final ReadSessionAccessor sessionAccessor) {
@@ -79,6 +82,8 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         switch (expressionConstant) {
             case API_ACCESSOR:
                 return getApiAccessor();
+            case CONNECTOR_API_ACCESSOR:
+                return getConnectorApiAccessor();
             case ENGINE_EXECUTION_CONTEXT:
                 return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
             case ACTIVITY_INSTANCE_ID:
@@ -100,6 +105,18 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     protected APIAccessorImpl getApiAccessor() {
         return new APIAccessorImpl();
+    }
+
+    protected APIAccessor getConnectorApiAccessor() throws SExpressionEvaluationException {
+        SSession sSession;
+        try {
+            sSession = this.sessionService.getSession(this.sessionAccessor.getSessionId());
+        } catch (SSessionNotFoundException e) {
+            throw new SExpressionEvaluationException(e);
+        } catch (SessionIdNotSetException e) {
+            throw new SExpressionEvaluationException(e);
+        }
+        return new ConnectorAPIAccessorImpl(sSession.getTenantId());
     }
 
     private Serializable getLoggedUserFromSession() throws SExpressionEvaluationException {

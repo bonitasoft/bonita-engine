@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractArchivedCommentsSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -26,28 +25,25 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 /**
  * @author Hongwen Zang
+ * @author Celine Souchet
  */
 public class SearchArchivedComments extends AbstractArchivedCommentsSearchEntity {
 
     private final SCommentService sCommentService;
 
-    private final ReadPersistenceService persistenceService;
-
-    public SearchArchivedComments(final SCommentService sCommentService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
-            final ReadPersistenceService persistenceService) {
+    public SearchArchivedComments(final SCommentService sCommentService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
         this.sCommentService = sCommentService;
-        this.persistenceService = persistenceService;
     }
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return sCommentService.getNumberOfArchivedComments(searchOptions, persistenceService);
+        return sCommentService.getNumberOfArchivedComments(searchOptions);
     }
 
     @Override
     public List<SAComment> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return sCommentService.searchArchivedComments(searchOptions, persistenceService);
+        return sCommentService.searchArchivedComments(searchOptions);
     }
 
 }

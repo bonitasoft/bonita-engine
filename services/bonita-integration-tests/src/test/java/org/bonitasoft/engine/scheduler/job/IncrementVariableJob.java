@@ -12,9 +12,6 @@ import org.bonitasoft.engine.scheduler.impl.VariableStorage;
  */
 public class IncrementVariableJob extends GroupJob {
 
-    /**
-   * 
-   */
     private static final long serialVersionUID = 3707724945060118636L;
 
     private String variableName;

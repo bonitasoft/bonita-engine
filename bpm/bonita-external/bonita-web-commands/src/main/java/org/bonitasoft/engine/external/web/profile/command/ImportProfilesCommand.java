@@ -26,7 +26,6 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ProfileService;
@@ -55,7 +54,6 @@ public class ImportProfilesCommand extends TenantCommand {
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
         final ProfileService profileService = serviceAccessor.getProfileService();
         final IdentityService identityService = serviceAccessor.getIdentityService();
 
@@ -72,20 +70,20 @@ public class ImportProfilesCommand extends TenantCommand {
         final Parser parser = serviceAccessor.getProfileParser();
         final List<ExportedProfile> profiles = getProfilesFromXML(new String(xmlContent), parser);
 
-        return (Serializable) importWithDeleteExisting(transactionExecutor, profileService, identityService, profiles);
+        return (Serializable) importWithDeleteExisting(profileService, identityService, profiles);
     }
 
-    private List<String> importWithDeleteExisting(final TransactionExecutor transactionExecutor, final ProfileService profileService,
-            final IdentityService identityService, final List<ExportedProfile> profiles) throws SCommandExecutionException {
+    private List<String> importWithDeleteExisting(final ProfileService profileService, final IdentityService identityService,
+            final List<ExportedProfile> profiles) throws SCommandExecutionException {
         final DeleteAllExistingProfiles deleteAll = new DeleteAllExistingProfiles(profileService);
         try {
-            transactionExecutor.execute(deleteAll);
+            deleteAll.execute();
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }
         final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, getUserIdFromSession());
         try {
-            transactionExecutor.execute(importProfiles);
+            importProfiles.execute();
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }
