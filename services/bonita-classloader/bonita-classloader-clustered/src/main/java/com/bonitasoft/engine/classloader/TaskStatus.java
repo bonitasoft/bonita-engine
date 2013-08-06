@@ -72,10 +72,10 @@ public class TaskStatus implements Serializable {
 
 	public String getMessage() {
 		StringBuilder stb = new StringBuilder();
-		if(error){
+		if (error) {
 			stb.append("Error refreshing classloader on node");
-		}else{
-			stb.append("Refresed classloader on node");
+		} else {
+			stb.append("Refreshed classloader on node");
 			
 		}
 		stb.append(node);
@@ -90,7 +90,7 @@ public class TaskStatus implements Serializable {
 		stb.append(" took ");
 		stb.append(completionTime);
 		stb.append(" ms");
-		if(error){
+		if (error) {
 			stb.append(", error is ");
 			stb.append(throwable.getMessage());
 		}
