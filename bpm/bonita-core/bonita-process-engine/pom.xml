@@ -78,7 +78,7 @@
 						<id>install license</id>
 						<phase>process-test-resources</phase>
 						<configuration>
-							<target unless="maven.test.skip">
+							<target>
 								<copy todir="${bonita.home}/server/licenses" failonerror="true">
 									<fileset dir="${user.home}/lic" includes="*.lic" />
 								</copy>
