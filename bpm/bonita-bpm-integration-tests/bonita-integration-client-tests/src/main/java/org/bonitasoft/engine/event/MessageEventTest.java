@@ -66,6 +66,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("javadoc")
 public class MessageEventTest extends CommonAPITest {
 
     private static final String MESSAGE = "message";
@@ -212,7 +213,7 @@ public class MessageEventTest extends CommonAPITest {
         return sendMessageProcess;
     }
 
-    private ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final Map<String, String> data, final List<Operation> catchMessageOperations)
+    protected ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final Map<String, String> data, final List<Operation> catchMessageOperations)
             throws BonitaException {
         return deployAndEnableProcessWithStartMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, MESSAGE, data, catchMessageOperations);
     }
@@ -268,8 +269,8 @@ public class MessageEventTest extends CommonAPITest {
         addProcessData(processData, processBuilder);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addAutomaticTask("auto1");
-        final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processBuilder.addIntermediateCatchEvent(
-                CATCH_EVENT_NAME).addMessageEventTrigger(messageName);
+        final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processBuilder.addIntermediateCatchEvent(CATCH_EVENT_NAME)
+                .addMessageEventTrigger(messageName);
         addCorrelations(correlations, catchMessageEventTriggerDefinitionBuilder);
         addCatchMessageOperations(operations, catchMessageEventTriggerDefinitionBuilder);
         processBuilder.addActor(ACTOR_NAME);
@@ -460,8 +461,7 @@ public class MessageEventTest extends CommonAPITest {
         correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, correlations,
-                data,
-                null, null);
+                data, null, null);
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageInterCatchEventAnd1Correlation();
 
         // start two instances of a receive message process
@@ -802,8 +802,8 @@ public class MessageEventTest extends CommonAPITest {
     @Test
     public void dataTransferFromMessageEndEventToMessageIntermediateCatchEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, null,
-                Collections.singletonMap("lastName", String.class.getName()),
-                Collections.singletonMap("lName", String.class.getName()), Collections.singletonMap("lName", "lastName"));
+                Collections.singletonMap("lastName", String.class.getName()), Collections.singletonMap("lName", String.class.getName()),
+                Collections.singletonMap("lName", "lastName"));
 
         final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
                 ExpressionType.TYPE_VARIABLE));
@@ -998,7 +998,7 @@ public class MessageEventTest extends CommonAPITest {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    private void sendMessage(final String messageName, final String targetProcessName, final String targetFlowNodeName,
+    protected void sendMessage(final String messageName, final String targetProcessName, final String targetFlowNodeName,
             final Map<Expression, Expression> messageContent) throws BonitaException {
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
         final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression(targetFlowNodeName);
@@ -1064,6 +1064,22 @@ public class MessageEventTest extends CommonAPITest {
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", taskInstance.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
+
+        disableAndDeleteProcess(receiveMessageProcess);
+    }
+
+    @Test
+    public void sendMessageTwiceTriggersTwoStartMessageEvents() throws Exception {
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
+
+        // at the first test some time the cron job time some time before executing
+        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 20, 5000, true, 1, user);
+        assertTrue("There should be 1 pending task", checkNbPendingTaskOf.waitUntil());
+
+        sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
+        final CheckNbPendingTaskOf checkNbPendingTask2 = new CheckNbPendingTaskOf(getProcessAPI(), 20, 5000, true, 2, user);
+        assertTrue("There should be 2 pending tasks", checkNbPendingTask2.waitUntil());
 
         disableAndDeleteProcess(receiveMessageProcess);
     }

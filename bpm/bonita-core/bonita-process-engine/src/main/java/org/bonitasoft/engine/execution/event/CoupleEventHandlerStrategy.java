@@ -94,11 +94,11 @@ public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
         do {
             waitingEvents = eventInstanceService.searchWaitingEvents(waitingEventClass, queryOptions);
             count = eventInstanceService.getNumberOfWaitingEvents(waitingEventClass, countOptions);
-            deleWaitingEvents(waitingEvents);
+            deleteWaitingEvents(waitingEvents);
         } while (count > waitingEvents.size());
     }
 
-    private void deleWaitingEvents(final List<? extends SWaitingEvent> waitingEvents) throws SWaitingEventModificationException {
+    private void deleteWaitingEvents(final List<? extends SWaitingEvent> waitingEvents) throws SWaitingEventModificationException {
         for (final SWaitingEvent sWaitingEvent : waitingEvents) {
             eventInstanceService.deleteWaitingEvent(sWaitingEvent);
         }

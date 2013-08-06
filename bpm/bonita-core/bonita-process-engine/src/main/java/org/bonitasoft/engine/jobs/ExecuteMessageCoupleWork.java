@@ -16,14 +16,9 @@ package org.bonitasoft.engine.jobs;
 import java.io.Serializable;
 
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
@@ -57,22 +52,7 @@ public class ExecuteMessageCoupleWork extends TxBonitaWork implements Serializab
         final SWaitingMessageEvent waitingMessage = eventInstanceService.getWaitingMessage(waitingMessageId);
         if (waitingMessage != null) {
             enventsHandler.triggerCatchEvent(waitingMessage, messageInstanceId);
-            // markWaitingMessageAsDone(waitingMessage);
-            markMessageAsHandled();
         }
-    }
-
-    // private void markWaitingMessageAsDone(final SWaitingMessageEvent waitingMessage) throws SWaitingEventModificationException {
-    // final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-    // descriptor.addField(instanceBuilders.getSWaitingMessageEventBuilder().getProgressKey(), SWaitingMessageEventBuilder.PROGRESS_DONE_KEY);
-    // eventInstanceService.updateWaitingMessage(waitingMessage, descriptor);
-    // }
-
-    private void markMessageAsHandled() throws SMessageModificationException, SMessageInstanceNotFoundException, SMessageInstanceReadException {
-        final SMessageInstance messageInstanceToUpdate = eventInstanceService.getMessageInstance(messageInstanceId);
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(instanceBuilders.getSMessageInstanceBuilder().getHandledKey(), true);
-        eventInstanceService.updateMessageInstance(messageInstanceToUpdate, descriptor);
     }
 
     @Override
