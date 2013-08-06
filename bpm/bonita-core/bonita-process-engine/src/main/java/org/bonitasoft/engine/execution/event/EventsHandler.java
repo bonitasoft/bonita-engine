@@ -118,8 +118,8 @@ public class EventsHandler {
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders, final BPMDefinitionBuilders bpmDefinitionBuilders,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final WorkService workService, final ProcessInstanceService processInstanceService, final LockService lockService, final TokenService tokenService,
+            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry, final WorkService workService,
+            final ProcessInstanceService processInstanceService, final LockService lockService, final TokenService tokenService,
             final TechnicalLoggerService logger) {
         this.bpmDefinitionBuilders = bpmDefinitionBuilders;
         this.eventInstanceService = eventInstanceService;
@@ -309,8 +309,7 @@ public class EventsHandler {
      * @param triggeringElementID
      * @throws SBonitaException
      */
-    public void triggerCatchEvent(final SWaitingEvent waitingEvent, final Long triggeringElementID)
-            throws SBonitaException {
+    public void triggerCatchEvent(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
         final SBPMEventType eventType = waitingEvent.getEventType();
         final long processDefinitionId = waitingEvent.getProcessDefinitionId();
         final long targetSFlowNodeDefinitionId = waitingEvent.getFlowNodeDefinitionId();
@@ -361,10 +360,10 @@ public class EventsHandler {
                 instantiateProcess(processDefinitionId, targetSFlowNodeDefinitionId, operations);
                 break;
             default:
-                if (waitingEvent != null) { // is null if it's a timer
+                if (waitingEvent != null) {
                     eventInstanceService.deleteWaitingEvent(waitingEvent);
                     executeFlowNode(flowNodeInstanceId, operations, waitingEvent.getParentProcessInstanceId());
-                } else {
+                } else { // is null if it's a timer
                     long processInstanceId = eventInstanceService.getFlowNodeInstance(flowNodeInstanceId).getParentProcessInstanceId();
                     executeFlowNode(flowNodeInstanceId, operations, processInstanceId);
                 }
@@ -417,8 +416,8 @@ public class EventsHandler {
                 subProcessId, parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
-    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, long processInstanceId) throws SActivityReadException,
-            SActivityExecutionFailedException, SActivityExecutionException, WorkRegisterException {
+    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, final long processInstanceId)
+            throws SActivityReadException, SActivityExecutionFailedException, SActivityExecutionException, WorkRegisterException {
         containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
                 processInstanceId);
     }
