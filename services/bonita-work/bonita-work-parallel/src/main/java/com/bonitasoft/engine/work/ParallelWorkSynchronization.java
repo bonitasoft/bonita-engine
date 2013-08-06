@@ -15,10 +15,10 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.AbstractBonitaWork;
 import org.bonitasoft.engine.work.AbstractWorkSynchronization;
-import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.RunnableListener;
 import org.bonitasoft.engine.work.ExecutorWorkService;
+import org.bonitasoft.engine.work.RunnableListener;
 
 /**
  * @author Charles Souillard
@@ -36,8 +36,8 @@ public class ParallelWorkSynchronization extends AbstractWorkSynchronization {
     }
 
     @Override
-    protected void executeRunnables(final Collection<BonitaWork> works) {
-        for (final BonitaWork work : works) {
+    protected void executeRunnables(final Collection<AbstractBonitaWork> works) {
+        for (final AbstractBonitaWork work : works) {
             executorService.submit(new BonitaWorkWrapper(runnableListener, getTenantId(), work));
         }
     }

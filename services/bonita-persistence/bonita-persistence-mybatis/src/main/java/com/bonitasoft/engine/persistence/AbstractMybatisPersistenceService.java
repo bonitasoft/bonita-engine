@@ -87,7 +87,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
     public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final AbstractMyBatisConfigurationsProvider configurations,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager, final DataSource datasource) throws SPersistenceException {
+            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager, final DataSource datasource)
+            throws SPersistenceException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource);
         this.dbIdentifier = dbIdentifier;
         this.txService = txService;
@@ -123,7 +124,8 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
     }
 
     @Override
-    protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements, final boolean useDataSourceConnection)
+    protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
+            final boolean useDataSourceConnection)
             throws SPersistenceException, IOException {
         // TODO charles use the useDataSourceConnection parameter
         StringReader reader = null;
@@ -433,7 +435,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         parameters.put("id", selectDescriptor.getId());
 
         final String selectStatement = this.getSelectStatement(selectDescriptor, parameters);
-        try {            
+        try {
             final SelectByIdStatement<T> statement = new SelectByIdStatement<T>(selectStatement, parameters, selectDescriptor.getEntityType(),
                     selectDescriptor.getId());
             return statement.execute(getSession());
@@ -662,13 +664,13 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         }
 
     }
-    
+
     private ScriptRunner getScriptRunner(final SqlSession session) {
         final Connection connection = session.getConnection();
         final ScriptRunner runner = new ScriptRunner(connection);
         return runner;
     }
-    
+
     @Override
     public void flushStatements() throws SPersistenceException {
         getSession().flushStatements();

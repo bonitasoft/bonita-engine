@@ -55,12 +55,8 @@
 
 	<bean id="sessionAccessor" class="org.bonitasoft.engine.sessionaccessor.ThreadLocalSessionAccessor" />
 
-	<bean id="transactionExecutor" class="com.bonitasoft.engine.execution.RetryTransactionExecutor">
+	<bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">
 		<constructor-arg name="transactionService" ref="transactionService" />
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
-		<constructor-arg name="retries" value="3" />
-		<constructor-arg name="delay" value="20" />
-		<constructor-arg name="delayFactor" value="1.5" />
 	</bean>
 
 	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
@@ -85,7 +81,6 @@
 	<bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
 		<constructor-arg name="activityInstanceManager" ref="activityInstanceService" />
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="operationService" ref="operationService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
@@ -100,6 +95,8 @@
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
+		<constructor-arg name="workService" ref="workService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -112,7 +109,6 @@
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
 		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
@@ -143,7 +139,6 @@
 		<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
 		<constructor-arg name="breakpointService" ref="breakpointService" />
 		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
-		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="userFilterService" ref="userFilterService" />
@@ -151,6 +146,7 @@
 		<constructor-arg name="identityService" ref="identityService" />
 		<constructor-arg name="workService" ref="workService" />
 		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders" />
+		<constructor-arg name="tokenService" ref="tokenService"/>
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
@@ -162,7 +158,6 @@
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="workService" ref="workService" />
@@ -221,6 +216,7 @@
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders" />
 		<constructor-arg name="operationBuilders" ref="sOperationBuilders" />
+		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean>
 
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">

@@ -9,12 +9,15 @@
 package com.bonitasoft.engine.persistence;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.DBConfigurationsProvider;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
@@ -43,6 +46,11 @@ public class PlatformMybatisPersistenceService extends AbstractMybatisPersistenc
     @Override
     protected long getTenantId() throws TenantIdNotSetException {
         return -1;
+    }
+
+    @Override
+    public void deleteByTenant(Class<? extends PersistentObject> entityClass, List<FilterOption> filters) throws SPersistenceException {
+        // TODO Auto-generated method stub
     }
 
 }

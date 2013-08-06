@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
+import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
@@ -55,12 +56,11 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -112,12 +112,9 @@ import org.bonitasoft.engine.search.process.SearchProcessInstances;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
-import com.bonitasoft.engine.api.impl.transaction.connector.SetConnectorInstancesState;
-import com.bonitasoft.engine.api.impl.transaction.process.DeleteProcessExt;
 import com.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
@@ -157,21 +154,20 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    protected TransactionContent getDeleteTransactionContent(final long processDefinitionId) {
-        return new DeleteProcessExt(getTenantAccessor(), processDefinitionId);
+    protected ProcessManagementAPIImplDelegate instantiateProcessManagementAPIDelegate() {
+        return new ProcessManagementAPIExtDelegate();
     }
 
     @Override
     public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws ImportParameterException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         SProcessDefinition sDefinition = null;
         if (pDefinitionId > 0) {
             final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
             final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(pDefinitionId, processDefinitionService);
             try {
-                transactionExecutor.execute(getProcessDefinition);
+                getProcessDefinition.execute();
             } catch (final SBonitaException e) {
                 throw new ImportParameterException(e);
             }
@@ -216,12 +212,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
     }
 
-    private SProcessDefinition getServerProcessDefinition(final TransactionExecutor transactionExecutor, final long processDefinitionUUID,
-            final ProcessDefinitionService processDefinitionService) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+    private SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID, final ProcessDefinitionService processDefinitionService)
+            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionUUID,
                 processDefinitionService);
         try {
-            transactionExecutor.execute(transactionContentWithResult);
+            transactionContentWithResult.execute();
             return transactionContentWithResult.getResult();
         } catch (final SProcessDefinitionNotFoundException e) {
             throw e;
@@ -236,9 +232,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public int getNumberOfParameterInstances(final long processDefinitionId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
             return sProcessDefinition.getParameters().size();
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -250,9 +245,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
             final SParameter parameter = parameterService.get(processDefinitionId, parameterName);
             final String name = parameter.getName();
             final String value = parameter.getValue();
@@ -273,7 +267,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
             OrderBy order = null;
             switch (sort) {
@@ -285,7 +278,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     break;
             }
 
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
             if (sProcessDefinition.getParameters().isEmpty()) {
                 return Collections.emptyList();
             }
@@ -312,9 +305,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(transactionExecutor, processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
             final SParameterDefinition parameter = sProcessDefinition.getParameter(parameterName);
             if (parameter == null) {
                 throw new ParameterNotFoundException(processDefinitionId, parameterName);
@@ -338,16 +330,15 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final String userName = getUserNameFromSession();
             tenantAccessor = getTenantAccessor();
             final IdentityService identityService = tenantAccessor.getIdentityService();
-            final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
             final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
             final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
             final GetSUser getSUser = new GetSUser(identityService, userName);
-            transactionExecutor.execute(getSUser);
+            getSUser.execute();
             final long userId = getSUser.getResult().getId();
 
             final long humanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
             final GetActivityInstance getActivityInstance = new GetActivityInstance(activityInstanceService, humanTaskId);
-            transactionExecutor.execute(getActivityInstance);
+            getActivityInstance.execute();
             final SActivityInstance activityInstance = getActivityInstance.getResult();
             if (!(activityInstance instanceof SHumanTaskInstance)) {
                 throw new CreationException("The parent activity is not a Human task");
@@ -359,15 +350,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     (String) fields.get(ManualTaskField.TASK_NAME), -1L, (String) fields.get(ManualTaskField.DISPLAY_NAME), humanTaskId,
                     (Long) fields.get(ManualTaskField.ASSIGN_TO), (String) fields.get(ManualTaskField.DESCRIPTION),
                     (Date) fields.get(ManualTaskField.DUE_DATE), STaskPriority.valueOf(prio.name()));
-            transactionExecutor.execute(createManualUserTask);
+            createManualUserTask.execute();
             final long id = createManualUserTask.getResult().getId();
-            executeFlowNode(id);// put it in ready
+            executeFlowNode(userId, id, false /* wrapInTransaction */);// put it in ready
             final AddActivityInstanceTokenCount addActivityInstanceTokenCount = new AddActivityInstanceTokenCount(activityInstanceService, humanTaskId, 1);
-            transactionExecutor.execute(addActivityInstanceTokenCount);
+            addActivityInstanceTokenCount.execute();
             return ModelConvertor.toManualTask(createManualUserTask.getResult(), flowNodeStateManager);
-        } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
-            throw new CreationException(e.getMessage());
         } catch (final Exception e) {
             log(tenantAccessor, e);
             throw new CreationException(e.getMessage());
@@ -378,25 +366,16 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public void deleteManualUserTask(final long manualTaskId) throws DeletionException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(manualTaskId);
-                if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exists
-                    processInstanceService.deleteFlowNodeInstance(activityInstance, null);
-                } else {
-                    throw new DeletionException("Can't delete a task that is not a manual task");
-                }
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new DeletionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+            final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(manualTaskId);
+            if (activityInstance instanceof SManualTaskInstance) {// should check in the definition that it does not exist
+                processInstanceService.deleteFlowNodeInstance(activityInstance, null);
+            } else {
+                throw new DeletionException("Can't delete a task that is not a manual one");
             }
-        } catch (final STransactionException e) {
+        } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
     }
@@ -422,7 +401,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     private List<ConnectorInstance> getConnectorInstancesFor(final long instanceId, final int startIndex, final int maxResults, final String flownodeType,
             final ConnectorInstanceCriterion order) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final SConnectorInstanceBuilder connectorInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSConnectorInstanceBuilder();
         OrderByType orderByType;
@@ -486,17 +464,10 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 break;
         }
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(instanceId, flownodeType, startIndex,
-                        maxResults, fieldName, orderByType);
-                return ModelConvertor.toConnectorInstances(connectorInstances);
-            } catch (final SConnectorInstanceReadException e) {
-                throw new RetrieveException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
+            final List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(instanceId, flownodeType, startIndex,
+                    maxResults, fieldName, orderByType);
+            return ModelConvertor.toConnectorInstances(connectorInstances);
+        } catch (final SConnectorInstanceReadException e) {
             throw new RetrieveException(e);
         }
     }
@@ -519,13 +490,24 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorInstanceNotFoundException, UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final SetConnectorInstancesState txContent = new SetConnectorInstancesState(connectorsToReset, connectorInstanceService);
         try {
-            transactionExecutor.execute(txContent);
+            setConnectorInstancesState(connectorsToReset, connectorInstanceService);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
+        }
+    }
+
+    private void setConnectorInstancesState(final Map<Long, ConnectorStateReset> connectorsToReset, final ConnectorInstanceService connectorInstanceService)
+            throws SBonitaException {
+        for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
+            final Long connectorInstanceId = connEntry.getKey();
+            final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
+            if (connectorInstance == null) {
+                throw new SConnectorException("Connector instance not found with id " + connectorInstanceId);
+            }
+            final ConnectorStateReset state = connEntry.getValue();
+            connectorInstanceService.setState(connectorInstance, state.name());
         }
     }
 
@@ -543,38 +525,22 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.POST_DEPLOY_CONFIG);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final long tenantId = tenantAccessor.getTenantId();
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-                connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
-            } catch (final SInvalidConnectorImplementationException e) {
-                throw new InvalidConnectorImplementationException(e);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new UpdateException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
+            final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
+        } catch (final SInvalidConnectorImplementationException e) {
+            throw new InvalidConnectorImplementationException(e);
+        } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
         // refresh classloader in an other transaction.
         DependencyService dependencyService = getTenantAccessor().getDependencyService();
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                dependencyService.refreshClassLoader("process", processDefinitionId);
-            } catch (final SBonitaException e) {
-                throw new UpdateException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
-            }
-        } catch (final STransactionException e) {
+            dependencyService.refreshClassLoader("process", processDefinitionId);
+        } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
     }
@@ -589,61 +555,64 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             ActivityInstanceNotFoundException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
-        String containerType;
+
+        final String containerType;
+
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                // Reset connectors first:
-                if (connectorsToReset != null) {
-                    for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-                        final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connEntry.getKey());
-                        final ConnectorStateReset state = connEntry.getValue();
-                        connectorInstanceService.setState(connectorInstance, state.name());
-                    }
+            // Reset connectors first:
+            if (connectorsToReset != null) {
+                for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
+                    final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connEntry.getKey());
+                    final ConnectorStateReset state = connEntry.getValue();
+                    connectorInstanceService.setState(connectorInstance, state.name());
                 }
-
-                // Check if no connector remains in FAILED state:
-                final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-                List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId,
-                        SConnectorInstance.FLOWNODE_TYPE, ConnectorEvent.ON_ENTER, 0, 1, ConnectorState.FAILED.name());
-                if (!connectorInstances.isEmpty()) {
-                    throw new ActivityExecutionException("There is at least one connector in failed on ON_ENTER of the activity: "
-                            + connectorInstances.get(0).getName());
-                }
-                connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE,
-                        ConnectorEvent.ON_FINISH, 0, 1, ConnectorState.FAILED.name());
-                if (!connectorInstances.isEmpty()) {
-                    throw new ActivityExecutionException("There is at least one connector in failed on ON_FINISH of the activity: "
-                            + connectorInstances.get(0).getName());
-                }
-
-                // Then replay activity:
-                // can change state and call execute
-                activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
-                activityInstanceService.setExecuting(activityInstance);
-                containerType = SFlowElementsContainerType.PROCESS.name();
-                if (activityInstance.getLogicalGroup(2) > 0) {
-                    containerType = SFlowElementsContainerType.FLOWNODE.name();
-                }
-            } catch (final SActivityInstanceNotFoundException e) {
-                throw new ActivityInstanceNotFoundException(e);
-            } catch (final SBonitaException e) {
-                throw new ActivityExecutionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
             }
-        } catch (final STransactionException e) {
-            throw new ActivityExecutionException(e);
-        }
-        try {
-            containerRegistry.executeFlowNodeInSameThread(activityInstanceId, null, null, containerType, null);
+
+            // Check if no connector remains in FAILED state:
+            ensureNoMoreConnectoFailed(activityInstanceId, connectorInstanceService);
+
+            // Then replay activity:
+            // can change state and call execute
+            final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
+            activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
+            activityInstanceService.setExecuting(activityInstance);
+
+            if (activityInstance.getLogicalGroup(2) > 0) {
+                containerType = SFlowElementsContainerType.FLOWNODE.name();
+            } else {
+                containerType = SFlowElementsContainerType.PROCESS.name();
+            }
+
+            containerRegistry.executeFlowNode(activityInstanceId, null, null, containerType, activityInstance.getParentProcessInstanceId());
+        } catch (final SActivityInstanceNotFoundException e) {
+            throw new ActivityInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new ActivityExecutionException(e);
+        } catch (Exception e) {
+            throw new ActivityExecutionException(e);
+        }
+    }
+
+    /**
+     * @param activityInstanceId
+     * @param connectorInstanceService
+     * @throws SConnectorInstanceReadException
+     * @throws ActivityExecutionException
+     */
+    private void ensureNoMoreConnectoFailed(final long activityInstanceId, final ConnectorInstanceService connectorInstanceService)
+            throws SConnectorInstanceReadException, ActivityExecutionException {
+        for (ConnectorEvent connectorEvent : ConnectorEvent.values()) {
+            List<SConnectorInstance> connectorInstances;
+            connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE, connectorEvent, 0, 1,
+                    ConnectorState.FAILED.name());
+            if (!connectorInstances.isEmpty()) {
+                throw new ActivityExecutionException("There is one connector in failed on " + connectorEvent.name() + " of the activity: "
+                        + connectorInstances.get(0).getName());
+            }
         }
     }
 
@@ -705,7 +674,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
             throws ConnectorExecutionException, ConnectorNotFoundException {
-        return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+        return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
 
@@ -713,11 +682,11 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
             final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ConnectorExecutionException, ConnectorNotFoundException {
-        return executeConnectorAtProcessInstantiationWithOtWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
+        return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, operations, operationsInputValues, processInstanceId);
     }
 
-    private Map<String, Serializable> executeConnectorAtProcessInstantiationWithOtWithoutOperations(final String connectorDefinitionId,
+    private Map<String, Serializable> executeConnectorAtProcessInstantiationWithOrWithoutOperations(final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, Expression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationsInputValues,
             final long processInstanceId) throws ConnectorExecutionException {
@@ -727,42 +696,34 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SAProcessInstanceBuilder saProcessInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSAProcessInstanceBuilder();
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                        tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(), OrderByType.ASC);
-                getArchivedProcessInstanceList.execute();
-                final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
-                final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
-                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
+                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(), OrderByType.ASC);
+            getArchivedProcessInstanceList.execute();
+            final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
+            final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
-                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
-                final SExpressionContext expcontext = new SExpressionContext();
-                expcontext.setContainerId(processInstanceId);
-                expcontext.setContainerType("PROCESS_INSTANCE");
-                expcontext.setProcessDefinitionId(processDefinitionId);
-                expcontext.setTime(saprocessInstance.getArchiveDate().getTime());
-                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
-                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
-                if (operations != null) {
-                    // execute operations
-                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-                } else {
-                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
-                }
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } catch (final NotSerializableException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final SExpressionContext expcontext = new SExpressionContext();
+            expcontext.setContainerId(processInstanceId);
+            expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setProcessDefinitionId(processDefinitionId);
+            expcontext.setTime(saprocessInstance.getArchiveDate().getTime());
+
+            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                    connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+
+            if (operations != null) {
+                // execute operations
+                return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
+            } else {
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
-        } catch (final STransactionException e) {
+        } catch (final SBonitaException e) {
+            throw new ConnectorExecutionException(e);
+        } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         }
     }
@@ -799,39 +760,30 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-                final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getRootContainerId());
-                final long processDefinitionId = processInstance.getProcessDefinitionId();
-                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
-                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
-                final SExpressionContext expcontext = new SExpressionContext();
-                expcontext.setContainerId(activityInstanceId);
-                expcontext.setContainerType("ACTIVITY_INSTANCE");
-                expcontext.setProcessDefinitionId(processDefinitionId);
-                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
-                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
-                if (operations != null) {
-                    // execute operations
-                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-                } else {
-                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
-                }
-            } catch (final NotSerializableException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+            final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getRootContainerId());
+            final long processDefinitionId = processInstance.getProcessDefinitionId();
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final SExpressionContext expcontext = new SExpressionContext();
+            expcontext.setContainerId(activityInstanceId);
+            expcontext.setContainerType("ACTIVITY_INSTANCE");
+            expcontext.setProcessDefinitionId(processDefinitionId);
+            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                    connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+            if (operations != null) {
+                // execute operations
+                return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
+            } else {
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
-        } catch (final STransactionException e) {
+        } catch (final NotSerializableException e) {
+            throw new ConnectorExecutionException(e);
+        } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         }
     }
@@ -860,49 +812,38 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final SAActivityInstance aactivityInstance = activityInstanceService.getArchivedActivityInstance(activityInstanceId, persistenceService);
+            final SAActivityInstance aactivityInstance = activityInstanceService.getArchivedActivityInstance(activityInstanceId);
 
-                final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
-                        aactivityInstance.getRootContainerId(), tenantAccessor.getSearchEntitiesDescriptor());
-                getLastArchivedProcessInstance.execute();
+            final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
+                    aactivityInstance.getRootContainerId(), tenantAccessor.getSearchEntitiesDescriptor());
+            getLastArchivedProcessInstance.execute();
 
-                final long processDefinitionId = getLastArchivedProcessInstance.getResult().getProcessDefinitionId();
-                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final long processDefinitionId = getLastArchivedProcessInstance.getResult().getProcessDefinitionId();
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
-                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
-                final SExpressionContext expcontext = new SExpressionContext();
-                expcontext.setContainerId(activityInstanceId);
-                expcontext.setContainerType("ACTIVITY_INSTANCE");
-                expcontext.setProcessDefinitionId(processDefinitionId);
-                expcontext.setTime(aactivityInstance.getArchiveDate() + 500);
-                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
-                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
-                if (operations != null) {
-                    // execute operations
-                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-                } else {
-                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
-                }
-            } catch (final NotSerializableException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final SExpressionContext expcontext = new SExpressionContext();
+            expcontext.setContainerId(activityInstanceId);
+            expcontext.setContainerType("ACTIVITY_INSTANCE");
+            expcontext.setProcessDefinitionId(processDefinitionId);
+            expcontext.setTime(aactivityInstance.getArchiveDate() + 500);
+            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                    connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+            if (operations != null) {
+                // execute operations
+                return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
+            } else {
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
-        } catch (final STransactionException e) {
+        } catch (final NotSerializableException e) {
+            throw new ConnectorExecutionException(e);
+        } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         }
     }
@@ -935,41 +876,32 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
-        try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
-                        processInstanceId, tenantAccessor.getSearchEntitiesDescriptor());
-                getLastArchivedProcessInstance.execute();
-                final ArchivedProcessInstance saprocessInstance = getLastArchivedProcessInstance.getResult();
-                final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
-                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
-                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
-                final SExpressionContext expcontext = new SExpressionContext();
-                expcontext.setContainerId(processInstanceId);
-                expcontext.setContainerType("PROCESS_INSTANCE");
-                expcontext.setProcessDefinitionId(processDefinitionId);
-                expcontext.setTime(saprocessInstance.getArchiveDate().getTime() + 500);
-                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
-                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
-                if (operations != null) {
-                    // execute operations
-                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-                } else {
-                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
-                }
-            } catch (final NotSerializableException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+        try {
+            final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService, processInstanceId,
+                    tenantAccessor.getSearchEntitiesDescriptor());
+            getLastArchivedProcessInstance.execute();
+            final ArchivedProcessInstance saprocessInstance = getLastArchivedProcessInstance.getResult();
+            final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final SExpressionContext expcontext = new SExpressionContext();
+            expcontext.setContainerId(processInstanceId);
+            expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setProcessDefinitionId(processDefinitionId);
+            expcontext.setTime(saprocessInstance.getArchiveDate().getTime() + 500);
+            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                    connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+            if (operations != null) {
+                // execute operations
+                return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
+            } else {
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
-        } catch (final STransactionException e) {
+        } catch (final NotSerializableException e) {
+            throw new ConnectorExecutionException(e);
+        } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         }
     }
@@ -1005,37 +937,29 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-            try {
-                final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-                final long processDefinitionId = processInstance.getProcessDefinitionId();
-                final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
-                final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
-                final SExpressionContext expcontext = new SExpressionContext();
-                expcontext.setContainerId(processInstanceId);
-                expcontext.setContainerType("PROCESS_INSTANCE");
-                expcontext.setProcessDefinitionId(processDefinitionId);
-                final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
-                        connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
-                if (operations != null) {
-                    // execute operations
-                    return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-                } else {
-                    return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
-                }
-            } catch (final NotSerializableException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } catch (final SBonitaException e) {
-                transactionExecutor.setTransactionRollback();
-                throw new ConnectorExecutionException(e);
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
+
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+            final long processDefinitionId = processInstance.getProcessDefinitionId();
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final SExpressionContext expcontext = new SExpressionContext();
+            expcontext.setContainerId(processInstanceId);
+            expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setProcessDefinitionId(processDefinitionId);
+            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+                    connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
+            if (operations != null) {
+                // execute operations
+                return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
+            } else {
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
-        } catch (final STransactionException e) {
+        } catch (final NotSerializableException e) {
+            throw new ConnectorExecutionException(e);
+        } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         }
     }
@@ -1059,14 +983,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public ProcessInstance updateProcessInstanceIndex(final long processInstanceId, final Index index, final String value)
             throws ProcessInstanceNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
         final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
         try {
             final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, updateBuilder, processInstanceId, index,
                     value);
-            transactionExecutor.execute(updateProcessInstance);
+            updateProcessInstance.execute();
             return getProcessInstance(processInstanceId);
         } catch (final SProcessInstanceNotFoundException spinfe) {
             throw new ProcessInstanceNotFoundException(spinfe);
@@ -1084,13 +1007,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
         final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
         try {
             final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, updater, updateBuilder, processInstanceId);
-            transactionExecutor.execute(updateProcessInstance);
+            updateProcessInstance.execute();
             return getProcessInstance(processInstanceId);
         } catch (final SProcessInstanceNotFoundException spinfe) {
             throw new ProcessInstanceNotFoundException(spinfe);
@@ -1102,7 +1024,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     protected SearchResult<ProcessInstance> searchProcessInstances(final TenantServiceAccessor tenantAccessor, final SearchOptions searchOptions) {
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -1110,7 +1031,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
                     searchEntitiesDescriptor.getProcessInstanceDescriptor(), searchOptions, processDefinitionService);
-            transactionExecutor.execute(searchProcessInstances);
+            searchProcessInstances.execute();
             return searchProcessInstances.getResult();
         } catch (final SBonitaException sbe) {
             throw new BonitaRuntimeException(sbe);

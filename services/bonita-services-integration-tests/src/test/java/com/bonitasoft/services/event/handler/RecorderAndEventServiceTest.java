@@ -40,7 +40,7 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
 
     static {
         eventService = getServicesBuilder().buildEventService();
-        persistenceService = getServicesBuilder().buildPersistence();
+        persistenceService = getServicesBuilder().buildTenantPersistenceService();
         recorder = getServicesBuilder().buildRecorder(false);
     }
 

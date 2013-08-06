@@ -5,10 +5,12 @@
     <property name="jndiName" value="${transaction.manager}" />
   </bean>
   
-	<bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl">
-    <constructor-arg name="logger" ref="technicalLoggerService" />
-    <constructor-arg name="txManager" ref="transactionManager" />
-    <constructor-arg name="eventService" ref="eventService" />
-  </bean>
-
+    <bean id="transactionService" class="com.bonitasoft.engine.transaction.JTATransactionServiceExt" scope="singleton">
+        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="txManager" ref="transactionManager" />
+        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="retries" value="3" />
+        <constructor-arg name="delay" value="20" />
+        <constructor-arg name="delayFactor" value="1.5" />
+    </bean>
 </beans>

@@ -851,8 +851,8 @@
 
 		<!-- Transaction -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.transaction</groupId>
-			<artifactId>bonita-transaction-impl</artifactId>
+			<groupId>com.bonitasoft.engine.transaction</groupId>
+			<artifactId>bonita-transaction-impl-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

@@ -9,7 +9,6 @@
 package com.bonitasoft.services;
 
 import org.bonitasoft.engine.CommonServiceTest;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
@@ -27,11 +26,6 @@ public class CommonServiceSPTest extends CommonServiceTest {
 
     public static ServicesBuilder getServicesBuilder() {
         return servicesBuilder;
-    }
-
-    @Override
-    protected WorkService getWorkService() {
-        return servicesBuilder.buildWorkService();
     }
 
 }

@@ -61,9 +61,4 @@ public class IncrementAVariable implements StatelessJob {
         variableName = (String) attributes.get("variableName");
     }
 
-    @Override
-    public boolean isWrappedInTransaction() {
-        return true;
-    }
-
 }

@@ -154,7 +154,10 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         businessArchive.setProcessDefinition(processDefinition);
         // deploy the archive
 
-        return this.processAPIImpl.deploy(businessArchive.done());
+        getTransactionService().begin();
+        final ProcessDefinition process = processAPIImpl.deploy(businessArchive.done());
+        getTransactionService().complete();
+        return process;
     }
 
     @Ignore("Wait until new service configuration")
@@ -166,7 +169,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         // create expression
         // check
         assertEquals("baptiste", createAndEvaluateParameterExpression(nameParameter, deployId, "processDefinitionId"));
-        this.processAPIImpl.deleteProcess(deploy.getId());
+        processAPIImpl.deleteProcess(deploy.getId());
     }
 
     @Test(expected = SExpressionEvaluationException.class)
@@ -178,7 +181,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         try {
             createAndEvaluateParameterExpression("nonExistingParameter", deployId, "processDefinitionId");
         } finally {
-            this.processAPIImpl.deleteProcess(deploy.getId());
+            processAPIImpl.deleteProcess(deploy.getId());
         }
     }
 

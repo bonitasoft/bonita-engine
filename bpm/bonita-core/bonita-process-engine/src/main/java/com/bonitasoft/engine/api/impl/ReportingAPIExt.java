@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -33,7 +32,6 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.GetReportContent;
 import com.bonitasoft.engine.api.impl.transaction.reporting.SearchReports;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReport;
-import com.bonitasoft.engine.core.reporting.SReportAlreadyExistsException;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import com.bonitasoft.engine.reporting.Report;
@@ -66,19 +64,18 @@ public class ReportingAPIExt implements ReportingAPI {
         return userId;
     }
 
-    protected CreationException handleReportDuplication(final String name, final TenantServiceAccessor tenantAccessor,
-            final TransactionExecutor transactionExecutor, final SBonitaException sbe) {
+    protected void checkReportAlreadyExists(final String name, final TenantServiceAccessor tenantAccessor) throws AlreadyExistsException {
         // Check if the problem is primary key duplication:
         try {
             final GetReport getReport = new GetReport(tenantAccessor, name);
-            transactionExecutor.execute(getReport);
+            getReport.execute();
             if (getReport.getResult() != null) {
-                return new AlreadyExistsException("A report already exists with the name " + name);
+                throw new AlreadyExistsException("A report already exists with the name " + name);
             }
         } catch (SBonitaException e) {
             // ignore it
         }
-        return new CreationException(sbe);
+
     }
 
     @Override
@@ -89,15 +86,13 @@ public class ReportingAPIExt implements ReportingAPI {
         final SReportBuilder reportBuilder = reportingService.getReportBuilder();
         reportBuilder.createNewInstance(name, userId, false, description, null);
         SReport report = reportBuilder.done();
+        checkReportAlreadyExists(name, tenantAccessor);
         final AddReport addReport = new AddReport(reportingService, report, content);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(addReport);
+            addReport.execute();
             return SPModelConvertor.toReport(addReport.getResult());
-        } catch (final SReportAlreadyExistsException sraee) {
-            throw new AlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
-            throw handleReportDuplication(name, tenantAccessor, transactionExecutor, sbe);
+            throw new CreationException(sbe);
         }
     }
 
@@ -109,14 +104,12 @@ public class ReportingAPIExt implements ReportingAPI {
         final SReportBuilder reportBuilder = reportingService.getReportBuilder();
         final SReport sReport = SPModelConvertor.constructSReport(reportCreator, reportBuilder, userId);
         final AddReport addReport = new AddReport(reportingService, sReport, content);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+        checkReportAlreadyExists((String) reportCreator.getFields().get(ReportCreator.ReportField.NAME), tenantAccessor);
         try {
-            transactionExecutor.execute(addReport);
+            addReport.execute();
             return SPModelConvertor.toReport(addReport.getResult());
-        } catch (final SReportAlreadyExistsException sraee) {
-            throw new AlreadyExistsException(sraee);
         } catch (final SBonitaException sbe) {
-            throw handleReportDuplication((String) reportCreator.getFields().get(ReportCreator.ReportField.NAME), tenantAccessor, transactionExecutor, sbe);
+            throw new CreationException(sbe);
         }
     }
 
@@ -124,9 +117,8 @@ public class ReportingAPIExt implements ReportingAPI {
     public void deleteReport(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReport deleteReport = new DeleteReport(tenantAccessor, id);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(deleteReport);
+            deleteReport.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -136,9 +128,8 @@ public class ReportingAPIExt implements ReportingAPI {
     public void deleteReports(final List<Long> reportIds) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteReports deleteReports = new DeleteReports(tenantAccessor, reportIds);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(deleteReports);
+            deleteReports.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -169,9 +160,8 @@ public class ReportingAPIExt implements ReportingAPI {
     public Report getReport(final long reportId) throws ReportNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final GetReport getReport = new GetReport(tenantAccessor, reportId);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(getReport);
+            getReport.execute();
             final SReport report = getReport.getResult();
             return SPModelConvertor.toReport(report);
         } catch (final SReportNotFoundException srnfe) {
@@ -185,9 +175,8 @@ public class ReportingAPIExt implements ReportingAPI {
     public byte[] getReportContent(final long reportId) throws ReportNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final GetReportContent getReport = new GetReportContent(tenantAccessor, reportId);
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
-            transactionExecutor.execute(getReport);
+            getReport.execute();
             return getReport.getResult();
         } catch (final SReportNotFoundException srnfe) {
             throw new ReportNotFoundException(srnfe);
@@ -199,13 +188,12 @@ public class ReportingAPIExt implements ReportingAPI {
     @Override
     public SearchResult<Report> searchReports(final SearchOptions options) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ReportingService reportingService = tenantAccessor.getReportingService();
         final SearchReports searchReports = new SearchReports(reportingService, searchEntitiesDescriptor.getReportDescriptor(reportingService
                 .getReportBuilder()), options);
         try {
-            transactionExecutor.execute(searchReports);
+            searchReports.execute();
             return searchReports.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);

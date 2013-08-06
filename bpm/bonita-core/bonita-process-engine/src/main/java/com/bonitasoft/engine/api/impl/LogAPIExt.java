@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -62,11 +61,10 @@ public class LogAPIExt implements LogAPI {
     @Override
     public Log getLog(final long logId) throws LogNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         try {
             final GetLogInstance getLogInstance = new GetLogInstance(logId, loggerService);
-            transactionExecutor.execute(getLogInstance);
+            getLogInstance.execute();
             return SPModelConvertor.toLog(getLogInstance.getResult());
         } catch (final SQueriableLogNotFoundException sqlnfe) {
             throw new LogNotFoundException(sqlnfe);
@@ -79,10 +77,9 @@ public class LogAPIExt implements LogAPI {
     public int getNumberOfLogs() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         try {
             final GetNumberOfLogInstances transactionContent = new GetNumberOfLogInstances(loggerService);
-            transactionExecutor.execute(transactionContent);
+            transactionContent.execute();
             return transactionContent.getResult();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -92,7 +89,6 @@ public class LogAPIExt implements LogAPI {
     @Override
     public List<Log> getLogs(final int startIndex, final int maxResults, final LogCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final SIndexedLogBuilder queriableLogBuilder = tenantAccessor.getSQueriableLogModelBuilder().getQueriableLogBuilder();
         String field = null;
@@ -131,7 +127,7 @@ public class LogAPIExt implements LogAPI {
             final String fieldContent = field;
             final OrderByType orderContent = order;
             final GetLogsWithOrder getLogs = new GetLogsWithOrder(loggerService, startIndex, maxResults, orderContent, fieldContent);
-            transactionExecutor.execute(getLogs);
+            getLogs.execute();
             return SPModelConvertor.toLogs(getLogs.getResult());
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -141,12 +137,11 @@ public class LogAPIExt implements LogAPI {
     @Override
     public SearchResult<Log> searchLogs(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchLogs searchLogs = new SearchLogs(loggerService, searchEntitiesDescriptor.getLogDescriptor(), searchOptions);
         try {
-            transactionExecutor.execute(searchLogs);
+            searchLogs.execute();
             return searchLogs.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);

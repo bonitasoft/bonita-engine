@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.api.NoSessionRequired;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 
@@ -30,6 +31,7 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
      *             since 6.0
      */
+    @NoSessionRequired
     APISession login(long tenantId, String userName, String password) throws LoginException;
 
 }
