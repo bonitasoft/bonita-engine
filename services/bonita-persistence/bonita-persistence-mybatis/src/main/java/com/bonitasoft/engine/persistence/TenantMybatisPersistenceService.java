@@ -18,6 +18,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.DBConfigurationsProvider;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -37,7 +38,8 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
     public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
             final ReadSessionAccessor sessionAccessor, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
             final MyBatisConfigurationsProvider configurations, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
-            final String likeEscapeCharacter, final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager, final DataSource datasource)
+            final String likeEscapeCharacter, final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager,
+            final DataSource datasource)
             throws SPersistenceException {
         super(name, dbIdentifier, txService, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
                 likeEscapeCharacter, technicalLoggerService, sequenceManager, datasource);
@@ -92,6 +94,11 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
     @Override
     protected long getTenantId() throws TenantIdNotSetException {
         return this.sessionAccessor.getTenantId();
+    }
+
+    @Override
+    public void deleteByTenant(Class<? extends PersistentObject> entityClass, List<FilterOption> filters) throws SPersistenceException {
+        // TODO Auto-generated method stub
     }
 
 }

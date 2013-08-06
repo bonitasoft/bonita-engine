@@ -30,7 +30,7 @@ import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-public class ClusteredCacheServiceTest {
+public class CommonClusteredCacheServiceTest {
 
     CacheService cacheService;
 

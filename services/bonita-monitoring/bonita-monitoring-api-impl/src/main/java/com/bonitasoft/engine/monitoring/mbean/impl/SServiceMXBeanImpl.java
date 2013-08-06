@@ -105,6 +105,7 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
         long sesssionId = -1;
         try {
             sesssionId = MBeanUtil.createSesssion(transactionSvc, sessionAccessor, sessionService, tenantId, username);
+            // No transaction is opened because the service does not need the database.
             numberOfactiveTransactions = monitoringService.getNumberOfActiveTransactions();
         } catch (final Exception e) {
             throw new SMonitoringException("Impossible to retrieve number of active transactions", e);

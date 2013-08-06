@@ -5,6 +5,12 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
+	</bean>	
+	
+	<bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
 	</bean>
 
 </beans>
