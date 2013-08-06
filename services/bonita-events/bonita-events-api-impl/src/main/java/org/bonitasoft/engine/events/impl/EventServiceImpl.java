@@ -40,7 +40,7 @@ public class EventServiceImpl implements EventService {
     /**
      * Contains a list of all events type and their registered handlers
      */
-    private final Map<String, Set<SHandler<SEvent>>> registeredHandlers;
+    protected Map<String, Set<SHandler<SEvent>>> registeredHandlers;
 
     private final SEventBuilders eventBuilders;
 
@@ -63,7 +63,7 @@ public class EventServiceImpl implements EventService {
 
     /**
      * Fire the given Event only to interested handlers
-     * 
+     *
      * @throws FireEventException
      */
     @Override
