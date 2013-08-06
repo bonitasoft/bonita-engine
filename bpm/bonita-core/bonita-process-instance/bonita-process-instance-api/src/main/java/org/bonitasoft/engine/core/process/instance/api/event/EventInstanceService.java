@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.instance.api.event;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
@@ -120,7 +121,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     SWaitingEvent getWaitingEvent(Long waintingEventId) throws SWaitingEventNotFoundException, SWaitingEventReadException;
 
     /**
-     * 
      * @param eventInstanceId
      * @throws SEventTriggerInstanceReadException
      * @throws SEventTriggerInstanceDeletionException
@@ -129,7 +129,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     void deleteEventTriggerInstances(long eventInstanceId) throws SEventTriggerInstanceReadException, SEventTriggerInstanceDeletionException;
 
     /**
-     * 
      * @param eventTriggerInstance
      * @throws SEventTriggerInstanceDeletionException
      * @since 6.1
@@ -137,7 +136,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     void deleteEventTriggerInstance(SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException;
 
     /**
-     * 
      * @param flowNodeInstance
      * @throws SWaitingEventModificationException
      * @throws SFlowNodeReadException
@@ -145,4 +143,21 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      */
     void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException;
 
+    /**
+     * Get the list of all {@link SMessageInstance}s that are "In Progress", that is, that a work is running or should be running.
+     * 
+     * @return the list of all matching {@link SMessageInstance}s
+     * @throws SMessageInstanceReadException
+     *             if a read error occurs.
+     */
+    public List<SMessageInstance> getInProgressMessageInstances() throws SMessageInstanceReadException;
+
+    /**
+     * Get the list of all {@link WaitingEvent}s that are "In Progress", that is, that a work is running or should be running.
+     * 
+     * @return the list of all matching {@link WaitingEvent}s
+     * @throws SWaitingEventReadException
+     *             if a read error occurs.
+     */
+    public List<SWaitingMessageEvent> getInProgressWaitingMessageEvents() throws SWaitingEventReadException;
 }
