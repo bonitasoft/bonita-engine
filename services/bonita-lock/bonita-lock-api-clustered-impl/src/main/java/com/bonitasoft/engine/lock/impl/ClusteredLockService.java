@@ -18,7 +18,7 @@ import com.hazelcast.core.ILock;
 
 /**
  * create and release locks using hazelcast
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ClusteredLockService implements LockService {
@@ -35,43 +35,38 @@ public class ClusteredLockService implements LockService {
     }
 
     @Override
-    public void createExclusiveLockAccess(final long objectToLockId, final String objectType) throws SLockException {
+    public void unlock(final long objectToLockId, final String objectType) throws SLockException {
         try {
-            final ILock lock = hazelcastInstance.getLock(getKey(objectToLockId, objectType));
+            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
+            lock.unlock();
+        } catch (final Exception e) {
+            throw new SLockException(e);
+        }
+
+    }
+
+    @Override
+    public boolean tryLock(final long objectToLockId, final String objectType) throws SLockException {
+        try {
+            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
+            return lock.tryLock();
+        } catch (final Exception e) {
+            throw new SLockException(e);
+        }
+    }
+
+    @Override
+    public void lock(final long objectToLockId, final String objectType) throws SLockException {
+        try {
+            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
             lock.lock();
         } catch (final Exception e) {
             throw new SLockException(e);
         }
     }
 
-    @Override
-    public void releaseExclusiveLockAccess(final long objectToLockId, final String objectType) throws SLockException {
-        try {
-            final ILock lock = hazelcastInstance.getLock(getKey(objectToLockId, objectType));
-            lock.unlock();
-        } catch (final Exception e) {
-            throw new SLockException(e);
-        }
-    }
-
-    @Override
-    public void createSharedLockAccess(final long objectToLockId, final String objectType) throws SLockException {
-        // Not implemented by Hazelcast. See https://github.com/hazelcast/hazelcast/issues/481 for more details, so calls createExclusiveLockAccess
-        createExclusiveLockAccess(objectToLockId, objectType);
-    }
-
-    @Override
-    public void releaseSharedLockAccess(final long objectToLockId, final String objectType) throws SLockException {
-        // Not implemented by Hazelcast. See https://github.com/hazelcast/hazelcast/issues/481 for more details, so calls releaseExclusiveLockAccess
-        releaseExclusiveLockAccess(objectToLockId, objectType);
-    }
-
-    private String getKey(final long objectToLockId, final String objectType) throws SLockException {
-        final StringBuilder stb = new StringBuilder();
-        stb.append(objectType);
-        stb.append(SEPARATOR);
-        stb.append(objectToLockId);
-        return stb.toString();
+    private String buildKey(final long objectToLockId, final String objectType) throws SLockException {
+        return objectType + SEPARATOR + objectToLockId;
     }
 
 }

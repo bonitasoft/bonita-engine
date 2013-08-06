@@ -28,6 +28,7 @@ import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinition
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -44,7 +45,6 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
@@ -67,14 +67,14 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl implements
             final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry,
             final ArchiveService archiveService, final TechnicalLoggerService logger, final DocumentMappingService documentMappingService,
             final SCommentService commentService, final SACommentBuilder saCommentBuilder, final BreakpointService breakpointService,
-            final TransactionExecutor transactionExecutor, final TransactionService transactionService, final LockService lockService,
+            final TransactionExecutor transactionExecutor, final LockService lockService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
-            final IdentityService identityService, final WorkService workService, final BPMDefinitionBuilders bpmDefinitionBuilders) {
+            final IdentityService identityService, final WorkService workService, final BPMDefinitionBuilders bpmDefinitionBuilders, TokenService tokenService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, sDataInstanceBuilders, instanceBuilders,
                 operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService, saCommentBuilder,
-                transactionExecutor, transactionService, lockService, eventsHandler, userFilterService, actorMappingService, identityService, workService,
-                bpmDefinitionBuilders);
+                transactionExecutor, lockService, eventsHandler, userFilterService, actorMappingService, identityService, workService,
+                bpmDefinitionBuilders, tokenService);
         this.breakpointService = breakpointService;
     }
 

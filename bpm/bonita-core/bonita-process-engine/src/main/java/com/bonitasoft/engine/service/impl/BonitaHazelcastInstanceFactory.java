@@ -53,4 +53,11 @@ public class BonitaHazelcastInstanceFactory {
         }
         return hazelCastInstance;
     }
+    
+    public static synchronized HazelcastInstance getInstance() {
+        if (hazelCastInstance != null) {
+            return hazelCastInstance;
+        }
+        throw new IllegalStateException("The hazelcast instance has not been created. You may not be executed in clustered environment.");
+    }
 }

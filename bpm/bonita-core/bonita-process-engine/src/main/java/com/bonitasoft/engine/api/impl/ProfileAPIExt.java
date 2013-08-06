@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.profile.DeleteAllExistingProfiles;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfile;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileByName;
@@ -32,6 +33,8 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.SProfileAlreadyExistsException;
+import org.bonitasoft.engine.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
@@ -61,6 +64,7 @@ import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntry;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnInsert;
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileCreator;
+import com.bonitasoft.engine.profile.ProfileCreator.ProfileField;
 import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater;
@@ -93,17 +97,21 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     @Override
     public Profile createProfile(final ProfileCreator creator) throws CreationException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
-
+        Map<ProfileField, Serializable> fields = creator.getFields();
+        final String name = (String) fields.get(ProfileField.NAME);
+        if (name == null || name.isEmpty()) {
+            throw new CreationException("Name is mandatory.");
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
-        final CreateProfile createProfile = new CreateProfile(profileService, profileService.getSProfileBuilderAccessor().getSProfileBuilder(),
-                creator, false, getUserIdFromSession());
         try {
-            transactionExecutor.execute(createProfile);
-            return SPModelConvertor.toProfile(createProfile.getResult());
-        } catch (final SBonitaException e) {
+            SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, profileService.getSProfileBuilderAccessor()
+                    .getSProfileBuilder(), false, getUserIdFromSession()));
+            return SPModelConvertor.toProfile(profile);
+        } catch (final SProfileCreationException e) {
+            throw new CreationException(e);
+        } catch (final SProfileAlreadyExistsException e) {
             throw new CreationException(e);
         }
     }
@@ -119,16 +127,15 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     @Override
     public void deleteProfile(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         final GetProfile getProfile = new GetProfile(profileService, id);
         try {
-            transactionExecutor.execute(getProfile);
+            getProfile.execute();
             final SProfile sProfile = getProfile.getResult();
             if (!sProfile.isDefault()) {
                 final DeleteProfile deleteProfileTransaction = new DeleteProfile(profileService, id);
-                transactionExecutor.execute(deleteProfileTransaction);
+                deleteProfileTransaction.execute();
             } else {
                 throw new DeletionException("Can't delete a default profile. Profile id = <" + id + ">, name = <" + sProfile.getName() + ">");
             }
@@ -140,14 +147,13 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     @Override
     public byte[] exportAllProfiles() throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityservice = tenantAccessor.getIdentityService();
         final XMLWriter writer = tenantAccessor.getXMLWriter();
 
         final ExportAllProfiles exportProfiles = new ExportAllProfiles(profileService, identityservice, writer);
         try {
-            transactionExecutor.execute(exportProfiles);
+            exportProfiles.execute();
         } catch (final SBonitaException e) {
             throw new ExecutionException(e);
         }
@@ -158,7 +164,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     @Override
     public byte[] exportProfilesWithIdsSpecified(final long[] profileIds) throws ExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityservice = tenantAccessor.getIdentityService();
         if (profileIds.length > 0) {
@@ -170,7 +175,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             final XMLWriter writer = tenantAccessor.getXMLWriter();
             final ExportProfilesSpecified exportProfiles = new ExportProfilesSpecified(profileService, identityservice, writer, profileIDs);
             try {
-                transactionExecutor.execute(exportProfiles);
+                exportProfiles.execute();
             } catch (final SBonitaException e) {
                 throw new ExecutionException(e);
             }
@@ -182,16 +187,17 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
+    @CustomTransactions
     public List<String> importProfilesUsingSpecifiedPolicy(final byte[] xmlContent, final ImportPolicy policy) throws ExecutionException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         List<String> warnings;
 
         final Parser parser = tenantAccessor.getProfileParser();
+        TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final List<ExportedProfile> profiles = getProfilesFromXML(new String(xmlContent), parser);
 
         switch (policy) {
@@ -345,13 +351,12 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         }
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         final UpdateProfile updateProfile = new UpdateProfile(profileService, profileService.getSProfileBuilderAccessor().getSProfileUpdateBuilder(), id,
                 updateDescriptor, getUserIdFromSession());
         try {
-            transactionExecutor.execute(updateProfile);
+            updateProfile.execute();
             return SPModelConvertor.toProfile(updateProfile.getResult());
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -365,19 +370,19 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
         final String type = (String) fields.get(ProfileEntryField.TYPE);
         final String page = (String) fields.get(ProfileEntryField.PAGE);
+        final String name = (String) fields.get(ProfileEntryField.NAME);
         if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
             throw new CreationException("For a link, the page is mandatory.");
         }
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SProfileEntryBuilder sProfileEntryBuilder = profileService.getSProfileBuilderAccessor().getSProfileEntryBuilder();
 
         SProfileEntry sProfileEntry;
         final CreateProfileEntry createProfileEntry = new CreateProfileEntry(profileService, sProfileEntryBuilder, creator);
         try {
-            transactionExecutor.execute(createProfileEntry);
+            createProfileEntry.execute();
             sProfileEntry = createProfileEntry.getResult();
         } catch (final SBonitaException e) {
             throw new CreationException(e);
@@ -385,7 +390,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
         try {
-            transactionExecutor.execute(updateProfileEntryIndexTransaction);
+            updateProfileEntryIndexTransaction.execute();
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
@@ -409,12 +414,11 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     @Override
     public void deleteProfileEntry(final long id) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         final DeleteProfileEntry deleteProfileEntryTransaction = new DeleteProfileEntry(profileService, id);
         try {
-            transactionExecutor.execute(deleteProfileEntryTransaction);
+            deleteProfileEntryTransaction.execute();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -425,7 +429,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         SProfileEntry sProfileEntry;
@@ -433,7 +436,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final UpdateProfileEntry updateProfileEntry = new UpdateProfileEntry(profileService, profileService.getSProfileBuilderAccessor()
                 .getSProfileEntryUpdateBuilder(), id, updateDescriptor);
         try {
-            transactionExecutor.execute(updateProfileEntry);
+            updateProfileEntry.execute();
             sProfileEntry = updateProfileEntry.getResult();
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -443,7 +446,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         if (fields.get(ProfileEntryUpdateField.INDEX) != null) {
             final UpdateProfileEntryIndexOnInsert updateProfileEntryIndexTransaction = new UpdateProfileEntryIndexOnInsert(profileService, sProfileEntry);
             try {
-                transactionExecutor.execute(updateProfileEntryIndexTransaction);
+                updateProfileEntryIndexTransaction.execute();
             } catch (final SBonitaException e) {
                 throw new UpdateException(e);
             }

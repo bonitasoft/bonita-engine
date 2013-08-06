@@ -55,20 +55,6 @@ public class ClusterTests extends CommonAPISPTest {
 
     private User user;
 
-    // @BeforeClass
-    // public static void deployCommand() throws Exception{
-    // final APISession loginDefaultTenant = loginDefaultTenant();
-    // ClientEventUtil.deployCommand(loginDefaultTenant);
-    // logoutTenant(loginDefaultTenant);
-    // }
-    //
-    // @AfterClass
-    // public static void undeployCommand() throws Exception{
-    // final APISession loginDefaultTenant = loginDefaultTenant();
-    // ClientEventUtil.deployCommand(loginDefaultTenant);
-    // logoutTenant(loginDefaultTenant);
-    // }
-
     @Before
     public void beforeTest() throws Exception {
         login();

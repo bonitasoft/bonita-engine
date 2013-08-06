@@ -18,7 +18,6 @@ import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -48,52 +47,19 @@ public class DeleteBatchJob implements StatelessJob {
         return "Batch delete of flagged elements";
     }
 
-    /*
-     * try {
-     * transactionService.begin();
-     * platformLoginService.logout(session.getId());
-     * } catch (final SSessionNotFoundException e) {
-     * throw new SessionNotFoundException(e);
-     * } catch (final SBonitaException e) {
-     * throw new PlatformLogoutException(e.getMessage());
-     * } finally {
-     * try {
-     * transactionService.complete();
-     * } catch (final SBonitaException e) {
-     * throw new PlatformLogoutException(e.getMessage());
-     * }
-     * }
-     */
     @Override
     public void execute() throws JobExecutionException, FireEventException {
         for (final String classToPurge : classesToPurge) {
             try {
-                transactionService.begin();
                 persistenceService.purge(classToPurge);
             } catch (final SBonitaException e) {
-                try {
-                    transactionService.setRollbackOnly();
-                } catch (final STransactionException e1) {
-                    // ignore
-                }
                 throw new JobExecutionException(e);
-            } finally {
-                try {
-                    transactionService.complete();
-                } catch (final SBonitaException e) {
-                    throw new JobExecutionException(e);
-                }
             }
         }
     }
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-    }
-
-    @Override
-    public boolean isWrappedInTransaction() {
-        return false;
     }
 
     public static void setTransactionService(final TransactionService transactionService) {

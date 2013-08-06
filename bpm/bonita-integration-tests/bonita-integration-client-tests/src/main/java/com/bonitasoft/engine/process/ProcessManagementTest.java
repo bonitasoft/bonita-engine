@@ -8,6 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.List;
 
@@ -41,10 +45,6 @@ import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ProcessManagementTest extends CommonAPISPTest {
 
     private static final String PROCESS_VERSION = "1.0";
@@ -69,7 +69,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         john = createUser(JOHN_USERNAME, PASSWORD);
     }
 
-    @Test
+    // @Test
     public void searchArchivedSubTasks() throws Exception {
         // create user and process
         final String actor = "acting";
@@ -151,7 +151,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test
+    // @Test
     public void searchSubTasks() throws Exception {
         // create user and process
         final String delivery = "Delivery men";
@@ -277,7 +277,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test
+    // @Test
     public void executeTaskShouldCancelSubtasks() throws Exception {
         final String actor = "acting";
         loginWith(JOHN_USERNAME, PASSWORD);
@@ -355,7 +355,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test
+    // @Test
     public void getProcessInstancesWithLabelOnStringIndex() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
@@ -399,7 +399,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         deleteUser(USERNAME);
     }
 
-    @Test
+    // @Test
     public void getProcessInstancesWithStringIndex() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);

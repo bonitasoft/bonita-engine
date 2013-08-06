@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.work;
 
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.AbstractBonitaWork;
 import org.bonitasoft.engine.work.NotifyingRunnable;
 import org.bonitasoft.engine.work.RunnableListener;
 
@@ -17,11 +17,11 @@ import org.bonitasoft.engine.work.RunnableListener;
  */
 public class BonitaWorkWrapper extends NotifyingRunnable {
 
-    private final BonitaWork work;
+    private final AbstractBonitaWork work;
 
     private boolean cancelled = false;
 
-    public BonitaWorkWrapper(final RunnableListener runnableListener, final long tenantId, final BonitaWork work) {
+    public BonitaWorkWrapper(final RunnableListener runnableListener, final long tenantId, final AbstractBonitaWork work) {
         super(runnableListener, tenantId);
         this.work = work;
     }

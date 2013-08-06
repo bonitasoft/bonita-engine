@@ -22,7 +22,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -59,31 +58,27 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         final String message = "Mandatory parameter " + CONNECTORS_LIST_KEY + " is missing or not convertible to List.";
         final List<ConnectorDefinitionWithInputValues> connectorsList = getParameter(parameters, CONNECTORS_LIST_KEY, message);
 
+        final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final ClassLoader processClassloader;
+        final long processDefinitionID;
         try {
-            // get the classloader of process
-            final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
-            final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
-            final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
-            final boolean txOpened = transactionExecutor.openTransaction();
-            final ClassLoader processClassloader;
-            final long processDefinitionID;
+            final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
+            processDefinitionID = flowNodeInstance.getLogicalGroup(0);
+            processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
+            // set the classloader and update activity instance variable
+            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
-                processDefinitionID = flowNodeInstance.getLogicalGroup(0);
-                processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
-                // set the classloader and update activity instance variable
-                final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-                try {
-                    Thread.currentThread().setContextClassLoader(processClassloader);
-                    executeConnectors(sActivityInstanceID, processDefinitionID, connectorsList);
-                    updateActivityInstanceVariables(operationsList, operationsContext, sActivityInstanceID, processDefinitionID);
-                } finally {
-                    Thread.currentThread().setContextClassLoader(contextClassLoader);
-                }
+                Thread.currentThread().setContextClassLoader(processClassloader);
+
+                // TODO This should not be part of the transaction.
+                executeConnectors(sActivityInstanceID, processDefinitionID, connectorsList);
+                
+                updateActivityInstanceVariables(operationsList, operationsContext, sActivityInstanceID, processDefinitionID);
             } finally {
-                transactionExecutor.completeTransaction(txOpened);
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-            executeActivity(sActivityInstanceID);
+            executeActivity(sActivityInstanceID, processDefinitionID);
         } catch (final BonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminate(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
