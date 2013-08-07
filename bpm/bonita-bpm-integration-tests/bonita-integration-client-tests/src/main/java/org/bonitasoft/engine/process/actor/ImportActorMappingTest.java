@@ -101,20 +101,21 @@ public class ImportActorMappingTest extends CommonAPITest {
     @Test
     public void importActorMappingWithWrongXMLFile() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("actorMappingWithException.xml");
-
         checkProcessNotActivated(businessArchive);
     }
 
     @Test
     public void importActorMappingWithUnknownUser() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("simpleActorMapping.xml");
-
         checkProcessNotActivated(businessArchive);
     }
 
     @Test
     public void importActorMappingWithUnknownGroup() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
+        final User user = createUser("john", "bpm");
+        final Group rd = createGroup("RD1");
+        final Role role = createRole("dev");
 
         // even if missing group the process is resolved
         checkProcessActivated(businessArchive);
@@ -123,6 +124,9 @@ public class ImportActorMappingTest extends CommonAPITest {
     @Test
     public void importActorMappingWithUnknownRole() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
+        final User user = createUser("john", "bpm");
+        final Group rd = createGroup("RD");
+        final Role role = createRole("dev1");
 
         // even if missing role the process is resolved
         checkProcessActivated(businessArchive);
@@ -130,6 +134,9 @@ public class ImportActorMappingTest extends CommonAPITest {
 
     @Test
     public void importActorMappingWithUnknownMemberShip() throws Exception {
+        final User user = createUser("john", "bpm");
+        final Group rd = createGroup("RD2");
+        final Role role = createRole("dev");
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMappingWithUnkownGroup.xml");
 
         // even if missing membership the process is resolved

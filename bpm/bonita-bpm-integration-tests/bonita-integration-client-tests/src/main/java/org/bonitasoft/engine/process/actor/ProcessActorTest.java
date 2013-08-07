@@ -137,18 +137,17 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("DeliveryProcess", "1.0");
         processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("deliver", delivery);
-        final DesignProcessDefinition processDefinition = processBuilder.done();
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, delivery, john);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
         assertEquals(delivery, actor.getName());
         assertEquals("Delivery all day and night long", actor.getDescription());
 
-        getProcessAPI().startProcess(definition.getId());
+        getProcessAPI().startProcess(processDefinition.getId());
         assertTrue("no new activity found", new WaitUntil(20, 1000) {
 
             @Override
@@ -217,12 +216,12 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
-        final DesignProcessDefinition processDefinition = processBuilder.done();
+        final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchive.setProcessDefinition(processDefinition);
+        businessArchive.setProcessDefinition(designProcessDefinition);
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, delivery, john);
-        getProcessAPI().startProcess(definition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, delivery, john);
+        getProcessAPI().startProcess(processDefinition.getId());
         Thread.sleep(1000);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);

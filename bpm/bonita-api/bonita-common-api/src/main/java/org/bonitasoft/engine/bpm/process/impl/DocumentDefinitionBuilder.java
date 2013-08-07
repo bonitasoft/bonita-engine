@@ -28,7 +28,7 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
 
     public DocumentDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final String name, final String fileName) {
-        this(processDefinitionBuilder, container, name);
+        this(processDefinitionBuilder, container, fileName); // FIXME : filename must be replaced by name ??
         documentDefinitionImpl.setFileName(fileName);
     }
 

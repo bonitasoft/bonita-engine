@@ -151,7 +151,9 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
                     throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
                             + processDefinition.getName() + " " + processDefinition.getVersion() + " did not have loop cardinality nor loop data input ref set");
                 }
-                createInnerInstances(bpmInstancesCreator, activityInstanceService, processDefinition, activity, flowNodeInstance, 0);
+                createInnerInstances(bpmInstancesCreator, activityInstanceService, processDefinition, activity, flowNodeInstance, miLoop, 0,
+                        miLoop.isSequential() ? 1 : numberOfInstanceMax);
+
             }
         } catch (final SActivityStateExecutionException e) {
             throw e;
@@ -163,7 +165,7 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
 
     static List<SFlowNodeInstance> createInnerInstances(final BPMInstancesCreator bpmInstancesCreator, final ActivityInstanceService activityInstanceService,
             final SProcessDefinition processDefinition, final SActivityDefinition activity, final SFlowNodeInstance flowNodeInstance,
-            final int numberOfInstanceToCreate) throws SBonitaException {
+            final SMultiInstanceLoopCharacteristics miLoop, final int numberOfActiveInstances, final int numberOfInstanceToCreate) throws SBonitaException {
         final SMultiInstanceActivityInstanceBuilder loopActivityInstanceBuilder = bpmInstancesCreator.getBPMInstanceBuilders()
                 .getSMultiInstanceActivityInstanceBuilder();
         final long rootProcessInstanceId = flowNodeInstance.getLogicalGroup(loopActivityInstanceBuilder.getRootProcessInstanceIndex());

@@ -81,7 +81,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
     public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         try {
             final String dataInstanceKey = getKey(dataInstance);
-            if (checkDataAlreadyExists(TRANSIENT_DATA_CACHE_NAME, dataInstanceKey)) {
+            if (checkDataAlreadyExists(dataInstanceKey)) {
                 handleDataAlreadyExists(dataInstance);
             }
             setId(dataInstance);
@@ -107,8 +107,8 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
         throw new SCreateDataInstanceException(stb.toString());
     }
 
-    private boolean checkDataAlreadyExists(final String cacheName, final String dataInstanceKey) throws CacheException {
-        final List<?> keys = getCacheKeys(cacheName);
+    private boolean checkDataAlreadyExists(final String dataInstanceKey) throws CacheException {
+        final List<?> keys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
         return keys.contains(dataInstanceKey);
     }
 
