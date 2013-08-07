@@ -12,6 +12,7 @@
         		<bean class="org.bonitasoft.engine.restart.RestartTransitionsHandler" />
         		<bean class="org.bonitasoft.engine.restart.RestartFlowsNodeHandler" />
         		<bean class="org.bonitasoft.engine.restart.RestartProcessHandler" />
+        		<bean class="org.bonitasoft.engine.restart.BPMEventWorksHandler" />
         	</list>
         </property>
 	</bean>
