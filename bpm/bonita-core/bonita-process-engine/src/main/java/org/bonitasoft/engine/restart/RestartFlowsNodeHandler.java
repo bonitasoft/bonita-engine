@@ -19,8 +19,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
+import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -33,6 +33,7 @@ import org.bonitasoft.engine.work.WorkService;
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class RestartFlowsNodeHandler implements TenantRestartHandler {
 
@@ -40,7 +41,6 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final WorkService workService = platformServiceAccessor.getWorkService();
-        final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
             final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
@@ -61,7 +61,7 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                     } else {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":"
                                 + sFlowNodeInstance.getId());
-                        workService.registerWork(new ExecuteFlowNodeWork(processExecutor, sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
+                        workService.registerWork(new ExecuteFlowNodeWork(Type.PROCESS, sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
                                 .getLogicalGroup(processInstanceIndex)));
                     }
                 }

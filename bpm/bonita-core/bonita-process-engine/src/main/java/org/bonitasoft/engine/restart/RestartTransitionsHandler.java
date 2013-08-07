@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
-import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.work.ExecuteTransitionWork;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -32,6 +31,7 @@ import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class RestartTransitionsHandler implements TenantRestartHandler {
 
@@ -42,7 +42,6 @@ public class RestartTransitionsHandler implements TenantRestartHandler {
         QueryOptions searchOptions = QueryOptions.defaultQueryOptions();
         List<STransitionInstance> search;
         final WorkService workService = platformServiceAccessor.getWorkService();
-        final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         try {
             do {
@@ -51,9 +50,9 @@ public class RestartTransitionsHandler implements TenantRestartHandler {
                 for (final STransitionInstance transitionInstance : search) {
                     final long processDefinitionId = transitionInstance.getLogicalGroup(processDefinitionIndex);
                     final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-                    workService.registerWork(new ExecuteTransitionWork(processExecutor, processDefinition, transitionInstance));
+                    workService.registerWork(new ExecuteTransitionWork(processDefinition.getId(), transitionInstance.getId()));
                 }
-                
+
             } while (search.size() == searchOptions.getNumberOfResults());
         } catch (final SBonitaSearchException e) {
             handleException(e, "Unable to restart transitions: can't get them from database");

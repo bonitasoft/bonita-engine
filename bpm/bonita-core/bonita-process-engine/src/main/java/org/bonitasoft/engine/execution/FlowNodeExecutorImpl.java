@@ -51,6 +51,7 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
+import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -70,6 +71,7 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Elias Ricken de Medeiros
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
@@ -195,19 +197,20 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         try {
             if (!lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name())) {
                 // reschedule the work
-                ExecuteFlowNodeWork runnable = new ExecuteFlowNodeWork(this, flowNodeInstanceId, operations, expressionContext, processInstanceId);
+                final ExecuteFlowNodeWork runnable = new ExecuteFlowNodeWork(Type.FLOWNODE, flowNodeInstanceId, operations, expressionContext,
+                        processInstanceId);
                 try {
-                    int sleepTime = 50;
+                    final int sleepTime = 50;
                     logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + sleepTime + " ms to reexecute " + runnable.getDescription());
                     Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                 }
                 workService.registerWork(runnable);
                 return null;
             }
             transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, processInstanceId, SFlowElementsContainerType.PROCESS
                     .name()));
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new SFlowNodeExecutionException(e);
         }
         FlowNodeState state = null;
@@ -263,14 +266,14 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                         // reschedule this work but without the operations
                         workService.registerWork(new NotifyChildFinishedWork(processDefinition.getId(), sFlowNodeInstance.getId(), sFlowNodeInstance
                                 .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
-                    } catch (WorkRegisterException e) {
+                    } catch (final WorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
                 } else if (!state.isStable() && !state.isInterrupting()) {
                     try {
                         // reschedule this work but without the operations
-                        workService.registerWork(new ExecuteFlowNodeWork(this, flowNodeInstanceId, null, null, processInstanceId));
-                    } catch (WorkRegisterException e) {
+                        workService.registerWork(new ExecuteFlowNodeWork(Type.FLOWNODE, flowNodeInstanceId, null, null, processInstanceId));
+                    } catch (final WorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
                 }
@@ -346,7 +349,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     // reschedule this work but without the operations
                     workService.registerWork(new NotifyChildFinishedWork(sProcessDefinition.getId(), sFlowNodeInstance.getId(), sFlowNodeInstance
                             .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
-                } catch (WorkRegisterException e) {
+                } catch (final WorkRegisterException e) {
                     throw new SFlowNodeExecutionException(e);
                 }
             }
@@ -356,7 +359,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childFinished(long processDefinitionId, long flowNodeInstanceId, final int stateId, final long parentId) throws SBonitaException {
+    public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final int stateId, final long parentId) throws SBonitaException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         if (!lockService.tryLock(parentId, SFlowElementsContainerType.PROCESS.name())) {// lock activity in order to avoid hit 2 times at the same time
@@ -366,7 +369,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             try {
                 logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
                 Thread.sleep(50);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
             }
             workService.registerWork(runnable);
             return;

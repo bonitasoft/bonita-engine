@@ -15,36 +15,46 @@ package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
-import org.bonitasoft.engine.execution.ContainerExecutor;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class ExecuteTransitionWork extends TxBonitaWork {
 
-    private static final long serialVersionUID = 3053349747850216847L;
+    private static final long serialVersionUID = 3875386133862872479L;
 
-    private final SProcessDefinition sDefinition;
+    private final long processDefinitionId;
 
-    private final STransitionInstance sTransitionInstance;
+    private final long transitionInstanceId;
 
-    private final ContainerExecutor containerExecutor;
-
-    public ExecuteTransitionWork(final ContainerExecutor containerExecutor, final SProcessDefinition sDefinition, final STransitionInstance sTransitionInstance) {
-        this.containerExecutor = containerExecutor;
-        this.sDefinition = sDefinition;
-        this.sTransitionInstance = sTransitionInstance;
+    public ExecuteTransitionWork(final long processDefinitionId, final long transitionInstanceId) {
+        this.processDefinitionId = processDefinitionId;
+        this.transitionInstanceId = transitionInstanceId;
     }
 
     @Override
     protected void work() throws Exception {
-        containerExecutor.executeTransition(sDefinition, sTransitionInstance);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SProcessDefinition sProcessDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processDefinitionId);
+        final STransitionInstance sTransitionInstance = tenantAccessor.getTransitionInstanceService().get(transitionInstanceId);
+        tenantAccessor.getProcessExecutor().executeTransition(sProcessDefinition, sTransitionInstance);
     }
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": transitionInstanceId:" + sTransitionInstance.getId();
+        return getClass().getSimpleName() + ": transitionInstanceId:" + transitionInstanceId;
+    }
+
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            return TenantServiceSingleton.getInstance(getTenantId());
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
