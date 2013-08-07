@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -32,9 +35,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("javadoc")
 public class SPTimerBoundaryEventTest extends CommonAPISPTest {
@@ -112,7 +112,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
 
             Thread.sleep(timerDuration); // wait timer trigger
 
-            final WaitForStep waitForExceptionStep = waitForStep(100, 500, "exceptionStep", processInstance, TestStates.getReadyState(null));
+            final WaitForStep waitForExceptionStep = waitForStep(100, 500, "exceptionStep", processInstance, TestStates.getReadyState());
 
             // ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
             // assertEquals(TestStates.getAbortedState(), archActivityInst.getState());

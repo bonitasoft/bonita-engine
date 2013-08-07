@@ -12,14 +12,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -30,7 +28,6 @@ import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -53,7 +50,6 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutorImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -82,22 +78,20 @@ public class ProcessExecutorExt extends ProcessExecutorImpl implements ProcessEx
     protected final BPMInstanceBuilders instanceBuilders;
 
     public ProcessExecutorExt(final BPMInstanceBuilders instanceBuilders, final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final FlowNodeStateManager flowNodeStateManager, final TechnicalLoggerService logger,
-            final FlowNodeExecutor flowNodeExecutor, final TransactionExecutor transactionExecutor, final WorkService workService,
-            final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
+            final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
+            final WorkService workService, final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final SExpressionBuilders expressionBuilders, final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
-            final BPMInstancesCreator bpmInstancesCreator, final ArchiveService archiveService, final LockService lockService, final TokenService tokenService,
-            final EventsHandler eventsHandler, final BPMDefinitionBuilders bpmDefinitionBuilders, final SOperationBuilders operationBuilders,
-            TransactionService transactionService) {
-        super(instanceBuilders, activityInstanceService, processInstanceService, flowNodeStateManager, logger, flowNodeExecutor, transactionExecutor,
-                workService, processDefinitionService, gatewayInstanceService, transitionService, eventInstanceService, connectorService,
+            final BPMInstancesCreator bpmInstancesCreator, final LockService lockService, final TokenService tokenService, final EventsHandler eventsHandler,
+            final SOperationBuilders operationBuilders, final TransactionService transactionService) {
+        super(instanceBuilders, activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService,
+                gatewayInstanceService, transitionService, eventInstanceService, connectorService,
                 connectorInstanceService, classLoaderService, operationService, expressionBuilders, expressionResolverService, eventService, handlers,
-                processDocumentService, documentBuilder, sessionAccessor, containerRegistry, bpmInstancesCreator, archiveService, lockService, tokenService,
-                eventsHandler, bpmDefinitionBuilders, operationBuilders, transactionService);
+                processDocumentService, documentBuilder, sessionAccessor, containerRegistry, bpmInstancesCreator, lockService, tokenService,
+                eventsHandler, operationBuilders, transactionService);
 
         this.instanceBuilders = instanceBuilders;
     }
