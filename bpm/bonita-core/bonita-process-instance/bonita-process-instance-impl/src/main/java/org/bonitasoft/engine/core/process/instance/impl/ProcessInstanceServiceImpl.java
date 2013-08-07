@@ -342,8 +342,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!childrenProcessInstanceIds.isEmpty());
     }
 
-    private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SProcessInstanceModificationException,
-            SBonitaSearchException, SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
+    private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
+            SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
         List<SAFlowNodeInstance> activityInstances;
         do {
             activityInstances = activityService.getArchivedFlowNodeInstances(processInstanceId, 0, BATCH_SIZE);
@@ -363,7 +363,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteArchivedFlowNodeInstanceElements(final SAFlowNodeInstance activityInstance) throws SFlowNodeReadException,
-            SProcessInstanceModificationException, SBonitaSearchException, SConnectorInstanceDeletionException, SDataInstanceException {
+            SBonitaSearchException, SConnectorInstanceDeletionException, SDataInstanceException {
         if (activityInstance instanceof SAActivityInstance) {
             dataInstanceService.deleteLocalArchivedDataInstances(activityInstance.getSourceObjectId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
             connectorInstanceService.deleteArchivedConnectorInstances(activityInstance.getSourceObjectId(), SConnectorInstance.FLOWNODE_TYPE);

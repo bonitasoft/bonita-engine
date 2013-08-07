@@ -7,7 +7,6 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.BeforeClass;
@@ -18,7 +17,7 @@ public class APIAccessorTest {
     public static APIAccessor apiAccessor;
 
     @BeforeClass
-    public static void beforeClass() throws BonitaException {
+    public static void beforeClass() {
         apiAccessor = new APIAccessorImpl();
     }
 

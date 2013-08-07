@@ -120,7 +120,7 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
         SExternalIdentityMapping mapping;
 
         CreateExternalIdentityMapping(final SExternalIdentityMappingBuilder builder, final MemberType memberType, final long userId, final long groupId,
-                final long roleId) throws SBonitaException {
+                final long roleId) {
             this.builder = builder;
             this.memberType = memberType;
             this.userId = userId;

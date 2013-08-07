@@ -72,7 +72,7 @@ public class SExpressionContext implements Serializable {
         inputValues = new HashMap<String, Object>();
     }
 
-    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues) {
+    public SExpressionContext(final Long containerId, final String containerType, final Map<String, Serializable> inputValues) {
         this.containerId = containerId;
         this.containerType = containerType;
         if (inputValues == null) {
@@ -82,8 +82,7 @@ public class SExpressionContext implements Serializable {
         }
     }
 
-    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues,
-            final long time) {
+    public SExpressionContext(final Long containerId, final String containerType, final Map<String, Serializable> inputValues, final long time) {
         this.containerId = containerId;
         this.containerType = containerType;
         if (inputValues == null) {

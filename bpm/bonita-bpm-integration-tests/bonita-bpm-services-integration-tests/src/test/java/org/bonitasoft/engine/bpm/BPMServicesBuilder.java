@@ -20,6 +20,7 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.AuthenticationService;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -122,11 +123,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     ServicesAccessor accessor;
 
     public BPMServicesBuilder() {
-        super();
-        accessor = ServicesAccessor.getInstance();
-    }
-
-    public BPMServicesBuilder(final Long tenantid) {
         super();
         accessor = ServicesAccessor.getInstance();
     }
@@ -377,6 +373,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public BPMInstanceBuilders getBPMInstanceBuilders() {
         return accessor.getInstanceOf(BPMInstanceBuilders.class);
+    }
+
+    @Override
+    public BPMInstancesCreator getBPMInstancesCreator() {
+        return accessor.getInstanceOf(BPMInstancesCreator.class);
     }
 
     @Override

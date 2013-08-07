@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.jobs;
 
-import java.io.Serializable;
-
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
@@ -27,7 +25,7 @@ import org.bonitasoft.engine.work.TxBonitaWork;
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */
-public class ExecuteMessageCoupleWork extends TxBonitaWork implements Serializable {
+public class ExecuteMessageCoupleWork extends TxBonitaWork {
 
     private static final long serialVersionUID = 2171765554098439091L;
 

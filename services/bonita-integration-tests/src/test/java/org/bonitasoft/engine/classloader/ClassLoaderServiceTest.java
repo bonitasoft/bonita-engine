@@ -1,5 +1,13 @@
 package org.bonitasoft.engine.classloader;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.net.URL;
 
@@ -17,14 +25,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Elias Ricken de Medeiros, Charles Souillard, Baptiste Mesta
@@ -548,7 +548,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         return classLoader instanceof BonitaClassLoader;
     }
 
-    private void assertSameClassloader(final ClassLoader classLoader1, final ClassLoader classLoader2) throws ClassLoaderException {
+    private void assertSameClassloader(final ClassLoader classLoader1, final ClassLoader classLoader2) {
         assertNotNull(classLoader1);
         assertNotNull(classLoader2);
         final ClassLoader c1 = classLoader1 instanceof VirtualClassLoader ? ((VirtualClassLoader) classLoader1).getClassLoader() : classLoader1;
@@ -556,7 +556,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         assertEquals(c1, c2);
     }
 
-    private void assertNotSameClassloader(final ClassLoader classLoader1, final ClassLoader classLoader2) throws ClassLoaderException {
+    private void assertNotSameClassloader(final ClassLoader classLoader1, final ClassLoader classLoader2) {
         assertNotNull(classLoader1);
         assertNotNull(classLoader2);
         final ClassLoader c1 = classLoader1 instanceof VirtualClassLoader ? ((VirtualClassLoader) classLoader1).getClassLoader() : classLoader1;

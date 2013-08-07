@@ -132,11 +132,11 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 final int numberOfInstances = miActivity.getNumberOfInstances();
                 input.put(ExpressionConstants.NUMBER_OF_INSTANCES.getEngineConstantName(), numberOfInstances);
                 final SExpressionContext sExpressionContext = new SExpressionContext(miActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                        miActivity.getLogicalGroup(0), input);
+                        input);
                 if (completionCondition != null) {
                     final boolean complete = (Boolean) expressionResolverService.evaluate(completionCondition, sExpressionContext);
                     if (complete) {
-                        abortNonCompletedChildren(processDefinition, miActivity);
+                        abortNonCompletedChildren(miActivity);
                         if (miActivity.isSequential()) {
                             return true;
                         }
@@ -153,7 +153,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 List<SFlowNodeInstance> createInnerInstances = null;
                 if (shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
                     createInnerInstances = InitializingMultiInstanceActivityStateImpl.createInnerInstances(bpmInstancesCreator, activityInstanceService,
-                            processDefinition, activityDefinition, flowNodeInstance, loopCharacteristics, numberOfInstances, 1);
+                            processDefinition, activityDefinition, flowNodeInstance, numberOfInstances);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
                         containerRegistry.executeFlowNode(sFlowNodeInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
                                 sFlowNodeInstance.getLogicalGroup(3));
@@ -168,7 +168,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         }
     }
 
-    private boolean abortNonCompletedChildren(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
+    private boolean abortNonCompletedChildren(final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         final int numberOfResults = 100;
         long count = 0;
         List<SActivityInstance> children;

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvider {
 
@@ -37,7 +38,7 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
     private final ThreadLocal<SSession> localSession = new ThreadLocal<SSession>();
 
     public QueriableLogSessionProviderImpl(final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
-            final TechnicalLoggerService technicalLoggerService) throws SSessionNotFoundException, SessionIdNotSetException {
+            final TechnicalLoggerService technicalLoggerService) {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.technicalLoggerService = technicalLoggerService;

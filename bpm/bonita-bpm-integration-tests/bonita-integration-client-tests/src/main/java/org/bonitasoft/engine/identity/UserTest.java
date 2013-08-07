@@ -15,7 +15,6 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -43,27 +42,27 @@ public class UserTest extends CommonAPITest {
     }
 
     @Test(expected = CreationException.class)
-    public void cannotCreateAUserWithAnEmptyPassword() throws BonitaException, InterruptedException {
+    public void cannotCreateAUserWithAnEmptyPassword() throws BonitaException {
         final String userName = "matti";
         final String password = "";
         createUserOnDefaultTenant(userName, password);
     }
 
     @Test(expected = CreationException.class)
-    public void cannotCreateAUserWithAnEmptyUserName() throws BonitaException, InterruptedException {
+    public void cannotCreateAUserWithAnEmptyUserName() throws BonitaException {
         final String userName = "";
         final String password = "revontuli";
         createUserOnDefaultTenant(userName, password);
     }
 
     @Test(expected = CreationException.class)
-    public void cannotCreateAUserWithANullPassword() throws BonitaException, InterruptedException {
+    public void cannotCreateAUserWithANullPassword() throws BonitaException {
         final String userName = "matti";
         createUserOnDefaultTenant(userName, null);
     }
 
     @Test(expected = CreationException.class)
-    public void cannotCreateAUserWithANullUserName() throws BonitaException, InterruptedException {
+    public void cannotCreateAUserWithANullUserName() throws BonitaException {
         final String password = "revontuli";
         createUserOnDefaultTenant(null, password);
     }
@@ -110,7 +109,7 @@ public class UserTest extends CommonAPITest {
         }
     }
 
-    public void getFirstPageWithNoResult() throws BonitaException {
+    public void getFirstPageWithNoResult() {
         getIdentityAPI().getUsers(0, 10, UserCriterion.USER_NAME_ASC);
     }
 
@@ -222,7 +221,7 @@ public class UserTest extends CommonAPITest {
     }
 
     @Test
-    public void cannotGetTechUserInList() throws BonitaException {
+    public void cannotGetTechUserInList() {
         final Map<Long, User> users = getIdentityAPI().getUsers(Arrays.asList(-1l));
         assertNull(users.get(-1));
     }
@@ -1015,7 +1014,7 @@ public class UserTest extends CommonAPITest {
     }
 
     @Test
-    public void checkCreatedByForCreatedUser() throws BonitaException, BonitaHomeNotSetException {
+    public void checkCreatedByForCreatedUser() throws BonitaException {
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
         assertEquals("bonitasoft", userCreated.getUserName());

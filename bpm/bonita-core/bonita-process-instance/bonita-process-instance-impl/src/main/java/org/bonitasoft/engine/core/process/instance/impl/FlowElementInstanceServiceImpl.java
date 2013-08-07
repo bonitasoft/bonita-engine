@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.process.instance.api.FlowElementInstanceServic
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -29,6 +28,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public abstract class FlowElementInstanceServiceImpl implements FlowElementInstanceService {
 
@@ -40,8 +40,7 @@ public abstract class FlowElementInstanceServiceImpl implements FlowElementInsta
 
     private final ReadPersistenceService persistenceRead;
 
-    public FlowElementInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final BPMInstanceBuilders instanceBuilders) {
+    public FlowElementInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final BPMInstanceBuilders instanceBuilders) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.instanceBuilders = instanceBuilders;

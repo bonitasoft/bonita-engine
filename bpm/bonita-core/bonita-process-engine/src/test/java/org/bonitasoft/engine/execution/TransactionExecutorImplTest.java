@@ -37,38 +37,40 @@ public class TransactionExecutorImplTest {
 
         verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
     }
-    
+
     @SuppressWarnings("unchecked")
-    @Test(expected=SBonitaException.class)
+    @Test(expected = SBonitaException.class)
     public void executeTransactionWithSBonitaException() throws Exception {
-        // To keep compatibility the SBonitaException has to be rethrown 
-       
+        // To keep compatibility the SBonitaException has to be rethrown
+
         final TransactionService transactionService = new MockTransactionService();
         final TransactionContent transactionContent = mock(TransactionContent.class);
         @SuppressWarnings("deprecation")
         final TransactionExecutorImpl executor = new TransactionExecutorImpl(transactionService);
 
-        Mockito.doThrow(new SBonitaException() {}).when(transactionContent).execute();
-        
+        Mockito.doThrow(new SBonitaException() {
+
+            private static final long serialVersionUID = -2042720042398918977L;
+        }).when(transactionContent).execute();
+
         executor.execute(transactionContent);
 
         verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
     }
- 
-    
-    // Minimal implementation of a TransactionService (we do not (and don't want !)) to see the JTATransactionServiceImpl 
+
+    // Minimal implementation of a TransactionService (we do not (and don't want !)) to see the JTATransactionServiceImpl
     class MockTransactionService implements TransactionService {
 
         @Override
         public void begin() throws STransactionCreationException {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
         public void complete() throws STransactionCommitException, STransactionRollbackException {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -86,7 +88,7 @@ public class TransactionExecutorImplTest {
         @Override
         public void setRollbackOnly() throws STransactionException {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -111,7 +113,7 @@ public class TransactionExecutorImplTest {
         @Override
         public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -119,7 +121,7 @@ public class TransactionExecutorImplTest {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
-    
+
 }

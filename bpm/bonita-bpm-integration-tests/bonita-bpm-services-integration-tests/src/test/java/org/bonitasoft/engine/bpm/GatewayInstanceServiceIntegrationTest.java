@@ -77,7 +77,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
     }
 
     @Test
-    public void testCheckMergingCondition() throws SBonitaException {
+    public void testCheckMergingCondition() {
         // it's implement need to be improved
     }
 

@@ -190,7 +190,7 @@ public class RoleTest extends CommonAPITest {
     }
 
     @Test
-    public void noRolesWhenThePageIndexIsOutOfRange() throws BonitaException {
+    public void noRolesWhenThePageIndexIsOutOfRange() {
         final List<Role> roles = identityAPI.getRoles(5, 10, RoleCriterion.NAME_ASC);
         assertTrue(roles.isEmpty());
     }

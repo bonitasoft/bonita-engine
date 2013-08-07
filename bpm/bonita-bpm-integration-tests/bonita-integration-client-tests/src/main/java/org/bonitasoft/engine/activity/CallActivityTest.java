@@ -442,7 +442,7 @@ public class CallActivityTest extends CommonAPITest {
 
     private void waitForStepAndExecuteIt(final ProcessInstance rootProcessInstance, final String userTaskName, final User user,
             final ProcessInstance actualProcessInstance, final ProcessInstance... childProcessInstances) throws Exception {
-        final WaitForStep waitForStep = waitForStep(50, 5000, userTaskName, rootProcessInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForStep = waitForStep(50, 5000, userTaskName, rootProcessInstance, TestStates.getReadyState());
         if (childProcessInstances != null) {
             for (final ProcessInstance childProcessInstance : childProcessInstances) {
                 assertTrue("target process was not archived: " + childProcessInstance.getName(), waitProcessToFinishAndBeArchived(childProcessInstance));
@@ -621,12 +621,12 @@ public class CallActivityTest extends CommonAPITest {
 
         getProcessAPI().disableProcess(targetProcessDef1.getId());
         try {
-            getProcessAPI().deleteProcess(targetProcessDef1.getId());
+            deleteProcess(targetProcessDef1);
             fail("Should not be able to delete process instance that is called by an other process");
         } catch (final ProcessInstanceHierarchicalDeletionException e) {
             getProcessAPI().deleteProcessInstance(e.getProcessInstanceId());
             // should work now
-            getProcessAPI().deleteProcess(targetProcessDef1.getId());
+            deleteProcess(targetProcessDef1);
         } finally {
             disableAndDeleteProcess(callingProcessDef);
         }
@@ -678,7 +678,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
         assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
 
-        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState(null));
+        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState());
         ActivityInstance activityInstance = waitForStep.getResult();
         assertEquals(targetPI.getId(), activityInstance.getParentProcessInstanceId());
         assertEquals(callingProcessInstance.getId(), activityInstance.getRootContainerId());
@@ -686,7 +686,7 @@ public class CallActivityTest extends CommonAPITest {
         // execute step in the target process
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 
-        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState(null));
+        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState());
         assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
         activityInstance = waitForStep.getResult();
         assertEquals(callingProcessInstance.getId(), activityInstance.getParentProcessInstanceId());
@@ -742,7 +742,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals("callActivityDescription", callActivityInstance.getDescription());
         assertEquals("callActivityDisplayDescription", callActivityInstance.getDisplayDescription());
 
-        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState(null));
+        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState());
         ActivityInstance activityInstance = waitForStep.getResult();
         assertEquals(targetPI.getId(), activityInstance.getParentProcessInstanceId());
         assertEquals(callingProcessInstance.getId(), activityInstance.getRootContainerId());
@@ -750,7 +750,7 @@ public class CallActivityTest extends CommonAPITest {
         // execute step in the target process
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 
-        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState(null));
+        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState());
         assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
         activityInstance = waitForStep.getResult();
         assertEquals(callingProcessInstance.getId(), activityInstance.getParentProcessInstanceId());
@@ -820,7 +820,7 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
         // Execute step in the target process
-        final WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState());
         final ActivityInstance activityInstance = waitForStep.getResult();
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 

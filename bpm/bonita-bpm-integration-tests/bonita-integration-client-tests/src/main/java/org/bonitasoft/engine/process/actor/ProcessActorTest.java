@@ -30,7 +30,6 @@ import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -41,12 +40,9 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupNotFoundException;
 import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -164,8 +160,8 @@ public class ProcessActorTest extends CommonAPITest {
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
 
-        getProcessAPI().disableProcess(definition.getId());
-        getProcessAPI().deleteProcess(definition.getId());
+        // Clean up
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -207,8 +203,8 @@ public class ProcessActorTest extends CommonAPITest {
         getProcessAPI().enableProcess(processDeploymentInfo.getProcessId());
         assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDeploymentInfo.getProcessId()).getActivationState());
 
-        getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
-        getProcessAPI().deleteProcess(processDeploymentInfo.getProcessId());
+        // Clean up
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -232,9 +228,9 @@ public class ProcessActorTest extends CommonAPITest {
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
 
-        getProcessAPI().disableProcess(definition.getId());
-        getProcessAPI().deleteProcess(definition.getId());
+        // Clean up
         deleteUser(user);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -839,7 +835,7 @@ public class ProcessActorTest extends CommonAPITest {
         deleteUser(user.getId());
     }
 
-    private ActorInstance checkActors(final String delivery, final ProcessDefinition definition) throws ProcessDefinitionNotFoundException {
+    private ActorInstance checkActors(final String delivery, final ProcessDefinition definition) {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
@@ -847,8 +843,7 @@ public class ProcessActorTest extends CommonAPITest {
         return actor;
     }
 
-    private void cleanUserGroupAndRole(final Group group, final Role role) throws UserNotFoundException, GroupNotFoundException, RoleNotFoundException,
-            DeletionException {
+    private void cleanUserGroupAndRole(final Group group, final Role role) throws DeletionException {
         getIdentityAPI().deleteGroup(group.getId());
         getIdentityAPI().deleteRole(role.getId());
     }

@@ -112,7 +112,7 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
         final Map<String, Serializable> input = new HashMap<String, Serializable>(0);
         input.put(ExpressionConstants.LOOP_COUNTER.getEngineConstantName(), loopActivity.getLoopCounter());
         final SExpressionContext sExpressionContext = new SExpressionContext(loopActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                loopActivity.getLogicalGroup(0), input);
+                input);
         return ((Boolean) expressionResolverService.evaluate(standardLoop.getLoopCondition(), sExpressionContext)).booleanValue();
     }
 

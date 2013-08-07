@@ -29,6 +29,7 @@ import org.bonitasoft.engine.actor.xml.UserNamesBinding;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -155,6 +156,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BPMDefinitionBuilders bpmDefinitionBuilders;
 
     private BPMInstanceBuilders bpmInstanceBuilders;
+
+    private BPMInstancesCreator bpmInstancesCreator;
 
     private ActorMappingService actorMappingService;
 
@@ -365,6 +368,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             activityInstanceService = beanAccessor.getService(ActivityInstanceService.class);
         }
         return activityInstanceService;
+    }
+
+    @Override
+    public BPMInstancesCreator getBPMInstancesCreator() {
+        if (bpmInstancesCreator == null) {
+            bpmInstancesCreator = beanAccessor.getService(BPMInstancesCreator.class);
+        }
+        return bpmInstancesCreator;
     }
 
     @Override

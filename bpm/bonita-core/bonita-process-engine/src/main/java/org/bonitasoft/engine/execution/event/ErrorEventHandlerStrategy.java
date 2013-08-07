@@ -167,7 +167,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         SWaitingErrorEvent waitingErrorEvent;
 
         // check on direct boundary
-        waitingErrorEvent = getWaitingErrorEventFromBoundary(errorTrigger, flowNodeKeyProvider, processInstance, eventInstance, errorCode, flowNodeInstance);
+        waitingErrorEvent = getWaitingErrorEventFromBoundary(flowNodeKeyProvider, eventInstance, errorCode, flowNodeInstance);
         // check on event sub-process
         if (waitingErrorEvent == null) {
             waitingErrorEvent = getWaitingErrorEventSubProcess(container, parentProcessInstanceId, errorCode);
@@ -182,8 +182,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     }
 
-    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SErrorEventTriggerDefinition errorTrigger,
-            final SFlowNodeInstanceBuilder flowNodeKeyProvider, final SProcessInstance processInstance, final SThrowEventInstance eventInstance,
+    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SFlowNodeInstanceBuilder flowNodeKeyProvider, final SThrowEventInstance eventInstance,
             final String errorCode, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         // get the parent activity of the boundary
         final long logicalGroup = eventInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());

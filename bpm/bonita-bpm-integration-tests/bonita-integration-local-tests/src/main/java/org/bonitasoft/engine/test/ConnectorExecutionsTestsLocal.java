@@ -428,7 +428,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         // wait for step containing the connector and execute it
         final ActivityInstance step1 = waitForUserTask(taskName, processInstance.getId());
         assignAndExecuteStep(step1, userId);
-        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState(step1));
+        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
 
         // check that there are no more connector instances
         final SearchResult<ConnectorInstance> searchResult = searchConnectors(step1.getId(), ConnectorInstance.FLOWNODE_TYPE, 10);
@@ -497,7 +497,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // Run Started state of the human task
         executeFlowNodeUntilEnd(activityInstanceId);
-        waitForArchivedActivity(activityInstanceId, TestStates.getNormalFinalState(null));
+        waitForArchivedActivity(activityInstanceId, TestStates.getNormalFinalState());
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task
         assertTrue(waitUntil.waitUntil());
@@ -712,7 +712,8 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         assertEquals(1, processResolutionProblems.size());
         final Problem problem = processResolutionProblems.get(0);
         assertEquals("connector", problem.getResource());
-        getProcessAPI().deleteProcess(processDefinition.getId());
+
+        deleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Missing class connector", "Process instance" }, story = "Execute connector with missing class on process instance.")

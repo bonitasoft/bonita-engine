@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
@@ -29,9 +32,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ProcessResolutionTest extends CommonAPITest {
 
@@ -130,7 +130,7 @@ public class ProcessResolutionTest extends CommonAPITest {
 
     @Cover(classes = { ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-988", keywords = { "dependency" })
     @Test
-    public void deploy2ProcessWithSameDependency() throws BonitaException, InterruptedException {
+    public void deploy2ProcessWithSameDependency() throws BonitaException {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("process", "1.0").addAutomaticTask("step1");
         final DesignProcessDefinition processDefinition1 = builder.done();

@@ -22,7 +22,6 @@ import java.util.Map;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
@@ -30,7 +29,6 @@ import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
@@ -42,7 +40,6 @@ import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
@@ -57,13 +54,11 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -94,12 +89,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.EndingIntermediateCatchEventExceptionStateImpl;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorOfActivity;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorWork;
 import org.bonitasoft.engine.execution.work.InstantiateProcessWork;
@@ -170,37 +163,22 @@ public class StateBehaviors {
 
     private final ContainerRegistry containerRegistry;
 
-    private final FlowNodeStateManager flowNodeStateManager;
-
-    private final ProcessInstanceService processInstanceService;
-
-    private final ArchiveService archiveService;
-
-    private final SDataInstanceBuilders dataInstanceBuilders;
-
-    private final TransactionExecutor transactionExecutor;
-
     private final EventInstanceService eventInstanceService;
 
     private final SchedulerService schedulerService;
 
     private final TechnicalLoggerService logger;
 
-    private final BPMDefinitionBuilders bpmDefinitionBuilders;
-
     private final ConnectorInstanceService connectorInstanceService;
 
-    public StateBehaviors(final TransactionExecutor transactionExecutor, final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
+    public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final BPMInstanceBuilders instanceBuilders, final ActorMappingService actorMappingService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ExpressionResolverService expressionResolverService,
             final ProcessDefinitionService processDefinitionService, final DataInstanceService dataInstanceService, final OperationService operationService,
-            final WorkService workService, final ContainerRegistry containerRegistry, final FlowNodeStateManager flowNodeStateManager,
-            final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final SDataInstanceBuilders dataInstanceBuilders,
-            final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService, final TechnicalLoggerService logger,
-            final BPMDefinitionBuilders bpmDefinitionBuilders) {
+            final WorkService workService, final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice,
+            final SchedulerService schedulerService, final TechnicalLoggerService logger) {
         super();
-        this.transactionExecutor = transactionExecutor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
         this.activityInstanceService = activityInstanceService;
@@ -216,14 +194,9 @@ public class StateBehaviors {
         this.operationService = operationService;
         this.workService = workService;
         this.containerRegistry = containerRegistry;
-        this.flowNodeStateManager = flowNodeStateManager;
-        this.processInstanceService = processInstanceService;
-        this.archiveService = archiveService;
-        this.dataInstanceBuilders = dataInstanceBuilders;
         eventInstanceService = eventInstanceSevice;
         this.schedulerService = schedulerService;
         this.logger = logger;
-        this.bpmDefinitionBuilders = bpmDefinitionBuilders;
     }
 
     public DataInstanceContainer getParentContainerType(final SFlowNodeInstance flowNodeInstance) {
@@ -534,8 +507,7 @@ public class StateBehaviors {
     }
 
     private void instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
-            final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws SActivityStateExecutionException,
-            SProcessDefinitionNotFoundException, SProcessDefinitionReadException, WorkRegisterException {
+            final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws WorkRegisterException {
         final long callerProcessDefinitionId = callerProcessDefinition.getId();
         final long callerId = callActivityInstance.getId();
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
@@ -718,10 +690,7 @@ public class StateBehaviors {
 
     private ExecuteConnectorOfActivity buildWorkToExecuteConnector(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
-        return new ExecuteConnectorOfActivity(containerRegistry, transactionExecutor, processInstanceService, archiveService, instanceBuilders,
-                dataInstanceService, dataInstanceBuilders, activityInstanceService, flowNodeStateManager, classLoaderService, connectorService,
-                connectorInstanceService, processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters, eventsHandler,
-                bpmInstancesCreator, bpmDefinitionBuilders, eventInstanceService, workService);
+        return new ExecuteConnectorOfActivity(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters);
     }
 
     private ExecuteConnectorOfActivity buildWorkToSetConnectorFailed(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
@@ -818,7 +787,7 @@ public class StateBehaviors {
         }
     }
 
-    public void interrupWaitinEvents(final SProcessDefinition processDefinition, final SReceiveTaskInstance receiveTaskInstance) throws SBonitaException {
+    public void interrupWaitinEvents(final SReceiveTaskInstance receiveTaskInstance) throws SBonitaException {
         final SWaitingEventKeyProvider waitingEventKeyProvider = instanceBuilders.getSWaitingMessageEventBuilder();
         interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class, waitingEventKeyProvider);
     }

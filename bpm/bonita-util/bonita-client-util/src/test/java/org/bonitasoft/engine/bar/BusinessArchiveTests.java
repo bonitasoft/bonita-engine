@@ -1074,7 +1074,7 @@ public class BusinessArchiveTests {
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
-    public void createProcessWithConnectorHavingNullInput() throws InvalidProcessDefinitionException, InvalidBusinessArchiveFormatException {
+    public void createProcessWithConnectorHavingNullInput() throws InvalidProcessDefinitionException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithConnectorNullInput", "1.0");
         builder.addAutomaticTask("step1").addConnector("eee", "zzz", "eee", ConnectorEvent.ON_ENTER).addInput("name", null);
         builder.addConnector("eee", "zzz", "eee", ConnectorEvent.ON_ENTER).addInput("name", null);

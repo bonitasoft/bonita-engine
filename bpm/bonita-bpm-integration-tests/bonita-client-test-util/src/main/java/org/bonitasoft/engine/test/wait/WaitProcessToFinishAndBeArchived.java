@@ -41,7 +41,7 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
 
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
             final ProcessAPI processAPI) {
-        this(repeatEach, timeout, throwExceptions, processInstance, processAPI, TestStates.getNormalFinalState(null));
+        this(repeatEach, timeout, throwExceptions, processInstance, processAPI, TestStates.getNormalFinalState());
     }
 
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final ProcessAPI processAPI) {

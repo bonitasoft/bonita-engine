@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,13 +22,13 @@ import org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Hongwen Zang
+ * @author Celine Souchet
  */
 public class SearchArchivedCommentsDescriptor extends SearchEntityDescriptor {
 
@@ -36,7 +36,7 @@ public class SearchArchivedCommentsDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> archivedCommentsAllFields;
 
-    SearchArchivedCommentsDescriptor(final BPMInstanceBuilders instanceBuilders, final SCommentBuilders sCommentBuilders, final SUserBuilder userBuilder) {
+    SearchArchivedCommentsDescriptor(final SCommentBuilders sCommentBuilders, final SUserBuilder userBuilder) {
         SACommentBuilder saCommentBuilder = sCommentBuilders.getSACommentBuilder();
         searchEntityKeys = new HashMap<String, FieldDescriptor>(5);
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID,

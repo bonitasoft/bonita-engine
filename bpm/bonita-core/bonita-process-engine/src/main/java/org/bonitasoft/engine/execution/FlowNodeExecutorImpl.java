@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
@@ -47,7 +46,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
@@ -90,8 +88,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final DataInstanceService dataInstanceService;
 
-    private final SDataInstanceBuilders dataInstanceBuilders;
-
     private final BPMInstanceBuilders bpmInstanceBuilders;
 
     private final ContainerRegistry containerRegistry;
@@ -116,18 +112,16 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger,
-            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
-            final ProcessInstanceService processInstanceService, final LockService lockService, final EventInstanceService eventInstanceService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final WorkService workService,
-            final TransactionService transactionService) {
+            final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
+            final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
+            final LockService lockService, final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final WorkService workService, final TransactionService transactionService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
         this.operationService = operationService;
         this.archiveService = archiveService;
         this.dataInstanceService = dataInstanceService;
-        dataInstanceBuilders = sDataInstanceBuilders;
         this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.containerRegistry = containerRegistry;
         this.processInstanceService = processInstanceService;
@@ -145,18 +139,16 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger,
-            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
-            final ProcessInstanceService processInstanceService, final LockService lockService, final EventInstanceService eventInstanceService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final WorkService workService,
-            final TransactionService transactionService, final int setInFailThreadTimeout) {
+            final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
+            final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
+            final LockService lockService, final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final WorkService workService, final TransactionService transactionService, final int setInFailThreadTimeout) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
         this.operationService = operationService;
         this.archiveService = archiveService;
         this.dataInstanceService = dataInstanceService;
-        dataInstanceBuilders = sDataInstanceBuilders;
         this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.containerRegistry = containerRegistry;
         this.processInstanceService = processInstanceService;
@@ -432,7 +424,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive, final SProcessDefinition processDefinition)
             throws SActivityExecutionException {
         ProcessArchiver.archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processInstanceService, archiveService, bpmInstanceBuilders,
-                dataInstanceService, dataInstanceBuilders, processDefinition, activityInstanceService, connectorInstanceService);
+                dataInstanceService, processDefinition, activityInstanceService, connectorInstanceService);
     }
 
 }

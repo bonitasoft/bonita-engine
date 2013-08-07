@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.process.impl;
 import org.bonitasoft.engine.bpm.document.impl.DocumentDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
 
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -29,7 +28,7 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
 
     public DocumentDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final String name, final String fileName) {
-        this(processDefinitionBuilder, container, fileName);
+        this(processDefinitionBuilder, container, name);
         documentDefinitionImpl.setFileName(fileName);
     }
 

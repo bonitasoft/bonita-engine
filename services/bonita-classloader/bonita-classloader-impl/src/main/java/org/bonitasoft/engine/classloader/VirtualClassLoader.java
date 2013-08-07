@@ -22,12 +22,14 @@ import java.io.InputStream;
  * @author Matthieu Chaffotte
  */
 public class VirtualClassLoader extends ClassLoader {
-    
+
     /**
      * WARNING!!!!!!
      * The bigger weakness of this class is that it does not override ALL public, package and protected methods of the java.lang.ClassLoader class
-     * The risk (already experimented with Groovy integration for example) is that this VirtualClassLoader will be the parent of any other kind of classloader (GroovyClassLoader for example)
-     * and thus, all protected/package methods can be called this this "clhid" classloader. If VirtualClassLoader does not override the given method to delegate this to the BonitaClassLoader instance
+     * The risk (already experimented with Groovy integration for example) is that this VirtualClassLoader will be the parent of any other kind of classloader
+     * (GroovyClassLoader for example)
+     * and thus, all protected/package methods can be called this this "clhid" classloader. If VirtualClassLoader does not override the given method to delegate
+     * this to the BonitaClassLoader instance
      * then the delegation model does not work anymore and some classes/resources can't be found. A good implementation should override all methods...
      */
     private BonitaClassLoader classloader;
@@ -36,7 +38,7 @@ public class VirtualClassLoader extends ClassLoader {
 
     protected final long artifactId;
 
-    protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) throws ClassLoaderException {
+    protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
         this.artifactType = artifactType;
         this.artifactId = artifactId;
@@ -49,23 +51,23 @@ public class VirtualClassLoader extends ClassLoader {
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
         if (this.classloader != null) {
-           return this.classloader.loadClass(name, false);
+            return this.classloader.loadClass(name, false);
         }
         return getParent().loadClass(name);
     }
-    
+
     @Override
     protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
         if (this.classloader != null) {
             return this.classloader.loadClass(name, resolve);
-         }
-         return getParent().loadClass(name);
+        }
+        return getParent().loadClass(name);
     }
 
     @Override
     public synchronized InputStream getResourceAsStream(final String name) {
         if (this.classloader != null) {
-            return this.classloader.getResourceAsStream(name);    
+            return this.classloader.getResourceAsStream(name);
         }
         return null;
     }
@@ -79,7 +81,7 @@ public class VirtualClassLoader extends ClassLoader {
             this.classloader.release();
         }
     }
-    
+
     @Override
     public String toString() {
         return super.toString() + ", type=" + this.artifactType + ", id=" + this.artifactId;

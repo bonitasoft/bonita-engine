@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl.transaction.flownode;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 

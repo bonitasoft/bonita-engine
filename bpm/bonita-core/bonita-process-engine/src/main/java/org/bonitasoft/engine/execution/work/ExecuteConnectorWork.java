@@ -16,8 +16,6 @@ package org.bonitasoft.engine.execution.work;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -31,10 +29,10 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
-import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.NonTxBonitaWork;
 
 /**
@@ -45,6 +43,116 @@ import org.bonitasoft.engine.work.NonTxBonitaWork;
 public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
     private static final long serialVersionUID = 9031279948838300081L;
+
+    protected final SProcessDefinition processDefinition;
+
+    protected final SConnectorInstance connector;
+
+    protected final SConnectorDefinition sConnectorDefinition;
+
+    protected final Map<String, Object> inputParameters;
+
+    private SBonitaException errorThrownWhenEvaluationOfInputParameters;
+
+    public ExecuteConnectorWork(final SProcessDefinition processDefinition, final SConnectorInstance connector,
+            final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
+        super();
+        this.processDefinition = processDefinition;
+        this.connector = connector;
+        this.sConnectorDefinition = sConnectorDefinition;
+        this.inputParameters = inputParameters;
+    }
+
+    protected ClassLoader getClassLoader() throws SBonitaException {
+        return getTenantAccessor().getClassLoaderService().getLocalClassLoader("process", processDefinition.getId());
+    }
+
+    protected abstract void errorEventOnFail() throws SBonitaException;
+
+    protected abstract SThrowEventInstance createThrowErrorEventInstance(SEndEventDefinition eventDefinition) throws SBonitaException;
+
+    protected void setConnectorAndContainerToFailed() throws SBonitaException {
+        setConnectorOnlyToFailed();
+        setContainerInFail();
+    }
+
+    protected void setConnectorOnlyToFailed() throws SBonitaException {
+        final ConnectorInstanceService connectorInstanceService = getTenantAccessor().getConnectorInstanceService();
+        final SConnectorInstance intTxConnectorInstance = connectorInstanceService.getConnectorInstance(connector.getId());
+        connectorInstanceService.setState(intTxConnectorInstance, ConnectorService.FAILED);
+    }
+
+    protected abstract void setContainerInFail() throws SBonitaException;
+
+    protected abstract void continueFlow() throws SBonitaException;
+
+    protected void evaluateOutput(final ConnectorResult result, final Long id, final String containerType) throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+
+        final List<SOperation> outputs = sConnectorDefinition.getOutputs();
+        final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinition.getId());
+        connectorService.executeOutputOperation(outputs, sExpressionContext, result);
+        connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connector.getId()), ConnectorService.DONE);
+    }
+
+    public void setErrorThrownWhenEvaluationOfInputParameters(final SBonitaException errorThrownWhenEvaluationOfInputParameters) {
+        this.errorThrownWhenEvaluationOfInputParameters = errorThrownWhenEvaluationOfInputParameters;
+    }
+
+    /**
+     * @return the errorThrownWhenEvaluationOfInputParameters
+     *         the error thrown when evaluating input parameters or null if there was no error when evaluating input parameters
+     */
+    public SBonitaException getErrorThrownWhenEvaluationOfInputParameters() {
+        return errorThrownWhenEvaluationOfInputParameters;
+    }
+
+    protected abstract void evaluateOutput(ConnectorResult result) throws SBonitaException;
+
+    @Override
+    protected void work() throws Exception {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
+
+        final ClassLoader processClassloader = getClassLoader();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        HandleConnectorOnFailEventTxContent handleError = null;
+        try {
+            Thread.currentThread().setContextClassLoader(processClassloader);
+            if (errorThrownWhenEvaluationOfInputParameters != null) {
+                handleError = new HandleConnectorOnFailEventTxContent(errorThrownWhenEvaluationOfInputParameters);
+                transactionExecutor.execute(handleError);
+            } else {
+                try {
+                    final ConnectorResult result = connectorService.executeConnector(processDefinition.getId(), connector, processClassloader, inputParameters);
+                    transactionExecutor.execute(new EvaluateConnectorOutputsTxContent(result));
+                } catch (final SBonitaException e) {
+                    handleError = new HandleConnectorOnFailEventTxContent(e);
+                    transactionExecutor.execute(handleError);
+                }
+            }
+            if (handleError == null || handleError.shouldContinueFlow()) {
+                transactionExecutor.execute(new ContinueFlowTxContent());
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            return TenantServiceSingleton.getInstance(getTenantId());
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected BPMDefinitionBuilders getBPMDefinitionBuilders() {
+        return getTenantAccessor().getBPMDefinitionBuilders();
+    }
 
     /**
      * @author Emmanuel Duchastenier
@@ -115,122 +223,6 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
         @Override
         public void execute() throws SBonitaException {
             evaluateOutput(result);
-        }
-    }
-
-    protected final SProcessDefinition processDefinition;
-
-    protected final ClassLoaderService classLoaderService;
-
-    private final TransactionExecutor transactionExecutor;
-
-    protected final SConnectorInstance connector;
-
-    protected final SConnectorDefinition sConnectorDefinition;
-
-    protected final ConnectorService connectorService;
-
-    protected final Map<String, Object> inputParameters;
-
-    protected EventsHandler eventsHandler;
-
-    protected BPMInstanceBuilders bpmInstanceBuilders;
-
-    protected BPMInstancesCreator bpmInstancesCreator;
-
-    protected BPMDefinitionBuilders bpmDefinitionBuilders;
-
-    protected final ConnectorInstanceService connectorInstanceService;
-
-    private SBonitaException errorThrownWhenEvaluationOfInputParameters;
-
-    public ExecuteConnectorWork(final SProcessDefinition processDefinition, final ClassLoaderService classLoaderService,
-            final TransactionExecutor transactionExecutor, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition,
-            final ConnectorService connectorService, final ConnectorInstanceService connectorInstanceService, final Map<String, Object> inputParameters,
-            final EventsHandler eventsHandler, final BPMInstanceBuilders bpmInstanceBuilders, final BPMInstancesCreator bpmInstancesCreator,
-            final BPMDefinitionBuilders bpmDefinitionBuilders) {
-        super();
-        this.processDefinition = processDefinition;
-        this.classLoaderService = classLoaderService;
-        this.transactionExecutor = transactionExecutor;
-        this.connector = connector;
-        this.sConnectorDefinition = sConnectorDefinition;
-        this.connectorService = connectorService;
-        this.connectorInstanceService = connectorInstanceService;
-        this.inputParameters = inputParameters;
-        this.eventsHandler = eventsHandler;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
-        this.bpmInstancesCreator = bpmInstancesCreator;
-        this.bpmDefinitionBuilders = bpmDefinitionBuilders;
-    }
-
-    protected ClassLoader getClassLoader() throws SBonitaException {
-        return classLoaderService.getLocalClassLoader("process", processDefinition.getId());
-    }
-
-    protected abstract void errorEventOnFail() throws SBonitaException;
-
-    protected abstract SThrowEventInstance createThrowErrorEventInstance(SEndEventDefinition eventDefinition) throws SBonitaException;
-
-    protected void setConnectorAndContainerToFailed() throws SBonitaException {
-        setConnectorOnlyToFailed();
-        setContainerInFail();
-    }
-
-    protected void setConnectorOnlyToFailed() throws SBonitaException {
-        final SConnectorInstance intTxConnectorInstance = connectorInstanceService.getConnectorInstance(connector.getId());
-        connectorInstanceService.setState(intTxConnectorInstance, ConnectorService.FAILED);
-    }
-
-    protected abstract void setContainerInFail() throws SBonitaException;
-
-    protected abstract void continueFlow() throws SBonitaException;
-
-    protected void evaluateOutput(final ConnectorResult result, final Long id, final String containerType) throws SBonitaException {
-        final List<SOperation> outputs = sConnectorDefinition.getOutputs();
-        final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinition.getId());
-        connectorService.executeOutputOperation(outputs, sExpressionContext, result);
-        connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connector.getId()), ConnectorService.DONE);
-    }
-
-    public void setErrorThrownWhenEvaluationOfInputParameters(final SBonitaException errorThrownWhenEvaluationOfInputParameters) {
-        this.errorThrownWhenEvaluationOfInputParameters = errorThrownWhenEvaluationOfInputParameters;
-    }
-
-    /**
-     * @return the errorThrownWhenEvaluationOfInputParameters
-     *         the error thrown when evaluating input parameters or null if there was no error when evaluating input parameters
-     */
-    public SBonitaException getErrorThrownWhenEvaluationOfInputParameters() {
-        return errorThrownWhenEvaluationOfInputParameters;
-    }
-
-    protected abstract void evaluateOutput(ConnectorResult result) throws SBonitaException;
-
-    @Override
-    protected void work() throws Exception {
-        final ClassLoader processClassloader = getClassLoader();
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        HandleConnectorOnFailEventTxContent handleError = null;
-        try {
-            Thread.currentThread().setContextClassLoader(processClassloader);
-            if (errorThrownWhenEvaluationOfInputParameters != null) {
-                handleError = new HandleConnectorOnFailEventTxContent(errorThrownWhenEvaluationOfInputParameters);
-                transactionExecutor.execute(handleError);
-            } else {
-                try {
-                    final ConnectorResult result = connectorService.executeConnector(processDefinition.getId(), connector, processClassloader, inputParameters);
-                    transactionExecutor.execute(new EvaluateConnectorOutputsTxContent(result));
-                } catch (final SBonitaException e) {
-                    handleError = new HandleConnectorOnFailEventTxContent(e);
-                    transactionExecutor.execute(handleError);
-                }
-            }
-            if (handleError == null || handleError.shouldContinueFlow()) {
-                transactionExecutor.execute(new ContinueFlowTxContent());
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 }

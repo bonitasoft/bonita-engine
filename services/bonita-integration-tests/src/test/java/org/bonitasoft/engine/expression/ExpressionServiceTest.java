@@ -23,14 +23,12 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.transaction.SBadTransactionStateException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -88,8 +86,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
 
     private Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
-            SBadTransactionStateException, FireEventException, STransactionCreationException, STransactionCommitException,
-            STransactionRollbackException {
+            STransactionCreationException, STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
         final Object result = expressionService.evaluate(expression, dependencyValues, resolvedExpressions);
         getTransactionService().complete();
@@ -319,7 +316,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         evaluate(groovyNumExpr, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
-    private SExpression newPatternExpression(final String content, final List<SExpression> dependencies) throws SInvalidExpressionException {
+    private SExpression newPatternExpression(final String content, final List<SExpression> dependencies) {
         return buildExpression(content, SExpression.TYPE_PATTERN, String.class.getName(), null, dependencies);
     }
 

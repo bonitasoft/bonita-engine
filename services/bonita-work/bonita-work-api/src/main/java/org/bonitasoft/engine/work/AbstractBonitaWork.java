@@ -23,7 +23,6 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -103,7 +102,7 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
         throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.", e);
     }
 
-    protected long getTenantId() throws TenantIdNotSetException {
+    protected long getTenantId() {
         return tenantId;
     }
 

@@ -1,19 +1,18 @@
 package org.bonitasoft.engine.persistence;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.persistence.model.Human;
 import org.bonitasoft.engine.persistence.model.Parent;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.session.SSessionException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class MultiTenancyTest extends CommonServiceTest {
 
@@ -91,7 +90,7 @@ public class MultiTenancyTest extends CommonServiceTest {
         }
     }
 
-    private void changeTenant(final long tenantId, final SessionAccessor sessionAccessor) throws SSessionException, SessionIdNotSetException, Exception {
+    private void changeTenant(final long tenantId) throws SSessionException, SessionIdNotSetException, Exception {
         getTransactionService().begin();
         TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), tenantId);
         getTransactionService().complete();
@@ -113,7 +112,7 @@ public class MultiTenancyTest extends CommonServiceTest {
             PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
             getTransactionService().complete();
 
-            changeTenant(tenant1Id, getSessionAccessor());
+            changeTenant(tenant1Id);
             getTransactionService().begin();
             try {
                 PersistenceTestUtil.checkHuman(human1,
@@ -128,7 +127,7 @@ public class MultiTenancyTest extends CommonServiceTest {
             // getTransactionService().begin();
             final long defaultTenantId = getDefaultTenantId();
             // getTransactionService().complete();
-            changeTenant(defaultTenantId, getSessionAccessor());
+            changeTenant(defaultTenantId);
             getTransactionService().begin();
             PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
             try {
@@ -155,19 +154,19 @@ public class MultiTenancyTest extends CommonServiceTest {
             // getTransactionService().begin();
             final long defaultTenantId = getDefaultTenantId();
             // getTransactionService().complete();
-            changeTenant(defaultTenantId, getSessionAccessor());
+            changeTenant(defaultTenantId);
             getTransactionService().begin();
             final Human human1 = PersistenceTestUtil.buildHuman("default", "lastName", 45);
             persistenceService.insert(human1);
             getTransactionService().complete();
 
-            changeTenant(tenant1Id, getSessionAccessor());
+            changeTenant(tenant1Id);
             getTransactionService().begin();
             final Human human2 = PersistenceTestUtil.buildHuman("tenant1", "lastName", 32);
             persistenceService.insert(human2);
             getTransactionService().complete();
 
-            changeTenant(tenant2Id, getSessionAccessor());
+            changeTenant(tenant2Id);
             getTransactionService().begin();
             final Human human3 = PersistenceTestUtil.buildHuman("tenant2", "lastName", 12);
             persistenceService.insert(human3);
@@ -199,7 +198,7 @@ public class MultiTenancyTest extends CommonServiceTest {
             persistenceService.insert(human1);
             assertEquals(1, human1.getId());
             getTransactionService().complete();
-            changeTenant(tenant1Id, getSessionAccessor());
+            changeTenant(tenant1Id);
 
             getTransactionService().begin();
             final Long nbOfHuman = persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfHumans", null, Human.class, Long.class));

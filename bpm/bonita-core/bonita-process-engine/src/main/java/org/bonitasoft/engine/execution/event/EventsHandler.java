@@ -23,8 +23,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -44,9 +42,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowM
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionFailedException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -163,7 +158,7 @@ public class EventsHandler {
             final SReceiveTaskInstance receiveTaskInstance) throws SBonitaException {
         final SEventTriggerDefinition eventTrigger = receiveTaskDefinition.getTrigger();
         final MessageEventHandlerStrategy messageEventHandlerStrategy = (MessageEventHandlerStrategy) handlers.get(SEventTriggerType.MESSAGE);
-        messageEventHandlerStrategy.handleCatchEvent(processDefinition, receiveTaskDefinition, receiveTaskInstance, eventTrigger);
+        messageEventHandlerStrategy.handleCatchEvent(processDefinition, receiveTaskInstance, eventTrigger);
     }
 
     /**
@@ -243,7 +238,7 @@ public class EventsHandler {
             SExpressionException {
         final SThrowMessageEventTriggerDefinition eventTrigger = sendTaskDefinition.getMessageTrigger();
         final MessageEventHandlerStrategy messageEventHandlerStrategy = (MessageEventHandlerStrategy) handlers.get(SEventTriggerType.MESSAGE);
-        messageEventHandlerStrategy.handleThrowEvent(processDefinition, sendTaskDefinition, sendTaskInstance, eventTrigger);
+        messageEventHandlerStrategy.handleThrowEvent(processDefinition, sendTaskInstance, eventTrigger);
     }
 
     public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition eventDefinition,
@@ -404,14 +399,13 @@ public class EventsHandler {
                 subProcessId, parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
-    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, long processInstanceId) throws SActivityReadException,
-            SActivityExecutionFailedException, SActivityExecutionException, WorkRegisterException {
+    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, long processInstanceId) throws WorkRegisterException {
         containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
                 processInstanceId);
     }
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
-            throws WorkRegisterException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+            throws WorkRegisterException {
         final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionId, operations);
         work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
         workService.registerWork(work);

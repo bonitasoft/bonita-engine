@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,13 +17,9 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
@@ -45,14 +41,13 @@ import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEvent
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.work.WorkRegisterException;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
@@ -60,44 +55,14 @@ import org.bonitasoft.engine.work.WorkService;
  */
 public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
+    private static final long serialVersionUID = 6220793197069669088L;
+
     private final SFlowNodeInstance flowNodeInstance;
 
-    private final ActivityInstanceService activityInstanceService;
-
-    private final FlowNodeStateManager flowNodeStateManager;
-
-    private final ProcessInstanceService processInstanceService;
-
-    private final ArchiveService archiveService;
-
-    private final DataInstanceService dataInstanceService;
-
-    private final SDataInstanceBuilders dataInstanceBuilders;
-
-    private final ContainerRegistry containerRegistry;
-
-    private final EventInstanceService eventInstanceService;
-
-    public ExecuteConnectorOfActivity(final ContainerRegistry containerRegistry, final TransactionExecutor transactionExecutor,
-            final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final BPMInstanceBuilders bpmInstanceBuilders,
-            final DataInstanceService dataInstanceService, final SDataInstanceBuilders dataInstanceBuilders,
-            final ActivityInstanceService activityInstanceService, final FlowNodeStateManager flowNodeStateManager,
-            final ClassLoaderService classLoaderService, final ConnectorService connectorService, final ConnectorInstanceService connectorInstanceService,
-            final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final SConnectorInstance connector,
-            final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters, final EventsHandler eventsHandler,
-            final BPMInstancesCreator bpmInstancesCreator, final BPMDefinitionBuilders bpmDefinitionBuilders, final EventInstanceService eventInstanceService,
-            final WorkService workService) {
-        super(processDefinition, classLoaderService, transactionExecutor, connector, sConnectorDefinition, connectorService, connectorInstanceService,
-                inputParameters, eventsHandler, bpmInstanceBuilders, bpmInstancesCreator, bpmDefinitionBuilders);
-        this.containerRegistry = containerRegistry;
-        this.processInstanceService = processInstanceService;
-        this.archiveService = archiveService;
-        this.dataInstanceService = dataInstanceService;
-        this.dataInstanceBuilders = dataInstanceBuilders;
-        this.activityInstanceService = activityInstanceService;
-        this.flowNodeStateManager = flowNodeStateManager;
+    public ExecuteConnectorOfActivity(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final SConnectorInstance connector,
+            final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
+        super(processDefinition, connector, sConnectorDefinition, inputParameters);
         this.flowNodeInstance = flowNodeInstance;
-        this.eventInstanceService = eventInstanceService;
     }
 
     @Override
@@ -107,25 +72,38 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     @Override
     protected void continueFlow() throws SFlowNodeExecutionException, WorkRegisterException, SFlowNodeReadException {
+        final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
         String containerType = SFlowElementsContainerType.PROCESS.name();
         if (flowNodeInstance.getLogicalGroup(2) > 0) {
             containerType = SFlowElementsContainerType.FLOWNODE.name();
         }
         // no need to set the classloader: done in the flowNodeExecutor.gotoNextStableState
         containerRegistry.executeFlowNodeInSameThread(flowNodeInstance.getId(), null, null, containerType,
-                flowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex()));
+                flowNodeInstance.getLogicalGroup(getTenantAccessor().getBPMInstanceBuilders().getSUserTaskInstanceBuilder().getParentProcessInstanceIndex()));
     }
 
     @Override
     protected void setContainerInFail() throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
+        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ArchiveService archiveService = tenantAccessor.getArchiveService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+
         final SFlowNodeInstance intTxflowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());
         ProcessArchiver.archiveFlowNodeInstance(intTxflowNodeInstance, false, processInstanceService, archiveService, bpmInstanceBuilders, dataInstanceService,
-                dataInstanceBuilders, processDefinition, activityInstanceService, connectorInstanceService);
+                processDefinition, activityInstanceService, connectorInstanceService);
         activityInstanceService.setState(intTxflowNodeInstance, flowNodeStateManager.getFailedState());
     }
 
     @Override
     protected SThrowEventInstance createThrowErrorEventInstance(final SEndEventDefinition eventDefinition) throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
         final SEndEventInstanceBuilder endEventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
         final SEndEventInstanceBuilder builder = endEventInstanceBuilder.createNewEndEventInstance(eventDefinition.getName(), eventDefinition.getId(),
                 flowNodeInstance.getRootContainerId(), flowNodeInstance.getParentContainerId(), processDefinition.getId(),
@@ -143,11 +121,14 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     void handleErrorEventOnFail() throws SBonitaException {
-        // create a fake definition
+        final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders();
         final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
+        final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
+        final EventsHandler eventsHandler = getTenantAccessor().getEventsHandler();
+
+        // create a fake definition
         final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(
                 sConnectorDefinition.getErrorCode()).done();
-        final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
         // event definition as the error code as name, this way we don't need to find the connector that throw this error
         final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(sConnectorDefinition.getErrorCode())
                 .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();

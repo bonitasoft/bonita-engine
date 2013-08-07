@@ -306,7 +306,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         return sRole;
     }
 
-    private SUser addUser(final ExportedUser user) throws SUserCreationException, SUserUpdateException {
+    private SUser addUser(final ExportedUser user) throws SUserCreationException {
         SUser sUser;
         if (user.isPasswordEncrypted()) {
             sUser = identityService.createUserWithoutEncryptingPassword(ModelConvertor.constructSUser(user, identityModelBuilder));

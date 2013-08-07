@@ -74,7 +74,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SCatchEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, eventInstance);
-        final SJobDescriptor jobDescriptor = getJobDescriptor(processDefinition, eventDefinition, jobName);
+        final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
         final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, eventInstance);
         scheduleJob(processDefinition, eventInstance, sEventTriggerDefinition, jobDescriptor, jobParameters);
     }
@@ -132,7 +132,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
             final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
             throws SBonitaException {
         final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessInstance.getId(), subProcessId);
-        final SJobDescriptor jobDescriptor = getJobDescriptor(processDefinition, eventDefinition, jobName);
+        final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
         final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, null, subProcessId, parentProcessInstance);
 
         // TODO not only process scope
@@ -175,7 +175,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         return jobParameters;
     }
 
-    private SJobDescriptor getJobDescriptor(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final String jobName) {
+    private SJobDescriptor getJobDescriptor(final String jobName) {
         return schedulerService.getJobDescriptorBuilder().createNewInstance(TriggerTimerEventJob.class.getName(), jobName).done();
     }
 

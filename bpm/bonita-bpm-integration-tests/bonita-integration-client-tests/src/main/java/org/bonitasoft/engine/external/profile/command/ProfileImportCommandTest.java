@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.external.profile.command;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -27,10 +31,6 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ProfileImportCommandTest extends AbstractCommandProfileTest {
 
@@ -155,7 +155,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.")
     @Test
-    public void defaultProfileCreation() throws BonitaException, IOException {
+    public void defaultProfileCreation() throws BonitaException {
         Profile getProfileResult = getProfileAPI().getProfile(adminProfileId);
         assertEquals("Administrator", getProfileResult.getName());
 

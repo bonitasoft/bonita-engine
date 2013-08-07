@@ -341,7 +341,6 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
@@ -541,7 +540,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
-            throws SBonitaException, SProcessInstanceHierarchicalDeletionException, SearchException {
+            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         List<ProcessInstance> processInstances;
         final int maxResults = 1000;
         do {
@@ -644,7 +643,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<ProcessInstance> searchProcessInstancesFromProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId,
-            final int startIndex, final int maxResults) throws SProcessInstanceReadException, SSearchException {
+            final int startIndex, final int maxResults) throws SSearchException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(startIndex, maxResults);
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
@@ -1228,11 +1227,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
-        try {
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        } catch (final SBonitaException e) {
-            throw new CreationException(e);
-        }
+        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         return clientActorMember;
     }
 
@@ -1267,11 +1262,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (SBonitaReadException e) {
             throw new CreationException(e);
         }
-        try {
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        } catch (final SBonitaException e4) {
-            throw new CreationException(e4);
-        }
+        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         return clientActorMember;
     }
 
@@ -1320,11 +1311,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
-        try {
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        } catch (final SBonitaException e) {
-            throw new CreationException(e);
-        }
+        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         return clientActorMember;
     }
 
@@ -1366,11 +1353,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
         }
-        try {
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        } catch (final SBonitaException e) {
-            throw new CreationException(e);
-        }
+        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         return clientActorMember;
     }
 
@@ -2719,13 +2702,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Date getActivityReachedStateDate(final long activityInstanceId, final String stateName) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
         final int stateId = ModelConvertor.getServerActivityStateId(stateName);
-        final GetArchivedActivityInstance getArchivedActivityInstance = new GetArchivedActivityInstance(activityInstanceId, stateId, activityInstanceService,
-                persistenceService);
+        final GetArchivedActivityInstance getArchivedActivityInstance = new GetArchivedActivityInstance(activityInstanceId, stateId, activityInstanceService);
         try {
             getArchivedActivityInstance.execute();
             final long reachedDate = getArchivedActivityInstance.getResult().getReachedStateDate();
@@ -3466,8 +3446,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
-        } catch (SearchException e) {
-            throw new DeletionException(e);
         }
     }
 
@@ -3778,9 +3756,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final SProcessSupervisorBuilders supervisorBuilders = serviceAccessor.getSSupervisorBuilders();
-        final IdentityModelBuilder identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
-
-        final SearchProcessSupervisorDescriptor searchDescriptor = new SearchProcessSupervisorDescriptor(supervisorBuilders, identityModelBuilder);
+        final SearchProcessSupervisorDescriptor searchDescriptor = new SearchProcessSupervisorDescriptor(supervisorBuilders);
         final SearchSupervisors searchSupervisorsTransaction = new SearchSupervisors(supervisorService, searchDescriptor, searchOptions);
         try {
             searchSupervisorsTransaction.execute();
@@ -3819,7 +3795,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final SProcessSupervisorBuilders supervisorBuilders = serviceAccessor.getSSupervisorBuilders();
-        final IdentityModelBuilder identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
 
         // Prepare search options
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
@@ -3828,7 +3803,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.USER_ID, userId == null ? -1 : userId);
         searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.ROLE_ID, roleId == null ? -1 : roleId);
         searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.GROUP_ID, groupId == null ? -1 : groupId);
-        final SearchProcessSupervisorDescriptor searchDescriptor = new SearchProcessSupervisorDescriptor(supervisorBuilders, identityModelBuilder);
+        final SearchProcessSupervisorDescriptor searchDescriptor = new SearchProcessSupervisorDescriptor(supervisorBuilders);
         final SearchSupervisors searchSupervisorsTransaction = new SearchSupervisors(supervisorService, searchDescriptor, searchOptionsBuilder.done());
 
         try {

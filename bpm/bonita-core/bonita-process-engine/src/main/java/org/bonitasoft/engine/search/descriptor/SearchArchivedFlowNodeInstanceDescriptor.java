@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,11 +22,11 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescript
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowNodeInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class SearchArchivedFlowNodeInstanceDescriptor extends SearchEntityDescriptor {
 
@@ -34,7 +34,7 @@ public class SearchArchivedFlowNodeInstanceDescriptor extends SearchEntityDescri
 
     private final Map<Class<? extends PersistentObject>, Set<String>> flowNodeInstanceDescriptorAllFields;
 
-    public SearchArchivedFlowNodeInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders, final FlowNodeStateManager flowNodeStateManager) {
+    public SearchArchivedFlowNodeInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
         final SAFlowNodeInstanceBuilder flowNodeKeyProvider = bpmInstanceBuilders.getSAUserTaskInstanceBuilder();
         archFlowNodeDescriptorKeys = new HashMap<String, FieldDescriptor>(9);
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.NAME,

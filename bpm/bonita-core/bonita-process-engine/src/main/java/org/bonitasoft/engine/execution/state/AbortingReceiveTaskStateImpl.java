@@ -39,13 +39,11 @@ public class AbortingReceiveTaskStateImpl extends AbortingFlowNodeContainerState
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
         try {
             final SReceiveTaskInstance receiveTaskInstance = (SReceiveTaskInstance) instance;
-            getStateBehaviors().interrupWaitinEvents(processDefinition, receiveTaskInstance);
+            getStateBehaviors().interrupWaitinEvents(receiveTaskInstance);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
         return super.execute(processDefinition, instance);
     }
-
-
 
 }

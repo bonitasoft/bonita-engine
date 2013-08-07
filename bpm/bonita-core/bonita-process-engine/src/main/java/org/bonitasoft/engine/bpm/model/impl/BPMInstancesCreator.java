@@ -206,7 +206,7 @@ public class BPMInstancesCreator {
                 SFlowNodeInstanceBuilder builder;
                 if (loopCharacteristics instanceof SStandardLoopCharacteristics) {
                     builder = createLoopActivityInstance(processDefinitionId, rootContainerId, parentContainerId, rootProcessInstanceId,
-                            parentProcessInstanceId, activityDefinition, loopCharacteristics);
+                            parentProcessInstanceId, activityDefinition);
                 } else {
                     builder = createMultiInstanceActivityInstance(processDefinitionId, rootContainerId, parentContainerId, rootProcessInstanceId,
                             parentProcessInstanceId, activityDefinition, (SMultiInstanceLoopCharacteristics) loopCharacteristics);
@@ -441,8 +441,7 @@ public class BPMInstancesCreator {
     }
 
     public SLoopActivityInstanceBuilder createLoopActivityInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-            final long rootProcessInstanceId, final long parentProcessInstanceId, final SActivityDefinition activityDefinition,
-            final SLoopCharacteristics loopCharacteristics) {
+            final long rootProcessInstanceId, final long parentProcessInstanceId, final SActivityDefinition activityDefinition) {
         final SLoopActivityInstanceBuilder builder = instanceBuilders.getSLoopActivityInstanceBuilder().createNewOuterTaskInstance(
                 activityDefinition.getName(), activityDefinition.getId(), rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId,
                 parentProcessInstanceId);
@@ -553,6 +552,8 @@ public class BPMInstancesCreator {
                 sDataInstances.add(dataInstance);
             } catch (final ClassCastException e) {
                 throw new SBonitaException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: " + e.getMessage()) {
+
+                    private static final long serialVersionUID = -3864933477546504156L;
                 };
             }
         }

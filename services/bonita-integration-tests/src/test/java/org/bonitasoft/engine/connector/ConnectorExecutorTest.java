@@ -35,15 +35,11 @@ import org.junit.Test;
  */
 public class ConnectorExecutorTest {
 
-    private ConnectorExecutor connectorExecutor;
-
     private Parser parser;
 
     private Map<String, Object> inputParameters; // TODO parse it from XML file
 
     private final String INPUT_KEY = "input1";
-
-    private final String OUTPUT_KEY = "output1";
 
     @Before
     public void before() throws Exception {
@@ -88,7 +84,7 @@ public class ConnectorExecutorTest {
 
     @Test
     public void testExecuteConnector() throws Exception {
-        connectorExecutor = getConnectorExecutor();
+        getConnectorExecutor();
         inputParameters = getInputParameters();
         // Map<String, Object> resultMap = connectorExecutor.execute(null, inputParameters);
         // assertNotNull(resultMap);

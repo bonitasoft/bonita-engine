@@ -17,6 +17,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilders;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -127,6 +128,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     BPMDefinitionBuilders getBPMDefinitionBuilders();
 
     BPMInstanceBuilders getBPMInstanceBuilders();
+
+    BPMInstancesCreator getBPMInstancesCreator();
 
     FlowNodeExecutor getFlowNodeExecutor();
 

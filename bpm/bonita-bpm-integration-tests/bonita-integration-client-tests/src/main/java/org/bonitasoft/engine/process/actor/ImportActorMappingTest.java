@@ -101,48 +101,39 @@ public class ImportActorMappingTest extends CommonAPITest {
     @Test
     public void importActorMappingWithWrongXMLFile() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("actorMappingWithException.xml");
-        final User user = createUser("john", "bpm");
 
-        checkProcessNotActivated(user, null, null, businessArchive);
+        checkProcessNotActivated(businessArchive);
     }
 
     @Test
     public void importActorMappingWithUnknownUser() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("simpleActorMapping.xml");
-        final User user = createUser("paul", "bpm");
 
-        checkProcessNotActivated(user, null, null, businessArchive);
+        checkProcessNotActivated(businessArchive);
     }
 
     @Test
     public void importActorMappingWithUnknownGroup() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD1");
-        final Role role = createRole("dev");
+
         // even if missing group the process is resolved
-        checkProcessActivated(user, rd, role, businessArchive);
+        checkProcessActivated(businessArchive);
     }
 
     @Test
     public void importActorMappingWithUnknownRole() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD");
-        final Role role = createRole("dev1");
+
         // even if missing role the process is resolved
-        checkProcessActivated(user, rd, role, businessArchive);
+        checkProcessActivated(businessArchive);
     }
 
     @Test
     public void importActorMappingWithUnknownMemberShip() throws Exception {
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD2");
-        final Role role = createRole("dev");
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMappingWithUnkownGroup.xml");
 
         // even if missing membership the process is resolved
-        checkProcessActivated(user, rd, role, businessArchive);
+        checkProcessActivated(businessArchive);
     }
 
     @Test
@@ -253,7 +244,7 @@ public class ImportActorMappingTest extends CommonAPITest {
         return processBuilder;
     }
 
-    private void checkProcessNotActivated(final User user, final Group group, final Role role, final BusinessArchiveBuilder businessArchive) throws Exception {
+    private void checkProcessNotActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive.done());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
@@ -265,7 +256,7 @@ public class ImportActorMappingTest extends CommonAPITest {
         getIdentityAPI().deleteOrganization();
     }
 
-    private void checkProcessActivated(final User user, final Group group, final Role role, final BusinessArchiveBuilder businessArchive) throws Exception {
+    private void checkProcessActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive.done());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());

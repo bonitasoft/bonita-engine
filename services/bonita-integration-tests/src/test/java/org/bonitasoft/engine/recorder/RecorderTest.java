@@ -1,5 +1,10 @@
 package org.bonitasoft.engine.recorder;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,11 +40,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Elias Ricken de Medeiros, Yanyan Liu
@@ -106,7 +106,7 @@ public class RecorderTest extends CommonServiceTest {
         return Collections.singletonMap(key, value);
     }
 
-    private List<SQueriableLog> getLogs(final long indexValue, final String actionType) throws SBonitaReadException, SBonitaSearchException {
+    private List<SQueriableLog> getLogs(final long indexValue, final String actionType) throws SBonitaSearchException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(getActionTypeFilterOption(actionType));
         filters.add(new FilterOption(SQueriableLog.class, getLogModelBuilder().getObjectIdKey(), indexValue));
@@ -118,7 +118,7 @@ public class RecorderTest extends CommonServiceTest {
         return new FilterOption(SQueriableLog.class, getLogModelBuilder().getActionTypeKey(), actionType);
     }
 
-    private List<SQueriableLog> getLogs(final String actionType) throws SBonitaReadException, SBonitaSearchException {
+    private List<SQueriableLog> getLogs(final String actionType) throws SBonitaSearchException {
         final List<FilterOption> filters = Arrays.asList(getActionTypeFilterOption(actionType));
         return loggerService.searchLogs(new QueryOptions(0, 10, null, filters, null));
     }

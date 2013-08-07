@@ -11,28 +11,19 @@ import java.util.List;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
-import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupNotFoundException;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
@@ -161,11 +152,9 @@ public class PendingTasksTest extends CommonAPITest {
         assertNotNull(userTaskInstances);
         assertEquals(2, userTaskInstances.size());
 
-        getProcessAPI().disableProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().disableProcess(processDefinition2.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        // Clean up
         deleteUser(test);
+        disableAndDeleteProcess(processDefinition1, processDefinition2);
     }
 
     @Test
@@ -391,9 +380,7 @@ public class PendingTasksTest extends CommonAPITest {
         }
     }
 
-    private ProcessDefinition deployProcessMappedToGroup(final Group mainGroup) throws InvalidProcessDefinitionException,
-            InvalidBusinessArchiveFormatException, ProcessDeployException, ProcessDefinitionNotFoundException, ActorNotFoundException, GroupNotFoundException,
-            CreationException, ProcessEnablementException, AlreadyExistsException {
+    private ProcessDefinition deployProcessMappedToGroup(final Group mainGroup) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor("myActor");
         processBuilder.addUserTask("Request", "myActor");

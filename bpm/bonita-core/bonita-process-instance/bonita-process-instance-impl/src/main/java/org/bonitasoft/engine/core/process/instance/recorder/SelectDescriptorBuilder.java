@@ -319,15 +319,13 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<Long>("getNumberOfArchivedTasksSupervisedBy", parameters, SUserTaskInstance.class, Long.class);
     }
 
-    public static SelectListDescriptor<SHumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final int fromIndex, final int maxResults,
-            final String field, final OrderByType orderByType) {
+    public static SelectListDescriptor<SHumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final int fromIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SHumanTaskInstance>("searchAssignedTasksSupervisedBy", parameters, SHumanTaskInstance.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final int fromIndex, final int maxResults,
-            final String field, final OrderByType orderByType) {
+    public static SelectListDescriptor<SHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final int fromIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SHumanTaskInstance>("searchArchivedTasksSupervisedBy", parameters, SHumanTaskInstance.class, queryOptions);

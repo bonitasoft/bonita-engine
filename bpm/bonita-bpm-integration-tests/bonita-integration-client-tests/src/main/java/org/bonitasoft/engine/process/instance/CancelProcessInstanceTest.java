@@ -97,7 +97,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         assertEquals(targetProcessDef.getId(), targetProcessInstance.getProcessDefinitionId());
 
         final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), 50, 5000, true, parentProcessInstance, 2,
-                TestStates.getReadyState(null));
+                TestStates.getReadyState());
         assertTrue(checkNbOfActivities.waitUntil());
 
         getProcessAPI().cancelProcessInstance(parentProcessInstance.getId());

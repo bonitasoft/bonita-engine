@@ -25,9 +25,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
@@ -38,7 +36,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -64,7 +61,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
@@ -82,8 +78,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -109,7 +103,6 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorOfProcess;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
@@ -188,10 +181,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected final EventsHandler eventsHandler;
 
-    private final BPMDefinitionBuilders bpmDefinitionBuilders;
-
-    private final ContainerRegistry containerRegistry;
-
     private final ConnectorInstanceService connectorInstanceService;
 
     private final SExpressionBuilders expressionBuilders;
@@ -200,33 +189,26 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final TransactionService transactionService;
 
-    private final TransactionExecutor transactionExecutor;
-
     public ProcessExecutorImpl(final BPMInstanceBuilders instanceBuilders, final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final FlowNodeStateManager flowNodeStateManager, final TechnicalLoggerService logger,
-            final FlowNodeExecutor flowNodeExecutor, final TransactionExecutor transactionExecutor, final WorkService workService,
-            final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
+            final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
+            final WorkService workService, final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final SExpressionBuilders expressionBuilders, final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
-            final BPMInstancesCreator bpmInstancesCreator, final ArchiveService archiveService, final LockService lockService, final TokenService tokenService,
-            final EventsHandler eventsHandler, final BPMDefinitionBuilders bpmDefinitionBuilders, final SOperationBuilders operationBuilders,
-            final TransactionService transactionService) {
+            final BPMInstancesCreator bpmInstancesCreator, final LockService lockService, final TokenService tokenService,
+            final EventsHandler eventsHandler, final SOperationBuilders operationBuilders, final TransactionService transactionService) {
         super();
         this.instanceBuilders = instanceBuilders;
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
         this.connectorInstanceService = connectorInstanceService;
         this.expressionBuilders = expressionBuilders;
-        this.containerRegistry = containerRegistry;
         this.tokenService = tokenService;
-        this.bpmDefinitionBuilders = bpmDefinitionBuilders;
         this.transactionService = transactionService;
         this.logger = logger;
         this.flowNodeExecutor = flowNodeExecutor;
-        this.transactionExecutor = transactionExecutor;
         this.workService = workService;
         this.processDefinitionService = processDefinitionService;
         this.gatewayInstanceService = gatewayInstanceService;
@@ -393,7 +375,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return chosenTransitions;
     }
 
-    private List<STransitionDefinition> evaluateTransitionsParallely(final List<STransitionDefinition> outgoingTransitionDefinitions) throws SBonitaException {
+    private List<STransitionDefinition> evaluateTransitionsParallely(final List<STransitionDefinition> outgoingTransitionDefinitions) {
         final List<STransitionDefinition> chosenTransitions = new ArrayList<STransitionDefinition>(outgoingTransitionDefinitions.size());
         for (final STransitionDefinition sTransitionDefinition : outgoingTransitionDefinitions) {
             chosenTransitions.add(sTransitionDefinition);
@@ -401,8 +383,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return chosenTransitions;
     }
 
-    protected STransitionDefinition getDefaultTransition(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws STransitionCreationException, STransitionReadException {
+    protected STransitionDefinition getDefaultTransition(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance) {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final SFlowNodeDefinition flowNode = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
         return flowNode.getDefaultTransition();
@@ -424,7 +405,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return (Boolean) expressionResolverService.evaluate(expression, contextDependency);
     }
 
-    private List<SFlowNodeDefinition> getStartNodes(final SProcessDefinition definition, final long targetSFlowNodeDefinitionId) throws SActorNotFoundException {
+    private List<SFlowNodeDefinition> getStartNodes(final SProcessDefinition definition, final long targetSFlowNodeDefinitionId) {
         return getStartNodes(definition.getProcessContainer(), targetSFlowNodeDefinitionId);
     }
 
@@ -448,8 +429,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return filteredSFlowNodeDefinitions;
     }
 
-    private List<SFlowNodeDefinition> getStartNodes(final SProcessDefinition definition, final long flowNodeDefinitionId, final long targetSFlowNodeDefinitionId)
-            throws SActorNotFoundException {
+    private List<SFlowNodeDefinition> getStartNodes(final SProcessDefinition definition, final long flowNodeDefinitionId, final long targetSFlowNodeDefinitionId) {
         final SSubProcessDefinition subProcDef = (SSubProcessDefinition) definition.getProcessContainer().getFlowNode(flowNodeDefinitionId);
         return getStartNodes(subProcDef.getSubProcessContainer(), targetSFlowNodeDefinitionId);
     }
@@ -478,14 +458,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         try {
                             inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), sExpressionContext, null);
                         } catch (final SBonitaException sbe) {
-                            final ExecuteConnectorWork work = getWork(processDefinition, sProcessInstance, activationEvent, connectorService,
-                                    nextConnectorInstance, sConnectorDefinition, inputParameters);
+                            final ExecuteConnectorWork work = getWork(processDefinition, sProcessInstance, activationEvent, nextConnectorInstance,
+                                    sConnectorDefinition, inputParameters);
                             work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
                             workService.registerWork(work);
                         }
                         if (inputParameters != null) {
-                            workService.registerWork(getWork(processDefinition, sProcessInstance, activationEvent, connectorService, nextConnectorInstance,
-                                    sConnectorDefinition, inputParameters));
+                            workService.registerWork(getWork(processDefinition, sProcessInstance, activationEvent, nextConnectorInstance, sConnectorDefinition,
+                                    inputParameters));
                         }
                         return true;
                     }
@@ -496,11 +476,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private ExecuteConnectorOfProcess getWork(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance,
-            final ConnectorEvent activationEvent, final ConnectorService connectorService, final SConnectorInstance nextConnectorInstance,
-            final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
-        return new ExecuteConnectorOfProcess(transactionExecutor, processInstanceService, classLoaderService, connectorService, connectorInstanceService,
-                processDefinition, nextConnectorInstance, sConnectorDefinition, inputParameters, sProcessInstance, this, activationEvent, eventsHandler,
-                instanceBuilders, bpmInstancesCreator, bpmDefinitionBuilders, containerRegistry);
+            final ConnectorEvent activationEvent, final SConnectorInstance nextConnectorInstance, final SConnectorDefinition sConnectorDefinition,
+            final Map<String, Object> inputParameters) {
+        return new ExecuteConnectorOfProcess(processDefinition, nextConnectorInstance, sConnectorDefinition, inputParameters, sProcessInstance.getId(),
+                sProcessInstance.getRootProcessInstanceId(), activationEvent);
     }
 
     private void initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final SProcessDefinition sProcessDefinition,

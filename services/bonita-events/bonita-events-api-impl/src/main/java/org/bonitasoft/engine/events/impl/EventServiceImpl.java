@@ -54,7 +54,7 @@ public class EventServiceImpl implements EventService {
         return registeredHandlers;
     }
 
-    public EventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) throws HandlerRegistrationException {
+    public EventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) {
         super();
         this.eventBuilders = eventBuilders;
         this.logger = logger;
@@ -63,7 +63,7 @@ public class EventServiceImpl implements EventService {
 
     /**
      * Fire the given Event only to interested handlers
-     *
+     * 
      * @throws FireEventException
      */
     @Override

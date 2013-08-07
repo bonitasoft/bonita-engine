@@ -32,7 +32,6 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -46,7 +45,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -116,14 +114,14 @@ public class EvaluateExpressionTest extends CommonAPITest {
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        getProcessAPI().disableProcess(processDefinition.getId());
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        // Clean up
         deleteUser(user);
+        disableAndDeleteProcess(processDefinition);
         logout();
     }
 
     private static ProcessDefinitionBuilder createProcessDefinitionBuilderWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
+            final List<String> stepNames, final List<Boolean> isHuman) {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
         processBuilder.addActor("Actor1");
         ActivityDefinitionBuilder activityDefinitionBuilder = null;
@@ -155,12 +153,11 @@ public class EvaluateExpressionTest extends CommonAPITest {
     }
 
     private void cleanup(final long userId, final long processDefinitionId) throws BonitaException {
-        getProcessAPI().disableProcess(processDefinitionId);
-        getProcessAPI().deleteProcess(processDefinitionId);
         deleteUser(userId);
+        disableAndDeleteProcess(processDefinitionId);
     }
 
-    private Map<Expression, Map<String, Serializable>> createExpression(final Expression expression) throws InvalidExpressionException {
+    private Map<Expression, Map<String, Serializable>> createExpression(final Expression expression) {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
         expressions.put(expression, null);
         return expressions;

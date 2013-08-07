@@ -20,9 +20,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
@@ -85,8 +82,8 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     private final TechnicalLoggerService logger;
 
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-            final BPMInstanceBuilders instanceBuilders, final ProcessDefinitionService processDefinitionService,
-            final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger, final TokenService tokenService) {
+            final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger,
+            final TokenService tokenService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
@@ -158,8 +155,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         return tokenService.getNumberOfToken(gatewayInstance.getParentContainerId(), tokenRefId) <= size;
     }
 
-    private boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException {
+    private boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) {
         final List<String> hitsBy = getHitByTransitionList(gatewayInstance);
         final List<STransitionDefinition> trans = getTransitionDefinitions(gatewayInstance, sDefinition);
         boolean go = true;
@@ -179,8 +175,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         return Arrays.asList(gatewayInstance.getHitBys().split(","));
     }
 
-    protected List<STransitionDefinition> getTransitionDefinitions(final SGatewayInstance gatewayInstance, final SProcessDefinition processDefinition)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+    protected List<STransitionDefinition> getTransitionDefinitions(final SGatewayInstance gatewayInstance, final SProcessDefinition processDefinition) {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SGatewayDefinition gatewayDefinition = processContainer.getGateway(gatewayInstance.getName());
         return gatewayDefinition.getIncomingTransitions();

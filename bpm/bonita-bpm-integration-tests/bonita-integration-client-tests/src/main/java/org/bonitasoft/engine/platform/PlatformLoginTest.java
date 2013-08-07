@@ -1,12 +1,11 @@
 package org.bonitasoft.engine.platform;
 
+import static org.junit.Assert.fail;
+
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
@@ -22,8 +21,6 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.fail;
-
 public class PlatformLoginTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlatformLoginTest.class);
@@ -38,7 +35,7 @@ public class PlatformLoginTest {
         logAsPlatformAdmin();
     }
 
-    private static void logAsPlatformAdmin() throws PlatformLoginException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    private static void logAsPlatformAdmin() throws PlatformLoginException {
         session = platformLoginAPI.login("platformAdmin", "platform");
     }
 

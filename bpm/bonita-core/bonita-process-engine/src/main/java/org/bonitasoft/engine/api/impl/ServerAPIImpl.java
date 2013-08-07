@@ -39,7 +39,6 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -280,7 +279,7 @@ public class ServerAPIImpl implements ServerAPI {
         return parameterTypes;
     }
 
-    private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session) throws STenantNotFoundException, SSchedulerException {
+    private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session) throws SSchedulerException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
         if (!schedulerService.isStarted() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {

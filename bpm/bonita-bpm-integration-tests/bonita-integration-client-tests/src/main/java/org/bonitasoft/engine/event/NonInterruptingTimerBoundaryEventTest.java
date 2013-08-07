@@ -46,11 +46,11 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final WaitForStep exceptionFlowStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
+        final WaitForStep exceptionFlowStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
 
         // execute the task containing the boundary and verify that the normal flow continues
         assignAndExecuteStep(waitForStep1, getUser().getId());
-        final WaitForStep normalFlowStep = waitForStep(50, 2000, "step2", processInstance, TestStates.getReadyState(null));
+        final WaitForStep normalFlowStep = waitForStep(50, 2000, "step2", processInstance, TestStates.getReadyState());
 
         // execute exception flow step and normal flow step and verify that the process has finished
         assignAndExecuteStep(exceptionFlowStep.getResult(), getUser().getId());
@@ -174,7 +174,7 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
         Thread.sleep(timerDuration); // wait timer trigger
 
         // verify that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
 
         // execute multi-instance and verify that normal flow continues
         executeRemainingParallelMultiInstances(multiTaskName, processInstance, loopCardinality);

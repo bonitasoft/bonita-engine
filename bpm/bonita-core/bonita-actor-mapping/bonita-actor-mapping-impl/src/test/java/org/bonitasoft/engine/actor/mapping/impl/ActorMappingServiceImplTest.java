@@ -225,7 +225,7 @@ public class ActorMappingServiceImplTest {
         final List<SActorMember> actors = new ArrayList<SActorMember>();
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(actors);
 
-        Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembers(0, 1, "id", OrderByType.ASC));
+        Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembers(0, 1));
     }
 
     /**
