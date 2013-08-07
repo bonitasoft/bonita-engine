@@ -113,6 +113,9 @@ public class ServerAPIImpl implements ServerAPI {
             }
             throw new ServerWrappedException(ute);
         } catch (final Throwable cause) {
+            if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, cause);
+            }
             throw new ServerWrappedException(new BonitaRuntimeException(cause));
         } finally {
             if (cleanSession) {
