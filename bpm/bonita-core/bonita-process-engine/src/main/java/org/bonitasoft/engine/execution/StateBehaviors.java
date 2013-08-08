@@ -664,20 +664,21 @@ public class StateBehaviors {
         } while (childrenToEnd.size() == numberOfResults);
     }
 
-    public void executeConnectorInWork(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+    public void executeConnectorInWork(final Long processDefinitionId, final SFlowNodeInstance flowNodeInstance,
             final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition) throws SActivityStateExecutionException {
         // TODO this work should be triggered by with the id of the user logged in?
-
+        final long connectorInstanceId = connector.getId();
         final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                processDefinition.getId());
+                processDefinitionId);
         ExecuteConnectorWork work = null;
+
         try {
             Map<String, Object> inputParameters = null;
             inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), sExpressionContext, null);
-            work = buildWorkToExecuteConnector(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters);
+            work = buildWorkToExecuteConnector(processDefinitionId, flowNodeInstance, connectorInstanceId, sConnectorDefinition, inputParameters);
 
         } catch (final SBonitaException sbe) {
-            work = buildWorkToSetConnectorFailed(processDefinition, flowNodeInstance, connector, sConnectorDefinition, sbe);
+            work = buildWorkToSetConnectorFailed(processDefinitionId, flowNodeInstance, connectorInstanceId, sConnectorDefinition, sbe);
 
         } finally {
             try {
@@ -688,14 +689,15 @@ public class StateBehaviors {
         }
     }
 
-    private ExecuteConnectorOfActivity buildWorkToExecuteConnector(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
-            final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
-        return new ExecuteConnectorOfActivity(processDefinition, flowNodeInstance, connector, sConnectorDefinition, inputParameters);
+    private ExecuteConnectorOfActivity buildWorkToExecuteConnector(final Long processDefinitionId, final SFlowNodeInstance flowNodeInstance,
+            final long connectorInstanceId, final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
+        return new ExecuteConnectorOfActivity(processDefinitionId, flowNodeInstance, connectorInstanceId, sConnectorDefinition, inputParameters);
     }
 
-    private ExecuteConnectorOfActivity buildWorkToSetConnectorFailed(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
-            final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition, SBonitaException sbe) {
-        final ExecuteConnectorOfActivity work = buildWorkToExecuteConnector(processDefinition, flowNodeInstance, connector, sConnectorDefinition, null);
+    private ExecuteConnectorOfActivity buildWorkToSetConnectorFailed(final Long processDefinitionId, final SFlowNodeInstance flowNodeInstance,
+            final long connectorInstanceId, final SConnectorDefinition sConnectorDefinition, SBonitaException sbe) {
+        final ExecuteConnectorOfActivity work = buildWorkToExecuteConnector(processDefinitionId, flowNodeInstance, connectorInstanceId, sConnectorDefinition,
+                null);
         work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
         return work;
     }
@@ -729,7 +731,7 @@ public class StateBehaviors {
                         }
 
                         for (final SBoundaryEventDefinition boundaryEventDefinition : boundaryEventDefinitions) {
-                            final SFlowNodeInstance boundaryEventInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinition,
+                            final SFlowNodeInstance boundaryEventInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                                     rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                                     rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId(),
                                     activityInstance.getTokenRefId());

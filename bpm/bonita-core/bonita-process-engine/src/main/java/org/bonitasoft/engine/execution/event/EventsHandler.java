@@ -241,31 +241,30 @@ public class EventsHandler {
         messageEventHandlerStrategy.handleThrowEvent(processDefinition, sendTaskInstance, eventTrigger);
     }
 
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition eventDefinition,
-            final SThrowEventInstance eventInstance, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
-
+    public boolean handlePostThrowEvent(final SProcessDefinition sProcessDefinition, final SEndEventDefinition sEndEventDefinition,
+            final SThrowEventInstance sThrowEventInstance, final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
         boolean hasActionsToExecute = false;
-        if (eventDefinition == null) {
+        if (sEndEventDefinition == null) {
             /*
              * If the eventDefinition is not set that mean that the event was
              * triggered by a connector and that it's an error event
              * ...yep that's a lot of assumptions
              */
-            final String errorCode = eventInstance.getName();
+            final String errorCode = sThrowEventInstance.getName();
 
             final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders
                     .getThrowErrorEventTriggerDefinitionBuilder();
             final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(errorCode).done();
-            hasActionsToExecute = handlers.get(SEventTriggerType.ERROR).handlePostThrowEvent(processDefinition, null, eventInstance,
-                    errorEventTriggerDefinition, flowNodeInstance);
+            hasActionsToExecute = handlers.get(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, null, sThrowEventInstance,
+                    errorEventTriggerDefinition, sFlowNodeInstance);
         } else {
-            final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
+            final List<SEventTriggerDefinition> eventTriggers = sEndEventDefinition.getEventTriggers();
             for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
                 final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
                 if (eventHandlerStrategy != null) {
                     hasActionsToExecute = hasActionsToExecute
-                            || eventHandlerStrategy.handlePostThrowEvent(processDefinition, eventDefinition, eventInstance, sEventTriggerDefinition,
-                                    flowNodeInstance);
+                            || eventHandlerStrategy.handlePostThrowEvent(sProcessDefinition, sEndEventDefinition, sThrowEventInstance, sEventTriggerDefinition,
+                                    sFlowNodeInstance);
                 }
             }
         }
@@ -361,9 +360,9 @@ public class EventsHandler {
             final Boolean isInterrupting) throws SBonitaException {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(subProcessId);
-        final SFlowNodeInstance subProcflowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinition, rootProcessInstanceId,
+        final SFlowNodeInstance subProcflowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, rootProcessInstanceId,
                 parentProcessInstanceId, SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0,
-                SStateCategory.NORMAL, -1, processDefinition.getId());
+                SStateCategory.NORMAL, -1, processDefinitionId);
         // FIXME: the token count will be inconsistent if a ProcessExecutor.childReachedState is called at same time.
         final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
         tokenService.createToken(parentProcessInstanceId, parentProcessInstance.getProcessDefinitionId(), null);

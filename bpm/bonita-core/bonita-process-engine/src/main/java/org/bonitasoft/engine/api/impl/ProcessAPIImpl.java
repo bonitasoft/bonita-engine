@@ -3405,18 +3405,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void setActivityStateById(final long activityInstanceId, final int stateId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         try {
             final GetActivityInstance getActivityInstance = new GetActivityInstance(activityInstanceService, activityInstanceId);
             getActivityInstance.execute();
             final SActivityInstance activityInstance = getActivityInstance.getResult();
-            final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(activityInstance.getLogicalGroup(0), processDefinitionService);
-            getProcessDefinition.execute();
             // set state
-            flowNodeExecutor.setStateByStateId(getProcessDefinition.getResult(), activityInstance.getId(), stateId);
+            flowNodeExecutor.setStateByStateId(activityInstance.getLogicalGroup(0), activityInstance.getId(), stateId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
@@ -4782,32 +4778,25 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void retryTask(final long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SAutomaticTaskInstanceBuilder keyProvider = tenantAccessor.getBPMInstanceBuilders().getSAutomaticTaskInstanceBuilder();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        int stateId = -1;
-        FlowNodeState state = null;
-        final SFlowNodeInstance activity;
-        final FlowNodeState flowNodeState;
-        final SProcessDefinition processDefinition;
+
         try {
-            activity = activityInstanceService.getFlowNodeInstance(activityInstanceId);
-            processDefinition = processDefinitionService.getProcessDefinition(activity.getLogicalGroup(keyProvider.getProcessDefinitionIndex()));
-            flowNodeState = flowNodeStateManager.getState(activity.getStateId());
-            stateId = activity.getPreviousStateId();
-            state = flowNodeStateManager.getState(stateId);
-        } catch (final SBonitaException e) {
-            throw new ActivityExecutionException(e);
-        }
-        if (!ActivityStates.FAILED_STATE.equals(flowNodeState.getName())) {
-            throw new ActivityExecutionException("Unable to retry a task that is not failed - task name=" + activity.getName() + " id=" + activityInstanceId
-                    + " that was in state " + flowNodeState);
-        }
-        try {
-            flowNodeExecutor.setStateByStateId(processDefinition, activity.getId(), stateId);
+            final SFlowNodeInstance activity = activityInstanceService.getFlowNodeInstance(activityInstanceId);
+            final long processDefinitionId = activity.getLogicalGroup(keyProvider.getProcessDefinitionIndex());
+            final FlowNodeState flowNodeState = flowNodeStateManager.getState(activity.getStateId());
+            final int stateId = activity.getPreviousStateId();
+            final FlowNodeState state = flowNodeStateManager.getState(stateId);
+
+            if (!ActivityStates.FAILED_STATE.equals(flowNodeState.getName())) {
+                throw new ActivityExecutionException("Unable to retry a task that is not failed - task name=" + activity.getName() + " id="
+                        + activityInstanceId
+                        + " that was in state " + flowNodeState);
+            }
+
+            flowNodeExecutor.setStateByStateId(processDefinitionId, activity.getId(), stateId);
             // execute the flow node only if it is not the final state
             if (!state.isTerminal()) {
                 final long userIdFromSession = getUserIdFromSession();

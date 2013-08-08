@@ -151,22 +151,22 @@ public class BPMInstancesCreator {
         this.logger = logger;
     }
 
-    public List<SFlowNodeInstance> createFlowNodeInstances(final SProcessDefinition sProcessDefinition, final long rootContainerId,
+    public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId,
             final long parentContainerId, final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId,
             final long parentProcessInstanceId, final SStateCategory stateCategory, final Long tokenRefId) throws SBonitaException {
         final List<SFlowNodeInstance> flownNodeInstances = new ArrayList<SFlowNodeInstance>(flowNodeDefinitions.size());
         for (final SFlowNodeDefinition sFlowNodeDefinition : flowNodeDefinitions) {
-            flownNodeInstances.add(createFlowNodeInstance(sProcessDefinition, rootContainerId, parentContainerId, SFlowElementsContainerType.PROCESS,
+            flownNodeInstances.add(createFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, SFlowElementsContainerType.PROCESS,
                     sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, -1, stateCategory, -1, tokenRefId));
         }
         return flownNodeInstances;
     }
 
-    public SFlowNodeInstance createFlowNodeInstance(final SProcessDefinition sProcessDefinition, final long rootContainerId, final long parentContainerId,
+    public SFlowNodeInstance createFlowNodeInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
             final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
             final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
             final long relatedActivityInstanceId, final Long tokenRefId) throws SBonitaException {
-        final SFlowNodeInstance flownNodeInstance = toFlowNodeInstance(sProcessDefinition.getId(), rootContainerId, parentContainerId, parentContainerType,
+        final SFlowNodeInstance flownNodeInstance = toFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, parentContainerType,
                 sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, createInnerActivity, loopCounter, stateCategory,
                 relatedActivityInstanceId, tokenRefId);
         if (SFlowNodeType.GATEWAY.equals(flownNodeInstance.getType())) {

@@ -122,9 +122,17 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     ServicesAccessor accessor;
 
+    Long tenantId;
+
     public BPMServicesBuilder() {
         super();
         accessor = ServicesAccessor.getInstance();
+    }
+
+    public BPMServicesBuilder(final Long tenantId) {
+        super();
+        accessor = ServicesAccessor.getInstance();
+        this.tenantId = tenantId;
     }
 
     @Override

@@ -25,11 +25,11 @@ import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
+import org.bonitasoft.engine.execution.transaction.GetConnectorInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -44,9 +44,9 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
     private static final long serialVersionUID = 9031279948838300081L;
 
-    protected final SProcessDefinition processDefinition;
+    protected final long processDefinitionId;
 
-    protected final SConnectorInstance connector;
+    protected final long connectorInstanceId;
 
     protected final SConnectorDefinition sConnectorDefinition;
 
@@ -54,17 +54,17 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
     private SBonitaException errorThrownWhenEvaluationOfInputParameters;
 
-    public ExecuteConnectorWork(final SProcessDefinition processDefinition, final SConnectorInstance connector,
-            final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
+    public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final SConnectorDefinition sConnectorDefinition,
+            final Map<String, Object> inputParameters) {
         super();
-        this.processDefinition = processDefinition;
-        this.connector = connector;
+        this.processDefinitionId = processDefinitionId;
+        this.connectorInstanceId = connectorInstanceId;
         this.sConnectorDefinition = sConnectorDefinition;
         this.inputParameters = inputParameters;
     }
 
     protected ClassLoader getClassLoader() throws SBonitaException {
-        return getTenantAccessor().getClassLoaderService().getLocalClassLoader("process", processDefinition.getId());
+        return getTenantAccessor().getClassLoaderService().getLocalClassLoader("process", processDefinitionId);
     }
 
     protected abstract void errorEventOnFail() throws SBonitaException;
@@ -78,7 +78,7 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
     protected void setConnectorOnlyToFailed() throws SBonitaException {
         final ConnectorInstanceService connectorInstanceService = getTenantAccessor().getConnectorInstanceService();
-        final SConnectorInstance intTxConnectorInstance = connectorInstanceService.getConnectorInstance(connector.getId());
+        final SConnectorInstance intTxConnectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
         connectorInstanceService.setState(intTxConnectorInstance, ConnectorService.FAILED);
     }
 
@@ -92,9 +92,9 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
 
         final List<SOperation> outputs = sConnectorDefinition.getOutputs();
-        final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinition.getId());
+        final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinitionId);
         connectorService.executeOutputOperation(outputs, sExpressionContext, result);
-        connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connector.getId()), ConnectorService.DONE);
+        connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connectorInstanceId), ConnectorService.DONE);
     }
 
     public void setErrorThrownWhenEvaluationOfInputParameters(final SBonitaException errorThrownWhenEvaluationOfInputParameters) {
@@ -115,6 +115,7 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
     protected void work() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
 
         final ClassLoader processClassloader = getClassLoader();
@@ -127,7 +128,11 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
                 transactionExecutor.execute(handleError);
             } else {
                 try {
-                    final ConnectorResult result = connectorService.executeConnector(processDefinition.getId(), connector, processClassloader, inputParameters);
+                    final GetConnectorInstance getConnectorInstance = new GetConnectorInstance(connectorInstanceService, connectorInstanceId);
+                    transactionExecutor.execute(getConnectorInstance);
+                    final SConnectorInstance connectorInstance = getConnectorInstance.getResult();
+                    final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
+                            inputParameters);
                     transactionExecutor.execute(new EvaluateConnectorOutputsTxContent(result));
                 } catch (final SBonitaException e) {
                     handleError = new HandleConnectorOnFailEventTxContent(e);

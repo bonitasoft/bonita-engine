@@ -53,39 +53,37 @@ public interface FlowNodeExecutor extends ContainerExecutor {
 
     /**
      * 
-     * @param processDefinition
+     * @param sProcessDefinitionId
      * @param flowNodeInstanceId
      * @param stateId
      * @throws SActivityStateExecutionException
      * @since 6.1
      */
-    void setStateByStateId(SProcessDefinition processDefinition, long flowNodeInstanceId, int stateId) throws SActivityStateExecutionException;
+    void setStateByStateId(long sProcessDefinitionId, long flowNodeInstanceId, int stateId) throws SActivityStateExecutionException;
 
     /**
      * 
-     * @param childProcDef
      * @param childProcInst
      * @param childState
-     * @param hasActionToExecute
+     * @param hasActionsToExecute
      * @throws SBonitaException
-     * @since 6.0
+     * @since 6.1
      */
-    void childReachedState(SProcessDefinition childProcDef, SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionToExecute)
-            throws SBonitaException;
+    void childReachedState(SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionsToExecute) throws SBonitaException;
 
     /**
      * Archive the flownode instance given as parameter. Also archive all related object that needs to be archived as well.
      * 
      * @param flowNodeInstance
-     *            the flow node instance to be archived.
+     *            The flow node instance to be archived.
      * @param deleteAfterArchive
-     * @param processDefinition
-     *            the process definition
+     * @param processDefinitionId
+     *            the identifier of process definition
      * @throws SActivityExecutionException
      *             in case an error occurs
+     * @since 6.1
      */
-    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive, SProcessDefinition processDefinition)
-            throws SActivityExecutionException;
+    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive, long processDefinitionId) throws SActivityExecutionException;
 
     /**
      * @param processDefinition
@@ -107,12 +105,11 @@ public interface FlowNodeExecutor extends ContainerExecutor {
     /**
      * 
      * @param fFlowNodeInstance
-     * @param processDefinition
+     * @param processDefinitionId
      * @param sbe
      * @throws SFlowNodeExecutionException
-     * @since 6.0
+     * @since 6.1
      */
-    void setFlowNodeFailedInTransaction(SFlowNodeInstance fFlowNodeInstance, SProcessDefinition processDefinition, SBonitaException sbe)
-            throws SFlowNodeExecutionException;
+    void setFlowNodeFailedInTransaction(SFlowNodeInstance fFlowNodeInstance, long processDefinitionId, SBonitaException sbe) throws SFlowNodeExecutionException;
 
 }
