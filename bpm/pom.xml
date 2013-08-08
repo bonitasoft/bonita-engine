@@ -13,44 +13,102 @@
 
 	<name>Bonita BPM modules</name>
 
-	<modules>
-		<module>bonita-core</module>
-		<module>bonita-api</module>
-		<module>bonita-common</module>
-		<module>bonita-client</module>
-		<module>bonita-server</module>
-		<module>bonita-home</module>
-		<module>bonita-deploy</module>
-		<module>bonita-connector-service</module>
-		<module>bonita-expression-resolver</module>
-		<module>bonita-external</module>
-		<module>bonita-util</module>
-	</modules>
-
 	<profiles>
+		<profile>
+			<id>deploy</id>
+			<modules>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>all</id>
+			<modules>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+				<module>bonita-home</module>
+				<module>bonita-deploy</module>
+				<module>bonita-connector-service</module>
+				<module>bonita-expression-resolver</module>
+				<module>bonita-external</module>
+				<module>bonita-util</module>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>fast</id>
+			<modules>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+				<module>bonita-home</module>
+				<module>bonita-deploy</module>
+				<module>bonita-connector-service</module>
+				<module>bonita-expression-resolver</module>
+				<module>bonita-external</module>
+				<module>bonita-util</module>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>package</id>
+			<modules>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+				<module>bonita-home</module>
+				<module>bonita-deploy</module>
+				<module>bonita-connector-service</module>
+				<module>bonita-expression-resolver</module>
+				<module>bonita-external</module>
+				<module>bonita-util</module>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>package-all</id>
+			<modules>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+				<module>bonita-home</module>
+				<module>bonita-deploy</module>
+				<module>bonita-connector-service</module>
+				<module>bonita-expression-resolver</module>
+				<module>bonita-external</module>
+				<module>bonita-util</module>
+				<module>bonita-bpm-integration-tests</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>tests</id>
 			<properties>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 			<modules>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+				<module>bonita-home</module>
+				<module>bonita-deploy</module>
+				<module>bonita-connector-service</module>
+				<module>bonita-expression-resolver</module>
+				<module>bonita-external</module>
+				<module>bonita-util</module>
 				<module>bonita-bpm-integration-tests</module>
 			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		<profile>
 			<id>sonar</id>
@@ -58,36 +116,17 @@
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 			<modules>
-				<module>bonita-bpm-integration-tests</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>all</id>
-			<properties>
-				<maven.javadoc.skip>false</maven.javadoc.skip>
-			</properties>
-			<modules>
-				<module>bonita-bpm-integration-tests</module>
-			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>package-all</id>
-			<modules>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
+				<module>bonita-common</module>
+				<module>bonita-client</module>
+				<module>bonita-server</module>
+				<module>bonita-home</module>
+				<module>bonita-deploy</module>
+				<module>bonita-connector-service</module>
+				<module>bonita-expression-resolver</module>
+				<module>bonita-external</module>
+				<module>bonita-util</module>
 				<module>bonita-bpm-integration-tests</module>
 			</modules>
 		</profile>
