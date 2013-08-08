@@ -8,26 +8,17 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
-import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
-import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.transaction.SBadTransactionStateException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -94,7 +85,7 @@ public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void startMbeanAccessibility() throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanStartException {
+    public void startMbeanAccessibility() throws NullPointerException, MBeanStartException {
         assertFalse(mbserver.isRegistered(serviceMB));
         assertFalse(mbserver.isRegistered(jvmMB));
 
@@ -117,18 +108,18 @@ public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void testGetCurrentMemoryUsage() throws SBonitaException {
+    public void testGetCurrentMemoryUsage() {
         assertTrue(monitoringService.getCurrentMemoryUsage() > 0);
     }
 
     @Test
-    public void testGetMemoryUsagePercentage() throws SBonitaException {
+    public void testGetMemoryUsagePercentage() {
         assertTrue(monitoringService.getMemoryUsagePercentage() >= 0);
         assertTrue(monitoringService.getMemoryUsagePercentage() <= 100);
     }
 
     @Test
-    public void testGetSystemLoadAverage() throws SBonitaException {
+    public void testGetSystemLoadAverage() {
         final double result = monitoringService.getSystemLoadAverage();
 
         if (result < 0) {
@@ -139,17 +130,17 @@ public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void testGetUpTime() throws SBonitaException {
+    public void testGetUpTime() {
         assertTrue(monitoringService.getUpTime() > 0);
     }
 
     @Test
-    public void testGetStartTime() throws SBonitaException {
+    public void testGetStartTime() {
         assertTrue(monitoringService.getStartTime() <= System.currentTimeMillis());
     }
 
     @Test
-    public void testGetTotalThreadsCpuTime() throws SBonitaException {
+    public void testGetTotalThreadsCpuTime() {
         assertTrue(monitoringService.getTotalThreadsCpuTime() > 0);
         final long result = monitoringService.getTotalThreadsCpuTime();
 
@@ -160,55 +151,54 @@ public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void testGetThreadCount() throws SBonitaException {
+    public void testGetThreadCount() {
         assertTrue(monitoringService.getThreadCount() > 0);
     }
 
     @Test
-    public void testGetAvailableProcessors() throws SBonitaException {
+    public void testGetAvailableProcessors() {
         assertTrue(monitoringService.getAvailableProcessors() > 0);
     }
 
     @Test
-    public void testGetOSArch() throws SBonitaException {
+    public void testGetOSArch() {
         assertNotNull(monitoringService.getOSArch());
     }
 
     @Test
-    public void testGetOSName() throws SBonitaException {
+    public void testGetOSName() {
         assertNotNull(monitoringService.getOSName());
     }
 
     @Test
-    public void testGetOSVersion() throws SBonitaException {
+    public void testGetOSVersion() {
         assertNotNull(monitoringService.getOSVersion());
     }
 
     @Test
-    public void testGetJvmName() throws SBonitaException {
+    public void testGetJvmName() {
         assertNotNull(monitoringService.getJvmName());
     }
 
     @Test
-    public void testGetJvmVendor() throws SBonitaException {
+    public void testGetJvmVendor() {
         assertNotNull(monitoringService.getJvmVendor());
     }
 
     @Test
-    public void testGetJvmVersion() throws SBonitaException {
+    public void testGetJvmVersion() {
         assertNotNull(monitoringService.getJvmVersion());
     }
 
     @Test
-    public void testGetJvmSystemProperties() throws SBonitaException {
+    public void testGetJvmSystemProperties() {
         final Map<String, String> systemProperties = monitoringService.getJvmSystemProperties();
         assertNotNull(systemProperties);
     }
 
     @Test
-    public void isSchedulerStartedTest() throws HandlerUnregistrationException, MBeanStopException, STransactionCreationException, SIdentityException,
-            HandlerRegistrationException, SBadTransactionStateException, FireEventException, STransactionCommitException, MBeanStartException,
-            SSchedulerException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, STransactionRollbackException {
+    public void isSchedulerStartedTest() throws STransactionCreationException, SSchedulerException, FireEventException, STransactionCommitException,
+            STransactionRollbackException {
         getTransactionService().begin();
         assertFalse(monitoringService.isSchedulerStarted());
 

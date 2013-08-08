@@ -37,7 +37,6 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -52,7 +51,7 @@ import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
  * 
  * @author Celine Souchet
  */
-public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl implements FlowNodeStateManager {
+public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
 
     private final BreakpointService breakpointService;
 
@@ -65,13 +64,11 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl implements
             final ArchiveService archiveService, final TechnicalLoggerService logger, final DocumentMappingService documentMappingService,
             final SCommentService commentService, final SACommentBuilder saCommentBuilder, final BreakpointService breakpointService,
             final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService,
-            final WorkService workService, TokenService tokenService) {
+            final ActorMappingService actorMappingService, final WorkService workService, TokenService tokenService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, sDataInstanceBuilders, instanceBuilders,
                 operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService, saCommentBuilder,
-                lockService, eventsHandler, userFilterService, actorMappingService, workService,
-                tokenService);
+                lockService, eventsHandler, userFilterService, actorMappingService, workService, tokenService);
         this.breakpointService = breakpointService;
     }
 

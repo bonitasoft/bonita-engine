@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaException;
@@ -41,7 +40,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.")
     @Test
-    public void defaultProfileCreation() throws BonitaException, IOException {
+    public void defaultProfileCreation() throws BonitaException {
         Profile getProfileResult = getProfileAPI().getProfile(adminProfileId);
         assertEquals("Administrator", getProfileResult.getName());
 
@@ -63,7 +62,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Create", "Delete", "Profile", "Custom" }, story = "Create and delete custom profile.", jira = "ENGINE-1532")
     @Test
-    public void createAndDeleteCustomProfile() throws BonitaException, IOException {
+    public void createAndDeleteCustomProfile() throws BonitaException {
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "iconPath");
 
         final Profile getProfileResult = getProfileAPI().getProfile(createdProfile.getId());
@@ -84,7 +83,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Create", "Profile", "Custom" }, story = "Create custom profile from an other profile.", jira = "ENGINE-1532")
     @Test
-    public void createCustomProfileFromOtherProfile() throws BonitaException, IOException {
+    public void createCustomProfileFromOtherProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
         final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
@@ -115,7 +114,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Can't", "Delete", "Default", "Profile" }, story = "Can't delete default profile.", jira = "ENGINE-1532")
     @Test(expected = DeletionException.class)
-    public void cantDeleteDefaultProfile() throws BonitaException, IOException {
+    public void cantDeleteDefaultProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
         final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();
@@ -133,7 +132,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile.", jira = "ENGINE-1532")
     @Test
-    public void updateCustomProfile() throws BonitaException, IOException {
+    public void updateCustomProfile() throws BonitaException {
         final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
 
         // Update custom profile
@@ -160,7 +159,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Can't", "Update", "Default", "Profile" }, story = "Can't update default profile.", jira = "ENGINE-1532")
     @Test(expected = UpdateException.class)
-    public void cantUpdateDefaultProfile() throws BonitaException, IOException {
+    public void cantUpdateDefaultProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileSearchDescriptor.NAME, "Administrator");
         final List<Profile> profiles = getProfileAPI().searchProfiles(builder.done()).getResult();

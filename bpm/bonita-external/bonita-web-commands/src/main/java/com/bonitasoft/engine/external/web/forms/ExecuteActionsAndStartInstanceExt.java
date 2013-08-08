@@ -37,7 +37,6 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperationExecutionException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -111,8 +110,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
             final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws ProcessDefinitionNotFoundException,
-            CreationException,
-            RetrieveException, ProcessDefinitionNotEnabledException, OperationExecutionException {
+            CreationException, RetrieveException, ProcessDefinitionNotEnabledException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();

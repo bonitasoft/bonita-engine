@@ -331,7 +331,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final File[] fileContents = new File(reportFolder).listFiles(new FilenameFilter() {
 
             @Override
-            public boolean accept(@SuppressWarnings("unused") final File dir, final String name) {
+            public boolean accept(final File dir, final String name) {
                 return name.startsWith(reportName + "-content");
             }
         });
@@ -357,7 +357,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final File[] filescreenshots = new File(reportFolder).listFiles(new FilenameFilter() {
 
             @Override
-            public boolean accept(@SuppressWarnings("unused") final File dir, final String name) {
+            public boolean accept(final File dir, final String name) {
                 return name.startsWith(reportName + "-screenshot");
             }
         });

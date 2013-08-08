@@ -22,6 +22,8 @@ import java.util.Map;
  */
 public class ReportCreator implements Serializable {
 
+    private static final long serialVersionUID = -6244698895635243428L;
+
     public enum ReportField {
         NAME, DESCRIPTION, SCREENSHOT// , PROVIDED;
     }

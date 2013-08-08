@@ -59,7 +59,6 @@ public class DeleteBatchJobRegister implements JobRegister {
         this.loggerService = loggerService;
         this.repeat = repeat;
         DeleteBatchJob.setPersistenceService(persistenceService);
-        DeleteBatchJob.setTransactionService(transactionService);
         DeleteBatchJob.setClassesToPurge(classesToPurge);
         mustStartJob = true;
         INSTANCE = this;

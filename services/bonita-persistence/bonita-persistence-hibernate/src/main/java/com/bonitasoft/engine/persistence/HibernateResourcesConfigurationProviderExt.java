@@ -10,7 +10,6 @@ package com.bonitasoft.engine.persistence;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl;
 
 /**
@@ -20,7 +19,7 @@ public class HibernateResourcesConfigurationProviderExt extends HibernateResourc
 
     protected final Map<String, String> cacheConcurrencyStrategies;
 
-    public HibernateResourcesConfigurationProviderExt(final Map<String, String> cacheConcurrencyStrategies) throws SPersistenceException {
+    public HibernateResourcesConfigurationProviderExt(final Map<String, String> cacheConcurrencyStrategies) {
         super();
         this.cacheConcurrencyStrategies = cacheConcurrencyStrategies;
     }

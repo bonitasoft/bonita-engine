@@ -28,7 +28,6 @@ import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnableToReadBonitaClientConfiguration;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -94,7 +93,7 @@ public class ClusterTests extends CommonAPISPTest {
         LOGGER.info("changed to " + port);
     }
 
-    private void changeApis() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, UnableToReadBonitaClientConfiguration {
+    private void changeApis() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));

@@ -46,7 +46,6 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
-import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutorImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
@@ -73,7 +72,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  * @author Hongwen Zang
  * @author Celine Souchet
  */
-public class ProcessExecutorExt extends ProcessExecutorImpl implements ProcessExecutor {
+public class ProcessExecutorExt extends ProcessExecutorImpl {
 
     protected final BPMInstanceBuilders instanceBuilders;
 
