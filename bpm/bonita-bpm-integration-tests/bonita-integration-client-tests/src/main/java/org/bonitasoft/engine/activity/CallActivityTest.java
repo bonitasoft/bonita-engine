@@ -46,6 +46,7 @@ import org.bonitasoft.engine.bpm.process.impl.EndEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -606,11 +607,9 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
-    @Test
+    @Test(expected = DeletionException.class)
     public void deleteProcessDefinitionWithProcessInstanceThatIsCalledByCallActivity() throws Exception {
-
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
@@ -623,12 +622,9 @@ public class CallActivityTest extends CommonAPITest {
         try {
             deleteProcess(targetProcessDef1);
             fail("Should not be able to delete process instance that is called by an other process");
-        } catch (final ProcessInstanceHierarchicalDeletionException e) {
-            getProcessAPI().deleteProcessInstance(e.getProcessInstanceId());
-            // should work now
-            deleteProcess(targetProcessDef1);
         } finally {
             disableAndDeleteProcess(callingProcessDef);
+            deleteProcess(targetProcessDef1);
         }
 
     }
