@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.util.List;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -79,6 +80,18 @@ public class ProfileTest extends AbstractProfileTest {
 
         profileCount = getProfileAPI().searchProfiles(builder.done()).getCount();
         assertEquals(Long.valueOf(4), profileCount);
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void cantCreate2CustomProfilesWithSameName() throws Exception {
+        final ProfileCreator creator = new ProfileCreator("aProfile");
+        final Profile profile = getProfileAPI().createProfile(creator);
+        try {
+            getProfileAPI().createProfile(creator);
+        } finally {
+            // Clean up
+            getProfileAPI().deleteProfile(profile.getId());
+        }
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Create", "Profile", "Custom" }, story = "Create custom profile from an other profile.", jira = "ENGINE-1532")
