@@ -45,7 +45,6 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
@@ -86,7 +85,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private String applicationName = null;
 
-    public HTTPServerAPI(final Map<String, String> parameters) throws ServerAPIException {
+    public HTTPServerAPI(final Map<String, String> parameters) {
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
     }

@@ -17,7 +17,6 @@ package org.bonitasoft.engine.test.annotation;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -119,7 +118,7 @@ public class CustomListener extends RunListener {
         System.out.println("Cover annotation report generated at : " + path + "/" + REPORT_FULL_NAME);
     }
 
-    private void finishXML() throws XMLStreamException, IOException {
+    private void finishXML() throws XMLStreamException {
         writer.writeEndElement();
         writer.writeEndDocument();
         writer.flush();

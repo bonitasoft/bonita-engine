@@ -17,6 +17,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilders;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -57,6 +58,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -87,15 +89,16 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Hongwen Zang
+ * @author Celine Souchet
  */
 public interface TenantServiceAccessor extends ServiceAccessor {
 
     long getTenantId();
 
     SessionService getSessionService();
-    
+
     ReadSessionAccessor getReadSessionAccessor();
-    
+
     IdentityModelBuilder getIdentityModelBuilder();
 
     IdentityService getIdentityService();
@@ -125,6 +128,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     BPMDefinitionBuilders getBPMDefinitionBuilders();
 
     BPMInstanceBuilders getBPMInstanceBuilders();
+
+    BPMInstancesCreator getBPMInstancesCreator();
 
     FlowNodeExecutor getFlowNodeExecutor();
 
@@ -231,5 +236,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DefaultCommandProvider getDefaultCommandProvider();
 
     WorkService getWorkService();
+
+    TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor();
 
 }

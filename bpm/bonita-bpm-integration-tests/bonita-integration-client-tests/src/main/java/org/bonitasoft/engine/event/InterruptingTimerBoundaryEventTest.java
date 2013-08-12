@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -23,10 +27,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
 
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
@@ -43,7 +43,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         Thread.sleep(timerDuration); // wait timer trigger
 
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -103,7 +103,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, exceptionFlowTaskName, processInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, exceptionFlowTaskName, processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -139,7 +139,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -174,7 +174,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final WaitForStep waitForStep1 = waitForStep(50, 2000, "step1", processInstance);
         Thread.sleep(timerDuration); // wait timer trigger
 
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -244,7 +244,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         // Wait timer trigger
         Thread.sleep(timerDuration);
-        final WaitForStep waitForExceptionStep = waitForStep(100, 500, "exceptionStep", processInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForExceptionStep = waitForStep(100, 500, "exceptionStep", processInstance, TestStates.getReadyState());
         // Check that step1 is aborted
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());

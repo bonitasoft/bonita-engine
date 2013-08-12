@@ -16,7 +16,6 @@ package org.bonitasoft.engine.execution;
 import java.io.IOException;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -32,7 +31,7 @@ public class SetFlowNodeInFailedThread extends AbstractSetInFailedThread {
     // local parameters
     private final long flowNodeInstanceId;
 
-    private final SProcessDefinition processDefinition;
+    private final long processDefinitionId;
 
     private final FlowNodeExecutor flowNodeExecutor;
 
@@ -41,12 +40,12 @@ public class SetFlowNodeInFailedThread extends AbstractSetInFailedThread {
 
     private String flowNodeInstanceName;
 
-    public SetFlowNodeInFailedThread(final long flowNodeInstanceId, final SProcessDefinition processDefinition, final FlowNodeExecutor flowNodeExecutor)
+    public SetFlowNodeInFailedThread(final long flowNodeInstanceId, final long processDefinitionId, final FlowNodeExecutor flowNodeExecutor)
             throws TenantIdNotSetException, BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException {
         super();
         this.flowNodeInstanceId = flowNodeInstanceId;
-        this.processDefinition = processDefinition;
+        this.processDefinitionId = processDefinitionId;
         this.flowNodeExecutor = flowNodeExecutor;
     }
 
@@ -58,7 +57,7 @@ public class SetFlowNodeInFailedThread extends AbstractSetInFailedThread {
         final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         parentFlowNodeInstanceId = flowNodeInstance.getParentProcessInstanceId();
         flowNodeInstanceName = flowNodeInstance.getName();
-        flowNodeExecutor.archiveFlowNodeInstance(flowNodeInstance, false, processDefinition);
+        flowNodeExecutor.archiveFlowNodeInstance(flowNodeInstance, false, processDefinitionId);
         activityInstanceService.setState(flowNodeInstance, flowNodeStateManager.getFailedState());
     }
 

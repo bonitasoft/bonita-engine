@@ -19,7 +19,6 @@ import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
-import org.bonitasoft.engine.sequence.exceptions.SequenceManagerException;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
@@ -31,9 +30,9 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
  */
 public class PlatformHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
-    public PlatformHibernatePersistenceService(  final String name,  final HibernateConfigurationProvider hbmConfigurationProvider,
-            final DBConfigurationsProvider dbConfigurationsProvider,  final String statementDelimiter,  final String likeEscapeCharacter,
-            final TechnicalLoggerService logger,  final SequenceManager sequenceManager,  final DataSource datasource) throws SPersistenceException, SequenceManagerException {
+    public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
+            final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource) throws SPersistenceException {
         super(name, hbmConfigurationProvider, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource);
     }
 

@@ -32,7 +32,6 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -1090,8 +1089,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         deleteUser(user);
     }
 
-    private ProcessDefinitionBuilder createProcessDefinition(final String processName, final String delivery, final boolean withUserTask)
-            throws InvalidExpressionException {
+    private ProcessDefinitionBuilder createProcessDefinition(final String processName, final String delivery, final boolean withUserTask) {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(processName, "17.3");
         designProcessDefinition.addDescription("Delivery all day and night long");
         if (withUserTask) {
@@ -1231,7 +1229,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         assertEquals(TestStates.getAbortedState(), processes.get(1).getState());
         // completed
         assertEquals(simpleProcess.getName(), processes.get(2).getName());
-        assertEquals(TestStates.getNormalFinalState(null), processes.get(2).getState());
+        assertEquals(TestStates.getNormalFinalState(), processes.get(2).getState());
 
         // clean up
         disableAndDeleteProcess(simpleProcess.getId());

@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
@@ -21,7 +20,6 @@ import org.bonitasoft.engine.bpm.category.CategoryUpdater;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
@@ -681,8 +679,7 @@ public class ProcessCategoryTest extends CommonAPITest {
     }
 
     private List<ProcessDefinition> generateProcessDefinition(final int count, final String processName, final String version)
-            throws InvalidBusinessArchiveFormatException, ProcessDeployException, ProcessDefinitionNotFoundException, InvalidProcessDefinitionException,
-            ActorMappingImportException, AlreadyExistsException {
+            throws InvalidBusinessArchiveFormatException, ProcessDeployException, InvalidProcessDefinitionException, AlreadyExistsException {
         final List<ProcessDefinition> processDefinitionList = new ArrayList<ProcessDefinition>();
         for (int i = 1; i <= count; i++) {
             final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, version + i,

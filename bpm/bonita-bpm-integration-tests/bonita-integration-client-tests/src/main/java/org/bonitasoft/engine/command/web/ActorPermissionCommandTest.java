@@ -61,10 +61,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     private void cleanup(final long userId, final List<Long> processDefinitionIds) throws BonitaException {
         // clean up:
         deleteUser(userId);
-        for (final Long processDefinitionId : processDefinitionIds) {
-            getProcessAPI().disableProcess(processDefinitionId);
-            getProcessAPI().deleteProcess(processDefinitionId);
-        }
+        disableAndDeleteProcessById(processDefinitionIds);
     }
 
     private Map<String, Serializable> prepareParametersWithUserId(final long userId, final List<Long> processDefinitionIds) {

@@ -36,27 +36,54 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  */
 public interface FlowNodeExecutor extends ContainerExecutor {
 
+    /**
+     * 
+     * @param flowNodeInstanceId
+     * @param expressionContext
+     * @param operations
+     * @param processInstanceId
+     * @param executerId
+     * @param executerDelegateId
+     * @return
+     * @throws SFlowNodeExecutionException
+     * @since 6.0
+     */
     FlowNodeState stepForward(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, long processInstanceId,
             Long executerId, Long executerDelegateId) throws SFlowNodeExecutionException;
 
-    void setStateByStateId(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, int stateId) throws SActivityStateExecutionException;
+    /**
+     * 
+     * @param sProcessDefinitionId
+     * @param flowNodeInstanceId
+     * @param stateId
+     * @throws SActivityStateExecutionException
+     * @since 6.1
+     */
+    void setStateByStateId(long sProcessDefinitionId, long flowNodeInstanceId, int stateId) throws SActivityStateExecutionException;
 
-    void childReachedState(SProcessDefinition childProcDef, SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionToExecute)
-            throws SBonitaException;
+    /**
+     * 
+     * @param childProcInst
+     * @param childState
+     * @param hasActionsToExecute
+     * @throws SBonitaException
+     * @since 6.1
+     */
+    void childReachedState(SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionsToExecute) throws SBonitaException;
 
     /**
      * Archive the flownode instance given as parameter. Also archive all related object that needs to be archived as well.
      * 
      * @param flowNodeInstance
-     *            the flow node instance to be archived.
+     *            The flow node instance to be archived.
      * @param deleteAfterArchive
-     * @param processDefinition
-     *            the process definition
+     * @param processDefinitionId
+     *            the identifier of process definition
      * @throws SActivityExecutionException
      *             in case an error occurs
+     * @since 6.1
      */
-    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive, SProcessDefinition processDefinition)
-            throws SActivityExecutionException;
+    void archiveFlowNodeInstance(SFlowNodeInstance flowNodeInstance, boolean deleteAfterArchive, long processDefinitionId) throws SActivityExecutionException;
 
     /**
      * @param processDefinition
@@ -75,7 +102,14 @@ public interface FlowNodeExecutor extends ContainerExecutor {
     StateCode executeState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, FlowNodeState state)
             throws SActivityStateExecutionException, SActivityExecutionException;
 
-    void setFlowNodeFailedInTransaction(SFlowNodeInstance fFlowNodeInstance, SProcessDefinition processDefinition, SBonitaException sbe)
-            throws SFlowNodeExecutionException;
+    /**
+     * 
+     * @param fFlowNodeInstance
+     * @param processDefinitionId
+     * @param sbe
+     * @throws SFlowNodeExecutionException
+     * @since 6.1
+     */
+    void setFlowNodeFailedInTransaction(SFlowNodeInstance fFlowNodeInstance, long processDefinitionId, SBonitaException sbe) throws SFlowNodeExecutionException;
 
 }

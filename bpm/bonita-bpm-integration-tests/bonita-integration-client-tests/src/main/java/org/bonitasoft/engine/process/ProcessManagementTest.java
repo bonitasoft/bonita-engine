@@ -112,7 +112,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final Date after = new Date();
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        deleteProcess(processDefinition);
         assertNotNull(processDeploymentInfo);
         assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
         assertEquals(APITestUtil.PROCESS_NAME, processDeploymentInfo.getName());
@@ -142,7 +142,7 @@ public class ProcessManagementTest extends CommonAPITest {
         try {
             getProcessAPI().startProcess(user.getId(), processDefinition.getId());
         } finally {
-            getProcessAPI().deleteProcess(processDefinition.getId());
+            deleteProcess(processDefinition);
             deleteUser(user);
         }
     }
@@ -160,7 +160,7 @@ public class ProcessManagementTest extends CommonAPITest {
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
 
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        deleteProcess(processDefinition);
         deleteUser(user);
     }
 
@@ -175,7 +175,7 @@ public class ProcessManagementTest extends CommonAPITest {
             getProcessAPI().disableProcess(processDefinition.getId());
             getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         } finally {
-            getProcessAPI().deleteProcess(processDefinition.getId());
+            deleteProcess(processDefinition);
         }
     }
 
@@ -196,7 +196,7 @@ public class ProcessManagementTest extends CommonAPITest {
             // ok
         } finally {
             getProcessAPI().disableProcess(processDefinition.getId());
-            getProcessAPI().deleteProcess(processDefinition.getId());
+            deleteProcess(processDefinition);
             deleteUser(user);
         }
     }
@@ -210,10 +210,10 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         try {
-            getProcessAPI().deleteProcess(processDefinition.getId());
+            deleteProcess(processDefinition);
         } finally {
             getProcessAPI().disableProcess(processDefinition.getId());
-            getProcessAPI().deleteProcess(processDefinition.getId());
+            deleteProcess(processDefinition);
             deleteUser(user);
         }
     }
@@ -229,7 +229,7 @@ public class ProcessManagementTest extends CommonAPITest {
         assertNotNull(getProcessAPI().getProcessDefinition(processDefinition.getId()));
         assertNotNull(getProcessAPI().getProcessDeploymentInfo(processDefinition.getId()));
         assertEquals(numberOfProcesses + 1, getProcessAPI().getNumberOfProcessDeploymentInfos());
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        deleteProcess(processDefinition);
         assertEquals(numberOfProcesses, getProcessAPI().getNumberOfProcessDeploymentInfos());
         try {
             getProcessAPI().getProcessDefinition(processDefinition.getId());
@@ -399,14 +399,14 @@ public class ProcessManagementTest extends CommonAPITest {
                 ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
-            assertEquals(activityInstance.getState(), TestStates.getReadyState(null));
+            assertEquals(activityInstance.getState(), TestStates.getReadyState());
         }
 
         checkNbOfOpenActivities(40, 3000, processInstance2, 2);
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance1.getId(), 0, 200, ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
-            assertEquals(activityInstance.getState(), TestStates.getReadyState(null));
+            assertEquals(activityInstance.getState(), TestStates.getReadyState());
         }
 
         disableAndDeleteProcess(processDefinition1);
@@ -573,7 +573,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final byte[] doc = resources.get(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + documentFile);
         assertTrue("File content not the expected", Arrays.equals(documentText.getBytes(), doc));
 
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        deleteProcess(processDefinition);
     }
 
     @Test
@@ -594,8 +594,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final long latestProcessDefinitionId = getProcessAPI().getLatestProcessDefinitionId(processName);
         assertEquals(processDefinition2.getId(), latestProcessDefinitionId);
 
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        deleteProcess(processDefinition1, processDefinition2);
     }
 
     @Test(expected = ProcessDefinitionNotFoundException.class)
@@ -678,7 +677,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final long processDefId = getProcessAPI().getProcessDefinitionId(APITestUtil.PROCESS_NAME, APITestUtil.PROCESS_VERSION);
         assertEquals(processDefId, processDefinition.getId());
 
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        deleteProcess(processDefinition);
     }
 
     @Test(expected = ProcessDefinitionNotFoundException.class)
@@ -691,7 +690,7 @@ public class ProcessManagementTest extends CommonAPITest {
         try {
             getProcessAPI().getProcessDefinitionId(APITestUtil.PROCESS_NAME + "_wrongName", APITestUtil.PROCESS_VERSION);
         } finally {
-            getProcessAPI().deleteProcess(processDefinition.getId());
+            deleteProcess(processDefinition);
         }
     }
 
@@ -916,7 +915,7 @@ public class ProcessManagementTest extends CommonAPITest {
         assertEquals(updatedDisplayDescription, updatedProcessDeploymentInfo.getDisplayDescription());
         assertEquals(iconPath, updatedProcessDeploymentInfo.getIconPath());
 
-        getProcessAPI().deleteProcess(processId);
+        deleteProcess(processDefinition);
     }
 
     @Test
@@ -948,7 +947,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDeploymentInfo updatedProcessDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processId);
         assertEquals(updatedDisplayDescription, updatedProcessDeploymentInfo.getDisplayDescription());
 
-        getProcessAPI().deleteProcess(processId);
+        deleteProcess(processDefinition);
     }
 
     @Test(expected = ProcessDefinitionNotFoundException.class)
@@ -966,7 +965,7 @@ public class ProcessManagementTest extends CommonAPITest {
         try {
             getProcessAPI().updateProcessDeploymentInfo(processId + 1, processDeploymentInfoUpdateDescriptor);
         } finally {
-            getProcessAPI().deleteProcess(processId);
+            deleteProcess(processDefinition);
         }
     }
 
@@ -983,7 +982,7 @@ public class ProcessManagementTest extends CommonAPITest {
         try {
             getProcessAPI().updateProcessDeploymentInfo(processId, processDeploymentInfoUpdateDescriptor);
         } finally {
-            getProcessAPI().deleteProcess(processId);
+            deleteProcess(processDefinition);
         }
     }
 
@@ -1062,7 +1061,7 @@ public class ProcessManagementTest extends CommonAPITest {
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         // look in archive
-        assertEquals(reachedDate, getProcessAPI().getActivityReachedStateDate(humanTaskInstance.getId(), TestStates.getReadyState(null)));
+        assertEquals(reachedDate, getProcessAPI().getActivityReachedStateDate(humanTaskInstance.getId(), TestStates.getReadyState()));
         disableAndDeleteProcess(processDefinition1);
         deleteUser(user);
     }
@@ -1197,7 +1196,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
-                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState(null)).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
         // add lucy to actor
         addMappingOfActorsForUser(coders, lucy.getId(), definition);
         // assign first user task to jack, second one to john, leaving the third pending
@@ -1242,7 +1241,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
-                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState(null)).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
         // add lucy to actor
         addMappingOfActorsForUser(coders, lucy.getId(), definition);
         // assign first user task to jack, second one to john, leaving the third pending
@@ -1497,7 +1496,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(jack.getId(), processDefinition.getId());
         try {
-            waitForProcessToFinish(processInstance, TestStates.getNormalFinalState(processInstance));
+            waitForProcessToFinish(processInstance, TestStates.getNormalFinalState());
         } catch (final Exception e) {
             fail("Process should finish");
         }
@@ -1583,7 +1582,7 @@ public class ProcessManagementTest extends CommonAPITest {
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,
-            ProcessDeployException, ProcessDefinitionNotFoundException, InvalidBusinessArchiveFormatException, AlreadyExistsException {
+            ProcessDeployException, InvalidBusinessArchiveFormatException, AlreadyExistsException {
         final List<Long> ids = new ArrayList<Long>();
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;

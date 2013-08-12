@@ -135,12 +135,12 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue("expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState("step1")).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         assertEquals("step1", step1.getName());
-        assertEquals(TestStates.getReadyState(step1), step1.getState());
+        assertEquals(TestStates.getReadyState(), step1.getState());
         assignAndExecuteStep(step1, getSession().getUserId());
         try {
             ActivityInstance activityInstance = getProcessAPI().getActivityInstance(step1.getId());
@@ -221,7 +221,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     // final ArchivedActivityInstance archivedStep3 = processRuntimeAPI.getArchivedActivityInstance(step3.getId());
     // assertEquals(TestStates.getNormalFinalState(archivedStep3), archivedStep3.getStateId());
     //
-    // assertEquals(TestStates.getNormalFinalState(processInstance), processRuntimeAPI.getArchivedProcessInstance(processInstance.getId()).getStateId());
+    // assertEquals(TestStates.getNormalFinalState(), processRuntimeAPI.getArchivedProcessInstance(processInstance.getId()).getStateId());
     // disableAndDelete(processDefinition);
     // }
 
@@ -247,7 +247,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     // final ProcessDefinition processDefinition = deployAndEnable(designProcessDefinition);
     // final ProcessInstance processInstance = processRuntimeAPI.start(processDefinition.getId());
     //
-    // assertNotSame(TestStates.getNormalFinalState(processInstance), processInstance.getStateId());// FIXME
+    // assertNotSame(TestStates.getNormalFinalState(), processInstance.getStateId());// FIXME
     //
     // assertTrue("expected 1 activities", new CheckNbOfActivities(20, 500, true, processInstance, 1).waitUntil());
     //
@@ -258,7 +258,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     //
     // processRuntimeAPI.executeActivity(step2.getId());
     //
-    // assertEquals(TestStates.getNormalFinalState(processInstance), processRuntimeAPI.getArchivedProcessInstance(processInstance.getId()).getStateId());//
+    // assertEquals(TestStates.getNormalFinalState(), processRuntimeAPI.getArchivedProcessInstance(processInstance.getId()).getStateId());//
     // FIXME
     //
     // disableAndDelete(processDefinition);
@@ -280,7 +280,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assertEquals(0, activities.size());
 
         assertTrue("Process instance should be completed",
-                containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10), TestStates.getNormalFinalState(processInstance)));// FIXME
+                containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10), TestStates.getNormalFinalState()));// FIXME
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(user.getId());
@@ -305,7 +305,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assertTrue("The process instance must start between " + before + " and " + after + ", but was " + startDate, after >= startDate && startDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
         assertTrue("expected 1 activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState(null)).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         before = new Date().getTime();
@@ -339,7 +339,7 @@ public class ProcessExecutionTest extends CommonAPITest {
                 + processStartDate + ">", after >= processStartDate && processStartDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
         assertTrue("expected 1 activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState(null)).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
@@ -369,7 +369,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 100);
         assertEquals(1, archs.size());
-        assertEquals(TestStates.getInitialState(processInstance), archs.get(0).getState());
+        assertEquals(TestStates.getInitialState(), archs.get(0).getState());
 
         assignAndExecuteStep(step1, user.getId());
         waitForProcessToFinish(processInstance);
@@ -420,7 +420,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue("Expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState(null)).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         final long before = new Date().getTime();
@@ -454,7 +454,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(user.getId(), processInstance.getStartedBy());
         assertTrue("Expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState(null)).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         assignAndExecuteStep(step1, user.getId());

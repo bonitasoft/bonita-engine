@@ -25,7 +25,6 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -36,7 +35,6 @@ import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommen
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -86,7 +84,6 @@ import org.bonitasoft.engine.execution.state.InterruptedFlowNodeState;
 import org.bonitasoft.engine.execution.state.ReadyActivityStateImpl;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.state.WaitingFlowNodeStateImpl;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -99,6 +96,7 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Zhang Bole
+ * @author Celine Souchet
  */
 public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
@@ -197,15 +195,13 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final EventInstanceService eventInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders,
             final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry,
             final ArchiveService archiveService, final TechnicalLoggerService logger, final DocumentMappingService documentMappingService,
-            final SCommentService commentService, final SACommentBuilder saCommentBuilder, final TransactionExecutor transactionExecutor,
-            final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService, final IdentityService identityService, final WorkService workService,
-            final BPMDefinitionBuilders bpmDefinitionBuilders, TokenService tokenService) {
+            final SCommentService commentService, final SACommentBuilder saCommentBuilder, final LockService lockService, final EventsHandler eventsHandler,
+            final UserFilterService userFilterService, final ActorMappingService actorMappingService, final WorkService workService,
+            final TokenService tokenService) {
         initStates(connectorService, connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService,
                 eventInstanceService, sDataInstanceBuilders, instanceBuilders, operationService, activityInstanceService, bpmInstancesCreator,
                 containerRegistry, processDefinitionService, processInstanceService, archiveService, logger, documentMappingService, commentService,
-                saCommentBuilder, transactionExecutor, lockService, eventsHandler, userFilterService, actorMappingService, identityService, workService,
-                bpmDefinitionBuilders, tokenService);
+                saCommentBuilder, lockService, eventsHandler, userFilterService, actorMappingService, workService, tokenService);
         defineTransitionsForAllNodesType();
         initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
     }
@@ -341,13 +337,11 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final TechnicalLoggerService logger,
             final DocumentMappingService documentMappingService, final SCommentService commentService, final SACommentBuilder saCommentBuilder,
-            final TransactionExecutor transactionExecutor, final LockService lockService, final EventsHandler eventsHandler,
-            final UserFilterService userFilterService, final ActorMappingService actorMappingService, final IdentityService identityService,
-            final WorkService workService, final BPMDefinitionBuilders bpmDefinitionBuilders, TokenService tokenService) {
-        stateBehaviors = new StateBehaviors(transactionExecutor, bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService,
+            final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
+            final ActorMappingService actorMappingService, final WorkService workService, TokenService tokenService) {
+        stateBehaviors = new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService,
                 classLoaderService, instanceBuilders, actorMappingService, connectorService, connectorInstanceService, expressionResolverService,
-                processDefinitionService, dataInstanceService, operationService, workService, containerRegistry, this, processInstanceService, archiveService,
-                sDataInstanceBuilders, eventInstanceService, schedulerService, logger, bpmDefinitionBuilders);
+                processDefinitionService, dataInstanceService, operationService, workService, containerRegistry, eventInstanceService, schedulerService, logger);
         failed = new FailedActivityStateImpl();
         initializing = new InitializingActivityStateImpl(stateBehaviors);
         initializingActivityWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(stateBehaviors);
@@ -579,11 +573,6 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             stateNames.add(state.getName());
         }
         return stateNames;
-    }
-
-    @Override
-    public void setProcessExecutor(final ProcessExecutor processExecutor) {
-        stateBehaviors.setProcessExecutor(processExecutor);
     }
 
 }

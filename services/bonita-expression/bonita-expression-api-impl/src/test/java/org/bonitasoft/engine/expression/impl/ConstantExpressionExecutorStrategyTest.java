@@ -64,8 +64,7 @@ public class ConstantExpressionExecutorStrategyTest {
     @Cover(classes = { ConstantExpressionExecutorStrategyTest.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate", "Expression", "Constant",
             "Date" }, jira = "ENGINE-1559, ENGINE-1099")
     @Test
-    public final void evaluateDateWithoutTimeZone() throws SExpressionEvaluationException, SExpressionDependencyMissingException,
-            ParseException {
+    public final void evaluateDateWithoutTimeZone() throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
 
         final Date result = (Date) strategy.evaluate(sExpression, null, null);
@@ -75,8 +74,7 @@ public class ConstantExpressionExecutorStrategyTest {
     @Cover(classes = { ConstantExpressionExecutorStrategyTest.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate", "Expression", "Constant",
             "Date" }, jira = "ENGINE-1559, ENGINE-1099")
     @Test
-    public final void evaluateDateWithoutMilliseconds() throws SExpressionEvaluationException, SExpressionDependencyMissingException,
-            ParseException {
+    public final void evaluateDateWithoutMilliseconds() throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26+02:00", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
 
         final Date result = (Date) strategy.evaluate(sExpression, null, null);

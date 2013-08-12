@@ -330,8 +330,7 @@ public class SupervisorTest extends CommonAPITest {
         assertEquals(proDefIds.get(4).longValue(), processDeploymentInfos2.get(0).getProcessId());
 
         for (final Long pid : proDefIds) {
-            getProcessAPI().disableProcess(pid);
-            getProcessAPI().deleteProcess(pid);
+            disableAndDeleteProcess(pid);
         }
         getProcessAPI().deleteCategory(category1.getId());
         getProcessAPI().deleteCategory(category2.getId());

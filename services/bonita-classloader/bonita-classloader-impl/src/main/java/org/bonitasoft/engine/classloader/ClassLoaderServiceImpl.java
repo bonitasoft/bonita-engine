@@ -38,13 +38,17 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private final String temporaryFolder;
 
     private VirtualClassLoader virtualGlobalClassLoader;
+
     private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
     private static final String separator = ":";
 
     private static final String GLOBAL_FOLDER = "global";
+
     public static final String GLOBAL_TYPE = "___global___";
+
     public static final long GLOBAL_ID = -1;
+
     private static final String LOCAL_FOLDER = "local";
 
     public ClassLoaderServiceImpl(final String temporaryFolder, final TechnicalLoggerService logger) {
@@ -81,7 +85,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return GLOBAL_TYPE;
     }
 
-    private synchronized VirtualClassLoader getVirtualGlobalClassLoader() throws ClassLoaderException {
+    private synchronized VirtualClassLoader getVirtualGlobalClassLoader() {
         if (this.virtualGlobalClassLoader == null) {
             this.virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
         }
@@ -102,7 +106,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final String key = getKey(type, id);
         final VirtualClassLoader classLoader = this.localClassLoaders.get(key);
         if (classLoader == null) {
-            final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, getGlobalClassLoader()); 
+            final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, getGlobalClassLoader());
             this.localClassLoaders.put(key, virtualClassLoader);
         }
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -147,7 +151,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return stb.toString();
     }
 
-
     @Override
     public synchronized void removeAllLocalClassLoaders(final String application) {
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -177,7 +180,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     public synchronized void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws ClassLoaderException {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
         virtualClassloader.release();
-        virtualClassloader.setClassLoader(new BonitaClassLoader(resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(), ClassLoaderServiceImpl.class.getClassLoader()));
+        virtualClassloader.setClassLoader(new BonitaClassLoader(resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
+                ClassLoaderServiceImpl.class.getClassLoader()));
     }
 
     @Override

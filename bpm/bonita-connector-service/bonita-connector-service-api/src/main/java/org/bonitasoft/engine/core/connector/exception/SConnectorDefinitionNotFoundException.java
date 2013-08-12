@@ -11,19 +11,31 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.work;
+package org.bonitasoft.engine.core.connector.exception;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Emmanuel Duchastenier
- * @author Charles Souillard
  * @author Celine Souchet
  */
-public abstract class TxBonitaWork extends AbstractBonitaWork {
+public class SConnectorDefinitionNotFoundException extends SBonitaException {
 
-    private static final long serialVersionUID = 9220497862331957402L;
+    private static final long serialVersionUID = -4558945817033278955L;
 
-    @Override
-    protected boolean isTransactional() {
-        return true;
+    public SConnectorDefinitionNotFoundException(final long id) {
+        super("Unable to find connector definition with id \"" + id + "\".");
     }
+
+    public SConnectorDefinitionNotFoundException(final String message) {
+        super(message);
+    }
+
+    public SConnectorDefinitionNotFoundException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public SConnectorDefinitionNotFoundException(final Throwable cause) {
+        super(cause);
+    }
+
 }

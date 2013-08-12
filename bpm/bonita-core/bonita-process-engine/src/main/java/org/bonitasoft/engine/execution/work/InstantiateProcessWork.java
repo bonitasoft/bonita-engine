@@ -13,18 +13,12 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
-import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
@@ -35,58 +29,51 @@ import org.bonitasoft.engine.work.TxBonitaWork;
  */
 public class InstantiateProcessWork extends TxBonitaWork {
 
+    private static final long serialVersionUID = 4030451057251328099L;
+
     private final OperationsWithContext operations;
 
-    private final ProcessExecutor processExecutor;
-
-    private final SProcessDefinition processDefinition;
-
-    private final ProcessInstanceService processInstanceService;
-
-    private final FlowNodeInstanceService flowNodeInstanceService;
-
-    private final LockService lockService;
-
-    private final TechnicalLoggerService logger;
-
-    private final BPMInstancesCreator bpmInstancesCreator;
+    private final long processDefinitionId;
 
     private long callerId = -1;
 
     private long subProcessId = -1;
 
+    private long subProcflowNodeInstanceId = -1;
+
     private long targetSFlowNodeDefinitionId = -1;
 
-    private Long idOfTheProcessToInterrupt;
+    private long processToInterruptId = -1;
 
-    private SFlowNodeInstance subProcflowNodeInstance;
-
-    public InstantiateProcessWork(final SProcessDefinition processDefinition, final OperationsWithContext operations, final ProcessExecutor processExecutor,
-            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final LockService lockService,
-            final TechnicalLoggerService logger, final BPMInstancesCreator bpmInstancesCreator) {
-        this.processDefinition = processDefinition;
+    public InstantiateProcessWork(final long processDefinitionId, final OperationsWithContext operations) {
+        this.processDefinitionId = processDefinitionId;
         this.operations = operations;
-        this.processExecutor = processExecutor;
-        this.processInstanceService = processInstanceService;
-        this.flowNodeInstanceService = flowNodeInstanceService;
-        this.lockService = lockService;
-        this.logger = logger;
-        this.bpmInstancesCreator = bpmInstancesCreator;
     }
 
     @Override
     protected void work() throws Exception {
-        if (idOfTheProcessToInterrupt != null) {
-            final TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(
-                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, flowNodeInstanceService, processExecutor, lockService, logger);
-            interruptor.interruptProcessInstance(idOfTheProcessToInterrupt, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
+        if (processToInterruptId != -1) {
+            final TransactionalProcessInstanceInterruptor interruptor = getTenantAccessor().getTransactionalProcessInstanceInterruptor();
+            interruptor.interruptProcessInstance(processToInterruptId, SStateCategory.ABORTING, -1, subProcflowNodeInstanceId);
         }
-        processExecutor.start(processDefinition, targetSFlowNodeDefinitionId, 0, 0, getExpressionContext(), operations.getOperations(), null, null, callerId,
-                subProcessId);
+
+        final ProcessExecutor processExecutor = getTenantAccessor().getProcessExecutor();
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
+                null, null, callerId, subProcessId);
     }
 
-    private SExpressionContext getExpressionContext() {
-        return operations.getContext();
+    @Override
+    protected String getDescription() {
+        return getClass().getSimpleName() + ": Process definition with id " + processDefinitionId
+                + ((subProcflowNodeInstanceId != -1) ? ", subProcflowNodeInstanceId:" + subProcflowNodeInstanceId : "");
+    }
+
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            return TenantServiceSingleton.getInstance(getTenantId());
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setCallerId(final long callerId) {
@@ -97,21 +84,16 @@ public class InstantiateProcessWork extends TxBonitaWork {
         this.subProcessId = subProcessId;
     }
 
-    public void setSubProcflowNodeInstance(final SFlowNodeInstance subProcflowNodeInstance) {
-        this.subProcflowNodeInstance = subProcflowNodeInstance;
+    public void setSubProcflowNodeInstanceId(final long subProcflowNodeInstanceId) {
+        this.subProcflowNodeInstanceId = subProcflowNodeInstanceId;
     }
 
-    public void setIdOfTheProcessToInterrupt(final Long idOfTheProcessToInterrupt) {
-        this.idOfTheProcessToInterrupt = idOfTheProcessToInterrupt;
+    public void setProcessToInterruptId(final long processToInterruptId) {
+        this.processToInterruptId = processToInterruptId;
     }
-
-    @Override
-    protected String getDescription() {
-        return getClass().getSimpleName() + ": Process of type " + processDefinition.getName() + " (" + processDefinition.getVersion() + ")"
-                + ((subProcflowNodeInstance != null) ? ", subProcflowNodeInstanceId:" + subProcflowNodeInstance.getId() : "");
-	}
 
     public void setTargetSFlowNodeDefinitionId(long targetSFlowNodeDefinitionId) {
         this.targetSFlowNodeDefinitionId = targetSFlowNodeDefinitionId;
-	}
+    }
+
 }

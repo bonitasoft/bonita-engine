@@ -42,8 +42,9 @@ public abstract class EventHandlerStrategy {
     public abstract void handleThrowEvent(SProcessDefinition processDefinition, SEventDefinition eventDefinition, SThrowEventInstance eventInstance,
             SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
 
-    public abstract boolean handlePostThrowEvent(SProcessDefinition processDefinition, SEndEventDefinition eventDefinition, SThrowEventInstance eventInstance,
-            SEventTriggerDefinition sEventTriggerDefinition, SFlowNodeInstance flowNodeInstance) throws SBonitaException;
+    public abstract boolean handlePostThrowEvent(SProcessDefinition processDefinition, SEndEventDefinition sEventDefinition,
+            SThrowEventInstance sThrowEventInstance, SEventTriggerDefinition sEventTriggerDefinition, SFlowNodeInstance sFlowNodeInstance)
+            throws SBonitaException;
 
     public abstract void handleThrowEvent(SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException;
 

@@ -80,8 +80,7 @@ public class CommandServiceImpl implements CommandService {
     private final QueriableLoggerService queriableLoggerService;
 
     public CommandServiceImpl(final SCommandBuilderAccessor commandBuilderAccessor, final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService)
-            throws SCommandAlreadyExistsException, SCommandCreationException {
+            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
         super();
         this.commandBuilderAccessor = commandBuilderAccessor;
         this.persistenceService = persistenceService;

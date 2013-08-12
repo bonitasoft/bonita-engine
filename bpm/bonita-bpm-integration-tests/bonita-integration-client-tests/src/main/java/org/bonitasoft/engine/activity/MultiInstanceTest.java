@@ -194,7 +194,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        checkPendingTaskSequentially(loopMax, processDefinition, processInstance, true);
+        checkPendingTaskSequentially(loopMax, processInstance, true);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -247,7 +247,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final DataInstance processDataInstance2 = getProcessAPI().getProcessDataInstance(loopDataInputName, process.getId());
         final List<?> value = (List<?>) processDataInstance2.getValue();
         final int loopMax = value.size();
-        checkPendingTaskSequentially(loopMax, processDefinition, process, false);
+        checkPendingTaskSequentially(loopMax, process, false);
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(loopDataOutputName, process.getId());
         assertNotNull("unable to find the loop data output on the process", processDataInstance);
         final List<?> list = (List<?>) processDataInstance.getValue();
@@ -319,7 +319,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        checkPendingTaskInParallel(loopMax, loopMax, processDefinition, processInstance);
+        checkPendingTaskInParallel(loopMax, loopMax, processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -341,7 +341,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        checkPendingTaskInParallel(loopMax, loopMax, processDefinition, processInstance);
+        checkPendingTaskInParallel(loopMax, loopMax, processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -362,7 +362,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskInParallel(loopMax, 2, processDefinition, processInstance);
+        checkPendingTaskInParallel(loopMax, 2, processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -383,7 +383,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskInParallel(loopMax, 1, processDefinition, processInstance);
+        checkPendingTaskInParallel(loopMax, 1, processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -409,7 +409,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskSequentially(15, processDefinition, processInstance, true);
+        checkPendingTaskSequentially(15, processInstance, true);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -435,7 +435,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskSequentially(3, processDefinition, processInstance, true);
+        checkPendingTaskSequentially(3, processInstance, true);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -614,7 +614,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskSequentially(numberOfExecutedActivities, processDefinition, processInstance, true);
+        checkPendingTaskSequentially(numberOfExecutedActivities, processInstance, true);
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
@@ -666,7 +666,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskInParallel(numberOfTask, numberOfTaskToComplete, processDefinition, processInstance);
+        checkPendingTaskInParallel(numberOfTask, numberOfTaskToComplete, processInstance);
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
@@ -852,7 +852,7 @@ public class MultiInstanceTest extends CommonAPITest {
                                 + condition, Boolean.class.getName(), new ExpressionBuilder().createEngineConstant(expressionConstant)));
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskSequentially(numberOfExecutedActivities, processDefinition, processInstance, true);
+        checkPendingTaskSequentially(numberOfExecutedActivities, processInstance, true);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -874,12 +874,11 @@ public class MultiInstanceTest extends CommonAPITest {
                                 + condition, Boolean.class.getName(), new ExpressionBuilder().createEngineConstant(expressionConstant)));
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskInParallel(numberOfExecutedActivities, numberOfTaskToComplete, processDefinition, processInstance);
+        checkPendingTaskInParallel(numberOfExecutedActivities, numberOfTaskToComplete, processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
-    private void checkPendingTaskSequentially(final int loopMax, final ProcessDefinition processDefinition, final ProcessInstance processInstance,
-            final boolean mustBeFinished) throws Exception {
+    private void checkPendingTaskSequentially(final int loopMax, final ProcessInstance processInstance, final boolean mustBeFinished) throws Exception {
         for (int i = 0; i < loopMax; i++) {
             final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 10000, false, 1, john);
             if (!checkNbPendingTaskOf.waitUntil()) {
@@ -897,8 +896,7 @@ public class MultiInstanceTest extends CommonAPITest {
         }
     }
 
-    private void checkPendingTaskInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessDefinition processDefinition,
-            final ProcessInstance processInstance) throws Exception {
+    private void checkPendingTaskInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessInstance processInstance) throws Exception {
         for (int i = 0; i < numberOfTaskToCompleteMI; i++) {
             final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, numberOfTask - i, john);
             if (!checkNbPendingTaskOf.waitUntil()) {

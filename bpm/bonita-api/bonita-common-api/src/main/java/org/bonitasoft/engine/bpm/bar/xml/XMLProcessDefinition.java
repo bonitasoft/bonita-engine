@@ -800,6 +800,7 @@ public class XMLProcessDefinition {
     }
 
     private void fillConnectorNode(final XMLNode connectorNode, final ConnectorDefinition connector) {
+        connectorNode.addAttribute(ID, String.valueOf(connector.getId()));
         connectorNode.addAttribute(NAME, connector.getName());
         connectorNode.addAttribute(CONNECTOR_ID, connector.getConnectorId());
         connectorNode.addAttribute(CONNECTOR_VERSION, connector.getVersion());

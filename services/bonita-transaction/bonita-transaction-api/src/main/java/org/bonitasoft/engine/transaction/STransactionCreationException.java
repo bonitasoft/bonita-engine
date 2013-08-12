@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-
 public class STransactionCreationException extends STransactionException {
 
     private static final long serialVersionUID = 1L;

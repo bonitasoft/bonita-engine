@@ -27,6 +27,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class SSendTaskDefinitionImpl extends SActivityDefinitionImpl implements SSendTaskDefinition {
 
@@ -34,10 +35,10 @@ public class SSendTaskDefinitionImpl extends SActivityDefinitionImpl implements 
 
     private final SThrowMessageEventTriggerDefinition trigger;
 
-    public SSendTaskDefinitionImpl(final SFlowElementContainerDefinitionImpl parentContainer, final SendTaskDefinitionImpl activityDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SSendTaskDefinitionImpl(final SendTaskDefinitionImpl activityDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final SOperationBuilders sOperationBuilders) {
+        super(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
         trigger = new SThrowMessageEventTriggerDefinitionImpl(activityDefinition.getMessageTrigger(), sDataDefinitionBuilders, sExpressionBuilders);
     }
 

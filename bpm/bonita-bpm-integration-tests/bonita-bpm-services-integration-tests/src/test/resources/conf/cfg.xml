@@ -68,7 +68,6 @@
 	<bean id="searchEntitiesDescriptor" class="org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
-		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
 		<constructor-arg name="sSupervisorBuilders" ref="sSupervisorBuilders" />
 		<constructor-arg name="definitionBuilders" ref="bpmDefinitionBuilders" />
 		<constructor-arg name="commentBuilders" ref="commentBuilders" />
@@ -84,15 +83,13 @@
 		<constructor-arg name="operationService" ref="operationService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="containerRegistry" ref="containerRegistry" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />		
+		<constructor-arg name="containerRegistry" ref="containerRegistry" />		
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="commentService" ref="commentService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="lockService" ref="lockService" />
-		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="workService" ref="workService" />
@@ -117,11 +114,11 @@
 	</bean>
 
 	<bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
+		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="connectorService" ref="connectorService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
-		<constructor-arg name="processInstanceService" ref="processInstanceService" />
-		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="schedulerService" ref="scheduler" />
@@ -130,21 +127,18 @@
 		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="operationService" ref="operationService" />
-		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="documentMappingService" ref="documentMappingService" />
 		<constructor-arg name="commentService" ref="commentService" />
-		<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
+		<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />		
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="userFilterService" ref="userFilterService" />
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
-		<constructor-arg name="identityService" ref="identityService" />
 		<constructor-arg name="workService" ref="workService"/>
-		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
 		<constructor-arg name="tokenService" ref="tokenService"/>
 	</bean>
 
@@ -170,11 +164,8 @@
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
-		<constructor-arg name="tokenService" ref="tokenService"/>
-		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor" />
-		<constructor-arg name="transactionExecutor" ref="transactionExecutor" />
 		<constructor-arg name="workService" ref="workService" />
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
@@ -210,12 +201,20 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
-		<constructor-arg name="bpmDefinitionBuilders" ref="bpmDefinitionBuilders"/>
 		<constructor-arg name="operationBuilders" ref="sOperationBuilders"/>
 		<constructor-arg name="transactionService" ref="transactionService" />
+	</bean>
+	
+	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
+		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
+		<constructor-arg name="processInstanceService" ref="processInstanceService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+		<constructor-arg name="processExecutor" ref="processExecutor" />
+		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 	
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">

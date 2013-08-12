@@ -56,7 +56,7 @@ public class CacheServiceTest {
         cacheService = null;
     }
 
-    protected CacheService getCacheService() throws CacheException {
+    protected CacheService getCacheService() {
         final List<CacheConfiguration> configurationsList = new ArrayList<CacheConfiguration>(2);
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName(SOME_DEFAULT_CACHE_NAME);

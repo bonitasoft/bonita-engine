@@ -73,6 +73,7 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
             final SOperation sOperation = ServerModelConvertor.convertOperation(sOperationBuilders, sExpressionBuilders, operation);
             outputs.add(sOperation);
         }
+        setId(connector.getId());
     }
 
     public SConnectorDefinitionImpl(final String name, final String connectorId, final String version, final ConnectorEvent activationEvent) {

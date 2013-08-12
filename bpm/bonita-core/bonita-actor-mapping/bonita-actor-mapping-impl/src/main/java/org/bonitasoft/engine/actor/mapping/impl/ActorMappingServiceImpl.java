@@ -418,9 +418,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         return persistenceService.selectList(descriptor);
     }
 
-    public List<SActorMember> getActorMembers(final int fromIndex, final int numberOfActorMembers, final String field, final OrderByType order)
-            throws SBonitaReadException {
-        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembers(fromIndex, numberOfActorMembers, field, order);
+    public List<SActorMember> getActorMembers(final int fromIndex, final int numberOfActorMembers) throws SBonitaReadException {
+        final SelectListDescriptor<SActorMember> descriptor = SelectDescriptorBuilder.getActorMembers(fromIndex, numberOfActorMembers);
         return persistenceService.selectList(descriptor);
     }
 

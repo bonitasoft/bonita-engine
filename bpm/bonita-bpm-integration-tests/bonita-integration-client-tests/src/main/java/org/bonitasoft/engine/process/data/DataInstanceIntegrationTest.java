@@ -17,7 +17,6 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -321,7 +320,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         // Execute pending task
         assertTrue("expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 1000, true, processInstance, 1, TestStates.getReadyState(null)).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 20, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.get(0);
         assignAndExecuteStep(activityInstance, user.getId());
@@ -501,7 +500,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         }
     }
 
-    private DataInstance getActivityDataInstance(final long activityInstanceId) throws DataNotFoundException {
+    private DataInstance getActivityDataInstance(final long activityInstanceId) {
         final List<DataInstance> activityDataInstances = getProcessAPI().getActivityDataInstances(activityInstanceId, 0, 10);
         assertEquals(1, activityDataInstances.size());
         return activityDataInstances.get(0);

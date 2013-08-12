@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,13 +20,13 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.execution.ProcessExecutor;
 
 /**
  * @author Baptiste Mesta
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public interface FlowNodeStateManager {
 
@@ -52,7 +52,5 @@ public interface FlowNodeStateManager {
     FlowNodeState getSkippedState(SFlowNodeInstance flownNodeInstance);
 
     FlowNodeState getCanceledState(SFlowNodeInstance flownNodeInstance);
-
-    void setProcessExecutor(ProcessExecutor processExecutor);
 
 }

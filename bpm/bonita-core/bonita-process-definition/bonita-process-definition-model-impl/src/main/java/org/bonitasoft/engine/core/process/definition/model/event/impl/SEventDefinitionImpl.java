@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,12 +20,10 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.EventDefinition;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
@@ -38,10 +36,9 @@ public abstract class SEventDefinitionImpl extends SFlowNodeDefinitionImpl imple
 
     private final List<SEventTriggerDefinition> eventTriggers;
 
-    public SEventDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final EventDefinition eventDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SEventDefinitionImpl(final EventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SOperationBuilders sOperationBuilders) {
+        super(eventDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
         // initialize the list have an initial capacity of 1: most of time there will be zero or one event trigger
         eventTriggers = new ArrayList<SEventTriggerDefinition>(1);
     }

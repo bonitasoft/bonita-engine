@@ -265,7 +265,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
      */
     protected abstract long getTenantId() throws TenantIdNotSetException;
 
-    protected SequenceManager getSequenceManager() throws TenantIdNotSetException {
+    protected SequenceManager getSequenceManager() {
         return sequenceManager;
     }
 

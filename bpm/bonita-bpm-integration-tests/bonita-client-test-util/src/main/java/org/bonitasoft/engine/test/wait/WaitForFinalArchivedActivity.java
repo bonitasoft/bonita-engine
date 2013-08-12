@@ -52,7 +52,7 @@ public class WaitForFinalArchivedActivity extends WaitUntil {
         boolean found = false;
         while (iterator.hasNext() && !found) {
             final ArchivedActivityInstance activityInstance = iterator.next();
-            if (activityInstance.getName().equals(activityName) && activityInstance.getState().equals(TestStates.getNormalFinalState(activityInstance))) {
+            if (activityInstance.getName().equals(activityName) && activityInstance.getState().equals(TestStates.getNormalFinalState())) {
                 result = activityInstance;
                 found = true;
             }

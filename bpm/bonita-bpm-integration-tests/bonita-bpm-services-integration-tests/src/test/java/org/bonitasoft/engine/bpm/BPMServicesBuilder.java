@@ -20,6 +20,7 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.AuthenticationService;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -70,6 +71,7 @@ import org.bonitasoft.engine.exceptions.ExceptionsManager;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -120,9 +122,18 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     ServicesAccessor accessor;
 
+    Long tenantId;
+
     public BPMServicesBuilder() {
         super();
         accessor = ServicesAccessor.getInstance();
+    }
+
+    public BPMServicesBuilder(final Long tenantId) {
+        // What is the parameter tenantId useful for ?
+        super();
+        accessor = ServicesAccessor.getInstance();
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -350,6 +361,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
+    public BPMInstancesCreator getBPMInstancesCreator() {
+        return accessor.getInstanceOf(BPMInstancesCreator.class);
+    }
+
+    @Override
     public FlowNodeExecutor getFlowNodeExecutor() {
         return getInstanceOf(FlowNodeExecutor.class);
     }
@@ -357,6 +373,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public ProcessExecutor getProcessExecutor() {
         return getInstanceOf(ProcessExecutor.class);
+    }
+
+    @Override
+    public TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor() {
+        return accessor.getInstanceOf(TransactionalProcessInstanceInterruptor.class);
     }
 
     @Override
@@ -614,7 +635,5 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     public ReadSessionAccessor getReadSessionAccessor() {
     	return getInstanceOf(ReadSessionAccessor.class);
     }
-
-
 
 }

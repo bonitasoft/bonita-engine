@@ -59,8 +59,7 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SActorMember>("getActorMembersOfActor", parameters, SActorMember.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SActorMember> getActorMembers(final int fromIndex, final int numberOfElements, final String field,
-            final OrderByType order) {
+    public static SelectListDescriptor<SActorMember> getActorMembers(final int fromIndex, final int numberOfElements) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements);
         final Map<String, Object> parameters = Collections.emptyMap();
         return new SelectListDescriptor<SActorMember>("getActorMembers", parameters, SActorMember.class, queryOptions);

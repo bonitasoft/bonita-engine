@@ -97,8 +97,8 @@ public class CMISDocumentServiceImpl implements DocumentService {
      * @throws SessionNotFoundException
      */
     public CMISDocumentServiceImpl(final SessionAccessor sessionAccessor, final SessionService sessionService, final String cmisServerUrl,
-            final String repositoryId, final CmisUserProvider cmisUserProvider, final SDocumentBuilder documentBuilder) throws SSessionNotFoundException,
-            SDocumentException, SessionIdNotSetException {
+            final String repositoryId, final CmisUserProvider cmisUserProvider, final SDocumentBuilder documentBuilder) throws SDocumentException,
+            SessionIdNotSetException {
         super();
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;

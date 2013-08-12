@@ -17,7 +17,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.persistence.ReadPersistenceService;
 
 /**
  * @author Baptiste Mesta
@@ -40,8 +39,7 @@ public class GetArchivedActivityInstance implements TransactionContentWithResult
         stateId = -1;
     }
 
-    public GetArchivedActivityInstance(final long activityInstanceId, final int stateId, final ActivityInstanceService activityInstanceService,
-            final ReadPersistenceService persistenceService) {
+    public GetArchivedActivityInstance(final long activityInstanceId, final int stateId, final ActivityInstanceService activityInstanceService) {
         this.activityInstanceId = activityInstanceId;
         this.stateId = stateId;
         this.activityInstanceService = activityInstanceService;

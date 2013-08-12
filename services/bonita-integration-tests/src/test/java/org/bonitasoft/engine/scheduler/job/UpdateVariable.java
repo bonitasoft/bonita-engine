@@ -18,7 +18,7 @@ public class UpdateVariable extends GroupJob {
 
     private Object variableValue;
 
-    public UpdateVariable(final String jobName, final String variableName, final Object variableValue) {
+    public UpdateVariable(final String variableName, final Object variableValue) {
         super();
         this.variableName = variableName;
         this.variableValue = variableValue;

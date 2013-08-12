@@ -32,7 +32,6 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
 import org.bonitasoft.engine.data.model.builder.SDataSourceBuilder;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -42,7 +41,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.test.util.TestUtil;
-import org.bonitasoft.engine.transaction.SBadTransactionStateException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -131,8 +129,8 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
     }
 
     protected Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionTypeUnknownException,
-            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SBadTransactionStateException,
-            FireEventException, STransactionCreationException, STransactionCommitException, STransactionRollbackException {
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, STransactionCreationException,
+            STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
         final Object result = getExpressionService().evaluate(expression, resolvedExpressions);
         getTransactionService().complete();
@@ -141,8 +139,8 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
 
     protected List<Object> evaluate(final ExpressionKind expressionKind, final List<SExpression> expressions, final Map<String, Object> dependencyValues,
             final Map<Integer, Object> resolvedExpressions) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
-            SExpressionDependencyMissingException, SInvalidExpressionException, SBadTransactionStateException, FireEventException,
-            STransactionCreationException, STransactionCommitException, STransactionRollbackException {
+            SExpressionDependencyMissingException, SInvalidExpressionException, STransactionCreationException, STransactionCommitException,
+            STransactionRollbackException {
         getTransactionService().begin();
         final List<Object> result = getExpressionService().evaluate(expressionKind, expressions, dependencyValues, resolvedExpressions);
         getTransactionService().complete();

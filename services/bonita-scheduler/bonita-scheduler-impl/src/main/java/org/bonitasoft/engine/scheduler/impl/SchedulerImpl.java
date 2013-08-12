@@ -64,7 +64,6 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -181,8 +180,7 @@ public class SchedulerImpl implements SchedulerService {
         internalSchedule(jobDescriptor, parameters, trigger);
     }
 
-    private void internalSchedule(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters, final Trigger trigger) throws SSchedulerException,
-            FireEventException {
+    private void internalSchedule(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters, final Trigger trigger) throws SSchedulerException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "schedule"));
         }
@@ -404,7 +402,7 @@ public class SchedulerImpl implements SchedulerService {
         try {
             session = sessionService.createSession(jobIdentifier.getTenantId(), "scheduler");
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
-            
+
             Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier, traceEnabled);
             return transactionService.executeInTransaction(callable);
         } catch (final Exception e) {
@@ -425,7 +423,7 @@ public class SchedulerImpl implements SchedulerService {
             }
         }
     }
-    
+
     /**
      * @param jobIdentifier
      * @param traceEnabled
@@ -433,9 +431,11 @@ public class SchedulerImpl implements SchedulerService {
      */
     private Callable<JobWrapper> buildGetPersistedJobCallable(final JobIdentifier jobIdentifier, final boolean traceEnabled) {
         return new Callable<JobWrapper>() {
+
             @Override
             public JobWrapper call() throws Exception {
-                final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(new SelectByIdDescriptor<SJobDescriptorImpl>("getSJobDescriptorImplById",
+                final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(new SelectByIdDescriptor<SJobDescriptorImpl>(
+                        "getSJobDescriptorImplById",
                         SJobDescriptorImpl.class, jobIdentifier.getId()));
                 // FIXME do something here if the job does not exist
                 if (sJobDescriptor == null) {
@@ -452,7 +452,8 @@ public class SchedulerImpl implements SchedulerService {
                     parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
                 }
                 statelessJob.setAttributes(parameterMap);
-                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger, jobIdentifier.getTenantId(),
+                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger,
+                        jobIdentifier.getTenantId(),
                         eventService, jobTruster, sessionService, sessionAccessor);
                 if (traceEnabled) {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPersistedJob"));

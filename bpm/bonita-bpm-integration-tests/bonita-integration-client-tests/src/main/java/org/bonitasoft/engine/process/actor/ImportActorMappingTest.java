@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -40,8 +41,17 @@ public class ImportActorMappingTest extends CommonAPITest {
 
     private static final String DELIVERY_MEN = "Delivery men";
 
+    private ProcessDefinition processDefinition;
+
     @After
     public void afterTest() throws BonitaException {
+        try {
+            getProcessAPI().disableProcess(processDefinition.getId());
+        } catch (final ProcessActivationException e) {
+            // Do nothing. Process already disabled
+        }
+        deleteProcess(processDefinition);
+        getIdentityAPI().deleteOrganization();
         logout();
     }
 
@@ -52,17 +62,15 @@ public class ImportActorMappingTest extends CommonAPITest {
 
     @Test
     public void importSimpleActorMapping() throws Exception {
-        final String johnName = "john";
-
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("simpleActorMapping.xml");
-        final User john = createUser(johnName, "bpm");
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        getProcessAPI().enableProcess(definition.getId());
+        final User john = createUser("john", "bpm");
+        processDefinition = getProcessAPI().deploy(businessArchive.done());
+        getProcessAPI().enableProcess(processDefinition.getId());
 
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
-        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+        final long processInstanceId = getProcessAPI().startProcess(processDefinition.getId()).getId();
         assertNotNull(waitForUserTask("userTask1", processInstanceId));
         assertTrue("no new activity found", new WaitUntil(20, 500) {
 
@@ -74,135 +82,117 @@ public class ImportActorMappingTest extends CommonAPITest {
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
-
-        disableAndDeleteProcess(definition);
-        deleteUser(johnName);
     }
 
     @Test
     public void importComplexActorMapping() throws Exception {
-        final String johnName = "john";
-
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
-        final User john = createUser(johnName, "bpm");
+        final User john = createUser("john", "bpm");
         final Group rd = createGroup("RD");
         final Role role = createRole("dev");
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
-        getProcessAPI().enableProcess(definition.getId());
+        processDefinition = getProcessAPI().deploy(businessArchive.done());
+        getProcessAPI().enableProcess(processDefinition.getId());
 
-        getAndCheckActors(john, rd, role, definition);
-
-        disableAndDeleteProcess(definition);
-        getIdentityAPI().deleteGroup(rd.getId());
-        getIdentityAPI().deleteRole(role.getId());
-        deleteUser(johnName);
+        getAndCheckActors(john, rd, role, processDefinition);
     }
 
     @Test
-    public void importActorMappingWithWrongXMLFile() throws Exception {
+    public void importActorMappingWithWrongXMLFileBeforeDeploy() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("actorMappingWithException.xml");
+        checkProcessNotActivated(businessArchive);
+    }
+
+    @Test(expected = ActorMappingImportException.class)
+    public void importActorMappingWithWrongXMLFileAfterDeploy() throws Exception {
         final User user = createUser("john", "bpm");
 
-        checkProcessNotActivated(user, null, null, businessArchive);
+        createProcessDefinitionAndCheckActorMappingImportException(user, "actorMappingWithException.xml");
     }
 
     @Test
-    public void importActorMappingWithUnknownUser() throws Exception {
+    public void importActorMappingWithUnknownUserBeforeDeploy() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("simpleActorMapping.xml");
+        checkProcessNotActivated(businessArchive);
+    }
+
+    @Test(expected = ActorMappingImportException.class)
+    public void importActorMappingWithUnknownUserAfterDeploy() throws Exception {
         final User user = createUser("paul", "bpm");
 
-        checkProcessNotActivated(user, null, null, businessArchive);
+        createProcessDefinitionAndCheckActorMappingImportException(user, "actorMappingWithException.xml");
     }
 
     @Test
-    public void importActorMappingWithUnknownGroup() throws Exception {
+    public void importActorMappingWithUnknownGroupBeforeDeploy() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD1");
-        final Role role = createRole("dev");
+        createUser("john", "bpm");
+        createGroup("RD1");
+        createRole("dev");
+
         // even if missing group the process is resolved
-        checkProcessActivated(user, rd, role, businessArchive);
+        checkProcessActivated(businessArchive);
+    }
+
+    @Test(expected = ActorMappingImportException.class)
+    public void importActorMappingWithUnknownGroupAfterDeploy() throws Exception {
+        final User user = createUser("john", "bpm");
+        createGroup("RD1");
+        createRole("dev");
+
+        createProcessDefinitionAndCheckActorMappingImportException(user, "complexActorMapping.xml");
     }
 
     @Test
-    public void importActorMappingWithUnknownRole() throws Exception {
+    public void importActorMappingWithUnknownRoleBeforeDeploy() throws Exception {
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMapping.xml");
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD");
-        final Role role = createRole("dev1");
+        createUser("john", "bpm");
+        createGroup("RD");
+        createRole("dev1");
+
         // even if missing role the process is resolved
-        checkProcessActivated(user, rd, role, businessArchive);
+        checkProcessActivated(businessArchive);
+    }
+
+    @Test(expected = ActorMappingImportException.class)
+    public void importActorMappingWithUnknownRoleAfterDeploy() throws Exception {
+        final User user = createUser("john", "bpm");
+        createGroup("RD");
+        createRole("dev1");
+
+        createProcessDefinitionAndCheckActorMappingImportException(user, "complexActorMapping.xml");
     }
 
     @Test
-    public void importActorMappingWithUnknownMemberShip() throws Exception {
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD2");
-        final Role role = createRole("dev");
+    public void importActorMappingWithUnknownMemberShipBeforeDeploy() throws Exception {
+        createUser("john", "bpm");
+        createGroup("RD2");
+        createRole("dev");
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("complexActorMappingWithUnkownGroup.xml");
 
         // even if missing membership the process is resolved
-        checkProcessActivated(user, rd, role, businessArchive);
+        checkProcessActivated(businessArchive);
+    }
+
+    @Test(expected = ActorMappingImportException.class)
+    public void importActorMappingWithUnknownMemberShipAfterDeploy() throws Exception {
+        final User user = createUser("john", "bpm");
+        createGroup("RD2");
+        createRole("dev");
+
+        createProcessDefinitionAndCheckActorMappingImportException(user, "complexActorMappingWithUnkownGroup.xml");
     }
 
     @Test
-    public void testImportActorMapping() throws Exception {
+    public void importActorMapping() throws Exception {
         final User user = createUser("john", "bpm");
         final Group rd = createGroup("RD");
         final Role role = createRole("dev");
 
         final ProcessDefinitionBuilder processBuilder = createProcessDefinitionBuilder();
-        final ProcessDefinition definition = deployAndEnableWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
-        getProcessAPI().importActorMapping(definition.getId(), xmlToByteArray("complexActorMapping2.xml"));
+        processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
+        getProcessAPI().importActorMapping(processDefinition.getId(), xmlToByteArray("complexActorMapping2.xml"));
 
-        getAndCheckActors(user, rd, role, definition);
-
-        // clean-up
-        disableAndDeleteProcess(definition);
-        getIdentityAPI().deleteGroup(rd.getId());
-        getIdentityAPI().deleteRole(role.getId());
-        deleteUser(user.getId());
-    }
-
-    @Test(expected = ActorMappingImportException.class)
-    public void testImportActorMappingWithWrongXMLFile() throws Exception {
-        final User user = createUser("john", "bpm");
-
-        createProcessDefinitionAndCheckActorMappingImportException(user, null, null, "actorMappingWithException.xml");
-    }
-
-    @Test(expected = ActorMappingImportException.class)
-    public void testImportActorMappingWithUnknownUser() throws Exception {
-        final User user = createUser("paul", "bpm");
-
-        createProcessDefinitionAndCheckActorMappingImportException(user, null, null, "simpleActorMapping.xml");
-    }
-
-    @Test(expected = ActorMappingImportException.class)
-    public void testImportActorMappingWithUnknownGroup() throws Exception {
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD1");
-        final Role role = createRole("dev");
-
-        createProcessDefinitionAndCheckActorMappingImportException(user, rd, role, "complexActorMapping.xml");
-    }
-
-    @Test(expected = ActorMappingImportException.class)
-    public void testImportActorMappingWithUnknownRole() throws Exception {
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD");
-        final Role role = createRole("dev1");
-
-        createProcessDefinitionAndCheckActorMappingImportException(user, rd, role, "complexActorMapping.xml");
-    }
-
-    @Test(expected = ActorMappingImportException.class)
-    public void testImportActorMappingWithUnknownMemberShip() throws Exception {
-        final User user = createUser("john", "bpm");
-        final Group rd = createGroup("RD2");
-        final Role role = createRole("dev");
-
-        createProcessDefinitionAndCheckActorMappingImportException(user, rd, role, "complexActorMappingWithUnkownGroup.xml");
+        getAndCheckActors(user, rd, role, processDefinition);
     }
 
     /**
@@ -253,24 +243,20 @@ public class ImportActorMappingTest extends CommonAPITest {
         return processBuilder;
     }
 
-    private void checkProcessNotActivated(final User user, final Group group, final Role role, final BusinessArchiveBuilder businessArchive) throws Exception {
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive.done());
+    private void checkProcessNotActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
+        processDefinition = getProcessAPI().deploy(businessArchive.done());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         final List<Problem> processResolutionProblems = getProcessAPI().getProcessResolutionProblems(processDefinition.getId());
         assertEquals(1, processResolutionProblems.size());
         final Problem problem = processResolutionProblems.get(0);
         assertEquals("actor", problem.getResource());
-        deleteProcess(processDefinition);
-        getIdentityAPI().deleteOrganization();
     }
 
-    private void checkProcessActivated(final User user, final Group group, final Role role, final BusinessArchiveBuilder businessArchive) throws Exception {
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive.done());
+    private void checkProcessActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
+        processDefinition = getProcessAPI().deploy(businessArchive.done());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
-        deleteProcess(processDefinition);
-        getIdentityAPI().deleteOrganization();
     }
 
     /**
@@ -279,27 +265,12 @@ public class ImportActorMappingTest extends CommonAPITest {
      * @throws Exception
      * @since 6.0
      */
-    private void createProcessDefinitionAndCheckActorMappingImportException(final User user, final Group group, final Role role, final String xmlFileName)
+    private void createProcessDefinitionAndCheckActorMappingImportException(final User user, final String xmlFileName)
             throws Exception {
         final ProcessDefinitionBuilder processBuilder = createProcessDefinitionBuilder();
-        final ProcessDefinition definition = deployAndEnableWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
+        processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
 
-        try {
-            getProcessAPI().importActorMapping(definition.getId(), xmlToByteArray(xmlFileName));
-        } finally {
-            // clean-up
-            disableAndDeleteProcess(definition);
-            if (group != null) {
-                getIdentityAPI().deleteGroup(group.getId());
-            }
-            if (role != null) {
-                getIdentityAPI().deleteRole(role.getId());
-            }
-            if (user != null) {
-                deleteUser(user.getUserName());
-            }
-            getIdentityAPI().deleteOrganization();
-        }
+        getProcessAPI().importActorMapping(processDefinition.getId(), xmlToByteArray(xmlFileName));
     }
 
     /**

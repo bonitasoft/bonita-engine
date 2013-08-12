@@ -50,7 +50,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
@@ -1084,7 +1083,7 @@ public class MessageEventTest extends CommonAPITest {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    private void checkUserHasNoPendingTasks() throws UserNotFoundException {
+    private void checkUserHasNoPendingTasks() {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(0, taskInstances.size());
     }

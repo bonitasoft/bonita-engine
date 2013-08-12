@@ -94,8 +94,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
                 if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
                     markWaitingMessageAsInProgress(waitingMessage);
                 }
-                workService.registerWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId(), eventInstanceService, instanceBuilders,
-                        enventsHandler));
+                workService.registerWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId()));
             }
         } catch (final SBonitaException e) {
             throw new JobExecutionException(e);
@@ -113,10 +112,10 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
      * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
      */
     protected List<SMessageEventCouple> makeMessageUniqueCouples(final List<SMessageEventCouple> messageCouples) {
-        List<Long> takenMessages = new ArrayList<Long>(messageCouples.size());
-        List<Long> takenWaitings = new ArrayList<Long>(messageCouples.size());
-        List<SMessageEventCouple> pairs = new ArrayList<SMessageEventCouple>();
-        for (SMessageEventCouple couple : messageCouples) {
+        final List<Long> takenMessages = new ArrayList<Long>(messageCouples.size());
+        final List<Long> takenWaitings = new ArrayList<Long>(messageCouples.size());
+        final List<SMessageEventCouple> pairs = new ArrayList<SMessageEventCouple>();
+        for (final SMessageEventCouple couple : messageCouples) {
             final SMessageInstance messageInstance = couple.getMessageInstance();
             final SWaitingMessageEvent waitingMessage = couple.getWaitingMessage();
             if (!takenMessages.contains(messageInstance.getId()) && !takenWaitings.contains(waitingMessage.getId())) {
@@ -135,7 +134,6 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         eventInstanceService = getTenantServiceAccessor().getEventInstanceService();
         instanceBuilders = getTenantServiceAccessor().getBPMInstanceBuilders();
-        enventsHandler = getTenantServiceAccessor().getEventsHandler();
         workService = getTenantServiceAccessor().getWorkService();
     }
 

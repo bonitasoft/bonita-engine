@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.services.SPersistenceException;
-
 /**
  * @author Charles Souillard
  * @author Celine Souchet
@@ -32,7 +30,7 @@ public class HibernateResourcesConfigurationProviderImpl implements HibernateRes
 
     private final Map<String, String> classAliasMappings = new HashMap<String, String>();
 
-    public HibernateResourcesConfigurationProviderImpl() throws SPersistenceException {
+    public HibernateResourcesConfigurationProviderImpl() {
         super();
     }
 
