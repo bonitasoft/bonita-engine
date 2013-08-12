@@ -132,15 +132,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public ExpressionService getExpressionService() {
-        return accessor.getInstanceOf(ExpressionService.class);
-    }
-
-    public QueriableLoggerService getQueriableLogger(final String name) {
-        return accessor.getInstanceOf(name, QueriableLoggerService.class);
-    }
-
-    public QueriableLoggerService getQueriableLogger() {
-        return this.getQueriableLogger("syncQueriableLoggerService"); // default is the sync one
+        return getInstanceOf(ExpressionService.class);
     }
 
     @Override
