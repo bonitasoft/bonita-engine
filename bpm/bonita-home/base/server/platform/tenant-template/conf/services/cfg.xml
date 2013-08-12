@@ -13,12 +13,6 @@
 		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
-	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="eventService" ref="eventService" />
-	</bean>
-
 	<bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />
 		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />

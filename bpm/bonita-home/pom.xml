@@ -80,6 +80,7 @@
 								<descriptor>assembly-teamwork.xml</descriptor>
 								<descriptor>assembly-efficiency.xml</descriptor>
 								<descriptor>assembly-performance.xml</descriptor>
+								<descriptor>assembly-performance-cluster.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>

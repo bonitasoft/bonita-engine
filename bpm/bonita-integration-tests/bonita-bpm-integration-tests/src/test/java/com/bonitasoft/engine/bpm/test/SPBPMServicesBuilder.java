@@ -62,6 +62,7 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
 
     @Override
     public TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
+        // What is the parameter useful for ?
         return this;
     }
 
