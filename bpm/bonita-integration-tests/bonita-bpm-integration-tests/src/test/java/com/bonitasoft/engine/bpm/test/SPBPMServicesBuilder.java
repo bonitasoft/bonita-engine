@@ -31,10 +31,6 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
         super();
     }
 
-    public SPBPMServicesBuilder(final Long tenantid) {
-        super(tenantid);
-    }
-
     @Override
     public ParameterService getParameterService() {
         return this.getInstanceOf(ParameterService.class);
