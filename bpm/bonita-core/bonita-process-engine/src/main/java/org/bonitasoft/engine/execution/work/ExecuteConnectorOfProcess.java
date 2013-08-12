@@ -21,8 +21,12 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SEndEventDefinitionBuilder;
@@ -56,10 +60,9 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     private final ConnectorEvent activationEvent;
 
-    public ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId,
-            final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters, final long processInstanceId,
-            final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
-        super(processDefinitionId, connectorInstanceId, sConnectorDefinition, inputParameters);
+    public ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
+            final Map<String, Object> inputParameters, final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
+        super(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParameters);
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
         this.activationEvent = activationEvent;
@@ -114,13 +117,14 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SConnectorDefinition sConnectorDefinition = getSConnectorDefinition(tenantAccessor);
 
         setConnectorOnlyToFailed();
         // create a fake definition
-        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(
-                sConnectorDefinition.getErrorCode()).done();
+        final String errorCode = sConnectorDefinition.getErrorCode();
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(errorCode).done();
         // event definition as the error code as name, this way we don't need to find the connector that throw this error
-        final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(sConnectorDefinition.getErrorCode())
+        final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(errorCode)
                 .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
         // create an instance using this definition
         final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(eventDefinition);
@@ -135,7 +139,20 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     protected String getDescription() {
-        return getClass().getSimpleName() + ": processInstanceId:" + processInstanceId;
+        return getClass().getSimpleName() + ": processInstanceId = " + processInstanceId + ", connectorDefinitionName = " + connectorDefinitionName;
     }
 
+    @Override
+    protected SConnectorDefinition getSConnectorDefinition(final TenantServiceAccessor tenantAccessor) throws SProcessDefinitionNotFoundException,
+            SProcessDefinitionReadException, SConnectorDefinitionNotFoundException {
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        // final SConnectorDefinition sConnectorDefinition = processContainer.getConnectorDefinition(connectorDefinitionId);// FIXME: Uncomment when generate id
+        final SConnectorDefinition sConnectorDefinition = processContainer.getConnectorDefinition(connectorDefinitionName);
+        if (sConnectorDefinition == null) {
+            throw new SConnectorDefinitionNotFoundException(connectorDefinitionName);
+        }
+        return sConnectorDefinition;
+    }
 }

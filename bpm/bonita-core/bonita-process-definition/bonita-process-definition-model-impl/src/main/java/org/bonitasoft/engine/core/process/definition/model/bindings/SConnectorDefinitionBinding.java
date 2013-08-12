@@ -60,6 +60,7 @@ public class SConnectorDefinitionBinding extends SNamedElementBinding {
     public Object getObject() {
         final SConnectorDefinitionImpl connectorDefinitionImpl = new SConnectorDefinitionImpl(name, connectorId, version,
                 ConnectorEvent.valueOf(activationEvent));
+        connectorDefinitionImpl.setId(id);
         connectorDefinitionImpl.setFailAction(FailAction.valueOf(failAction));
         connectorDefinitionImpl.setErrorCode(errorCode);
         for (final Entry<String, SExpression> entry : inputs.entrySet()) {

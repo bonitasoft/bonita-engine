@@ -457,18 +457,20 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         final SExpressionContext sExpressionContext = new SExpressionContext(sProcessInstance.getId(),
                                 DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId);
                         Map<String, Object> inputParameters = null;
-                        final long connectorInstanceId = nextConnectorInstance.getId();
+                        final Long connectorInstanceId = nextConnectorInstance.getId();
+                        // final Long connectorDefinitionId = sConnectorDefinition.getId(); // FIXME: Uncomment when generate id
+                        final String connectorDefinitionName = sConnectorDefinition.getName();
                         try {
                             inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), sExpressionContext, null);
                         } catch (final SBonitaException sbe) {
                             final ExecuteConnectorWork work = getWork(processDefinitionId, sProcessInstance, activationEvent, connectorInstanceId,
-                                    sConnectorDefinition, inputParameters);
+                                    connectorDefinitionName, inputParameters);
                             work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
                             workService.registerWork(work);
                         }
                         if (inputParameters != null) {
-                            workService.registerWork(getWork(processDefinitionId, sProcessInstance, activationEvent, connectorInstanceId, sConnectorDefinition,
-                                    inputParameters));
+                            workService.registerWork(getWork(processDefinitionId, sProcessInstance, activationEvent, connectorInstanceId,
+                                    connectorDefinitionName, inputParameters));
                         }
                         return true;
                     }
@@ -478,11 +480,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return false;
     }
 
-    private ExecuteConnectorOfProcess getWork(final long processDefinitionId, final SProcessInstance sProcessInstance,
-            final ConnectorEvent activationEvent, final long connectorInstanceId, final SConnectorDefinition sConnectorDefinition,
-            final Map<String, Object> inputParameters) {
-        return new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, sConnectorDefinition, inputParameters, sProcessInstance.getId(),
-                sProcessInstance.getRootProcessInstanceId(), activationEvent);
+    private ExecuteConnectorOfProcess getWork(final long processDefinitionId, final SProcessInstance sProcessInstance, final ConnectorEvent activationEvent,
+            final long connectorInstanceId, final String connectorDefinitionName, final Map<String, Object> inputParameters) {
+        return new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParameters,
+                sProcessInstance.getId(), sProcessInstance.getRootProcessInstanceId(), activationEvent);
     }
 
     private void initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final SProcessDefinition sProcessDefinition,

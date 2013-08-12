@@ -1731,6 +1731,7 @@ public class ModelConvertor {
     public static ConnectorDefinition toConnectorDefinition(final SConnectorDefinition connector) {
         final ConnectorDefinitionImpl connectorDefinitionImpl = new ConnectorDefinitionImpl(connector.getName(), connector.getConnectorId(),
                 connector.getVersion(), connector.getActivationEvent());
+        connectorDefinitionImpl.setId(connector.getId());
         for (final Entry<String, SExpression> input : connector.getInputs().entrySet()) {
             connectorDefinitionImpl.addInput(input.getKey(), toExpression(input.getValue()));
         }

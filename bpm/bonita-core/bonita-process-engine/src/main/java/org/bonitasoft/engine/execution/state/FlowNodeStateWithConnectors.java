@@ -65,14 +65,16 @@ public abstract class FlowNodeStateWithConnectors implements FlowNodeState {
             beforeOnEnter(processDefinition, flowNodeInstance);
         }
         if ((phase & DURING_ON_ENTER) != 0 && executeOnEnter) {
-            stateBehaviors.executeConnectorInWork(processDefinition.getId(), flowNodeInstance, entry.getValue().getKey(), entry.getValue().getValue());
+            stateBehaviors.executeConnectorInWork(processDefinition.getId(), flowNodeInstance.getFlowNodeDefinitionId(), flowNodeInstance.getId(), entry
+                    .getValue().getKey(), entry.getValue().getValue());
             return StateCode.EXECUTING;
         }
         if ((phase & BEFORE_ON_FINISH) != 0) {
             onEnterToOnFinish(processDefinition, flowNodeInstance);
         }
         if ((phase & DURING_ON_FINISH) != 0 && executeOnFinish) {
-            stateBehaviors.executeConnectorInWork(processDefinition.getId(), flowNodeInstance, entry.getValue().getKey(), entry.getValue().getValue());
+            stateBehaviors.executeConnectorInWork(processDefinition.getId(), flowNodeInstance.getFlowNodeDefinitionId(), flowNodeInstance.getId(), entry
+                    .getValue().getKey(), entry.getValue().getValue());
             return StateCode.EXECUTING;
         }
         if ((phase & AFTER_ON_FINISH) != 0) {

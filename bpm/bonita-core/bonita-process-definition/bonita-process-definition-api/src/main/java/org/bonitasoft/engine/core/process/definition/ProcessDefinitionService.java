@@ -91,14 +91,14 @@ public interface ProcessDefinitionService {
     /**
      * Get processDefinition by its id
      * 
-     * @param processId
+     * @param processDefinitionId
      *            identifier of processDefinition
      * @return the processDefinition corresponding to the parameter processId
      * @throws SProcessDefinitionNotFoundException
      *             error thrown if no process definition found
      * @throws SProcessDefinitionReadException
      */
-    SProcessDefinition getProcessDefinition(long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
+    SProcessDefinition getProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
 
     /**
      * Get deployment info of the process definition having the id given in parameter

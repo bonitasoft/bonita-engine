@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,14 +16,16 @@ package org.bonitasoft.engine.bpm.connector;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
-public interface ConnectorDefinition extends NamedElement {
+public interface ConnectorDefinition extends NamedElement, BaseElement {
 
     String getConnectorId();
 

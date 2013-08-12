@@ -58,6 +58,7 @@ public class ConnectorDefinitionBinding extends NamedElementBinding {
     @Override
     public Object getObject() {
         final ConnectorDefinitionImpl connectorDefinitionImpl = new ConnectorDefinitionImpl(name, connectorId, version, ConnectorEvent.valueOf(activationEvent));
+        connectorDefinitionImpl.setId(id);
         connectorDefinitionImpl.setFailAction(FailAction.valueOf(failAction));
         connectorDefinitionImpl.setErrorCode(errorCode);
         for (final Entry<String, Expression> entry : inputs.entrySet()) {

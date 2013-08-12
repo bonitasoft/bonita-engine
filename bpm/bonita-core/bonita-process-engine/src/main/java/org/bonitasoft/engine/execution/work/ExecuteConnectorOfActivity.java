@@ -20,8 +20,10 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
+import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SEndEventDefinitionBuilder;
@@ -32,8 +34,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
@@ -57,29 +57,42 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private static final long serialVersionUID = 6220793197069669088L;
 
-    private final SFlowNodeInstance flowNodeInstance;
+    private final long flowNodeInstanceId;
 
-    public ExecuteConnectorOfActivity(final long processDefinitionId, final SFlowNodeInstance flowNodeInstance, final long connectorInstanceId,
-            final SConnectorDefinition sConnectorDefinition, final Map<String, Object> inputParameters) {
-        super(processDefinitionId, connectorInstanceId, sConnectorDefinition, inputParameters);
-        this.flowNodeInstance = flowNodeInstance;
+    private final long flowNodeDefinitionId;
+
+    public ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
+            final long connectorInstanceId, final String connectorDefinitionName, final Map<String, Object> inputParameters) {
+        super(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParameters);
+        this.flowNodeDefinitionId = flowNodeDefinitionId;
+        this.flowNodeInstanceId = flowNodeInstanceId;
     }
 
     @Override
     protected void evaluateOutput(final ConnectorResult result) throws STransactionException, SBonitaException {
-        evaluateOutput(result, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        evaluateOutput(result, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name());
     }
 
     @Override
-    protected void continueFlow() throws SFlowNodeExecutionException, WorkRegisterException, SFlowNodeReadException {
-        final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
+    protected void continueFlow() throws WorkRegisterException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
         String containerType = SFlowElementsContainerType.PROCESS.name();
-        if (flowNodeInstance.getLogicalGroup(2) > 0) {
-            containerType = SFlowElementsContainerType.FLOWNODE.name();
+
+        try {
+            final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+            if (sFlowNodeInstance.getLogicalGroup(2) > 0) {
+                containerType = SFlowElementsContainerType.FLOWNODE.name();
+            }
+            // no need to set the classloader: done in the flowNodeExecutor.gotoNextStableState
+            final long parentProcessInstanceId = sFlowNodeInstance.getLogicalGroup(getTenantAccessor().getBPMInstanceBuilders().getSUserTaskInstanceBuilder()
+                    .getParentProcessInstanceIndex());
+            containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceId, null, null, containerType, parentProcessInstanceId);
+        } catch (SBonitaException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        // no need to set the classloader: done in the flowNodeExecutor.gotoNextStableState
-        containerRegistry.executeFlowNodeInSameThread(flowNodeInstance.getId(), null, null, containerType,
-                flowNodeInstance.getLogicalGroup(getTenantAccessor().getBPMInstanceBuilders().getSUserTaskInstanceBuilder().getParentProcessInstanceIndex()));
     }
 
     @Override
@@ -94,7 +107,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
 
-        final SFlowNodeInstance intTxflowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());
+        final SFlowNodeInstance intTxflowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         ProcessArchiver.archiveFlowNodeInstance(intTxflowNodeInstance, false, processDefinitionId, processInstanceService, processDefinitionService,
                 archiveService, bpmInstanceBuilders, dataInstanceService, activityInstanceService, connectorInstanceService);
         activityInstanceService.setState(intTxflowNodeInstance, flowNodeStateManager.getFailedState());
@@ -106,10 +119,13 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
         final SEndEventInstanceBuilder endEventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
+        final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final SEndEventInstanceBuilder builder = endEventInstanceBuilder.createNewEndEventInstance(eventDefinition.getName(), eventDefinition.getId(),
-                flowNodeInstance.getRootContainerId(), flowNodeInstance.getParentContainerId(), processDefinitionId, flowNodeInstance.getRootContainerId(),
-                flowNodeInstance.getParentContainerId());
-        builder.setParentActivityInstanceId(flowNodeInstance.getId());
+                sFlowNodeInstance.getRootContainerId(), sFlowNodeInstance.getParentContainerId(), processDefinitionId, sFlowNodeInstance.getRootContainerId(),
+                sFlowNodeInstance.getParentContainerId());
+        builder.setParentActivityInstanceId(flowNodeInstanceId);
         final SThrowEventInstance done = (SThrowEventInstance) builder.done();
         new CreateEventInstance(done, eventInstanceService).call();
         return done;
@@ -128,18 +144,22 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SConnectorDefinition sConnectorDefinition = getSConnectorDefinition(tenantAccessor);
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
+        final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
 
         // create a fake definition
-        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(
-                sConnectorDefinition.getErrorCode()).done();
+        final String errorCode = sConnectorDefinition.getErrorCode();
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(errorCode).done();
         // event definition as the error code as name, this way we don't need to find the connector that throw this error
-        final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(sConnectorDefinition.getErrorCode())
+        final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(errorCode)
                 .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
         // create an instance using this definition
         final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(eventDefinition);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
-                throwEventInstance, errorEventTriggerDefinition, flowNodeInstance);
+                throwEventInstance, errorEventTriggerDefinition, sFlowNodeInstance);
         if (!hasActionToExecute) {
             setConnectorAndContainerToFailed();
         }
@@ -147,6 +167,19 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     @Override
     protected String getDescription() {
-        return getClass().getSimpleName() + ": flowNodeInstance:" + flowNodeInstance.getId();
+        return getClass().getSimpleName() + ": flowNodeInstanceId = " + flowNodeInstanceId + ", connectorDefinitionName = " + connectorDefinitionName;
+    }
+
+    @Override
+    protected SConnectorDefinition getSConnectorDefinition(final TenantServiceAccessor tenantAccessor) throws SBonitaException {
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        final SFlowNodeDefinition flowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(flowNodeDefinitionId);
+
+        final SConnectorDefinition sConnectorDefinition = flowNodeDefinition.getConnectorDefinition(connectorDefinitionName);
+        if (sConnectorDefinition == null) {
+            throw new SConnectorDefinitionNotFoundException(connectorDefinitionName);
+        }
+        return sConnectorDefinition;
     }
 }
