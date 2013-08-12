@@ -138,201 +138,181 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public ProcessDefinitionService getProcessDefinitionService() {
-        return accessor.getInstanceOf(ProcessDefinitionService.class);
+        return getInstanceOf(ProcessDefinitionService.class);
     }
 
     @Override
     public ExpressionService getExpressionService() {
-        return accessor.getInstanceOf(ExpressionService.class);
-    }
-
-    public QueriableLoggerService getQueriableLogger(final String name) {
-        return accessor.getInstanceOf(name, QueriableLoggerService.class);
-    }
-
-    public QueriableLoggerService getQueriableLogger() {
-        return this.getQueriableLogger("syncQueriableLoggerService"); // default is the sync one
+        return getInstanceOf(ExpressionService.class);
     }
 
     @Override
     public IdentityModelBuilder getIdentityModelBuilder() {
-        return accessor.getInstanceOf(IdentityModelBuilder.class);
+        return getInstanceOf(IdentityModelBuilder.class);
     }
 
     public SExpressionBuilders getExpressionBuilders() {
-        return accessor.getInstanceOf(SExpressionBuilders.class);
+        return getInstanceOf(SExpressionBuilders.class);
     }
 
     public SDataInstanceBuilders getSDataInstanceBuilders() {
-        return accessor.getInstanceOf(SDataInstanceBuilders.class);
+        return getInstanceOf(SDataInstanceBuilders.class);
     }
 
     @Override
     public SDataDefinitionBuilders getSDataDefinitionBuilders() {
-        return accessor.getInstanceOf(SDataDefinitionBuilders.class);
+        return getInstanceOf(SDataDefinitionBuilders.class);
     }
 
     public DependencyBuilder getDependencyModelBuilder() {
-        return accessor.getInstanceOf(DependencyBuilder.class);
+        return getInstanceOf(DependencyBuilder.class);
     }
 
     public DependencyMappingBuilder getDependencyMappingModelBuilder() {
-        return accessor.getInstanceOf(DependencyMappingBuilder.class);
+        return getInstanceOf(DependencyMappingBuilder.class);
     }
 
     public PersistenceService getPersistence() {
-        return this.getPersistence("persistenceService");
+        return getInstanceOf(PersistenceService.class);
     }
 
-    public PersistenceService getPersistence(final String name) {
-        return accessor.getInstanceOf(name, PersistenceService.class);
-    }
-
-    public PersistenceService getJournal() {
-        return this.getPersistence();
-    }
-
-    public Recorder getRecorder(final boolean sync) {
-        String synchType = "recorderAsync";
-        if (sync) {
-            synchType = "recorderSync";
-        }
-        return accessor.getInstanceOf(synchType, Recorder.class);
+    public Recorder getRecorder() {
+        return getInstanceOf(Recorder.class);
     }
 
     @Override
     public TransactionService getTransactionService() {
-        return accessor.getInstanceOf(TransactionService.class);
+        return getInstanceOf(TransactionService.class);
     }
 
     @Override
     public PlatformService getPlatformService() {
-        return accessor.getInstanceOf(PlatformService.class);
+        return getInstanceOf(PlatformService.class);
     }
 
     @Override
     public DataService getDataService() {
-        return accessor.getInstanceOf(DataService.class);
+        return getInstanceOf(DataService.class);
     }
 
     public SDataSourceParameterBuilder getDataSourceParameterModelBuilder() {
-        return accessor.getInstanceOf(SDataSourceParameterBuilder.class);
+        return getInstanceOf(SDataSourceParameterBuilder.class);
     }
 
     public SDataSourceBuilder getDataSourceModelBuilder() {
-        return accessor.getInstanceOf(SDataSourceBuilder.class);
+        return getInstanceOf(SDataSourceBuilder.class);
     }
 
     public SPlatformBuilder getPlatformBuilder() {
-        return accessor.getInstanceOf(SPlatformBuilder.class);
+        return getInstanceOf(SPlatformBuilder.class);
     }
 
     public STenantBuilder getTenantBuilder() {
-        return accessor.getInstanceOf(STenantBuilder.class);
+        return getInstanceOf(STenantBuilder.class);
     }
 
     @Override
     public SessionAccessor getSessionAccessor() {
-        return accessor.getInstanceOf(SessionAccessor.class);
+        return getInstanceOf(SessionAccessor.class);
     }
 
     @Override
     public IdentityService getIdentityService() {
-        return accessor.getInstanceOf(IdentityService.class);
+        return getInstanceOf(IdentityService.class);
     }
 
     @Override
     public ArchiveService getArchiveService() {
-        return accessor.getInstanceOf(ArchiveService.class);
+        return getInstanceOf(ArchiveService.class);
     }
 
     @Override
     public DataInstanceService getDataInstanceService() {
-        return accessor.getInstanceOf(DataInstanceService.class);
+        return getInstanceOf(DataInstanceService.class);
     }
 
     @Override
     public DependencyService getDependencyService() {
-        return accessor.getInstanceOf("platformDependencyService", DependencyService.class);
+        return getInstanceOf("platformDependencyService", DependencyService.class);
     }
 
     public SQueriableLogModelBuilder getQueriableLogModelBuilder() {
-        return accessor.getInstanceOf(SQueriableLogModelBuilder.class);
+        return getInstanceOf(SQueriableLogModelBuilder.class);
     }
 
     @Override
     public SchedulerService getSchedulerService() {
-        return accessor.getInstanceOf(SchedulerService.class);
+        return getInstanceOf(SchedulerService.class);
     }
 
     @Override
     public ClassLoaderService getClassLoaderService() {
-        return accessor.getInstanceOf(ClassLoaderService.class);
+        return getInstanceOf(ClassLoaderService.class);
     }
 
     @Override
     public EventService getEventService() {
-        return accessor.getInstanceOf(EventService.class);
+        return getInstanceOf(EventService.class);
     }
 
     public ExceptionsManager getExceptionsManager() {
-        return accessor.getInstanceOf(ExceptionsManager.class);
+        return getInstanceOf(ExceptionsManager.class);
     }
 
     public ProcessDefinitionService getProcessDefinitionManager() {
-        return accessor.getInstanceOf(ProcessDefinitionService.class);
+        return getInstanceOf(ProcessDefinitionService.class);
     }
 
     public FlowNodeInstanceService getActivityInstanceManager() {
-        return accessor.getInstanceOf(ActivityInstanceService.class);
+        return getInstanceOf(ActivityInstanceService.class);
     }
 
     @Override
     public CacheService getCacheService() {
-        return accessor.getInstanceOf(CacheService.class);
+        return getInstanceOf(CacheService.class);
     }
 
     public AuthenticationService getAuthenticationService() {
-        return accessor.getInstanceOf(AuthenticationService.class);
+        return getInstanceOf(AuthenticationService.class);
     }
 
     public PlatformAuthenticationService getPlatformAuthenticationService() {
-        return accessor.getInstanceOf(PlatformAuthenticationService.class);
+        return getInstanceOf(PlatformAuthenticationService.class);
     }
 
     @Override
     public SessionService getSessionService() {
-        return accessor.getInstanceOf(SessionService.class);
+        return getInstanceOf(SessionService.class);
     }
 
     @Override
     public PlatformSessionService getPlatformSessionService() {
-        return accessor.getInstanceOf(PlatformSessionService.class);
+        return getInstanceOf(PlatformSessionService.class);
     }
 
     @Override
     public PlatformLoginService getPlatformLoginService() {
-        return accessor.getInstanceOf(PlatformLoginService.class);
+        return getInstanceOf(PlatformLoginService.class);
     }
 
     @Override
     public LoginService getLoginService() {
-        return accessor.getInstanceOf(LoginService.class);
+        return getInstanceOf(LoginService.class);
     }
 
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
-        return accessor.getInstanceOf(TechnicalLoggerService.class);
+        return getInstanceOf(TechnicalLoggerService.class);
     }
 
     @Override
     public SPlatformBuilder getSPlatformBuilder() {
-        return accessor.getInstanceOf(SPlatformBuilder.class);
+        return getInstanceOf(SPlatformBuilder.class);
     }
 
     @Override
     public STenantBuilder getSTenantBuilder() {
-        return accessor.getInstanceOf(STenantBuilder.class);
+        return getInstanceOf(STenantBuilder.class);
     }
 
     @Override
@@ -342,42 +322,42 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public TransactionExecutor getTransactionExecutor() {
-        return accessor.getInstanceOf(TransactionExecutor.class);
+        return getInstanceOf(TransactionExecutor.class);
     }
 
     @Override
     public QueriableLoggerService getQueriableLoggerService() {
-        return accessor.getInstanceOf(QueriableLoggerService.class);
+        return getInstanceOf(QueriableLoggerService.class);
     }
 
     @Override
     public SQueriableLogModelBuilder getSQueriableLogModelBuilder() {
-        return accessor.getInstanceOf(SQueriableLogModelBuilder.class);
+        return getInstanceOf(SQueriableLogModelBuilder.class);
     }
 
     @Override
     public ProcessInstanceService getProcessInstanceService() {
-        return accessor.getInstanceOf(ProcessInstanceService.class);
+        return getInstanceOf(ProcessInstanceService.class);
     }
 
     @Override
     public TokenService getTokenService() {
-        return accessor.getInstanceOf(TokenService.class);
+        return getInstanceOf(TokenService.class);
     }
 
     @Override
     public ActivityInstanceService getActivityInstanceService() {
-        return accessor.getInstanceOf(ActivityInstanceService.class);
+        return getInstanceOf(ActivityInstanceService.class);
     }
 
     @Override
     public BPMDefinitionBuilders getBPMDefinitionBuilders() {
-        return accessor.getInstanceOf(BPMDefinitionBuilders.class);
+        return getInstanceOf(BPMDefinitionBuilders.class);
     }
 
     @Override
     public BPMInstanceBuilders getBPMInstanceBuilders() {
-        return accessor.getInstanceOf(BPMInstanceBuilders.class);
+        return getInstanceOf(BPMInstanceBuilders.class);
     }
 
     @Override
@@ -387,12 +367,12 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public FlowNodeExecutor getFlowNodeExecutor() {
-        return accessor.getInstanceOf(FlowNodeExecutor.class);
+        return getInstanceOf(FlowNodeExecutor.class);
     }
 
     @Override
     public ProcessExecutor getProcessExecutor() {
-        return accessor.getInstanceOf(ProcessExecutor.class);
+        return getInstanceOf(ProcessExecutor.class);
     }
 
     @Override
@@ -402,81 +382,81 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public FlowNodeStateManager getFlowNodeStateManager() {
-        return accessor.getInstanceOf(FlowNodeStateManager.class);
+        return getInstanceOf(FlowNodeStateManager.class);
     }
 
     @Override
     public ActorMappingService getActorMappingService() {
-        return accessor.getInstanceOf(ActorMappingService.class);
+        return getInstanceOf(ActorMappingService.class);
     }
 
     @Override
     public SActorBuilders getSActorBuilders() {
-        return accessor.getInstanceOf(SActorBuilders.class);
+        return getInstanceOf(SActorBuilders.class);
     }
 
     @Override
     public SCategoryBuilderAccessor getCategoryModelBuilderAccessor() {
-        return accessor.getInstanceOf(SCategoryBuilderAccessor.class);
+        return getInstanceOf(SCategoryBuilderAccessor.class);
     }
 
     @Override
     public CategoryService getCategoryService() {
-        return accessor.getInstanceOf(CategoryService.class);
+        return getInstanceOf(CategoryService.class);
     }
 
     @Override
     public SExpressionBuilders getSExpressionBuilders() {
-        return accessor.getInstanceOf(SExpressionBuilders.class);
+        return getInstanceOf(SExpressionBuilders.class);
     }
 
     public GatewayInstanceService getGatewayInstanceService() {
-        return accessor.getInstanceOf(GatewayInstanceService.class);
+        return getInstanceOf(GatewayInstanceService.class);
     }
 
     @Override
     public TransitionService getTransitionInstanceService() {
-        return accessor.getInstanceOf(TransitionService.class);
+        return getInstanceOf(TransitionService.class);
     }
 
     @Override
     public CommandService getCommandService() {
-        return accessor.getInstanceOf(CommandService.class);
+        return getInstanceOf(CommandService.class);
     }
 
     @Override
     public DocumentMappingService getDocumentMappingService() {
-        return accessor.getInstanceOf(DocumentMappingService.class);
+        return getInstanceOf(DocumentMappingService.class);
     }
 
     @Override
     public SDocumentMappingBuilderAccessor getDocumentMappingBuilderAccessor() {
-        return accessor.getInstanceOf(SDocumentMappingBuilderAccessor.class);
+        return getInstanceOf(SDocumentMappingBuilderAccessor.class);
     }
 
     @Override
     public ProcessDocumentService getProcessDocumentService() {
-        return accessor.getInstanceOf(ProcessDocumentService.class);
+        return getInstanceOf(ProcessDocumentService.class);
     }
 
     @Override
     public SProcessDocumentBuilder getProcessDocumentBuilder() {
-        return accessor.getInstanceOf(SProcessDocumentBuilder.class);
+        return getInstanceOf(SProcessDocumentBuilder.class);
     }
 
     @Override
     public SCommandBuilderAccessor getSCommandBuilderAccessor() {
-        return accessor.getInstanceOf(SCommandBuilderAccessor.class);
+        return getInstanceOf(SCommandBuilderAccessor.class);
     }
 
     @Override
     public EventInstanceService getEventInstanceService() {
-        return accessor.getInstanceOf(EventInstanceService.class);
+        return getInstanceOf(EventInstanceService.class);
     }
 
     @Override
     public DependencyBuilderAccessor getDependencyBuilderAccessor() {
-        return accessor.getInstanceOf("platformDependencyBuilderAccessor", DependencyBuilderAccessor.class);
+        return getInstanceOf("platformDependencyBuilderAccessor", DependencyBuilderAccessor.class);
     }
 
     @Override
@@ -486,127 +466,127 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public ConnectorService getConnectorService() {
-        return accessor.getInstanceOf(ConnectorService.class);
+        return getInstanceOf(ConnectorService.class);
     }
 
     @Override
     public ConnectorInstanceService getConnectorInstanceService() {
-        return accessor.getInstanceOf(ConnectorInstanceService.class);
+        return getInstanceOf(ConnectorInstanceService.class);
     }
 
     @Override
     public ProfileService getProfileService() {
-        return accessor.getInstanceOf(ProfileService.class);
+        return getInstanceOf(ProfileService.class);
     }
 
     @Override
     public SProfileBuilderAccessor getSProfileBuilderAccessor() {
-        return accessor.getInstanceOf(SProfileBuilderAccessor.class);
+        return getInstanceOf(SProfileBuilderAccessor.class);
     }
 
     @Override
     public PlatformCommandService getPlatformCommandService() {
-        return accessor.getInstanceOf(PlatformCommandService.class);
+        return getInstanceOf(PlatformCommandService.class);
     }
 
     @Override
     public SPlatformCommandBuilderAccessor getSPlatformCommandBuilderAccessor() {
-        return accessor.getInstanceOf(SPlatformCommandBuilderAccessor.class);
+        return getInstanceOf(SPlatformCommandBuilderAccessor.class);
     }
 
     @Override
     public SDataSourceModelBuilder getSDataSourceModelBuilder() {
-        return accessor.getInstanceOf(SDataSourceModelBuilder.class);
+        return getInstanceOf(SDataSourceModelBuilder.class);
     }
 
     @Override
     public ParserFactory getParserFactgory() {
-        return accessor.getInstanceOf(ParserFactory.class);
+        return getInstanceOf(ParserFactory.class);
     }
 
     @Override
     public Parser getActorMappingParser() {
-        return accessor.getInstanceOf(Parser.class);
+        return getInstanceOf(Parser.class);
     }
 
     @Override
     public ExpressionResolverService getExpressionResolverService() {
-        return accessor.getInstanceOf(ExpressionResolverService.class);
+        return getInstanceOf(ExpressionResolverService.class);
     }
 
     @Override
     public XMLWriter getXMLWriter() {
-        return accessor.getInstanceOf(XMLWriter.class);
+        return getInstanceOf(XMLWriter.class);
     }
 
     @Override
     public SupervisorMappingService getSupervisorService() {
-        return accessor.getInstanceOf(SupervisorMappingService.class);
+        return getInstanceOf(SupervisorMappingService.class);
     }
 
     @Override
     public SProcessSupervisorBuilders getSSupervisorBuilders() {
-        return accessor.getInstanceOf(SProcessSupervisorBuilders.class);
+        return getInstanceOf(SProcessSupervisorBuilders.class);
     }
 
     @Override
     public OperationService getOperationService() {
-        return accessor.getInstanceOf(OperationService.class);
+        return getInstanceOf(OperationService.class);
     }
 
     @Override
     public SOperationBuilders getSOperationBuilders() {
-        return accessor.getInstanceOf(SOperationBuilders.class);
+        return getInstanceOf(SOperationBuilders.class);
     }
 
     @Override
     public UserFilterService getUserFilterService() {
-        return accessor.getInstanceOf("userFilterService", UserFilterService.class);
+        return getInstanceOf("userFilterService", UserFilterService.class);
     }
 
     @Override
     public SearchEntitiesDescriptor getSearchEntitiesDescriptor() {
-        return accessor.getInstanceOf(SearchEntitiesDescriptor.class);
+        return getInstanceOf(SearchEntitiesDescriptor.class);
     }
 
     @Override
     public SCommentService getCommentService() {
-        return accessor.getInstanceOf(SCommentService.class);
+        return getInstanceOf(SCommentService.class);
     }
 
     @Override
     public SCommentBuilders getSCommentBuilders() {
-        return accessor.getInstanceOf(SCommentBuilders.class);
+        return getInstanceOf(SCommentBuilders.class);
     }
 
     @Override
     public ContainerRegistry getContainerRegistry() {
-        return accessor.getInstanceOf(ContainerRegistry.class);
+        return getInstanceOf(ContainerRegistry.class);
     }
 
     @Override
     public ExternalIdentityMappingService getExternalIdentityMappingService() {
-        return accessor.getInstanceOf(ExternalIdentityMappingService.class);
+        return getInstanceOf(ExternalIdentityMappingService.class);
     }
 
     @Override
     public SExternalIdentityMappingBuilders getExternalIdentityMappingBuilders() {
-        return accessor.getInstanceOf(SExternalIdentityMappingBuilders.class);
+        return getInstanceOf(SExternalIdentityMappingBuilders.class);
     }
 
     @Override
     public LockService getLockService() {
-        return accessor.getInstanceOf(LockService.class);
+        return getInstanceOf(LockService.class);
     }
 
     @Override
     public Parser getProfileParser() {
-        return accessor.getInstanceOf(Parser.class);
+        return getInstanceOf(Parser.class);
     }
 
     @Override
     public EventsHandler getEventsHandler() {
-        return accessor.getInstanceOf(EventsHandler.class);
+        return getInstanceOf(EventsHandler.class);
     }
 
     @Override
@@ -615,45 +595,45 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public NodeConfiguration getPlaformConfiguration() {
-        return accessor.getInstanceOf(NodeConfiguration.class);
+        return getInstanceOf(NodeConfiguration.class);
     }
 
     @Override
     public ConnectorExecutor getConnectorExecutor() {
-        return accessor.getInstanceOf(ConnectorExecutor.class);
+        return getInstanceOf(ConnectorExecutor.class);
     }
 
     @Override
     public WorkService getWorkService() {
-        return accessor.getInstanceOf(WorkService.class);
+        return getInstanceOf(WorkService.class);
     }
 
     @Override
     public DependencyResolver getDependencyResolver() {
-        return accessor.getInstanceOf(DependencyResolver.class);
+        return getInstanceOf(DependencyResolver.class);
     }
 
-    public <T> T getInstanceOf(final Class<T> class1) {
+    protected <T> T getInstanceOf(final Class<T> class1) {
         return accessor.getInstanceOf(class1);
     }
 
-    public <T> T getInstanceOf(final String name, final Class<T> class1) {
+    protected <T> T getInstanceOf(final String name, final Class<T> class1) {
         return accessor.getInstanceOf(name, class1);
     }
 
     @Override
     public DefaultCommandProvider getDefaultCommandProvider() {
-        return accessor.getInstanceOf(DefaultCommandProvider.class);
+        return getInstanceOf(DefaultCommandProvider.class);
     }
 
     @Override
     public PlatformCacheService getPlatformCacheService() {
-        return accessor.getInstanceOf(PlatformCacheService.class);
+        return getInstanceOf(PlatformCacheService.class);
     }
 
     @Override
     public ReadSessionAccessor getReadSessionAccessor() {
-        return accessor.getInstanceOf(ReadSessionAccessor.class);
+    	return getInstanceOf(ReadSessionAccessor.class);
     }
 
 }

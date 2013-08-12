@@ -123,11 +123,9 @@ public class ServicesBuilder {
     }
 
     public Recorder buildRecorder(final boolean sync) {
-        String synchType = "recorderAsync";
-        if (sync) {
-            synchType = "recorderSync";
-        }
-        return getAccessor().getInstanceOf(synchType, Recorder.class);
+        // The parameter sync is not used as there is now only one version
+        // of the Recorder
+        return getAccessor().getInstanceOf("recorderSync", Recorder.class);
     }
 
     public TransactionService buildTransactionService() {
