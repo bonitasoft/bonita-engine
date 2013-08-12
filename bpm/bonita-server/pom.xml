@@ -251,6 +251,11 @@
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.events</groupId>
+			<artifactId>bonita-events-api-clustered-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Expression -->
 		<dependency>
@@ -836,8 +841,9 @@
 									<include>org.bonitasoft.engine.events:bonita-events-model</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
-									<include>com.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
+									<include>com.bonitasoft.engine.events:bonita-events-api-impl</include>
+									<include>com.bonitasoft.engine.events:bonita-events-api-clustered-impl</include>
 									<!-- Expression -->
 									<include>org.bonitasoft.engine.expression:bonita-expression-model</include>
 									<include>org.bonitasoft.engine.expression:bonita-expression-model-impl</include>
