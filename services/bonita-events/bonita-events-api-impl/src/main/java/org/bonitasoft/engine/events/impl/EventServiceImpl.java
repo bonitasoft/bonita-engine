@@ -79,11 +79,12 @@ public class EventServiceImpl implements EventService {
 
                 if (handlers.size() > 0) {
                     FireEventException fireEventException = null;
-                    for (final SHandler<SEvent> h : handlers) {// for each handler, I check if it's interested or not by the given event
-                        if (h.isInterested(event)) {
+                    for (final SHandler<SEvent> handler : handlers) {
+                        // for each handler, I check if it's interested or not by the given event
+                        if (handler.isInterested(event)) {
                             // for now, I just log the Exception into the console
                             try {
-                                h.execute(event);
+                                handler.execute(event);
                             } catch (final Exception e) {
                                 if (fireEventException == null) {
                                     fireEventException = new FireEventException("Unable to execute some handler");
