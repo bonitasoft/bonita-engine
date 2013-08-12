@@ -54,7 +54,6 @@ import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Charles Souillard
@@ -63,10 +62,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 public abstract class AbstractMybatisPersistenceService extends AbstractDBPersistenceService {
 
     private final String dbIdentifier;
-
-    private final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider;
-
-    private final TransactionService txService;
 
     private final Map<String, StatementMapping> statementMappings;
 
@@ -84,15 +79,11 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     private final String statementDelimiter;
 
-    public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
-            final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider, final AbstractMyBatisConfigurationsProvider configurations,
+    public AbstractMybatisPersistenceService(final String name, final String dbIdentifier, final AbstractMyBatisConfigurationsProvider configurations,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager, final DataSource datasource)
-            throws SPersistenceException {
+            final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager, final DataSource datasource) {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource);
         this.dbIdentifier = dbIdentifier;
-        this.txService = txService;
-        this.mybatisSqlSessionFactoryProvider = mybatisSqlSessionFactoryProvider;
         this.statementDelimiter = statementDelimiter;
         this.statementMappings = new HashMap<String, StatementMapping>();
         this.classAliasMappings = new HashMap<String, String>();
@@ -418,14 +409,6 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     @Override
     public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        try {
-            return this.selectById(getSession(), selectDescriptor);
-        } catch (final SPersistenceException e) {
-            throw new SBonitaReadException(e, selectDescriptor);
-        }
-    }
-
-    <T extends PersistentObject> T selectById(final SqlSession session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
         Map<String, Object> parameters;
         try {
             parameters = getDefaultParameters();
@@ -444,7 +427,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
         }
     }
 
-    private <T> String getSelectStatement(final AbstractSelectDescriptor<T> selectDescriptor, final Map<String, Object> parameters) throws SBonitaReadException {
+    private <T> String getSelectStatement(final AbstractSelectDescriptor<T> selectDescriptor, final Map<String, Object> parameters) {
         final String selectStatement = this.getSelectStatement(selectDescriptor);
         if (this.statementMappings.containsKey(selectStatement)) {
             final StatementMapping statementMapping = this.statementMappings.get(selectStatement);

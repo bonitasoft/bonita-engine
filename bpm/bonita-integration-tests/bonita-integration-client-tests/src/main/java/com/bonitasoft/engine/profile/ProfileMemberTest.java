@@ -2,8 +2,6 @@ package com.bonitasoft.engine.profile;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -31,13 +29,13 @@ public class ProfileMemberTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Group" }, story = "Create and delete group to profile.")
     @Test
-    public void createAndDeleteGroupToProfile() throws BonitaException, IOException {
+    public void createAndDeleteGroupToProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("group", null, group1.getId(), null);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role", "Group" }, story = "Create and delete role and group to profile.")
     @Test
-    public void createAndDeleteRoleAndGroupToProfile() throws BonitaException, IOException {
+    public void createAndDeleteRoleAndGroupToProfile() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
         getIdentityAPI().addUserMembership(user2.getId(), group1.getId(), role2.getId());
         getIdentityAPI().addUserMembership(user3.getId(), group2.getId(), role1.getId());
@@ -48,13 +46,13 @@ public class ProfileMemberTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role" }, story = "Create and delete role to profile.")
     @Test
-    public void createAndDeleteRoleToProfile() throws BonitaException, IOException {
+    public void createAndDeleteRoleToProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("role", null, null, role3.getId());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete" }, story = "Create and delete user profile.")
     @Test
-    public void createandDeleteUserProfile() throws BonitaException, IOException {
+    public void createandDeleteUserProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("user", user2.getId(), null, null);
     }
 
@@ -108,28 +106,28 @@ public class ProfileMemberTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Twice", "Same" }, jira = "ENGINE-919")
     @Test(expected = CreationException.class)
-    public void createTwiceSameProfileMemberWithUser() throws BonitaException, IOException {
+    public void createTwiceSameProfileMemberWithUser() throws BonitaException {
         getProfileAPI().createProfileMember(adminProfileId, user1.getId(), null, null);
         getProfileAPI().createProfileMember(adminProfileId, user1.getId(), null, null);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Twice", "Same" }, jira = "ENGINE-919")
     @Test(expected = CreationException.class)
-    public void createTwiceSameProfileMemberWithRole() throws BonitaException, IOException {
+    public void createTwiceSameProfileMemberWithRole() throws BonitaException {
         getProfileAPI().createProfileMember(adminProfileId, null, null, role1.getId());
         getProfileAPI().createProfileMember(adminProfileId, null, null, role1.getId());
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group", "Twice", "Same" }, jira = "ENGINE-919")
     @Test(expected = CreationException.class)
-    public void createTwiceSameProfileMemberWithGroup() throws BonitaException, IOException {
+    public void createTwiceSameProfileMemberWithGroup() throws BonitaException {
         getProfileAPI().createProfileMember(adminProfileId, null, group1.getId(), null);
         getProfileAPI().createProfileMember(adminProfileId, null, group1.getId(), null);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "UserMembership", "Twice", "Same" }, jira = "ENGINE-919")
     @Test(expected = CreationException.class)
-    public void createTwiceSameProfileMemberWithMembership() throws BonitaException, IOException {
+    public void createTwiceSameProfileMemberWithMembership() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
 
         // Create UserProfile
@@ -139,7 +137,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
 
     @Ignore("Problem with assumption that default values pre-exist")
     @Test
-    public void multitenancyOnSearchUserProfileMembers() throws BonitaException, IOException {
+    public void multitenancyOnSearchUserProfileMembers() throws BonitaException {
         logout();
 
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();

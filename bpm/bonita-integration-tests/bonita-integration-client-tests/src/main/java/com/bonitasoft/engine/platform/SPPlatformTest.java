@@ -8,6 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
@@ -38,11 +43,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.APITestSPUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @SuppressWarnings("javadoc")
 public class SPPlatformTest {
@@ -352,7 +352,7 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void getTenantsWithOrderByName() throws BonitaException {
+    public void getTenantsWithOrderByName() {
         final List<Tenant> tenants1 = platformAPI.getTenants(0, 2, TenantCriterion.NAME_ASC);
         final List<Tenant> tenants2 = platformAPI.getTenants(2, 2, TenantCriterion.NAME_ASC);
         final List<Tenant> tenants3 = platformAPI.getTenants(4, 2, TenantCriterion.NAME_ASC);
@@ -370,7 +370,7 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void getTenantsWithOrderByDescription() throws BonitaException {
+    public void getTenantsWithOrderByDescription() {
         final int count = platformAPI.getNumberOfTenants();
         assertEquals(4, count);
 
@@ -404,7 +404,7 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void getTenantsWithOrderByCreationDate() throws BonitaException {
+    public void getTenantsWithOrderByCreationDate() {
         final List<Tenant> tenantsCreAsc = platformAPI.getTenants(0, 4, TenantCriterion.CREATION_ASC);
         assertEquals(4, tenantsCreAsc.size());
         assertEquals(DEFAULT_TENANT_NAME, tenantsCreAsc.get(0).getName());
@@ -453,7 +453,7 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void getTenantsWithPages() throws BonitaException {
+    public void getTenantsWithPages() {
         final List<Tenant> testTenants = platformAPI.getTenants(0, 2, TenantCriterion.NAME_ASC);
         assertNotNull(testTenants);
         assertEquals(2, testTenants.size());
@@ -474,7 +474,7 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void getTenantsWithIndexPageOutOfRange() throws BonitaException {
+    public void getTenantsWithIndexPageOutOfRange() {
         final List<Tenant> tenants = platformAPI.getTenants(50, 100, TenantCriterion.NAME_ASC);
         assertTrue(tenants.isEmpty());
     }
@@ -516,7 +516,7 @@ public class SPPlatformTest {
     }
 
     @Test
-    public void getNumberOfTenants() throws BonitaException {
+    public void getNumberOfTenants() {
         assertEquals(4, platformAPI.getNumberOfTenants());
     }
 

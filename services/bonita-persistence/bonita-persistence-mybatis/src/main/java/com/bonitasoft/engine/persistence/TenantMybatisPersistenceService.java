@@ -24,7 +24,6 @@ import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Charles Souillard
@@ -35,14 +34,12 @@ public class TenantMybatisPersistenceService extends AbstractMybatisPersistenceS
 
     private final ReadSessionAccessor sessionAccessor;
 
-    public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final TransactionService txService,
-            final ReadSessionAccessor sessionAccessor, final MybatisSqlSessionFactoryProvider mybatisSqlSessionFactoryProvider,
+    public TenantMybatisPersistenceService(final String name, final String dbIdentifier, final ReadSessionAccessor sessionAccessor,
             final MyBatisConfigurationsProvider configurations, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
             final String likeEscapeCharacter, final TechnicalLoggerService technicalLoggerService, final SequenceManager sequenceManager,
-            final DataSource datasource)
-            throws SPersistenceException {
-        super(name, dbIdentifier, txService, mybatisSqlSessionFactoryProvider, configurations, dbConfigurationsProvider, statementDelimiter,
-                likeEscapeCharacter, technicalLoggerService, sequenceManager, datasource);
+            final DataSource datasource) {
+        super(name, dbIdentifier, configurations, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, technicalLoggerService, sequenceManager,
+                datasource);
         this.sessionAccessor = sessionAccessor;
     }
 

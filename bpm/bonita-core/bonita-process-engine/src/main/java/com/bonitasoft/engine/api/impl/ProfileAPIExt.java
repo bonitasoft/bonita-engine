@@ -370,7 +370,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
         final String type = (String) fields.get(ProfileEntryField.TYPE);
         final String page = (String) fields.get(ProfileEntryField.PAGE);
-        final String name = (String) fields.get(ProfileEntryField.NAME);
         if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
             throw new CreationException("For a link, the page is mandatory.");
         }

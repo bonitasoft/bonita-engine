@@ -26,7 +26,6 @@ public class SelectListStatement<T> extends ReadStatement<List<T>> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<T> execute(final SqlSession sqlSession) {
         return sqlSession.selectList(this.statement, this.parameter, this.rowBounds);
     }
