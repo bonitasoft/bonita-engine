@@ -122,18 +122,15 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     ServicesAccessor accessor;
 
-    Long tenantId;
-
     public BPMServicesBuilder() {
-        super();
-        accessor = ServicesAccessor.getInstance();
+        this(null);
     }
 
+    // This constructor is called by reflection
     public BPMServicesBuilder(final Long tenantId) {
-        // What is the parameter tenantId useful for ?
+        // For this class only used by the tests, we do not matter of the parameter tenantId
         super();
         accessor = ServicesAccessor.getInstance();
-        this.tenantId = tenantId;
     }
 
     @Override
