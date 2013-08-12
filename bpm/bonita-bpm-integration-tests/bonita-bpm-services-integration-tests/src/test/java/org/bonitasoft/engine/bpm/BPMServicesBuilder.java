@@ -596,11 +596,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(DependencyResolver.class);
     }
 
-    public <T> T getInstanceOf(final Class<T> class1) {
+    protected <T> T getInstanceOf(final Class<T> class1) {
         return accessor.getInstanceOf(class1);
     }
 
-    public <T> T getInstanceOf(final String name, final Class<T> class1) {
+    protected <T> T getInstanceOf(final String name, final Class<T> class1) {
         return accessor.getInstanceOf(name, class1);
     }
 
