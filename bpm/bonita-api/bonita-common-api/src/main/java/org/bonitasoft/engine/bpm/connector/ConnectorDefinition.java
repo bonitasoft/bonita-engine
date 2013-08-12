@@ -25,7 +25,7 @@ import org.bonitasoft.engine.operation.Operation;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public interface ConnectorDefinition extends NamedElement, BaseElement {
+public interface ConnectorDefinition extends NamedElement {
 
     String getConnectorId();
 
