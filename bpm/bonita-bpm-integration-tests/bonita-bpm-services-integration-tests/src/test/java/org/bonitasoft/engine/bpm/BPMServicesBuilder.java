@@ -125,12 +125,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         accessor = ServicesAccessor.getInstance();
     }
 
-    public BPMServicesBuilder(final Long tenantid) {
-        // What is the parameter tenantId useful for ?
-        super();
-        accessor = ServicesAccessor.getInstance();
-    }
-
     @Override
     public ProcessDefinitionService getProcessDefinitionService() {
         return accessor.getInstanceOf(ProcessDefinitionService.class);
