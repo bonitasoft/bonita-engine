@@ -89,8 +89,8 @@ public final class ServiceAccessorFactory {
                 throw new BonitaHomeConfigurationException("tenantClassName not set in bonita-platform.properties");
             }
             final Class<TenantServiceAccessor> tenantClass = ClassReflector.getClass(TenantServiceAccessor.class, tenantClassName);
-            final Constructor<TenantServiceAccessor> constructor = tenantClass.getConstructor(Long.class);
-            tenantServiceAccessor.put(tenantId, constructor.newInstance(tenantId));
+            final Constructor<TenantServiceAccessor> constructor = tenantClass.getConstructor();
+            tenantServiceAccessor.put(tenantId, constructor.newInstance());
         }
         return tenantServiceAccessor.get(tenantId);
     }
