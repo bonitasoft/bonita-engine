@@ -162,15 +162,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     public PersistenceService getPersistence() {
-        return this.getPersistence("persistenceService");
-    }
-
-    public PersistenceService getPersistence(final String name) {
-        return accessor.getInstanceOf(name, PersistenceService.class);
-    }
-
-    public PersistenceService getJournal() {
-        return this.getPersistence();
+        return this.getPersistence(PersistenceService.class);
     }
 
     public Recorder getRecorder(final boolean sync) {
