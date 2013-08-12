@@ -67,26 +67,22 @@ public interface ProfileService {
      * 
      * @param profile
      * @return sProfile
-     * @throws SProfileAlreadyExistsException
-     *             occurs when the sProfile has already been taken
      * @throws SProfileCreationException
      *             occurs when an exception is thrown during sProfile creation
      * @since 6.0
      */
-    SProfile createProfile(SProfile profile) throws SProfileAlreadyExistsException, SProfileCreationException;
+    SProfile createProfile(SProfile profile) throws SProfileCreationException;
 
     /**
      * Update profile by given profile and new content
      * 
      * @param profile
      * @param descriptor
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfile
      * @throws SProfileUpdateException
      *             occurs when an exception is thrown during sProfile update
      * @since 6.0
      */
-    void updateProfile(SProfile profile, EntityUpdateDescriptor descriptor) throws SProfileNotFoundException, SProfileUpdateException;
+    void updateProfile(SProfile profile, EntityUpdateDescriptor descriptor) throws SProfileUpdateException;
 
     /**
      * Delete profile by given sProfile
@@ -172,12 +168,11 @@ public interface ProfileService {
      * 
      * @param profileEntry
      * @return the new created sProfileEntry
-     * @throws SProfileEntryAlreadyExistsException
      * @throws SProfileEntryCreationException
      *             occurs when an exception is thrown during sProfileEntry creation
      * @since 6.0
      */
-    SProfileEntry createProfileEntry(SProfileEntry profileEntry) throws SProfileEntryAlreadyExistsException, SProfileEntryCreationException;
+    SProfileEntry createProfileEntry(SProfileEntry profileEntry) throws SProfileEntryCreationException;
 
     /**
      * Update a profileEntry by given profileEntry and new content
@@ -223,14 +218,10 @@ public interface ProfileService {
      * @param lastName
      * @param userName
      * @return sProfileMember
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileMember
-     * @throws SProfileCreationException
-     *             occurs when an exception is thrown during sProfileMember creation
+     * @throws SProfileMemberCreationException TODO
      * @since 6.0
      */
-    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName) throws SProfileNotFoundException,
-            SProfileCreationException;
+    SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName) throws SProfileMemberCreationException;
 
     /**
      * Add a group to exist profile
@@ -242,14 +233,10 @@ public interface ProfileService {
      * @param groupName
      * @param parentPath
      * @return sProfileMember
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileMember
-     * @throws SProfileCreationException
-     *             occurs when an exception is thrown during sProfileMember creation
+     * @throws SProfileMemberCreationException TODO
      * @since 6.0
      */
-    SProfileMember addGroupToProfile(long profileId, long groupId, String groupName, String parentPath) throws SProfileNotFoundException,
-            SProfileCreationException;
+    SProfileMember addGroupToProfile(long profileId, long groupId, String groupName, String parentPath) throws SProfileMemberCreationException;
 
     /**
      * Add a role to exist profile
@@ -260,13 +247,10 @@ public interface ProfileService {
      *            the identifier of role
      * @param roleName
      * @return sProfileMember
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileMember
-     * @throws SProfileCreationException
-     *             occurs when an exception is thrown during sProfileMember creation
+     * @throws SProfileMemberCreationException TODO
      * @since 6.0
      */
-    SProfileMember addRoleToProfile(long profileId, long roleId, String roleName) throws SProfileNotFoundException, SProfileCreationException;
+    SProfileMember addRoleToProfile(long profileId, long roleId, String roleName) throws SProfileMemberCreationException;
 
     /**
      * Add a role and a group to exist profile
@@ -281,14 +265,11 @@ public interface ProfileService {
      * @param groupName
      * @param groupParentPath
      * @return sProfileMember
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileMember
-     * @throws SProfileCreationException
-     *             occurs when an exception is thrown during sProfileMember creation
+     * @throws SProfileMemberCreationException TODO
      * @since 6.0
      */
     SProfileMember addRoleAndGroupToProfile(long profileId, long roleId, long groupId, String roleName, String groupName, String groupParentPath)
-            throws SProfileNotFoundException, SProfileCreationException;
+            throws SProfileMemberCreationException;
 
     /**
      * Get all sProfileMembers with same user having the given value for the given int index

@@ -1202,8 +1202,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public UserMembership updateUserMembership(final long userMembershipId, final long newGroupId, final long newRoleId) throws MembershipNotFoundException,
-            UpdateException {
+    public UserMembership updateUserMembership(final long userMembershipId, final long newGroupId, final long newRoleId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final EntityUpdateDescriptor changeDescriptor = tenantAccessor.getIdentityModelBuilder().getUserMembershipUpdateBuilder().updateGroupId(newGroupId)

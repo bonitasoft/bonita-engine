@@ -59,8 +59,7 @@ public class InitializingActivityStateImpl extends FlowNodeStateWithConnectors {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance)
-            throws SActivityStateExecutionException {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return false;
     }
 
@@ -99,7 +98,7 @@ public class InitializingActivityStateImpl extends FlowNodeStateWithConnectors {
     }
 
     @Override
-    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
 
     }
 }

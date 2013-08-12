@@ -31,7 +31,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -406,7 +405,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void executeTransition(final SProcessDefinition sDefinition, final STransitionInstance transitionInstance) throws SBonitaException {
+    public void executeTransition(final SProcessDefinition sDefinition, final STransitionInstance transitionInstance) {
         // do nothing: no transition in a flow node for now
     }
 
@@ -417,7 +416,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public FlowNodeState executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException, SActivityReadException {
+            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
         return stepForward(flowNodeInstanceId, null, null, processInstanceId, executerId, executerDelegateId);
     }
 

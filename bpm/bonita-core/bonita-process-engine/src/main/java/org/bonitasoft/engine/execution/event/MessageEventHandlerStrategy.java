@@ -290,8 +290,9 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition, final SThrowEventInstance sThrowEventInstance,
-            final  SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
+            final SThrowEventInstance sThrowEventInstance,
+            final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do
         return false;
     }

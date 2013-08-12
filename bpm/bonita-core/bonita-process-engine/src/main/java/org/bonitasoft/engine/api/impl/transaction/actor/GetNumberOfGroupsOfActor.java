@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl.transaction.actor;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 
 /**
@@ -34,7 +33,7 @@ public class GetNumberOfGroupsOfActor implements TransactionContentWithResult<Lo
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public void execute() {
         numberOfGroups = actorMappingService.getNumberOfGroupsOfActor(actorId);
     }
 

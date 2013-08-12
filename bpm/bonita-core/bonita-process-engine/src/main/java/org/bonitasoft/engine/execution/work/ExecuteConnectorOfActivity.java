@@ -47,7 +47,6 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.work.WorkRegisterException;
 
 /**
  * @author Baptiste Mesta
@@ -74,7 +73,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void continueFlow() throws WorkRegisterException {
+    protected void continueFlow() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();

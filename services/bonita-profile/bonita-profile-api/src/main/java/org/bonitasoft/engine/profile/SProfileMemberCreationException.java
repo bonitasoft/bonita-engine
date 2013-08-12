@@ -11,26 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution;
+package org.bonitasoft.engine.profile;
 
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class CountAnswer implements Answer<Void> {
+public class SProfileMemberCreationException extends SBonitaException {
 
-    private int count;
+    private static final long serialVersionUID = 5352601047167402771L;
 
-    public int getCount() {
-        return count;
+    public SProfileMemberCreationException(final String message) {
+        super(message);
     }
 
-    @Override
-    public Void answer(final InvocationOnMock invocation) {
-        count++;
-        return null;
+    public SProfileMemberCreationException(final Throwable cause) {
+        super(cause);
+    }
+
+    public SProfileMemberCreationException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
 }

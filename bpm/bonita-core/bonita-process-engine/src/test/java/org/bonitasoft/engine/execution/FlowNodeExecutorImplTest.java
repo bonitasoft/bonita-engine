@@ -23,7 +23,7 @@ import org.junit.Test;
 public class FlowNodeExecutorImplTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     /**

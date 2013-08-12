@@ -115,7 +115,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     @Override
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
-            final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+            final SEventTriggerDefinition sEventTriggerDefinition) {
     }
 
     @Override
@@ -124,7 +124,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) {
     }
 
     @Override
@@ -207,8 +207,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     @Override
     public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance)
-            throws SBonitaException {
+            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do
         return false;
     }

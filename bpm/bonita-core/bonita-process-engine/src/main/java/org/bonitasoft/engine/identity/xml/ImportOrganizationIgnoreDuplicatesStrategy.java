@@ -16,7 +16,6 @@ package org.bonitasoft.engine.identity.xml;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
-import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -32,19 +31,19 @@ public class ImportOrganizationIgnoreDuplicatesStrategy implements ImportOrganiz
     }
 
     @Override
-    public void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) {
     }
 
     @Override
-    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingUser(final SUser existingUser, final ExportedUser user) {
     }
 
     @Override
-    public void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingRole(final SRole existingRole, final RoleCreator newRole) {
     }
 
     @Override
-    public void foundExistingMembership(final SUserMembership existingMembership) throws ImportDuplicateInOrganizationException {
+    public void foundExistingMembership(final SUserMembership existingMembership) {
     }
 
 }

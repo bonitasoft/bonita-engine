@@ -33,8 +33,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
@@ -63,8 +61,6 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
 
     private transient BPMInstanceBuilders instanceBuilders;
 
-    private EventsHandler enventsHandler;
-
     private WorkService workService;
 
     @Override
@@ -78,7 +74,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     }
 
     @Override
-    public void execute() throws JobExecutionException, FireEventException {
+    public void execute() throws JobExecutionException {
         try {
             final List<SMessageEventCouple> potentialMessageCouples = eventInstanceService.getMessageEventCouples();
 

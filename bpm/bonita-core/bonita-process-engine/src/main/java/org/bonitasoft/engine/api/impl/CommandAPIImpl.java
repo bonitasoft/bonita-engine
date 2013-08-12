@@ -225,7 +225,7 @@ public class CommandAPIImpl implements CommandAPI {
     }
 
     @Override
-    public void update(final String commandName, final CommandUpdater updateDescriptor) throws CommandNotFoundException, UpdateException {
+    public void update(final String commandName, final CommandUpdater updateDescriptor) throws UpdateException {
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
@@ -279,7 +279,7 @@ public class CommandAPIImpl implements CommandAPI {
     }
 
     @Override
-    public void update(final long commandId, final CommandUpdater updater) throws CommandNotFoundException, UpdateException {
+    public void update(final long commandId, final CommandUpdater updater) throws UpdateException {
         if (updater == null || updater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }

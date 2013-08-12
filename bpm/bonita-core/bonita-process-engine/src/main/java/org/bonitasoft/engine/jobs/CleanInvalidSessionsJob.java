@@ -16,9 +16,7 @@ package org.bonitasoft.engine.jobs;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
@@ -41,7 +39,7 @@ public class CleanInvalidSessionsJob extends InternalJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException, FireEventException {
+    public void execute() throws JobExecutionException {
         try {
             final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final SessionService sessionService = platformServiceAccessor.getSessionService();
@@ -52,7 +50,7 @@ public class CleanInvalidSessionsJob extends InternalJob {
     }
 
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
 
     }
 

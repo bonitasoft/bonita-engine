@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -70,7 +69,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     @Override
     public Serializable evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException {
         ExpressionConstants expressionConstant = ExpressionConstantsResolver.getExpressionConstantsFromName(expression.getContent());
         if (expressionConstant == null) {
             expressionConstant = ExpressionConstants.API_ACCESSOR;// just to make the expressionConstantsResolver load constants
@@ -299,7 +298,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException {
         final List<Object> results = new ArrayList<Object>();
         for (final SExpression sExpression : expressions) {
             results.add(evaluate(sExpression, dependencyValues, resolvedExpressions));

@@ -124,7 +124,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) {
         // NOT supported. Must to be implemented with errors can be sent via the API
     }
 
@@ -329,7 +329,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
+    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) {
         return EMPTY;
     }
 

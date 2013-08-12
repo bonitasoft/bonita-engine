@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.jobs;
 
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.TxBonitaWork;

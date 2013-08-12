@@ -64,7 +64,7 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return StateCode.DONE;
     }
 

@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Yanyan Liu
@@ -32,13 +31,13 @@ public class RoleBinding extends ElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         final String name = attributes.get(OrganizationMappingConstants.NAME);
         roleCreator = new RoleCreator(name);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (OrganizationMappingConstants.DISPLAY_NAME.equals(name)) {
             roleCreator.setDisplayName(value);
         } else if (OrganizationMappingConstants.DESCRIPTION.equals(name)) {
@@ -51,7 +50,7 @@ public class RoleBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

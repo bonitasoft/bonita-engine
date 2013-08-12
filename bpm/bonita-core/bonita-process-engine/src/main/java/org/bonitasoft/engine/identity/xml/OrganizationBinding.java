@@ -22,7 +22,6 @@ import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Yanyan Liu
@@ -39,15 +38,15 @@ public class OrganizationBinding extends ElementBinding {
     private final List<UserMembership> memberships = new ArrayList<UserMembership>();
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (OrganizationMappingConstants.USER.equals(name)) {
             users.add((ExportedUser) value);
         } else if (OrganizationMappingConstants.ROLE.equals(name)) {

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.bean;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,25 +36,25 @@ public class ServerAPIBean implements SessionBean, ServerAPI {
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         final ServerAPIImpl apiImpl = new ServerAPIImpl();
         return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 
     @Override
-    public void ejbActivate() throws EJBException, RemoteException {
+    public void ejbActivate() throws EJBException {
     }
 
     @Override
-    public void ejbPassivate() throws EJBException, RemoteException {
+    public void ejbPassivate() throws EJBException {
     }
 
     @Override
-    public void ejbRemove() throws EJBException, RemoteException {
+    public void ejbRemove() throws EJBException {
     }
 
     @Override
-    public void setSessionContext(final SessionContext ctx) throws EJBException, RemoteException {
+    public void setSessionContext(final SessionContext ctx) throws EJBException {
         this.ctx = ctx;
     }
 

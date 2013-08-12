@@ -238,7 +238,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public FlowNodeState executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeReadException, SFlowNodeExecutionException {
+            final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
         return flowNodeExecutor.stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerDelegateId);
     }
 

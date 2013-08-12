@@ -95,7 +95,7 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
+    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) {
         return EMPTY;
     }
 
@@ -119,8 +119,9 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition, final SThrowEventInstance sThrowEventInstance,
-            final  SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
+            final SThrowEventInstance sThrowEventInstance,
+            final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do
         return false;
     }

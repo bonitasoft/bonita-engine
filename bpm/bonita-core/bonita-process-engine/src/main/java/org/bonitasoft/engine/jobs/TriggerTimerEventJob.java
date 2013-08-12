@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
@@ -64,7 +63,7 @@ public class TriggerTimerEventJob extends InternalJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException, FireEventException {
+    public void execute() throws JobExecutionException {
         try {
             if (subProcessId == null) {
                 eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);

@@ -223,8 +223,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
     }
 
     @Override
-    public final StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws SActivityStateExecutionException {
+    public final StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return StateCode.DONE;
     }
 

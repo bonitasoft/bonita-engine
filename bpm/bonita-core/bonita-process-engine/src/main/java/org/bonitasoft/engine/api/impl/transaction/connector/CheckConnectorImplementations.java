@@ -20,7 +20,6 @@ import java.util.Set;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.Problem.Level;
 import org.bonitasoft.engine.bpm.process.impl.ProblemImpl;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
@@ -48,7 +47,7 @@ public class CheckConnectorImplementations implements TransactionContent {
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public void execute() {
         problems = new ArrayList<Problem>();
         final List<SConnectorDefinition> processConnectors = sDefinition.getProcessContainer().getConnectors();
         if (processConnectors != null) {

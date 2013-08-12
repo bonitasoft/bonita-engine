@@ -75,41 +75,38 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
 
     @Override
     public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SCatchEventInstance eventInstance,
-            final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+            final SEventTriggerDefinition sEventTriggerDefinition) {
         // No catch of terminate
 
     }
 
     @Override
-    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
+    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) {
         return EMPTY;
     }
 
     @Override
-    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) {
 
     }
 
     @Override
     public void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
-            throws SBonitaException {
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void unregisterCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessIsnstance)
-            throws SBonitaException {
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessIsnstance) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance)
-            throws SBonitaException {
+            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do
         return false;
     }
