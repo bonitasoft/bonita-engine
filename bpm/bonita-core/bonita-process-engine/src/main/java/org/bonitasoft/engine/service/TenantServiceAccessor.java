@@ -35,6 +35,7 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
@@ -51,6 +52,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
@@ -187,6 +189,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     SDataSourceModelBuilder getSDataSourceModelBuilder();
 
+    SDataInstanceBuilders getSDataInstanceBuilders();
+
     DataService getDataService();
 
     ParserFactory getParserFactgory();
@@ -238,5 +242,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     WorkService getWorkService();
 
     TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor();
+
+    SACommentBuilder getSACommentBuilders();
 
 }

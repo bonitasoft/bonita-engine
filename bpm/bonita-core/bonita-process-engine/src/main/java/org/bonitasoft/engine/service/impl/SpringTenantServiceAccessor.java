@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
@@ -63,6 +64,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
@@ -115,7 +117,7 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
- * 
+ *
  */
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
@@ -209,6 +211,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private SDataDefinitionBuilders sDataDefinitionBuilders;
 
+    private SDataInstanceBuilders sDataInstanceBuilders;
+
     private DataService dataService;
 
     private SDataSourceModelBuilder sDataSourceModelBuilder;
@@ -260,6 +264,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ReadSessionAccessor readSessionAccessor;
 
     private TransactionalProcessInstanceInterruptor transactionalProcessInstanceInterruptor;
+
+    private SACommentBuilder saCommentBuilder;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -656,6 +662,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public SDataInstanceBuilders getSDataInstanceBuilders() {
+        if (sDataInstanceBuilders == null) {
+            sDataInstanceBuilders = beanAccessor.getService(SDataInstanceBuilders.class);
+        }
+        return sDataInstanceBuilders;
+    }
+
+    @Override
     public DataService getDataService() {
         if (dataService == null) {
             dataService = beanAccessor.getService(DataService.class);
@@ -892,6 +906,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             workService = beanAccessor.getService(WorkService.class);
         }
         return workService;
+    }
+
+    @Override
+    public SACommentBuilder getSACommentBuilders() {
+        if (saCommentBuilder == null) {
+            saCommentBuilder = beanAccessor.getService(SACommentBuilder.class);
+        }
+        return saCommentBuilder;
     }
 
 }
