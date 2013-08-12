@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,10 +22,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 public class GroupTest extends CommonAPITest {
 
@@ -333,6 +333,29 @@ public class GroupTest extends CommonAPITest {
         getIdentityAPI().deleteGroup(groupL3.getId());
         getIdentityAPI().deleteGroup(groupL2.getId());
         getIdentityAPI().deleteGroup(newRootGroup.getId());
+    }
+
+    @Test
+    public void testUpdateGroupNameAndParenthAlsoUpdateAllChildrenInfos() throws BonitaException {
+        // arrange
+        Group parentGroup = getIdentityAPI().createGroup("France", defaultGroup.getPath());
+        Group childGroup = getIdentityAPI().createGroup("Grenoble", parentGroup.getPath());
+
+        // act
+        final GroupUpdater group2Updater = new GroupUpdater();
+        group2Updater.updateParentPath("/WorldCompany");
+        group2Updater.updateName("Germany");
+        getIdentityAPI().updateGroup(parentGroup.getId(), group2Updater);
+
+        // assert
+        parentGroup = getIdentityAPI().getGroup(parentGroup.getId());
+        childGroup = getIdentityAPI().getGroup(childGroup.getId());
+        assertEquals("/WorldCompany/Germany", childGroup.getParentPath());
+        assertEquals("/WorldCompany/Germany/Grenoble", childGroup.getPath());
+
+        // clean-up:
+        getIdentityAPI().deleteGroup(childGroup.getId());
+        getIdentityAPI().deleteGroup(parentGroup.getId());
     }
 
     @Test(expected = GroupNotFoundException.class)

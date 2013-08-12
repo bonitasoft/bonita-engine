@@ -45,12 +45,6 @@ public class ExecuteMessageCoupleWork extends TxBonitaWork {
         final SWaitingMessageEvent waitingMessage = eventInstanceService.getWaitingMessage(waitingMessageId);
         if (waitingMessage != null) {
             tenantAccessor.getEventsHandler().triggerCatchEvent(waitingMessage, messageInstanceId);
-
-            // markMessageAsHandled
-            final SMessageInstance messageInstanceToUpdate = eventInstanceService.getMessageInstance(messageInstanceId);
-            final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-            descriptor.addField(tenantAccessor.getBPMInstanceBuilders().getSMessageInstanceBuilder().getHandledKey(), true);
-            eventInstanceService.updateMessageInstance(messageInstanceToUpdate, descriptor);
         }
     }
 

@@ -85,7 +85,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * Default implementation of the Identity service
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Bole Zhang
@@ -110,13 +110,13 @@ public class IdentityServiceImpl implements IdentityService {
 
     private final CredentialsEncrypter encrypter;
 
-    public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventSvc,
+    public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
             final IdentityModelBuilder identityModelBuilder, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
             final CredentialsEncrypter encrypter) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        eventService = eventSvc;
-        eventBuilder = eventSvc.getEventBuilder();
+        this.eventService = eventService;
+        eventBuilder = eventService.getEventBuilder();
         this.identityModelBuilder = identityModelBuilder;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
@@ -621,7 +621,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void deleteLightUserMembership(SUserMembership userMembership) throws SMembershipDeletionException {
+    public void deleteLightUserMembership(final SUserMembership userMembership) throws SMembershipDeletionException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteUserMembership"));
         }

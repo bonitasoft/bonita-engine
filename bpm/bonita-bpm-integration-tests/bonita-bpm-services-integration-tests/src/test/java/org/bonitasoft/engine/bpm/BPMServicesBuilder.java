@@ -130,6 +130,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     public BPMServicesBuilder(final Long tenantId) {
+        // What is the parameter tenantId useful for ?
         super();
         accessor = ServicesAccessor.getInstance();
         this.tenantId = tenantId;
@@ -189,10 +190,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     public PersistenceService getJournal() {
         return this.getPersistence();
-    }
-
-    public PersistenceService geaccessortory() {
-        return this.getPersistence("history");
     }
 
     public Recorder getRecorder(final boolean sync) {

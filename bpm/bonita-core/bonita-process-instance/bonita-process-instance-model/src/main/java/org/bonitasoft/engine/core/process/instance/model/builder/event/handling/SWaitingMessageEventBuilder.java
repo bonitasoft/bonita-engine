@@ -25,8 +25,6 @@ public interface SWaitingMessageEventBuilder extends SWaitingEventKeyProvider, S
 
     public static final int PROGRESS_IN_TREATMENT_KEY = 1;
 
-    public static final int PROGRESS_DONE_KEY = 2;
-
     SWaitingMessageEventBuilder createNewWaitingMessageStartEventInstance(long processdefinitionId, final String messageName, final String processName,
             final long flowNodeDefinitionId, final String flowNodeName);
 

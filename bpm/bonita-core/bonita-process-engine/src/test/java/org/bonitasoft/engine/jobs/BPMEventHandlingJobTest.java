@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
@@ -108,6 +109,69 @@ public class BPMEventHandlingJobTest {
         final SMessageEventCouple second = uniqueCouples.get(1);
         assertEquals(3L, second.getMessageInstance().getId());
         assertEquals(30L, second.getWaitingMessage().getId());
+    }
+
+    @Test
+    public void couplesWithDuplicateStartWaitingEventsAreConsideredTwice() throws Exception {
+        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
+
+        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
+        final SMessageInstance mi1 = mock(SMessageInstance.class);
+        when(couple1.getMessageInstance()).thenReturn(mi1);
+        when(mi1.getId()).thenReturn(1L);
+        final SWaitingMessageEvent wm1 = mock(SWaitingMessageEvent.class);
+        when(couple1.getWaitingMessage()).thenReturn(wm1);
+        when(wm1.getEventType()).thenReturn(SBPMEventType.START_EVENT);
+        when(wm1.getId()).thenReturn(10L);
+
+        final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
+        final SMessageInstance mi2 = mock(SMessageInstance.class);
+        when(couple2.getMessageInstance()).thenReturn(mi2);
+        when(mi2.getId()).thenReturn(2L);
+        final SWaitingMessageEvent wm2 = mock(SWaitingMessageEvent.class);
+        when(couple2.getWaitingMessage()).thenReturn(wm2);
+        when(wm2.getId()).thenReturn(10L);
+        when(wm2.getEventType()).thenReturn(SBPMEventType.START_EVENT);
+
+        messageCouples.addAll(Arrays.asList(couple1, couple2));
+        final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
+        assertEquals(2, uniqueCouples.size());
+        final SMessageEventCouple first = uniqueCouples.get(0);
+        assertEquals(1L, first.getMessageInstance().getId());
+        assertEquals(10L, first.getWaitingMessage().getId());
+        final SMessageEventCouple second = uniqueCouples.get(1);
+        assertEquals(2L, second.getMessageInstance().getId());
+        assertEquals(10L, second.getWaitingMessage().getId());
+    }
+
+    @Test
+    public void couplesWithDuplicateEventSubProcessesAreConsideredOnlyOnce() throws Exception {
+        List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
+
+        final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
+        final SMessageInstance mi1 = mock(SMessageInstance.class);
+        when(couple1.getMessageInstance()).thenReturn(mi1);
+        when(mi1.getId()).thenReturn(1L);
+        final SWaitingMessageEvent wm1 = mock(SWaitingMessageEvent.class);
+        when(couple1.getWaitingMessage()).thenReturn(wm1);
+        when(wm1.getEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
+        when(wm1.getId()).thenReturn(10L);
+
+        final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
+        final SMessageInstance mi2 = mock(SMessageInstance.class);
+        when(couple2.getMessageInstance()).thenReturn(mi2);
+        when(mi2.getId()).thenReturn(2L);
+        final SWaitingMessageEvent wm2 = mock(SWaitingMessageEvent.class);
+        when(couple2.getWaitingMessage()).thenReturn(wm2);
+        when(wm2.getId()).thenReturn(10L);
+        when(wm2.getEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
+
+        messageCouples.addAll(Arrays.asList(couple1, couple2));
+        final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
+        assertEquals(1, uniqueCouples.size());
+        final SMessageEventCouple first = uniqueCouples.get(0);
+        assertEquals(1L, first.getMessageInstance().getId());
+        assertEquals(10L, first.getWaitingMessage().getId());
     }
 
     @Test

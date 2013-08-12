@@ -8,3 +8,4 @@ services/bonita-integration-tests/src/test/java/org/bonitasoft/engine/TemporaryA
 bpm/bonita-bpm-integration-tests/bonita-bpm-services-integration-tests/src/test/java/org/bonitasoft/engine/bpm/test/TemporaryTestsWithJNDI.java
 TemporaryLocalIntegrationTests.java
 bpm/bonita-bpm-integration-tests/bonita-integration-local-tests/src/test/java/org/bonitasoft/engine/DeployBarTest.java
+*.iml

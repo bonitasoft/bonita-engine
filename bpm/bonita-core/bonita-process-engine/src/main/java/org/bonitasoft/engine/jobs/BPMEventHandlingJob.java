@@ -15,6 +15,7 @@ package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,10 +29,12 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
@@ -44,11 +47,23 @@ import org.bonitasoft.engine.work.WorkService;
  */
 public class BPMEventHandlingJob extends InternalJob implements Serializable {
 
+    /**
+     * List of BPMN Event types that can be triggered multiple times for a single instance
+     */
+    private static final List<SBPMEventType> START_WAITING_MESSAGE_LIST = Arrays.asList(SBPMEventType.START_EVENT/*
+                                                                                                                  * , SBPMEventType.EVENT_SUB_PROCESS
+                                                                                                                  * // EVENT_SUB_PROCESS of type non-interrupted
+                                                                                                                  * should be considered as well, as soon as we
+                                                                                                                  * support them
+                                                                                                                  */);
+
     private static final long serialVersionUID = 8929044925208984537L;
 
     private transient EventInstanceService eventInstanceService;
 
     private transient BPMInstanceBuilders instanceBuilders;
+
+    private EventsHandler enventsHandler;
 
     private WorkService workService;
 
@@ -76,7 +91,9 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
 
                 // Mark messages that will be treated as "treatment in progress":
                 markMessageAsInProgress(messageInstance);
-                markWaitingMessageAsInProgress(waitingMessage);
+                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
+                    markWaitingMessageAsInProgress(waitingMessage);
+                }
                 workService.registerWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId()));
             }
         } catch (final SBonitaException e) {
@@ -87,6 +104,8 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     /**
      * From a list of couples that may contain duplicate waiting message candidates, select only one waiting message for each message instance: the first
      * matching waiting message is arbitrary chosen.
+     * In the case of <code>SWaitingMessageEvent</code> of types {@link SBPMEventType#START_EVENT} or {@link SBPMEventType#EVENT_SUB_PROCESS}, it can be
+     * selected several times to trigger multiple instances.
      * 
      * @param messageCouples
      *            all the possible couples that match the potential correlation.
@@ -101,7 +120,10 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
             final SWaitingMessageEvent waitingMessage = couple.getWaitingMessage();
             if (!takenMessages.contains(messageInstance.getId()) && !takenWaitings.contains(waitingMessage.getId())) {
                 takenMessages.add(messageInstance.getId());
-                takenWaitings.add(waitingMessage.getId());
+                // Starting events and Starting event sub-processes must not be considered as taken if they appear several times:
+                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
+                    takenWaitings.add(waitingMessage.getId());
+                }
                 pairs.add(couple);
             }
         }
