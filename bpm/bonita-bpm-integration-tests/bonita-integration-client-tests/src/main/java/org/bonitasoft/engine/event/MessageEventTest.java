@@ -1083,7 +1083,7 @@ public class MessageEventTest extends CommonAPITest {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    private void checkUserHasNoPendingTasks() throws UserNotFoundException {
+    private void checkUserHasNoPendingTasks() {
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(0, taskInstances.size());
     }
