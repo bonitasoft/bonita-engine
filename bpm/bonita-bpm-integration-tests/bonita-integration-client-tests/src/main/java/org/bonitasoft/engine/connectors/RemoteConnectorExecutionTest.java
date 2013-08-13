@@ -1117,9 +1117,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
                 .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addConnector("wait200ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
+        builder.addConnector("wait300ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
                 new ExpressionBuilder().createConstantLongExpression(300));
-        builder.addConnector("wait200msbis", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
+        builder.addConnector("wait2000ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
                 new ExpressionBuilder().createConstantLongExpression(2000));
         builder.addConnector("myConnector2", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))
@@ -1243,11 +1243,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
         final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-                // .addData(
-                // "data",
-                // "org.bonitasoft.dfgdfg.Restaurant",
-                // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
-                // "org.bonitasoft.dfgdfg.Restaurant"))
+        // .addData(
+        // "data",
+        // "org.bonitasoft.dfgdfg.Restaurant",
+        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
+        // "org.bonitasoft.dfgdfg.Restaurant"))
                 .addUserTask("step1", "actor");
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));
