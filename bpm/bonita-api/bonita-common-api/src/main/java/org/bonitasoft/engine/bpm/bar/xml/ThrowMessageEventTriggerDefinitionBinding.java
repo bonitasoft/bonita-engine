@@ -19,7 +19,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.ThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -47,7 +46,7 @@ public class ThrowMessageEventTriggerDefinitionBinding extends MessageEventTrigg
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((DataDefinition) value);

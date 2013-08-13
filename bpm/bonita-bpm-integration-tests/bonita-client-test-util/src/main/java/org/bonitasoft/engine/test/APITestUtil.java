@@ -165,7 +165,7 @@ public class APITestUtil {
     public static final int DEFAULT_TIMEOUT = 10000;
 
     @After
-    public void clearSynchroRepository() throws Exception {
+    public void clearSynchroRepository() {
         try {
             login();
             ClientEventUtil.clearRepo(getCommandAPI());

@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.impl.TextDataDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -27,7 +26,7 @@ public class TextDataDefinitionBinding extends DataDefinitionBinding {
     private boolean longText;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         longText = Boolean.valueOf(attributes.get(XMLProcessDefinition.TEXT_DATA_DEFINITION_LONG));
     }

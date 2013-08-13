@@ -39,7 +39,7 @@ public final class CheckNbPendingTaskOf extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         pendingHumanTaskInstances = processAPI.getPendingHumanTaskInstances(user.getId(), 0, Math.max(nbActivities, 20), orderBy);
         return pendingHumanTaskInstances.size() == nbActivities;
     }

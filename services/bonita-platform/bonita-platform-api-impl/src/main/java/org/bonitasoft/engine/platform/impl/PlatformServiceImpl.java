@@ -34,7 +34,6 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.SPlatformAlreadyExistException;
 import org.bonitasoft.engine.platform.SPlatformCreationException;
 import org.bonitasoft.engine.platform.SPlatformDeletionException;
 import org.bonitasoft.engine.platform.SPlatformNotFoundException;
@@ -90,7 +89,7 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void createPlatformTables() throws SPlatformCreationException, SPlatformAlreadyExistException {
+    public void createPlatformTables() throws SPlatformCreationException {
         // create platform tables
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createPlatformTables"));

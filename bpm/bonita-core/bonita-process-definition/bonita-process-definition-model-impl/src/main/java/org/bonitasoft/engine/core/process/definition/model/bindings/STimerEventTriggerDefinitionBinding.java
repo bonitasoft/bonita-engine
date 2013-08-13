@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerT
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.STimerEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -35,16 +34,16 @@ public class STimerEventTriggerDefinitionBinding extends ElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         timerType = STimerType.valueOf(attributes.get(XMLSProcessDefinition.TIMER_EVENT_TRIGGER_TIMER_TYPE));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.EXPRESSION_NODE.equals(name)) {
             timerExpression = (SExpression) value;
         }

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.connectors;
 
 import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 
 /**
@@ -23,7 +22,7 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 public class TestConnectorEngineExecutionContext extends AbstractConnector {
 
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
 
     }
 

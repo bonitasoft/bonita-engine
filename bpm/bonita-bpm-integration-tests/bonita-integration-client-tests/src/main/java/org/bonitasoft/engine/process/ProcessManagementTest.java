@@ -355,7 +355,7 @@ public class ProcessManagementTest extends CommonAPITest {
     }
 
     @Test
-    public void getArchivedActivityInstancesOfAnUnknownProcess() throws Exception {
+    public void getArchivedActivityInstancesOfAnUnknownProcess() {
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(456213846564l, 0, 100,
                 ActivityInstanceCriterion.REACHED_STATE_DATE_ASC);
         assertEquals(0, archivedActivityInstances.size());
@@ -604,7 +604,7 @@ public class ProcessManagementTest extends CommonAPITest {
     }
 
     @Test
-    public void getSupportedStates() throws Exception {
+    public void getSupportedStates() {
         Set<String> TestStatesName = getProcessAPI().getSupportedStates(FlowNodeType.USER_TASK);
         assertEquals(5, TestStatesName.size());
         TestStatesName = getProcessAPI().getSupportedStates(FlowNodeType.AUTOMATIC_TASK);

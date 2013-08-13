@@ -99,7 +99,7 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     }
 
     @Override
-    public Configuration getConfiguration() throws ConfigurationException {
+    public Configuration getConfiguration() {
         return configuration;
     }
 

@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.bindings.XMLSProcessDefinition.BEntry;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -38,11 +37,11 @@ public class SConnectorDefinitionInputBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.EXPRESSION_NODE.equals(name)) {
             expression = (SExpression) value;
         }

@@ -72,12 +72,12 @@ public class CustomListener extends RunListener {
 
     private final SimpleDateFormat sdfTest = new SimpleDateFormat("dd-MM-yyyy, HH:mm:ss, z");
 
-    public CustomListener() throws Exception {
+    public CustomListener() {
         System.out.println("Creation of the customized listener");
         createXML();
     }
 
-    private void createXML() throws Exception {
+    private void createXML() {
 
     }
 
@@ -201,17 +201,17 @@ public class CustomListener extends RunListener {
     }
 
     @Override
-    public void testStarted(final Description description) throws Exception {
+    public void testStarted(final Description description) {
         testState = OK;
     }
 
     @Override
-    public void testFailure(final Failure failure) throws Exception {
+    public void testFailure(final Failure failure) {
         testState = KO;
     }
 
     @Override
-    public void testIgnored(final Description description) throws Exception {
+    public void testIgnored(final Description description) {
         testState = IGNORE;
     }
 

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSendTaskDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -38,7 +37,7 @@ public class SSendTaskDefinitionBinding extends SActivityDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.THROW_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
             throwMessageEventTriggerDefinition = (SThrowMessageEventTriggerDefinition) value;

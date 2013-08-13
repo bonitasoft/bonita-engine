@@ -46,7 +46,7 @@ public final class CheckNbOfProcessInstances extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         result = processAPI.getProcessInstances(0, nbOfProcInst + 1, orderBy);
         return nbOfProcInst == result.size();
     }

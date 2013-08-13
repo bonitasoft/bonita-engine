@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -27,16 +26,16 @@ public abstract class SErrorEventTriggerDefinitionBinding extends ElementBinding
     private String errorCode;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         errorCode = attributes.get(XMLProcessDefinition.ERROR_CODE);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     protected String getErrorCode() {

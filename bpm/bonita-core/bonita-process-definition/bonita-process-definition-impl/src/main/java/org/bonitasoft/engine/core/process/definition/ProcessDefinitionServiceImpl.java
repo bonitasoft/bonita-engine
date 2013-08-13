@@ -513,7 +513,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(final List<Long> processIds, final int fromIndex, final int numberOfProcesses,
-            final String field, final OrderByType order) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+            final String field, final OrderByType order) throws SProcessDefinitionReadException {
         if (processIds == null || processIds.size() == 0) {
             return Collections.emptyList();
         }
@@ -529,8 +529,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(final List<Long> processIds) throws SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException {
+    public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(final List<Long> processIds) throws SProcessDefinitionReadException {
         if (processIds == null || processIds.size() == 0) {
             return Collections.emptyList();
         }

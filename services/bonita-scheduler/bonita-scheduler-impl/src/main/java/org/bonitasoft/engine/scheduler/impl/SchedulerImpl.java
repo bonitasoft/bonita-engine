@@ -161,7 +161,7 @@ public class SchedulerImpl implements SchedulerService {
     }
 
     @Override
-    public void schedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException, FireEventException {
+    public void schedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "schedule"));
         }
@@ -172,8 +172,7 @@ public class SchedulerImpl implements SchedulerService {
     }
 
     @Override
-    public void schedule(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters, final Trigger trigger) throws SSchedulerException,
-            FireEventException {
+    public void schedule(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters, final Trigger trigger) throws SSchedulerException {
         if (trigger == null) {
             throw new SSchedulerException("The trigger is null");
         }
@@ -279,7 +278,7 @@ public class SchedulerImpl implements SchedulerService {
     }
 
     @Override
-    public void executeNow(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters) throws SSchedulerException, FireEventException {
+    public void executeNow(final SJobDescriptor jobDescriptor, final List<SJobParameter> parameters) throws SSchedulerException {
         internalSchedule(jobDescriptor, parameters, null);
     }
 

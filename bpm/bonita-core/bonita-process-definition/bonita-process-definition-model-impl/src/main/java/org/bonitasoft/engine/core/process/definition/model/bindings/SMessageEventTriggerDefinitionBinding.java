@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCorrelationDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -34,16 +33,16 @@ public abstract class SMessageEventTriggerDefinitionBinding extends ElementBindi
     private final List<SCorrelationDefinition> correlations = new ArrayList<SCorrelationDefinition>();
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         messageName = attributes.get(XMLSProcessDefinition.NAME);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.CORRELATION_NODE.equals(name)) {
             correlations.add((SCorrelationDefinition) value);
         }

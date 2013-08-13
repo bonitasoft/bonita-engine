@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.impl.CatchMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -47,7 +46,7 @@ public class CatchMessageEventTriggerDefinitionBinding extends MessageEventTrigg
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.OPERATION_NODE.equals(name)) {
             operations.add((Operation) value);

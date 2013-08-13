@@ -122,9 +122,8 @@ public class ServicesBuilder {
         return this.buildPersistence("history");
     }
 
-    public Recorder buildRecorder(final boolean sync) {
-        // The parameter sync is not used as there is now only one version
-        // of the Recorder
+    public Recorder buildRecorder() {
+        // The parameter sync is not used as there is now only one version of the Recorder
         return getAccessor().getInstanceOf("recorderSync", Recorder.class);
     }
 

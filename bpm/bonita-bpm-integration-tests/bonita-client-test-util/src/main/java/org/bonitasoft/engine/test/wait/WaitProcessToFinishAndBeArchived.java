@@ -49,7 +49,7 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         final List<ArchivedProcessInstance> archivedProcessInstances = processAPI.getArchivedProcessInstances(processInstance.getId(), 0, 200);
         return APITestUtil.containsState(archivedProcessInstances, state);
     }

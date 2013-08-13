@@ -15,7 +15,6 @@ package org.bonitasoft.engine.connectors;
 
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 
 /**
  * @author Baptiste Mesta
@@ -23,7 +22,7 @@ import org.bonitasoft.engine.connector.ConnectorValidationException;
 public class TestConnectorLongToExecute extends AbstractConnector {
 
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
     }
 
     @Override

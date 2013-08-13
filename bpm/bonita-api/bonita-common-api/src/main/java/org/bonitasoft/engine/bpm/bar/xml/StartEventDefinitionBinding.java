@@ -20,7 +20,6 @@ import org.bonitasoft.engine.bpm.flownode.CatchErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.CatchEventDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.StartEventDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -42,7 +41,7 @@ public class StartEventDefinitionBinding extends CatchEventDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.CATCH_ERROR_EVENT_TRIGGER_NODE.equals(name)) {
             errorEventTriggers.add((CatchErrorEventTriggerDefinition) value);

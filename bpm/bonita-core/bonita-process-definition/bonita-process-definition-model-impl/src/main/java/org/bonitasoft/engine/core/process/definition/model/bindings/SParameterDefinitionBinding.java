@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.impl.SParameterDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -28,7 +27,7 @@ public class SParameterDefinitionBinding extends SNamedElementBinding {
     private String type;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         type = attributes.get(XMLSProcessDefinition.PARAMETER_TYPE);
     }
@@ -46,14 +45,14 @@ public class SParameterDefinitionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.DESCRIPTION.equals(name)) {
             description = value;
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
 
     }
 

@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.WaitUntil;
 
 public class WaitForAssignedStep extends WaitUntil {
@@ -42,7 +41,7 @@ public class WaitForAssignedStep extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws BonitaException {
+    protected boolean check() {
         final List<HumanTaskInstance> taskInstances = processAPI.getAssignedHumanTaskInstances(userId, 0, 20, ActivityInstanceCriterion.DEFAULT);
         for (final HumanTaskInstance taskInstance : taskInstances) {
             if (taskInstance.getName().equals(userTaskName) && taskInstance.getParentProcessInstanceId() == processInstanceId) {

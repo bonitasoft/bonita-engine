@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.filter.JarDependencies;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Yanyan Liu
@@ -30,18 +29,18 @@ public class JarDependenciesBinding extends ElementBinding {
     private final List<String> dependencies = new ArrayList<String>();
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLDescriptor.JAR_DEPENDENCY.equals(name)) {
             dependencies.add(value);
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

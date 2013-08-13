@@ -93,7 +93,7 @@ public class RoleTest extends CommonAPITest {
     }
 
     @Test
-    public void getAnEmptyListWhenNoRolesAreDefined() throws Exception {
+    public void getAnEmptyListWhenNoRolesAreDefined() {
         final List<Role> roles = identityAPI.getRoles(0, 10, RoleCriterion.NAME_ASC);
         assertEquals(0, roles.size());
     }

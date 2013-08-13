@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SThrowEventDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -38,7 +37,7 @@ public abstract class SThrowEventDefinitionBinding extends SFlowNodeDefinitionBi
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.THROW_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
             messageEventTriggers.add((SThrowMessageEventTriggerDefinition) value);

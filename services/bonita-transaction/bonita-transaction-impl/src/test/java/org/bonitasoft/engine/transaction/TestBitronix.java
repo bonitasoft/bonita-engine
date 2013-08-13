@@ -5,7 +5,6 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
-import javax.transaction.UserTransaction;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,12 +30,10 @@ public class TestBitronix {
         conf.setLogPart1Filename("/tmp/tx-logs/part1.btm");
         conf.setLogPart2Filename("/tmp/tx-logs/part2.btm");
 
-        Hashtable env = new Hashtable();
+        Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
         Context ctx = new InitialContext(env);
 
-        // DataSource ds = (DataSource) ctx.lookup("myDataSourceUniqueName");
-        UserTransaction ut = (UserTransaction) ctx.lookup("java:comp/UserTransaction");
         TransactionManager tm = (TransactionManager) ctx.lookup("java:comp/UserTransaction");
 
         tm.begin();

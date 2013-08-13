@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.queriablelogger;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,9 +24,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.junit.After;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class QueriableLoggerServiceTest extends CommonServiceTest {
 
@@ -59,7 +59,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
     private final QueriableLogSessionProvider qlSessionProvider;
 
-    public QueriableLoggerServiceTest() throws Exception {
+    public QueriableLoggerServiceTest() {
         loggerService = getServicesBuilder().buildQueriableLogger("syncQueriableLoggerService");
         logModelBuilder = getServicesBuilder().getInstanceOf(SQueriableLogModelBuilder.class);
         logbuilder = logModelBuilder.getQueriableLogBuilder();

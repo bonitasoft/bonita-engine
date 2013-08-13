@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SBoundaryEventDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchErrorEventTriggerDefinition;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -44,7 +43,7 @@ public class SBoundaryEventDefinitionBinding extends SCatchEventDefinitionBindin
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.CATCH_ERROR_EVENT_TRIGGER_NODE.equals(name)) {
             errorEventTriggers.add((SCatchErrorEventTriggerDefinition) value);

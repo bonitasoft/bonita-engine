@@ -878,7 +878,7 @@ public class BusinessArchiveTests {
     }
 
     @Test
-    public void checkErrorMessageOnInvalidTransition() throws Exception {
+    public void checkErrorMessageOnInvalidTransition() {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addTransition("unknown1", "unknown2");
         try {

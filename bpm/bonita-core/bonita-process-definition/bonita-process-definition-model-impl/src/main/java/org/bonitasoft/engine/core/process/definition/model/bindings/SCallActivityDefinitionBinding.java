@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SCallableElementType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SCallActivityDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -52,7 +51,7 @@ public class SCallActivityDefinitionBinding extends SActivityDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.CALLABLE_ELEMENT_NODE.equals(name)) {
             callableElement = (SExpression) value;
@@ -66,7 +65,7 @@ public class SCallActivityDefinitionBinding extends SActivityDefinitionBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         callableElementType = SCallableElementType.valueOf(attributes.get(XMLSProcessDefinition.CALLABLE_ELEMENT_TYPE));
     }

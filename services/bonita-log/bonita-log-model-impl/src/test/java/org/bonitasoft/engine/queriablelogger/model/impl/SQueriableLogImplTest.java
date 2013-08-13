@@ -26,13 +26,13 @@ public class SQueriableLogImplTest {
     public TestName name = new TestName();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         LOGGER.info("Testing : {}", name.getMethodName());
         queriableLog = new SQueriableLogImpl();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         LOGGER.info("Tested: {}", name.getMethodName());
         queriableLog = null;
     }

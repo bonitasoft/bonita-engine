@@ -292,7 +292,7 @@ public class SequenceManagerImpl implements SequenceManager {
     }
 
     @Override
-    public void close() throws SQLException {
+    public void close() {
     }
 
     @Override

@@ -90,8 +90,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public void createTokens(final Long processInstanceId, final Long refId, final Long parentRefId, final int numberOfToken) throws SObjectCreationException,
-            SObjectModificationException, SObjectNotFoundException, SObjectReadException {
+    public void createTokens(final Long processInstanceId, final Long refId, final Long parentRefId, final int numberOfToken) throws SObjectCreationException {
         if (numberOfToken > 0) {
             for (int i = 0; i < numberOfToken; i++) {
                 createToken(processInstanceId, refId, parentRefId);

@@ -124,7 +124,7 @@ public class RestartHandlersTests extends CommonAPITest {
         final WaitUntil waitUntil = new WaitUntil(100, 5000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 40,
                         ActivityInstanceCriterion.NAME_ASC);
                 return nameAre(names.toArray(new String[names.size()])).matches(pendingHumanTaskInstances);

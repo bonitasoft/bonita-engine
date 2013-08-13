@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.migration.model.SMigrationMapping;
 import org.bonitasoft.engine.core.migration.model.SOperationWithEnablement;
 import org.bonitasoft.engine.core.migration.model.impl.SMigrationMappingImpl;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -45,7 +44,7 @@ public class SMigrationMappingBinding extends ElementBinding {
     private String sourceName;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         sourceName = attributes.get(XMLSMigrationPlan.SOURCE_NAME);
         targetName = attributes.get(XMLSMigrationPlan.TARGET_NAME);
         sourceState = attributes.get(XMLSMigrationPlan.SOURCE_STATE);
@@ -53,11 +52,11 @@ public class SMigrationMappingBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSMigrationPlan.CONNECTOR_NODE.equals(name)) {
             connectors.add((SConnectorDefinitionWithEnablement) value);
         }

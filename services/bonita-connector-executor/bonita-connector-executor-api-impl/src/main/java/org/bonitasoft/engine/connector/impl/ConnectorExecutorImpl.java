@@ -104,6 +104,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
+    @SuppressWarnings("unused")
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
     }

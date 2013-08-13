@@ -19,7 +19,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.EndEventDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -38,7 +37,7 @@ public class EndEventDefinitionBinding extends ThrowEventDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.TERMINATE_EVENT_TRIGGER_NODE.equals(name)) {
             terminateEventTrigger = (TerminateEventTriggerDefinition) value;

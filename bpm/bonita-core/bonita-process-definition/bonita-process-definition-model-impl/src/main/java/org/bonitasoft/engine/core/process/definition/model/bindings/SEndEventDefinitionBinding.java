@@ -19,7 +19,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SEndEventDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.STerminateEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -37,7 +36,7 @@ public class SEndEventDefinitionBinding extends SThrowEventDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.TERMINATE_EVENT_TRIGGER_NODE.equals(name)) {
             terminateEventTrigger = (STerminateEventTriggerDefinition) value;

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import org.bonitasoft.engine.bpm.flownode.impl.AutomaticTaskDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -35,7 +34,7 @@ public class AutomaticTaskDefinitionBinding extends ActivityDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
     }
 

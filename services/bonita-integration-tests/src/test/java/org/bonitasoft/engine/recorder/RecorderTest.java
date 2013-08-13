@@ -74,7 +74,7 @@ public class RecorderTest extends CommonServiceTest {
 
     static {
         persitenceService = getServicesBuilder().buildTenantPersistenceService();
-        recorder = getServicesBuilder().buildRecorder(false);
+        recorder = getServicesBuilder().buildRecorder();
         scheduler = getServicesBuilder().buildSchedulerService();
         platformBuilder = getServicesBuilder().buildPlatformBuilder();
         tenantBuilder = getServicesBuilder().buildTenantBuilder();

@@ -141,7 +141,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -189,7 +189,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -237,7 +237,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -281,7 +281,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -337,7 +337,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil1 = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -352,7 +352,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil2 = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check3 = VariableStorage.getInstance().getVariableValue(inputName3).equals(valueOfInput3);
                 final boolean check4 = VariableStorage.getInstance().getVariableValue(inputName4).equals(valueOfInput4);
                 return check3 && check4;
@@ -566,7 +566,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(repeatEach, timeout, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return VariableStorage.getInstance().getVariableValue(inputName).equals(valueOfInput);
             }
         };

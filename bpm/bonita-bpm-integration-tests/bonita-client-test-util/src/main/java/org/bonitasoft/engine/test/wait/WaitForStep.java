@@ -62,7 +62,7 @@ public class WaitForStep extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         final List<ActivityInstance> openedActivityInstances = processAPI.getOpenActivityInstances(processInstanceId, 0, 10,
                 ActivityInstanceCriterion.DEFAULT);
         final Iterator<ActivityInstance> iterator = openedActivityInstances.iterator();

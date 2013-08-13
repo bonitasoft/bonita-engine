@@ -19,7 +19,6 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -75,7 +74,7 @@ public class ImportActorMappingTest extends CommonAPITest {
         assertTrue("no new activity found", new WaitUntil(20, 500) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 1;
             }
         }.waitUntil());
@@ -234,10 +233,9 @@ public class ImportActorMappingTest extends CommonAPITest {
 
     /**
      * @return
-     * @throws InvalidProcessDefinitionException
      * @since 6.0
      */
-    private ProcessDefinitionBuilder createProcessDefinitionBuilder() throws InvalidProcessDefinitionException {
+    private ProcessDefinitionBuilder createProcessDefinitionBuilder() {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor(DELIVERY_MEN).addDescription("Delivery all day and night long").addUserTask("userTask1", DELIVERY_MEN);
         return processBuilder;
@@ -278,10 +276,9 @@ public class ImportActorMappingTest extends CommonAPITest {
      * @param group
      * @param role
      * @param definition
-     * @throws Exception
      * @since 6.0
      */
-    private void getAndCheckActors(final User user, final Group group, final Role role, final ProcessDefinition definition) throws Exception {
+    private void getAndCheckActors(final User user, final Group group, final Role role, final ProcessDefinition definition) {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 15, ActorCriterion.NAME_DESC);
         final ActorInstance actorInstance = actors.get(0);
         final List<ActorMember> actorMembers = getProcessAPI().getActorMembers(actorInstance.getId(), 0, 15);

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.io.xml.ElementBinding;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -31,7 +30,7 @@ public abstract class NamedElementBinding extends ElementBinding {
     protected String description;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         final String idString = attributes.get(XMLProcessDefinition.ID);
         id = idString == null || "".equals(idString) ? null : Long.parseLong(idString);
         name = attributes.get(XMLProcessDefinition.NAME);

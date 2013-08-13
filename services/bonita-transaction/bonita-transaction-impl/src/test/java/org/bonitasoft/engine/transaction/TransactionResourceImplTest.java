@@ -12,9 +12,6 @@ import javax.transaction.TransactionManager;
 
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
-import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
@@ -23,13 +20,10 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
 
 public class TransactionResourceImplTest extends TransactionResourceTest {
-
-    private static BitronixTransactionManager txManager;
 
     @BeforeClass
     public static void setUpJNDIBitronixTransactionManager() {
@@ -51,7 +45,7 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
 
     private TransactionManager getTransactionManager() {
         try {
-            final Hashtable env = new Hashtable();
+            final Hashtable<String, String> env = new Hashtable<String, String>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
 
             final Context ctx = new InitialContext(env);
@@ -66,11 +60,11 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
         return new EventService() {
 
             @Override
-            public void removeHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerUnregistrationException {
+            public void removeHandler(final String eventType, final SHandler<SEvent> handler) {
             }
 
             @Override
-            public void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
+            public void removeAllHandlers(final SHandler<SEvent> handler) {
             }
 
             @Override
@@ -144,11 +138,11 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
             }
 
             @Override
-            public void fireEvent(final SEvent event) throws FireEventException {
+            public void fireEvent(final SEvent event) {
             }
 
             @Override
-            public void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+            public void addHandler(final String eventType, final SHandler<SEvent> handler) {
             }
 
             @Override
@@ -160,35 +154,34 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
 
     // TODO See to use some mocks instead of Anonymous classes.
     protected TechnicalLoggerService getLoggerService() {
-        
+
         return new TechnicalLoggerService() {
-            
+
             @Override
             public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Throwable t) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void log(Class<?> callerClass, TechnicalLogSeverity severity, Throwable t) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public boolean isLoggable(Class<?> callerClass, TechnicalLogSeverity severity) {
                 // TODO Auto-generated method stub
                 return false;
             }
         };
-        
 
     }
-    
+
 }

@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connector.ConnectorException;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -32,7 +30,7 @@ public class TestConnectorWithConnectedResource extends AbstractConnector {
     }
 
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
 
     }
 
@@ -42,12 +40,12 @@ public class TestConnectorWithConnectedResource extends AbstractConnector {
     }
 
     @Override
-    public void connect() throws ConnectorException {
+    public void connect() {
         output.add("connect");
     }
 
     @Override
-    public void disconnect() throws ConnectorException {
+    public void disconnect() {
         output.add("disconect");
     }
 

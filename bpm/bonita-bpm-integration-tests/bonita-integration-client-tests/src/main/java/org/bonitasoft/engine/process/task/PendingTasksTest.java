@@ -144,7 +144,7 @@ public class PendingTasksTest extends CommonAPITest {
         assertTrue("no pending user task instances are found", new WaitUntil(150, 1000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(userId, 0, 10, null).size() == 2;
             }
         }.waitUntil());
@@ -236,7 +236,7 @@ public class PendingTasksTest extends CommonAPITest {
         assertTrue("étape1 should be pending", new WaitUntil(30, 2000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null).size() == 1;
             }
         }.waitUntil());

@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -33,7 +32,7 @@ public class UserFilterDefinitionBinding extends NamedElementBinding {
     private final Map<String, Expression> inputs = new HashMap<String, Expression>();
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         userFilterId = attributes.get(XMLProcessDefinition.USER_FILTER_ID);
         version = attributes.get(XMLProcessDefinition.CONNECTOR_VERSION);
@@ -54,11 +53,11 @@ public class UserFilterDefinitionBinding extends NamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.CONNECTOR_INPUT.equals(name)) {// Same as connector input
             final Entry<?, ?> entry = (Entry<?, ?>) value;
             inputs.put((String) entry.getKey(), (Expression) entry.getValue());

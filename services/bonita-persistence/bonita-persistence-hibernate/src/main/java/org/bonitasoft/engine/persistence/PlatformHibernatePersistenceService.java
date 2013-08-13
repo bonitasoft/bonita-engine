@@ -20,7 +20,6 @@ import javax.sql.DataSource;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -37,7 +36,7 @@ public class PlatformHibernatePersistenceService extends AbstractHibernatePersis
     }
 
     @Override
-    protected long getTenantId() throws TenantIdNotSetException {
+    protected long getTenantId() {
         return -1;
     }
 
@@ -47,7 +46,7 @@ public class PlatformHibernatePersistenceService extends AbstractHibernatePersis
     }
 
     @Override
-    public void deleteByTenant(Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) throws SPersistenceException {
+    public void deleteByTenant(Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) {
         // FIXME : Method for tenant. TODO: Refactor code for PlatformHibernatePersistenceService don't implements TenantPersistenceService
     }
 

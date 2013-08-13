@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.WaitUntil;
 
 public class WaitForActivity extends WaitUntil {
@@ -51,7 +50,7 @@ public class WaitForActivity extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws BonitaException {
+    protected boolean check() {
         final List<ActivityInstance> activityInstances = processAPI.getActivities(processInstanceId, 0, 10);
         final Iterator<ActivityInstance> iterator = activityInstances.iterator();
         boolean found = false;

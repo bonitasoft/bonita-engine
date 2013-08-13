@@ -7,7 +7,6 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.parameter.impl.ParameterDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -19,7 +18,7 @@ public class ParameterDefinitionBinding extends NamedElementBinding {
     private String type;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         type = attributes.get(XMLProcessDefinition.PARAMETER_TYPE);
     }
@@ -37,14 +36,14 @@ public class ParameterDefinitionBinding extends NamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLProcessDefinition.DESCRIPTION.equals(name)) {
             description = value;
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
 
     }
 

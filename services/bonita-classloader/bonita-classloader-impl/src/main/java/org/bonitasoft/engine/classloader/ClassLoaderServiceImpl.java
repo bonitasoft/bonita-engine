@@ -93,12 +93,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public synchronized ClassLoader getGlobalClassLoader() throws ClassLoaderException {
+    public synchronized ClassLoader getGlobalClassLoader() {
         return getVirtualGlobalClassLoader();
     }
 
     @Override
-    public synchronized ClassLoader getLocalClassLoader(final String type, final long id) throws ClassLoaderException {
+    public synchronized ClassLoader getLocalClassLoader(final String type, final long id) {
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLocalClassLoader"));
         }
@@ -177,7 +177,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public synchronized void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws ClassLoaderException {
+    public synchronized void refreshGlobalClassLoader(final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
         virtualClassloader.release();
         virtualClassloader.setClassLoader(new BonitaClassLoader(resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
@@ -185,7 +185,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public synchronized void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws ClassLoaderException {
+    public synchronized void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getLocalClassLoader(type, id);
         virtualClassloader.release();
         virtualClassloader.setClassLoader(new BonitaClassLoader(resources, type, id, getLocalTemporaryFolder(type, id), getGlobalClassLoader()));
