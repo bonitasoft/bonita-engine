@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.handler;
 
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 
@@ -21,7 +20,5 @@ import org.bonitasoft.engine.events.model.SHandler;
  * @author Baptiste Mesta
  */
 public interface SProcessInstanceHandler<T extends SEvent> extends SHandler<T> {
-
-    void setProcessInstanceService(ProcessInstanceService processInstanceService);
 
 }

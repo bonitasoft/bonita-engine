@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test.synchro;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -20,6 +21,9 @@ import java.util.Map;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -29,18 +33,37 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
-    private final TransactionService transactionService;
+    private static final long serialVersionUID = 1L;
+    private final long tenantId;
 
-    public AbstractUpdateHandler(final TransactionService transactionService) {
+    public AbstractUpdateHandler(final long tenantId) {
         super();
-        this.transactionService = transactionService;
+        this.tenantId = tenantId;
     }
 
     protected abstract Map<String, Serializable> getEvent(final SEvent sEvent);
 
     @Override
     public void execute(final SEvent sEvent) throws SHandlerExecutionException {
-        final Map<String, Serializable> event = getEvent(sEvent);
+        try {
+            final Map<String, Serializable> event = getEvent(sEvent);
+            Long id = getObjectId(sEvent);
+
+            final BonitaTransactionSynchronization synchronization = new WaitForEventSynchronization(event, id);
+
+            TransactionService transactionService = getTransactionService();
+            transactionService.registerBonitaSynchronization(synchronization);
+        } catch (final STransactionNotFoundException e) {
+            e.printStackTrace();
+            throw new SHandlerExecutionException(e);
+        }
+    }
+
+    /**
+     * @param sEvent
+     * @return
+     */
+    private Long getObjectId(final SEvent sEvent) {
         Long id = null;
         Object object = null;
         try {
@@ -49,15 +72,28 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
             final Object invoke = method.invoke(object);
             id = (Long) invoke;
         } catch (final Throwable e) {
-            System.out.println("AbstractUpdateHandler: No id on object " + object);
+            System.err.println("AbstractUpdateHandler: No id on object " + object);
         }
+        return id;
+    }
+
+    /**
+     * @return
+     * @throws BonitaHomeNotSetException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws ClassNotFoundException
+     * @throws IOException
+     * @throws BonitaHomeConfigurationException
+     */
+    private TransactionService getTransactionService() throws SHandlerExecutionException {
+        TransactionService transactionService;
         try {
-            final BonitaTransactionSynchronization synchronization = new WaitForEventSynchronization(event, id);
-            transactionService.registerBonitaSynchronization(synchronization);
-        } catch (final STransactionNotFoundException e) {
-            e.printStackTrace();
-            throw new SHandlerExecutionException(e);
+            transactionService = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor().getTenantServiceAccessor(tenantId).getTransactionService();
+        } catch (Exception e) {
+            throw new SHandlerExecutionException(e.getMessage(), null);
         }
+        return transactionService;
     }
 
 }

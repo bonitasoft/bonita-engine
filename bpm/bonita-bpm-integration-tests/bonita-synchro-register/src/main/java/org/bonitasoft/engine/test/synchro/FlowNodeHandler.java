@@ -18,15 +18,16 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
  */
 public class FlowNodeHandler extends AbstractUpdateHandler {
 
-    public FlowNodeHandler(final TransactionService transactionService) {
-        super(transactionService);
+    private static final long serialVersionUID = 1L;
+
+    public FlowNodeHandler(final long tenantId) {
+        super(tenantId);
     }
 
     @Override

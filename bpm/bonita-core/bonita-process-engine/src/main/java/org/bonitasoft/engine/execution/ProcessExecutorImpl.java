@@ -227,7 +227,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.eventsHandler = eventsHandler;
         for (final Entry<String, SProcessInstanceHandler<SEvent>> handler : handlers.entrySet()) {
             try {
-                handler.getValue().setProcessInstanceService(processInstanceService);
                 eventService.addHandler(handler.getKey(), handler.getValue());// TODO check if it's already here?
             } catch (final HandlerRegistrationException e) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// just log it
@@ -864,7 +863,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     /**
      * Evaluate the split of the element
      * The element contains the current token it received
-     * 
+     *
      * @return
      *         number of token of the process
      */
@@ -1065,7 +1064,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     /**
      * execute the implicit end of an element
-     * 
+     *
      * @param numberOfTokenToMerge
      * @param tokenRefId
      * @param processInstanceId

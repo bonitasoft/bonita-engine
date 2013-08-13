@@ -15,7 +15,6 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 public class AddHandlerCommand extends TenantCommand {
 
@@ -31,20 +30,21 @@ public class AddHandlerCommand extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         final EventService eventService = serviceAccessor.getEventService();
-        final TransactionService transactionService = serviceAccessor.getTransactionService();
         try {
+            long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceHandler.class)) {
-                eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED, new ProcessInstanceHandler(transactionService));
+                eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED, new ProcessInstanceHandler(tenantId));
             }
             if (!containsHandler(eventService, ACTIVITYINSTANCE_STATE_UPDATED, FlowNodeHandler.class)) {
-                eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED, new FlowNodeHandler(transactionService));
-                eventService.addHandler(ACTIVITYINSTANCE_CREATED, new FlowNodeHandler(transactionService));
-                eventService.addHandler(EVENT_INSTANCE_CREATED, new FlowNodeHandler(transactionService));
+                eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED, new FlowNodeHandler(tenantId));
+                eventService.addHandler(ACTIVITYINSTANCE_CREATED, new FlowNodeHandler(tenantId));
+                eventService.addHandler(EVENT_INSTANCE_CREATED, new FlowNodeHandler(tenantId));
             }
-            final CommandService commandService = serviceAccessor.getCommandService();
-            final List<Long> commandIds = (List<Long>) parameters.get("commands");
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("system", true);
+            final CommandService commandService = serviceAccessor.getCommandService();
+            @SuppressWarnings("unchecked")
+            final List<Long> commandIds = (List<Long>) parameters.get("commands");
             for (final Long commandId : commandIds) {
                 commandService.update(commandService.get(commandId), entityUpdateDescriptor);
             }
