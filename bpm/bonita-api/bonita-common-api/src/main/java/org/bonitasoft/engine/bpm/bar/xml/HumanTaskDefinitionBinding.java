@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -34,7 +33,7 @@ public abstract class HumanTaskDefinitionBinding extends ActivityDefinitionBindi
     private String priority;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         actorName = attributes.get(XMLProcessDefinition.ACTOR_NAME);
         priority = attributes.get(XMLProcessDefinition.PRIORITY);
@@ -47,7 +46,7 @@ public abstract class HumanTaskDefinitionBinding extends ActivityDefinitionBindi
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.USER_FILTER_NODE.equals(name)) {
             userFilter = (UserFilterDefinition) value;

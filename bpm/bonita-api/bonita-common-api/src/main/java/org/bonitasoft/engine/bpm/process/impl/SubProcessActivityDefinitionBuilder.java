@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
 
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -35,7 +34,7 @@ public class SubProcessActivityDefinitionBuilder extends FlowElementContainerBui
      *         the builder to add elements in this sub process
      */
     public SubProcessDefinitionBuilder getSubProcessBuilder() {
-        return new SubProcessDefinitionBuilder(getProcessBuilder(), getContainer(), subProcessActivity);
+        return new SubProcessDefinitionBuilder(getProcessBuilder(), subProcessActivity);
     }
 
 }

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupNotFoundException;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -53,7 +52,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     }
 
     @After
-    public void tearDown() throws GroupNotFoundException, DeletionException {
+    public void tearDown() throws DeletionException {
         try {
             transactionService.begin();
             new IdentityAPIImpl().deleteGroups(Arrays.asList(childGroup.getId(), parentGroup.getId(), mainGroup.getId()));
@@ -61,7 +60,6 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         } catch (STransactionException e) {
             throw new DeletionException(e);
         }
-
     }
 
     public ActorMappingServiceTest() {

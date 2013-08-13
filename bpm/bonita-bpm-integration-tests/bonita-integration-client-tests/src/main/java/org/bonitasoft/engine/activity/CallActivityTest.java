@@ -46,6 +46,7 @@ import org.bonitasoft.engine.bpm.process.impl.EndEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -288,7 +289,6 @@ public class CallActivityTest extends CommonAPITest {
      */
     private void executeCallAtivityUntilEndOfProcess(final boolean addInputOperations, final boolean addOutputOperations, final String strTargetVersion,
             final boolean terminateEnd) throws Exception {
-
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, terminateEnd);
         final ProcessDefinition targetProcessDef3 = getSimpleProcess(ACTOR_NAME, "targetProcess", "3.0", terminateEnd);
         final ProcessDefinition targetProcessDef2 = getSimpleProcess(ACTOR_NAME, "targetProcess", "2.0", terminateEnd);
@@ -442,7 +442,7 @@ public class CallActivityTest extends CommonAPITest {
 
     private void waitForStepAndExecuteIt(final ProcessInstance rootProcessInstance, final String userTaskName, final User user,
             final ProcessInstance actualProcessInstance, final ProcessInstance... childProcessInstances) throws Exception {
-        final WaitForStep waitForStep = waitForStep(50, 5000, userTaskName, rootProcessInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForStep = waitForStep(50, 5000, userTaskName, rootProcessInstance, TestStates.getReadyState());
         if (childProcessInstances != null) {
             for (final ProcessInstance childProcessInstance : childProcessInstances) {
                 assertTrue("target process was not archived: " + childProcessInstance.getName(), waitProcessToFinishAndBeArchived(childProcessInstance));
@@ -606,11 +606,9 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
-    @Test
+    @Test(expected = DeletionException.class)
     public void deleteProcessDefinitionWithProcessInstanceThatIsCalledByCallActivity() throws Exception {
-
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
 
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
@@ -621,14 +619,11 @@ public class CallActivityTest extends CommonAPITest {
 
         getProcessAPI().disableProcess(targetProcessDef1.getId());
         try {
-            getProcessAPI().deleteProcess(targetProcessDef1.getId());
+            deleteProcess(targetProcessDef1);
             fail("Should not be able to delete process instance that is called by an other process");
-        } catch (final ProcessInstanceHierarchicalDeletionException e) {
-            getProcessAPI().deleteProcessInstance(e.getProcessInstanceId());
-            // should work now
-            getProcessAPI().deleteProcess(targetProcessDef1.getId());
         } finally {
             disableAndDeleteProcess(callingProcessDef);
+            deleteProcess(targetProcessDef1);
         }
 
     }
@@ -678,7 +673,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
         assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
 
-        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState(null));
+        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState());
         ActivityInstance activityInstance = waitForStep.getResult();
         assertEquals(targetPI.getId(), activityInstance.getParentProcessInstanceId());
         assertEquals(callingProcessInstance.getId(), activityInstance.getRootContainerId());
@@ -686,7 +681,7 @@ public class CallActivityTest extends CommonAPITest {
         // execute step in the target process
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 
-        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState(null));
+        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState());
         assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
         activityInstance = waitForStep.getResult();
         assertEquals(callingProcessInstance.getId(), activityInstance.getParentProcessInstanceId());
@@ -742,7 +737,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals("callActivityDescription", callActivityInstance.getDescription());
         assertEquals("callActivityDisplayDescription", callActivityInstance.getDisplayDescription());
 
-        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState(null));
+        WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState());
         ActivityInstance activityInstance = waitForStep.getResult();
         assertEquals(targetPI.getId(), activityInstance.getParentProcessInstanceId());
         assertEquals(callingProcessInstance.getId(), activityInstance.getRootContainerId());
@@ -750,7 +745,7 @@ public class CallActivityTest extends CommonAPITest {
         // execute step in the target process
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 
-        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState(null));
+        waitForStep = waitForStep(50, 5000, "step1", callingProcessInstance, TestStates.getReadyState());
         assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
         activityInstance = waitForStep.getResult();
         assertEquals(callingProcessInstance.getId(), activityInstance.getParentProcessInstanceId());
@@ -766,7 +761,6 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = { ProcessDefinitionBuilder.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Expression" })
     @Test(expected = InvalidProcessDefinitionException.class)
     public void callActivityTargetProcessExprIsNull() throws Exception {
-
         final Expression targetProcessNameExpr = null;
         final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
 
@@ -786,7 +780,6 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessDefinition callingProcessDef = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
 
         disableAndDeleteProcess(callingProcessDef);
-
     }
 
     @Cover(classes = { CallActivityInstance.class, HumanTaskInstance.class, ArchivedProcessInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = {
@@ -820,7 +813,7 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
         // Execute step in the target process
-        final WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState(null));
+        final WaitForStep waitForStep = waitForStep(50, 2000, "tStep1", callingProcessInstance, TestStates.getReadyState());
         final ActivityInstance activityInstance = waitForStep.getResult();
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 
@@ -901,7 +894,7 @@ public class CallActivityTest extends CommonAPITest {
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnEnter").done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         callActivityBuilder
-                .addConnector("onEnterConnector", "org.bonitasoft.connector.testConnectorWithOutput", PROCESS_VERSION, ConnectorEvent.ON_FINISH)
+                .addConnector("onFinishConnector", "org.bonitasoft.connector.testConnectorWithOutput", PROCESS_VERSION, ConnectorEvent.ON_FINISH)
                 .addInput("input1", new ExpressionBuilder().createDataExpression("parentProcessData", String.class.getName()))
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName("valueOnCallOnFinish").done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));

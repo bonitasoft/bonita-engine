@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Yanyan Liu
@@ -33,11 +32,11 @@ public class MembershipBinding extends ElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (OrganizationMappingConstants.USER_NAME.equals(name)) {
             membership.setUsername(value);
         } else if (OrganizationMappingConstants.ROLE_NAME.equals(name)) {
@@ -54,7 +53,7 @@ public class MembershipBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

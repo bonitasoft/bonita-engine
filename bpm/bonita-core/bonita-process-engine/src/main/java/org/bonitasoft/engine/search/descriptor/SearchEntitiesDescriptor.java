@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
@@ -84,8 +83,7 @@ public class SearchEntitiesDescriptor {
     private final SearchProfileMemberRoleAndGroupDescriptor profileMemberRoleAndGroupDescriptor;
 
     public SearchEntitiesDescriptor(final IdentityModelBuilder identityModelBuilder, final BPMInstanceBuilders bpmInstanceBuilders,
-            final FlowNodeStateManager flowNodeStateManager, final SProcessSupervisorBuilders sSupervisorBuilders,
-            final BPMDefinitionBuilders definitionBuilders, final SCommentBuilders commentBuilders,
+            final SProcessSupervisorBuilders sSupervisorBuilders, final BPMDefinitionBuilders definitionBuilders, final SCommentBuilders commentBuilders,
             final SCategoryBuilderAccessor categoryBuilderAccessor, final SDocumentMappingBuilderAccessor sDocumentMappingBuilderAccessor,
             final SExternalIdentityMappingBuilders sExternalIdentityMappingBuilders, final SCommandBuilderAccessor commandBuilderAccessor) {
         userDescriptor = new SearchUserDescriptor(identityModelBuilder);
@@ -102,12 +100,12 @@ public class SearchEntitiesDescriptor {
         entityMemberUserDescriptor = new SearchEntityMemberUserDescriptor(sExternalIdentityMappingBuilders, identityModelBuilder);
         archivedDocumentDescriptor = new SearchArchivedDocumentDescriptor(sDocumentMappingBuilderAccessor);
         activityInstanceDescriptor = new SearchActivityInstanceDescriptor(bpmInstanceBuilders, sSupervisorBuilders);
-        archivedActivityInstanceDescriptor = new SearchArchivedActivityInstanceDescriptor(bpmInstanceBuilders, sSupervisorBuilders);
-        searchArchivedCommentsDescriptor = new SearchArchivedCommentsDescriptor(bpmInstanceBuilders, commentBuilders, identityModelBuilder.getUserBuilder());
+        archivedActivityInstanceDescriptor = new SearchArchivedActivityInstanceDescriptor(bpmInstanceBuilders);
+        searchArchivedCommentsDescriptor = new SearchArchivedCommentsDescriptor(commentBuilders, identityModelBuilder.getUserBuilder());
         searchArchivedConnectorInstanceDescriptor = new SearchArchivedConnectorInstanceDescriptor(bpmInstanceBuilders);
-        flowNodeInstanceDescriptor = new SearchFlowNodeInstanceDescriptor(bpmInstanceBuilders, flowNodeStateManager);
+        flowNodeInstanceDescriptor = new SearchFlowNodeInstanceDescriptor(bpmInstanceBuilders);
         searchCommandDescriptor = new SearchCommandDescriptor(commandBuilderAccessor.getSCommandBuilder());
-        archivedFlowNodeInstanceDescriptor = new SearchArchivedFlowNodeInstanceDescriptor(bpmInstanceBuilders, flowNodeStateManager);
+        archivedFlowNodeInstanceDescriptor = new SearchArchivedFlowNodeInstanceDescriptor(bpmInstanceBuilders);
 
         searchProfileDescriptor = new SearchProfileDescriptor();
         searchProfileEntryDescriptor = new SearchProfileEntryDescriptor();

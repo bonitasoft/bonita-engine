@@ -1,5 +1,12 @@
 package org.bonitasoft.engine.data.instance;
 
+import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,13 +43,6 @@ import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Zhao Na
@@ -773,8 +773,8 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     }
 
     private void verifyUpdateLongTextDataInstance(final String name, final String classType, final String description, final String content,
-            final Long containerId, final String containerType, final Boolean isTransient, final String updatelabel, final String updateDescription,
-            final Serializable updateValue) throws Exception {
+            final Long containerId, final String containerType, final Boolean isTransient, final String updateDescription, final Serializable updateValue)
+            throws Exception {
         final SDataInstance dataInstance = buildLongTextDataInstance(name, description, content, containerId, containerType, isTransient);
         insertDataInstance(dataInstance);
 
@@ -789,14 +789,14 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     public void testUpdateLongTextData() throws Exception {
         final String longText = getLongText();
         verifyUpdateLongTextDataInstance("longTextData", String.class.getName(), "A very long text", getStringForExpression(longText), 11L, "processTask",
-                false, "new long text", "Updated description for long text", longText + "Updated");
+                false, "Updated description for long text", longText + "Updated");
     }
 
     @Test
     public void testTransientUpdateLongTextData() throws Exception {
         final String longText = getLongText();
         verifyUpdateLongTextDataInstance("longTextData", String.class.getName(), "A very long text", getStringForExpression(longText), 11L, "processTask",
-                true, "new long text", "Updated description for long text", longText + "Updated");
+                true, "Updated description for long text", longText + "Updated");
     }
 
     @Test

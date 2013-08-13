@@ -101,8 +101,7 @@ public class ProcessArchiver {
         }
         if (!processDefinition.getProcessContainer().getDataDefinitions().isEmpty()) {
             // Archive SADataInstance
-            archiveDataInstances(processInstance, archiveService, dataInstanceService, logger, instancesBuilders, sDataInstanceBuilders, saProcessInstance,
-                    processDefinitionService, archiveDate);
+            archiveDataInstances(processInstance, archiveService, dataInstanceService, logger, instancesBuilders, sDataInstanceBuilders, archiveDate);
         }
         // Archive SComment
         archiveComments(processInstance, archiveService, logger, instancesBuilders, commentService, saCommentBuilder, archiveDate);
@@ -220,8 +219,7 @@ public class ProcessArchiver {
 
     private static void archiveDataInstances(final SProcessInstance processInstance, final ArchiveService archiveService,
             final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final BPMInstanceBuilders instancesBuilders,
-            final SDataInstanceBuilders sDataInstanceBuilders, final SAProcessInstance saProcessInstance,
-            final ProcessDefinitionService processDefinitionService, final long archiveDate) throws SArchivingException {
+            final SDataInstanceBuilders sDataInstanceBuilders, final long archiveDate) throws SArchivingException {
         final int archiveBatchSize = 50;
         int currentIndex = 0;
         try {
@@ -270,10 +268,10 @@ public class ProcessArchiver {
         logBuilder.setActionType(actionType);
     }
 
-    public static void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive,
+    private static void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive,
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final BPMInstanceBuilders bpmInstanceBuilders,
-            final DataInstanceService dataInstanceService, final SDataInstanceBuilders dataInstanceBuilders, final SProcessDefinition processDefinition,
-            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService) throws SActivityExecutionException {
+            final DataInstanceService dataInstanceService, final SProcessDefinition processDefinition, final ActivityInstanceService activityInstanceService,
+            final ConnectorInstanceService connectorInstanceService) throws SActivityExecutionException {
         try {
             final long archiveDate = System.currentTimeMillis();
             // Remove data instance + data visibility mapping
@@ -373,5 +371,19 @@ public class ProcessArchiver {
         } catch (final SBonitaException e) {
             throw new SActivityExecutionException(e);
         }
+    }
+
+    public static void archiveFlowNodeInstance(final SFlowNodeInstance intTxflowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId,
+            final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService, final ArchiveService archiveService,
+            final BPMInstanceBuilders bpmInstanceBuilders, final DataInstanceService dataInstanceService,
+            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService) throws SActivityExecutionException {
+        final SProcessDefinition processDefinition;
+        try {
+            processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        } catch (final SBonitaException e) {
+            throw new SActivityExecutionException(e);
+        }
+        archiveFlowNodeInstance(intTxflowNodeInstance, deleteAfterArchive, processInstanceService, archiveService, bpmInstanceBuilders, dataInstanceService,
+                processDefinition, activityInstanceService, connectorInstanceService);
     }
 }

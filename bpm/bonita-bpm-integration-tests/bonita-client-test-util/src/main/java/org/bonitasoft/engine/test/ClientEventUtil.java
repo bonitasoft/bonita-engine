@@ -143,7 +143,7 @@ public class ClientEventUtil {
         }
     }
 
-    public static void clearRepo(final CommandAPI commandAPI) throws BonitaException {
+    public static void clearRepo(final CommandAPI commandAPI) {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
         parameters.put("clear", true);
         try {

@@ -95,7 +95,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         // Thread.sleep(500);
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(null),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -155,7 +155,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(null),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -256,7 +256,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(null),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -309,7 +309,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(null),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -377,7 +377,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(null),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 

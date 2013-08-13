@@ -20,8 +20,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImp
  */
 public class SubProcessDefinitionBuilder extends FlowElementContainerBuilder implements ContainerBuilder {
 
-    SubProcessDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            final SubProcessDefinitionImpl subProcessActivity) {
+    SubProcessDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final SubProcessDefinitionImpl subProcessActivity) {
         super(new FlowElementContainerDefinitionImpl(), processDefinitionBuilder);
         subProcessActivity.setSubProcessContainer(getContainer());
     }

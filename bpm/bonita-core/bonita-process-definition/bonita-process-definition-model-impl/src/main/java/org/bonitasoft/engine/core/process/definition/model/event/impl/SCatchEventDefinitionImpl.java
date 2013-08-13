@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -25,7 +25,6 @@ import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.SignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchErrorEventTriggerDefinition;
@@ -42,6 +41,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class SCatchEventDefinitionImpl extends SEventDefinitionImpl implements SCatchEventDefinition {
 
@@ -57,10 +57,10 @@ public abstract class SCatchEventDefinitionImpl extends SEventDefinitionImpl imp
 
     private boolean isInterrupting = true;
 
-    public SCatchEventDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final CatchEventDefinition eventDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SCatchEventDefinitionImpl(final CatchEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final SOperationBuilders sOperationBuilders) {
+        super(eventDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
         isInterrupting = eventDefinition.isInterrupting();
         timerEventTriggers = new ArrayList<STimerEventTriggerDefinition>(eventDefinition.getTimerEventTriggerDefinitions().size());
         for (final TimerEventTriggerDefinition timerTrigger : eventDefinition.getTimerEventTriggerDefinitions()) {

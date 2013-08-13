@@ -56,7 +56,7 @@ public class CommentServiceTest extends CommonBPMServicesTest {
     }
 
     // @Test(expected = SCategoryAlreadyExistsException.class)
-    public void testCreateCategoryWithSCategoryAlreadyExistsException() throws Exception {
+    public void testCreateCategoryWithSCategoryAlreadyExistsException() {
         // final BusinessTransaction tx = transactionService.createTransaction();
         // final String name = "categoryTestExceptionName";
         // final String description = "test create category with SCategoryAlreadyExistsException";

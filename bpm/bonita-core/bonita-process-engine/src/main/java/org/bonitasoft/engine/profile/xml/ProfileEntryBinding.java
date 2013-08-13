@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.profile.ExportedProfileEntryBuilder;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Zhao Na
@@ -29,12 +28,12 @@ public class ProfileEntryBinding extends ElementBinding {
     private ExportedProfileEntryBuilder profileEntryBuilder = null;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         profileEntryBuilder = new ExportedProfileEntryBuilder(attributes.get("name"));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {
             profileEntryBuilder.setDescription(value);
         } else if ("type".equals(name)) {
@@ -49,7 +48,7 @@ public class ProfileEntryBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

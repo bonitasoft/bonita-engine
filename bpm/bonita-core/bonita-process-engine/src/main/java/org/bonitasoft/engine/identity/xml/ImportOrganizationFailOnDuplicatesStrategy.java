@@ -16,7 +16,6 @@ package org.bonitasoft.engine.identity.xml;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
-import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -32,17 +31,17 @@ public class ImportOrganizationFailOnDuplicatesStrategy implements ImportOrganiz
     }
 
     @Override
-    public void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws ImportDuplicateInOrganizationException {
         throw new ImportDuplicateInOrganizationException("There's already a group with the path : " + existingGroup.getPath());
     }
 
     @Override
-    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws ImportDuplicateInOrganizationException {
         throw new ImportDuplicateInOrganizationException("There's already a user with the name : " + existingUser.getUserName());
     }
 
     @Override
-    public void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws ImportDuplicateInOrganizationException {
         throw new ImportDuplicateInOrganizationException("There's already a role with the name : " + existingRole.getName());
 
     }

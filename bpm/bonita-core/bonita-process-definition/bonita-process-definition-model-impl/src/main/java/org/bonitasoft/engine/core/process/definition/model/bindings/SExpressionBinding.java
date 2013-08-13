@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -45,7 +44,7 @@ public class SExpressionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         interpreter = attributes.get(XMLSProcessDefinition.EXPRESSION_INTERPRETER);
         returnType = attributes.get(XMLSProcessDefinition.EXPRESSION_RETURN_TYPE);
@@ -70,14 +69,14 @@ public class SExpressionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.EXPRESSION_NODE.equals(name)) {
             dependencies.add((SExpression) value);
         }
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.EXPRESSION_CONTENT.equals(name)) {
             content = value;
         }

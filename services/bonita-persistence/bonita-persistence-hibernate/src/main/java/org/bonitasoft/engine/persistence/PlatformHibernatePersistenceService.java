@@ -19,9 +19,7 @@ import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
-import org.bonitasoft.engine.sequence.exceptions.SequenceManagerException;
 import org.bonitasoft.engine.services.SPersistenceException;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -31,14 +29,14 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
  */
 public class PlatformHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
-    public PlatformHibernatePersistenceService(  final String name,  final HibernateConfigurationProvider hbmConfigurationProvider,
-            final DBConfigurationsProvider dbConfigurationsProvider,  final String statementDelimiter,  final String likeEscapeCharacter,
-            final TechnicalLoggerService logger,  final SequenceManager sequenceManager,  final DataSource datasource) throws SPersistenceException, SequenceManagerException {
+    public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
+            final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource) throws SPersistenceException {
         super(name, hbmConfigurationProvider, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource);
     }
 
     @Override
-    protected long getTenantId() throws TenantIdNotSetException {
+    protected long getTenantId() {
         return -1;
     }
 
@@ -48,7 +46,7 @@ public class PlatformHibernatePersistenceService extends AbstractHibernatePersis
     }
 
     @Override
-    public void deleteByTenant(Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) throws SPersistenceException {
+    public void deleteByTenant(Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) {
         // FIXME : Method for tenant. TODO: Refactor code for PlatformHibernatePersistenceService don't implements TenantPersistenceService
     }
 

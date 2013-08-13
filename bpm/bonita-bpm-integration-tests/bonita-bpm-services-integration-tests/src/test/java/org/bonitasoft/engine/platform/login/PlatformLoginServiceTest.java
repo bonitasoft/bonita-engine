@@ -1,14 +1,14 @@
 package org.bonitasoft.engine.platform.login;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.platform.login.SPlatformLoginException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -18,7 +18,7 @@ public class PlatformLoginServiceTest extends CommonBPMServicesTest {
 
     private final PlatformLoginService platformLoginService;
 
-    public PlatformLoginServiceTest() throws Exception {
+    public PlatformLoginServiceTest() {
         platformLoginService = getServicesBuilder().getPlatformLoginService();
     }
 

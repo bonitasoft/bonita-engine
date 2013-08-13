@@ -22,7 +22,6 @@ import java.util.List;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
 
@@ -45,14 +44,14 @@ public class WaitForFinalArchivedActivity extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws BonitaException {
+    protected boolean check() {
         final List<ArchivedActivityInstance> activityInstances = processAPI.getArchivedActivityInstances(processInstanceId, 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         final Iterator<ArchivedActivityInstance> iterator = activityInstances.iterator();
         boolean found = false;
         while (iterator.hasNext() && !found) {
             final ArchivedActivityInstance activityInstance = iterator.next();
-            if (activityInstance.getName().equals(activityName) && activityInstance.getState().equals(TestStates.getNormalFinalState(activityInstance))) {
+            if (activityInstance.getName().equals(activityName) && activityInstance.getState().equals(TestStates.getNormalFinalState())) {
                 result = activityInstance;
                 found = true;
             }

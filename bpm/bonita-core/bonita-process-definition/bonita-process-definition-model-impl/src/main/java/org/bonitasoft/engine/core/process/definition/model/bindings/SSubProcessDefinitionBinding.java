@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSubProcessDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,13 +29,13 @@ public class SSubProcessDefinitionBinding extends SActivityDefinitionBinding {
     private SFlowElementContainerDefinitionImpl container;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         triggeredByEvent = Boolean.valueOf(attributes.get(XMLSProcessDefinition.TRIGGERED_BY_EVENT));
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.FLOW_ELEMENTS_NODE.equals(name)) {
             container = (SFlowElementContainerDefinitionImpl) value;
         } else {

@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -29,7 +28,7 @@ public class SGatewayDefinitionBinding extends SFlowNodeDefinitionBinding {
     private SGatewayType type;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         type = SGatewayType.valueOf(attributes.get(XMLSProcessDefinition.GATEWAY_TYPE));
     }
@@ -47,12 +46,12 @@ public class SGatewayDefinitionBinding extends SFlowNodeDefinitionBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         super.setChildElement(name, value, attributes);
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
     }
 

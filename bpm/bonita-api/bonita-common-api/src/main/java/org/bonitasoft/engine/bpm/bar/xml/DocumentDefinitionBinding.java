@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.document.impl.DocumentDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -36,13 +35,13 @@ public class DocumentDefinitionBinding extends NamedElementBinding {
     private String fileName;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         mimeType = attributes.get(XMLProcessDefinition.DOCUMENT_DEFINITION_MIME_TYPE);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLProcessDefinition.DOCUMENT_DEFINITION_FILE_NAME.equals(name)) {
             fileName = value;
         }
@@ -58,7 +57,7 @@ public class DocumentDefinitionBinding extends NamedElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

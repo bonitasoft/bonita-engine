@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Celine Souchet
@@ -29,16 +28,16 @@ public class MembershipsBinding extends ElementBinding {
     private List<BEntry<String, String>> memberships;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         memberships = new ArrayList<BEntry<String, String>>(5);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if ("membership".equals(name)) {
             memberships.add((BEntry<String, String>) value);
         }

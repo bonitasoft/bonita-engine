@@ -139,7 +139,7 @@ public class ProcessDeletionTest extends CommonAPITest {
             final String activityName = "step2" + i;
             processDefinitionBuilder.addUserTask(activityName, actorName);
             processDefinitionBuilder.addTransition("step1", activityName);
-        
+
         }
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, pedro);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -243,7 +243,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         checkAllArchivedElementsWereDeleted(simpleProcessInstanceId);
     }
 
-    private void checkAllArchivedElementsWereDeleted(final long processInstanceId) throws BonitaException {
+    private void checkAllArchivedElementsWereDeleted(final long processInstanceId) {
         // check that archived flow nodes were deleted.
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstanceId, 0, 100,
                 ActivityInstanceCriterion.DEFAULT);

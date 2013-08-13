@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
@@ -133,8 +132,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     }
 
-    public void handleCatchEvent(final SProcessDefinition processDefinition, final SReceiveTaskDefinition receiveTaskDefinition,
-            final SReceiveTaskInstance receiveTaskInstance, final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+    public void handleCatchEvent(final SProcessDefinition processDefinition, final SReceiveTaskInstance receiveTaskInstance,
+            final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final SCatchMessageEventTriggerDefinition messageTrigger = (SCatchMessageEventTriggerDefinition) sEventTriggerDefinition;
         final String messageName = messageTrigger.getMessageName();
         final String processName = processDefinition.getName();
@@ -165,9 +164,9 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         handleThrowMessage(sEventTriggerDefinition, eventInstanceId, eventInstanceName, processDefinitionId, expressionContext);
     }
 
-    public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskDefinition sendTaskDefinition,
-            final SSendTaskInstance sendTaskInstance, final SThrowMessageEventTriggerDefinition messageTrigger) throws SEventTriggerInstanceCreationException,
-            SMessageInstanceCreationException, SDataInstanceException, SExpressionException {
+    public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
+            final SThrowMessageEventTriggerDefinition messageTrigger) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException,
+            SDataInstanceException, SExpressionException {
         final long eventInstanceId = sendTaskInstance.getId();
         final String eventInstanceName = sendTaskInstance.getName();
         final long parentContainerId = sendTaskInstance.getParentContainerId();
@@ -291,9 +290,9 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition eventDefinition,
-            final SThrowEventInstance eventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws SBonitaException {
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
+            final SThrowEventInstance sThrowEventInstance,
+            final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance) {
         // nothing to do
         return false;
     }

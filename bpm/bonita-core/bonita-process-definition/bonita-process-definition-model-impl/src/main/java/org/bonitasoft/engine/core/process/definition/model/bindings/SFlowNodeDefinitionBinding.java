@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -45,11 +44,11 @@ public abstract class SFlowNodeDefinitionBinding extends SNamedElementBinding {
     private SExpression displayDescriptionAfterCompletion;
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.DISPLAY_DESCRIPTION.equals(name)) {
             displayDescription = (SExpression) value;
         }

@@ -27,6 +27,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Julien Molinaro
+ * @author Celine Souchet
  */
 public class SReceiveTaskDefinitionImpl extends SActivityDefinitionImpl implements SReceiveTaskDefinition {
 
@@ -34,14 +35,14 @@ public class SReceiveTaskDefinitionImpl extends SActivityDefinitionImpl implemen
 
     private final SCatchMessageEventTriggerDefinitionImpl trigger;
 
-    public SReceiveTaskDefinitionImpl(SFlowElementContainerDefinitionImpl parentContainer, ReceiveTaskDefinitionImpl activityDefinition,
-            SExpressionBuilders sExpressionBuilders, Map<String, STransitionDefinition> transitionsMap, SDataDefinitionBuilders sDataDefinitionBuilders,
-            SOperationBuilders sOperationBuilders) {
-        super(parentContainer, activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SReceiveTaskDefinitionImpl(final ReceiveTaskDefinitionImpl activityDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final SOperationBuilders sOperationBuilders) {
+        super(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
         trigger = new SCatchMessageEventTriggerDefinitionImpl(activityDefinition.getTrigger(), sDataDefinitionBuilders, sExpressionBuilders, sOperationBuilders);
     }
 
-    public SReceiveTaskDefinitionImpl(long id, String name, SCatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
+    public SReceiveTaskDefinitionImpl(final long id, final String name, final SCatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
         super(id, name);
         this.trigger = new SCatchMessageEventTriggerDefinitionImpl(catchMessageEventTriggerDefinition);
     }

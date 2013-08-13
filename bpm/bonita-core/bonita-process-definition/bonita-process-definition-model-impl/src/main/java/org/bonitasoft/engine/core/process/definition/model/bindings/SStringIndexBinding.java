@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -31,17 +30,17 @@ public class SStringIndexBinding extends ElementBinding {
     private SExpression value;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         index = Integer.valueOf(attributes.get(XMLSProcessDefinition.INDEX));
         label = attributes.get(XMLSProcessDefinition.LABEL);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.EXPRESSION_NODE.equals(name)) {
             this.value = (SExpression) value;
         }

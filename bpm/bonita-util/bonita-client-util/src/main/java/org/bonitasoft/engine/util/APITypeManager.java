@@ -58,8 +58,7 @@ public class APITypeManager {
         return apiAccessType;
     }
 
-    public static void setAPITypeAndParams(final ApiAccessType type, final Map<String, String> parameters) throws BonitaHomeNotSetException,
-            ServerAPIException, UnknownAPITypeException {
+    public static void setAPITypeAndParams(final ApiAccessType type, final Map<String, String> parameters) {
         apiAccessType = type;
 
         if (!ApiAccessType.LOCAL.equals(type)) {

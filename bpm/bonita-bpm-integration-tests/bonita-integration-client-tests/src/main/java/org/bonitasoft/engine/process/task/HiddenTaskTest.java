@@ -131,8 +131,8 @@ public class HiddenTaskTest extends CommonAPITest {
         final long id = processDef.getId();
         final ProcessInstance procInstance = getProcessAPI().startProcess(id);
 
-        final ActivityInstance task1 = waitForTaskInState("humanTask_1", procInstance, TestStates.getReadyState(null));
-        final ActivityInstance task2 = waitForTaskInState("humanTask_2", procInstance, TestStates.getReadyState(null));
+        final ActivityInstance task1 = waitForTaskInState("humanTask_1", procInstance, TestStates.getReadyState());
+        final ActivityInstance task2 = waitForTaskInState("humanTask_2", procInstance, TestStates.getReadyState());
 
         getProcessAPI().hideTasks(user.getId(), task1.getId(), task2.getId());
 

@@ -48,7 +48,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException {
         return evaluate(Collections.singletonList(expression), dependencyValues, resolvedExpressions).get(0);
     }
 
@@ -59,7 +59,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+            throws SExpressionEvaluationException {
         try {
             final Long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
             final String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);

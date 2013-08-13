@@ -27,8 +27,11 @@ import org.bonitasoft.engine.expression.model.SExpression;
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class SExpressionContext {
+public class SExpressionContext implements Serializable {
+
+    private static final long serialVersionUID = 6417383664862870145L;
 
     public static final String containerIdKey = "containerId";
 
@@ -61,7 +64,7 @@ public class SExpressionContext {
     public SExpressionContext() {
         inputValues = new HashMap<String, Object>();
     }
-    
+
     public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId) {
         this.containerId = containerId;
         this.containerType = containerType;
@@ -69,7 +72,7 @@ public class SExpressionContext {
         inputValues = new HashMap<String, Object>();
     }
 
-    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues) {
+    public SExpressionContext(final Long containerId, final String containerType, final Map<String, Serializable> inputValues) {
         this.containerId = containerId;
         this.containerType = containerType;
         if (inputValues == null) {
@@ -79,8 +82,7 @@ public class SExpressionContext {
         }
     }
 
-    public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId, final Map<String, Serializable> inputValues,
-            final long time) {
+    public SExpressionContext(final Long containerId, final String containerType, final Map<String, Serializable> inputValues, final long time) {
         this.containerId = containerId;
         this.containerType = containerType;
         if (inputValues == null) {
@@ -112,8 +114,6 @@ public class SExpressionContext {
     public void setTime(final long time) {
         this.time = time;
     }
-
-
 
     public void setContainerId(final Long containerId) {
         this.containerId = containerId;

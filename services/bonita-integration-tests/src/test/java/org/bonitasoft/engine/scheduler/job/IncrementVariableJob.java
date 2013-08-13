@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.impl.VariableStorage;
 
 /**
@@ -40,7 +39,7 @@ public class IncrementVariableJob extends GroupJob {
     }
 
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
         super.setAttributes(attributes);
         variableName = (String) attributes.get("variableName");
         throwExceptionAfterNIncrements = (Integer) attributes.get("throwExceptionAfterNIncrements");

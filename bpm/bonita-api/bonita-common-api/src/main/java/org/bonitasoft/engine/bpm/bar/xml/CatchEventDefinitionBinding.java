@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.flownode.CatchSignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.CatchEventDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -46,18 +45,18 @@ public abstract class CatchEventDefinitionBinding extends FlowNodeDefinitionBind
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         isInterrupting = Boolean.parseBoolean(attributes.get(XMLProcessDefinition.INTERRUPTING));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         super.setChildElement(name, value, attributes);
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.TIMER_EVENT_TRIGGER_NODE.equals(name)) {
             timerEventTriggers.add((TimerEventTriggerDefinition) value);

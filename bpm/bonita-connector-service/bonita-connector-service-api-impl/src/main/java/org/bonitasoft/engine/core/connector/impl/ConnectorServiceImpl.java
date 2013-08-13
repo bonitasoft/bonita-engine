@@ -389,7 +389,6 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     }
 
-    @SuppressWarnings("resource")
     protected void checkConnectorImplementationIsValid(final byte[] connectorImplementationArchive, final String connectorId, final String connectorVersion)
             throws SConnectorException, SInvalidConnectorImplementationException {
         ZipInputStream zipInputstream = null;

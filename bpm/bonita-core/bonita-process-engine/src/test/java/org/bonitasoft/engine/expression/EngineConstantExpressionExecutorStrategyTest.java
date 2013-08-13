@@ -13,6 +13,14 @@
  **/
 package org.bonitasoft.engine.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,21 +37,11 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.anyLong;
-
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -81,7 +79,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
     }
 
     private void taskAssigneeOnHumanTask(final SFlowNodeType flowNodeType, final SHumanTaskInstance humanTaskInstance)
-            throws SActivityInstanceNotFoundException, SActivityReadException, SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SActivityInstanceNotFoundException, SActivityReadException, SExpressionEvaluationException {
         final SExpression expression = mock(SExpression.class);
 
         when(activityInstanceService.getActivityInstance(containerId)).thenReturn(humanTaskInstance);

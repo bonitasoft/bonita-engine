@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.category.model.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Yanyan Liu
@@ -36,12 +35,12 @@ public class CategoryMappingBinding extends ElementBinding {
     private XMLProcessDefinitionsMapping processDefinitionsMapping;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         this.name = attributes.get(XMLCategoryMapping.NAME);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
 
         if (XMLCategoryMapping.DESCRIPTION.equals(name)) {
             this.description = value;
@@ -58,7 +57,7 @@ public class CategoryMappingBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLCategoryMapping.PROCESS_DEFINITIONS.equals(name)) {
             this.processDefinitionsMapping = (XMLProcessDefinitionsMapping) value;
         }

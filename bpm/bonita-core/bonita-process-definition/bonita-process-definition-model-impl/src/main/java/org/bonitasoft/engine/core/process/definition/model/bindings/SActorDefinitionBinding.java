@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SActorDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -28,14 +27,14 @@ public class SActorDefinitionBinding extends SNamedElementBinding {
     private String description;
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.DESCRIPTION.equals(name)) {
             description = value;
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

@@ -90,7 +90,6 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -535,8 +534,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void createDefaultDataSource(final SDataSourceModelBuilder sDataSourceModelBuilder, final DataService dataService) throws SSessionException,
-            SDataSourceAlreadyExistException, SDataException {
+    protected void createDefaultDataSource(final SDataSourceModelBuilder sDataSourceModelBuilder, final DataService dataService)
+            throws SDataSourceAlreadyExistException, SDataException {
         final SDataSource bonitaDataSource = sDataSourceModelBuilder.getDataSourceBuilder()
                 .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl")
                 .done();

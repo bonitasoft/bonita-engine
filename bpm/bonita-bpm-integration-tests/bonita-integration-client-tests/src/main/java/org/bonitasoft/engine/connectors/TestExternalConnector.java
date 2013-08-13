@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.connectors;
 
 import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 
 /**
  * @author Nicolas Chabanoles
@@ -24,7 +23,7 @@ public class TestExternalConnector extends AbstractConnector {
     private boolean hasBeenValidated = false;
 
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
         hasBeenValidated = true;
     }
 

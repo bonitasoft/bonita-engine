@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -34,7 +33,7 @@ public class SXMLDataDefinitionBinding extends SDataDefinitionBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         super.setChildElement(name, value, attributes);
         if (XMLSProcessDefinition.XML_DATA_DEFINITION_NAMESPACE.equals(name)) {
             namespace = value;

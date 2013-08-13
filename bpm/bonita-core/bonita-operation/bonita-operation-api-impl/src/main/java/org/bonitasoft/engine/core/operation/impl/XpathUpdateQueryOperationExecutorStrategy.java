@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.operation.impl;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -29,15 +28,10 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.xml.DocumentManager;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;

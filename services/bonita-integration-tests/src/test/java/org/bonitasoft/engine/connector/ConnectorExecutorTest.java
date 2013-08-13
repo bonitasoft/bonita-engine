@@ -22,8 +22,6 @@ import java.util.Map;
 import org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.parse.SAXParser;
@@ -35,18 +33,14 @@ import org.junit.Test;
  */
 public class ConnectorExecutorTest {
 
-    private ConnectorExecutor connectorExecutor;
-
     private Parser parser;
 
     private Map<String, Object> inputParameters; // TODO parse it from XML file
 
     private final String INPUT_KEY = "input1";
 
-    private final String OUTPUT_KEY = "output1";
-
     @Before
-    public void before() throws Exception {
+    public void before() {
         parser = new SAXParser(null, null);
         final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>();
         // bindings.add(ConnectorImplementationBinding.class);
@@ -66,12 +60,12 @@ public class ConnectorExecutorTest {
         return new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, new SessionAccessor() {
 
             @Override
-            public long getTenantId() throws TenantIdNotSetException {
+            public long getTenantId() {
                 return 0;
             }
 
             @Override
-            public long getSessionId() throws SessionIdNotSetException {
+            public long getSessionId() {
                 return 0;
             }
 
@@ -87,8 +81,8 @@ public class ConnectorExecutorTest {
     }
 
     @Test
-    public void testExecuteConnector() throws Exception {
-        connectorExecutor = getConnectorExecutor();
+    public void testExecuteConnector() {
+        getConnectorExecutor();
         inputParameters = getInputParameters();
         // Map<String, Object> resultMap = connectorExecutor.execute(null, inputParameters);
         // assertNotNull(resultMap);

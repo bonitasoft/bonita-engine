@@ -40,7 +40,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
-import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
@@ -104,7 +103,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public List<Profile> getProfilesForUser(final long userId) throws UserNotFoundException {
+    public List<Profile> getProfilesForUser(final long userId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final GetProfilesForUser getProfilesForUser = new GetProfilesForUser(profileService, userId);
@@ -257,7 +256,6 @@ public class ProfileAPIImpl implements ProfileAPI {
     @Override
     public ProfileMember createProfileMember(final Long profileId, final Long userId, final Long groupId, final Long roleId) throws CreationException,
             AlreadyExistsException {
-        System.out.println("ProfileAPIImpl.createProfileMember() pid=" + profileId + " userId" + userId + " gid=" + groupId + " roleId" + roleId);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final IdentityService identityService = tenantAccessor.getIdentityService();

@@ -66,15 +66,10 @@ public class UpdateGroup implements TransactionContent {
         final String parentPathKey = groupBuilder.getParentPathKey();
         final String nameKey = groupBuilder.getNameKey();
         final Map<String, Object> fields = changeDescriptor.getFields();
-        if (fields.containsKey(parentPathKey)) {
-            final String parentPath = (String) fields.get(parentPathKey);
-            updateChildren(group, parentPath, groupBuilder.getIdKey(), parentPathKey, group.getName());
-
-        } else {
-            if (fields.containsKey(nameKey)) {
-                updateChildren(group, group.getParentPath(), groupBuilder.getIdKey(), parentPathKey, (String) fields.get(nameKey));
-
-            }
+        if (fields.containsKey(parentPathKey) || fields.containsKey(nameKey)) {
+            final String parentPath = ((fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : group.getParentPath()));
+            final String groupName = (fields.containsKey(nameKey) ? (String) fields.get(nameKey) : group.getName());
+            updateChildren(group, parentPath, groupBuilder.getIdKey(), parentPathKey, groupName);
         }
         identityService.updateGroup(group, changeDescriptor);
     }

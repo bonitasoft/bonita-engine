@@ -3,9 +3,6 @@ package org.bonitasoft.engine.scheduler.job;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
-
 /**
  * @author Baptiste Mesta
  */
@@ -16,7 +13,7 @@ public class IncrementItselfJob extends GroupJob {
     private static int value = 0;
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() {
         value++;
     }
 
@@ -34,7 +31,7 @@ public class IncrementItselfJob extends GroupJob {
     }
 
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
         super.setAttributes(attributes);
     }
 

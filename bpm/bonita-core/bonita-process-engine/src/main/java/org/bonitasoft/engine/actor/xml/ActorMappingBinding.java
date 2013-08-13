@@ -16,7 +16,6 @@ package org.bonitasoft.engine.actor.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -26,16 +25,16 @@ public class ActorMappingBinding extends ElementBinding {
     private ActorMapping mapping;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         this.mapping = new ActorMapping();
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if ("actorMapping".equals(name)) {
             mapping.addActor((Actor) value);
         }

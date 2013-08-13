@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -35,13 +34,13 @@ public class SDocumentDefinitionBinding extends SNamedElementBinding {
     private String fileName;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         mimeType = attributes.get(XMLSProcessDefinition.DOCUMENT_DEFINITION_MIME_TYPE);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.DOCUMENT_DEFINITION_FILE_NAME.equals(name)) {
             fileName = value;
         }
@@ -57,7 +56,7 @@ public class SDocumentDefinitionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

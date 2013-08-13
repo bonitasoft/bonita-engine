@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
@@ -23,8 +25,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta
@@ -64,9 +64,9 @@ public class ProcessDeploymentTest extends CommonAPITest {
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(TestStates.getProcessDepInfoEnabledState(), processDeploymentInfo.getActivationState());
 
-        getProcessAPI().disableProcess(processDefinition.getId());
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        // Clean up
         deleteUser(user);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -91,9 +91,9 @@ public class ProcessDeploymentTest extends CommonAPITest {
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(TestStates.getProcessDepInfoEnabledState(), processDeploymentInfo.getActivationState());
 
-        getProcessAPI().disableProcess(processDefinition.getId());
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        // Clean up
         deleteUser(user);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test

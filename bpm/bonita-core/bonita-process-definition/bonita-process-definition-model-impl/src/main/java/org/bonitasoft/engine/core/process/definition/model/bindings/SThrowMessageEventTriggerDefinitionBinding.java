@@ -20,7 +20,6 @@ import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -48,7 +47,7 @@ public class SThrowMessageEventTriggerDefinitionBinding extends SMessageEventTri
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);

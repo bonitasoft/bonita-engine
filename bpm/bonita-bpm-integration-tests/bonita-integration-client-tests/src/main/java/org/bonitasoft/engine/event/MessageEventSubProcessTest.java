@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +44,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta
@@ -185,7 +185,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
 
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity, TestStates.getNormalFinalState(null));
+        waitForArchivedActivity(eventSubProcessActivity, TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.getAbortedState());
 
@@ -263,7 +263,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(step1, john.getId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState(step1));
+        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(processInstance);
 
         // the parent process instance has completed, so no more waiting events are expected

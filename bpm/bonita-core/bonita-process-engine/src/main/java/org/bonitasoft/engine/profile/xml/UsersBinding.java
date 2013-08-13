@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Zhao Na
@@ -28,19 +27,19 @@ public class UsersBinding extends ElementBinding {
     private List<String> userNames;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         userNames = new ArrayList<String>(5);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("user".equals(name)) {
             userNames.add(value);
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

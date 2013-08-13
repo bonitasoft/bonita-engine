@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.impl.StandardLoopCharacteristics;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.ElementBinding;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -32,16 +31,16 @@ public class StandardLoopCharacteristicsBinding extends ElementBinding {
     private Expression loopMax;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         testBefore = Boolean.valueOf(attributes.get(XMLProcessDefinition.TEST_BEFORE));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.LOOP_CONDITION.equals(name)) {
             loopCondition = (Expression) value;
         }

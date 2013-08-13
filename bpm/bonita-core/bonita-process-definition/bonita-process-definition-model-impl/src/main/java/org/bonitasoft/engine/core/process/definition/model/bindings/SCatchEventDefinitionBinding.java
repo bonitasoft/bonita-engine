@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.impl.SCatchEven
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerEventTriggerDefinition;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -47,18 +46,18 @@ public abstract class SCatchEventDefinitionBinding extends SFlowNodeDefinitionBi
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         isInterrupting = Boolean.parseBoolean(attributes.get(XMLSProcessDefinition.INTERRUPTING));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         super.setChildElement(name, value, attributes);
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.TIMER_EVENT_TRIGGER_NODE.equals(name)) {
             timerEventTriggers.add((STimerEventTriggerDefinition) value);

@@ -58,7 +58,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     @Deprecated
-    public void deleteProcess(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
+    public void deleteProcess(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DeleteProcess deleteProcess = new DeleteProcess(getTenantAccessor(), processDefinitionId);
         deleteProcess.execute();

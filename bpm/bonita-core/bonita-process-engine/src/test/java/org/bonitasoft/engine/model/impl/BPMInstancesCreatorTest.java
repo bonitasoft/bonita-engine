@@ -59,7 +59,7 @@ public class BPMInstancesCreatorTest {
     private SConnectorInstanceBuilder connectorBuilder;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 

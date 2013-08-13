@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -33,21 +32,21 @@ public class DataDefinitionBinding extends NamedElementBinding {
     protected String isTransient;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         className = attributes.get(XMLProcessDefinition.DATA_DEFINITION_CLASS);
         isTransient = attributes.get(XMLProcessDefinition.DATA_DEFINITION_TRANSIENT);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLProcessDefinition.DESCRIPTION.equals(name)) {
             description = value;
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.DEFAULT_VALUE_NODE.equals(name)) {
             defaultValue = (Expression) value;
         }

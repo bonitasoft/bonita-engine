@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -32,7 +31,7 @@ public class STextDataDefinitionBinding extends SDataDefinitionBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         longText = Boolean.valueOf(attributes.get(XMLSProcessDefinition.TEXT_DATA_DEFINITION_LONG));
     }

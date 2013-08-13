@@ -19,16 +19,14 @@ import javax.naming.NamingException;
 
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
-
 
 /**
  * @author Charles Souillard
  */
 public class TestConnectorWithAPICall extends AbstractConnector {
-    
+
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
 
     }
 
@@ -38,15 +36,15 @@ public class TestConnectorWithAPICall extends AbstractConnector {
         final String version = (String) getInputParameter("processVersion");
         final String propValue = System.getProperty(Context.INITIAL_CONTEXT_FACTORY);
         final String userTransactionJNDIName = System.getProperty("sysprop.bonita.transaction.manager", "java:comp/UserTransaction");
-        long processId = -1; 
+        long processId = -1;
         try {
             if (propValue == null) {
-                throw new RuntimeException("Unable to find the system property: " + Context.INITIAL_CONTEXT_FACTORY); 
+                throw new RuntimeException("Unable to find the system property: " + Context.INITIAL_CONTEXT_FACTORY);
             }
-            
+
             final InitialContext ctxt = new InitialContext();
             ctxt.lookup(userTransactionJNDIName);
-            
+
             processId = getAPIAccessor().getProcessAPI().getProcessDefinitionId(name, version);
         } catch (ProcessDefinitionNotFoundException e) {
             throw new RuntimeException("Unable to get Process with name and version: " + name + ", " + version);
@@ -55,7 +53,7 @@ public class TestConnectorWithAPICall extends AbstractConnector {
         } finally {
             setOutputParameter("processId", processId);
         }
-        
+
     }
 
 }

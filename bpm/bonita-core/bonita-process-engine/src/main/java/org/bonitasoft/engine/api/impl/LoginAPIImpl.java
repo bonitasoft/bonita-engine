@@ -141,7 +141,7 @@ public class LoginAPIImpl extends
         }
 
         @Override
-        public void execute() throws SBonitaException {
+        public void execute() {
             SessionAccessor sessionAccessor = null;
             try {
                 session = loginService.login(tenantId, userName, password);

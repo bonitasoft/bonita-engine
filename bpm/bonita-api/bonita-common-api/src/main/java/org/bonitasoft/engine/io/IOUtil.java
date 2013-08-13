@@ -321,7 +321,7 @@ public class IOUtil {
      *            the stream to read from
      * @return the content read from the inputStream, as a String
      */
-    public static String read(final InputStream inputStream) throws IOException {
+    public static String read(final InputStream inputStream) {
         final Scanner scanner = new Scanner(inputStream, fEncoding);
         return read(scanner);
     }

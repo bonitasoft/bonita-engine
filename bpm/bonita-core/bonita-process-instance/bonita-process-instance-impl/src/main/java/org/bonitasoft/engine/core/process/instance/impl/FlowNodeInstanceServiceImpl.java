@@ -262,8 +262,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     public SFlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws SFlowNodeNotFoundException, SFlowNodeReadException {
         SFlowNodeInstance selectOne;
         try {
-            selectOne = persistenceRead.selectById(SelectDescriptorBuilder
-                    .getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
+            selectOne = persistenceRead.selectById(SelectDescriptorBuilder.getElementById(SFlowNodeInstance.class, "SFlowNodeInstance", flowNodeInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }

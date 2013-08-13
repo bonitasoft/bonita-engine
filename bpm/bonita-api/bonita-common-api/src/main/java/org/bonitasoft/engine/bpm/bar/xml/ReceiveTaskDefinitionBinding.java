@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.ReceiveTaskDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Julien Molinaro
@@ -37,7 +36,7 @@ public class ReceiveTaskDefinitionBinding extends ActivityDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.CATCH_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
             catchMessageEventTriggerDefinition = (CatchMessageEventTriggerDefinition) value;

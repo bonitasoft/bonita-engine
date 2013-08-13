@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,18 +27,18 @@ public class ActorBinding extends ElementBinding {
     private Actor actor;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         final String name = attributes.get("name");
         actor = new Actor(name);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if ("users".equals(name)) {
             actor.addUsers((List<String>) value);
         } else if ("groups".equals(name)) {

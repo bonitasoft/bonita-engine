@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,17 +28,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class DocumentManager {
 
-    public static Document generateDocument(final String s) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+    public static Document generateDocument(final String s) throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         final InputStream is = new ByteArrayInputStream(s.getBytes());
         try {

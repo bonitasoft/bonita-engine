@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.CommonServiceTest;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
@@ -1021,7 +1020,7 @@ public class IdentityServiceTest extends CommonServiceTest {
         assertTrue("not in asc order", users.get(0).getLastName().compareTo(users.get(users.size() - 1).getLastName()) < 0);
     }
 
-    private List<SUser> createUsers(final int i, final String baseUsername) throws SIdentityException, FireEventException {
+    private List<SUser> createUsers(final int i, final String baseUsername) throws SIdentityException {
         final List<SUser> ids = new ArrayList<SUser>();
         for (int j = 0; j < i; j++) {
             final SUser user = builder.getUserBuilder().createNewInstance().setUserName(baseUsername + j).setFirstName("firstName" + j)
@@ -1031,7 +1030,7 @@ public class IdentityServiceTest extends CommonServiceTest {
         return ids;
     }
 
-    private void deleteUsers() throws SIdentityException, FireEventException {
+    private void deleteUsers() throws SIdentityException {
         final List<SUser> users = identityService.getUsers(0, 5000);
         for (final SUser sUser : users) {
             identityService.deleteUser(sUser);

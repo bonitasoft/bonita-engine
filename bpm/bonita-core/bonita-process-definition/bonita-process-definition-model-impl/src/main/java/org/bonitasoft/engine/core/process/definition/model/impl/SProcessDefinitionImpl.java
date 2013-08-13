@@ -75,7 +75,6 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
 
     public SProcessDefinitionImpl(final DesignProcessDefinition processDefinition, final SExpressionBuilders sExpressionBuilders,
             final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-
         super(processDefinition.getName());
         description = processDefinition.getDescription();
         version = processDefinition.getVersion();

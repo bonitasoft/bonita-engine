@@ -67,7 +67,7 @@ public abstract class MemberCommand extends CommandWithParameters {
         return getParameter(parameters, ProfileMemberUtils.ROLE_ID, message);
     }
 
-    protected String getQuerySuffix(final MemberType memberType) throws SCommandParameterizationException {
+    protected String getQuerySuffix(final MemberType memberType) {
         String suffix = null;
         switch (memberType) {
             case USER:

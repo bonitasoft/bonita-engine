@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,19 +20,19 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
+import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ContainerRegistry {
 
@@ -49,11 +49,11 @@ public class ContainerRegistry {
         executors.put(containerExecutor.getHandledType(), containerExecutor);
     }
 
-    public void nodeReachedState(final SProcessDefinition processDefinition, final SFlowNodeInstance child, final FlowNodeState state, final long parentId,
-            final String parentType) throws SBonitaException {
+    public void nodeReachedState(final long processDefinitionId, final long flowNodeInstanceId, final int stateId, final long parentId, final String parentType)
+            throws SBonitaException {
         final ContainerExecutor containerExecutor = executors.get(parentType);
         if (containerExecutor != null) {
-            containerExecutor.childFinished(processDefinition, child, state, parentId);
+            containerExecutor.childFinished(processDefinitionId, flowNodeInstanceId, stateId, parentId);
         } else {
             throw new SActivityExecutionException("There is no container executor for the container " + parentId + " having the type " + parentType);
         }
@@ -65,8 +65,13 @@ public class ContainerRegistry {
 
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
             final String containerType, final long processInstanceId) throws WorkRegisterException {
-        final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
-        workService.registerWork(new ExecuteFlowNodeWork(containerExecutor, flowNodeInstanceId, operations, contextDependency, processInstanceId));
+        Type executorType = null;
+        if (SFlowElementsContainerType.PROCESS.name().equals(containerType)) {
+            executorType = Type.PROCESS;
+        } else {
+            executorType = Type.FLOWNODE;
+        }
+        workService.registerWork(new ExecuteFlowNodeWork(executorType, flowNodeInstanceId, operations, contextDependency, processInstanceId));
     }
 
     public void executeFlowNodeInSameThread(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,

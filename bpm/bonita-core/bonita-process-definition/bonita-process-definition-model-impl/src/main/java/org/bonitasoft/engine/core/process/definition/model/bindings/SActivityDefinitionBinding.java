@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SActivityDefinitionImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Feng Hui
@@ -39,7 +38,7 @@ public abstract class SActivityDefinitionBinding extends SFlowNodeDefinitionBind
     private final List<SBoundaryEventDefinition> boundaryEventDefinitions = new ArrayList<SBoundaryEventDefinition>(1);
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);

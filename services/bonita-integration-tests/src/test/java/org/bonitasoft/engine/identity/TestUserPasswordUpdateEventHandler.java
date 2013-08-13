@@ -28,9 +28,8 @@ public class TestUserPasswordUpdateEventHandler extends UserUpdateEventHandler {
         if (USER_UPDATED.compareToIgnoreCase(updateEvent.getType()) == 0) {
             final SUser newUser = (SUser) updateEvent.getObject();
             final SUser oldUser = (SUser) updateEvent.getOldObject();
-            if (!newUser.getPassword().equals(oldUser.getPassword())) {
-                return true;
-            }
+
+            return !newUser.getPassword().equals(oldUser.getPassword());
         }
         return false;
     }

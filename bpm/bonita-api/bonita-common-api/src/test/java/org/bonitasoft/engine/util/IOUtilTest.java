@@ -121,7 +121,7 @@ public class IOUtilTest {
     }
 
     @Test
-    public void testDeleteFile() throws Exception {
+    public void testDeleteFile() {
         final File file = mock(File.class);
         when(file.delete()).thenReturn(true);
         final boolean deleteFile = IOUtil.deleteFile(file, 2, 1);
@@ -130,7 +130,7 @@ public class IOUtilTest {
     }
 
     @Test
-    public void testDeleteFileNotDeleted() throws Exception {
+    public void testDeleteFileNotDeleted() {
         final File file = mock(File.class);
         when(file.delete()).thenReturn(false);
         final boolean deleteFile = IOUtil.deleteFile(file, 2, 1);
@@ -139,7 +139,7 @@ public class IOUtilTest {
     }
 
     @Test
-    public void testDeleteFiledeletedAfterFewTry() throws Exception {
+    public void testDeleteFiledeletedAfterFewTry() {
         final File file = mock(File.class);
         when(file.delete()).thenReturn(false, false, true);
         final boolean deleteFile = IOUtil.deleteFile(file, 6, 1);

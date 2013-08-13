@@ -21,6 +21,8 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 public class ConnectorAPIAccessorImpl implements APIAccessor {
 
+    private static final long serialVersionUID = 3365911149008207537L;
+
     private final long tenantId;
 
     public ConnectorAPIAccessorImpl(final long tenantId) {

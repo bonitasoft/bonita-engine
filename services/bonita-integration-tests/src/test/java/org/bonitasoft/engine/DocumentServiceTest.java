@@ -15,7 +15,6 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.document.DocumentService;
-import org.bonitasoft.engine.document.SDocumentException;
 import org.junit.AfterClass;
 
 /**
@@ -35,7 +34,7 @@ public class DocumentServiceTest extends CommonServiceTest {
         cleanPlatform();
     }
 
-    public static void cleanUp() throws SDocumentException {
+    public static void cleanUp() {
         // if (documentService instanceof CMISDocumentServiceImpl) {
         // ((CMISDocumentServiceImpl) documentService).clear();
         // }

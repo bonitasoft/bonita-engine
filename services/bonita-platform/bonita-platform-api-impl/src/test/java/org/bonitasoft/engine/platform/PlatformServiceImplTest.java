@@ -140,14 +140,14 @@ public class PlatformServiceImplTest {
      * @throws CacheException
      */
     @Test
-    public final void getPlatform() throws SBonitaReadException, SPlatformNotFoundException, CacheException {
+    public final void getPlatform() throws SPlatformNotFoundException, CacheException {
         final SPlatform sPlatform = mock(SPlatform.class);
         when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
         Assert.assertEquals(sPlatform, platformServiceImpl.getPlatform());
     }
 
     @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatformNotExists() throws SBonitaReadException, SPlatformNotFoundException, CacheException {
+    public final void getPlatformNotExists() throws SPlatformNotFoundException, CacheException {
         when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
         platformServiceImpl.getPlatform();
@@ -271,14 +271,14 @@ public class PlatformServiceImplTest {
      * @throws CacheException
      */
     @Test
-    public final void isPlatformCreated() throws SBonitaReadException, CacheException {
+    public final void isPlatformCreated() throws CacheException {
         final SPlatform sPlatform = mock(SPlatform.class);
         when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
         Assert.assertTrue(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
-    public final void isPlatformNotCreated() throws SBonitaReadException, CacheException {
+    public final void isPlatformNotCreated() throws CacheException {
         when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
         Assert.assertFalse(platformServiceImpl.isPlatformCreated());

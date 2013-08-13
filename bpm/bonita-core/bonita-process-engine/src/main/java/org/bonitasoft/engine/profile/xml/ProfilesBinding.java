@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Zhao Na
@@ -30,16 +29,16 @@ public class ProfilesBinding extends ElementBinding {
     private List<ExportedProfile> profiles;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         profiles = new ArrayList<ExportedProfile>(10);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if ("profile".equals(name)) {
             profiles.add((ExportedProfile) value);
         }

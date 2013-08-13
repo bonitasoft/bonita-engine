@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 import java.util.Map;
 
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -28,7 +27,7 @@ public class SConditionalExpressionBinding extends SExpressionBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         returnType = Boolean.class.getName();
     }

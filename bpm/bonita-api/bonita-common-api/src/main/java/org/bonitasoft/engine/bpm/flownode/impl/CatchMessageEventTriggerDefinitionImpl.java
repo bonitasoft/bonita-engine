@@ -16,11 +16,9 @@ package org.bonitasoft.engine.bpm.flownode.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
-import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -38,8 +36,7 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         operations = new ArrayList<Operation>(1);
     }
 
-    public CatchMessageEventTriggerDefinitionImpl(final String messageName, final Map<String, Expression> outputDataMapping,
-            final List<CorrelationDefinition> correlations) {
+    public CatchMessageEventTriggerDefinitionImpl(final String messageName, final List<CorrelationDefinition> correlations) {
         super(messageName, correlations);
         operations = new ArrayList<Operation>(1);
     }

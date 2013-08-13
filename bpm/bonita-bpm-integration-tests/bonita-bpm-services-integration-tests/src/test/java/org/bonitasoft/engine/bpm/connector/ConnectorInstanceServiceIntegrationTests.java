@@ -23,7 +23,7 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
     private ConnectorInstanceService connectorInstanceService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.connectorInstanceService = getServicesBuilder().getConnectorInstanceService();
     }
 
@@ -57,7 +57,8 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
     private SConnectorInstance getNextInTransaction(final long containerId, final String containerType, final ConnectorEvent activationEvent)
             throws SBonitaException {
         getTransactionService().begin();
-        final SConnectorInstance connectorInstance = this.connectorInstanceService.getNextExecutableConnectorInstance(containerId, containerType, activationEvent);
+        final SConnectorInstance connectorInstance = this.connectorInstanceService.getNextExecutableConnectorInstance(containerId, containerType,
+                activationEvent);
         getTransactionService().complete();
         return connectorInstance;
     }

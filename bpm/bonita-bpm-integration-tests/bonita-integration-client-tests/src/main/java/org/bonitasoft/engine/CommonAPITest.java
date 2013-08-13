@@ -31,7 +31,7 @@ public abstract class CommonAPITest extends APITestUtil {
     }
 
     @AfterClass
-    public static void afterClass() throws BonitaException, InterruptedException {
+    public static void afterClass() throws BonitaException {
         APITestUtil.stopAndCleanPlatformAndTenant(true);
     }
 

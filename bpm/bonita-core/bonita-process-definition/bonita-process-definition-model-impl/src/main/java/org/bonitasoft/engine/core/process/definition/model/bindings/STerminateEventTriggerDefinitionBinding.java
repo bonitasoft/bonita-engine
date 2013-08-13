@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.STerminateEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -25,15 +24,15 @@ import org.bonitasoft.engine.xml.SXMLParseException;
 public class STerminateEventTriggerDefinitionBinding extends ElementBinding {
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.ThrowEventDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -38,7 +37,7 @@ public abstract class ThrowEventDefinitionBinding extends FlowNodeDefinitionBind
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.THROW_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
             messageEventTriggers.add((ThrowMessageEventTriggerDefinition) value);

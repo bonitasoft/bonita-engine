@@ -23,7 +23,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
-import org.bonitasoft.engine.identity.SUserDeletionException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -102,8 +101,7 @@ public class DeleteUser extends DeleteWithActorMembers implements TransactionCon
         } while (profileMembersOfUser.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
     }
 
-    private void deleteActorMembers(final long id) throws SActorMemberNotFoundException, SActorMemberDeletionException, SUserNotFoundException,
-            SUserDeletionException, SBonitaReadException {
+    private void deleteActorMembers(final long id) throws SActorMemberNotFoundException, SActorMemberDeletionException, SBonitaReadException {
         final List<SActorMember> actorMembers = actorMappingService.getActorMembersOfUser(id);
         for (final SActorMember sActorMember : actorMembers) {
             setActorIdsOfRemovedElements(actorMappingService.removeActorMember(sActorMember.getId()));

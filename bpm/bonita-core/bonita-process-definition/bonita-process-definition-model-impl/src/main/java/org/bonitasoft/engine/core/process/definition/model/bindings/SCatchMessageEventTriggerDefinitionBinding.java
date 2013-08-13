@@ -19,7 +19,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SCatchMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -48,7 +47,7 @@ public class SCatchMessageEventTriggerDefinitionBinding extends SMessageEventTri
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.OPERATION_NODE.equals(name)) {
             operations.add((SOperation) value);

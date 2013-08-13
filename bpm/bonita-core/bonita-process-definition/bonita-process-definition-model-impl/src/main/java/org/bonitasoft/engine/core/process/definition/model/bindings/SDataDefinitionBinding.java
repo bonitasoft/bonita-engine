@@ -19,7 +19,6 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -42,21 +41,21 @@ public class SDataDefinitionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         className = attributes.get(XMLSProcessDefinition.DATA_DEFINITION_CLASS);
         isTransient = attributes.get(XMLSProcessDefinition.DATA_DEFINITION_TRANSIENT);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSProcessDefinition.DESCRIPTION.equals(name)) {
             description = value;
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.DEFAULT_VALUE_NODE.equals(name)) {
             defaultValue = (SExpression) value;
         }

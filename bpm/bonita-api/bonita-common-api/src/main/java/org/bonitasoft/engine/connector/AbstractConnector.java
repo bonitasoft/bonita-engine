@@ -76,12 +76,12 @@ public abstract class AbstractConnector implements Connector {
     }
 
     @Override
-    public void connect() throws ConnectorException {
+    public void connect() {
         // default implementation do nothing
     }
 
     @Override
-    public void disconnect() throws ConnectorException {
+    public void disconnect() {
         // default implementation do nothing
     }
 

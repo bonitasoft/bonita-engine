@@ -17,6 +17,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilders;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -34,6 +35,7 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
@@ -50,6 +52,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
@@ -57,6 +60,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -87,15 +91,16 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Hongwen Zang
+ * @author Celine Souchet
  */
 public interface TenantServiceAccessor extends ServiceAccessor {
 
     long getTenantId();
 
     SessionService getSessionService();
-    
+
     ReadSessionAccessor getReadSessionAccessor();
-    
+
     IdentityModelBuilder getIdentityModelBuilder();
 
     IdentityService getIdentityService();
@@ -125,6 +130,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     BPMDefinitionBuilders getBPMDefinitionBuilders();
 
     BPMInstanceBuilders getBPMInstanceBuilders();
+
+    BPMInstancesCreator getBPMInstancesCreator();
 
     FlowNodeExecutor getFlowNodeExecutor();
 
@@ -182,6 +189,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     SDataSourceModelBuilder getSDataSourceModelBuilder();
 
+    SDataInstanceBuilders getSDataInstanceBuilders();
+
     DataService getDataService();
 
     ParserFactory getParserFactgory();
@@ -231,5 +240,9 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DefaultCommandProvider getDefaultCommandProvider();
 
     WorkService getWorkService();
+
+    TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor();
+
+    SACommentBuilder getSACommentBuilders();
 
 }

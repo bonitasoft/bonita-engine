@@ -17,6 +17,7 @@ import org.bonitasoft.engine.bpm.process.Problem;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ProblemImpl implements Problem {
 
@@ -24,16 +25,24 @@ public class ProblemImpl implements Problem {
 
     private final Level level;
 
-    private final Long resourceId;
+    private final String resourceId;
 
     private final String resource;
 
     private final String description;
 
-    public ProblemImpl(final Level level, final Long resourceId, final String resource, final String description) {
+    public ProblemImpl(final Level level, final String resourceId, final String resource, final String description) {
         super();
         this.level = level;
         this.resourceId = resourceId;
+        this.resource = resource;
+        this.description = description;
+    }
+
+    public ProblemImpl(final Level level, final long resourceId, final String resource, final String description) {
+        super();
+        this.level = level;
+        this.resourceId = String.valueOf(resourceId);
         this.resource = resource;
         this.description = description;
     }
@@ -44,7 +53,7 @@ public class ProblemImpl implements Problem {
     }
 
     @Override
-    public Long getResourceId() {
+    public String getResourceId() {
         return resourceId;
     }
 

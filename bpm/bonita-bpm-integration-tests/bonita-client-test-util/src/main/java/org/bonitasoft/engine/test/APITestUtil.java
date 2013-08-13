@@ -33,7 +33,6 @@ import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
-import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
@@ -166,7 +165,7 @@ public class APITestUtil {
     public static final int DEFAULT_TIMEOUT = 10000;
 
     @After
-    public void clearSynchroRepository() throws Exception {
+    public void clearSynchroRepository() {
         try {
             login();
             ClientEventUtil.clearRepo(getCommandAPI());
@@ -244,7 +243,7 @@ public class APITestUtil {
         getProcessAPI().addUserToActor(actor.getId(), userId);
     }
 
-    public ActorInstance getActor(final String actorName, final ProcessDefinition definition) throws ProcessDefinitionNotFoundException, ActorNotFoundException {
+    public ActorInstance getActor(final String actorName, final ProcessDefinition definition) throws ActorNotFoundException {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 50, ActorCriterion.NAME_ASC);
         final ActorInstance actorInstance = getActorInstance(actors, actorName);
         if (actorInstance == null) {
@@ -599,9 +598,17 @@ public class APITestUtil {
         }
     }
 
+    protected void disableAndDeleteProcessById(final List<Long> processDefinitionIds) throws BonitaException {
+        if (processDefinitionIds != null) {
+            for (final Long id : processDefinitionIds) {
+                disableAndDeleteProcess(id);
+            }
+        }
+    }
+
     protected void deleteProcessInstanceAndArchived(final long processDefinitionId) throws BonitaException {
-        getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 1000);
-        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 1000);
+        getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 10000);
+        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 10000);
     }
 
     protected void deleteProcessInstanceAndArchived(final ProcessDefinition... processDefinitions) throws BonitaException {
@@ -709,7 +716,7 @@ public class APITestUtil {
         }
     }
 
-    private FlowNodeInstance getFlowNodeInstance(final Long id) throws ActivityInstanceNotFoundException, RuntimeException {
+    private FlowNodeInstance getFlowNodeInstance(final Long id) throws RuntimeException {
         try {
             return getProcessAPI().getFlowNodeInstance(id);
         } catch (final FlowNodeInstanceNotFoundException e) {
@@ -766,7 +773,7 @@ public class APITestUtil {
 
     protected void waitForFlowNodeInReadyState(final ProcessInstance processInstance, final String flowNodeName, final boolean useRootProcessInstance)
             throws Exception {
-        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.getReadyState(flowNodeName), flowNodeName, useRootProcessInstance,
+        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.getReadyState(), flowNodeName, useRootProcessInstance,
                 DEFAULT_TIMEOUT);
         final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
         assertNotNull(flowNodeInstance);
@@ -1159,7 +1166,7 @@ public class APITestUtil {
     }
 
     public CheckNbOfActivities checkNbOfActivitiesInReadyState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
-        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.getReadyState(null));
+        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.getReadyState());
     }
 
     public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
@@ -1232,7 +1239,7 @@ public class APITestUtil {
         return checkNbOfProcessInstances;
     }
 
-    public void checkFlowNodeWasntExecuted(final long processInstancedId, final String flowNodeName) throws BonitaException {
+    public void checkFlowNodeWasntExecuted(final long processInstancedId, final String flowNodeName) {
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstancedId, 0, 200,
                 ActivityInstanceCriterion.DEFAULT);
         for (final ArchivedActivityInstance archivedActivityInstance : archivedActivityInstances) {
@@ -1285,7 +1292,7 @@ public class APITestUtil {
     }
 
     public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName)
-            throws DataNotFoundException, InvalidExpressionException, UpdateException {
+            throws InvalidExpressionException, UpdateException {
         final Operation stringOperation = buildStringOperation(dataName, updatedValue);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -30,7 +29,7 @@ public class WaitingFlowNodeStateImpl implements FlowNodeState {
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) {
         return StateCode.DONE;
     }
 
@@ -60,8 +59,7 @@ public class WaitingFlowNodeStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance)
-            throws SActivityStateExecutionException {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return true;
     }
 

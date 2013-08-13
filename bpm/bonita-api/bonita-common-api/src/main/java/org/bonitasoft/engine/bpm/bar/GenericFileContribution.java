@@ -24,7 +24,6 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 /**
  * @author Emmanuel Duchastenier
  */
@@ -33,7 +32,7 @@ public abstract class GenericFileContribution implements BusinessArchiveContribu
     public abstract String getFileName();
 
     @Override
-    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
+    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         // final Set<String> fileNames = businessArchive.getResources(getFileName()).keySet();
         // final File[] listFiles = connectorFolder.listFiles();
         final File file = new File(barFolder, getFileName());

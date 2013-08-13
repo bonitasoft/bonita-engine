@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="identityService" class="org.bonitasoft.engine.identity.impl.IdentityServiceImpl">
-		<constructor-arg name="eventSvc" ref="eventService" />
+		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="identityModelBuilder" ref="identityModelBuilder" />

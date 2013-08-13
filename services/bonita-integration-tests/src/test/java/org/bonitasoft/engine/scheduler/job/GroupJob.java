@@ -3,7 +3,6 @@ package org.bonitasoft.engine.scheduler.job;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 
 /**
@@ -21,7 +20,7 @@ public abstract class GroupJob implements StatelessJob {
     }
 
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
         jobName = (String) attributes.get("jobName");
     }
 

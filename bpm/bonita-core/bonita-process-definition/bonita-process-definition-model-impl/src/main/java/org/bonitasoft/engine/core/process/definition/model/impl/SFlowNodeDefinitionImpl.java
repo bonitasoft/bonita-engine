@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
@@ -52,6 +51,8 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
 
     private final List<SConnectorDefinition> connectors;
 
+    private final Map<String, SConnectorDefinition> allConnectorsMap;
+
     private String description;
 
     private SExpression displayDescription;
@@ -64,12 +65,11 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
 
     private final Map<ConnectorEvent, List<SConnectorDefinition>> connectorsMap;
 
-    public SFlowNodeDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final FlowNodeDefinition flowNodeDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> sTransitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
+    public SFlowNodeDefinitionImpl(final FlowNodeDefinition flowNodeDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> sTransitionsMap, final SOperationBuilders sOperationBuilders) {
         super(flowNodeDefinition.getName());
-        incomings = buildIncomingTransitions(flowNodeDefinition, sExpressionBuilders, sTransitionsMap);
-        outgoings = buildOutGoingTransitions(flowNodeDefinition, sExpressionBuilders, sTransitionsMap);
+        incomings = buildIncomingTransitions(flowNodeDefinition, sTransitionsMap);
+        outgoings = buildOutGoingTransitions(flowNodeDefinition, sTransitionsMap);
         if (flowNodeDefinition.getDefaultTransition() != null) {
             defaultTransition = sTransitionsMap.get(flowNodeDefinition.getDefaultTransition().getName());
         }
@@ -84,6 +84,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
             connectorsMap.get(e.getActivationEvent()).add(e);
         }
         connectors = Collections.unmodifiableList(mConnectors);
+        allConnectorsMap = new HashMap<String, SConnectorDefinition>(2);
 
         description = flowNodeDefinition.getDescription();
         displayDescription = ServerModelConvertor.convertExpression(sExpressionBuilders, flowNodeDefinition.getDisplayDescription());
@@ -102,6 +103,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         connectorsMap = new HashMap<ConnectorEvent, List<SConnectorDefinition>>(2);
         connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
         connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
+        allConnectorsMap = new HashMap<String, SConnectorDefinition>(2);
     }
 
     @Override
@@ -113,7 +115,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         this.parentContainer = parentContainer;
     }
 
-    private List<STransitionDefinition> buildOutGoingTransitions(final FlowNodeDefinition nodeDefinition, final SExpressionBuilders sExpressionBuilders,
+    private List<STransitionDefinition> buildOutGoingTransitions(final FlowNodeDefinition nodeDefinition,
             final Map<String, STransitionDefinition> sTransitionsMap) {
         Iterator<TransitionDefinition> iterator;
         final List<TransitionDefinition> outgoingTransitions = nodeDefinition.getOutgoingTransitions();
@@ -127,7 +129,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         return outgoings;
     }
 
-    private List<STransitionDefinition> buildIncomingTransitions(final FlowNodeDefinition nodeDefinition, final SExpressionBuilders sExpressionBuilders,
+    private List<STransitionDefinition> buildIncomingTransitions(final FlowNodeDefinition nodeDefinition,
             final Map<String, STransitionDefinition> sTransitionsMap) {
         final List<TransitionDefinition> incomingTransitions = nodeDefinition.getIncomingTransitions();
         final List<STransitionDefinition> incomings = new ArrayList<STransitionDefinition>();
@@ -153,6 +155,12 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     @Override
     public List<SConnectorDefinition> getConnectors() {
         return Collections.unmodifiableList(connectors);
+    }
+
+    @Override
+    // public SConnectorDefinition getConnectorDefinition(final long id) { // FIXME: Uncomment when generate id
+    public SConnectorDefinition getConnectorDefinition(final String name) {
+        return allConnectorsMap.get(name);
     }
 
     @Override
@@ -211,9 +219,11 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         incomings.remove(sTransition);
     }
 
-    public void addConnector(final SConnectorDefinition connector) {
-        connectors.add(connector);
-        connectorsMap.get(connector.getActivationEvent()).add(connector);
+    public void addConnector(final SConnectorDefinition sConnectorDefinition) {
+        connectors.add(sConnectorDefinition);
+        connectorsMap.get(sConnectorDefinition.getActivationEvent()).add(sConnectorDefinition);
+        // allConnectorsMap.put(sConnectorDefinition.getId(), sConnectorDefinition); // FIXME: Uncomment when generate id
+        allConnectorsMap.put(sConnectorDefinition.getName(), sConnectorDefinition);
     }
 
     @Override

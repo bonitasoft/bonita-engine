@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.ElementBinding;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -40,7 +39,7 @@ public class MultiInstanceLoopCharacteristicsBinding extends ElementBinding {
     private Expression completionCondition;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         isSequential = Boolean.valueOf(attributes.get(XMLProcessDefinition.MULTI_INSTANCE_IS_SEQUENTIAL));
         dataInputItemRef = attributes.get(XMLProcessDefinition.MULTI_INSTANCE_DATA_INPUT_ITEM_REF);
         dataOutputItemRef = attributes.get(XMLProcessDefinition.MULTI_INSTANCE_DATA_OUTPUT_ITEM_REF);
@@ -49,11 +48,11 @@ public class MultiInstanceLoopCharacteristicsBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.MULTI_INSTANCE_LOOP_CARDINALITY.equals(name)) {
             loopCardinality = (Expression) value;
         }

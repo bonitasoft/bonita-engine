@@ -62,12 +62,8 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final DataSource datasource;
 
-    public SequenceManagerImpl(final Map<Long, Integer> rangeSizes,
-            final int defaultRangeSize,
-            final Map<String, Long> sequencesMappings,
-            final DataSource datasource, final int retries, final int delay,
-            final int delayFactor) throws InstantiationException,
-            IllegalAccessException, ClassNotFoundException, SQLException {
+    public SequenceManagerImpl(final Map<Long, Integer> rangeSizes, final int defaultRangeSize, final Map<String, Long> sequencesMappings,
+            final DataSource datasource, final int retries, final int delay, final int delayFactor) {
         this.defaultRangeSize = defaultRangeSize;
         this.rangeSizes = rangeSizes;
         this.sequencesMappings = sequencesMappings;
@@ -296,7 +292,7 @@ public class SequenceManagerImpl implements SequenceManager {
     }
 
     @Override
-    public void close() throws SQLException {
+    public void close() {
     }
 
     @Override

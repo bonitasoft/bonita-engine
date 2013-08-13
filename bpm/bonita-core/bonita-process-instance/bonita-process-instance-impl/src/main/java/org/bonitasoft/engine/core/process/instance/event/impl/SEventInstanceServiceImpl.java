@@ -311,8 +311,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
     }
 
     @Override
-    public List<SMessageEventCouple> getMessageEventCouples() throws SEventTriggerInstanceReadException, SMessageModificationException,
-            SWaitingEventModificationException {
+    public List<SMessageEventCouple> getMessageEventCouples() throws SEventTriggerInstanceReadException {
         final SelectListDescriptor<SMessageEventCouple> selectDescriptor = SelectDescriptorBuilder.getMessageEventCouples();
         try {
             return getPersistenceRead().selectList(selectDescriptor);

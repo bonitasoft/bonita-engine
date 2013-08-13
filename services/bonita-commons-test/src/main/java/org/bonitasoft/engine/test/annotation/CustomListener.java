@@ -17,7 +17,6 @@ package org.bonitasoft.engine.test.annotation;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -73,12 +72,12 @@ public class CustomListener extends RunListener {
 
     private final SimpleDateFormat sdfTest = new SimpleDateFormat("dd-MM-yyyy, HH:mm:ss, z");
 
-    public CustomListener() throws Exception {
+    public CustomListener() {
         System.out.println("Creation of the customized listener");
         createXML();
     }
 
-    private void createXML() throws Exception {
+    private void createXML() {
 
     }
 
@@ -119,7 +118,7 @@ public class CustomListener extends RunListener {
         System.out.println("Cover annotation report generated at : " + path + "/" + REPORT_FULL_NAME);
     }
 
-    private void finishXML() throws XMLStreamException, IOException {
+    private void finishXML() throws XMLStreamException {
         writer.writeEndElement();
         writer.writeEndDocument();
         writer.flush();
@@ -202,17 +201,17 @@ public class CustomListener extends RunListener {
     }
 
     @Override
-    public void testStarted(final Description description) throws Exception {
+    public void testStarted(final Description description) {
         testState = OK;
     }
 
     @Override
-    public void testFailure(final Failure failure) throws Exception {
+    public void testFailure(final Failure failure) {
         testState = KO;
     }
 
     @Override
-    public void testIgnored(final Description description) throws Exception {
+    public void testIgnored(final Description description) {
         testState = IGNORE;
     }
 
