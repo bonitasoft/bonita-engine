@@ -236,8 +236,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<!-- Use teamwork to avoid having a test suite running for 30minutes because of clustering -->
-				<bonita.home.classifier>teamwork</bonita.home.classifier>
+				<bonita.home.classifier>performance</bonita.home.classifier>
 			</properties>
 		</profile>
 		<profile>

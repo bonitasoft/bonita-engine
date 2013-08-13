@@ -41,7 +41,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     @Override
     public ParameterService getParameterService() {
         if (parameterService == null) {
-            parameterService = getBeanAccessor().getService(ParameterService.class);
+            parameterService = lookupService(ParameterService.class);
         }
         return parameterService;
     }
@@ -49,7 +49,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     @Override
     public BreakpointService getBreakpointService() {
         if (breakpointService == null) {
-            breakpointService = getBeanAccessor().getService(BreakpointService.class);
+            breakpointService = lookupService(BreakpointService.class);
         }
         return breakpointService;
     }
@@ -57,7 +57,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     @Override
     public SearchEntitiesDescriptor getSearchEntitiesDescriptor() {
         if (searchEntitiesDescriptor == null) {
-            searchEntitiesDescriptor = getBeanAccessor().getService(SearchEntitiesDescriptor.class);
+            searchEntitiesDescriptor = lookupService(SearchEntitiesDescriptor.class);
         }
         return searchEntitiesDescriptor;
     }
@@ -65,7 +65,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     @Override
     public BPMInstanceBuilders getBPMInstanceBuilders() {
         if (bpmInstanceBuilders == null) {
-            bpmInstanceBuilders = getBeanAccessor().getService(BPMInstanceBuilders.class);
+            bpmInstanceBuilders = lookupService(BPMInstanceBuilders.class);
         }
         return bpmInstanceBuilders;
     }
@@ -73,7 +73,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     @Override
     public ReportingService getReportingService() {
         if (reportingService == null) {
-            reportingService = getBeanAccessor().getService(ReportingService.class);
+            reportingService = lookupService(ReportingService.class);
         }
         return reportingService;
     }
@@ -81,9 +81,13 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     @Override
     public TenantMonitoringService getTenantMonitoringService() {
         if (tenantMonitoringServie == null) {
-            tenantMonitoringServie = getBeanAccessor().getService(TenantMonitoringService.class);
+            tenantMonitoringServie = lookupService(TenantMonitoringService.class);
         }
         return tenantMonitoringServie;
+    }
+
+    private <T> T lookupService(final Class<T> clazz) {
+        return getBeanAccessor().getService(clazz);
     }
 
 }

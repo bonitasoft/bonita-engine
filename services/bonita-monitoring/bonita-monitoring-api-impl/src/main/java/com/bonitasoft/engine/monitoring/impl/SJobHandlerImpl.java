@@ -32,8 +32,6 @@ public class SJobHandlerImpl implements SHandler<SEvent> {
 
     private int executingJobs = 0;
 
-    private int completedJobs = 0;
-
     @Override
     public void execute(final SEvent event) {
         final String type = event.getType();
@@ -41,7 +39,6 @@ public class SJobHandlerImpl implements SHandler<SEvent> {
             executingJobs++;
         } else if (JOB_COMPLETED.compareToIgnoreCase(type) == 0) {
             executingJobs--;
-            completedJobs++;
         } else if (JOB_FAILED.compareToIgnoreCase(type) == 0) {
             executingJobs--;
         }

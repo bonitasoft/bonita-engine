@@ -22,7 +22,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -31,8 +30,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.ClassLoaderException;
-import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
@@ -73,7 +70,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
 
                 // TODO This should not be part of the transaction.
                 executeConnectors(sActivityInstanceID, processDefinitionID, connectorsList);
-                
+
                 updateActivityInstanceVariables(operationsList, operationsContext, sActivityInstanceID, processDefinitionID);
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -92,8 +89,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
     }
 
     private void executeConnectors(final long sActivityInstanceID, final long processDefinitionID, final List<ConnectorDefinitionWithInputValues> connectors)
-            throws ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, ClassLoaderException, ConnectorException,
-            InvalidEvaluationConnectorConditionException, NotSerializableException, SBonitaException {
+            throws ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, InvalidEvaluationConnectorConditionException, SBonitaException {
         if (connectors == null) {
             return;
         }

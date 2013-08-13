@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.connector;
 
-import org.bonitasoft.engine.connector.Connector;
-
 import com.bonitasoft.engine.api.APIAccessor;
 
 /**
@@ -18,7 +16,7 @@ import com.bonitasoft.engine.api.APIAccessor;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public abstract class AbstractConnector extends org.bonitasoft.engine.connector.AbstractConnector implements Connector {
+public abstract class AbstractConnector extends org.bonitasoft.engine.connector.AbstractConnector {
 
     public void setAPIAccessor(final APIAccessor apiAccessor) {
         this.apiAccessor = apiAccessor;

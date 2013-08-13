@@ -44,14 +44,13 @@ public class MybatisSqlSessionFactoryProvider {
     private final Properties properties;
 
     public MybatisSqlSessionFactoryProvider(final String configuration, final List<AbstractMyBatisConfigurationsProvider> myBatisConfigurationsProviders,
-            final Properties properties) throws SPersistenceException {
+            final Properties properties) {
         this.configuration = configuration;
         this.myBatisConfigurationsProviders = myBatisConfigurationsProviders;
         this.properties = properties;
     }
 
-    public MybatisSqlSessionFactoryProvider(final String configuration, final List<AbstractMyBatisConfigurationsProvider> myBatisConfigurationsProviders)
-            throws SPersistenceException {
+    public MybatisSqlSessionFactoryProvider(final String configuration, final List<AbstractMyBatisConfigurationsProvider> myBatisConfigurationsProviders) {
         this.configuration = configuration;
         this.myBatisConfigurationsProviders = myBatisConfigurationsProviders;
         properties = null;

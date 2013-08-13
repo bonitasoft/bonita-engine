@@ -40,15 +40,14 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
-	<bean id="gatewayInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
-		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="persistenceRead" ref="persistenceService" />
-		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
-		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+    <bean id="gatewayInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
+        <constructor-arg name="recorder" ref="recorderSync" />
+        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
-        <constructor-arg name="tokenService" ref="tokenService" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="tokenService" ref="tokenService" />
     </bean>
 
 	<bean id="transitionService" class="org.bonitasoft.engine.core.process.instance.impl.TransitionServiceImpl">

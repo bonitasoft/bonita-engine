@@ -23,6 +23,7 @@ import org.bonitasoft.engine.api.impl.transaction.profile.GetProfileByName;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -33,8 +34,8 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileAlreadyExistsException;
 import org.bonitasoft.engine.profile.SProfileCreationException;
+import org.bonitasoft.engine.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
@@ -95,7 +96,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Profile createProfile(final ProfileCreator creator) throws CreationException {
+    public Profile createProfile(final ProfileCreator creator) throws CreationException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
         Map<ProfileField, Serializable> fields = creator.getFields();
         final String name = (String) fields.get(ProfileField.NAME);
@@ -104,15 +105,17 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-
         try {
-            SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, profileService.getSProfileBuilderAccessor()
-                    .getSProfileBuilder(), false, getUserIdFromSession()));
-            return SPModelConvertor.toProfile(profile);
-        } catch (final SProfileCreationException e) {
-            throw new CreationException(e);
-        } catch (final SProfileAlreadyExistsException e) {
-            throw new CreationException(e);
+            profileService.getProfileByName(name);
+            throw new AlreadyExistsException("A profile with name \"" + name + "\" already exists");
+        } catch (final SProfileNotFoundException sProfileNotFoundException) {
+            try {
+                final SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, profileService.getSProfileBuilderAccessor()
+                        .getSProfileBuilder(), false, getUserIdFromSession()));
+                return SPModelConvertor.toProfile(profile);
+            } catch (final SProfileCreationException e) {
+                throw new CreationException(e);
+            }
         }
     }
 
@@ -370,7 +373,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
         final String type = (String) fields.get(ProfileEntryField.TYPE);
         final String page = (String) fields.get(ProfileEntryField.PAGE);
-        final String name = (String) fields.get(ProfileEntryField.NAME);
         if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
             throw new CreationException("For a link, the page is mandatory.");
         }

@@ -18,6 +18,8 @@ package com.bonitasoft.engine.core.reporting;
  */
 public class SSaveReportWithContentImpl extends SReportImpl implements SSaveReportWithContent {
 
+    private static final long serialVersionUID = -5601507328546725517L;
+
     private byte[] content;
 
     public SSaveReportWithContentImpl() {

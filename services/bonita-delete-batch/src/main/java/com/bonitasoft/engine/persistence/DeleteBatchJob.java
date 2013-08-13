@@ -18,7 +18,6 @@ import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
@@ -28,8 +27,6 @@ public class DeleteBatchJob implements StatelessJob {
     private static final long serialVersionUID = 1L;
 
     private static PersistenceService persistenceService;
-
-    private static TransactionService transactionService;
 
     private static List<String> classesToPurge;
 
@@ -60,10 +57,6 @@ public class DeleteBatchJob implements StatelessJob {
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-    }
-
-    public static void setTransactionService(final TransactionService transactionService) {
-        DeleteBatchJob.transactionService = transactionService;
     }
 
     public static void setClassesToPurge(final List<String> classesToPurge) {

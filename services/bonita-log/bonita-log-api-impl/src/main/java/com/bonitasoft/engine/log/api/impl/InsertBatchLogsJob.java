@@ -21,18 +21,16 @@ import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class InsertBatchLogsJob implements StatelessJob {
 
     private static final long serialVersionUID = -4356390646702427686L;
 
     private static PersistenceService persistenceService;
-
-    private static TransactionService transactionService;
 
     public static void setPersistenceService(final PersistenceService persistenceService) {
         InsertBatchLogsJob.persistenceService = persistenceService;
@@ -62,10 +60,6 @@ public class InsertBatchLogsJob implements StatelessJob {
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
-    }
-
-    public static void setTransactionService(final TransactionService transactionService) {
-        InsertBatchLogsJob.transactionService = transactionService;
     }
 
 }

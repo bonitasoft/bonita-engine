@@ -24,7 +24,6 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.Trigger;
 import org.bonitasoft.engine.scheduler.UnixCronTrigger;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 public class InsertBatchLogsJobRegister implements JobRegister {
 
@@ -49,12 +48,11 @@ public class InsertBatchLogsJobRegister implements JobRegister {
      *            e.g. * *\/2 * * * ? to run it every 2 minutes
      */
     public InsertBatchLogsJobRegister(final PersistenceService persistenceService, final SchedulerService schedulerService,
-            final TechnicalLoggerService loggerService, final TransactionService transactionService, final String cronExpression) {
+            final TechnicalLoggerService loggerService, final String cronExpression) {
         this.schedulerService = schedulerService;
         this.loggerService = loggerService;
         this.cronExpression = cronExpression;
         InsertBatchLogsJob.setPersistenceService(persistenceService);
-        InsertBatchLogsJob.setTransactionService(transactionService);
         mustStartJob = true;
         INSTANCE = this;
     }
