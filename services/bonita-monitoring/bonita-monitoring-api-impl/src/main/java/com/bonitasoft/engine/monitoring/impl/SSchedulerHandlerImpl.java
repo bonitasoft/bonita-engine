@@ -16,6 +16,8 @@ import org.bonitasoft.engine.events.model.SHandler;
  */
 public class SSchedulerHandlerImpl implements SHandler<SEvent> {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String SCHEDULER_STARTED = "SCHEDULER_STARTED";
 
     public static final String SCHEDULER_STOPPED = "SCHEDULER_STOPPED";

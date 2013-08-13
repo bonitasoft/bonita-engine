@@ -17,6 +17,8 @@ import org.bonitasoft.engine.events.model.SHandler;
  */
 public class SUserHandlerImpl implements SHandler<SEvent> {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String USER_CREATED = "USER_CREATED";
 
     public static final String USER_DELETED = "USER_DELETED";

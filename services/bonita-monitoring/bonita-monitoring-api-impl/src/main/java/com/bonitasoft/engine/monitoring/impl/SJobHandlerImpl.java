@@ -18,11 +18,13 @@ import org.bonitasoft.engine.events.model.SHandler;
  * <li>JOB_FAILED = "JOB_FAILED"</li>
  * <li>JOB_COMPLETED = "JOB_COMPLETED"</li>
  * </ul>
- * 
+ *
  * @author Christophe Havard
  * @author Matthieu Chaffotte
  */
 public class SJobHandlerImpl implements SHandler<SEvent> {
+
+    private static final long serialVersionUID = 1L;
 
     public static final String JOB_EXECUTING = "JOB_EXECUTING";
 
