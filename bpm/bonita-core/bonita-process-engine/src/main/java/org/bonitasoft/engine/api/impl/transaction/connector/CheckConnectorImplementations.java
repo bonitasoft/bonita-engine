@@ -56,7 +56,7 @@ public class CheckConnectorImplementations implements TransactionContent {
                     connectorService.getConnectorImplementation(sDefinition.getId(), sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(),
                             tenantId);
                 } catch (final SConnectorException e) {
-                    final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getId(), "connector", "The process connector '"
+                    final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getName(), "connector", "The process connector '"
                             + sConnectorDefinition.getName() + "' has no implementation");
                     problems.add(problem);
                 }
