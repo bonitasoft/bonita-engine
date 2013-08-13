@@ -33,8 +33,7 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
         final Configuration conf = TransactionManagerServices.getConfiguration();
         // TODO Make the following configurable
         conf.setServerId("jvm-1");
-        conf.setLogPart1Filename("/tmp/tx-logs/part1.btm");
-        conf.setLogPart2Filename("/tmp/tx-logs/part2.btm");
+        conf.setJournal(null); // Disable the journal for the tests.
     }
 
     @AfterClass
@@ -158,35 +157,35 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
 
     // TODO See to use some mocks instead of Anonymous classes.
     protected TechnicalLoggerService getLoggerService() {
-        
+
         return new TechnicalLoggerService() {
-            
+
             @Override
             public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Throwable t) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void log(Class<?> callerClass, TechnicalLogSeverity severity, Throwable t) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public boolean isLoggable(Class<?> callerClass, TechnicalLogSeverity severity) {
                 // TODO Auto-generated method stub
                 return false;
             }
         };
-        
+
 
     }
-    
+
 }

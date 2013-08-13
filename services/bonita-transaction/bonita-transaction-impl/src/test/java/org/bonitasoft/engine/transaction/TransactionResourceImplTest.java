@@ -29,8 +29,7 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
     public static void setUpJNDIBitronixTransactionManager() {
         final Configuration conf = TransactionManagerServices.getConfiguration();
         conf.setServerId("jvm-1");
-        conf.setLogPart1Filename("/tmp/tx-logs/part1.btm");
-        conf.setLogPart2Filename("/tmp/tx-logs/part2.btm");
+        conf.setJournal(null); // Disable the journal for the tests.
     }
 
     @AfterClass

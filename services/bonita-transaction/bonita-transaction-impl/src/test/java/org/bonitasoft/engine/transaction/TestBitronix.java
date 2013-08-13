@@ -27,8 +27,7 @@ public class TestBitronix {
 
         Configuration conf = TransactionManagerServices.getConfiguration();
         conf.setServerId("jvm-1");
-        conf.setLogPart1Filename("/tmp/tx-logs/part1.btm");
-        conf.setLogPart2Filename("/tmp/tx-logs/part2.btm");
+        conf.setJournal(null); // Disable the journal for the tests.
 
         Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
