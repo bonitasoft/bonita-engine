@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.connector;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;

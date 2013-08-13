@@ -766,7 +766,7 @@ public class XMLSProcessDefinition {
     }
 
     private void fillConnectorNode(final XMLNode connectorNode, final SConnectorDefinition connector) {
-        connectorNode.addAttribute(ID, String.valueOf(connector.getId()));
+        // connectorNode.addAttribute(ID, String.valueOf(connector.getId())); TODO : Uncomment when generate id
         connectorNode.addAttribute(NAME, connector.getName());
         connectorNode.addAttribute(CONNECTOR_ID, connector.getConnectorId());
         connectorNode.addAttribute(CONNECTOR_VERSION, connector.getVersion());

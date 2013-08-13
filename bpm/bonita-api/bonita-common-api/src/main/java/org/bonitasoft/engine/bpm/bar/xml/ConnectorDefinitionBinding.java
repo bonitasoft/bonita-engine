@@ -23,7 +23,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -46,7 +45,7 @@ public class ConnectorDefinitionBinding extends NamedElementBinding {
     private String errorCode;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         activationEvent = attributes.get(XMLProcessDefinition.CONNECTOR_ACTIVATION_EVENT);
         connectorId = attributes.get(XMLProcessDefinition.CONNECTOR_ID);
@@ -58,7 +57,7 @@ public class ConnectorDefinitionBinding extends NamedElementBinding {
     @Override
     public Object getObject() {
         final ConnectorDefinitionImpl connectorDefinitionImpl = new ConnectorDefinitionImpl(name, connectorId, version, ConnectorEvent.valueOf(activationEvent));
-        connectorDefinitionImpl.setId(id);
+        // connectorDefinitionImpl.setId(id); TODO : Uncomment when generate id
         connectorDefinitionImpl.setFailAction(FailAction.valueOf(failAction));
         connectorDefinitionImpl.setErrorCode(errorCode);
         for (final Entry<String, Expression> entry : inputs.entrySet()) {
@@ -76,11 +75,11 @@ public class ConnectorDefinitionBinding extends NamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.CONNECTOR_INPUT.equals(name)) {
             final Entry<?, ?> entry = (Entry<?, ?>) value;
             inputs.put((String) entry.getKey(), (Expression) entry.getValue());
