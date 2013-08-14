@@ -16,8 +16,11 @@ package org.bonitasoft.engine.work;
 /**
  * @author Emmanuel Duchastenier
  * @author Charles Souillard
+ * @author Celine Souchet
  */
 public abstract class TxBonitaWork extends AbstractBonitaWork {
+
+    private static final long serialVersionUID = 9220497862331957402L;
 
     @Override
     protected boolean isTransactional() {

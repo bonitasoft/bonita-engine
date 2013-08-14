@@ -53,7 +53,7 @@ public final class CheckNbOfArchivedActivities extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         final List<ArchivedActivityInstance> activities = processAPI.getArchivedActivityInstances(processInstance.getId(), 0, 200,
                 ActivityInstanceCriterion.NAME_ASC);
         result = new HashSet<ArchivedActivityInstance>(activities.size());

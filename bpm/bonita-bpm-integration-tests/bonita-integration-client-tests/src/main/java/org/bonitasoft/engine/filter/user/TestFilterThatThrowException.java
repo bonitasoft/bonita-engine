@@ -2,7 +2,6 @@ package org.bonitasoft.engine.filter.user;
 
 import java.util.List;
 
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.filter.AbstractUserFilter;
 import org.bonitasoft.engine.filter.UserFilterException;
 
@@ -24,7 +23,7 @@ public class TestFilterThatThrowException extends AbstractUserFilter {
     }
 
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
 
     }
 

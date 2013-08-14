@@ -3,13 +3,11 @@ package org.bonitasoft.engine.process;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
@@ -83,7 +81,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         // create gateway instance and transition instance and archive them
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
-        waitForStep(100, 3000, "step4", processInstance, TestStates.getReadyState(null));
+        waitForStep(100, 3000, "step4", processInstance, TestStates.getReadyState());
 
         // test gateway instance, gateway instance has been deleted after archive
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 10);
@@ -436,7 +434,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final FlowNodeInstance gateway = waitForFlowNodeToFail(processInstance);
         final SearchOptions searchOptions = new SearchOptionsBuilder(0, 1).filter(FlowNodeInstanceSearchDescriptor.NAME, "gateway1").done();
         final SearchResult<FlowNodeInstance> searchFlowNodeInstances = getProcessAPI().searchFlowNodeInstances(searchOptions);
-        final GatewayInstance flowNodeInstance = (GatewayInstance) searchFlowNodeInstances.getResult().get(0);
+        final FlowNodeInstance flowNodeInstance = searchFlowNodeInstances.getResult().get(0);
         assertTrue(flowNodeInstance instanceof GatewayInstance);
         // retry the gateway
         getProcessAPI().retryTask(gateway.getId());
@@ -737,7 +735,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 10000, true, 2, user);
-        final boolean expectedNbPendingTask = checkNbPendingTaskOf.waitUntil();
+        checkNbPendingTaskOf.waitUntil();
         // assertTrue("# pending tasks does not match expected", expectedNbPendingTask);
         final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf.getPendingHumanTaskInstances();
         assertEquals(2, pendingHumanTaskInstances.size());
@@ -775,7 +773,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 10000, true, 1, user);
-        final boolean expectedNbPendingTask = checkNbPendingTaskOf.waitUntil();
+        checkNbPendingTaskOf.waitUntil();
         // assertTrue("# pending tasks does not match expected", expectedNbPendingTask);
         final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf.getPendingHumanTaskInstances();
         assertEquals(1, pendingHumanTaskInstances.size());
@@ -878,10 +876,10 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+        getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 1, user);
-        final boolean expectedNbPendingTask = checkNbPendingTaskOf.waitUntil();
+        checkNbPendingTaskOf.waitUntil();
         // assertTrue("# pending tasks does not match expected", expectedNbPendingTask);
         final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf.getPendingHumanTaskInstances();
         assertEquals(0, pendingHumanTaskInstances.size());

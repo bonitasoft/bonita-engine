@@ -92,7 +92,7 @@ public class SupervisorTest extends CommonAPITest {
         assertTrue("no new activity found", new WaitUntil(20, 1000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
             }
         }.waitUntil());
@@ -237,7 +237,7 @@ public class SupervisorTest extends CommonAPITest {
         assertTrue("no new activity found", new WaitUntil(20, 5000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 1;
             }
         }.waitUntil());
@@ -330,8 +330,7 @@ public class SupervisorTest extends CommonAPITest {
         assertEquals(proDefIds.get(4).longValue(), processDeploymentInfos2.get(0).getProcessId());
 
         for (final Long pid : proDefIds) {
-            getProcessAPI().disableProcess(pid);
-            getProcessAPI().deleteProcess(pid);
+            disableAndDeleteProcess(pid);
         }
         getProcessAPI().deleteCategory(category1.getId());
         getProcessAPI().deleteCategory(category2.getId());

@@ -21,7 +21,6 @@ import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Zhao Na
@@ -32,12 +31,12 @@ public class ProfileBinding extends ElementBinding {
     private ExportedProfileBuilder profileBuilder = null;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         profileBuilder = new ExportedProfileBuilder(attributes.get("name"), Boolean.valueOf(attributes.get("isDefault")));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {
             profileBuilder.setDescription(value);
         } else if ("iconPath".equals(name)) {
@@ -46,7 +45,7 @@ public class ProfileBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if ("profileEntries".equals(name)) {
             profileBuilder.setParentProfileEntries((List<ExportedParentProfileEntry>) value);
         } else if ("profileMapping".equals(name)) {

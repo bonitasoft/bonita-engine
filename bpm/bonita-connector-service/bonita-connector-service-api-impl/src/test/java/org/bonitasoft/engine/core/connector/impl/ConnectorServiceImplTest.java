@@ -68,7 +68,7 @@ public class ConnectorServiceImplTest {
     protected FilenameFilter jarFilenameFilter = new FilenameFilter() {
 
         @Override
-        public boolean accept(@SuppressWarnings("unused") final File dir, final String name) {
+        public boolean accept(final File dir, final String name) {
             return name.endsWith(".jar");
         }
     };

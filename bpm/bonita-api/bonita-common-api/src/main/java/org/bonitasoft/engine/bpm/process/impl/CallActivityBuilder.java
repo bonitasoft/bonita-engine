@@ -27,11 +27,10 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
 
     public CallActivityBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container, final String name,
             final Expression callableElement, final Expression callableElementVersion) {
-        super(container, processDefinitionBuilder, createNewCallActivity(name, callableElement, callableElementVersion, container));
+        super(container, processDefinitionBuilder, createNewCallActivity(name, callableElement, callableElementVersion));
     }
 
-    private static CallActivityDefinitionImpl createNewCallActivity(final String name, final Expression callableElement,
-            final Expression callableElementVersion, final FlowElementContainerDefinitionImpl container) {
+    private static CallActivityDefinitionImpl createNewCallActivity(final String name, final Expression callableElement, final Expression callableElementVersion) {
         final CallActivityDefinitionImpl activity = new CallActivityDefinitionImpl(name);
         activity.setCallableElement(callableElement);
         activity.setCallableElementVersion(callableElementVersion);

@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
@@ -46,10 +45,10 @@ public class SEndEventDefinitionImpl extends SThrowEventDefinitionImpl implement
 
     private final List<SThrowErrorEventTriggerDefinition> sErrorEventTriggerDefinitions;
 
-    public SEndEventDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final EndEventDefinition eventDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SEndEventDefinitionImpl(final EndEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final SOperationBuilders sOperationBuilders) {
+        super(eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
         final TerminateEventTriggerDefinition terminateEventTriggerDefinition = eventDefinition.getTerminateEventTriggerDefinition();
         if (terminateEventTriggerDefinition != null) {
             setTerminateEventTriggerDefinition(new STerminateEventTriggerDefinitionImpl());

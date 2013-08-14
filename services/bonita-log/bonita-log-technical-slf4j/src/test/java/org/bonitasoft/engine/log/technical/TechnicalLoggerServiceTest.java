@@ -20,8 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,13 +59,13 @@ public class TechnicalLoggerServiceTest {
     public TestName name = new TestName();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         LoggerFactory.getLogger(TechnicalLoggerServiceTest.class).info("Testing : {}", name.getMethodName());
 
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         LoggerFactory.getLogger(TechnicalLoggerServiceTest.class).info("Tested: {}", name.getMethodName());
     }
 

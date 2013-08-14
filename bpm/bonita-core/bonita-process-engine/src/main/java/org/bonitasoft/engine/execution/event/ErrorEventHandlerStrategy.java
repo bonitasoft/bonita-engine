@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -69,6 +69,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
@@ -123,21 +124,22 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+    public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) {
         // NOT supported. Must to be implemented with errors can be sent via the API
     }
 
     @Override
-    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition eventDefinition,
-            final SThrowEventInstance eventInstance, final SEventTriggerDefinition trigger, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
+    public boolean handlePostThrowEvent(final SProcessDefinition processDefinition, final SEndEventDefinition sEventDefinition,
+            final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance)
+            throws SBonitaException {
         boolean hasActionToExecute = false;
         final SFlowNodeInstanceBuilder flowNodeKeyProvider = getInstanceBuilders().getSIntermediateThrowEventInstanceBuilder();
-        final long parentProcessInstanceId = eventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
-        final SErrorEventTriggerDefinition errorTrigger = (SErrorEventTriggerDefinition) trigger;
+        final long parentProcessInstanceId = sThrowEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
+        final SErrorEventTriggerDefinition errorTrigger = (SErrorEventTriggerDefinition) sEventTriggerDefinition;
         final SWaitingErrorEvent waitingErrorEvent = getWaitingErrorEvent(processDefinition.getProcessContainer(), parentProcessInstanceId, errorTrigger,
-                eventInstance, flowNodeInstance);
+                sThrowEventInstance, sFlowNodeInstance);
         if (waitingErrorEvent != null) {
-            eventsHandler.triggerCatchEvent(waitingErrorEvent, eventInstance.getId());
+            eventsHandler.triggerCatchEvent(waitingErrorEvent, sThrowEventInstance.getId());
             hasActionToExecute = true;
         } else {
             final StringBuilder stringBuilder = new StringBuilder();
@@ -148,9 +150,9 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             stringBuilder.append(", version: ");
             stringBuilder.append(processDefinition.getVersion());
             stringBuilder.append("]");
-            if (eventDefinition != null) {
+            if (sEventDefinition != null) {
                 stringBuilder.append(", throw event: ");
-                stringBuilder.append(eventDefinition.getName());
+                stringBuilder.append(sEventDefinition.getName());
             }
             stringBuilder.append(". This throw error event will act as a Terminate Event.");
             logger.log(this.getClass(), TechnicalLogSeverity.WARNING, stringBuilder.toString());
@@ -167,7 +169,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         SWaitingErrorEvent waitingErrorEvent;
 
         // check on direct boundary
-        waitingErrorEvent = getWaitingErrorEventFromBoundary(errorTrigger, flowNodeKeyProvider, processInstance, eventInstance, errorCode, flowNodeInstance);
+        waitingErrorEvent = getWaitingErrorEventFromBoundary(flowNodeKeyProvider, eventInstance, errorCode, flowNodeInstance);
         // check on event sub-process
         if (waitingErrorEvent == null) {
             waitingErrorEvent = getWaitingErrorEventSubProcess(container, parentProcessInstanceId, errorCode);
@@ -182,8 +184,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     }
 
-    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SErrorEventTriggerDefinition errorTrigger,
-            final SFlowNodeInstanceBuilder flowNodeKeyProvider, final SProcessInstance processInstance, final SThrowEventInstance eventInstance,
+    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SFlowNodeInstanceBuilder flowNodeKeyProvider, final SThrowEventInstance eventInstance,
             final String errorCode, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         // get the parent activity of the boundary
         final long logicalGroup = eventInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());
@@ -328,7 +329,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     @Override
-    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) throws SBonitaException {
+    public OperationsWithContext getOperations(final SWaitingEvent waitingEvent, final Long triggeringElementID) {
         return EMPTY;
     }
 
@@ -346,4 +347,5 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         getEventInstanceService().createWaitingEvent(event);
 
     }
+
 }

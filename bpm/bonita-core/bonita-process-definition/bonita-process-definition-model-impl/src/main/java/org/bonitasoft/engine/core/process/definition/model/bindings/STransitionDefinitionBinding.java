@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -33,7 +32,7 @@ public class STransitionDefinitionBinding extends SNamedElementBinding {
     private SExpression condition;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         source = Long.valueOf(attributes.get(XMLProcessDefinition.TRANSITION_SOURCE));
         target = Long.valueOf(attributes.get(XMLProcessDefinition.TRANSITION_TARGET));
@@ -55,11 +54,11 @@ public class STransitionDefinitionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.TRANSITION_CONDITION.equals(name)) {
             condition = (SExpression) value;
         }

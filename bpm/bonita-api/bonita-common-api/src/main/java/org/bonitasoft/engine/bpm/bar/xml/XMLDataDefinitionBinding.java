@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.impl.XMLDataDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -29,7 +28,7 @@ public class XMLDataDefinitionBinding extends DataDefinitionBinding {
     private String element;
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         super.setChildElement(name, value, attributes);
         if (XMLProcessDefinition.XML_DATA_DEFINITION_NAMESPACE.equals(name)) {
             namespace = value;

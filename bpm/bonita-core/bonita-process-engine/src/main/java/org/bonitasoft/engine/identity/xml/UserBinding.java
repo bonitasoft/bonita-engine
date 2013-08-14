@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.identity.ExportedUserBuilder;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Yanyan Liu
@@ -33,13 +32,13 @@ public class UserBinding extends ElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         final String userName = attributes.get(OrganizationMappingConstants.USER_NAME);
         userBuilder.createNewInstance(userName, null);
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (OrganizationMappingConstants.PASSWORD.equals(name)) {
             userBuilder.setPassword(value);
             final String encrypted = attributes.get(OrganizationMappingConstants.PASSWORD_ENCRYPTED);
@@ -64,7 +63,7 @@ public class UserBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (OrganizationMappingConstants.PERSONAL_DATA.equals(name)) {
             final XMLContactDataMapping personalData = (XMLContactDataMapping) value;
             if (personalData != null) {

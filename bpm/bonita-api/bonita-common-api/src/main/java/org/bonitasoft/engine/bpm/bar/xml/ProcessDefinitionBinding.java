@@ -24,7 +24,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.DesignProcessDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -51,7 +50,7 @@ public class ProcessDefinitionBinding extends NamedElementBinding {
     private final List<StringIndex> stringIndexes = new ArrayList<StringIndex>(5);
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         version = attributes.get(XMLProcessDefinition.VERSION);
         displayName = attributes.get(XMLProcessDefinition.DISPLAY_NAME);
@@ -59,11 +58,11 @@ public class ProcessDefinitionBinding extends NamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.ACTOR_NODE.equals(name)) {
             actors.add((ActorDefinition) value);
         } else if (XMLProcessDefinition.INITIATOR_NODE.equals(name)) {

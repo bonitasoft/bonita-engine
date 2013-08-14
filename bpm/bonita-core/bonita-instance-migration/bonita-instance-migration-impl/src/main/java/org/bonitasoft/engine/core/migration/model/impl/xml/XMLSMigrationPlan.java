@@ -107,6 +107,8 @@ public class XMLSMigrationPlan {
 
     public static final String DESCRIPTION = "description";
 
+    private static final String ID = "id";
+
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 
     public XMLNode getXMLMigrationPlan(final SMigrationPlan migrationPlan) {
@@ -165,7 +167,6 @@ public class XMLSMigrationPlan {
     }
 
     private void createAndFillConnectorsNode(final XMLNode parent, final List<SConnectorDefinitionWithEnablement> connectors) {
-
         final XMLNode connectorsNode = new XMLNode(CONNECTORS_NODE);
         for (final SConnectorDefinitionWithEnablement connectorWithEnablement : connectors) {
             final XMLNode connectorNode = new XMLNode(CONNECTOR_NODE);
@@ -186,6 +187,7 @@ public class XMLSMigrationPlan {
 
     private void fillConnectorNode(final XMLNode connectorNode, final SConnectorDefinitionWithEnablement connectorWithEnablement) {
         final SConnectorDefinition connector = connectorWithEnablement.getConnector();
+        // connectorNode.addAttribute(ID, connector.getId().toString()); TODO : Uncomment when generate id
         connectorNode.addAttribute(NAME, connector.getName());
         connectorNode.addAttribute(CONNECTOR_ID, connector.getConnectorId());
         connectorNode.addAttribute(CONNECTOR_VERSION, connector.getVersion());

@@ -21,7 +21,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -43,11 +42,11 @@ public abstract class FlowNodeDefinitionBinding extends NamedElementBinding {
     private Expression displayDescriptionAfterCompletion;
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.DISPLAY_NAME.equals(name)) {
             displayName = (Expression) value;
         }

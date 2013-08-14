@@ -81,8 +81,7 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         this.mappingExclusions = mappingExclusions;
     }
 
-    private Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider)
-            throws SPersistenceException {
+    private Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
         final Configuration configuration = new Configuration();
         configuration.addProperties(properties);
         for (final String resource : hibernateResourcesConfigurationProvider.getResources()) {
@@ -100,7 +99,7 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     }
 
     @Override
-    public Configuration getConfiguration() throws ConfigurationException {
+    public Configuration getConfiguration() {
         return configuration;
     }
 

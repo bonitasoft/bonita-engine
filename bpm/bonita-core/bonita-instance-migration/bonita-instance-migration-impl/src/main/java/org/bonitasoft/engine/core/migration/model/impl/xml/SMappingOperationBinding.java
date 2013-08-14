@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilder;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -47,7 +46,7 @@ public class SMappingOperationBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSMigrationPlan.OPERATION_RIGHT_OPERAND.equals(name)) {
             rightOperand = (SExpression) value;
         }
@@ -76,12 +75,12 @@ public class SMappingOperationBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
 
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         operator = attributes.get(XMLSMigrationPlan.OPERATION_OPERATOR);
         operatorType = SOperatorType.valueOf(attributes.get(XMLSMigrationPlan.OPERATION_OPERATOR_TYPE));
     }

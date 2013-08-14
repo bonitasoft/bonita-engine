@@ -15,8 +15,6 @@ package org.bonitasoft.engine.profile;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -35,7 +33,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.")
     @Test
-    public void searchProfile() throws BonitaException, IOException {
+    public void searchProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.NAME, Order.DESC);
 
@@ -46,7 +44,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.")
     @Test
-    public void searchProfileWithSearchTerm() throws BonitaException, IOException {
+    public void searchProfileWithSearchTerm() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ProfileSearchDescriptor.NAME, Order.ASC);
         builder.searchTerm("Adm");

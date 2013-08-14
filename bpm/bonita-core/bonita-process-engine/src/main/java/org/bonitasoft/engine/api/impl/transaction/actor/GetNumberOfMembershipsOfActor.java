@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl.transaction.actor;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 
 /**
@@ -35,7 +34,7 @@ public class GetNumberOfMembershipsOfActor implements TransactionContentWithResu
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public void execute() {
         numberOfUserMemberships = actorMappingService.getNumberOfMembershipsOfActor(actorId);
     }
 

@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.model.impl.SMultiInstanceLoopCharacteristicsImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -40,7 +39,7 @@ public class SMultiInstanceLoopCharacteristicsBinding extends ElementBinding {
     private SExpression completionCondition;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         isSequential = Boolean.valueOf(attributes.get(XMLSProcessDefinition.MULTI_INSTANCE_IS_SEQUENTIAL));
         dataInputItemRef = attributes.get(XMLSProcessDefinition.MULTI_INSTANCE_DATA_INPUT_ITEM_REF);
         dataOutputItemRef = attributes.get(XMLSProcessDefinition.MULTI_INSTANCE_DATA_OUTPUT_ITEM_REF);
@@ -49,11 +48,11 @@ public class SMultiInstanceLoopCharacteristicsBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.MULTI_INSTANCE_LOOP_CARDINALITY.equals(name)) {
             loopCardinality = (SExpression) value;
         }

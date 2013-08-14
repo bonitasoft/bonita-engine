@@ -50,7 +50,7 @@ public class WaitForEvent extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         final List<EventInstance> eventInstances = processAPI.getEventInstances(processInstanceId, 0, 10, EventCriterion.NAME_ASC);
         boolean found = false;
         final Iterator<EventInstance> iterator = eventInstances.iterator();

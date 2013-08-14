@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.CatchEventDefinition;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
@@ -33,10 +32,10 @@ public class SIntermediateCatchEventDefinitionImpl extends SCatchEventDefinition
 
     private static final long serialVersionUID = -5011521635705533392L;
 
-    public SIntermediateCatchEventDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final CatchEventDefinition eventDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SIntermediateCatchEventDefinitionImpl(final CatchEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final SOperationBuilders sOperationBuilders) {
+        super(eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
     }
 
     public SIntermediateCatchEventDefinitionImpl(final long id, final String name) {

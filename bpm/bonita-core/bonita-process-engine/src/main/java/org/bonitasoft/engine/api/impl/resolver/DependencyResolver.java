@@ -28,9 +28,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -48,7 +46,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 
 /**
  * Handles the resolution of Process Dependencies. A process can have a list of <code>ProcessDependencyResolver</code>s which validates different aspects of the
@@ -66,7 +63,7 @@ public class DependencyResolver {
     }
 
     public boolean resolveDependencies(final ProcessAPI processAPI, final BusinessArchive businessArchive, final TenantServiceAccessor tenantAccessor,
-            final SProcessDefinition sDefinition) throws ProcessDeployException {
+            final SProcessDefinition sDefinition) {
         final List<ProcessDependencyResolver> resolvers = getResolvers();
         boolean resolved = true;
         for (final ProcessDependencyResolver resolver : resolvers) {
@@ -85,7 +82,7 @@ public class DependencyResolver {
      * We try here to check if now the process is resolved so it must not be done in the same transaction that did the modification
      * this does not throw exception, it only log because it can be retried after.
      */
-    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor) throws SBonitaException {
+    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor) {
         final List<ProcessDependencyResolver> resolvers = getResolvers();
         resolveDependencies(processDefinitionId, tenantAccessor, resolvers.toArray(new ProcessDependencyResolver[resolvers.size()]));
     }

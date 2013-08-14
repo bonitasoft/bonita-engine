@@ -30,7 +30,6 @@ import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -41,12 +40,9 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupNotFoundException;
 import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -141,22 +137,21 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("DeliveryProcess", "1.0");
         processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("deliver", delivery);
-        final DesignProcessDefinition processDefinition = processBuilder.done();
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, delivery, john);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
         assertEquals(delivery, actor.getName());
         assertEquals("Delivery all day and night long", actor.getDescription());
 
-        getProcessAPI().startProcess(definition.getId());
+        getProcessAPI().startProcess(processDefinition.getId());
         assertTrue("no new activity found", new WaitUntil(20, 1000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 1;
             }
         }.waitUntil());
@@ -164,8 +159,8 @@ public class ProcessActorTest extends CommonAPITest {
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
 
-        getProcessAPI().disableProcess(definition.getId());
-        getProcessAPI().deleteProcess(definition.getId());
+        // Clean up
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -207,8 +202,8 @@ public class ProcessActorTest extends CommonAPITest {
         getProcessAPI().enableProcess(processDeploymentInfo.getProcessId());
         assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDeploymentInfo.getProcessId()).getActivationState());
 
-        getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
-        getProcessAPI().deleteProcess(processDeploymentInfo.getProcessId());
+        // Clean up
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -221,20 +216,20 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
-        final DesignProcessDefinition processDefinition = processBuilder.done();
+        final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
-        businessArchive.setProcessDefinition(processDefinition);
+        businessArchive.setProcessDefinition(designProcessDefinition);
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, delivery, john);
-        getProcessAPI().startProcess(definition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, delivery, john);
+        getProcessAPI().startProcess(processDefinition.getId());
         Thread.sleep(1000);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
 
-        getProcessAPI().disableProcess(definition.getId());
-        getProcessAPI().deleteProcess(definition.getId());
+        // Clean up
         deleteUser(user);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -839,7 +834,7 @@ public class ProcessActorTest extends CommonAPITest {
         deleteUser(user.getId());
     }
 
-    private ActorInstance checkActors(final String delivery, final ProcessDefinition definition) throws ProcessDefinitionNotFoundException {
+    private ActorInstance checkActors(final String delivery, final ProcessDefinition definition) {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
@@ -847,8 +842,7 @@ public class ProcessActorTest extends CommonAPITest {
         return actor;
     }
 
-    private void cleanUserGroupAndRole(final Group group, final Role role) throws UserNotFoundException, GroupNotFoundException, RoleNotFoundException,
-            DeletionException {
+    private void cleanUserGroupAndRole(final Group group, final Role role) throws DeletionException {
         getIdentityAPI().deleteGroup(group.getId());
         getIdentityAPI().deleteRole(role.getId());
     }

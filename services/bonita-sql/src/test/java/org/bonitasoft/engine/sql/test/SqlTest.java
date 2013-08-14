@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.naming.ConfigurationException;
-
 import org.bonitasoft.engine.sql.Converter;
 import org.bonitasoft.engine.sql.DefaultSqlConverter;
 import org.bonitasoft.engine.sql.SqlResult;
@@ -30,7 +28,7 @@ import org.junit.rules.TestName;
 
 public class SqlTest {
 
-    public SqlTest() throws ConfigurationException {
+    public SqlTest() {
     }
 
     @Rule
@@ -273,28 +271,28 @@ public class SqlTest {
         }
     }
 
-    private String getUrl() throws IOException {
+    private String getUrl() {
         if (System.getProperty("jdbc.url") != null) {
             return System.getProperty("jdbc.url");
         }
         return props.getProperty("jdbc.url");
     }
 
-    private String getDriver() throws IOException {
+    private String getDriver() {
         if (System.getProperty("jdbc.driverClass") != null) {
             return System.getProperty("jdbc.driverClass");
         }
         return props.getProperty("jdbc.driverClass");
     }
 
-    private String getUser() throws IOException {
+    private String getUser() {
         if (System.getProperty("jdbc.user") != null) {
             return System.getProperty("jdbc.user");
         }
         return props.getProperty("jdbc.user");
     }
 
-    private String getPassword() throws IOException {
+    private String getPassword() {
         if (System.getProperty("jdbc.password") != null) {
             return System.getProperty("jdbc.password");
         }

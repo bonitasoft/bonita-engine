@@ -76,6 +76,7 @@ CREATE TABLE flownode_instance (
   nbCompletedInst INT,
   nbTerminatedInst INT,
   executedBy NUMBER(19, 0),
+  executedByDelegate NUMBER(19, 0),
   activityInstanceId NUMBER(19, 0),
   state_executing NUMBER(1) DEFAULT 0,
   abortedByBoundary NUMBER(19, 0),

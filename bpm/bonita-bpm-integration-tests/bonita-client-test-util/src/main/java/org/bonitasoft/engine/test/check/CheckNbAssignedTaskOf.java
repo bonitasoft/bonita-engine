@@ -30,7 +30,7 @@ public final class CheckNbAssignedTaskOf extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         assignedHumanTaskInstances = processAPI.getAssignedHumanTaskInstances(user.getId(), 0, Math.max(nbActivities, 20), ActivityInstanceCriterion.NAME_ASC);
         return assignedHumanTaskInstances.size() == nbActivities;
     }

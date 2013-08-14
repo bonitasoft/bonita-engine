@@ -17,7 +17,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
@@ -53,7 +52,7 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
@@ -71,15 +70,15 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) instance;
         if (boundaryEventInstance.isInterrupting()) {
-            aborteRelatedActivity(boundaryEventInstance, processDefinition);
+            aborteRelatedActivity(boundaryEventInstance);
         }
         // we create token here to be sure the token is put synchronously
-        createToken(processDefinition, boundaryEventInstance);
+        createToken(boundaryEventInstance);
 
         return StateCode.DONE;
     }
 
-    private void createToken(SProcessDefinition processDefinition, SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
+    private void createToken(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
         // we have always 1 outgoing transition with no condition so we create one token
         Long outputTokenRefId;
         Long outputParentTokenRefId;
@@ -101,8 +100,7 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
         }
     }
 
-    private void aborteRelatedActivity(final SBoundaryEventInstance boundaryEventInstance, final SProcessDefinition processDefinition)
-            throws SActivityStateExecutionException {
+    private void aborteRelatedActivity(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
         final SFlowNodeInstanceBuilder flowNodeKeyProvider = bpmInstanceBuilders.getSUserTaskInstanceBuilder();
         if (SStateCategory.NORMAL.equals(boundaryEventInstance.getStateCategory())) {
             try {
@@ -125,8 +123,7 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance)
-            throws SActivityStateExecutionException {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return true;
     }
 

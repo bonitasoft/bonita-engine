@@ -23,7 +23,7 @@ import org.junit.Test;
 public class FlowNodeExecutorImplTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     /**
@@ -135,7 +135,7 @@ public class FlowNodeExecutorImplTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.execution.FlowNodeExecutorImpl#childFinished(org.bonitasoft.engine.core.process.definition.model.SProcessDefinition, org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance, org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState, long)}
+     * {@link org.bonitasoft.engine.execution.FlowNodeExecutorImpl#childFinished(org.bonitasoft.engine.core.process.definition.model.SProcessDefinition, org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance, int, long)}
      * .
      */
     @Test

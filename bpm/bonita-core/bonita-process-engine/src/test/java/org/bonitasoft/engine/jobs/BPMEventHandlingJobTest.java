@@ -34,7 +34,7 @@ import org.junit.Test;
 public class BPMEventHandlingJobTest {
 
     @Test
-    public void makeMessageUniqueCouplesWithDuplicateMessage() throws Exception {
+    public void makeMessageUniqueCouplesWithDuplicateMessage() {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
@@ -73,7 +73,7 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void makeMessageUniqueCouplesWithDuplicateWaitingEvent() throws Exception {
+    public void makeMessageUniqueCouplesWithDuplicateWaitingEvent() {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
@@ -112,7 +112,7 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void couplesWithDuplicateStartWaitingEventsAreConsideredTwice() throws Exception {
+    public void couplesWithDuplicateStartWaitingEventsAreConsideredTwice() {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
@@ -145,7 +145,7 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void couplesWithDuplicateEventSubProcessesAreConsideredOnlyOnce() throws Exception {
+    public void couplesWithDuplicateEventSubProcessesAreConsideredOnlyOnce() {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
@@ -175,7 +175,7 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void makeMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent() throws Exception {
+    public void makeMessageUniqueCouplesWithDuplicateMessagesAndWaitingEvent() {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);

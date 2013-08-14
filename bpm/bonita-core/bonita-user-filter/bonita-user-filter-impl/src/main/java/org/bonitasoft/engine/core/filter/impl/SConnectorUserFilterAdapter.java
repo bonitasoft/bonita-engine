@@ -20,7 +20,6 @@ import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.connector.EngineExecutionContext;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
-import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 import org.bonitasoft.engine.filter.AbstractUserFilter;
 import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.filter.UserFilterException;
@@ -57,7 +56,7 @@ public class SConnectorUserFilterAdapter implements SConnector {
     }
 
     @Override
-    public void validate() throws SConnectorValidationException {
+    public void validate() {
 
     }
 
@@ -81,12 +80,12 @@ public class SConnectorUserFilterAdapter implements SConnector {
     }
 
     @Override
-    public void connect() throws SConnectorException {
+    public void connect() {
         // nothing for user filters
     }
 
     @Override
-    public void disconnect() throws SConnectorException {
+    public void disconnect() {
         // nothing for user filters
     }
 

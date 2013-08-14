@@ -27,7 +27,6 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
@@ -93,7 +92,7 @@ public class RestartHandlersTests extends CommonAPITest {
         final ArrayList<String> names = new ArrayList<String>(28);
         for (int i = 2; i < 30; i++) {
             final String activityName = "step" + i;
-            AutomaticTaskDefinitionBuilder addUserTask = builder.addAutomaticTask(activityName);
+            builder.addAutomaticTask(activityName);
             // if (i > 6) {
             // addUserTask.addOperation(new OperationBuilder().createSetDataOperation("data",
             // new ExpressionBuilder().createGroovyScriptExpression("script", "Thread.sleep(5);return 10;", "java.lang.Integer")));
@@ -125,7 +124,7 @@ public class RestartHandlersTests extends CommonAPITest {
         final WaitUntil waitUntil = new WaitUntil(100, 5000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 40,
                         ActivityInstanceCriterion.NAME_ASC);
                 return nameAre(names.toArray(new String[names.size()])).matches(pendingHumanTaskInstances);

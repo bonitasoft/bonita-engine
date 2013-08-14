@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -43,7 +42,7 @@ public class ExpressionBinding extends NamedElementBinding {
     public static final String DISPLAY_DESCRIPTION_AFTER_COMPLETION = "displayDescriptionAfterCompletion";
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         interpreter = attributes.get(XMLProcessDefinition.EXPRESSION_INTERPRETER);
         returnType = attributes.get(XMLProcessDefinition.EXPRESSION_RETURN_TYPE);
@@ -68,14 +67,14 @@ public class ExpressionBinding extends NamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLProcessDefinition.EXPRESSION_CONTENT.equals(name)) {
             content = value;
         }
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.EXPRESSION_NODE.equals(name)) {
             dependencies.add((Expression) value);
         }

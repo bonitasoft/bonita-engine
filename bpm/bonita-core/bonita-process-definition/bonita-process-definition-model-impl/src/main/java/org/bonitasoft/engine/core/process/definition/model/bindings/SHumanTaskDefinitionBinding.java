@@ -19,7 +19,6 @@ import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SHumanTaskDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -35,7 +34,7 @@ public class SHumanTaskDefinitionBinding extends SAutomaticTaskDefinitionBinding
     private String priority;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         actorName = attributes.get(XMLSProcessDefinition.ACTOR_NAME);
         priority = attributes.get(XMLSProcessDefinition.PRIORITY);
@@ -63,7 +62,7 @@ public class SHumanTaskDefinitionBinding extends SAutomaticTaskDefinitionBinding
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.USER_FILTER_NODE.equals(name)) {
             userFilter = (SUserFilterDefinition) value;

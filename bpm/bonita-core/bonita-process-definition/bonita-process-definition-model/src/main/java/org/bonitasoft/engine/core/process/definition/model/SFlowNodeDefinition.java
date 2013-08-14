@@ -60,6 +60,14 @@ public interface SFlowNodeDefinition extends SNamedElement {
 
     List<SConnectorDefinition> getConnectors();
 
+    /**
+     * 
+     * @param name
+     * @return
+     * @since 6.1
+     */
+    SConnectorDefinition getConnectorDefinition(String name);
+
     SFlowNodeType getType();
 
     String getDescription();
@@ -73,4 +81,5 @@ public interface SFlowNodeDefinition extends SNamedElement {
     List<SConnectorDefinition> getConnectors(ConnectorEvent connectorEvent);
 
     int getTransitionIndex(String transitionName);
+
 }

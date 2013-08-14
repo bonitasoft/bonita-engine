@@ -51,7 +51,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     @Override
-    public void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws SIdentityException {
         final EntityUpdateDescriptor descriptor = getGroupDescriptor(existingGroup, newGroup);
         if (!descriptor.getFields().isEmpty()) {
             identityService.updateGroup(existingGroup, descriptor);
@@ -59,7 +59,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     @Override
-    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SIdentityException {
         final long userId = existingUser.getId();
         final EntityUpdateDescriptor descriptor = getUserDescriptor(user);
         identityService.updateUser(existingUser, descriptor, user.isPasswordEncrypted());
@@ -82,7 +82,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     @Override
-    public void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws ImportDuplicateInOrganizationException, SIdentityException {
+    public void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws SIdentityException {
         final EntityUpdateDescriptor descriptor = getRoleDescriptor(existingRole, newRole);
         if (!descriptor.getFields().isEmpty()) {
             identityService.updateRole(existingRole, descriptor);
@@ -90,7 +90,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     @Override
-    public void foundExistingMembership(final SUserMembership existingMembership) throws ImportDuplicateInOrganizationException {
+    public void foundExistingMembership(final SUserMembership existingMembership) {
 
     }
 

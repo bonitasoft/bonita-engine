@@ -19,9 +19,8 @@ public class SEmployeeHandlerImpl implements SHandler<SUpdateEvent> {
         if (updateEvent.getType().compareToIgnoreCase(EMPLOYEE_UPDATED) == 0) {
             final Employee newEmployee = (Employee) updateEvent.getObject();
             final Employee oldEmployee = (Employee) updateEvent.getOldObject();
-            if (!newEmployee.getName().equals(oldEmployee.getName())) {
-                return true;
-            }
+
+            return !newEmployee.getName().equals(oldEmployee.getName());
         }
         return false;
     }

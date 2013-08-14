@@ -19,7 +19,6 @@ import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.impl.TimerEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.ElementBinding;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -35,16 +34,16 @@ public class TimerEventTriggerDefinitionBinding extends ElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         timerType = TimerType.valueOf(attributes.get(XMLProcessDefinition.TIMER_EVENT_TRIGGER_TIMER_TYPE));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.EXPRESSION_NODE.equals(name)) {
             timerExpression = (Expression) value;
         }

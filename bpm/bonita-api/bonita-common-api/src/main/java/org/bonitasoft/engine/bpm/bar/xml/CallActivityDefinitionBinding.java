@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.CallableElementType;
 import org.bonitasoft.engine.bpm.flownode.impl.CallActivityDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -52,7 +51,7 @@ public class CallActivityDefinitionBinding extends ActivityDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.CALLABLE_ELEMENT_NODE.equals(name)) {
             callableElement = (Expression) value;
@@ -66,7 +65,7 @@ public class CallActivityDefinitionBinding extends ActivityDefinitionBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         callableElementType = CallableElementType.valueOf(attributes.get(XMLProcessDefinition.CALLABLE_ELEMENT_TYPE));
     }

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,15 +23,11 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
-import org.bonitasoft.engine.operation.IncorrectOperationStructureException;
-import org.bonitasoft.engine.operation.OperationExecutionException;
-import org.bonitasoft.engine.transaction.SBadTransactionStateException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -158,9 +153,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     private void executeOperation(final SOperation operation, final long containerId, final String containerType,
-            final Map<String, Serializable> expressionContexts) throws IncorrectOperationStructureException, OperationExecutionException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException,
-            SBonitaException {
+            final Map<String, Serializable> expressionContexts) throws IllegalArgumentException, SecurityException, SBonitaException {
         transactionService.begin();
         final SExpressionContext sExpressionContext = new SExpressionContext();
         sExpressionContext.setSerializableInputValues(expressionContexts);
@@ -223,8 +216,8 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         dataDefinitionBuilder.setDefaultValue(expression);
     }
 
-    private void deleteDataInstance(final SDataInstance dataInstance) throws STransactionCommitException, SBadTransactionStateException, FireEventException,
-            STransactionCreationException, SDataInstanceException, STransactionRollbackException {
+    private void deleteDataInstance(final SDataInstance dataInstance) throws STransactionCommitException, STransactionCreationException,
+            SDataInstanceException, STransactionRollbackException {
         transactionService.begin();
         dataInstanceService.deleteDataInstance(dataInstance);
         transactionService.complete();

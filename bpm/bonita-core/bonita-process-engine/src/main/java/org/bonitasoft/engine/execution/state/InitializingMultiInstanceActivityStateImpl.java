@@ -151,9 +151,8 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
                     throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
                             + processDefinition.getName() + " " + processDefinition.getVersion() + " did not have loop cardinality nor loop data input ref set");
                 }
-                createInnerInstances(bpmInstancesCreator, activityInstanceService, processDefinition, activity, flowNodeInstance, miLoop, 0,
+                createInnerInstances(bpmInstancesCreator, activityInstanceService, processDefinition.getId(), activity, flowNodeInstance, miLoop, 0,
                         miLoop.isSequential() ? 1 : numberOfInstanceMax);
-
             }
         } catch (final SActivityStateExecutionException e) {
             throw e;
@@ -164,7 +163,7 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
     }
 
     static List<SFlowNodeInstance> createInnerInstances(final BPMInstancesCreator bpmInstancesCreator, final ActivityInstanceService activityInstanceService,
-            final SProcessDefinition processDefinition, final SActivityDefinition activity, final SFlowNodeInstance flowNodeInstance,
+            final long processDefinitionId, final SActivityDefinition activity, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfActiveInstances, final int numberOfInstanceToCreate) throws SBonitaException {
         final SMultiInstanceActivityInstanceBuilder loopActivityInstanceBuilder = bpmInstancesCreator.getBPMInstanceBuilders()
                 .getSMultiInstanceActivityInstanceBuilder();
@@ -174,10 +173,10 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
         final int nbOfInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfInstances();
         final ArrayList<SFlowNodeInstance> createdInstances = new ArrayList<SFlowNodeInstance>();
         for (int i = nbOfInstances; i < nbOfInstances + numberOfInstanceToCreate; i++) {
-            createdInstances.add(bpmInstancesCreator.createFlowNodeInstance(processDefinition, flowNodeInstance.getRootContainerId(), flowNodeInstance.getId(),
-                    SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, i, SStateCategory.NORMAL, -1, null));
+            createdInstances.add(bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, flowNodeInstance.getRootContainerId(),
+                    flowNodeInstance.getId(), SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, i,
+                    SStateCategory.NORMAL, -1, null));
             nbOfcreatedInstances++;
-
         }
         final SMultiInstanceActivityInstance multiInstanceActivityInstance = (SMultiInstanceActivityInstance) flowNodeInstance;
         activityInstanceService.addMultiInstanceNumberOfActiveActivities(multiInstanceActivityInstance, nbOfcreatedInstances);
@@ -212,8 +211,7 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance)
-            throws SActivityStateExecutionException {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return true;
     }
 

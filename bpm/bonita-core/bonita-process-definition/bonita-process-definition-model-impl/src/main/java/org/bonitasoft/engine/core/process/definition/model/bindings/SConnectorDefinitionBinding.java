@@ -24,7 +24,6 @@ import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConnectorDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -47,7 +46,7 @@ public class SConnectorDefinitionBinding extends SNamedElementBinding {
     private String errorCode;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         activationEvent = attributes.get(XMLSProcessDefinition.CONNECTOR_ACTIVATION_EVENT);
         connectorId = attributes.get(XMLSProcessDefinition.CONNECTOR_ID);
@@ -60,6 +59,7 @@ public class SConnectorDefinitionBinding extends SNamedElementBinding {
     public Object getObject() {
         final SConnectorDefinitionImpl connectorDefinitionImpl = new SConnectorDefinitionImpl(name, connectorId, version,
                 ConnectorEvent.valueOf(activationEvent));
+        connectorDefinitionImpl.setId(id);
         connectorDefinitionImpl.setFailAction(FailAction.valueOf(failAction));
         connectorDefinitionImpl.setErrorCode(errorCode);
         for (final Entry<String, SExpression> entry : inputs.entrySet()) {
@@ -77,11 +77,11 @@ public class SConnectorDefinitionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.CONNECTOR_INPUT.equals(name)) {
             final Entry<?, ?> entry = (Entry<?, ?>) value;
             inputs.put((String) entry.getKey(), (SExpression) entry.getValue());

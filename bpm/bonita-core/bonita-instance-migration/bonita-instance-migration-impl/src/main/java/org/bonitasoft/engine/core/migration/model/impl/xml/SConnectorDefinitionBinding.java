@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.migration.model.impl.SConnectorDefinitionWithE
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -43,7 +42,7 @@ public class SConnectorDefinitionBinding extends ElementBinding {
     private SExpression expression;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         name = attributes.get(XMLSMigrationPlan.NAME);
         connectorId = attributes.get(XMLSMigrationPlan.CONNECTOR_ID);
         version = attributes.get(XMLSMigrationPlan.CONNECTOR_VERSION);
@@ -52,7 +51,7 @@ public class SConnectorDefinitionBinding extends ElementBinding {
     @Override
     public Object getObject() {
         final SConnectorDefinitionImpl sConnectorDefinitionImpl = new SConnectorDefinitionImpl(name, connectorId, version);
-
+        // connectorDefinitionImpl.setId(id); TODO : Uncomment when generate id
         for (final Entry<String, SExpression> entry : inputs.entrySet()) {
             sConnectorDefinitionImpl.addInput(entry.getKey(), entry.getValue());
         }
@@ -70,11 +69,11 @@ public class SConnectorDefinitionBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSMigrationPlan.CONNECTOR_INPUT.equals(name)) {
             final Entry<?, ?> entry = (Entry<?, ?>) value;
             inputs.put((String) entry.getKey(), (SExpression) entry.getValue());

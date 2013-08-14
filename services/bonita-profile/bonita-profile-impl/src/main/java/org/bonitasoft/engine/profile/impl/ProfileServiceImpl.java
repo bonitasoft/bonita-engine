@@ -36,14 +36,13 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileAlreadyExistsException;
 import org.bonitasoft.engine.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.SProfileDeletionException;
-import org.bonitasoft.engine.profile.SProfileEntryAlreadyExistsException;
 import org.bonitasoft.engine.profile.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.SProfileEntryUpdateException;
+import org.bonitasoft.engine.profile.SProfileMemberCreationException;
 import org.bonitasoft.engine.profile.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.SProfileMemberNotFoundException;
 import org.bonitasoft.engine.profile.SProfileMemberReadException;
@@ -110,7 +109,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public SProfile createProfile(final SProfile profile) throws SProfileAlreadyExistsException, SProfileCreationException {
+    public SProfile createProfile(final SProfile profile) throws SProfileCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createProfile"));
         }
@@ -201,7 +200,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void updateProfile(final SProfile profile, final EntityUpdateDescriptor descriptor) throws SProfileNotFoundException, SProfileUpdateException {
+    public void updateProfile(final SProfile profile, final EntityUpdateDescriptor descriptor) throws SProfileUpdateException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateProfile"));
         }
@@ -406,7 +405,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public SProfileEntry createProfileEntry(final SProfileEntry profileEntry) throws SProfileEntryAlreadyExistsException, SProfileEntryCreationException {
+    public SProfileEntry createProfileEntry(final SProfileEntry profileEntry) throws SProfileEntryCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createProfileEntry"));
         }
@@ -512,20 +511,20 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public SProfileMember addUserToProfile(final long profileId, final long userId, final String firstName, final String lastName, final String userName)
-            throws SProfileNotFoundException, SProfileCreationException {
+            throws SProfileMemberCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addUserToProfile"));
         }
         final SProfileMemberImpl profileMember = getProfileMember(profileId, firstName, lastName, userName);
         profileMember.setUserId(userId);
-        insertProfileMember(profileMember);
+        createProfileMember(profileMember);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addUserToProfile"));
         }
         return profileMember;
     }
 
-    private void insertProfileMember(final SProfileMemberImpl profileMember) throws SProfileCreationException {
+    private void createProfileMember(final SProfileMemberImpl profileMember) throws SProfileMemberCreationException {
         final String message = "Adding a new profile member for userId " + profileMember.getUserId() + " with roleId " + profileMember.getRoleId()
                 + " in groupId " + profileMember.getGroupId();
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, message);
@@ -540,19 +539,19 @@ public class ProfileServiceImpl implements ProfileService {
             initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "insertProfileMember");
         } catch (final SRecorderException re) {
             initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "insertProfileMember");
-            throw new SProfileCreationException(re);
+            throw new SProfileMemberCreationException(re);
         }
     }
 
     @Override
     public SProfileMember addGroupToProfile(final long profileId, final long groupId, final String groupName, final String parentPath)
-            throws SProfileNotFoundException, SProfileCreationException {
+            throws SProfileMemberCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addGroupToProfile"));
         }
         final SProfileMemberImpl profileMember = getProfileMember(profileId, groupName, parentPath, null);
         profileMember.setGroupId(groupId);
-        insertProfileMember(profileMember);
+        createProfileMember(profileMember);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addGroupToProfile"));
         }
@@ -560,14 +559,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public SProfileMember addRoleToProfile(final long profileId, final long roleId, final String roleName) throws SProfileNotFoundException,
-            SProfileCreationException {
+    public SProfileMember addRoleToProfile(final long profileId, final long roleId, final String roleName) throws SProfileMemberCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addRoleToProfile"));
         }
         final SProfileMemberImpl profileMember = getProfileMember(profileId, roleName, null, null);
         profileMember.setRoleId(roleId);
-        insertProfileMember(profileMember);
+        createProfileMember(profileMember);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addRoleToProfile"));
         }
@@ -576,14 +574,14 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public SProfileMember addRoleAndGroupToProfile(final long profileId, final long roleId, final long groupId, final String roleName, final String groupName,
-            final String groupParentPath) throws SProfileNotFoundException, SProfileCreationException {
+            final String groupParentPath) throws SProfileMemberCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addRoleAndGroupToProfile"));
         }
         final SProfileMemberImpl profileMember = getProfileMember(profileId, roleName, groupName, groupParentPath);
         profileMember.setGroupId(groupId);
         profileMember.setRoleId(roleId);
-        insertProfileMember(profileMember);
+        createProfileMember(profileMember);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addRoleAndGroupToProfile"));
         }

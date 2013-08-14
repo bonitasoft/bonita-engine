@@ -37,13 +37,13 @@ public class SQueriableLogParameterImplTest {
     public TestName name = new TestName();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         LOGGER.info("Testing : {}", name.getMethodName());
         parameter = new SQueriableLogParameterImpl();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         LOGGER.info("Tested: {}", name.getMethodName());
         parameter = null;
     }

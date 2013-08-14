@@ -251,7 +251,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
         logBuilder.objectId(objectId);
         final SQueriableLog log = logBuilder.done();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), "recordInsert", log);
+            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 

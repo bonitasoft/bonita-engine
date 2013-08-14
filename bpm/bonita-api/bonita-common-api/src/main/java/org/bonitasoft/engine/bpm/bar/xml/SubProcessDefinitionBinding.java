@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,13 +29,13 @@ public class SubProcessDefinitionBinding extends ActivityDefinitionBinding {
     private FlowElementContainerDefinition container;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         triggeredByEvent = Boolean.valueOf(attributes.get(XMLProcessDefinition.TRIGGERED_BY_EVENT));
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.FLOW_ELEMENTS_NODE.equals(name)) {
             container = (FlowElementContainerDefinition) value;
         } else {

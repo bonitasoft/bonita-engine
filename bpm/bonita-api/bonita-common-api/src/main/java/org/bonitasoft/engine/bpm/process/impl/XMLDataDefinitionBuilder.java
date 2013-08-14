@@ -27,24 +27,23 @@ public class XMLDataDefinitionBuilder extends DataDefinitionBuilder {
 
     public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
             final String name, final String className, final Expression defaultValue) {
-        super(processDefinitionBuilder, process, getTextData(processDefinitionBuilder, name, className, defaultValue));
+        super(processDefinitionBuilder, process, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
     public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl process,
             final ActivityDefinitionImpl activity, final String name, final String className, final Expression defaultValue) {
-        super(processDefinitionBuilder, process, activity, getTextData(processDefinitionBuilder, name, className, defaultValue));
+        super(processDefinitionBuilder, process, activity, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
     public XMLDataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className, final Expression defaultValue) {
-        super(processDefinitionBuilder, container, messageEventTrigger, getTextData(processDefinitionBuilder, name, className, defaultValue));
+        super(processDefinitionBuilder, container, messageEventTrigger, getTextData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
     }
 
-    private static XMLDataDefinitionImpl getTextData(final ProcessDefinitionBuilder processDefinitionBuilder, final String name, final String className,
-            final Expression defaultValue) {
+    private static XMLDataDefinitionImpl getTextData(final String name, final String className, final Expression defaultValue) {
         final XMLDataDefinitionImpl xml = new XMLDataDefinitionImpl(name, defaultValue);
         xml.setClassName(className);
         return xml;

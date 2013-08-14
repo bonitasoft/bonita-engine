@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,12 +18,10 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
@@ -38,10 +36,9 @@ public class SGatewayDefinitionImpl extends SFlowNodeDefinitionImpl implements S
 
     private final SGatewayType gatewayType;
 
-    public SGatewayDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final GatewayDefinition gatewayDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, gatewayDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SGatewayDefinitionImpl(final GatewayDefinition gatewayDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SOperationBuilders sOperationBuilders) {
+        super(gatewayDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
         final GatewayType type = gatewayDefinition.getGatewayType();
         gatewayType = SGatewayType.valueOf(type.toString());
     }

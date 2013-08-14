@@ -24,7 +24,6 @@ import org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.RepeatXTimesTrigger;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
@@ -116,7 +115,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         abstract boolean check();
 
     }
-    
+
     @Test
     public void testCheckShutdownScheduler() throws Exception {
         schedulerService.shutdown();
@@ -429,7 +428,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
     }
-    
+
     @Test
     public void testExecuteSeveralTimesAJob() throws Exception {
         final String jobName = "IncrementVariableJob1";
@@ -443,7 +442,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
-        
+
         IncrementItselfJob.reset();
         WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1000, IncrementItselfJob.getValue() + 1);
         assertTrue(wf.waitFor());
@@ -567,11 +566,11 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
-        
+
         final int value = IncrementItselfJob.getValue();
-        
+
         Thread.sleep(2000);
-        
+
         final int newValue = IncrementItselfJob.getValue();
         final int delta = newValue - value;
         assertTrue("expected 1 or 2, 3 execution in 2 seconds, got: " + delta, delta == 1 || delta == 2 || delta == 3);
@@ -593,39 +592,39 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
-        
+
         Thread.sleep(2500);
-        
+
         final Integer value = (Integer) this.storage.getVariableValue(variableName);
-        
+
         assertTrue("expected 2 or 3, got: " + value, value == 2 || value == 3);
         Thread.sleep(2000);
         assertEquals(value, this.storage.getVariableValue(variableName));
     }
-/*
-    @Test(expected = SSchedulerException.class)
-    public void testCannotExecuteACronTriggerDueToExpressionMisconfiguration() throws Throwable {
-        final Date now = new Date();
-        final String variableName = "myVar";
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        final JobParameterBuilder jobParameterBuilder = schedulerService.getJobParameterBuilder();
-        parameters.add(jobParameterBuilder.createNewInstance("jobName", "job").done());
-        parameters.add(jobParameterBuilder.createNewInstance("variableName", variableName).done());
-        parameters.add(jobParameterBuilder.createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new UnixCronTrigger("events", now, 10, "1 * * * * * *");
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-    }
 
-    @Test
-    public void testDoNotThrowAnExceptionWhenDeletingAnUnknownJob() throws Exception {
-        final boolean deleted = schedulerService.delete("MyJob");
-        assertFalse(deleted);
-    }
-*/
+    /*
+     * @Test(expected = SSchedulerException.class)
+     * public void testCannotExecuteACronTriggerDueToExpressionMisconfiguration() throws Throwable {
+     * final Date now = new Date();
+     * final String variableName = "myVar";
+     * final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+     * .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
+     * final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+     * final JobParameterBuilder jobParameterBuilder = schedulerService.getJobParameterBuilder();
+     * parameters.add(jobParameterBuilder.createNewInstance("jobName", "job").done());
+     * parameters.add(jobParameterBuilder.createNewInstance("variableName", variableName).done());
+     * parameters.add(jobParameterBuilder.createNewInstance("throwExceptionAfterNIncrements", -1).done());
+     * final Trigger trigger = new UnixCronTrigger("events", now, 10, "1 * * * * * *");
+     * getTransactionService().begin();
+     * schedulerService.schedule(jobDescriptor, parameters, trigger);
+     * getTransactionService().complete();
+     * }
+     * @Test
+     * public void testDoNotThrowAnExceptionWhenDeletingAnUnknownJob() throws Exception {
+     * final boolean deleted = schedulerService.delete("MyJob");
+     * assertFalse(deleted);
+     * }
+     */
     @Test
     public void testDeleteAJob() throws Exception {
         final String jobName = "testDeleteAJob";
@@ -640,9 +639,9 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
 
         getTransactionService().complete();
-        
+
         Thread.sleep(200);
-        
+
         WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1000, IncrementItselfJob.getValue() + 1);
         assertTrue(wf.waitFor());
         schedulerService.delete(jobName);
@@ -748,7 +747,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
         Thread.sleep(2000);
-        
+
         final long defaultTenant = getTenantIdFromSession();
         assertNotNull(VariableStorage.getInstance(defaultTenant).getVariableValue(variableName));
         assertNull(VariableStorage.getInstance(this.tenant1).getVariableValue(variableName));
@@ -760,7 +759,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
 
     }
 
-    private long getTenantIdFromSession() throws SessionIdNotSetException, Exception {
+    private long getTenantIdFromSession() throws Exception {
         return getSessionAccessor().getTenantId();
     }
 
@@ -780,7 +779,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         getTransactionService().complete();
 
         Thread.sleep(200);
-        
+
         WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1000, IncrementItselfJob.getValue() + 1);
         assertTrue(wf.waitFor());
 
@@ -793,7 +792,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
 
         TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
         getTransactionService().complete();
-        
+
         // may be in execution so the last job is running
         Thread.sleep(500);
         assertFalse(wf.waitFor());

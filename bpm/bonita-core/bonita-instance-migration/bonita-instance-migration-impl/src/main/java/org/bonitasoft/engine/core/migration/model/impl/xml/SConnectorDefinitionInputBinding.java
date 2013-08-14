@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -30,7 +29,7 @@ public class SConnectorDefinitionInputBinding extends ElementBinding {
     private String name;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         name = attributes.get(XMLSMigrationPlan.NAME);
     }
 
@@ -45,11 +44,11 @@ public class SConnectorDefinitionInputBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSMigrationPlan.EXPRESSION_NODE.equals(name)) {
             expression = (SExpression) value;
         }

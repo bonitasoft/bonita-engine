@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.impl.GatewayDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -28,7 +27,7 @@ public class GatewayDefinitionBinding extends FlowNodeDefinitionBinding {
     private GatewayType type;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         type = GatewayType.valueOf(attributes.get(XMLProcessDefinition.GATEWAY_TYPE));
     }

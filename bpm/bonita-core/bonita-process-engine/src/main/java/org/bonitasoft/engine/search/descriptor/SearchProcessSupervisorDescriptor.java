@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
@@ -34,7 +33,7 @@ public class SearchProcessSupervisorDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> supervisorAllFields;
 
-    public SearchProcessSupervisorDescriptor(final SProcessSupervisorBuilders supervisorBuilders, final IdentityModelBuilder identityModelBuilder) {
+    public SearchProcessSupervisorDescriptor(final SProcessSupervisorBuilders supervisorBuilders) {
         final SProcessSupervisorBuilder supervisorBuilder = supervisorBuilders.getSSupervisorBuilder();
         // final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder();
         // final GroupBuilder groupBuilder = identityModelBuilder.getGroupBuilder();

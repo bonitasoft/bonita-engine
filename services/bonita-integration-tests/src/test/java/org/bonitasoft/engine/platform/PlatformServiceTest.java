@@ -42,7 +42,7 @@ public class PlatformServiceTest extends CommonServiceTest {
     }
 
     @Test
-    public void testPlatformBuilder() throws Exception {
+    public void testPlatformBuilder() {
         final String version = "myVersion";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
@@ -196,7 +196,7 @@ public class PlatformServiceTest extends CommonServiceTest {
     }
 
     @Test
-    public void testgetTenantBuilder() throws Exception {
+    public void testgetTenantBuilder() {
         final String name = "tenant1";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();

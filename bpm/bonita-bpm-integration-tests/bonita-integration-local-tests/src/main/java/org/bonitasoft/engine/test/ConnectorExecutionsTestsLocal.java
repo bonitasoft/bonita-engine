@@ -141,7 +141,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -189,7 +189,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -237,7 +237,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -281,7 +281,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -337,7 +337,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil1 = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check1 = VariableStorage.getInstance().getVariableValue(inputName1).equals(valueOfInput1);
                 final boolean check2 = VariableStorage.getInstance().getVariableValue(inputName2).equals(valueOfInput2);
                 return check1 && check2;
@@ -352,7 +352,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil2 = new WaitUntil(50, 2000, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 final boolean check3 = VariableStorage.getInstance().getVariableValue(inputName3).equals(valueOfInput3);
                 final boolean check4 = VariableStorage.getInstance().getVariableValue(inputName4).equals(valueOfInput4);
                 return check3 && check4;
@@ -428,7 +428,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         // wait for step containing the connector and execute it
         final ActivityInstance step1 = waitForUserTask(taskName, processInstance.getId());
         assignAndExecuteStep(step1, userId);
-        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState(step1));
+        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
 
         // check that there are no more connector instances
         final SearchResult<ConnectorInstance> searchResult = searchConnectors(step1.getId(), ConnectorInstance.FLOWNODE_TYPE, 10);
@@ -497,7 +497,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // Run Started state of the human task
         executeFlowNodeUntilEnd(activityInstanceId);
-        waitForArchivedActivity(activityInstanceId, TestStates.getNormalFinalState(null));
+        waitForArchivedActivity(activityInstanceId, TestStates.getNormalFinalState());
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task
         assertTrue(waitUntil.waitUntil());
@@ -566,7 +566,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final WaitUntil waitUntil = new WaitUntil(repeatEach, timeout, false) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return VariableStorage.getInstance().getVariableValue(inputName).equals(valueOfInput);
             }
         };
@@ -712,7 +712,8 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         assertEquals(1, processResolutionProblems.size());
         final Problem problem = processResolutionProblems.get(0);
         assertEquals("connector", problem.getResource());
-        getProcessAPI().deleteProcess(processDefinition.getId());
+
+        deleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Missing class connector", "Process instance" }, story = "Execute connector with missing class on process instance.")

@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
@@ -86,12 +87,24 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     private void validateProcess() {
+        final FlowElementContainerDefinition flowElementContainer = process.getProcessContainer();
+        final List<String> names = new ArrayList<String>();
+        validateFlowNodeUnique(flowElementContainer, names); // FIXME: can be removed after ids are added in flow nodes
         validateProcessAttributes();
-        validateUniqueNames(); // FIXME: can be removed after ids are added in flow nodes
-        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
-        validateProcess(processContainer, true);
+        validateProcess(flowElementContainer, true);
         validateEventsSubProcess();
         validateActors();
+    }
+
+    private void validateConnectors(final List<ConnectorDefinition> connectorDefinitions) {
+        final List<String> names = new ArrayList<String>();
+        for (final ConnectorDefinition connectorDefinition : connectorDefinitions) {
+            if (names.contains(connectorDefinition.getName())) {
+                designErrors.add("More than one connector are named '" + connectorDefinition.getName() + "'. All names must be unique.");
+            } else {
+                names.add(connectorDefinition.getName());
+            }
+        }
     }
 
     private void validateActors() {
@@ -105,6 +118,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     private void validateProcess(final FlowElementContainerDefinition flowElementContainer, final boolean isRootContainer) {
+        validateConnectors(flowElementContainer.getConnectors());
         validateGateways(flowElementContainer);
         validateDocuments(flowElementContainer);
         validateMultiInstances(flowElementContainer);
@@ -113,24 +127,18 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     }
 
-    private void validateUniqueNames() {
-        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
-        final List<String> names = new ArrayList<String>();
-        validateUniqueNames(processContainer, names);
-
-    }
-
-    private void validateUniqueNames(final FlowElementContainerDefinition processContainer, final List<String> names) {
-        validateFlowNodeName(names, processContainer.getActivities());
-        validateFlowNodeName(names, processContainer.getEndEvents());
-        validateFlowNodeName(names, processContainer.getGateways());
-        validateFlowNodeName(names, processContainer.getIntermediateCatchEvents());
-        validateFlowNodeName(names, processContainer.getIntermediateThrowEvents());
-        validateFlowNodeName(names, processContainer.getStartEvents());
+    private void validateFlowNodeUnique(final FlowElementContainerDefinition flowElementContainer, final List<String> names) {
+        validateFlowNodeName(names, flowElementContainer.getActivities());
+        validateFlowNodeName(names, flowElementContainer.getEndEvents());
+        validateFlowNodeName(names, flowElementContainer.getGateways());
+        validateFlowNodeName(names, flowElementContainer.getIntermediateCatchEvents());
+        validateFlowNodeName(names, flowElementContainer.getIntermediateThrowEvents());
+        validateFlowNodeName(names, flowElementContainer.getStartEvents());
     }
 
     private void validateFlowNodeName(final List<String> names, final Collection<? extends FlowNodeDefinition> flowNodes) {
         for (final FlowNodeDefinition flowNode : flowNodes) {
+            validateConnectors(flowNode.getConnectors());
             if (names.contains(flowNode.getName())) {
                 designErrors.add("More than one elements are named '" + flowNode.getName() + "'. All names must be unique.");
             } else {
@@ -138,7 +146,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             }
             if (flowNode instanceof SubProcessDefinition) {
                 final SubProcessDefinition subProcess = (SubProcessDefinition) flowNode;
-                validateUniqueNames(subProcess.getSubProcessContainer(), names);
+                validateFlowNodeUnique(subProcess.getSubProcessContainer(), names);
             }
         }
     }

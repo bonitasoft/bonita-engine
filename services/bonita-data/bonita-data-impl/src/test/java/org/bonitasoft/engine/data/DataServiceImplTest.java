@@ -17,15 +17,14 @@
 
 package org.bonitasoft.engine.data;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.data.DataServiceImpl;
-import org.bonitasoft.engine.data.DataSourceConfiguration;
-import org.bonitasoft.engine.data.SDataException;
-import org.bonitasoft.engine.data.SDataSourceNotFoundException;
-import org.bonitasoft.engine.data.SDataSourceParameterNotFoundException;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceParameter;
 import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
@@ -42,10 +41,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -72,7 +67,7 @@ public class DataServiceImplTest {
     private DataServiceImpl dataServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         logModelBuilder = mock(SDataSourceModelBuilder.class);
         classLoaderService = mock(ClassLoaderService.class);
         dataSourceConfigurations = new ArrayList<DataSourceConfiguration>();

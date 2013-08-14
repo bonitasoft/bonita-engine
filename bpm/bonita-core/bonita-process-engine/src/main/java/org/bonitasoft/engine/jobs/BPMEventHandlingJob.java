@@ -33,8 +33,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
@@ -63,8 +61,6 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
 
     private transient BPMInstanceBuilders instanceBuilders;
 
-    private EventsHandler enventsHandler;
-
     private WorkService workService;
 
     @Override
@@ -78,7 +74,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     }
 
     @Override
-    public void execute() throws JobExecutionException, FireEventException {
+    public void execute() throws JobExecutionException {
         try {
             final List<SMessageEventCouple> potentialMessageCouples = eventInstanceService.getMessageEventCouples();
 
@@ -94,8 +90,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
                 if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
                     markWaitingMessageAsInProgress(waitingMessage);
                 }
-                workService.registerWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId(), eventInstanceService, instanceBuilders,
-                        enventsHandler));
+                workService.registerWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId()));
             }
         } catch (final SBonitaException e) {
             throw new JobExecutionException(e);
@@ -113,10 +108,10 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
      * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
      */
     protected List<SMessageEventCouple> makeMessageUniqueCouples(final List<SMessageEventCouple> messageCouples) {
-        List<Long> takenMessages = new ArrayList<Long>(messageCouples.size());
-        List<Long> takenWaitings = new ArrayList<Long>(messageCouples.size());
-        List<SMessageEventCouple> pairs = new ArrayList<SMessageEventCouple>();
-        for (SMessageEventCouple couple : messageCouples) {
+        final List<Long> takenMessages = new ArrayList<Long>(messageCouples.size());
+        final List<Long> takenWaitings = new ArrayList<Long>(messageCouples.size());
+        final List<SMessageEventCouple> pairs = new ArrayList<SMessageEventCouple>();
+        for (final SMessageEventCouple couple : messageCouples) {
             final SMessageInstance messageInstance = couple.getMessageInstance();
             final SWaitingMessageEvent waitingMessage = couple.getWaitingMessage();
             if (!takenMessages.contains(messageInstance.getId()) && !takenWaitings.contains(waitingMessage.getId())) {
@@ -135,7 +130,6 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         eventInstanceService = getTenantServiceAccessor().getEventInstanceService();
         instanceBuilders = getTenantServiceAccessor().getBPMInstanceBuilders();
-        enventsHandler = getTenantServiceAccessor().getEventsHandler();
         workService = getTenantServiceAccessor().getWorkService();
     }
 

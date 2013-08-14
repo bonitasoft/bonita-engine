@@ -37,7 +37,7 @@ public class FlowNodeHandler extends AbstractUpdateHandler {
 
     @Override
     public boolean isInterested(final SEvent event) {
-        // the !isStateExecuting avoid having 2 time the same event in case of execution of e.g. connectors
+        // the !isStateExecuting avoid having 2 times the same event in case of execution of e.g. connectors
         return event.getObject() instanceof SFlowNodeInstance && !((SFlowNodeInstance) event.getObject()).isStateExecuting();
     }
 

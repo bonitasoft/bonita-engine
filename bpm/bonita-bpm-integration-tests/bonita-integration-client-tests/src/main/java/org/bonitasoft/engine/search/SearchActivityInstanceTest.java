@@ -109,7 +109,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
 
         // Wait for 2 activities in READY state:
         final CheckNbOfActivities checkNbReadyActivities = new CheckNbOfActivities(getProcessAPI(), 200, 3000, true, processInstance, 2,
-                TestStates.getReadyState(null));
+                TestStates.getReadyState());
         assertTrue("Expected 2 open activities for process instance " + processInstance.getId(), checkNbReadyActivities.waitUntil());
 
         // Check that no tasks are archived yet:
@@ -825,7 +825,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final HumanTaskInstance userTaskId = humanTasksSearch.getResult().get(0);
         assignAndExecuteStep(userTaskId, user.getId());
 
-        waitForStep(40, 2000, "Approval2", processInstance, TestStates.getReadyState(null));
+        waitForStep(40, 2000, "Approval2", processInstance, TestStates.getReadyState());
 
         final List<HumanTaskInstance> userTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, activityInstanceCriterion);
         assertNotNull(userTaskInstances);
@@ -861,9 +861,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         }
 
         deleteUser(user);
-        getProcessAPI().disableProcess(processDefinition.getId());
-        getProcessAPI().deleteProcess(processDefinition.getId());
-
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test

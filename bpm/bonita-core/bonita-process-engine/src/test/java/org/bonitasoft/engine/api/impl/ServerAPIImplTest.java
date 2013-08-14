@@ -51,7 +51,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class ServerAPIImplTest {
 
     @Before
-    public void initialize() throws Exception {
+    public void initialize() {
         MockitoAnnotations.initMocks(this);
     }
 

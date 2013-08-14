@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -14,13 +13,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
@@ -31,7 +28,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.MembershipNotFoundException;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
@@ -103,8 +99,8 @@ public class SupervisorCommandTest extends CommonAPITest {
         assertTrue(getProcessAPI().isUserProcessSupervisor(processDefinition.getId(), user.getId()));
 
         // clean-up
-        getProcessAPI().deleteProcess(processDefinition.getId());
         getIdentityAPI().deleteUser(user.getId());
+        deleteProcess(processDefinition);
         deleteSupervisor(createdSupervisor.getSupervisorId());
     }
 
@@ -133,7 +129,7 @@ public class SupervisorCommandTest extends CommonAPITest {
     }
 
     private ProcessDefinition createProcessDefinition(final String processName) throws InvalidProcessDefinitionException, ProcessDeployException,
-            ProcessDefinitionNotFoundException, InvalidBusinessArchiveFormatException, ActorMappingImportException, AlreadyExistsException {
+            InvalidBusinessArchiveFormatException, AlreadyExistsException {
         // test process definition with no supervisor
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0").done();
 
@@ -148,7 +144,7 @@ public class SupervisorCommandTest extends CommonAPITest {
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Get", "Delete" }, story = "Get and delete supervisor.")
     @Test
-    public void testAddGetAndDeleteSupervisor() throws BonitaException, IOException {
+    public void testAddGetAndDeleteSupervisor() throws BonitaException {
         final User user = this.createUser();
         final ProcessDefinition processDefinition = createProcessDefinition("myProcess1");
         // Add Supervisor
@@ -172,13 +168,13 @@ public class SupervisorCommandTest extends CommonAPITest {
         assertEquals(0, result.getCount());
 
         // clean-up
-        getProcessAPI().deleteProcess(processDefinition.getId());
+        deleteProcess(processDefinition);
         getIdentityAPI().deleteUser(user.getId());
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Role", "Delete" }, story = "Delete supervisors corresponding to criteria", jira = "ENGINE-766")
     @Test
-    public void testDeleteSupervisors() throws BonitaException, IOException {
+    public void testDeleteSupervisors() throws BonitaException {
         // Create groups, roles, users
         createUsers();
         createGroups();
@@ -234,8 +230,7 @@ public class SupervisorCommandTest extends CommonAPITest {
         deleteRoles(role1, role2);
         deleteGroups(group1, group2);
         deleteUsers(user1, user2, user3, user4, user5);
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        deleteProcess(processDefinition1, processDefinition2);
     }
 
     @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group" }, story = "Add group to supervisor.")
@@ -260,8 +255,8 @@ public class SupervisorCommandTest extends CommonAPITest {
 
         // clean-up
         deleteSupervisor(createdSupervisor.getSupervisorId());
-        getProcessAPI().deleteProcess(processDefinition.getId());
         getIdentityAPI().deleteGroup(group.getId());
+        deleteProcess(processDefinition);
     }
 
     private Group createGroup() throws AlreadyExistsException, CreationException {
@@ -296,12 +291,12 @@ public class SupervisorCommandTest extends CommonAPITest {
         assertTrue(getProcessAPI().isUserProcessSupervisor(processDefinition.getId(), user.getId()));
         // clean-up
         deleteSupervisor(createdSupervisor.getSupervisorId());
-        getProcessAPI().deleteProcess(processDefinition.getId());
         // delete membership first
         getIdentityAPI().deleteUserMembership(membership.getId());
         getIdentityAPI().deleteUser(user.getId());
         getIdentityAPI().deleteRole(role.getId());
         getIdentityAPI().deleteGroup(group.getId());
+        deleteProcess(processDefinition);
     }
 
     private Role createRole() throws AlreadyExistsException, CreationException {
@@ -309,38 +304,33 @@ public class SupervisorCommandTest extends CommonAPITest {
         return getIdentityAPI().createRole(roleName);
     }
 
-    private UserMembership createMembership(final long userId, final long groupId, final long roleId) throws MembershipNotFoundException,
-            AlreadyExistsException, CreationException {
+    private UserMembership createMembership(final long userId, final long groupId, final long roleId) throws AlreadyExistsException, CreationException {
         return getIdentityAPI().addUserMembership(userId, groupId, roleId);
     }
 
     private void afterSearchProcessSupervisorsForUser() throws BonitaException {
         deleteSupervisors(supervisor1, supervisor2, supervisor3, supervisor4, supervisor5);
         deleteUsers(user1, user2, user3, user4, user5);
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        deleteProcess(processDefinition1, processDefinition2);
     }
 
     private void afterSearchProcessSupervisorsForGroup() throws BonitaException {
         deleteSupervisors(supervisor1, supervisor2);
         deleteGroups(group1, group2);
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        deleteProcess(processDefinition1, processDefinition2);
     }
 
     private void afterSearchProcessSupervisorsForRole() throws BonitaException {
         deleteSupervisors(supervisor1, supervisor2);
         deleteRoles(role1, role2);
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        deleteProcess(processDefinition1, processDefinition2);
     }
 
     private void afterSearchProcessSupervisorsForRoleAndGroup() throws BonitaException {
         deleteSupervisors(supervisor1, supervisor2, supervisor3);
         deleteRoles(role1, role2);
         deleteGroups(group1, group2);
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        deleteProcess(processDefinition1, processDefinition2);
     }
 
     private void afterSearchProcessSupervisorsForUserAndMembership() throws BonitaException {
@@ -348,8 +338,7 @@ public class SupervisorCommandTest extends CommonAPITest {
         deleteUsers(user1, user2, user3, user4, user5);
         deleteGroups(group1, group2);
         deleteRoles(role1, role2);
-        getProcessAPI().deleteProcess(processDefinition1.getId());
-        getProcessAPI().deleteProcess(processDefinition2.getId());
+        deleteProcess(processDefinition1, processDefinition2);
     }
 
     private void beforeSearchProcessSupervisorsForUser() throws BonitaException {
@@ -387,8 +376,8 @@ public class SupervisorCommandTest extends CommonAPITest {
         createUserAndMembershipSupervisors();
     }
 
-    private void createProcessDefinitions() throws InvalidProcessDefinitionException, ProcessDeployException, ProcessDefinitionNotFoundException,
-            InvalidBusinessArchiveFormatException, ActorMappingImportException, AlreadyExistsException {
+    private void createProcessDefinitions() throws InvalidProcessDefinitionException, ProcessDeployException, InvalidBusinessArchiveFormatException,
+            AlreadyExistsException {
         processDefinition1 = createProcessDefinition("myProcess1");
         processDefinition2 = createProcessDefinition("myProcess2");
     }

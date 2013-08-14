@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -40,7 +39,7 @@ public class CancellingReceiveTaskStateImpl extends CancellingActivityWithBounda
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
         try {
             final SReceiveTaskInstance receiveTaskInstance = (SReceiveTaskInstance) instance;
-            getStateBehaviors().interrupWaitinEvents(processDefinition, receiveTaskInstance);
+            getStateBehaviors().interrupWaitinEvents(receiveTaskInstance);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
@@ -48,7 +47,7 @@ public class CancellingReceiveTaskStateImpl extends CancellingActivityWithBounda
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,10 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 
 /**
  * @author Yanyan Liu
+ * @author Celine Souchet
  */
 public class SearchArchivedActivityInstanceDescriptor extends SearchEntityDescriptor {
 
@@ -34,8 +34,7 @@ public class SearchArchivedActivityInstanceDescriptor extends SearchEntityDescri
 
     private final Map<Class<? extends PersistentObject>, Set<String>> archivedActivityInstanceDescriptorAllFields;
 
-    public SearchArchivedActivityInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders, final SProcessSupervisorBuilders sSupervisorBuilders) {
-
+    public SearchArchivedActivityInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
         final SAUserTaskInstanceBuilder instanceBuilder = bpmInstanceBuilders.getSAUserTaskInstanceBuilder();
         archivedActivityInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(10);
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.NAME,

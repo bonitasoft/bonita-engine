@@ -21,7 +21,6 @@ import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.impl.ActivityDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -39,7 +38,7 @@ public abstract class ActivityDefinitionBinding extends FlowNodeDefinitionBindin
     private final List<BoundaryEventDefinition> boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((DataDefinition) value);

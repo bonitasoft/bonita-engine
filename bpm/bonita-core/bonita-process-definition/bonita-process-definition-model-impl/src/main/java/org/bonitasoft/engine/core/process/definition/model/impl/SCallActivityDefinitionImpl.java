@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallableElementType;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
@@ -55,10 +54,10 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         dataOutputOperations = new ArrayList<SOperation>(3);
     }
 
-    public SCallActivityDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final CallActivityDefinition activityDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SCallActivityDefinitionImpl(final CallActivityDefinition activityDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final SOperationBuilders sOperationBuilders) {
+        super(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
         callableElement = ServerModelConvertor.convertExpression(sExpressionBuilders, activityDefinition.getCallableElement());
         callableElementVersion = ServerModelConvertor.convertExpression(sExpressionBuilders, activityDefinition.getCallableElementVersion());
         dataInputOperations = ServerModelConvertor.convertOperations(sOperationBuilders, sExpressionBuilders, activityDefinition.getDataInputOperations());

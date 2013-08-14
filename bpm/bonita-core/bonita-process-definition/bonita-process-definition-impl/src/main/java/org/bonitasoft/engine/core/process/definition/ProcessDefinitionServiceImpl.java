@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.definition;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -323,7 +322,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 final File xmlFile = new File(processFolder, SERVER_PROCESS_DEFINITION_XML);
                 parser.validate(xmlFile);
                 sProcessDefinition = (SProcessDefinition) parser.getObjectFromXML(xmlFile);
-                storeProcessDefinition(processId, tenantId, sProcessDefinition);
+                storeProcessDefinition(processId, sProcessDefinition);
             }
             return sProcessDefinition;
         } catch (final CacheException e) {
@@ -335,8 +334,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
     }
 
-    private long setIdOnProcessDefinition(final long tenantId, final SProcessDefinition sProcessDefinition) throws NoSuchMethodException,
-            IllegalAccessException, InvocationTargetException, CacheException, ReflectException {
+    private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws ReflectException {
         final long id = generateId();
         ClassReflector.invokeSetter(sProcessDefinition, "setId", Long.class, id);
         return id;
@@ -346,8 +344,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return Math.abs(UUID.randomUUID().getLeastSignificantBits());
     }
 
-    private void storeProcessDefinition(final Long id, final long tenantId, final SProcessDefinition sProcessDefinition) throws NoSuchMethodException,
-            IllegalAccessException, InvocationTargetException, CacheException {
+    private void storeProcessDefinition(final Long id, final SProcessDefinition sProcessDefinition) throws CacheException {
         cacheService.store(PROCESS_CACHE_NAME, id, sProcessDefinition);
     }
 
@@ -380,7 +377,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final long sessionId = sessionAccessor.getSessionId();
             final SSession session = sessionService.getSession(sessionId);
             final long tenantId = sessionAccessor.getTenantId();
-            final long processId = setIdOnProcessDefinition(session.getTenantId(), definition);
+            final long processId = setIdOnProcessDefinition(definition);
             // storeProcessDefinition(processId, tenantId, definition);// FIXME remove that to check the read of processes
 
             final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
@@ -415,9 +412,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             recorder.recordInsert(record, insertEvent);
             initiateLogBuilder(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
-        } catch (final CacheException e) {
-            initiateLogBuilder(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
-            throw new SProcessDefinitionException(e);
         } catch (final SRecorderException e) {
             initiateLogBuilder(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
             throw new SProcessDefinitionException(e);
@@ -519,7 +513,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(final List<Long> processIds, final int fromIndex, final int numberOfProcesses,
-            final String field, final OrderByType order) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+            final String field, final OrderByType order) throws SProcessDefinitionReadException {
         if (processIds == null || processIds.size() == 0) {
             return Collections.emptyList();
         }
@@ -535,8 +529,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(final List<Long> processIds) throws SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException {
+    public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(final List<Long> processIds) throws SProcessDefinitionReadException {
         if (processIds == null || processIds.size() == 0) {
             return Collections.emptyList();
         }
@@ -691,7 +684,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getNumberOfProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final QueryOptions countOptions) throws SBonitaSearchException {
+    public long getNumberOfProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final QueryOptions countOptions)
+            throws SBonitaSearchException {
         try {
             return persistenceService.getNumberOfEntities(SProcessDefinitionDeployInfo.class, "UsersManagedByCanStart", countOptions,
                     Collections.singletonMap("managerUserId", (Object) managerUserId));
@@ -884,7 +878,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         logBuilder.objectId(objectId);
         final SQueriableLog log = logBuilder.done();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), "recordInsert", log);
+            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 
@@ -1061,7 +1055,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getNumberOfUsersWhoCanStartProcessDeploymentInfo(final long processDefinitionId, final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long getNumberOfUsersWhoCanStartProcessDeploymentInfo(final long processDefinitionId, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(PROCESS_DEFINITION_ID, (Object) processDefinitionId);
             return persistenceService.getNumberOfEntities(SUser.class, WHOCANSTART_PROCESS_SUFFIX, searchOptions, parameters);
@@ -1071,7 +1066,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public List<SUser> searchUsersWhoCanStartProcessDeploymentInfo(final long processDefinitionId, final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SUser> searchUsersWhoCanStartProcessDeploymentInfo(final long processDefinitionId, final QueryOptions searchOptions)
+            throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(PROCESS_DEFINITION_ID, (Object) processDefinitionId);
             return persistenceService.searchEntity(SUser.class, WHOCANSTART_PROCESS_SUFFIX, searchOptions, parameters);

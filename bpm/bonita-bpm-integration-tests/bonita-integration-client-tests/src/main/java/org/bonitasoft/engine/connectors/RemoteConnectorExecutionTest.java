@@ -184,8 +184,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final String userTaskName = "step2";
         final String multiTaskName = "multi";
         final String outputValue = "result";
-        final ProcessDefinition processDefinition = deployProcessWithConnectorOnMutiInstance("delivery", "localData", globalDataName, localDataValue,
-                userTaskName, multiTaskName, outputValue, 2);
+        final ProcessDefinition processDefinition = deployProcessWithConnectorOnMutiInstance("localData", globalDataName, localDataValue, userTaskName,
+                multiTaskName, outputValue, 2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -216,14 +216,14 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    private ProcessDefinition deployProcessWithConnectorOnMutiInstance(final String actorName, final String localDataName, final String globalDataName,
+    private ProcessDefinition deployProcessWithConnectorOnMutiInstance(final String localDataName, final String globalDataName,
             final String localDataValue, final String userTaskName, final String multiTaskName, final String outputValue, final int nbOfInstances)
             throws BonitaException, IOException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("connectorOnMultiInstance", "1.0");
-        builder.addActor(actorName);
+        builder.addActor(ACTOR_NAME);
         builder.addShortTextData(globalDataName, new ExpressionBuilder().createConstantStringExpression("initial"));
         builder.addStartEvent("start");
-        final UserTaskDefinitionBuilder taskBuilder = builder.addUserTask(multiTaskName, actorName);
+        final UserTaskDefinitionBuilder taskBuilder = builder.addUserTask(multiTaskName, ACTOR_NAME);
         taskBuilder.addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(nbOfInstances));
         taskBuilder.addShortTextData(localDataName, new ExpressionBuilder().createConstantStringExpression(localDataValue));
         taskBuilder
@@ -231,13 +231,13 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, String.class.getName()))
                 .addOutput(new LeftOperandBuilder().createDataLeftOperand(globalDataName), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createConstantStringExpression(outputValue));
-        builder.addUserTask(userTaskName, actorName);
+        builder.addUserTask(userTaskName, ACTOR_NAME);
         builder.addEndEvent("end");
         builder.addTransition("start", multiTaskName);
         builder.addTransition(multiTaskName, userTaskName);
         builder.addTransition(userTaskName, "end");
 
-        return deployProcessWithDefaultTestConnector(actorName, johnUserId, builder, false);
+        return deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Multiple", "On activity" }, story = "Test multiple connectors on one activity.")
@@ -1117,9 +1117,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
                 .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addConnector("wait200ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
+        builder.addConnector("wait300ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
                 new ExpressionBuilder().createConstantLongExpression(300));
-        builder.addConnector("wait200msbis", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
+        builder.addConnector("wait2000ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER).addInput("timeout",
                 new ExpressionBuilder().createConstantLongExpression(2000));
         builder.addConnector("myConnector2", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))
@@ -1243,11 +1243,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
         final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-                // .addData(
-                // "data",
-                // "org.bonitasoft.dfgdfg.Restaurant",
-                // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
-                // "org.bonitasoft.dfgdfg.Restaurant"))
+        // .addData(
+        // "data",
+        // "org.bonitasoft.dfgdfg.Restaurant",
+        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
+        // "org.bonitasoft.dfgdfg.Restaurant"))
                 .addUserTask("step1", "actor");
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));

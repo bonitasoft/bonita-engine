@@ -232,8 +232,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public void deleteProcessInstance(final long processInstanceId) throws SFlowNodeReadException, SProcessInstanceModificationException,
-            SProcessInstanceReadException, SProcessInstanceNotFoundException, SProcessInstanceHierarchicalDeletionException {
+    public void deleteProcessInstance(final long processInstanceId) throws SProcessInstanceModificationException, SProcessInstanceReadException,
+            SProcessInstanceNotFoundException {
         final SProcessInstance processInstance = getProcessInstance(processInstanceId);
         deleteProcessInstance(processInstance);
     }
@@ -291,8 +291,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public void deleteArchivedProcessInstance(final SAProcessInstance archivedProcessInstance) throws SProcessInstanceModificationException,
-            SFlowNodeReadException {
+    public void deleteArchivedProcessInstance(final SAProcessInstance archivedProcessInstance) throws SProcessInstanceModificationException {
         final DeleteRecord deleteRecord = new DeleteRecord(archivedProcessInstance);
         final ProcessInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting process instance");
         SDeleteEvent deleteEvent = null;
@@ -310,8 +309,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public void deleteArchivedProcessInstanceElements(final long processInstanceId, final long processDefinitionId) throws SFlowNodeReadException,
-            SProcessInstanceModificationException {
+    public void deleteArchivedProcessInstanceElements(final long processInstanceId, final long processDefinitionId)
+            throws SProcessInstanceModificationException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
@@ -342,8 +341,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!childrenProcessInstanceIds.isEmpty());
     }
 
-    private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SProcessInstanceModificationException,
-            SBonitaSearchException, SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
+    private void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
+            SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
         List<SAFlowNodeInstance> activityInstances;
         do {
             activityInstances = activityService.getArchivedFlowNodeInstances(processInstanceId, 0, BATCH_SIZE);
@@ -363,7 +362,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteArchivedFlowNodeInstanceElements(final SAFlowNodeInstance activityInstance) throws SFlowNodeReadException,
-            SProcessInstanceModificationException, SBonitaSearchException, SConnectorInstanceDeletionException, SDataInstanceException {
+            SBonitaSearchException, SConnectorInstanceDeletionException, SDataInstanceException {
         if (activityInstance instanceof SAActivityInstance) {
             dataInstanceService.deleteLocalArchivedDataInstances(activityInstance.getSourceObjectId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
             connectorInstanceService.deleteArchivedConnectorInstances(activityInstance.getSourceObjectId(), SConnectorInstance.FLOWNODE_TYPE);
@@ -393,8 +392,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public void deleteProcessInstance(final SProcessInstance sProcessInstance) throws SFlowNodeReadException, SProcessInstanceModificationException,
-            SProcessInstanceHierarchicalDeletionException {
+    public void deleteProcessInstance(final SProcessInstance sProcessInstance) throws SProcessInstanceModificationException {
         final ProcessInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting process instance");
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -519,8 +517,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public void deleteFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SFlowNodeReadException,
-            SProcessInstanceModificationException {
+    public void deleteFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
+            throws SProcessInstanceModificationException {
         try {
             deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
             activityService.deleteFlowNodeInstance(flowNodeInstance);
@@ -654,8 +652,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public void setStateCategory(final SProcessInstance processInstance, final SStateCategory stateCatetory) throws SProcessInstanceNotFoundException,
-            SProcessInstanceModificationException {
+    public void setStateCategory(final SProcessInstance processInstance, final SStateCategory stateCatetory) throws SProcessInstanceModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(processInstanceKeyProvider.getStateCategoryKey(), stateCatetory);
         updateProcessInstance(processInstance, "update process instance state category", descriptor, PROCESS_INSTANCE_CATEGORY_STATE);

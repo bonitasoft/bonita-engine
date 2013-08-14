@@ -41,7 +41,7 @@ public final class CheckNbOfArchivedActivityInstances extends WaitUntil {
     }
 
     @Override
-    protected boolean check() throws Exception {
+    protected boolean check() {
         return processAPI.getArchivedActivityInstances(processInstance1.getId(), 0, 100, ActivityInstanceCriterion.DEFAULT).size() == expected;
     }
 }

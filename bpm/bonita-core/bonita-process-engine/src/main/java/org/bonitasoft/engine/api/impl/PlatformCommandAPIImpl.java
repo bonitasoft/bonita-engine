@@ -173,7 +173,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     }
 
     @Override
-    public CommandDescriptor get(final String platformCommandName) throws CommandNotFoundException, CreationException {
+    public CommandDescriptor get(final String platformCommandName) throws CommandNotFoundException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
 
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
@@ -202,7 +202,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     }
 
     @Override
-    public void update(final String platformCommandName, final CommandUpdater updater) throws CommandNotFoundException, UpdateException {
+    public void update(final String platformCommandName, final CommandUpdater updater) throws UpdateException {
         if (updater == null || updater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }

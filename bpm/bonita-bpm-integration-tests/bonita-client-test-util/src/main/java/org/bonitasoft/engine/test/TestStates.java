@@ -2,30 +2,25 @@ package org.bonitasoft.engine.test;
 
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
 
 /**
  * @author Baptiste Mesta
  */
 public class TestStates {
 
-    public static String getInitialState(final Object activity) {
+    public static String getInitialState() {
         return "initializing";
     }
 
-    public static String getNormalFinalState(final Object activity) {
+    public static String getNormalFinalState() {
         return "completed";
     }
 
-    public static String getNormalFinalState(final ProcessInstance processInstance) {
-        return "completed";
-    }
-
-    public static String getReadyState(final Object step1) {
+    public static String getReadyState() {
         return "ready";
     }
 
-    public static String getSkippedState(final Object step1) {
+    public static String getSkippedState() {
         return "skipped";
     }
 

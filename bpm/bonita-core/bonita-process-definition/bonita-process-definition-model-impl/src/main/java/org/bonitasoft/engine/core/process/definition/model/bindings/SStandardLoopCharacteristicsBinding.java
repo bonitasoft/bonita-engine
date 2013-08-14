@@ -18,7 +18,6 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.model.impl.SStandardLoopCharacteristicsImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -32,16 +31,16 @@ public class SStandardLoopCharacteristicsBinding extends ElementBinding {
     private SExpression loopMax;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         testBefore = Boolean.valueOf(attributes.get(XMLSProcessDefinition.TEST_BEFORE));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.LOOP_CONDITION.equals(name)) {
             loopCondition = (SExpression) value;
         }

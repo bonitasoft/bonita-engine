@@ -54,7 +54,7 @@ public class EventServiceImpl implements EventService {
         return registeredHandlers;
     }
 
-    public EventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) throws HandlerRegistrationException {
+    public EventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) {
         super();
         this.eventBuilders = eventBuilders;
         this.logger = logger;
@@ -63,7 +63,7 @@ public class EventServiceImpl implements EventService {
 
     /**
      * Fire the given Event only to interested handlers
-     *
+     * 
      * @throws FireEventException
      */
     @Override
@@ -79,11 +79,12 @@ public class EventServiceImpl implements EventService {
 
                 if (handlers.size() > 0) {
                     FireEventException fireEventException = null;
-                    for (final SHandler<SEvent> h : handlers) {// for each handler, I check if it's interested or not by the given event
-                        if (h.isInterested(event)) {
+                    for (final SHandler<SEvent> handler : handlers) {
+                        // for each handler, I check if it's interested or not by the given event
+                        if (handler.isInterested(event)) {
                             // for now, I just log the Exception into the console
                             try {
-                                h.execute(event);
+                                handler.execute(event);
                             } catch (final Exception e) {
                                 if (fireEventException == null) {
                                     fireEventException = new FireEventException("Unable to execute some handler");
@@ -116,22 +117,23 @@ public class EventServiceImpl implements EventService {
      * No handler duplication in a list for a given event type
      */
     @Override
-    public void addHandler(final String eventType, final SHandler<SEvent> h) throws HandlerRegistrationException {
+    public void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addHandler"));
         }
-        // the add method return false if the given element already exists in the Set, and do nothing.
-        if (h != null && eventType != null) {
+        // the add method returns false if the given element already exists in the Set, and does nothing.
+        if (handler != null && eventType != null) {
             // check if the given event type is already registered in the Event Service
             if (registeredHandlers.containsKey(eventType)) {
-                // if the Handler already exists for the same eventType, an Exception is thrown
+                // if the handler already exists for the same eventType, an Exception is thrown
                 final Set<SHandler<SEvent>> handlers = registeredHandlers.get(eventType);
-                if (!handlers.add(h)) {
+                if (!handlers.add(handler)) {
                     throw new HandlerRegistrationException("This handler is already registered for this event type");
                 }
-            } else { // if the given type doesnt't already exists in the eventFilters list, we create it
+            } else {
+                // if the given type doesn't already exist in the eventFilters list, we create it
                 final Set<SHandler<SEvent>> newHandlerSet = new HashSet<SHandler<SEvent>>();
-                newHandlerSet.add(h);
+                newHandlerSet.add(handler);
                 registeredHandlers.put(eventType, newHandlerSet);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -146,11 +148,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void removeAllHandlers(final SHandler<SEvent> h) throws HandlerUnregistrationException {
+    public void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeAllHandlers"));
         }
-        if (h == null) {
+        if (handler == null) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                         LogUtil.getLogOnExceptionMethod(this.getClass(), "removeAllHandlers", "Unable remove a null event"));
@@ -158,8 +160,8 @@ public class EventServiceImpl implements EventService {
             throw new HandlerUnregistrationException();
         } else {
             for (final Set<SHandler<SEvent>> handlers : registeredHandlers.values()) {
-                if (handlers.contains(h)) {
-                    handlers.remove(h);
+                if (handlers.contains(handler)) {
+                    handlers.remove(handler);
                 }
             }
         }

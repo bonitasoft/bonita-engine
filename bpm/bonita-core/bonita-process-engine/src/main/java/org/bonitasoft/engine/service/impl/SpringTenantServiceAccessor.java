@@ -29,6 +29,7 @@ import org.bonitasoft.engine.actor.xml.UserNamesBinding;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -46,6 +47,7 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
@@ -62,6 +64,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
@@ -70,6 +73,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -112,6 +116,8 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
+ *
  */
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
@@ -152,6 +158,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BPMDefinitionBuilders bpmDefinitionBuilders;
 
     private BPMInstanceBuilders bpmInstanceBuilders;
+
+    private BPMInstancesCreator bpmInstancesCreator;
 
     private ActorMappingService actorMappingService;
 
@@ -203,6 +211,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private SDataDefinitionBuilders sDataDefinitionBuilders;
 
+    private SDataInstanceBuilders sDataInstanceBuilders;
+
     private DataService dataService;
 
     private SDataSourceModelBuilder sDataSourceModelBuilder;
@@ -248,10 +258,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private DefaultCommandProvider commandProvider;
 
     private WorkService workService;
-    
+
     private SessionService sessionService;
-    
+
     private ReadSessionAccessor readSessionAccessor;
+
+    private TransactionalProcessInstanceInterruptor transactionalProcessInstanceInterruptor;
+
+    private SACommentBuilder saCommentBuilder;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -260,20 +274,20 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public ReadSessionAccessor getReadSessionAccessor() {
-    	if (readSessionAccessor == null) {
-    		readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
+        if (readSessionAccessor == null) {
+            readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
         }
         return readSessionAccessor;
     }
-    
+
     @Override
     public SessionService getSessionService() {
-    	if (sessionService == null) {
-    		sessionService = beanAccessor.getService(SessionService.class);
+        if (sessionService == null) {
+            sessionService = beanAccessor.getService(SessionService.class);
         }
         return sessionService;
     }
-    
+
     @Override
     public IdentityModelBuilder getIdentityModelBuilder() {
         if (identityModelBuilder == null) {
@@ -363,6 +377,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public BPMInstancesCreator getBPMInstancesCreator() {
+        if (bpmInstancesCreator == null) {
+            bpmInstancesCreator = beanAccessor.getService(BPMInstancesCreator.class);
+        }
+        return bpmInstancesCreator;
+    }
+
+    @Override
     public BPMInstanceBuilders getBPMInstanceBuilders() {
         if (bpmInstanceBuilders == null) {
             bpmInstanceBuilders = beanAccessor.getService(BPMInstanceBuilders.class);
@@ -392,6 +414,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             processExecutor = beanAccessor.getService(ProcessExecutor.class);
         }
         return processExecutor;
+    }
+
+    @Override
+    public TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor() {
+        if (transactionalProcessInstanceInterruptor == null) {
+            transactionalProcessInstanceInterruptor = beanAccessor.getService(TransactionalProcessInstanceInterruptor.class);
+        }
+        return transactionalProcessInstanceInterruptor;
     }
 
     @Override
@@ -632,6 +662,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public SDataInstanceBuilders getSDataInstanceBuilders() {
+        if (sDataInstanceBuilders == null) {
+            sDataInstanceBuilders = beanAccessor.getService(SDataInstanceBuilders.class);
+        }
+        return sDataInstanceBuilders;
+    }
+
+    @Override
     public DataService getDataService() {
         if (dataService == null) {
             dataService = beanAccessor.getService(DataService.class);
@@ -868,6 +906,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             workService = beanAccessor.getService(WorkService.class);
         }
         return workService;
+    }
+
+    @Override
+    public SACommentBuilder getSACommentBuilders() {
+        if (saCommentBuilder == null) {
+            saCommentBuilder = beanAccessor.getService(SACommentBuilder.class);
+        }
+        return saCommentBuilder;
     }
 
 }

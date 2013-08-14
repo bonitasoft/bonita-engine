@@ -65,7 +65,7 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
 
     @Override
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+            final SExpressionContext expressionContext) {
         return value;
     }
 

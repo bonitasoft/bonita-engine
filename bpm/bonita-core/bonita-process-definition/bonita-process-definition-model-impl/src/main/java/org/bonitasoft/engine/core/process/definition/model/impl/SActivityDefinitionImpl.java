@@ -29,7 +29,6 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBoundaryEventNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
@@ -61,10 +60,10 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
         super(id, name);
     }
 
-    public SActivityDefinitionImpl(final SFlowElementContainerDefinition parentContainer, final ActivityDefinition activityDefinition,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(parentContainer, activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SActivityDefinitionImpl(final ActivityDefinition activityDefinition, final SExpressionBuilders sExpressionBuilders,
+            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
+            final SOperationBuilders sOperationBuilders) {
+        super(activityDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
 
         final List<DataDefinition> dataDefinitions = activityDefinition.getDataDefinitions();
         for (final DataDefinition dataDefinition : dataDefinitions) {
@@ -91,7 +90,7 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
             final SOperationBuilders sOperationBuilders) {
         final List<BoundaryEventDefinition> boundaryEventDefinitions = activityDefinition.getBoundaryEventDefinitions();
         for (final BoundaryEventDefinition boundaryEventDefinition : boundaryEventDefinitions) {
-            addBoundaryEventDefinition(new SBoundaryEventDefinitionImpl(getParentContainer(), boundaryEventDefinition, sExpressionBuilders, transitionsMap,
+            addBoundaryEventDefinition(new SBoundaryEventDefinitionImpl(boundaryEventDefinition, sExpressionBuilders, transitionsMap,
                     sDataDefinitionBuilders, sOperationBuilders));
         }
     }

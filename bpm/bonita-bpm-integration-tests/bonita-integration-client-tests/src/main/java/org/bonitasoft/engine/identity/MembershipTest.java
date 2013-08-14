@@ -224,7 +224,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getNumberOfUserMembershipsByUserId() throws BonitaException {
+    public void getNumberOfUserMembershipsByUserId() {
         assertEquals(4, getIdentityAPI().getNumberOfUserMemberships(user1.getId()));
         assertEquals(1, getIdentityAPI().getNumberOfUserMemberships(user4.getId()));
     }
@@ -248,7 +248,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getUserMembershipsByRole() throws BonitaException {
+    public void getUserMembershipsByRole() {
         List<UserMembership> userMemberships = getIdentityAPI().getUserMembershipsByRole(role1.getId(), 0, 500);
         assertEquals(2, userMemberships.size());
 
@@ -263,7 +263,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getUserMembershipsByGroup() throws BonitaException {
+    public void getUserMembershipsByGroup() {
         List<UserMembership> userMemberships = getIdentityAPI().getUserMembershipsByGroup(group1.getId(), 0, 500);
         assertEquals(1, userMemberships.size());
         userMemberships = getIdentityAPI().getUserMembershipsByGroup(group3.getId(), 0, 500);
@@ -277,7 +277,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getUserMembershipsOrderByRoleNameAsc() throws BonitaException {
+    public void getUserMembershipsOrderByRoleNameAsc() {
         final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ROLE_NAME_ASC);
         assertEquals(3, userMemberships.size());
         assertEquals(role1.getName(), userMemberships.get(0).getRoleName());
@@ -286,7 +286,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getUserMembershipsOrderByRoleNameDesc() throws BonitaException {
+    public void getUserMembershipsOrderByRoleNameDesc() {
         final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ROLE_NAME_DESC);
         assertEquals(3, userMemberships.size());
         assertEquals(role4.getName(), userMemberships.get(0).getRoleName());
@@ -295,7 +295,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getUserMembershipsByGroupNameAsc() throws BonitaException {
+    public void getUserMembershipsByGroupNameAsc() {
         final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.GROUP_NAME_ASC);
         assertEquals(3, userMemberships.size());
         assertEquals(group1.getName(), userMemberships.get(0).getGroupName());
@@ -304,7 +304,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getUserMembershipsByGroupNameDesc() throws BonitaException {
+    public void getUserMembershipsByGroupNameDesc() {
         final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.GROUP_NAME_DESC);
         assertEquals(3, userMemberships.size());
         assertEquals(group4.getName(), userMemberships.get(0).getGroupName());
@@ -313,13 +313,13 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getAssignedBy() throws BonitaException {
+    public void getAssignedBy() {
         final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ASSIGNED_DATE_DESC);
         assertEquals(user1.getId(), userMemberships.get(0).getAssignedBy());
     }
 
     @Test
-    public void getUserMembershipsByAssignedDateAsc() throws BonitaException {
+    public void getUserMembershipsByAssignedDateAsc() {
         final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ASSIGNED_DATE_ASC);
         assertEquals(3, userMemberships.size());
         assertEquals(role1.getName(), userMemberships.get(0).getRoleName());
@@ -328,7 +328,7 @@ public class MembershipTest extends CommonAPITest {
     }
 
     @Test
-    public void getUserMembershipsByAssignedDateDesc() throws BonitaException {
+    public void getUserMembershipsByAssignedDateDesc() {
         final List<UserMembership> userMemberships = getIdentityAPI().getUserMemberships(user1.getId(), 0, 3, UserMembershipCriterion.ASSIGNED_DATE_DESC);
         assertEquals(3, userMemberships.size());
         assertEquals(role4.getName(), userMemberships.get(0).getRoleName());

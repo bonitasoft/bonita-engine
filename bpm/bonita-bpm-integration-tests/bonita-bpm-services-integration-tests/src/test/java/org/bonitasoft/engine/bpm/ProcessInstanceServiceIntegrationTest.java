@@ -9,12 +9,8 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -25,10 +21,8 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.transaction.SBadTransactionStateException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -72,7 +66,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
             transactionService.begin();
             List<SProcessInstance> processInstances = get100FirstProcessInstances();
             transactionService.complete();
-            
+
             while (processInstances.size() > 0) {
                 transactionService.begin();
                 for (final SProcessInstance sProcessInstance : processInstances) {
@@ -85,7 +79,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
                 processInstances = get100FirstProcessInstances();
                 transactionService.complete();
             }
-            
+
         } catch (final Exception e) {
             LOGGER.error("Error during clean-up. Ignoring...");
         }
@@ -96,9 +90,8 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     }
 
     @Test
-    public void getNumberOfProcessInstances() throws SProcessInstanceReadException, STransactionCreationException, SBadTransactionStateException,
-            FireEventException, STransactionCommitException, SProcessInstanceCreationException,
-            SProcessInstanceNotFoundException, SActivityReadException, SProcessInstanceModificationException, STransactionRollbackException, SBonitaSearchException {
+    public void getNumberOfProcessInstances() throws STransactionCreationException, STransactionCommitException, SProcessInstanceCreationException,
+            STransactionRollbackException, SBonitaSearchException {
         transactionService.begin();
         final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
         final long processDefinitionId = 123L;
@@ -327,8 +320,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     }
 
     private SProcessInstance createProcessInstanceInTransaction(final long process_definition_id, final String processName)
-            throws STransactionCreationException, SBadTransactionStateException, FireEventException, SProcessInstanceCreationException,
-            STransactionCommitException, STransactionRollbackException {
+            throws STransactionCreationException, SProcessInstanceCreationException, STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
         final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
 

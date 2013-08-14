@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfigurations;
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -41,7 +40,7 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
     }
 
     @Override
-    protected String getKeyFromCacheName(final String cacheName) throws CacheException {
+    protected String getKeyFromCacheName(final String cacheName) {
         return "P_" + cacheName;
     }
 

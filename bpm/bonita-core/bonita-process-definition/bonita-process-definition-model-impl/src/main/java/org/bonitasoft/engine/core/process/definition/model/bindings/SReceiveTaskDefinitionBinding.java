@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SReceiveTaskDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Julien Molinaro
@@ -37,7 +36,7 @@ public class SReceiveTaskDefinitionBinding extends SActivityDefinitionBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.CATCH_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
             catchMessageEventTriggerDefinition = (SCatchMessageEventTriggerDefinition) value;

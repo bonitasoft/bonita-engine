@@ -20,7 +20,6 @@ import org.bonitasoft.engine.profile.ExportedParentProfileEntryBuilder;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Zhao Na
@@ -31,12 +30,12 @@ public class ParentProfileEntryBinding extends ElementBinding {
     private ExportedParentProfileEntryBuilder parentProfileEntryBuilder = null;
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         parentProfileEntryBuilder = new ExportedParentProfileEntryBuilder(attributes.get("name"));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {
             parentProfileEntryBuilder.setDescription(value);
         } else if ("type".equals(name)) {
@@ -51,7 +50,7 @@ public class ParentProfileEntryBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if ("childrenEntries".equals(name)) {
             parentProfileEntryBuilder.setChildProfileEntries((List<ExportedProfileEntry>) value);
         }

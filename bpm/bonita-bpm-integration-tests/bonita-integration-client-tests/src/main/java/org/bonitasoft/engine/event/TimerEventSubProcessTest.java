@@ -146,7 +146,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity, TestStates.getNormalFinalState(null));
+        waitForArchivedActivity(eventSubProcessActivity, TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.getAbortedState());
 

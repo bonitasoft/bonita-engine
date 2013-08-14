@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.data.instance.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,7 +81,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
     public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         try {
             final String dataInstanceKey = getKey(dataInstance);
-            if (checkDataAlreadyExists(TRANSIENT_DATA_CACHE_NAME, dataInstanceKey)) {
+            if (checkDataAlreadyExists(dataInstanceKey)) {
                 handleDataAlreadyExists(dataInstance);
             }
             setId(dataInstance);
@@ -92,8 +91,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
         }
     }
 
-    private void setId(final SDataInstance dataInstance) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException, ReflectException {
+    private void setId(final SDataInstance dataInstance) throws SecurityException, IllegalArgumentException, ReflectException {
         // FIXME: probably the id will be be used, so not necessary to be set
         final long id = Math.abs(UUID.randomUUID().getMostSignificantBits());
         ClassReflector.invokeSetter(dataInstance, "setId", long.class, id);
@@ -109,7 +107,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
         throw new SCreateDataInstanceException(stb.toString());
     }
 
-    private boolean checkDataAlreadyExists(final String cacheName, final String dataInstanceKey) throws CacheException, SDataInstanceException {
+    private boolean checkDataAlreadyExists(final String dataInstanceKey) throws CacheException {
         final List<?> keys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
         return keys.contains(dataInstanceKey);
     }

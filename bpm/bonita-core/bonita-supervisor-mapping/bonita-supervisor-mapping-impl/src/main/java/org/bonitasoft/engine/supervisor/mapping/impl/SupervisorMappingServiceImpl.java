@@ -38,7 +38,6 @@ import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.supervisor.mapping.SSupervisorAlreadyExistsException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorCreationException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorDeletionException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorNotFoundException;
@@ -74,7 +73,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public SProcessSupervisor createSupervisor(final SProcessSupervisor supervisor) throws SSupervisorAlreadyExistsException, SSupervisorCreationException {
+    public SProcessSupervisor createSupervisor(final SProcessSupervisor supervisor) throws SSupervisorCreationException {
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new supervisor");
         final InsertRecord insertRecord = new InsertRecord(supervisor);
         SInsertEvent insertEvent = null;

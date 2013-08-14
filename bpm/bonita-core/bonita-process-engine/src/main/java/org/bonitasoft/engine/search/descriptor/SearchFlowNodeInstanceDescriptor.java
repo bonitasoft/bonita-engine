@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -34,7 +33,7 @@ public class SearchFlowNodeInstanceDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> flowNodeInstanceDescriptorAllFields;
 
-    public SearchFlowNodeInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders, final FlowNodeStateManager flowNodeStateManager) {
+    public SearchFlowNodeInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
         final SFlowNodeInstanceBuilder flowNodeKeyProvider = bpmInstanceBuilders.getSUserTaskInstanceBuilder();
         flowNodeInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(8);
         flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.NAME,

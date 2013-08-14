@@ -57,8 +57,7 @@ public class DataDefinitionBuilder extends FlowElementContainerBuilder implement
         this.dataDefinition = dataDefinition;
     }
 
-    private static DataDefinitionImpl getData(final ProcessDefinitionBuilder processDefinitionBuilder, final String name, final String className,
-            final Expression defaultValue) {
+    private static DataDefinitionImpl getData(final String name, final String className, final Expression defaultValue) {
         final DataDefinitionImpl data = new DataDefinitionImpl(name, defaultValue);
         data.setClassName(className);
         return data;
@@ -66,28 +65,28 @@ public class DataDefinitionBuilder extends FlowElementContainerBuilder implement
 
     public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final String name, final String className, final Expression defaultValue) {
-        this(processDefinitionBuilder, container, getData(processDefinitionBuilder, name, className, defaultValue));
+        this(processDefinitionBuilder, container, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
     }
 
     public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final ActivityDefinitionImpl activity, final String name, final String className, final Expression defaultValue) {
-        this(processDefinitionBuilder, container, activity, getData(processDefinitionBuilder, name, className, defaultValue));
+        this(processDefinitionBuilder, container, activity, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
     }
 
     public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final ThrowMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className, final Expression defaultValue) {
-        this(processDefinitionBuilder, container, messageEventTrigger, getData(processDefinitionBuilder, name, className, defaultValue));
+        this(processDefinitionBuilder, container, messageEventTrigger, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
     }
 
     public DataDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final CatchMessageEventTriggerDefinitionImpl messageEventTrigger, final String name, final String className, final Expression defaultValue) {
-        this(processDefinitionBuilder, container, messageEventTrigger, getData(processDefinitionBuilder, name, className, defaultValue));
+        this(processDefinitionBuilder, container, messageEventTrigger, getData(name, className, defaultValue));
         processDefinitionBuilder.checkExpression(toString(), defaultValue);
         processDefinitionBuilder.checkName(dataDefinition.getName());
     }

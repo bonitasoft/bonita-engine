@@ -59,7 +59,7 @@ public class ConnectorProcessDependencyResolver extends ProcessDependencyResolve
                     connectorService.getConnectorImplementation(processDefinition.getId(), sConnectorDefinition.getConnectorId(),
                             sConnectorDefinition.getVersion(), tenantId);
                 } catch (final SConnectorException e) {
-                    final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getId(), "connector", "The process connector '"
+                    final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getName(), "connector", "The process connector '"
                             + sConnectorDefinition.getName() + "' has no implementation");
                     problems.add(problem);
                 }
@@ -75,7 +75,7 @@ public class ConnectorProcessDependencyResolver extends ProcessDependencyResolve
                             connectorService.getConnectorImplementation(processDefinition.getId(), sConnectorDefinition.getConnectorId(),
                                     sConnectorDefinition.getVersion(), tenantId);
                         } catch (final SConnectorException e) {
-                            final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getId(), "connector", "The connector '"
+                            final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getName(), "connector", "The connector '"
                                     + sConnectorDefinition.getName() + "' of flow node '" + sFlowNodeDefinition.getName() + "' has no implementation");
                             problems.add(problem);
                         }

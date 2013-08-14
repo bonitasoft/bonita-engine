@@ -35,7 +35,6 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefiniti
 import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -65,17 +64,17 @@ public class SFlowElementBinding extends ElementBinding {
     private final List<SConnectorDefinition> connectors = new ArrayList<SConnectorDefinition>();
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
 
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
 
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLSProcessDefinition.AUTOMATIC_TASK_NODE.equals(name) || XMLSProcessDefinition.USER_TASK_NODE.equals(name)
                 || XMLSProcessDefinition.MANUAL_TASK_NODE.equals(name) || XMLSProcessDefinition.CALL_ACTIVITY_NODE.equals(name)
                 || XMLSProcessDefinition.RECEIVE_TASK_NODE.equals(name) || XMLSProcessDefinition.SUB_PROCESS.equals(name)

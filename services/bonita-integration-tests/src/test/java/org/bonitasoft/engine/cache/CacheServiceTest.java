@@ -16,8 +16,6 @@ import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,12 +49,12 @@ public class CacheServiceTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         LOGGER.info("Tested: {}", name.getMethodName());
         cacheService = null;
     }
 
-    protected CacheService getCacheService() throws CacheException {
+    protected CacheService getCacheService() {
         final List<CacheConfiguration> configurationsList = new ArrayList<CacheConfiguration>(2);
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName(SOME_DEFAULT_CACHE_NAME);
@@ -96,12 +94,12 @@ public class CacheServiceTest {
         }, new ReadSessionAccessor() {
 
             @Override
-            public long getTenantId() throws TenantIdNotSetException {
+            public long getTenantId() {
                 return 1;
             }
 
             @Override
-            public long getSessionId() throws SessionIdNotSetException {
+            public long getSessionId() {
                 return 1;
             }
         }, cacheConfigurations, this.getClass().getResource("/ehcache.xml"));

@@ -42,7 +42,6 @@ public class ListContainsMatcher extends BaseMatcher<List<?>> {
     public boolean matches(final Object item) {
         final List<?> list = (List<?>) item;
         try {
-            boolean match = true;
             if (names.size() != list.size()) {
                 return false;
             }

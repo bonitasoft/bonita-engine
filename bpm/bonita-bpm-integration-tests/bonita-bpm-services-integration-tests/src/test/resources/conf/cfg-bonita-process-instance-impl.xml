@@ -45,7 +45,6 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
-		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="tokenService" ref="tokenService" />

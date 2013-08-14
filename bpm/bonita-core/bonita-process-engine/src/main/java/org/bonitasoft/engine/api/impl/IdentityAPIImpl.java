@@ -62,7 +62,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -1203,8 +1202,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public UserMembership updateUserMembership(final long userMembershipId, final long newGroupId, final long newRoleId) throws MembershipNotFoundException,
-            UpdateException {
+    public UserMembership updateUserMembership(final long userMembershipId, final long newGroupId, final long newRoleId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final EntityUpdateDescriptor changeDescriptor = tenantAccessor.getIdentityModelBuilder().getUserMembershipUpdateBuilder().updateGroupId(newGroupId)
@@ -1381,7 +1379,6 @@ public class IdentityAPIImpl implements IdentityAPI {
         final SupervisorMappingService supervisorService = tenantAccessor.getSupervisorService();
         final ExternalIdentityMappingService externalIdentityMappingService = tenantAccessor.getExternalIdentityMappingService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final SCommentService commentService = tenantAccessor.getCommentService();
 
         final QueryOptions queryOptions = new QueryOptions(0, 1);
         try {

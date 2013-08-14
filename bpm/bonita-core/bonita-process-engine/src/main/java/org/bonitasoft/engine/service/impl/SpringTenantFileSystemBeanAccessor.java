@@ -16,9 +16,11 @@ package org.bonitasoft.engine.service.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
@@ -86,9 +88,20 @@ public class SpringTenantFileSystemBeanAccessor {
 
     public synchronized void initializeContext(final ClassLoader classLoader) {
         if (context == null) {// synchronized null check
+            // Inject the tenantId as a resolvable placeholder for the bean definitions.
+            Properties properties = new Properties();
+            properties.put("tenantId", String.valueOf(tenantId));
+
+            PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+            ppc.setProperties(properties);
+
             SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext platformContext = SpringPlatformFileSystemBeanAccessor.getContext();
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), true, platformContext);
+            // Delay the refresh so we can set our BeanFactoryPostProcessor to be able to resolve the placeholder.
+            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /*refresh*/, platformContext);
+            context.addBeanFactoryPostProcessor(ppc);
+
+            context.refresh();
         }
     }
 

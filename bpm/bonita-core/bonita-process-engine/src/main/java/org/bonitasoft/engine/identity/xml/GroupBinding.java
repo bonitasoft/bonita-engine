@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Yanyan Liu
@@ -32,7 +31,7 @@ public class GroupBinding extends ElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
         final String name = attributes.get(OrganizationMappingConstants.NAME);
         groupCreator = new GroupCreator(name);
         final String parentPath = attributes.get(OrganizationMappingConstants.PARENT_PATH);
@@ -40,7 +39,7 @@ public class GroupBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (OrganizationMappingConstants.DISPLAY_NAME.equals(name)) {
             groupCreator.setDisplayName(value);
         } else if (OrganizationMappingConstants.DESCRIPTION.equals(name)) {
@@ -53,7 +52,7 @@ public class GroupBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

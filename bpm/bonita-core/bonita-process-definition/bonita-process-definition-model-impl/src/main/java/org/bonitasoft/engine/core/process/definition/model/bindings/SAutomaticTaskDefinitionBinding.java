@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import org.bonitasoft.engine.core.process.definition.model.impl.SAutomaticTaskDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -35,7 +34,7 @@ public class SAutomaticTaskDefinitionBinding extends SActivityDefinitionBinding 
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) {
         super.setChildObject(name, value);
     }
 

@@ -16,8 +16,6 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.io.xml.XMLParseException;
-
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
@@ -25,11 +23,11 @@ import org.bonitasoft.engine.io.xml.XMLParseException;
 public class ActorInitiatorDefinitionBinding extends NamedElementBinding {
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
     }
 
     @Override

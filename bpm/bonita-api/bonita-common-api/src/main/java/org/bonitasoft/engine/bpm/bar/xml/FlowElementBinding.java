@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImp
 import org.bonitasoft.engine.bpm.flownode.impl.FlowNodeDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.TransitionDefinitionImpl;
 import org.bonitasoft.engine.io.xml.ElementBinding;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
@@ -60,7 +59,7 @@ public class FlowElementBinding extends ElementBinding {
     private final List<ConnectorDefinition> connectors = new ArrayList<ConnectorDefinition>();
 
     @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
+    public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.AUTOMATIC_TASK_NODE.equals(name) || XMLProcessDefinition.USER_TASK_NODE.equals(name)
                 || XMLProcessDefinition.MANUAL_TASK_NODE.equals(name) || XMLProcessDefinition.CALL_ACTIVITY_NODE.equals(name)
                 || XMLProcessDefinition.SUB_PROCESS.equals(name) || XMLProcessDefinition.RECEIVE_TASK_NODE.equals(name)
@@ -172,12 +171,12 @@ public class FlowElementBinding extends ElementBinding {
     }
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws XMLParseException {
+    public void setAttributes(final Map<String, String> attributes) {
 
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
 
     }
 

@@ -28,7 +28,7 @@ public class CountAnswer implements Answer<Void> {
     }
 
     @Override
-    public Void answer(final InvocationOnMock invocation) throws Throwable {
+    public Void answer(final InvocationOnMock invocation) {
         count++;
         return null;
     }

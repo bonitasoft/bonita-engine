@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -17,7 +16,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -175,7 +173,6 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionService transactionService = tenantAccessor.getTransactionService();
         final SCommentService commentService = tenantAccessor.getCommentService();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
         logout();
         loginWith("john", "bpm");
         final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
@@ -240,7 +237,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final ActivityInstance userTask = waitForUserTask("step1", p1);
         assignAndExecuteStep(userTask, john.getId());
         waitForProcessToFinish(p1);
-        waitForArchivedActivity(userTask.getId(), TestStates.getNormalFinalState(userTask));
+        waitForArchivedActivity(userTask.getId(), TestStates.getNormalFinalState());
         final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
         assertEquals("My Description", archivedUserTask.getDescription());
         assertEquals("My Display Description", archivedUserTask.getDisplayDescription());

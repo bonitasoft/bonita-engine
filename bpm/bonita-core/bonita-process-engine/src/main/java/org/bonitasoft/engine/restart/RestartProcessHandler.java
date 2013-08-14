@@ -32,7 +32,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.WorkRegisterException;
 
 /**
  * @author Baptiste Mesta
@@ -72,16 +71,14 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_FINISH, connectorService);
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
-        } catch (final WorkRegisterException e) {
-            handleException(e, "Unable to restart flowNodes: can't register work");
         } catch (final SProcessInstanceReadException e) {
-            handleException(e, "Unable to restart flowNodes: can't read process instances");
+            handleException(e, "Unable to restart process: can't read process instances");
         } catch (final SProcessDefinitionNotFoundException e) {
-            handleException(e, "Unable to restart flowNodes: can't find process definition");
+            handleException(e, "Unable to restart process: can't find process definition");
         } catch (final SProcessDefinitionReadException e) {
-            handleException(e, "Unable to restart flowNodes: can't read process definition");
+            handleException(e, "Unable to restart process: can't read process definition");
         } catch (final SBonitaException e) {
-            handleException(e, "Unable to restart flowNodes: can't execute connectors");
+            handleException(e, "Unable to restart process: can't execute connectors");
         }
 
     }

@@ -27,7 +27,6 @@ import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.dependency.ArtifactAccessor;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
@@ -131,7 +130,7 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public void createDependency(final SDependency dependency) throws SDependencyAlreadyExistsException, SDependencyCreationException {
+    public void createDependency(final SDependency dependency) throws SDependencyCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createDependency"));
         }

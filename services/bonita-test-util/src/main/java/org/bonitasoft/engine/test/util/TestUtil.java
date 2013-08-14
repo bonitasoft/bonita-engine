@@ -25,7 +25,6 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
-import org.bonitasoft.engine.transaction.SBadTransactionStateException;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
@@ -73,8 +72,7 @@ public class TestUtil {
     }
 
     // This method should disappear as well, with the Transaction refactoring.
-    public static void closeTransactionIfOpen(final TransactionService txService) throws SBadTransactionStateException, FireEventException,
-            STransactionException {
+    public static void closeTransactionIfOpen(final TransactionService txService) throws STransactionException {
         final TransactionState txState = txService.getState();
         if (txState == TransactionState.ROLLBACKONLY || txState == TransactionState.ACTIVE) {
             txService.complete();
@@ -86,7 +84,7 @@ public class TestUtil {
             final SessionService sessionService) throws Exception {
         PlatformUtil.createPlatform(txService, platformService, platformBuilder);
         final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService, tenantBuilder);
-        final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME, -1);
+        final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
         sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);
         return defaultTenantId;
     }
@@ -105,7 +103,7 @@ public class TestUtil {
             PlatformUtil.createPlatform(txService, platformService, platformBuilder);
         }
         final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService, tenantBuilder);
-        final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME, -1);
+        final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
         sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);
         return defaultTenantId;
     }
@@ -120,7 +118,7 @@ public class TestUtil {
     }
 
     public static SSession createSession(final TransactionService txService, final SessionService sessionService, final long defaultTenantId,
-            final String username, final long userId) throws SBonitaException {
+            final String username) throws SBonitaException {
         txService.begin();
         final SSession session = sessionService.createSession(defaultTenantId, username);
         txService.complete();
