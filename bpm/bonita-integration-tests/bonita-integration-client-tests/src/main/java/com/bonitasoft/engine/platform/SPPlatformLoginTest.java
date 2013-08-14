@@ -8,11 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.platform;
 
+import static org.junit.Assert.fail;
+
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
@@ -29,8 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
-import static org.junit.Assert.fail;
-
 @SuppressWarnings("javadoc")
 public class SPPlatformLoginTest {
 
@@ -46,7 +43,7 @@ public class SPPlatformLoginTest {
         logAsPlatformAdmin();
     }
 
-    private static void logAsPlatformAdmin() throws PlatformLoginException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    private static void logAsPlatformAdmin() throws PlatformLoginException {
         session = platformLoginAPI.login("platformAdmin", "platform");
     }
 

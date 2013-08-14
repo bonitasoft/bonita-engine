@@ -140,8 +140,8 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         return getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS);
     }
 
-    private ProcessDefinition createProcessAndInsertParameterAndDeployIt(final String processName, final String version, final String taskName,
-            final String parameterName, final String parameterValue) throws Exception {
+    private ProcessDefinition createProcessAndInsertParameterAndDeployIt(final String processName, final String version, final String parameterName,
+            final String parameterValue) throws Exception {
         // create process Definition
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(processName, version);
         // processBuilder.addParameter(parameterName, String.class.getCanonicalName()).addUserTask(taskName, null);
@@ -164,7 +164,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     @Test
     public void evaluateParameterExpression() throws Exception {
         final String nameParameter = "name";
-        final ProcessDefinition deploy = createProcessAndInsertParameterAndDeployIt("firstProcess", "1.0", "userTask1", nameParameter, "baptiste");
+        final ProcessDefinition deploy = createProcessAndInsertParameterAndDeployIt("firstProcess", "1.0", nameParameter, "baptiste");
         final Long deployId = deploy.getId();
         // create expression
         // check
@@ -175,7 +175,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     @Test(expected = SExpressionEvaluationException.class)
     public void evaluateExpressionWithAnUnknownParameter() throws Exception {
         final String nameParameter = "name";
-        final ProcessDefinition deploy = createProcessAndInsertParameterAndDeployIt("firstProcess", "1.0", "userTask1", nameParameter, "baptiste");
+        final ProcessDefinition deploy = createProcessAndInsertParameterAndDeployIt("firstProcess", "1.0", nameParameter, "baptiste");
         final Long deployId = deploy.getId();
 
         try {

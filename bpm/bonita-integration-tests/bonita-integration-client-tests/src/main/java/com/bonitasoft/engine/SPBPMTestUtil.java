@@ -38,7 +38,6 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
-import com.bonitasoft.engine.platform.TenantNotActivatedException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -221,7 +220,7 @@ public class SPBPMTestUtil {
     }
 
     public static APISession loginTenant(final String userName, final String password, final long tenantId) throws LoginException, BonitaHomeNotSetException,
-            ServerAPIException, UnknownAPITypeException, TenantNotActivatedException {
+            ServerAPIException, UnknownAPITypeException {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         final APISession session = loginAPI.login(tenantId, userName, password);
         return session;

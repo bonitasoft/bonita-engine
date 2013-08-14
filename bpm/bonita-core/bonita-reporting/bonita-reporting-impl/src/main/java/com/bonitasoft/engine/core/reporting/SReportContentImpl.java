@@ -17,6 +17,8 @@ import java.util.Arrays;
  */
 public class SReportContentImpl implements SReportContent {
 
+    private static final long serialVersionUID = 8144409961053736328L;
+
     private long tenantId;
 
     private long id;

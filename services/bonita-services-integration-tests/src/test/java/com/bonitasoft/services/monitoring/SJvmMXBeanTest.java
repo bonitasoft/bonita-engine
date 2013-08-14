@@ -13,13 +13,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
-import org.bonitasoft.engine.identity.SIdentityException;
-import org.bonitasoft.engine.transaction.SBadTransactionStateException;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -80,9 +74,8 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void systemLoadAverageTest() throws STransactionCreationException, SIdentityException, HandlerRegistrationException, SBadTransactionStateException,
-            FireEventException, STransactionCommitException, MBeanStartException, HandlerUnregistrationException,
-            MBeanStopException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
+    public void systemLoadAverageTest() throws MBeanStartException, HandlerUnregistrationException, MBeanStopException, AttributeNotFoundException,
+            InstanceNotFoundException, MBeanException, ReflectionException {
         final SJvmMXBean jvmMXB = getJvmMXBean();
         jvmMXB.start();
 
@@ -98,9 +91,8 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void uptimeTest() throws STransactionCreationException, SIdentityException, HandlerRegistrationException, SBadTransactionStateException,
-            FireEventException, STransactionCommitException, MBeanStartException, InterruptedException,
-            HandlerUnregistrationException, MBeanStopException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
+    public void uptimeTest() throws MBeanStartException, InterruptedException, HandlerUnregistrationException, MBeanStopException, AttributeNotFoundException,
+            InstanceNotFoundException, MBeanException, ReflectionException {
         final SJvmMXBean jvmMXB = getJvmMXBean();
         jvmMXB.start();
         final long uptime1 = (Long) mbserver.getAttribute(jvmMB, "UpTime");
@@ -111,9 +103,8 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void memoryUsageTest() throws STransactionCreationException, SIdentityException, HandlerRegistrationException, SBadTransactionStateException,
-            FireEventException, STransactionCommitException, MBeanStartException, HandlerUnregistrationException,
-            MBeanStopException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
+    public void memoryUsageTest() throws MBeanStartException, HandlerUnregistrationException, MBeanStopException, AttributeNotFoundException,
+            InstanceNotFoundException, MBeanException, ReflectionException {
         final SJvmMXBean jvmMXB = getJvmMXBean();
         jvmMXB.start();
         final long normalMemUsage = (Long) mbserver.getAttribute(jvmMB, "MemoryUsage");
@@ -129,8 +120,7 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
 
     @Test
     public void startTimeTest() throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, InterruptedException,
-            HandlerUnregistrationException, MBeanStopException, STransactionCreationException, SIdentityException, HandlerRegistrationException,
-            SBadTransactionStateException, FireEventException, STransactionCommitException, MBeanStartException {
+            HandlerUnregistrationException, MBeanStopException, MBeanStartException {
         final SJvmMXBean jvmMXB = getJvmMXBean();
         jvmMXB.start();
         final long startTime1 = (Long) mbserver.getAttribute(jvmMB, "StartTime");
@@ -141,9 +131,8 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void totalThreadCpuTimeTest() throws STransactionCreationException, SIdentityException, HandlerRegistrationException, SBadTransactionStateException,
-            FireEventException, STransactionCommitException, MBeanStartException, HandlerUnregistrationException,
-            MBeanStopException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
+    public void totalThreadCpuTimeTest() throws MBeanStartException, HandlerUnregistrationException, MBeanStopException, AttributeNotFoundException,
+            InstanceNotFoundException, MBeanException, ReflectionException {
         final SJvmMXBean jvmMXB = getJvmMXBean();
         jvmMXB.start();
         final long cpuTime1 = (Long) mbserver.getAttribute(jvmMB, "TotalThreadsCpuTime");
@@ -159,9 +148,8 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void threadCountTest() throws STransactionCreationException, SIdentityException, HandlerRegistrationException, SBadTransactionStateException,
-            FireEventException, STransactionCommitException, MBeanStartException, HandlerUnregistrationException,
-            MBeanStopException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, InterruptedException {
+    public void threadCountTest() throws MBeanStartException, HandlerUnregistrationException, MBeanStopException, AttributeNotFoundException,
+            InstanceNotFoundException, MBeanException, ReflectionException, InterruptedException {
         final SJvmMXBean jvmMXB = getJvmMXBean();
         jvmMXB.start();
         final int threadNumber1 = (Integer) mbserver.getAttribute(jvmMB, "ThreadCount");

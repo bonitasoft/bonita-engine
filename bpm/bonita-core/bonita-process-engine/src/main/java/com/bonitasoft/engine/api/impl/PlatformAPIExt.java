@@ -264,7 +264,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = tenantServiceAccessor.getCommandService();
-            Callable<Long> createTenant = new Callable<Long>() {
+            Callable<Long> initializeTenant = new Callable<Long>() {
 
                 @Override
                 public Long call() throws Exception {
@@ -286,7 +286,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     }
                 }
             };
-            return transactionService.executeInTransaction(createTenant);
+            return transactionService.executeInTransaction(initializeTenant);
         } catch (final Exception e) {
             throw new CreationException("Unable to create tenant " + tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.NAME), e);
         }
@@ -318,7 +318,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Get the binary content of a report, from its name.
-     * 
+     *
      * @param reportFolder
      *            the folder where to look.
      * @param reportName
@@ -331,7 +331,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final File[] fileContents = new File(reportFolder).listFiles(new FilenameFilter() {
 
             @Override
-            public boolean accept(@SuppressWarnings("unused") final File dir, final String name) {
+            public boolean accept(final File dir, final String name) {
                 return name.startsWith(reportName + "-content");
             }
         });
@@ -344,7 +344,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Get the binary screenshot of a report, from its name.
-     * 
+     *
      * @param reportFolder
      *            the folder where to look.
      * @param reportName
@@ -357,7 +357,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final File[] filescreenshots = new File(reportFolder).listFiles(new FilenameFilter() {
 
             @Override
-            public boolean accept(@SuppressWarnings("unused") final File dir, final String name) {
+            public boolean accept(final File dir, final String name) {
                 return name.startsWith(reportName + "-screenshot");
             }
         });

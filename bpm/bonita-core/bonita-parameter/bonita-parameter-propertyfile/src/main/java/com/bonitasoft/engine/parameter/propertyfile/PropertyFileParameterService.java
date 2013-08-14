@@ -270,7 +270,7 @@ public class PropertyFileParameterService implements ParameterService {
     }
 
     private List<SParameter> getParameters(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order,
-            final boolean onlyNulls) throws SParameterProcessNotFoundException, SOutOfBoundException {
+            final boolean onlyNulls) throws SParameterProcessNotFoundException {
         try {
             final String filePath = getFilePath(processDefinitionId);
             final List<SParameter> orderedParameters = getOrderedParameters(filePath, order, onlyNulls);

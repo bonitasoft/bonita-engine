@@ -82,7 +82,7 @@ public class LogTest extends CommonAPISPTest {
     }
 
     @Test
-    public void testLogsPageOutOfRangException() throws BonitaException {
+    public void testLogsPageOutOfRangException() {
         final List<Log> logs = getLogAPI().getLogs(getLogAPI().getNumberOfLogs() * 2, 10, LogCriterion.DEFAULT);
         assertTrue(logs.isEmpty());
     }
@@ -215,7 +215,7 @@ public class LogTest extends CommonAPISPTest {
     }
 
     @Test
-    public void testDontLogJobExecution() throws BonitaException {
+    public void testDontLogJobExecution() {
         final List<Log> logs = getLogAPI().getLogs(0, getLogAPI().getNumberOfLogs(), LogCriterion.CREATED_BY_DESC);
         assertFalse(contains(logs, "JOB_EXECUTED", 1));
     }

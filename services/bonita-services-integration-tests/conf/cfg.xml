@@ -20,12 +20,6 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="recorderAsync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-	</bean>
-
 	<bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
 
 	<bean id="xmlParser" class="org.bonitasoft.engine.xml.parse.SAXParser">
