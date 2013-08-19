@@ -75,13 +75,15 @@ public abstract class AbstractConnector implements Connector {
         return getOutputParameters();
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void connect() {
+    public void connect() throws ConnectorException {
         // default implementation do nothing
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void disconnect() {
+    public void disconnect() throws ConnectorException {
         // default implementation do nothing
     }
 
