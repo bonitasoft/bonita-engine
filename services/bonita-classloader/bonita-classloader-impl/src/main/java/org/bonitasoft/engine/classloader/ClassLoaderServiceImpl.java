@@ -33,6 +33,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
+	private final ParentClassLoaderResolver parentClassLoaderResolver;
+	
     private final TechnicalLoggerService logger;
 
     private final String temporaryFolder;
@@ -51,8 +53,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private static final String LOCAL_FOLDER = "local";
 
-    public ClassLoaderServiceImpl(final String temporaryFolder, final TechnicalLoggerService logger) {
-        this.logger = logger;
+    public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
+        this.parentClassLoaderResolver = parentClassLoaderResolver;
+    	this.logger = logger;
         if (temporaryFolder.startsWith("${") && temporaryFolder.contains("}")) {
             final Pattern pattern = Pattern.compile("^(.*)\\$\\{(.*)\\}(.*)$");
             final Matcher matcher = pattern.matcher(temporaryFolder);
@@ -106,7 +109,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final String key = getKey(type, id);
         final VirtualClassLoader classLoader = this.localClassLoaders.get(key);
         if (classLoader == null) {
-            final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, getGlobalClassLoader());
+            final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(this.parentClassLoaderResolver, this, type, id));
             this.localClassLoaders.put(key, virtualClassLoader);
         }
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {

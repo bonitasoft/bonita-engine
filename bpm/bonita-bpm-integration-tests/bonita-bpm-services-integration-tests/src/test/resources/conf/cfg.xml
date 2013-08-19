@@ -52,7 +52,12 @@
 		</constructor-arg>
 	</bean>
 
+    <bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
+      <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
+    
     <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
+        <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
         <constructor-arg name="temporaryFolder" value="${java.io.tmpdir}/bos-engine" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
