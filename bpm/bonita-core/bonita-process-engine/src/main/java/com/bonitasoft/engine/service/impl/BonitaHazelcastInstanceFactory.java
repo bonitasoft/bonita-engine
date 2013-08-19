@@ -48,12 +48,10 @@ public class BonitaHazelcastInstanceFactory {
                 config.addMapConfig(mapConfig);
             }
             hazelCastInstance = Hazelcast.newHazelcastInstance(config);
-        } else {
-            throw new IllegalStateException("The hazelcast instance already exists");
         }
         return hazelCastInstance;
     }
-    
+
     public static synchronized HazelcastInstance getInstance() {
         if (hazelCastInstance != null) {
             return hazelCastInstance;
