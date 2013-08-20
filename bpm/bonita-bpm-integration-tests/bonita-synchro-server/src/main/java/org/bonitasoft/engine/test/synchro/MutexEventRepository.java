@@ -51,12 +51,12 @@ public class MutexEventRepository implements EventRepository {
     @Override
     public void fireEvent(final Map<String, Serializable> event, final Long id) {
         synchronized (mutex) {
-            final SynchroObject synchroObject = getWaiterAndRemoveIt(event);
-            if (synchroObject == null) {
+            final SynchroObject waiter = getWaiterAndRemoveIt(event);
+            if (waiter == null) {
                 fired.put(event, id);
             } else {
-                synchroObject.setId(id);
-                synchroObject.release();
+                waiter.setId(id);
+                waiter.release();
             }
         }
     }
@@ -100,27 +100,27 @@ public class MutexEventRepository implements EventRepository {
 
     @Override
     public Long waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
-        SynchroObject synchroObject = null;
+        SynchroObject waiter = null;
         Long id = null;
         synchronized (mutex) {
             final Entry<Map<String, Serializable>, Long> entry = getFiredAndRemoveIt(event);
             if (entry != null) {
                 id = entry.getValue();
             } else {
-                synchroObject = new SynchroObject();
-                synchroObject.acquire(1);
-                waiters.put(event, synchroObject);
+                waiter = new SynchroObject();
+                waiter.acquire(1);
+                waiters.put(event, waiter);
             }
         }
-        if (synchroObject != null) {
+        if (waiter != null) {
             try {
-                if (!synchroObject.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+                if (!waiter.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
                     throwTimeout(event, timeout);
                 }
             } catch (final InterruptedException e) {
                 throwTimeout(event, timeout);
             }
-            return synchroObject.getObjectId();
+            return waiter.getObjectId();
         } else {
             return id;
         }
