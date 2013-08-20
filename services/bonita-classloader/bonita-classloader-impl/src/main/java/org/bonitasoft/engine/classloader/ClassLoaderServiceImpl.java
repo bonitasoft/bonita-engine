@@ -109,7 +109,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final String key = getKey(type, id);
         final VirtualClassLoader classLoader = this.localClassLoaders.get(key);
         if (classLoader == null) {
-            final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(this.parentClassLoaderResolver, this, type, id));
+            final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(getGlobalClassLoader(), this.parentClassLoaderResolver, this, type, id));
             this.localClassLoaders.put(key, virtualClassLoader);
         }
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {

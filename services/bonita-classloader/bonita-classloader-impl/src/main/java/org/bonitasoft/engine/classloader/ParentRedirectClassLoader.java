@@ -9,7 +9,8 @@ public class ParentRedirectClassLoader extends ClassLoader {
 	private final String childClassLoaderType;
 	private final long childClassLoaderId;
 
-	public ParentRedirectClassLoader(final ParentClassLoaderResolver parentClassLoaderResolver, final ClassLoaderService classLoaderService, final String childClassLoaderType, final long childClassLoaderId) {
+	public ParentRedirectClassLoader(final ClassLoader globalClassLoader, final ParentClassLoaderResolver parentClassLoaderResolver, final ClassLoaderService classLoaderService, final String childClassLoaderType, final long childClassLoaderId) {
+		super(globalClassLoader);
 		this.parentClassLoaderResolver = parentClassLoaderResolver;
 		this.classLoaderService = classLoaderService;
 		this.childClassLoaderType = childClassLoaderType;
