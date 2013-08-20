@@ -213,8 +213,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             long processDefinitionId = 0;
             try {
                 sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-                processDefinitionId = sFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder()
-                        .getProcessDefinitionIndex());
+                processDefinitionId = sFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder().getProcessDefinitionIndex());
                 final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
                 Thread.currentThread().setContextClassLoader(localClassLoader);
 
@@ -295,7 +294,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         setInFailedThread.start();
         final StringBuilder msg = new StringBuilder("Flownode with id " + fFlowNodeInstance + " named '" + setInFailedThread.getFlowNodeInstanceName()
                 + "' on process instance with id " + setInFailedThread.getParentFlowNodeInstanceId() + " has failed: " + sbe.getMessage());
-        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, msg.toString());
+        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, msg.toString(), sbe);
 
         try {
             setInFailedThread.join(setInFailThreadTimeout);

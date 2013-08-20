@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.recorder.impl;
 
+import java.util.List;
+
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.FireEventException;
@@ -57,9 +59,11 @@ public class RecorderImpl implements Recorder {
 
         traceBeforeMethod(methodName);
         try {
-            this.persistenceService.insert(record.getEntity());
+            persistenceService.insert(record.getEntity());
             fireEvent(insertEvent);
             traceAfterMethod(methodName);
+        } catch (final FireEventException e) {
+            logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
             throw new SRecorderException(e);
@@ -72,9 +76,11 @@ public class RecorderImpl implements Recorder {
 
         traceBeforeMethod(methodName);
         try {
-            this.persistenceService.insertInBatch(record.getEntity());
+            persistenceService.insertInBatch(record.getEntity());
             fireEvent(insertEvent);
             traceAfterMethod(methodName);
+        } catch (final FireEventException e) {
+            logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
             throw new SRecorderException(e);
@@ -87,9 +93,11 @@ public class RecorderImpl implements Recorder {
 
         traceBeforeMethod(methodName);
         try {
-            this.persistenceService.delete(record.getEntity());
+            persistenceService.delete(record.getEntity());
             fireEvent(deleteEvent);
             traceAfterMethod(methodName);
+        } catch (final FireEventException e) {
+            logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
             throw new SRecorderException(e);
@@ -117,9 +125,11 @@ public class RecorderImpl implements Recorder {
         traceBeforeMethod(methodName);
         final UpdateDescriptor desc = UpdateDescriptor.buildSetFields(record.getEntity(), record.getFields());
         try {
-            this.persistenceService.update(desc);
+            persistenceService.update(desc);
             fireEvent(updateEvent);
             traceAfterMethod(methodName);
+        } catch (final FireEventException e) {
+            logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
             // FIXME what to do if some handlers fail?
@@ -127,33 +137,41 @@ public class RecorderImpl implements Recorder {
         }
     }
 
-    private void fireEvent(SEvent evt) throws FireEventException {
+    protected void logFireEventExceptionAndThrowSRecorderException(final FireEventException e, String methodName) throws SRecorderException {
+        final List<Exception> handlerExceptions = e.getHandlerExceptions();
+        for (Exception exception : handlerExceptions) {
+            traceException(methodName, exception);
+        }
+        throw new SRecorderException(e);
+    }
+
+    private void fireEvent(final SEvent evt) throws FireEventException {
         if (evt != null) {
-            this.eventService.fireEvent(evt);
+            eventService.fireEvent(evt);
         }
     }
 
     private boolean isTraceLoggable() {
-        return this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
+        return logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
     }
 
-    private void logTrace(String text) {
-        this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, text);
+    private void logTrace(final String text) {
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, text);
     }
 
-    private void traceException(String methodName, final Exception e) {
+    private void traceException(final String methodName, final Exception e) {
         if (isTraceLoggable()) {
             logTrace(LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
         }
     }
 
-    private void traceAfterMethod(String methodName) {
+    private void traceAfterMethod(final String methodName) {
         if (isTraceLoggable()) {
             logTrace(LogUtil.getLogAfterMethod(this.getClass(), methodName));
         }
     }
 
-    private void traceBeforeMethod(String methodName) {
+    private void traceBeforeMethod(final String methodName) {
         if (isTraceLoggable()) {
             logTrace(LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
