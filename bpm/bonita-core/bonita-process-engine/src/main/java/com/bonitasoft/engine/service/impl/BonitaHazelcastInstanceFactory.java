@@ -20,7 +20,9 @@ import org.bonitasoft.engine.cache.CacheConfigurations;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MapConfig.EvictionPolicy;
 import com.hazelcast.config.MaxSizeConfig;
+import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -40,13 +42,15 @@ public class BonitaHazelcastInstanceFactory {
                 final MapConfig mapConfig = new MapConfig("*" + cache.getName());
                 mapConfig.setTimeToLiveSeconds(cacheConfiguration.isEternal() ? 0 : new Long(cacheConfiguration.getTimeToLiveSeconds()).intValue());
                 final MaxSizeConfig maxSizeConfig = new MaxSizeConfig();
-                maxSizeConfig.setMaxSizePolicy("cluster_wide_map_size");
+                maxSizeConfig.setMaxSizePolicy(MaxSizePolicy.PER_PARTITION);
                 maxSizeConfig.setSize(cacheConfiguration.getMaxElementsInMemory());
                 mapConfig.setMaxSizeConfig(maxSizeConfig);
                 // can be: NONE (no eviction), LRU (Least Recently Used), LFU (Least Frequently Used). NONE is the default
-                mapConfig.setEvictionPolicy(cacheConfiguration.getEvictionPolicy());
+                mapConfig.setEvictionPolicy(EvictionPolicy.valueOf(cacheConfiguration.getEvictionPolicy()));
                 config.addMapConfig(mapConfig);
             }
+            // set classloader to null in order to use the context classloader instead
+            config.setClassLoader(null);
             hazelCastInstance = Hazelcast.newHazelcastInstance(config);
         }
         return hazelCastInstance;

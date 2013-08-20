@@ -11,9 +11,9 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 import com.bonitasoft.manager.Manager;
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.Instance;
-import com.hazelcast.core.Prefix;
+import com.hazelcast.core.IMap;
 
 public class ClusteredCacheService extends CommonClusteredCacheService implements CacheService {
 
@@ -45,15 +45,14 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
 
     @Override
     public List<String> getCachesNames() {
-        final Collection<Instance> instances = hazelcastInstance.getInstances();
-        final ArrayList<String> cacheNamesList = new ArrayList<String>(instances.size());
+        final Collection<DistributedObject> distributedObjects = hazelcastInstance.getDistributedObjects();
+        final ArrayList<String> cacheNamesList = new ArrayList<String>(distributedObjects.size());
 
         try {
-            // Hazelcast Maps are internally named with a prefix
-            final String prefix = Prefix.MAP + String.valueOf(sessionAccessor.getTenantId()) + '_';
-            for (final Instance instance : instances) {
-                if (instance.getInstanceType().isMap() && ((String) instance.getId()).startsWith(prefix)) {
-                    cacheNamesList.add(getCacheNameFromKey(((String) instance.getId()).substring(Prefix.MAP.length())));
+            final String prefix = String.valueOf(sessionAccessor.getTenantId()) + '_';
+            for (final DistributedObject instance : distributedObjects) {
+                if (instance instanceof IMap<?, ?> && instance.getName().startsWith(prefix)) {
+                    cacheNamesList.add(getCacheNameFromKey(instance.getName()));
                 }
             }
 

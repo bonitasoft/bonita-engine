@@ -15,7 +15,7 @@
 				<property name="networkConfig">
 					<bean class="com.hazelcast.config.NetworkConfig">
 						<property name="join">
-							<bean class="com.hazelcast.config.Join">
+							<bean class="com.hazelcast.config.JoinConfig">
 								<property name="multicastConfig">
 									<bean class="com.hazelcast.config.MulticastConfig">
 										<property name="enabled" value="true" />
@@ -26,7 +26,7 @@
 							</bean>
 						</property>
 						<property name="interfaces">
-							<bean class="com.hazelcast.config.Interfaces">
+							<bean class="com.hazelcast.config.InterfacesConfig">
 								<property name="interfaces">
 									<list>
 										<value>127.0.0.1</value>
@@ -36,6 +36,18 @@
 						</property>
 					</bean>
 				</property>
+<!-- 				<property name="serializationConfig"> -->
+<!-- 					<bean class="com.hazelcast.config.SerializationConfig"> -->
+<!-- 						<property name="serializerConfigs"> -->
+<!-- 						<list> -->
+<!-- 							<bean class="com.hazelcast.config.SerializerConfig"> -->
+<!-- 								<property name="className" value="com.bonitasoft.engine.classloader.BonitaSerializer"/> -->
+<!-- 								<property name="typeClassName" value="org.bonitasoft.engine.commons.BonitaSerializable"/> -->
+<!-- 							</bean> -->
+<!-- 						</list> -->
+<!-- 						</property> -->
+<!-- 					</bean> -->
+<!-- 				</property> -->
 			</bean>
 		</constructor-arg>
 		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations"/>

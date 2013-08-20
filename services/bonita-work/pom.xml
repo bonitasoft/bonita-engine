@@ -13,5 +13,6 @@
 
 	<modules>
 		<module>bonita-work-parallel</module>
+		<module>bonita-work-clustered</module>
 	</modules>
 </project>

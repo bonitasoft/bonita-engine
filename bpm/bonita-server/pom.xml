@@ -736,7 +736,7 @@
 		<!-- add hazel cast here because hibernate cache use it by configuration -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-hibernate</artifactId>
+			<artifactId>hazelcast-hibernate3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>

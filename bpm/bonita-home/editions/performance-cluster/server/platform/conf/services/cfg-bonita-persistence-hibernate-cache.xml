@@ -10,9 +10,9 @@
 				<prop key="hibernate.cache.use_minimal_puts">true</prop>
 <!-- 				name of the default instance used by bonita, it's configuration is set using cfg-bonita-clustering.xml -->
 				<prop key="hibernate.cache.hazelcast.instance_name">bonita</prop>
-				<prop key="hibernate.cache.provider_class">com.hazelcast.hibernate.provider.HazelcastCacheProvider</prop>
+<!-- 				<prop key="hibernate.cache.provider_class">com.hazelcast.hibernate.provider.HazelcastCacheProvider</prop> -->
 <!-- 				<prop key="hibernate.cache.region.factory_class">com.hazelcast.hibernate.HazelcastCacheRegionFactory</prop> -->
-<!-- 				<prop key="hibernate.cache.region.factory_class">com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory</prop> -->
+				<prop key="hibernate.cache.region.factory_class">com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory</prop>
 			</props>
 		</property>
 	</bean>
