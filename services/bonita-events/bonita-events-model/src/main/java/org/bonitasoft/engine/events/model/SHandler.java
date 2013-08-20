@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-import java.io.Serializable;
+import org.bonitasoft.engine.commons.BonitaSerializable;
 
 /**
  * @author Christophe Havard
  * @author Matthieu Chaffotte
  */
-public interface SHandler<T extends SEvent> extends Serializable {
+public interface SHandler<T extends SEvent> extends BonitaSerializable {
 
     /**
      * Performs the action corresponding to the given Event
