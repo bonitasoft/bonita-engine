@@ -34,6 +34,8 @@ public class MutexEventRepository implements EventRepository {
 
     private final Object mutex = new Object();
 
+    private static final MutexEventRepository INSTANCE = new MutexEventRepository(50);
+    
     /**
      * @param i
      */
@@ -43,12 +45,7 @@ public class MutexEventRepository implements EventRepository {
     }
 
     public static MutexEventRepository getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
-
-    private static class SingletonHolder {
-
-        public static final MutexEventRepository INSTANCE = new MutexEventRepository(50);
+        return INSTANCE;
     }
 
     @Override
