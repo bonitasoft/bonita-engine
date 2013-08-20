@@ -16,12 +16,12 @@
 		<module>bonita-integration-client-tests</module>
 		<module>bonita-integration-local-tests</module>
 		<module>bonita-synchro-server</module>
+		<module>bonita-synchro-register</module>
 <!-- 
   The following modules are commented because they are currently handled manually : 
   We build them manually and then we copy the produced jars in bpm/bonita-bpm-integration-tests/bonita-client-test-util/src/main/resources/
 -->
 
-<!-- 		<module>bonita-synchro-register</module> -->
 	</modules>
 
 	<profiles>
