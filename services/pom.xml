@@ -35,6 +35,7 @@
 		<module>bonita-scheduler</module>
 		<module>bonita-work</module>
 		<module>bonita-connector-executor-timedout</module>
+		<module>bonita-authentication</module>
 		<module>bonita-session</module>
 		<module>bonita-platform-session</module>
 		<module>bonita-monitoring</module>
