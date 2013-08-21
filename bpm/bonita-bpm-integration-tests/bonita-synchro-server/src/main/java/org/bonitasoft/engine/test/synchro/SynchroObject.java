@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test.synchro;
 
+import java.io.Serializable;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -26,13 +27,13 @@ public class SynchroObject extends Semaphore {
 
     private static final long serialVersionUID = -222157201988131547L;
 
-    private Long id;
+    private Serializable id;
 
-    public void setId(final Long id) {
+    public void setId(final Serializable id) {
         this.id = id;
     }
 
-    public Long getObjectId() {
+    public Serializable getObjectId() {
         return id;
     }
 }

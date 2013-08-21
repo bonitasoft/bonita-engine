@@ -30,7 +30,7 @@ public interface EventRepository {
      * @throws TimeoutException
      *             exception thrown if event is not fired even after timeout milliseconds
      */
-    Long waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException;
+	Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException;
 
     /**
      * Fire the given event and notify waiters.
@@ -39,7 +39,7 @@ public interface EventRepository {
      *            the event to fire
      * @param id
      */
-    void fireEvent(final Map<String, Serializable> event, Long id);
+    void fireEvent(final Map<String, Serializable> event, Serializable id);
 
     /**
      * Reset repository state by deleting all generated events not yet consumed.

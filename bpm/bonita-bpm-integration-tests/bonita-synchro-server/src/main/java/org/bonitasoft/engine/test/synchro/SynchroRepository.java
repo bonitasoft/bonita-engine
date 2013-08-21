@@ -33,16 +33,16 @@ public class SynchroRepository {
 
     private static final EventRepository repo = MutexEventRepository.getInstance();
 
-    public static void fireEvent(final Map<String, Serializable> event, final Long id) {
+    public static void fireEvent(final Map<String, Serializable> event, final Serializable id) {
         LOGGER.debug("Fire: " + event + " (id:" + id + ")");
         repo.fireEvent(event, id);
     }
 
-    public static Long waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
+    public static Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Wait: " + event);
         }
-        final Long waitForEvent = repo.waitForEvent(event, timeout);
+        final Serializable waitForEvent = repo.waitForEvent(event, timeout);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Receive: " + event + " (id:" + waitForEvent + ")");
         }

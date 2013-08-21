@@ -30,7 +30,7 @@ public class MutexEventRepository implements EventRepository {
 
     private final Map<Map<String, Serializable>, SynchroObject> waiters;
 
-    private final Map<Map<String, Serializable>, Long> fired;
+    private final Map<Map<String, Serializable>, Serializable> fired;
 
     private final Object mutex = new Object();
 
@@ -40,7 +40,7 @@ public class MutexEventRepository implements EventRepository {
      * @param i
      */
     private MutexEventRepository(final int initialCapacity) {
-        fired = new HashMap<Map<String, Serializable>, Long>(initialCapacity);
+        fired = new HashMap<Map<String, Serializable>, Serializable>(initialCapacity);
         waiters = new HashMap<Map<String, Serializable>, SynchroObject>(initialCapacity);
     }
 
@@ -49,7 +49,7 @@ public class MutexEventRepository implements EventRepository {
     }
 
     @Override
-    public void fireEvent(final Map<String, Serializable> event, final Long id) {
+    public void fireEvent(final Map<String, Serializable> event, final Serializable id) {
         synchronized (mutex) {
             final SynchroObject waiter = getWaiterAndRemoveIt(event);
             if (waiter == null) {
@@ -87,9 +87,9 @@ public class MutexEventRepository implements EventRepository {
         return true;
     }
 
-    private Entry<Map<String, Serializable>, Long> getFiredAndRemoveIt(final Map<String, Serializable> event) {
-        for (final Iterator<Entry<Map<String, Serializable>, Long>> iterator = fired.entrySet().iterator(); iterator.hasNext();) {
-            final Entry<Map<String, Serializable>, Long> fired = iterator.next();
+    private Entry<Map<String, Serializable>, Serializable> getFiredAndRemoveIt(final Map<String, Serializable> event) {
+        for (final Iterator<Entry<Map<String, Serializable>, Serializable>> iterator = fired.entrySet().iterator(); iterator.hasNext();) {
+            final Entry<Map<String, Serializable>, Serializable> fired = iterator.next();
             if (containsAllEntries(event, fired.getKey())) {
                 iterator.remove();
                 return fired;
@@ -99,11 +99,11 @@ public class MutexEventRepository implements EventRepository {
     }
 
     @Override
-    public Long waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
+    public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
         SynchroObject waiter = null;
-        Long id = null;
+        Serializable id = null;
         synchronized (mutex) {
-            final Entry<Map<String, Serializable>, Long> entry = getFiredAndRemoveIt(event);
+            final Entry<Map<String, Serializable>, Serializable> entry = getFiredAndRemoveIt(event);
             if (entry != null) {
                 id = entry.getValue();
             } else {
