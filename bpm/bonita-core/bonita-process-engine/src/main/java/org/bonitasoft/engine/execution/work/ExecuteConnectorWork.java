@@ -178,7 +178,9 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
         @Override
         public void execute() throws SBonitaException {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while executing connector", e);
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while executing connector", e);
+            }
             // TODO: store connection root cause in connnector_instance DB
             switch (sConnectorDefinition.getFailAction()) {
                 case ERROR_EVENT:

@@ -245,11 +245,15 @@ public class SchedulerImpl implements SchedulerService {
             schedulingLogBuilder.actionStatus(SQueriableLog.STATUS_OK);
         } catch (final Throwable e) {
             schedulingLogBuilder.actionStatus(SQueriableLog.STATUS_FAIL);
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            }
             try {
                 eventService.fireEvent(jobFailed);
             } catch (final FireEventException e1) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e1);
+                }
             }
             throw new SSchedulerException(e);
         } finally {
@@ -402,7 +406,7 @@ public class SchedulerImpl implements SchedulerService {
             session = sessionService.createSession(jobIdentifier.getTenantId(), "scheduler");
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-            Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier, traceEnabled);
+            final Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier, traceEnabled);
             return transactionService.executeInTransaction(callable);
         } catch (final Exception e) {
             throw new SSchedulerException("The job class couldn't be instantiated", e);
@@ -434,8 +438,7 @@ public class SchedulerImpl implements SchedulerService {
             @Override
             public JobWrapper call() throws Exception {
                 final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(new SelectByIdDescriptor<SJobDescriptorImpl>(
-                        "getSJobDescriptorImplById",
-                        SJobDescriptorImpl.class, jobIdentifier.getId()));
+                        "getSJobDescriptorImplById", SJobDescriptorImpl.class, jobIdentifier.getId()));
                 // FIXME do something here if the job does not exist
                 if (sJobDescriptor == null) {
                     return null;
@@ -452,8 +455,7 @@ public class SchedulerImpl implements SchedulerService {
                 }
                 statelessJob.setAttributes(parameterMap);
                 final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger,
-                        jobIdentifier.getTenantId(),
-                        eventService, jobTruster, sessionService, sessionAccessor);
+                        jobIdentifier.getTenantId(), eventService, jobTruster, sessionService, sessionAccessor);
                 if (traceEnabled) {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getPersistedJob"));
                 }

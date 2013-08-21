@@ -110,9 +110,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 configuration.setInterceptor(interceptor);
             } catch (final ClassNotFoundException cnfe) {
                 throw new SPersistenceException(cnfe);
-            } catch (InstantiationException e) {
+            } catch (final InstantiationException e) {
                 throw new SPersistenceException(e);
-            } catch (IllegalAccessException e) {
+            } catch (final IllegalAccessException e) {
                 throw new SPersistenceException(e);
             }
 
@@ -168,7 +168,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         try {
             final org.hibernate.classic.Session currentSession = sessionFactory.getCurrentSession();
             return currentSession;
-        } catch (HibernateException e) {
+        } catch (final HibernateException e) {
             throw new SPersistenceException(e);
         }
     }
@@ -180,8 +180,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     @Override
     public void delete(final PersistentObject entity) throws SPersistenceException {
-        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                "Deleting instance of class " + entity.getClass().getSimpleName() + " with id=" + entity.getId());
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                    "Deleting instance of class " + entity.getClass().getSimpleName() + " with id=" + entity.getId());
+        }
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
         final Session session = getSession(true);
         try {
@@ -383,7 +385,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected <T> String getQueryWithFilters(final String query, final List<FilterOption> filters, SearchFields multipleFilter) {
+    protected <T> String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter) {
         final StringBuilder builder = new StringBuilder(query);
         final Set<String> specificFilters = new HashSet<String>(filters.size());
         FilterOption previousFilter = null;
@@ -614,7 +616,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected void setPramaters(Query query, final Map<String, Object> inputParameters) {
+    protected void setPramaters(final Query query, final Map<String, Object> inputParameters) {
         for (final Map.Entry<String, Object> entry : inputParameters.entrySet()) {
             final Object value = entry.getValue();
             if (value instanceof Collection<?>) {
@@ -634,7 +636,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         final String fileContent = new String(IOUtil.getAllContentFrom(url));
 
-        logger.log(getClass(), TechnicalLogSeverity.TRACE, "Processing SQL resource : " + sqlResource);
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Processing SQL resource : " + sqlResource);
+        }
         final String regex = statementDelimiter.concat("\r?\n");
         final List<String> commands = new ArrayList<String>();
         final String[] tmp = fileContent.split(regex);
@@ -725,9 +729,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         return classAliasMappings;
     }
 
-
-
-        @Override
+    @Override
     public void delete(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
         final Query query = getSession(true).getNamedQuery("delete" + mappedClass.getSimpleName());
@@ -745,7 +747,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-        @Override
+    @Override
     public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
         final Query query = getSession(true).getNamedQuery("deleteByIds" + mappedClass.getSimpleName());

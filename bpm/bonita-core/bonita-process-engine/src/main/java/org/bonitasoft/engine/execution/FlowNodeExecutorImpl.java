@@ -192,7 +192,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                         processInstanceId);
                 try {
                     final int sleepTime = 50;
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + sleepTime + " ms to reexecute " + runnable.getDescription());
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "waiting " + sleepTime + " ms to reexecute " + runnable.getDescription());
+                    }
                     Thread.sleep(sleepTime);
                 } catch (final InterruptedException e) {
                 }
@@ -213,8 +215,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             long processDefinitionId = 0;
             try {
                 sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-                processDefinitionId = sFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder()
-                        .getProcessDefinitionIndex());
+                processDefinitionId = sFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder().getProcessDefinitionIndex());
                 final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
                 Thread.currentThread().setContextClassLoader(localClassLoader);
 
@@ -295,12 +296,16 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         setInFailedThread.start();
         final StringBuilder msg = new StringBuilder("Flownode with id " + fFlowNodeInstance + " named '" + setInFailedThread.getFlowNodeInstanceName()
                 + "' on process instance with id " + setInFailedThread.getParentFlowNodeInstanceId() + " has failed: " + sbe.getMessage());
-        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, msg.toString());
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, msg.toString());
+        }
 
         try {
             setInFailedThread.join(setInFailThreadTimeout);
         } catch (final InterruptedException e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The thread that set in fail flownode was interrupted: " + e.getMessage());
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The thread that set in fail flownode was interrupted: " + e.getMessage());
+            }
         }
 
         if (!setInFailedThread.isFinished()) {
@@ -359,7 +364,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final NotifyChildFinishedWork runnable = new NotifyChildFinishedWork(processDefinitionId, sFlowNodeInstanceChild.getId(),
                     sFlowNodeInstanceChild.getParentContainerId(), sFlowNodeInstanceChild.getParentContainerType().name(), stateId);
             try {
-                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
+                }
                 Thread.sleep(50);
             } catch (final InterruptedException e) {
             }

@@ -135,9 +135,9 @@ public class BPMInstancesCreator {
 
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService, final BPMInstanceBuilders instanceBuilders,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
-            final EventInstanceService eventInstanceService,
-            final ConnectorInstanceService connectorInstanceService, final SDataInstanceBuilders sDataInstanceBuilders,
-            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final TechnicalLoggerService logger) {
+            final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
+            final SDataInstanceBuilders sDataInstanceBuilders, final ExpressionResolverService expressionResolverService,
+            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.instanceBuilders = instanceBuilders;
@@ -151,9 +151,9 @@ public class BPMInstancesCreator {
         this.logger = logger;
     }
 
-    public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId,
-            final long parentContainerId, final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, final SStateCategory stateCategory, final Long tokenRefId) throws SBonitaException {
+    public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
+            final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
+            final SStateCategory stateCategory, final Long tokenRefId) throws SBonitaException {
         final List<SFlowNodeInstance> flownNodeInstances = new ArrayList<SFlowNodeInstance>(flowNodeDefinitions.size());
         for (final SFlowNodeDefinition sFlowNodeDefinition : flowNodeDefinitions) {
             flownNodeInstances.add(createFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, SFlowElementsContainerType.PROCESS,
@@ -562,8 +562,8 @@ public class BPMInstancesCreator {
                     instanceBuilders, processDefinition);
             transaction.execute();
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Initialized variables for process instance <" + processInstance.getName() + "> with id <"
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Initialized variables for process instance <" + processInstance.getName() + "> with id <"
                     + processInstance.getId() + ">");
         }
     }
@@ -625,8 +625,8 @@ public class BPMInstancesCreator {
             dataInstanceService.createDataInstance(dataInstance);
         }
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Initialized variables for " + containerType.getValue() + " with id <" + containerId + ">");
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Initialized variables for " + containerType.getValue() + " with id <" + containerId + ">");
         }
     }
 

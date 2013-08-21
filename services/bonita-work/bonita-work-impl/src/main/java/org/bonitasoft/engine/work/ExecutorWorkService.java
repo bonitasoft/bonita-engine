@@ -78,10 +78,12 @@ public class ExecutorWorkService implements WorkService, RunnableListener {
         }
     }
 
-    private synchronized AbstractWorkSynchronization getContinuationSynchronization(AbstractBonitaWork work) throws WorkRegisterException {
+    private synchronized AbstractWorkSynchronization getContinuationSynchronization(final AbstractBonitaWork work) throws WorkRegisterException {
         if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
-                    + " but the work service is shutdown. work will be restarted with the node");
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                        + " but the work service is shutdown. work will be restarted with the node");
+            }
             return null;
         }
         AbstractWorkSynchronization synchro = synchronizations.get();
@@ -152,10 +154,15 @@ public class ExecutorWorkService implements WorkService, RunnableListener {
             threadPoolExecutor.shutdown();
             try {
                 if (!threadPoolExecutor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s but all task were not finished");
+                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                        loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT
+                                + "s but all task were not finished");
+                    }
                 }
-            } catch (InterruptedException e) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "error while waiting termination of all work ", e);
+            } catch (final InterruptedException e) {
+                if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "error while waiting termination of all work ", e);
+                }
             }
         }
     }

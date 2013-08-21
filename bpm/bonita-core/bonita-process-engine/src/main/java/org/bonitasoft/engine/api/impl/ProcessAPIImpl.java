@@ -484,17 +484,17 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchOptions searchOptions = builder.done();
 
         try {
-            boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
+            final boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
             if (hasOpenProcessInstances) {
                 throw new DeletionException("Some active process instances are still found, process #" + processId + " can't be deleted.");
             }
-            boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
+            final boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
             if (hasArchivedProcessInstances) {
                 throw new DeletionException("Some archived process instances are still found, process #" + processId + " can't be deleted.");
             }
 
             processManagementAPIImplDelegate.deleteProcessDefinition(processId);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new DeletionException(e);
         }
     }
@@ -522,9 +522,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     deleteProcessInstancesFromProcessDefinition(processId, tenantAccessor);
                     try {
                         processManagementAPIImplDelegate.deleteProcessDefinition(processId);
-                    } catch (BonitaHomeNotSetException e) {
+                    } catch (final BonitaHomeNotSetException e) {
                         throw new SProcessDeletionException(e);
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         throw new SProcessDeletionException(e);
                     }
                     return null;
@@ -533,7 +533,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new DeletionException(e);
         }
     }
@@ -552,8 +552,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteProcessInstancesInsideLocks(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
             final List<ProcessInstance> processInstances) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        List<Long> processInstanceIds = new ArrayList<Long>(processInstances.size());
-        for (ProcessInstance processInstance : processInstances) {
+        final List<Long> processInstanceIds = new ArrayList<Long>(processInstances.size());
+        for (final ProcessInstance processInstance : processInstances) {
             processInstanceIds.add(processInstance.getId());
         }
         deleteProcessInstancesInsideLocksFromIds(tenantAccessor, ignoreProcessInstanceNotFound, processInstanceIds);
@@ -613,8 +613,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 deleteProcessInstance(processInstanceService, processInstanceId, activityInstanceService);
             } catch (final SProcessInstanceNotFoundException e) {
                 if (ignoreProcessInstanceNotFound) {
-                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage() + ". It has probably completed.");
+                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It has probably completed.");
                     }
                 } else {
                     throw e;
@@ -880,7 +880,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        TransactionContent transactionContent = new TransactionContent() {
+        final TransactionContent transactionContent = new TransactionContent() {
 
             @Override
             public void execute() throws SBonitaException {
@@ -892,7 +892,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     starterId = userId;
                 }
 
-                SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
                 processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId,
                         getUserIdFromSession());
             }
@@ -974,7 +974,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+        }
     }
 
     @Override
@@ -1235,11 +1237,11 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SActorMember actorMember = actorMappingService.addGroupToActor(actorId, groupId);
             processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
             clientActorMember = ModelConvertor.toActorMember(actorMember);
-        } catch (SActorNotFoundException e) {
+        } catch (final SActorNotFoundException e) {
             throw new CreationException(e);
-        } catch (SActorMemberCreationException e) {
+        } catch (final SActorMemberCreationException e) {
             throw new CreationException(e);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new CreationException(e);
         }
         tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
@@ -1912,7 +1914,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            OrderByType order = mapPagingCriterionToOrderByType(pagingCriterion);
+            final OrderByType order = mapPagingCriterionToOrderByType(pagingCriterion);
             return ModelConvertor.toCategories(categoryService.getCategoriesOfProcessDefinition(processDefinitionId, startIndex, maxResults, order));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -1926,7 +1928,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
-            OrderByType order = mapPagingCriterionToOrderByType(sortingCriterion);
+            final OrderByType order = mapPagingCriterionToOrderByType(sortingCriterion);
             return ModelConvertor.toCategories(categoryService.getCategoriesUnrelatedToProcessDefinition(processDefinitionId, startIndex, maxResults, order));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
@@ -2097,7 +2099,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public long removeCategoriesFromProcessDefinition(long processDefinitionId, int startIndex, int maxResults) throws DeletionException {
+    public long removeCategoriesFromProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
@@ -2111,27 +2113,26 @@ public class ProcessAPIImpl implements ProcessAPI {
                     Collections.singletonList(filterOption), null);
             final List<SProcessCategoryMapping> processCategoryMappings = categoryService.searchProcessCategoryMappings(queryOptions);
             return categoryService.deleteProcessCategoryMappings(processCategoryMappings);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
     }
 
     @Override
-    public long removeProcessDefinitionsFromCategory(long categoryId, int startIndex, int maxResults) throws DeletionException {
+    public long removeProcessDefinitionsFromCategory(final long categoryId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
                 .getSProcessCategoryMappingBuilder();
 
         try {
-            final FilterOption filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getCategoryIdKey(),
-                    categoryId);
+            final FilterOption filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getCategoryIdKey(), categoryId);
             final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getIdKey(), OrderByType.ASC);
             final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Collections.singletonList(order),
                     Collections.singletonList(filterOption), null);
             final List<SProcessCategoryMapping> processCategoryMappings = categoryService.searchProcessCategoryMappings(queryOptions);
             return categoryService.deleteProcessCategoryMappings(processCategoryMappings);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
     }
@@ -3570,7 +3571,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.CALLER_ID, -1);
         try {
             return searchProcessInstances(getTenantAccessor(), searchOptionsBuilder.done());
-        } catch (SSearchException e) {
+        } catch (final SSearchException e) {
             throw new SearchException(e);
         }
     }
@@ -4731,8 +4732,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public SearchResult<ArchivedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final SearchOptions searchOptions)
-            throws SearchException {
+    public SearchResult<ArchivedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4765,8 +4765,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
             if (!ActivityStates.FAILED_STATE.equals(flowNodeState.getName())) {
                 throw new ActivityExecutionException("Unable to retry a task that is not failed - task name=" + activity.getName() + " id="
-                        + activityInstanceId
-                        + " that was in state " + flowNodeState);
+                        + activityInstanceId + " that was in state " + flowNodeState);
             }
 
             flowNodeExecutor.setStateByStateId(processDefinitionId, activity.getId(), stateId);

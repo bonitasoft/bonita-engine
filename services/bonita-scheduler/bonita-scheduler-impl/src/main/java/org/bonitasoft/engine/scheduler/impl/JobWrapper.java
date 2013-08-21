@@ -115,9 +115,8 @@ public class JobWrapper implements StatelessJob {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "finished execution of " + statelessJob.getName());
             }
         } catch (final Exception e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error executing job " + name + " exception was thrown:" + e.getMessage(), e);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error while executing job " + name + ":" + e.getMessage(), e);
             }
             throw new JobExecutionException(e);
         } finally {

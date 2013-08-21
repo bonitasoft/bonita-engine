@@ -54,7 +54,9 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
             session = sessionService.createSession(tenantId, "workservice");
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+            }
             if (isTransactional()) {
                 workInTransaction();
             } else {
@@ -64,15 +66,19 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
             handleError(e);
         } catch (final Exception e) {
             // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
-                    "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                        "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
+            }
         } finally {
             if (session != null) {
                 try {
                     sessionAccessor.deleteSessionId();
                     sessionService.deleteSession(session.getId());
                 } catch (final SSessionNotFoundException e) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+                    }
                 }
             }
         }
@@ -110,19 +116,19 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
         this.tenantId = tenantId;
     }
 
-    public void setTechnicalLogger(TechnicalLoggerService loggerService) {
+    public void setTechnicalLogger(final TechnicalLoggerService loggerService) {
         this.loggerService = loggerService;
     }
 
-    public void setSessionService(SessionService sessionService) {
+    public void setSessionService(final SessionService sessionService) {
         this.sessionService = sessionService;
     }
 
-    public void setSessionAccessor(SessionAccessor sessionAccessor) {
+    public void setSessionAccessor(final SessionAccessor sessionAccessor) {
         this.sessionAccessor = sessionAccessor;
     }
 
-    public void setTransactionService(TransactionService transactionService) {
+    public void setTransactionService(final TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 

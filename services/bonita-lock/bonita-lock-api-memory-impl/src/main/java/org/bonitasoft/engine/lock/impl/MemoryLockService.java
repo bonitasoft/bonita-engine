@@ -104,7 +104,7 @@ public class MemoryLockService implements LockService {
         final long time = System.currentTimeMillis() - before;
 
         final TechnicalLogSeverity severity = selectSeverity(time);
-        if (severity != null) {
+        if (severity != null && logger.isLoggable(getClass(), severity)) {
             logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
             if (TechnicalLogSeverity.DEBUG.equals(severity)) {
                 logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));

@@ -114,9 +114,10 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             initiateLogBuilder(eventInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createEventInstance");
             throw new SEventInstanceCreationException(e);
         }
-
-        getLogger().log(this.getClass(), TechnicalLogSeverity.INFO,
-                "Created " + eventInstance.getType().getValue() + " <" + eventInstance.getName() + "> with id <" + eventInstance.getId() + ">");
+        if (getLogger().isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                    "Created " + eventInstance.getType().getValue() + " <" + eventInstance.getName() + "> with id <" + eventInstance.getId() + ">");
+        }
     }
 
     @Override

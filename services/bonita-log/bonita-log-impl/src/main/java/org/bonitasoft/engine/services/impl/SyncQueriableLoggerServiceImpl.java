@@ -33,8 +33,7 @@ public class SyncQueriableLoggerServiceImpl extends AbstractQueriableLoggerImpl 
     private final TechnicalLoggerService logger;
 
     public SyncQueriableLoggerServiceImpl(final PersistenceService persistenceService, final SQueriableLogModelBuilder builder,
-            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
-            final TechnicalLoggerService logger) {
+            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger) {
         super(persistenceService, builder, loggerStrategy, sessionProvider);
         this.logger = logger;
     }
@@ -43,14 +42,14 @@ public class SyncQueriableLoggerServiceImpl extends AbstractQueriableLoggerImpl 
     @Override
     protected void log(final List<SQueriableLog> loggableLogs) {
         try {
-            if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "persisting log");
+            if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "persisting log");
             }
             for (final SQueriableLog log : loggableLogs) {
                 getPersitenceService().insert(log);
             }
-            if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "log persisted");
+            if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "log persisted");
             }
 
         } catch (final SPersistenceException e) {

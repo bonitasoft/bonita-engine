@@ -147,14 +147,16 @@ public class ConnectorServiceImpl implements ConnectorService {
         } catch (final TenantIdNotSetException e) {
             throw new SConnectorException(e);
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(
+                    this.getClass(),
+                    TechnicalLogSeverity.DEBUG,
                     "Executed connector <" + sConnectorInstance.getName() + "> with id <" + sConnectorInstance.getId() + ">, version <"
                             + sConnectorInstance.getVersion() + ">, and inputs :");
             if (inputParameters != null) {
                 final Set<String> inputNames = inputParameters.keySet();
                 for (final String inputName : inputNames) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "    <" + inputName + "> : <" + inputParameters.get(inputName) + ">");
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "    <" + inputName + "> : <" + inputParameters.get(inputName) + ">");
                 }
             }
         }
@@ -245,13 +247,13 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new SConnectorException(e);
         }
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed connector <" + implementation.getImplementationClassName()
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed connector <" + implementation.getImplementationClassName()
                     + "> with definition id <" + implementation.getDefinitionId() + ">, version <" + implementation.getDefinitionVersion() + ">, and inputs :");
             if (inputParameters != null) {
                 final Set<String> inputNames = inputParameters.keySet();
                 for (final String inputName : inputNames) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "    <" + inputName + "> : <" + inputParameters.get(inputName) + ">");
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "    <" + inputName + "> : <" + inputParameters.get(inputName) + ">");
                 }
             }
         }

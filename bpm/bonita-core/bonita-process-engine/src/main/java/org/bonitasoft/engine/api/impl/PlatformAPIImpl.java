@@ -227,7 +227,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        WorkService workService = platformAccessor.getWorkService();
+        final WorkService workService = platformAccessor.getWorkService();
         try {
             try {
                 final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
@@ -269,7 +269,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
                         final long sessionId = createSessionAndMakeItActive(defaultTenant.getId(), sessionAccessor, sessionService);
                         for (final TenantRestartHandler restartHandler : platformConfiguration.getTenantRestartHandlers()) {
-                            Callable<Void> callable = new Callable<Void>() {
+                            final Callable<Void> callable = new Callable<Void>() {
 
                                 @Override
                                 public Void call() throws Exception {
@@ -332,12 +332,12 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             if (plaformConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(platformAccessor, schedulerService);
             }
-            WorkService workService = platformAccessor.getWorkService();
+            final WorkService workService = platformAccessor.getWorkService();
             workService.shutdown();
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
@@ -394,7 +394,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     return null;
                 }
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new DeletionException(e);
         }
     }
@@ -640,7 +640,10 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private void log(final PlatformServiceAccessor platformAccessor, final Exception e) {
         if (platformAccessor != null) {
-            platformAccessor.getTechnicalLoggerService().log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            }
         } else {
             e.printStackTrace();
         }

@@ -43,9 +43,11 @@ public class SequenceRunnableExecutor extends NotifyingRunnable {
             if (!cancelled) {
                 try {
                     work.run();
-                } catch (Throwable t) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Error while executing one work in the list of works: " + work.getDescription(),
-                            t);
+                } catch (final Throwable t) {
+                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                        loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                                "Error while executing one work in the list of works: " + work.getDescription(), t);
+                    }
                 }
             }
         }

@@ -54,9 +54,13 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
                 localSession.set(session);
             }
         } catch (final SessionIdNotSetException e) {
-            technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
+            }
         } catch (final SSessionNotFoundException e) {
-            technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
+            }
         }
         return session;
     }

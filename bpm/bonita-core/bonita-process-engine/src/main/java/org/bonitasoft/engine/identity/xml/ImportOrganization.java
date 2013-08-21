@@ -146,7 +146,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             } else {
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(getClass(), TechnicalLogSeverity.WARNING, "The membership " + newMembership
-                            + " because the user group or role can't be found\n userId=" + userId + " groupId=" + groupId + " roleId=" + roleId);
+                            + " coud not be imported because the user, group or role can't be found\n userId=" + userId + " groupId=" + groupId + " roleId="
+                            + roleId);
                 }
             }
         }

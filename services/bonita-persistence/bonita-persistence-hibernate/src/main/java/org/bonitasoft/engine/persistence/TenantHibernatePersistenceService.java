@@ -103,8 +103,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     @Override
     public void delete(final PersistentObject entity) throws SPersistenceException {
         try {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting instance of class " + entity.getClass().getSimpleName() + " with id="
-                    + entity.getId());
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting instance of class " + entity.getClass().getSimpleName()
+                        + " with id=" + entity.getId());
+            }
             final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
             final Session session = getSession(true);
             final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), getTenantId()));
@@ -191,8 +193,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
                     + " WHERE tenantId= :tenantId", filters, null));
             query.setLong("tenantId", getTenantId());
             query.executeUpdate();
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
-        } catch (TenantIdNotSetException e) {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
+            }
+        } catch (final TenantIdNotSetException e) {
             throw new SPersistenceException(e);
         }
     }

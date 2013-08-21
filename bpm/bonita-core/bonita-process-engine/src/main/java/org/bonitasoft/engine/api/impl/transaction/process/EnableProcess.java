@@ -57,8 +57,8 @@ public final class EnableProcess implements TransactionContent {
         processDefinitionService.enableProcessDeploymentInfo(processId);
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + userName + "> has enabled process <" +
-                    sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + userName + "> has enabled process <" + sProcessDefinition.getName()
+                    + "> in version <" + sProcessDefinition.getVersion() + ">");
         }
     }
 
