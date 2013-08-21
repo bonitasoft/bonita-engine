@@ -27,8 +27,4 @@ public class AuthenticationException extends SBonitaException {
         super("The user name or password is not valid.");
     }
 
-    public AuthenticationException(final Throwable t) {
-        super(t);
-    }
-
 }

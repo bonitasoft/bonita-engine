@@ -21,8 +21,6 @@ import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.session.SSessionException;
@@ -42,51 +40,40 @@ public class SecuredLoginServiceImpl implements LoginService {
 
     private final SessionAccessor sessionAccessor;
 
-    private final IdentityService identityService;
-
-    public SecuredLoginServiceImpl(final AuthenticationService authenticationService, final SessionService sessionService,
-            final SessionAccessor sessionAccessor, final IdentityService identityService) {
+    public SecuredLoginServiceImpl(final AuthenticationService authenticationService, final SessionService sessionService, final SessionAccessor sessionAccessor) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
-        this.identityService = identityService;
     }
 
     @Override
     public SSession login(final long tenantId, final String userName, final String password) throws SLoginException {
         sessionAccessor.setSessionInfo(-1, tenantId); // necessary to check user credentials
         long userId;
-        boolean isTechnicalUser = false;
+        boolean technicalUser = false;
         try {
-            final boolean valid = authenticationService.checkUserCredentials(userName, password);
-            if (valid) {
-                final SUser user = identityService.getUserByUserName(userName);
-                userId = user.getId();
+            final SUser user = authenticationService.checkUserCredentials(userName, password);
+            userId = user.getId();
+        } catch (final AuthenticationException ae) {
+            // Authentication fails it can be due to the technical user
+            final TechnicalUser technicalUser2 = getTechnicalUser(tenantId);
+            if (technicalUser2.getUserName().equals(userName) && technicalUser2.getPassword().equals(password)) {
+                technicalUser = true;
+                userId = -1;
             } else {
-                // if authentication fails it can be due to the technical user
-                final TechnicalUser technicalUser = getTechnicalUser(tenantId);
-                if (technicalUser.getUserName().equals(userName) && technicalUser.getPassword().equals(password)) {
-                    isTechnicalUser = true;
-                    userId = -1;
-                } else {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (final InterruptedException e) {
-                        throw new SLoginException("User name or password is not valid!");
-                    }
+                try {
+                    Thread.sleep(3000);
+                } catch (final InterruptedException e) {
                     throw new SLoginException("User name or password is not valid!");
                 }
+                throw new SLoginException("User name or password is not valid!");
             }
-        } catch (final AuthenticationException ae) {
-            throw new SLoginException(ae);
-        } catch (final SUserNotFoundException e) {
-            throw new SLoginException("Unable to found user " + userName);
         } finally {
             // clean session accessor
             sessionAccessor.deleteSessionId();
         }
         try {
-            return sessionService.createSession(tenantId, userId, userName, isTechnicalUser);
+            return sessionService.createSession(tenantId, userId, userName, technicalUser);
         } catch (final SSessionException e) {
             throw new SLoginException(e);
         }

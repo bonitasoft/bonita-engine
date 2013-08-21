@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -47,21 +46,10 @@ public class NotifyChildFinishedWork extends TxBonitaWork {
         this.stateId = stateId;
     }
 
-    protected ClassLoader getClassLoader() throws SBonitaException {
-        return getTenantAccessor().getClassLoaderService().getLocalClassLoader("process", processDefinitionId);
-    }
-
     @Override
     protected void work() throws Exception {
-        final ClassLoader processClassloader = getClassLoader();
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(processClassloader);
-            final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
-            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
-        } finally {
-            Thread.currentThread().setContextClassLoader(contextClassLoader);
-        }
+        final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
+        containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
     }
 
     @Override
