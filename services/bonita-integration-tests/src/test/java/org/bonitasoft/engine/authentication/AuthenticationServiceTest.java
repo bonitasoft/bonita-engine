@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.authentication;
 
+import static org.junit.Assert.assertFalse;
+
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -52,27 +54,28 @@ public class AuthenticationServiceTest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
-    @Test(expected = AuthenticationException.class)
+    @Test
     public void testCheckUserWithWrongPassword() throws Exception {
         final String username = "james";
         final String password = "bpm";
         final SUser user = createUser(username, password);
 
         getTransactionService().begin();
-        authService.checkUserCredentials(username, "wrong");
+        final boolean valid = authService.checkUserCredentials(username, "wrong");
         getTransactionService().complete();
+        assertFalse(valid);
 
         deleteUser(user);
     }
 
-    @Test(expected = AuthenticationException.class)
+    @Test
     public void testCheckNonExistentUser() throws Exception {
         final String username = "anonyme";
         final String password = "bpm";
         getTransactionService().begin();
-        authService.checkUserCredentials(username, password);
+        final boolean valid = authService.checkUserCredentials(username, password);
         getTransactionService().complete();
-
+        assertFalse(valid);
     }
 
 }

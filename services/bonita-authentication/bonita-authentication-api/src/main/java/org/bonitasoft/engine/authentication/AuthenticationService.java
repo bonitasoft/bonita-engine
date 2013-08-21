@@ -13,7 +13,6 @@
  */
 package org.bonitasoft.engine.authentication;
 
-import org.bonitasoft.engine.identity.model.SUser;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -32,6 +31,6 @@ public interface AuthenticationService {
      * @throws AuthenticationException
      *             Error thrown if either the password is invalid or the user is not found.
      */
-    SUser checkUserCredentials(final String username, final String password) throws AuthenticationException;
+    boolean checkUserCredentials(final String username, final String password) throws AuthenticationException;
 
 }
