@@ -14,7 +14,7 @@
 	<name>Bonita - Integration Tests on Tomcat 6</name>
 
 	<properties>
-		<bonita.home.classifier>hibernate-performance</bonita.home.classifier>
+		<bonita.home.classifier>hibernate-performance-cluster</bonita.home.classifier>
 		<tomcat.version>6.0.35</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
 		<tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
@@ -205,6 +205,7 @@
 										<systemProperties>
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+											<db.vendor>h2</db.vendor>
 											<logback.configurationFile>${tomcat1.conf.dir}/logback.xml</logback.configurationFile>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
 											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
@@ -237,7 +238,7 @@
 										<systemProperties>
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
-
+											<db.vendor>h2</db.vendor>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
 											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
 
@@ -271,6 +272,7 @@
 										<systemProperties>
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+											<db.vendor>h2</db.vendor>
 											<logback.configurationFile>${tomcat2.conf.dir}/logback.xml</logback.configurationFile>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
 											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
@@ -303,7 +305,7 @@
 										<systemProperties>
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
-
+											<db.vendor>h2</db.vendor>
 											<file.encoding>${project.build.sourceEncoding}</file.encoding>
 											<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
 

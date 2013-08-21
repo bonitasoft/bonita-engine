@@ -5,9 +5,9 @@
 		<property name="properties">
 			<props>
 <!-- 				Hazelcast second level cache configuration, more details here : http://www.hazelcast.com/docs/2.5/manual/single_html/#HibernateSecondLevelCache -->
-				<prop key="hibernate.cache.use_second_level_cache">true</prop>
-				<prop key="hibernate.cache.use_query_cache">true</prop>
-				<prop key="hibernate.cache.use_minimal_puts">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.use_query_cache">false</prop>
+				<prop key="hibernate.cache.use_minimal_puts">false</prop>
 <!-- 				name of the default instance used by bonita, it's configuration is set using cfg-bonita-clustering.xml -->
 				<prop key="hibernate.cache.hazelcast.instance_name">bonita</prop>
 <!-- 				<prop key="hibernate.cache.provider_class">com.hazelcast.hibernate.provider.HazelcastCacheProvider</prop> -->
