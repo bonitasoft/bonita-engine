@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.events.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -176,9 +177,13 @@ public class EventServiceImpl implements EventService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getHandlers"));
         }
+        if (handlers == null) {
+            return Collections.emptySet();
+        }
         HashSet<SHandler<SEvent>> hashSet = new HashSet<SHandler<SEvent>>(handlers.size());
         hashSet.addAll(handlers);
         return hashSet;
+
     }
 
     @Override
