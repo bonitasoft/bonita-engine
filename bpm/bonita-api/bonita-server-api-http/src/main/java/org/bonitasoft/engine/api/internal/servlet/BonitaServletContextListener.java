@@ -30,7 +30,12 @@ public class BonitaServletContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
-        SpringPlatformFileSystemBeanAccessor.initializeContext(null);
+        try {
+            SpringPlatformFileSystemBeanAccessor.initializeContext(null);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e;
+        }
 
     }
 
