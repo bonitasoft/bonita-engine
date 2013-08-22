@@ -1046,6 +1046,7 @@ public class OrganizationTest extends CommonAPITest {
     public void exportOrganizationWithSpecialCharacters() throws Exception {
         // create records for user role, group and membership
         final User user = getIdentityAPI().createUser("Céline*^$", "ploµ¨µ%§");
+        final User user2 = getIdentityAPI().createUser("ééééééééééééééééééé", "éééééééééééééééé");
 
         final RoleCreator roleCreator = new RoleCreator("Développeur");
         roleCreator.setDisplayName("'(-è");
@@ -1079,12 +1080,31 @@ public class OrganizationTest extends CommonAPITest {
 
         // User
         assertTrue(organizationContent.indexOf("Céline*^$") != -1);
+        assertTrue(organizationContent.indexOf("ééééééééééééééééééé") != -1);
 
         // UserMembership
         assertTrue(organizationContent.indexOf(getIdentityAPI().getUserMembership(membership.getId()).getGroupName()) != -1);
 
+        // Verify all tags
+        assertTrue(organizationContent.indexOf("<organization:Organization") != -1);
+        assertTrue(organizationContent.indexOf("<users>") != -1);
+        assertTrue(organizationContent.indexOf("<user") != -1);
+        assertTrue(organizationContent.indexOf("</user>") != -1);
+        assertTrue(organizationContent.indexOf("</users>") != -1);
+        assertTrue(organizationContent.indexOf("<roles>") != -1);
+        assertTrue(organizationContent.indexOf("<role") != -1);
+        assertTrue(organizationContent.indexOf("</role>") != -1);
+        assertTrue(organizationContent.indexOf("</roles>") != -1);
+        assertTrue(organizationContent.indexOf("<groups>") != -1);
+        assertTrue(organizationContent.indexOf("<group") != -1);
+        assertTrue(organizationContent.indexOf("</group>") != -1);
+        assertTrue(organizationContent.indexOf(" </groups>") != -1);
+        assertTrue(organizationContent.indexOf("<memberships") != -1);
+        assertTrue(organizationContent.indexOf("</memberships>") != -1);
+        assertTrue(organizationContent.indexOf("</organization:Organization>") != -1);
+
         // clean-up
-        getIdentityAPI().deleteUser(user.getId());
+        deleteUsers(user, user2);
         getIdentityAPI().deleteRole(role.getId());
         getIdentityAPI().deleteGroup(group.getId());
     }
@@ -1098,16 +1118,30 @@ public class OrganizationTest extends CommonAPITest {
         final String organizationContent = getIdentityAPI().exportOrganization();
 
         // Role
-        assertTrue(organizationContent.indexOf("Développeur") != -1);
-        assertTrue(organizationContent.indexOf("'(-è") != -1);
+        assertTrue(organizationContent.indexOf("ééé") != -1);
 
         // Group
-        assertTrue(organizationContent.indexOf("µ£¨µ") != -1);
-        assertTrue(organizationContent.indexOf(".?/5434%¨%¨%") != -1);
-        assertTrue(organizationContent.indexOf("$*ù$^ù") != -1);
+        assertTrue(organizationContent.indexOf("ééééééééé") != -1);
 
         // User
-        assertTrue(organizationContent.indexOf("Céline*^$") != -1);
+        assertTrue(organizationContent.indexOf("éé") != -1);
+
+        // Verify all tags
+        assertTrue(organizationContent.indexOf("<organization:Organization") != -1);
+        assertTrue(organizationContent.indexOf("<users>") != -1);
+        assertTrue(organizationContent.indexOf("<user") != -1);
+        assertTrue(organizationContent.indexOf("</user>") != -1);
+        assertTrue(organizationContent.indexOf("</users>") != -1);
+        assertTrue(organizationContent.indexOf("<roles>") != -1);
+        assertTrue(organizationContent.indexOf("<role") != -1);
+        assertTrue(organizationContent.indexOf("</role>") != -1);
+        assertTrue(organizationContent.indexOf("</roles>") != -1);
+        assertTrue(organizationContent.indexOf("<groups>") != -1);
+        assertTrue(organizationContent.indexOf("<group") != -1);
+        assertTrue(organizationContent.indexOf("</group>") != -1);
+        assertTrue(organizationContent.indexOf(" </groups>") != -1);
+        assertTrue(organizationContent.indexOf("<memberships/>") != -1);
+        assertTrue(organizationContent.indexOf("</organization:Organization>") != -1);
 
         // clean-up
         getIdentityAPI().deleteOrganization();

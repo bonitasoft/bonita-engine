@@ -2,24 +2,24 @@
 <organization:Organization
 	xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
 	<users>
-		<user userName="admin">
-			<password encrypted="false">ploµ¨µ%§</password>
-			<firstName>Céline*^$</firstName>
-			<lastName>éééééééééééééééééééééé</lastName>
+		<user userName="ééééé">
+			<password encrypted="false">é</password>
+			<firstName>éé</firstName>
+			<lastName>éééééééééééééééééééééééééééééééééééééééééééééééééé</lastName>
 			<enabled>false</enabled>
 			<personalData />
 			<professionalData />
 		</user>
 	</users>
 	<roles>
-		<role name="Développeur">
-			<displayName>'(-è</displayName>
-			<description>è-__ç_</description>
+		<role name="ééééééééééééééééééééééééééééééééééééé">
+			<displayName>ééé</displayName>
+			<description>éééé</description>
 		</role>
 	</roles>
 	<groups>
-		<group name="µ£¨µ" parentPath="$*ù$^ù">
-			<displayName>.?/5434%¨%¨%</displayName>
+		<group name="éééééééééééééééééééé" parentPath="ééééééééééééééé">
+			<displayName>ééééééééé</displayName>
 		</group>
 	</groups>
 	<memberships />
