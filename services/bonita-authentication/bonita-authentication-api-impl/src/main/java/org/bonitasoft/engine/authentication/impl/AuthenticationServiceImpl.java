@@ -39,25 +39,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public SUser checkUserCredentials(final String userName, final String password) throws AuthenticationException {
+    public boolean checkUserCredentials(final String userName, final String password) throws AuthenticationException {
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));
             }
             final SUser user = identityService.getUserByUserName(userName);
             final boolean valid = identityService.chechCredentials(user, password);
-            if (!valid) {
-                throw new AuthenticationException();
-            }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials"));
             }
-            return user;
+            return valid;
         } catch (final SUserNotFoundException sunfe) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "checkUserCredentials", sunfe));
             }
-            throw new AuthenticationException();
+            return false;
         }
     }
 
