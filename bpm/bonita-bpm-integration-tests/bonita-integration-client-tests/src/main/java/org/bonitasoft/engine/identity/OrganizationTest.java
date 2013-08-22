@@ -13,9 +13,11 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.CommonAPITest;
@@ -27,6 +29,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.identity.GroupCreator.GroupField;
+import org.bonitasoft.engine.identity.RoleCreator.RoleField;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -1035,6 +1039,54 @@ public class OrganizationTest extends CommonAPITest {
         getIdentityAPI().deleteRole(persistedRole2.getId());
         getIdentityAPI().deleteGroup(persistedGroup1.getId());
         getIdentityAPI().deleteGroup(persistedGroup2.getId());
+    }
+
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Export", "Organization", "Special characters" }, jira = "ENGINE-1517")
+    @Test
+    public void exportOrganizationWithSpecialCharacters() throws Exception {
+        // create records for user role, group and membership
+        final User user = getIdentityAPI().createUser("Céline*^$", "ploµ¨µ%§");
+
+        final RoleCreator roleCreator = new RoleCreator("Développeur");
+        roleCreator.setDisplayName("'(-è");
+        roleCreator.setDescription("è-__ç_");
+        roleCreator.setIconName("(-è_");
+        roleCreator.setIconPath("^*_ç");
+        final Role role = getIdentityAPI().createRole(roleCreator);
+
+        final GroupCreator groupCreator = new GroupCreator("µ£¨µ");
+        groupCreator.setDisplayName(".?/5434%¨%¨%");
+        groupCreator.setDescription("è-__ç_2");
+        groupCreator.setIconName("(-è_2");
+        groupCreator.setIconPath("^*_ç2");
+        groupCreator.setParentPath("$*ù$^ù");
+        final Group group = getIdentityAPI().createGroup(groupCreator);
+
+        final UserMembership membership = getIdentityAPI().addUserMembership(user.getId(), group.getId(), role.getId());
+
+        // export and check
+        final String organizationContent = getIdentityAPI().exportOrganization();
+
+        // Role
+        for (final Entry<RoleField, Serializable> entry : roleCreator.getFields().entrySet()) {
+            assertTrue(organizationContent.indexOf((String) entry.getValue()) != -1);
+        }
+
+        // Group
+        for (final Entry<GroupField, Serializable> entry : groupCreator.getFields().entrySet()) {
+            assertTrue(organizationContent.indexOf((String) entry.getValue()) != -1);
+        }
+
+        // User
+        assertTrue(organizationContent.indexOf("Céline*^$") != -1);
+
+        // UserMembership
+        assertTrue(organizationContent.indexOf(getIdentityAPI().getUserMembership(membership.getId()).getGroupName()) != -1);
+
+        // clean-up
+        getIdentityAPI().deleteUser(user.getId());
+        getIdentityAPI().deleteRole(role.getId());
+        getIdentityAPI().deleteGroup(group.getId());
     }
 
     @Test
