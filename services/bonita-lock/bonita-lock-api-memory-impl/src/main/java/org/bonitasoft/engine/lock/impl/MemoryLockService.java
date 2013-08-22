@@ -41,38 +41,22 @@ public class MemoryLockService implements LockService {
 
     private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
 
-    private final Map<String, Long> lockCount = new HashMap<String, Long>();
-
-    private void increaseLockCount(final String key) {
+    private ReentrantLock getLock(final String key) {
         synchronized (lock) {
-            long updatedLockCount;
             if (!locks.containsKey(key)) {
                 // use fair mode?
                 locks.put(key, new ReentrantLock());
-                updatedLockCount = 0L;
-            } else {
-                updatedLockCount = lockCount.get(key);
             }
-            lockCount.put(key, updatedLockCount + 1);
+            return locks.get(key);
         }
     }
 
-    private void decreaseLockCount(final String key) {
+    private void removeLockFromMapIfnotUsed(final String key) {
         synchronized (lock) {
-            if (lockCount.containsKey(key)) {
-                final Long count = lockCount.get(key) - 1;
-                lockCount.put(key, count);
-                if (count <= 0) {
-                    locks.remove(key);
-                    lockCount.remove(key);
-                }
+            ReentrantLock reentrantLock = locks.get(key);
+            if (!reentrantLock.hasQueuedThreads()) {
+                locks.remove(key);
             }
-        }
-    }
-
-    Long getLockCount(final long objectToLockId, final String objectType) {
-        synchronized (lock) {
-            return lockCount.get(buildKey(objectToLockId, objectType));
         }
     }
 
@@ -83,24 +67,25 @@ public class MemoryLockService implements LockService {
     @Override
     public void unlock(final long objectToLockId, final String objectType) throws SLockException {
         final String key = buildKey(objectToLockId, objectType);
-        locks.get(key).unlock();
-        decreaseLockCount(key);
+        try {
+            locks.get(key).unlock();
+        } finally {
+            removeLockFromMapIfnotUsed(key);
+        }
     }
 
     @Override
     public boolean tryLock(final long objectToLockId, final String objectType) throws SLockException {
         final String key = buildKey(objectToLockId, objectType);
-        increaseLockCount(key);
-        return locks.get(key).tryLock();
+        return getLock(key).tryLock();
     }
 
     @Override
     public void lock(final long objectToLockId, final String objectType) throws SLockException {
         final String key = buildKey(objectToLockId, objectType);
-        increaseLockCount(key);
-
+        ReentrantLock lock = getLock(key);
         final long before = System.currentTimeMillis();
-        locks.get(key).lock();
+        lock.lock();
         final long time = System.currentTimeMillis() - before;
 
         final TechnicalLogSeverity severity = selectSeverity(time);
