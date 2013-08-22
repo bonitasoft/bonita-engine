@@ -33,6 +33,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
@@ -40,6 +41,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
@@ -63,6 +66,9 @@ public class ClusterTests extends CommonAPISPTest {
         changeToNode2();
         login();
         logout();
+        PlatformSession platformSession = loginPlatform();
+        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        platformAPI.startNode();
         changeToNode1();
         loginWith(USERNAME, PASSWORD);
     }
