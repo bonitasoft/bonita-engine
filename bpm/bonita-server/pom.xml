@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -656,7 +657,7 @@
 			<artifactId>bonita-transaction-impl-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 
 		<!-- Transient Data -->
 		<dependency>
@@ -690,6 +691,12 @@
 			<artifactId>bonita-work-parallel</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.work</groupId>
+			<artifactId>bonita-work-clustered</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
 		<!-- XML -->
 		<dependency>
@@ -732,7 +739,7 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 		<!-- add hazel cast here because hibernate cache use it by configuration -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
@@ -1011,6 +1018,7 @@
 									<include>org.bonitasoft.engine.work:bonita-work-api</include>
 									<include>com.bonitasoft.engine.work:bonita-work-parallel</include>
 									<include>org.bonitasoft.engine.work:bonita-work-impl</include>
+									<include>com.bonitasoft.engine.work:bonita-work-clustered</include>
 									<!-- XML -->
 									<include>org.bonitasoft.engine.xml:bonita-xml-parse-api</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>

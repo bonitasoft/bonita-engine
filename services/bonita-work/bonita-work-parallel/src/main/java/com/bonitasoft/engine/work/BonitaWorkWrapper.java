@@ -8,21 +8,25 @@
  *******************************************************************************/
 package com.bonitasoft.engine.work;
 
-import org.bonitasoft.engine.work.AbstractBonitaWork;
-import org.bonitasoft.engine.work.NotifyingRunnable;
-import org.bonitasoft.engine.work.RunnableListener;
+import org.bonitasoft.engine.work.BonitaRunnable;
+import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * @author Baptiste Mesta
  */
-public class BonitaWorkWrapper extends NotifyingRunnable {
+public class BonitaWorkWrapper extends BonitaRunnable {
 
-    private final AbstractBonitaWork work;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2083826139943818362L;
+
+    private final BonitaWork work;
 
     private boolean cancelled = false;
 
-    public BonitaWorkWrapper(final RunnableListener runnableListener, final long tenantId, final AbstractBonitaWork work) {
-        super(runnableListener, tenantId);
+    public BonitaWorkWrapper(final long tenantId, final BonitaWork work) {
+        super(tenantId);
         this.work = work;
     }
 

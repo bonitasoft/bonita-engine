@@ -8,12 +8,17 @@
  *******************************************************************************/
 package com.bonitasoft.engine.work;
 
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import org.bonitasoft.engine.work.BonitaExecutorServiceFactory;
+import org.bonitasoft.engine.work.WorkerThreadFactory;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IExecutorService;
 
 /**
  * 
@@ -27,21 +32,44 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
 
     private final HazelcastInstance hazelcastInstance;
 
-    public ClusteredBonitaExecutorServiceFactory(HazelcastInstance hazelcastInstance) {
+    private final int corePoolSize;
+
+    private final int queueCapacity;
+
+    private final int maximumPoolSize;
+
+    private final long keepAliveTimeSeconds;
+
+    public ClusteredBonitaExecutorServiceFactory(final int corePoolSize, final int queueCapacity, final int maximumPoolSize, final long keepAliveTimeSeconds,
+            HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
+        this.corePoolSize = corePoolSize;
+        this.queueCapacity = queueCapacity;
+        this.maximumPoolSize = maximumPoolSize;
+        this.keepAliveTimeSeconds = keepAliveTimeSeconds;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
     }
 
     @Override
-    public IExecutorService createExecutorService() {
-        IExecutorService executorService = hazelcastInstance.getExecutorService(EXECUTOR_NAME);
-        return executorService;
-        // final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
-        // final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        // final WorkerThreadFactory threadFactory = new WorkerThreadFactory(EXECUTOR_NAME);
-        // return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
+    public ClusteredThreadPoolExecutor createExecutorService() {
+        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
+        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker");
+        return new ClusteredThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
+    }
+
+    private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
+
+        public QueueRejectedExecutionHandler() {
+        }
+
+        @Override
+        public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
+            throw new RejectedExecutionException("Unable to run the task " + task
+                    + "\n your work queue is full you might consider changing your configuration to scale more");
+        }
+
     }
 
 }
