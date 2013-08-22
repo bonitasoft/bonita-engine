@@ -1089,6 +1089,30 @@ public class OrganizationTest extends CommonAPITest {
         getIdentityAPI().deleteGroup(group.getId());
     }
 
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Export", "Organization", "Special characters" }, jira = "ENGINE-1517")
+    @Test
+    public void importAndExportOrganizationWithSpecialCharacters() throws Exception {
+        importOrganization("OrganizationWithSpecialCharacters.xml");
+
+        // export and check
+        final String organizationContent = getIdentityAPI().exportOrganization();
+
+        // Role
+        assertTrue(organizationContent.indexOf("Développeur") != -1);
+        assertTrue(organizationContent.indexOf("'(-è") != -1);
+
+        // Group
+        assertTrue(organizationContent.indexOf("µ£¨µ") != -1);
+        assertTrue(organizationContent.indexOf(".?/5434%¨%¨%") != -1);
+        assertTrue(organizationContent.indexOf("$*ù$^ù") != -1);
+
+        // User
+        assertTrue(organizationContent.indexOf("Céline*^$") != -1);
+
+        // clean-up
+        getIdentityAPI().deleteOrganization();
+    }
+
     @Test
     public void exportAndImportOrganization() throws Exception {
         // create records for user role, group and membership
