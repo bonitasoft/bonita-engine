@@ -65,8 +65,8 @@ public class JTATransactionServiceImpl implements TransactionService {
                     txManager.begin();
                     transactionStarted = true;
                     final Transaction tx = txManager.getTransaction();
-                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                        logger.log(getClass(), TechnicalLogSeverity.TRACE,
                                 "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
                     }
 
@@ -103,8 +103,8 @@ public class JTATransactionServiceImpl implements TransactionService {
         // Depending of the txManager status we either commit or rollback.
         try {
             final Transaction tx = txManager.getTransaction();
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Completing transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Completing transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
             }
 
             final int status = txManager.getStatus();
@@ -112,8 +112,8 @@ public class JTATransactionServiceImpl implements TransactionService {
             if (status == Status.STATUS_MARKED_ROLLBACK) {
                 try {
                     txManager.rollback();
-                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                        logger.log(getClass(), TechnicalLogSeverity.TRACE,
                                 "Rollbacking transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
                     }
                 } catch (final IllegalStateException e) {
@@ -236,11 +236,11 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+    public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
         begin();
         try {
             return callable.call();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             setRollbackOnly();
             throw e;
         } finally {
