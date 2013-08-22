@@ -44,6 +44,12 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>slow</id>
+			<modules>
+				<module>bonita-integration-as-tests</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>package-all</id>
 			<modules>
 				<module>bonita-bpm-integration-tests</module>

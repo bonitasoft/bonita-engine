@@ -11,7 +11,6 @@
 	<artifactId>bonita-integration-tomcat6-cluster</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Bonita - Integration Tests on Tomcat 6</name>
 
 	<properties>
 		<bonita.home.classifier>hibernate-performance-cluster</bonita.home.classifier>
