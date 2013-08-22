@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,38 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.work;
+package org.bonitasoft.engine.execution.work;
 
 /**
- * A runnable that notify a listener of it's state
- * 
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
-public abstract class NotifyingRunnable implements Runnable {
+public abstract class NonTxBonitaWork extends AbstractBonitaWork {
 
-    private final RunnableListener runnableListener;
-
-    private final long tenantId;
-
-    public NotifyingRunnable(final RunnableListener runnableListener, final long tenantId) {
-        this.runnableListener = runnableListener;
-        this.tenantId = tenantId;
-        runnableListener.runnableRegistered(this);
-    }
+    private static final long serialVersionUID = -8482398866704257129L;
 
     @Override
-    public void run() {
-        runnableListener.runnableStarted(this);
-        innerRun();
-        runnableListener.runnableDone(this);
+    protected boolean isTransactional() {
+        return false;
     }
-
-    public abstract void innerRun();
-
-    public abstract void cancel();
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
 }

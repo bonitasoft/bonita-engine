@@ -16,9 +16,7 @@ package org.bonitasoft.engine.work;
 import java.util.concurrent.ExecutorService;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Charles Souillard
@@ -27,6 +25,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 public interface WorkSynchronizationFactory {
 
     AbstractWorkSynchronization getWorkSynchronization(ExecutorService executorService, TechnicalLoggerService loggerService, SessionAccessor sessionAccessor,
-            SessionService sessionService, TransactionService transactionService, ExecutorWorkService threadPoolWorkService);
+            ExecutorWorkService threadPoolWorkService);
 
 }

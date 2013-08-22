@@ -17,9 +17,6 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
@@ -63,17 +60,9 @@ public class InstantiateProcessWork extends TxBonitaWork {
     }
 
     @Override
-    protected String getDescription() {
+    public String getDescription() {
         return getClass().getSimpleName() + ": Process definition with id " + processDefinitionId
-                + ((subProcflowNodeInstanceId != -1) ? ", subProcflowNodeInstanceId:" + subProcflowNodeInstanceId : "");
-    }
-
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+                + (subProcflowNodeInstanceId != -1 ? ", subProcflowNodeInstanceId:" + subProcflowNodeInstanceId : "");
     }
 
     public void setCallerId(final long callerId) {

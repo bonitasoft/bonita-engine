@@ -16,8 +16,6 @@ package org.bonitasoft.engine.execution.work;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
@@ -47,14 +45,6 @@ public class ExecuteTransitionWork extends TxBonitaWork {
     @Override
     public String getDescription() {
         return getClass().getSimpleName() + ": transitionInstanceId:" + transitionInstanceId;
-    }
-
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

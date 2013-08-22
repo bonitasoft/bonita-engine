@@ -16,9 +16,7 @@ package org.bonitasoft.engine.work;
 import java.util.concurrent.ExecutorService;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Charles Souillard
@@ -28,9 +26,9 @@ public class SequenceWorkSynchronizationFactory implements WorkSynchronizationFa
 
     @Override
     public AbstractWorkSynchronization getWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor, final SessionService sessionService, final TransactionService transactionService,
+            final SessionAccessor sessionAccessor,
             final ExecutorWorkService runnableListener) {
-        return new SequenceWorkSynchronization(runnableListener, executorService, loggerService, sessionAccessor, sessionService, transactionService);
+        return new SequenceWorkSynchronization(runnableListener, executorService, loggerService, sessionAccessor);
     }
 
 }

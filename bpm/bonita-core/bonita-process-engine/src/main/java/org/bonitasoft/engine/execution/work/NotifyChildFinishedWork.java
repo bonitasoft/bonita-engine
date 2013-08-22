@@ -14,9 +14,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
@@ -57,11 +54,4 @@ public class NotifyChildFinishedWork extends TxBonitaWork {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

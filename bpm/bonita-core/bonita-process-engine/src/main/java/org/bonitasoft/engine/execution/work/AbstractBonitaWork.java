@@ -11,37 +11,39 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.work;
+package org.bonitasoft.engine.execution.work;
 
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
-public abstract class AbstractBonitaWork implements Runnable, Serializable {
+public abstract class AbstractBonitaWork implements BonitaWork {
 
     private static final long serialVersionUID = -3346630968791356467L;
 
-    protected TechnicalLoggerService loggerService;
+    protected transient TechnicalLoggerService loggerService;
 
-    private SessionService sessionService;
+    private transient SessionService sessionService;
 
-    private SessionAccessor sessionAccessor;
+    private transient SessionAccessor sessionAccessor;
 
     private long tenantId;
 
-    protected TransactionService transactionService;
+    protected transient TransactionService transactionService;
 
     public AbstractBonitaWork() {
         super();
@@ -49,6 +51,11 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
 
     @Override
     public final void run() {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        loggerService = tenantAccessor.getTechnicalLoggerService();
+        sessionAccessor = tenantAccessor.getSessionAccessor();
+        sessionService = tenantAccessor.getSessionService();
+        transactionService = tenantAccessor.getTransactionService();
         SSession session = null;
         try {
             session = sessionService.createSession(tenantId, "workservice");
@@ -80,8 +87,6 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
 
     protected abstract boolean isTransactional();
 
-    protected abstract String getDescription();
-
     protected abstract void work() throws Exception;
 
     protected void workInTransaction() throws Exception {
@@ -106,24 +111,16 @@ public abstract class AbstractBonitaWork implements Runnable, Serializable {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
 
-    public void setTechnicalLogger(TechnicalLoggerService loggerService) {
-        this.loggerService = loggerService;
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            return TenantServiceSingleton.getInstance(getTenantId());
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    public void setSessionService(SessionService sessionService) {
-        this.sessionService = sessionService;
-    }
-
-    public void setSessionAccessor(SessionAccessor sessionAccessor) {
-        this.sessionAccessor = sessionAccessor;
-    }
-
-    public void setTransactionService(TransactionService transactionService) {
-        this.transactionService = transactionService;
-    }
-
 }

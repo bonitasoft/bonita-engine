@@ -79,6 +79,7 @@ import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -244,5 +245,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor();
 
     SACommentBuilder getSACommentBuilders();
+
+    SessionAccessor getSessionAccessor();
 
 }

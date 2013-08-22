@@ -32,8 +32,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.execution.transaction.GetConnectorInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.work.NonTxBonitaWork;
 
 /**
  * @author Baptiste Mesta
@@ -137,14 +135,6 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
-        }
-    }
-
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
         }
     }
 

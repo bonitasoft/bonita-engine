@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * A factory to create executor service that will be given to the WorkService
@@ -22,6 +22,6 @@ import java.util.concurrent.ExecutorService;
  */
 public interface BonitaExecutorServiceFactory {
 
-    ExecutorService createExecutorService();
+    ThreadPoolExecutor createExecutorService();
 
 }

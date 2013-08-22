@@ -165,7 +165,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected String getDescription() {
+    public String getDescription() {
         return getClass().getSimpleName() + ": flowNodeInstanceId = " + flowNodeInstanceId + ", connectorDefinitionName = " + connectorDefinitionName;
     }
 

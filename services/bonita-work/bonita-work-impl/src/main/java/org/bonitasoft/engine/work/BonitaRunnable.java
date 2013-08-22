@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,17 +13,34 @@
  **/
 package org.bonitasoft.engine.work;
 
-/**
- * @author Emmanuel Duchastenier
- * @author Charles Souillard
- * @author Celine Souchet
- */
-public abstract class TxBonitaWork extends AbstractBonitaWork {
+import java.io.Serializable;
 
-    private static final long serialVersionUID = 9220497862331957402L;
+/**
+ * A runnable that notify a listener of it's state
+ * 
+ * @author Baptiste Mesta
+ */
+public abstract class BonitaRunnable implements Runnable, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private final long tenantId;
+
+    public BonitaRunnable(final long tenantId) {
+        this.tenantId = tenantId;
+    }
 
     @Override
-    protected boolean isTransactional() {
-        return true;
+    public void run() {
+        innerRun();
     }
+
+    public abstract void innerRun();
+
+    public abstract void cancel();
+
+    public long getTenantId() {
+        return tenantId;
+    }
+
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,18 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.work;
+package org.bonitasoft.engine.execution.work;
 
 /**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ * @author Charles Souillard
+ * @author Celine Souchet
  */
-public interface RunnableListener {
+public abstract class TxBonitaWork extends AbstractBonitaWork {
 
-    void runnableRegistered(NotifyingRunnable runnable);
+    private static final long serialVersionUID = 9220497862331957402L;
 
-    void runnableStarted(NotifyingRunnable runnable);
-
-    void runnableDone(NotifyingRunnable runnable);
-
+    @Override
+    protected boolean isTransactional() {
+        return true;
+    }
 }
