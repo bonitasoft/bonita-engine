@@ -47,12 +47,12 @@ public class ClientInterceptor implements InvocationHandler, Serializable {
     private final String interfaceName;
 
     private static final Logger LOGGER = Logger.getLogger(ClientInterceptor.class.getName());
-
+    
     public ClientInterceptor(final String interfaceName, final ServerAPI api) {
         this.api = api;
         this.interfaceName = interfaceName;
     }
-
+    
     protected Map<String, Serializable> getOptions() {
         return new TreeMap<String, Serializable>();
     }
@@ -66,23 +66,23 @@ public class ClientInterceptor implements InvocationHandler, Serializable {
                 classNameParameters.add(parameterType.getName());
             }
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Calling method " + method.getName() + " on API" + api.getClass().getName());
+                LOGGER.log(Level.FINE, "Calling method " + method.getName() + " on API" + this.api.getClass().getName());
             }
-            // invoke ServerAPI unique method
-            final Object object = api.invokeMethod(getOptions(), this.interfaceName, method.getName(), classNameParameters, args);
+            //invoke ServerAPI unique method
+            final Object object = this.api.invokeMethod(getOptions(), this.interfaceName, method.getName(), classNameParameters, args);
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Quitting method " + method.getName() + " on API" + api.getClass().getName());
+                LOGGER.log(Level.FINE, "Quitting method " + method.getName() + " on API" + this.api.getClass().getName());
             }
             return object;
         } catch (final ServerWrappedException e) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Quitting method " + method.getName() + " on API " + api.getClass().getName() + " with exception " + e.getMessage());
+                LOGGER.log(Level.FINE, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName() + " with exception " + e.getMessage());
             }
             final Throwable cause = e.getCause();
             throw cause;
         } catch (final RemoteException e) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Quitting method " + method.getName() + " on API " + api.getClass().getName() + " with exception " + e.getMessage());
+                LOGGER.log(Level.FINE, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName() + " with exception " + e.getMessage());
             }
             final Throwable cause = e.getCause();
             throw cause;

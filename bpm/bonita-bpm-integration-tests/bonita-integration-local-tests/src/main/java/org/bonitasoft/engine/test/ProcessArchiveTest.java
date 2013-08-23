@@ -225,7 +225,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
     }
 
     @Test
-    public void archivedFlowNodeInstance() throws Exception {
+    public void testArchivedFlowNodeInstance() throws Exception {
         logout();
         loginWith("john", "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
@@ -249,7 +249,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
     }
 
     @Test
-    public void getArchivedFlowNodeInstance() throws Exception {
+    public void testGetArchivedFlowNodeInstance() throws Exception {
         logout();
         loginWith("john", "bpm");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0");
@@ -269,7 +269,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
     }
 
     @Test(expected = ArchivedFlowNodeInstanceNotFoundException.class)
-    public void getArchivedFlowNodeInstanceNotFound() throws ArchivedFlowNodeInstanceNotFoundException {
+    public void testGetArchivedFlowNodeInstanceNotFound() throws Exception {
         getProcessAPI().getArchivedFlowNodeInstance(123456789l);
     }
 

@@ -16,16 +16,13 @@ package org.bonitasoft.engine.actor.mapping.impl;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
+import org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.events.EventService;
@@ -39,36 +36,40 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
  * 
  */
-@RunWith(MockitoJUnitRunner.class)
 public class ActorMappingServiceImplTest {
 
-    @Mock
     private Recorder recorder;
 
-    @Mock
     private ReadPersistenceService persistenceService;
 
-    @Mock
     private EventService eventService;
 
-    @Mock
     private QueriableLoggerService queriableLoggerService;
 
-    @Mock
     private IdentityService identityService;
 
-    @InjectMocks
     private ActorMappingServiceImpl actorMappingServiceImpl;
+
+    @Before
+    public void setUp() throws Exception {
+        recorder = mock(Recorder.class);
+        persistenceService = mock(ReadPersistenceService.class);
+        eventService = mock(EventService.class);
+        queriableLoggerService = mock(QueriableLoggerService.class);
+        identityService = mock(IdentityService.class);
+        actorMappingServiceImpl = new ActorMappingServiceImpl(persistenceService, recorder, eventService, queriableLoggerService, identityService);
+    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActor(long)}.

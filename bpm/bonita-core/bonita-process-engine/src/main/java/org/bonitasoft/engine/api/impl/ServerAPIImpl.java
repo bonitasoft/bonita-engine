@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.Map;
 
@@ -50,15 +49,12 @@ import org.bonitasoft.engine.transaction.TransactionService;
 /**
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
- * @author Celine Souchet
  */
 public class ServerAPIImpl implements ServerAPI {
 
     private static final long serialVersionUID = -161775388604256321L;
 
     private final APIAccessResolver accessResolver;
-
-    private TechnicalLoggerService technicalLogger;
 
     private enum SessionType {
         PLATFORM, API;
@@ -72,24 +68,14 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private void setTechnicalLogger(final TechnicalLoggerService technicalLoggerService) {
-        technicalLogger = technicalLoggerService;
-    }
-
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
-
         SessionAccessor sessionAccessor = null;
         try {
             sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
             return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues);
-        } catch (final UndeclaredThrowableException e) {
-            if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-            }
-            throw new ServerWrappedException(e);
         } catch (final ServerWrappedException e) {
             throw e;
         } catch (final Exception e) {
@@ -106,46 +92,54 @@ public class ServerAPIImpl implements ServerAPI {
 
     private SessionAccessor beforeInvokeMethod(final Map<String, Serializable> options, final String apiInterfaceName) throws ServerWrappedException {
         // boolean hasSetSessionAccessor = false;
+        SessionAccessor sessionAccessor = null;
         TransactionService txService = null;
 
         try {
             final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
             final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
+
             txService = platformServiceAccessor.getTransactionService();
             txService.begin();
 
-            final SessionAccessor sessionAccessor = serviceAccessorFactory.createSessionAccessor();
-            final Session session = getSession(options);
             ClassLoader serverClassLoader = null;
+            final Session session = (Session) options.get("session");
             if (session != null) {
-                final long sessionId = session.getId();
-                switch (getSessionType(session)) {
+                final SessionType sessionType = getSessionType(session);
+                sessionAccessor = serviceAccessorFactory.createSessionAccessor();
+                switch (sessionType) {
                     case PLATFORM:
                         final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
                         final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
 
-                        if (!loginService.isValid(sessionId)) {
+                        if (!loginService.isValid(session.getId())) {
                             throw new ServerWrappedException(new InvalidSessionException("Invalid session"));
                         }
-                        platformSessionService.renewSession(sessionId);
-                        sessionAccessor.setSessionInfo(sessionId, -1);
+                        platformSessionService.renewSession(session.getId());
+                        sessionAccessor.setSessionInfo(session.getId(), -1);
                         serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
-                        setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
                         break;
+
                     case API:
                         final SessionService sessionService = platformServiceAccessor.getSessionService();
+
                         checkTenantSession(platformServiceAccessor, session);
-                        sessionService.renewSession(sessionId);
-                        sessionAccessor.setSessionInfo(sessionId, ((APISession) session).getTenantId());
+                        sessionService.renewSession(session.getId());
+                        sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
                         serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
-                        setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
                         break;
+
                     default:
                         throw new ServerWrappedException(new InvalidSessionException("Unknown session type: " + session.getClass().getName()));
                 }
+            } else {
+                if (accessResolver.needSession(apiInterfaceName)) {
+                    throw new ServerWrappedException(new InvalidSessionException("Session is null!"));
+                }
+            }
+
+            if (serverClassLoader != null) {
                 Thread.currentThread().setContextClassLoader(serverClassLoader);
-            } else if (accessResolver.needSession(apiInterfaceName)) {
-                throw new ServerWrappedException(new InvalidSessionException("Session is null!"));
             }
             return sessionAccessor;
         } catch (final ServerWrappedException swe) {
@@ -161,10 +155,6 @@ public class ServerAPIImpl implements ServerAPI {
                 throw new ServerWrappedException(e);
             }
         }
-    }
-
-    private Session getSession(final Map<String, Serializable> options) {
-        return (Session) options.get("session");
     }
 
     private SessionType getSessionType(final Session session) throws ServerWrappedException {
@@ -219,19 +209,19 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private void checkTenantSession(final PlatformServiceAccessor platformServiceAccessor, final Session session) throws ServerWrappedException {
+    private void checkTenantSession(final PlatformServiceAccessor platformAccessor, final Session session) throws ServerWrappedException {
         try {
-            final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-            final TechnicalLoggerService logger = platformServiceAccessor.getTechnicalLoggerService();
+            final SchedulerService schedulerService = platformAccessor.getSchedulerService();
+            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
             if (!schedulerService.isStarted() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "The scheduler is not started!");
             }
             final APISession apiSession = (APISession) session;
-            final STenant tenant = platformServiceAccessor.getPlatformService().getTenant(apiSession.getTenantId());
+            final STenant tenant = platformAccessor.getPlatformService().getTenant(apiSession.getTenantId());
             if (!PlatformService.ACTIVATED.equals(tenant.getStatus())) {
                 throw new ServerWrappedException(new InvalidSessionException("The tenantd is not activated"));
             }
-            final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(apiSession.getTenantId());
+            final TenantServiceAccessor tenantAccessor = platformAccessor.getTenantServiceAccessor(apiSession.getTenantId());
             final LoginService tenantLoginService = tenantAccessor.getLoginService();
             if (!tenantLoginService.isValid(apiSession.getId())) {
                 throw new ServerWrappedException(new InvalidSessionException("Invalid session"));
