@@ -505,7 +505,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
-                final TransactionContent deleteTrancastionContent = getDeleteTrancastionContent(processDefinitionId);
+                final TransactionContent deleteTrancastionContent = getDeleteTransactionContent(processDefinitionId);
                 transactionExecutor.execute(deleteTrancastionContent);
                 final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
                 final File file = new File(processesFolder);
@@ -532,7 +532,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected TransactionContent getDeleteTrancastionContent(final long processDefinitionId) {
+    protected TransactionContent getDeleteTransactionContent(final long processDefinitionId) {
         return new DeleteProcess(getTenantAccessor(), processDefinitionId);
     }
 
