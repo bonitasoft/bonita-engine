@@ -12,11 +12,13 @@
 
 	<name>Bonita Client API: EJB3</name>
 
+	
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-client-api</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+
 </project>
