@@ -8,26 +8,26 @@
  *******************************************************************************/
 package com.bonitasoft.engine.lock.impl;
 
-import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.SLockException;
+import java.util.concurrent.locks.Lock;
+
+import org.bonitasoft.engine.lock.impl.AbstractLockService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ILock;
 
 /**
  * create and release locks using hazelcast
  * 
  * @author Baptiste Mesta
  */
-public class ClusteredLockService implements LockService {
-
-    private static final String SEPARATOR = "_";
+public class ClusteredLockService extends AbstractLockService {
 
     private final HazelcastInstance hazelcastInstance;
 
-    public ClusteredLockService(final HazelcastInstance hazelcastInstance) {
+    public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, int lockTimeout) {
+        super(logger, lockTimeout);
         this.hazelcastInstance = hazelcastInstance;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
@@ -35,38 +35,13 @@ public class ClusteredLockService implements LockService {
     }
 
     @Override
-    public void unlock(final long objectToLockId, final String objectType) throws SLockException {
-        try {
-            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
-            lock.unlock();
-        } catch (final Exception e) {
-            throw new SLockException(e);
-        }
-
+    protected Lock getLock(String key) {
+        return hazelcastInstance.getLock(key);
     }
 
     @Override
-    public boolean tryLock(final long objectToLockId, final String objectType) throws SLockException {
-        try {
-            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
-            return lock.tryLock();
-        } catch (final Exception e) {
-            throw new SLockException(e);
-        }
-    }
-
-    @Override
-    public void lock(final long objectToLockId, final String objectType) throws SLockException {
-        try {
-            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
-            lock.lock();
-        } catch (final Exception e) {
-            throw new SLockException(e);
-        }
-    }
-
-    private String buildKey(final long objectToLockId, final String objectType) {
-        return objectType + SEPARATOR + objectToLockId;
+    protected void removeLockFromMapIfnotUsed(String key) {
+        // nothing to do
     }
 
 }

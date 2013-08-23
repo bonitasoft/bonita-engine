@@ -202,6 +202,8 @@
 										<containerId>tomcat6x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
+											<!-- in order to identify on which node we are  -->
+											<node.name>Node1</node.name>
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
@@ -235,6 +237,7 @@
 										<containerId>tomcat6x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
+											<!-- in order to identify on which node we are  -->
 											<bonita.home>${bonita.home}</bonita.home>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
@@ -270,6 +273,7 @@
 										<home>${tomcat2.home}</home>
 										<systemProperties>
 											<bonita.home>${bonita.home}</bonita.home>
+											<node.name>Node2</node.name>
 											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
 											<db.vendor>h2</db.vendor>
 											<logback.configurationFile>${tomcat2.conf.dir}/logback.xml</logback.configurationFile>
