@@ -3,25 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.bonitasoft.engine</groupId>
-		<artifactId>bonita-bpm-integration-tests</artifactId>
+		<artifactId>bonita-synchro-repository</artifactId>
 		<version>6.1.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>bonita-synchro-register</artifactId>
+	
+	<artifactId>bonita-synchro-server</artifactId>
+	
 	<dependencies>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-server</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-		<dependency>
-      <groupId>org.bonitasoft.engine</groupId>
-      <artifactId>bonita-synchro-server</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
 	</dependencies>
 </project>

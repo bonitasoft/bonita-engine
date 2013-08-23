@@ -522,6 +522,18 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Synchro-repository -->
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-synchro-server</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-synchro-register</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Transaction -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.transaction</groupId>
@@ -809,6 +821,9 @@
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl</include>
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl-hibernate</include>
+									<!-- Synchro-repository -->
+									<include>org.bonitasoft.engine:bonita-synchro-server</include>
+									<include>org.bonitasoft.engine:bonita-synchro-register</include>
 									<!-- Transaction -->
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
