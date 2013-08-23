@@ -13,14 +13,13 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import java.util.Map;
-
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -61,8 +60,10 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     private final long flowNodeDefinitionId;
 
     public ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
-            final long connectorInstanceId, final String connectorDefinitionName, final Map<String, Object> inputParameters) {
-        super(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParameters);
+            final long connectorInstanceId, final String connectorDefinitionName) {
+        super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                processDefinitionId));
         this.flowNodeDefinitionId = flowNodeDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
     }

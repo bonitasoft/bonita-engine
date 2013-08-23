@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -94,7 +93,6 @@ import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.EndingIntermediateCatchEventExceptionStateImpl;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorOfActivity;
-import org.bonitasoft.engine.execution.work.ExecuteConnectorWork;
 import org.bonitasoft.engine.execution.work.InstantiateProcessWork;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -668,44 +666,16 @@ public class StateBehaviors {
             final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition) throws SActivityStateExecutionException {
         // TODO this work should be triggered by with the id of the user logged in?
         final long connectorInstanceId = connector.getId();
-        final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                processDefinitionId);
-        ExecuteConnectorWork work = null;
 
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
-            Map<String, Object> inputParameters = null;
-            inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), sExpressionContext, null);
-            work = buildWorkToExecuteConnector(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId, connectorDefinitionName,
-                    inputParameters);
-
-        } catch (final SBonitaException sbe) {
-            work = buildWorkToSetConnectorFailed(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId, connectorDefinitionName,
-                    sbe);
-
-        } finally {
-            try {
-                workService.registerWork(work);
-            } catch (final WorkRegisterException e) {
-                throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstanceId,
-                        e);
-            }
+            workService.registerWork(new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId,
+                    connectorDefinitionName));
+        } catch (final WorkRegisterException e) {
+            throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstanceId,
+                    e);
         }
-    }
-
-    private ExecuteConnectorOfActivity buildWorkToExecuteConnector(final Long processDefinitionId, final long flowNodeDefinitionId,
-            final long flowNodeInstanceId, final long connectorInstanceId, final String connectorDefinitionName, final Map<String, Object> inputParameters) {
-        return new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId, connectorDefinitionName,
-                inputParameters);
-    }
-
-    private ExecuteConnectorOfActivity buildWorkToSetConnectorFailed(final Long processDefinitionId, final long flowNodeDefinitionId,
-            final long flowNodeInstanceId, final long connectorInstanceId, final String connectorDefinitionName, final SBonitaException sbe) {
-        final ExecuteConnectorOfActivity work = buildWorkToExecuteConnector(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId,
-                connectorDefinitionName, null);
-        work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
-        return work;
     }
 
     public void createAttachedBoundaryEvents(final SProcessDefinition processDefinition, final SActivityInstance activityInstance)

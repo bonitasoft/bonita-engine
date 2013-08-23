@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import java.util.Map;
-
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -22,6 +20,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -61,8 +60,9 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     private final ConnectorEvent activationEvent;
 
     public ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
-            final Map<String, Object> inputParameters, final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
-        super(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParameters);
+            final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
+        super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(processInstanceId,
+                DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId));
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
         this.activationEvent = activationEvent;

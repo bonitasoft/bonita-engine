@@ -29,7 +29,6 @@ import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinition
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
-import org.bonitasoft.engine.execution.transaction.GetConnectorInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -50,17 +49,15 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
 
     protected final String connectorDefinitionName;
 
-    protected final Map<String, Object> inputParameters;
-
-    private SBonitaException errorThrownWhenEvaluationOfInputParameters;
+    private final SExpressionContext inputParametersContext;
 
     public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
-            final Map<String, Object> inputParameters) {
+            SExpressionContext inputParametersContext) {
         super();
         this.processDefinitionId = processDefinitionId;
         this.connectorInstanceId = connectorInstanceId;
         this.connectorDefinitionName = connectorDefinitionName;
-        this.inputParameters = inputParameters;
+        this.inputParametersContext = inputParametersContext;
     }
 
     protected abstract void errorEventOnFail() throws SBonitaException;
@@ -114,21 +111,17 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
         HandleConnectorOnFailEventTxContent handleError = null;
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
-            if (errorThrownWhenEvaluationOfInputParameters != null) {
-                handleError = new HandleConnectorOnFailEventTxContent(errorThrownWhenEvaluationOfInputParameters, sConnectorDefinition);
+            try {
+                EvaluateParameterAndGetConnectorInstance transactionContent = new EvaluateParameterAndGetConnectorInstance(connectorService,
+                        sConnectorDefinition, connectorInstanceService);
+                transactionExecutor.execute(transactionContent);
+                final SConnectorInstance connectorInstance = transactionContent.getConnectorInstance();
+                final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
+                        transactionContent.getInputParameters());
+                transactionExecutor.execute(new EvaluateConnectorOutputsTxContent(result));
+            } catch (final SBonitaException e) {
+                handleError = new HandleConnectorOnFailEventTxContent(e, sConnectorDefinition);
                 transactionExecutor.execute(handleError);
-            } else {
-                try {
-                    final GetConnectorInstance getConnectorInstance = new GetConnectorInstance(connectorInstanceService, connectorInstanceId);
-                    transactionExecutor.execute(getConnectorInstance);
-                    final SConnectorInstance connectorInstance = getConnectorInstance.getResult();
-                    final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
-                            inputParameters);
-                    transactionExecutor.execute(new EvaluateConnectorOutputsTxContent(result));
-                } catch (final SBonitaException e) {
-                    handleError = new HandleConnectorOnFailEventTxContent(e, sConnectorDefinition);
-                    transactionExecutor.execute(handleError);
-                }
             }
             if (handleError == null || handleError.shouldContinueFlow()) {
                 transactionExecutor.execute(new ContinueFlowTxContent());
@@ -142,12 +135,38 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
         return getTenantAccessor().getBPMDefinitionBuilders();
     }
 
-    public void setErrorThrownWhenEvaluationOfInputParameters(final SBonitaException errorThrownWhenEvaluationOfInputParameters) {
-        this.errorThrownWhenEvaluationOfInputParameters = errorThrownWhenEvaluationOfInputParameters;
-    }
+    private final class EvaluateParameterAndGetConnectorInstance implements TransactionContent {
 
-    public SBonitaException getErrorThrownWhenEvaluationOfInputParameters() {
-        return errorThrownWhenEvaluationOfInputParameters;
+        private final ConnectorService connectorService;
+
+        private final SConnectorDefinition sConnectorDefinition;
+
+        private final ConnectorInstanceService connectorInstanceService;
+
+        private Map<String, Object> inputParameters;
+
+        private SConnectorInstance connectorInstance;
+
+        private EvaluateParameterAndGetConnectorInstance(ConnectorService connectorService, SConnectorDefinition sConnectorDefinition,
+                ConnectorInstanceService connectorInstanceService) {
+            this.connectorService = connectorService;
+            this.sConnectorDefinition = sConnectorDefinition;
+            this.connectorInstanceService = connectorInstanceService;
+        }
+
+        @Override
+        public void execute() throws SBonitaException {
+            inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), inputParametersContext, null);
+            connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
+        }
+
+        public Map<String, Object> getInputParameters() {
+            return inputParameters;
+        }
+
+        public SConnectorInstance getConnectorInstance() {
+            return connectorInstance;
+        }
     }
 
     /**

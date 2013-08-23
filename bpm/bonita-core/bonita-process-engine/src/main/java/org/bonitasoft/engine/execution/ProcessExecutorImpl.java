@@ -104,7 +104,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorOfProcess;
-import org.bonitasoft.engine.execution.work.ExecuteConnectorWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.execution.work.ExecuteTransitionWork;
@@ -457,36 +456,16 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (nextConnectorInstance != null) {
                 for (final SConnectorDefinition sConnectorDefinition : connectors) {
                     if (sConnectorDefinition.getName().equals(nextConnectorInstance.getName())) {
-                        final SExpressionContext sExpressionContext = new SExpressionContext(sProcessInstance.getId(),
-                                DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId);
-                        Map<String, Object> inputParameters = null;
                         final Long connectorInstanceId = nextConnectorInstance.getId();
-                        // final Long connectorDefinitionId = sConnectorDefinition.getId(); // FIXME: Uncomment when generate id
                         final String connectorDefinitionName = sConnectorDefinition.getName();
-                        try {
-                            inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), sExpressionContext, null);
-                        } catch (final SBonitaException sbe) {
-                            final ExecuteConnectorWork work = getWork(processDefinitionId, sProcessInstance, activationEvent, connectorInstanceId,
-                                    connectorDefinitionName, inputParameters);
-                            work.setErrorThrownWhenEvaluationOfInputParameters(sbe);
-                            workService.registerWork(work);
-                        }
-                        if (inputParameters != null) {
-                            workService.registerWork(getWork(processDefinitionId, sProcessInstance, activationEvent, connectorInstanceId,
-                                    connectorDefinitionName, inputParameters));
-                        }
+                        workService.registerWork(new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName,
+                                sProcessInstance.getId(), sProcessInstance.getRootProcessInstanceId(), activationEvent));
                         return true;
                     }
                 }
             }
         }
         return false;
-    }
-
-    private ExecuteConnectorOfProcess getWork(final long processDefinitionId, final SProcessInstance sProcessInstance, final ConnectorEvent activationEvent,
-            final long connectorInstanceId, final String connectorDefinitionName, final Map<String, Object> inputParameters) {
-        return new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParameters,
-                sProcessInstance.getId(), sProcessInstance.getRootProcessInstanceId(), activationEvent);
     }
 
     private void initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final SProcessDefinition sProcessDefinition,
