@@ -18,8 +18,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
@@ -33,7 +36,10 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
+import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -61,6 +67,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -78,6 +85,10 @@ import org.junit.Test;
  */
 @SuppressWarnings("javadoc")
 public class CallActivityTest extends CommonAPITest {
+
+    private static final String SEARCH_WAITING_EVENTS_COMMAND = "searchWaitingEventsCommand";
+
+    private static final String SEARCH_OPTIONS_KEY = "searchOptions";
 
     private User cebolinha;
 
@@ -231,6 +242,79 @@ public class CallActivityTest extends CommonAPITest {
     @Test
     public void callActivityWithDataInputAndOutputOperationsAndVersion2() throws Exception {
         executeCallAtivityUntilEndOfProcess(true, true, "2.0", false);
+    }
+
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway", "Message" }, jira = "ENGINE-1713")
+    @Test
+    public void callActivityAndGatewayAndMessage() throws Exception {
+        final Expression processVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+
+        // Main process
+        final ProcessDefinitionBuilder mainProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Main", PROCESS_VERSION);
+        mainProcessDefinitionBuilder.addActor(ACTOR_NAME);
+        mainProcessDefinitionBuilder.addStartEvent("MainStart").addEndEvent("MainEnd");
+        mainProcessDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL).addGateway("Gateway2", GatewayType.PARALLEL);
+        // Send callActivity
+        final Expression sendExpr = new ExpressionBuilder().createConstantStringExpression("Send");
+        mainProcessDefinitionBuilder.addCallActivity("Send", sendExpr, processVersionExpr);
+        // Receive callActivity
+        final Expression receiveExpr = new ExpressionBuilder().createConstantStringExpression("Receive");
+        mainProcessDefinitionBuilder.addCallActivity("Receive", receiveExpr, processVersionExpr);
+        // Transitions
+        mainProcessDefinitionBuilder.addTransition("MainStart", "Gateway1").addTransition("Gateway1", "Send").addTransition("Gateway1", "Receive")
+                .addTransition("Send", "Gateway2").addTransition("Receive", "Gateway2").addTransition("Gateway2", "MainEnd");
+        final ProcessDefinition mainProcessDefinition = deployAndEnableWithActor(mainProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+
+        // Receive process
+        final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Receive", PROCESS_VERSION);
+        receiveProcessDefinitionBuilder.addActor(ACTOR_NAME);
+        receiveProcessDefinitionBuilder.addStartEvent("ReceiveStart").addEndEvent("ReceiveEnd");
+        receiveProcessDefinitionBuilder.addLongTextData("copymsg", null);
+        receiveProcessDefinitionBuilder.addUserTask("Read", ACTOR_NAME);
+        final Operation operation = buildAssignOperation("copymsg", "MSG", ExpressionType.TYPE_VARIABLE, String.class.getName());
+        receiveProcessDefinitionBuilder.addIntermediateCatchEvent("ReceiveMsg").addMessageEventTrigger("ping").addOperation(operation);
+        // Transitions
+        receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg").addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
+        final ProcessDefinition receiveProcessDefinition = deployAndEnableWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+
+        // Send process
+        final ProcessDefinitionBuilder sendProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Send", PROCESS_VERSION);
+        sendProcessDefinitionBuilder.addActor(ACTOR_NAME);
+        sendProcessDefinitionBuilder.addStartEvent("SendStart");
+        final Expression msgData = new ExpressionBuilder().createConstantStringExpression("data");
+        sendProcessDefinitionBuilder.addLongTextData("msg", msgData);
+        sendProcessDefinitionBuilder.addUserTask("Step1", ACTOR_NAME);
+        final Expression targetProcess = new ExpressionBuilder().createConstantStringExpression("Receive");
+        final Expression targetFlowNode = new ExpressionBuilder().createConstantStringExpression("ReceiveMsg");
+        final Expression displayName = new ExpressionBuilder().createConstantStringExpression("MSG");
+        final Expression messageContent = new ExpressionBuilder().createDataExpression("msg", "java.lang.String");
+        sendProcessDefinitionBuilder.addEndEvent("SendMsgEnd").addMessageEventTrigger("ping", targetProcess, targetFlowNode)
+                .addMessageContentExpression(displayName, messageContent);
+        // Transitions
+        sendProcessDefinitionBuilder.addTransition("SendStart", "Step1").addTransition("Step1", "SendMsgEnd");
+        final ProcessDefinition sendProcessDefinition = deployAndEnableWithActor(sendProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
+
+        assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
+        final ActivityInstance step1 = waitForUserTask("Step1");
+        assignAndExecuteStep(step1, cascao.getId());
+
+        // Check waiting message
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+        searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, "ReceiveMsg");
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
+        final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
+        assertEquals(1, searchResult.getCount());
+
+        final ActivityInstance read = waitForUserTask("Read");
+        final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
+        assertEquals("data", copyMsg.getValue());
+        assignAndExecuteStep(read, cascao.getId());
+
+        waitForProcessToFinish(callingProcessInstance);
+        assertTrue("parent process was not archived", waitProcessToFinishAndBeArchived(callingProcessInstance));
+        disableAndDeleteProcess(mainProcessDefinition, receiveProcessDefinition, sendProcessDefinition);
     }
 
     /*

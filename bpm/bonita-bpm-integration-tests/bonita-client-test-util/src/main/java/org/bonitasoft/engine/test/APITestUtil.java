@@ -896,13 +896,26 @@ public class APITestUtil {
         return waitForEvent(processInstance, eventName, TestStates.getWaitingState());
     }
 
+    public WaitForEvent waitForEventInWaitingState(final long processInstanceId, final String eventName) throws Exception {
+        return waitForEvent(processInstanceId, eventName, TestStates.getWaitingState());
+    }
+
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
+        return waitForEvent(50, 5000, processInstance, eventName, state);
+    }
+
+    public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final String state) throws Exception {
         return waitForEvent(100, 5000, processInstance, eventName, state);
     }
 
     public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String eventName, final String state)
             throws Exception {
-        final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstance.getId(), state, getProcessAPI());
+        return waitForEvent(100, 5000, processInstance.getId(), eventName, state);
+    }
+
+    public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final long processInstanceId, final String eventName, final String state)
+            throws Exception {
+        final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstanceId, state, getProcessAPI());
         assertTrue("Expected 1 activities in " + state + " state", waitForEvent.waitUntil());
         return waitForEvent;
     }

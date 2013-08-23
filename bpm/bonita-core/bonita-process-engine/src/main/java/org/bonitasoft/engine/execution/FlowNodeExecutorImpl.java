@@ -228,7 +228,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     }
                     if (operations != null) {
                         for (final SOperation operation : operations) {
-                            operationService.execute(operation, sFlowNodeInstance.getRootContainerId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
+                            operationService.execute(operation, sFlowNodeInstance.getParentProcessInstanceId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                                     expressionContext);
                         }
                     }
