@@ -26,10 +26,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public interface LockService {
 
-    void unlock(long objectToLockId, String objectType) throws SLockException;
+    void unlock(BonitaLock lock) throws SLockException;
 
-    boolean tryLock(long objectToLockId, String objectType) throws SLockException;
+    BonitaLock tryLock(long objectToLockId, String objectType) throws SLockException;
 
-    void lock(long objectToLockId, String objectType) throws SLockException;
+    BonitaLock lock(long objectToLockId, String objectType) throws SLockException;
 
 }

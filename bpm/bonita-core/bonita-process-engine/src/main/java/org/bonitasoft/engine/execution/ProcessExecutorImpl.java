@@ -117,6 +117,7 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -189,6 +190,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final TransactionService transactionService;
 
+    private final boolean debugEnabled;
+
     public ProcessExecutorImpl(final BPMInstanceBuilders instanceBuilders, final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
             final WorkService workService, final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
@@ -225,6 +228,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.lockService = lockService;
         this.eventsHandler = eventsHandler;
+        debugEnabled = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
         for (final Entry<String, SProcessInstanceHandler<SEvent>> handler : handlers.entrySet()) {
             try {
                 eventService.addHandler(handler.getKey(), handler.getValue());// TODO check if it's already here?
@@ -554,19 +558,16 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionInstance.getName());
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         final Long processDefinitionId = sProcessDefinition.getId();
-
-        if (!lockService.tryLock(parentProcessInstanceId, objectType)) {
+        BonitaLock lock = lockService.tryLock(parentProcessInstanceId, objectType);
+        if (lock == null) {
             final ExecuteTransitionWork runnable = new ExecuteTransitionWork(processDefinitionId, sTransitionInstance.getId());
-            try {
-                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
-                Thread.sleep(50);
-            } catch (final InterruptedException e) {
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Failed to lock, the work will be rescheduled: " + runnable.getDescription());
             }
             workService.registerWork(runnable);
             return;
         }
-        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, parentProcessInstanceId, SFlowElementsContainerType.PROCESS
-                .name()));
+        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock));
 
         final boolean isGateway = SFlowNodeType.GATEWAY.equals(sFlowNodeDefinition.getType());
         boolean toExecute = false;
@@ -574,11 +575,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (isGateway) {
             // if flownode definition is gateway we have an exclusive lock on the transitioninstance.getTarget for this process instance
             gatewayLockId = parentProcessInstanceId + sFlowNodeDefinition.getId();
-            if (!lockService.tryLock(gatewayLockId, GATEWAY_LOCK)) {
+            BonitaLock lock2 = lockService.tryLock(gatewayLockId, GATEWAY_LOCK);
+            if (lock2 == null) {
                 workService.registerWork(new ExecuteTransitionWork(processDefinitionId, sTransitionInstance.getId()));
                 return;
             }
-            transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, gatewayLockId, GATEWAY_LOCK));
+            transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock2));
         }
         // refresh because the transition was get in an other transaction
         final STransitionInstance transitionInstance = transitionService.get(sTransitionInstance.getId());
@@ -773,20 +775,18 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SUserTaskInstanceBuilder flowNodeKeyProvider = bpmInstancesCreator.getBPMInstanceBuilders().getUserTaskInstanceBuilder();
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
-
-        if (!lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name())) {// lock process in order to avoid hit 2 times at the same time
+        BonitaLock lock = lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name());
+        if (lock == null) {// lock process in order to avoid hit 2 times at the same time
             final NotifyChildFinishedWork runnable = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId,
                     sFlowNodeInstanceChild.getParentContainerId(), sFlowNodeInstanceChild.getParentContainerType().name(), stateId);
-            try {
-                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
-                Thread.sleep(50);
-            } catch (final InterruptedException e) {
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Failed to lock, the work will be rescheduled: " + runnable.getDescription());
             }
             workService.registerWork(runnable);
             return;
         }
 
-        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, processInstanceId, SFlowElementsContainerType.PROCESS.name()));
+        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock));
         try {
             SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
             final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
@@ -863,7 +863,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     /**
      * Evaluate the split of the element
      * The element contains the current token it received
-     *
+     * 
      * @return
      *         number of token of the process
      */
@@ -1064,7 +1064,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     /**
      * execute the implicit end of an element
-     *
+     * 
      * @param numberOfTokenToMerge
      * @param tokenRefId
      * @param processInstanceId

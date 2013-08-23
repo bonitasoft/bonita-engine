@@ -50,6 +50,7 @@ import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
+import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -109,6 +110,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final TransactionService transactionService;
 
+    private boolean debugEnabled;
+
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
             final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
@@ -134,6 +137,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         this.commentService = commentService;
         this.logger = logger;
         setInFailThreadTimeout = 3000;
+        debugEnabled = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
     }
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
@@ -186,21 +190,18 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     public FlowNodeState stepForward(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
             final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
         try {
-            if (!lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name())) {
+            BonitaLock lock = lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name());
+            if (lock == null) {
                 // reschedule the work
                 final ExecuteFlowNodeWork runnable = new ExecuteFlowNodeWork(Type.FLOWNODE, flowNodeInstanceId, operations, expressionContext,
                         processInstanceId);
-                try {
-                    final int sleepTime = 50;
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + sleepTime + " ms to reexecute " + runnable.getDescription());
-                    Thread.sleep(sleepTime);
-                } catch (final InterruptedException e) {
+                if (debugEnabled) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Failed to lock, the work will be rescheduled: " + runnable.getDescription());
                 }
                 workService.registerWork(runnable);
                 return null;
             }
-            transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, processInstanceId, SFlowElementsContainerType.PROCESS
-                    .name()));
+            transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock));
         } catch (final SBonitaException e) {
             throw new SFlowNodeExecutionException(e);
         }
@@ -353,19 +354,18 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final int stateId, final long parentId) throws SBonitaException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        if (!lockService.tryLock(parentId, SFlowElementsContainerType.PROCESS.name())) {// lock activity in order to avoid hit 2 times at the same time
+        BonitaLock lock = lockService.tryLock(parentId, SFlowElementsContainerType.PROCESS.name());
+        if (lock == null) {// lock activity in order to avoid hit 2 times at the same time
             // reschedule work because we did not lock
             final NotifyChildFinishedWork runnable = new NotifyChildFinishedWork(processDefinitionId, sFlowNodeInstanceChild.getId(),
                     sFlowNodeInstanceChild.getParentContainerId(), sFlowNodeInstanceChild.getParentContainerType().name(), stateId);
-            try {
-                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "waiting " + 50 + " ms to reexecute " + runnable.getDescription());
-                Thread.sleep(50);
-            } catch (final InterruptedException e) {
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Failed to lock, the work will be rescheduled: " + runnable.getDescription());
             }
             workService.registerWork(runnable);
             return;
         }
-        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, parentId, SFlowElementsContainerType.PROCESS.name()));
+        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock));
 
         boolean hit = false;
         // TODO check deletion here
