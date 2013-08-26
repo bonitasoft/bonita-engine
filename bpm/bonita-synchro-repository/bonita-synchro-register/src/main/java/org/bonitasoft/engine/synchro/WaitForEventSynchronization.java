@@ -11,35 +11,41 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.synchro;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Baptiste Mesta
  */
-public class ProcessInstanceHandler extends AbstractUpdateHandler {
+public class WaitForEventSynchronization implements BonitaTransactionSynchronization {
 
-    private static final long serialVersionUID = 1L;
+    private final Map<String, Serializable> event;
 
-    public ProcessInstanceHandler(final long tenantId) {
-        super(tenantId);
+    private final Long id;
+
+    private final SynchroService synchroService;
+
+    public WaitForEventSynchronization(final Map<String, Serializable> event, final Long id, final SynchroService synchroService) {
+        this.event = event;
+        this.id = id;
+        this.synchroService = synchroService;
     }
 
     @Override
-    protected Map<String, Serializable> getEvent(final SEvent sEvent) {
-        final SProcessInstance instance = (SProcessInstance) sEvent.getObject();
-        return EventUtil.getEventForProcess(instance);
+    public void beforeCommit() {
+        // NOTHING
     }
 
     @Override
-    public boolean isInterested(final SEvent event) {
-        final Object object = event.getObject();
-        return (object instanceof SProcessInstance);
+    public void afterCompletion(final TransactionState status) {
+        if (status == TransactionState.COMMITTED) {
+            synchroService.fireEvent(event, id);
+        }
     }
 
 }

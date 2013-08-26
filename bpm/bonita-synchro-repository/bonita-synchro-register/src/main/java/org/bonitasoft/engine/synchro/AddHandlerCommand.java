@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.test.synchro;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.List;

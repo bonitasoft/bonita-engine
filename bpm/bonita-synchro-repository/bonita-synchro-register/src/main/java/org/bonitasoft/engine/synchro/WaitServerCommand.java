@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.synchro;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -30,14 +30,14 @@ public class WaitServerCommand extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         if (parameters.get("clear") != null) {
-            SynchroRepository.clearAllEvents();
+            serviceAccessor.getSynchroService().clearAllEvents();
             return null;
         } else {
             @SuppressWarnings("unchecked")
             final Map<String, Serializable> event = (Map<String, Serializable>) parameters.get("event");
             final int timeout = (Integer) parameters.get("timeout");
             try {
-                return SynchroRepository.waitForEvent(event, timeout);
+                return serviceAccessor.getSynchroService().waitForEvent(event, timeout);
             } catch (final Exception e) {
                 throw new SCommandExecutionException(e);
             }

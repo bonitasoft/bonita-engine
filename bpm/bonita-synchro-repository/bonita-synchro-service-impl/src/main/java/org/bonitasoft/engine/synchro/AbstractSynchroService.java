@@ -11,49 +11,41 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.synchro;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+
 /**
- * Event repository based on a mutex
- * 
- * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
+ * @author Charles Souillard
  */
-public class MutexEventRepository implements EventRepository {
+public abstract class AbstractSynchroService implements SynchroService {
 
-    private final Map<Map<String, Serializable>, SynchroObject> waiters;
+    protected abstract Map<Map<String, Serializable>, SynchroObject> getWaitersMap();
 
-    private final Map<Map<String, Serializable>, Serializable> fired;
+    protected abstract Map<Map<String, Serializable>, Serializable> getFiredMap();
 
-    private final Object mutex = new Object();
+    protected abstract Object getMutex();
 
-    private static final MutexEventRepository INSTANCE = new MutexEventRepository(50);
-    
-    /**
-     * @param i
-     */
-    private MutexEventRepository(final int initialCapacity) {
-        fired = new HashMap<Map<String, Serializable>, Serializable>(initialCapacity);
-        waiters = new HashMap<Map<String, Serializable>, SynchroObject>(initialCapacity);
-    }
+    private final TechnicalLoggerService logger;
 
-    public static MutexEventRepository getInstance() {
-        return INSTANCE;
+    public AbstractSynchroService(final TechnicalLoggerService logger) {
+        this.logger = logger;
     }
 
     @Override
     public void fireEvent(final Map<String, Serializable> event, final Serializable id) {
-        synchronized (mutex) {
+        synchronized (getMutex()) {
             final SynchroObject waiter = getWaiterAndRemoveIt(event);
             if (waiter == null) {
-                fired.put(event, id);
+                getFiredMap().put(event, id);
             } else {
                 waiter.setId(id);
                 waiter.release();
@@ -62,7 +54,7 @@ public class MutexEventRepository implements EventRepository {
     }
 
     private SynchroObject getWaiterAndRemoveIt(final Map<String, Serializable> event) {
-        for (final Iterator<Entry<Map<String, Serializable>, SynchroObject>> iterator = waiters.entrySet().iterator(); iterator.hasNext();) {
+        for (final Iterator<Entry<Map<String, Serializable>, SynchroObject>> iterator = getWaitersMap().entrySet().iterator(); iterator.hasNext();) {
             final Entry<Map<String, Serializable>, SynchroObject> waiter = iterator.next();
             if (containsAllEntries(waiter.getKey(), event)) {
                 iterator.remove();
@@ -72,11 +64,6 @@ public class MutexEventRepository implements EventRepository {
         return null;
     }
 
-    /**
-     * @param subSet
-     * @param event
-     * @return
-     */
     private boolean containsAllEntries(final Map<String, Serializable> subSet, final Map<String, Serializable> container) {
         for (final Entry<String, Serializable> entry : subSet.entrySet()) {
             final Serializable value = entry.getValue();
@@ -88,7 +75,7 @@ public class MutexEventRepository implements EventRepository {
     }
 
     private Entry<Map<String, Serializable>, Serializable> getFiredAndRemoveIt(final Map<String, Serializable> event) {
-        for (final Iterator<Entry<Map<String, Serializable>, Serializable>> iterator = fired.entrySet().iterator(); iterator.hasNext();) {
+        for (final Iterator<Entry<Map<String, Serializable>, Serializable>> iterator = getFiredMap().entrySet().iterator(); iterator.hasNext();) {
             final Entry<Map<String, Serializable>, Serializable> fired = iterator.next();
             if (containsAllEntries(event, fired.getKey())) {
                 iterator.remove();
@@ -102,14 +89,14 @@ public class MutexEventRepository implements EventRepository {
     public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
         SynchroObject waiter = null;
         Serializable id = null;
-        synchronized (mutex) {
+        synchronized (getMutex()) {
             final Entry<Map<String, Serializable>, Serializable> entry = getFiredAndRemoveIt(event);
             if (entry != null) {
                 id = entry.getValue();
             } else {
                 waiter = new SynchroObject();
                 waiter.acquire(1);
-                waiters.put(event, waiter);
+                getWaitersMap().put(event, waiter);
             }
         }
         if (waiter != null) {
@@ -127,17 +114,17 @@ public class MutexEventRepository implements EventRepository {
     }
 
     private void throwTimeout(final Map<String, Serializable> event, final long timeout) throws TimeoutException {
-        throw new TimeoutException("Event '" + event + "' has not been received on time after waiting '" + timeout + "ms'");
+        throw new TimeoutException("Event '" + event + "' has not been received on time after waiting '" + timeout + " ms'");
     }
 
     @Override
     public void clearAllEvents() {
-        fired.clear();
-        waiters.clear();
+        getFiredMap().clear();
+        getWaitersMap().clear();
     }
 
     @Override
     public boolean hasWaiters() {
-        return !waiters.isEmpty();
+        return !getWaitersMap().isEmpty();
     }
 }

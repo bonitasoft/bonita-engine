@@ -106,6 +106,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
+import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.test.util.ServicesAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
@@ -632,12 +633,17 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public ReadSessionAccessor getReadSessionAccessor() {
-    	return getInstanceOf(ReadSessionAccessor.class);
+        return getInstanceOf(ReadSessionAccessor.class);
     }
 
     @Override
     public SACommentBuilder getSACommentBuilders() {
         return getInstanceOf(SACommentBuilder.class);
+    }
+
+    @Override
+    public SynchroService getSynchroService() {
+        return getInstanceOf(SynchroService.class);
     }
 
 }

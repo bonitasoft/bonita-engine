@@ -13,7 +13,9 @@
 	<name>BonitaBPM Synchro-repository</name>
 
 	<modules>
-		<module>bonita-synchro-server</module>
+		<module>bonita-synchro-service</module>
+		<module>bonita-synchro-service-impl</module>
 		<module>bonita-synchro-register</module>
 	</modules>
+	<groupId>org.bonitasoft.engine.synchro</groupId>
 </project>

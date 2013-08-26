@@ -41,8 +41,6 @@ public class ClientEventUtil {
 
     private static final String WAIT_SERVER_COMMAND = "waitServerCommand";
 
-    private static final String SYNCHRO_REGISTER = "synchroRepositoryRegister";
-
     private static final String FLOW_NODE = "flowNode";
 
     private static final String PROCESS = "process";
@@ -107,9 +105,9 @@ public class ClientEventUtil {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
 
         final CommandDescriptor waitServerCommand = commandAPI.register(WAIT_SERVER_COMMAND, WAIT_SERVER_COMMAND,
-                "org.bonitasoft.engine.test.synchro.WaitServerCommand");
+                "org.bonitasoft.engine.synchro.WaitServerCommand");
         final CommandDescriptor addHandlerCommand = commandAPI.register(ADD_HANDLER_COMMAND, ADD_HANDLER_COMMAND,
-                "org.bonitasoft.engine.test.synchro.AddHandlerCommand");
+                "org.bonitasoft.engine.synchro.AddHandlerCommand");
 
         parameters.put("commands", (Serializable) Arrays.asList(waitServerCommand.getId(), addHandlerCommand.getId()));
         commandAPI.execute(ADD_HANDLER_COMMAND, parameters);

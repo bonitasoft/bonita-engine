@@ -11,9 +11,8 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.synchro;
+package org.bonitasoft.engine.synchro;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -21,8 +20,7 @@ import java.util.Map;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -34,6 +32,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
     private static final long serialVersionUID = 1L;
+
     private final long tenantId;
 
     public AbstractUpdateHandler(final long tenantId) {
@@ -49,9 +48,10 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
             final Map<String, Serializable> event = getEvent(sEvent);
             Long id = getObjectId(sEvent);
 
-            final BonitaTransactionSynchronization synchronization = new WaitForEventSynchronization(event, id);
+            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+            final BonitaTransactionSynchronization synchronization = new WaitForEventSynchronization(event, id, tenantServiceAccessor.getSynchroService());
 
-            TransactionService transactionService = getTransactionService();
+            TransactionService transactionService = tenantServiceAccessor.getTransactionService();
             transactionService.registerBonitaSynchronization(synchronization);
         } catch (final STransactionNotFoundException e) {
             e.printStackTrace();
@@ -77,23 +77,12 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
         return id;
     }
 
-    /**
-     * @return
-     * @throws BonitaHomeNotSetException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     * @throws IOException
-     * @throws BonitaHomeConfigurationException
-     */
-    private TransactionService getTransactionService() throws SHandlerExecutionException {
-        TransactionService transactionService;
+    private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
         try {
-            transactionService = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor().getTenantServiceAccessor(tenantId).getTransactionService();
+            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
         } catch (Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }
-        return transactionService;
     }
 
 }

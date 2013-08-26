@@ -11,37 +11,24 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.synchro;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
-
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionState;
+import java.util.concurrent.TimeoutException;
 
 /**
- * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
+ *
  */
-public class WaitForEventSynchronization implements BonitaTransactionSynchronization {
+public interface SynchroService {
 
-    private final Map<String, Serializable> event;
+    public abstract void fireEvent(Map<String, Serializable> event, Serializable id);
 
-    private final Long id;
+    public abstract Serializable waitForEvent(Map<String, Serializable> event, long timeout) throws InterruptedException, TimeoutException;
 
-    public WaitForEventSynchronization(final Map<String, Serializable> event, final Long id) {
-        this.event = event;
-        this.id = id;
-    }
+    public abstract void clearAllEvents();
 
-    @Override
-    public void beforeCommit() {
-        // NOTHING
-    }
+    public abstract boolean hasWaiters();
 
-    @Override
-    public void afterCompletion(final TransactionState status) {
-        if (status == TransactionState.COMMITTED) {
-            SynchroRepository.fireEvent(event, id);
-        }
-    }
 }
