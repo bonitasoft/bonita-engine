@@ -21,13 +21,18 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -35,6 +40,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
@@ -44,11 +50,13 @@ import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 
 /**
  * @author Baptiste Mesta
  * @author Julien Mege
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class HTTPServerAPI implements ServerAPI {
 
@@ -74,74 +82,101 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final String APPLICATION_NAME = "application.name";
 
+    private static final Logger LOGGER = Logger.getLogger(HTTPServerAPI.class.getName());
+
     private String serverUrl = null;
 
     private String applicationName = null;
 
-    public HTTPServerAPI(final Map<String, String> parameters) throws ServerAPIException {
+    private static final DefaultHttpClient httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
 
+    private static final XStream xstream = new XStream();
+
+    private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
+
+    public HTTPServerAPI(final Map<String, String> parameters) throws ServerAPIException {
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
-
     }
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
-        Object invokeMethodReturn = null;
         String response = null;
         try {
-            final DefaultHttpClient httpclient = new DefaultHttpClient();
-            final StringBuilder sBuilder = new StringBuilder(serverUrl);
-            sBuilder.append(SLASH).append(applicationName).append(SERVER_API).append(apiInterfaceName).append(SLASH).append(methodName);
-            final HttpPost httpost = new HttpPost(sBuilder.toString());
-            HttpEntity httpEntity;
-            final XStream xstream = new XStream();
-            /*
-             * if we have a business archive we use multipart to have the business archive attached as a binary content (it can be big)
-             */
-            if (classNameParameters.contains(BusinessArchive.class.getName()) || classNameParameters.contains(byte[].class.getName())) {
-                final List<Object> bytearrayParameters = new ArrayList<Object>();
-                final MultipartEntity entity = new MultipartEntity();
-                entity.addPart(OPTIONS, new StringBody(toXML(options, xstream)));
-                entity.addPart(CLASS_NAME_PARAMETERS, new StringBody(toXML(classNameParameters, xstream)));
-                for (int i = 0; i < parametersValues.length; i++) {
-                    final Object parameterValue = parametersValues[i];
-                    if (parameterValue instanceof BusinessArchive || parameterValue instanceof byte[]) {
-                        parametersValues[i] = BYTE_ARRAY;
-                        bytearrayParameters.add(parameterValue);
-                    }
-                }
-                entity.addPart(PARAMETERS_VALUES, new StringBody(toXML(parametersValues, xstream)));
-                int i = 0;
-                for (final Object object : bytearrayParameters) {
-                    entity.addPart(BINARY_PARAMETER + i, new ByteArrayBody(serialize(object), BINARY_PARAMETER + i));
-                    i++;
-                }
-                httpEntity = entity;
-            } else {
-                final List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-                nvps.add(new BasicNameValuePair(OPTIONS, toXML(options, xstream)));
-                nvps.add(new BasicNameValuePair(CLASS_NAME_PARAMETERS, toXML(classNameParameters, xstream)));
-                nvps.add(new BasicNameValuePair(PARAMETERS_VALUES, toXML(parametersValues, xstream)));
-                httpEntity = new UrlEncodedFormEntity(nvps, UTF_8);
+            response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
+            return checkInvokeMethodReturn(response, xstream);
+        } catch (final UndeclaredThrowableException e) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.log(Level.FINE, e.getMessage(), e);
             }
-            httpost.setEntity(httpEntity);
-
-            final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
-            response = httpclient.execute(httpost, responseHandler);
-            if (response != null && !response.isEmpty() && !response.equals("null")) {
-                invokeMethodReturn = fromXML(response, xstream);
-            }
-
-            if (invokeMethodReturn instanceof Throwable) {
-                throw (Throwable) invokeMethodReturn;
-            }
-
+            throw new ServerWrappedException(e);
         } catch (final Throwable e) {
             throw new ServerWrappedException(e.getMessage() + "response= " + response, e);
         }
+    }
+
+    private Object checkInvokeMethodReturn(final String response, final XStream xstream) throws Throwable {
+        Object invokeMethodReturn = null;
+        if (response != null && !response.isEmpty() && !response.equals("null")) {
+            invokeMethodReturn = fromXML(response, xstream);
+            if (invokeMethodReturn instanceof Throwable) {
+                throw (Throwable) invokeMethodReturn;
+            }
+        }
         return invokeMethodReturn;
+    }
+
+    private String executeHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+            final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException,
+            ClientProtocolException {
+        final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
+        return httpclient.execute(httpost, responseHandler);
+    }
+
+    private HttpPost createHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+            final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException {
+        final HttpEntity httpEntity = buildEntity(options, classNameParameters, parametersValues, xstream);
+        final StringBuilder sBuilder = new StringBuilder(serverUrl);
+        sBuilder.append(SLASH).append(applicationName).append(SERVER_API).append(apiInterfaceName).append(SLASH).append(methodName);
+        final HttpPost httpost = new HttpPost(sBuilder.toString());
+        httpost.setEntity(httpEntity);
+        return httpost;
+    }
+
+    private HttpEntity buildEntity(final Map<String, Serializable> options, final List<String> classNameParameters, final Object[] parametersValues,
+            final XStream xstream) throws UnsupportedEncodingException, IOException {
+        final HttpEntity httpEntity;
+        /*
+         * if we have a business archive we use multipart to have the business archive attached as a binary content (it can be big)
+         */
+        if (classNameParameters.contains(BusinessArchive.class.getName()) || classNameParameters.contains(byte[].class.getName())) {
+            final List<Object> bytearrayParameters = new ArrayList<Object>();
+            final MultipartEntity entity = new MultipartEntity();
+            entity.addPart(OPTIONS, new StringBody(toXML(options, xstream)));
+            entity.addPart(CLASS_NAME_PARAMETERS, new StringBody(toXML(classNameParameters, xstream)));
+            for (int i = 0; i < parametersValues.length; i++) {
+                final Object parameterValue = parametersValues[i];
+                if (parameterValue instanceof BusinessArchive || parameterValue instanceof byte[]) {
+                    parametersValues[i] = BYTE_ARRAY;
+                    bytearrayParameters.add(parameterValue);
+                }
+            }
+            entity.addPart(PARAMETERS_VALUES, new StringBody(toXML(parametersValues, xstream)));
+            int i = 0;
+            for (final Object object : bytearrayParameters) {
+                entity.addPart(BINARY_PARAMETER + i, new ByteArrayBody(serialize(object), BINARY_PARAMETER + i));
+                i++;
+            }
+            httpEntity = entity;
+        } else {
+            final List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair(OPTIONS, toXML(options, xstream)));
+            nvps.add(new BasicNameValuePair(CLASS_NAME_PARAMETERS, toXML(classNameParameters, xstream)));
+            nvps.add(new BasicNameValuePair(PARAMETERS_VALUES, toXML(parametersValues, xstream)));
+            httpEntity = new UrlEncodedFormEntity(nvps, UTF_8);
+        }
+        return httpEntity;
     }
 
     public byte[] serialize(final Object obj) throws IOException {
@@ -176,6 +211,8 @@ public class HTTPServerAPI implements ServerAPI {
             } catch (final IOException e) {
                 throw new BonitaRuntimeException("unable to deserialize object " + object, e);
             } catch (final ClassNotFoundException e) {
+                throw new BonitaRuntimeException("unable to deserialize object " + object, e);
+            } catch (final CannotResolveClassException e) {
                 throw new BonitaRuntimeException("unable to deserialize object " + object, e);
             } finally {
                 in.close();

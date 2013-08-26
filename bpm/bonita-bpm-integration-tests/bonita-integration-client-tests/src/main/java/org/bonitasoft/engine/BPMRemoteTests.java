@@ -45,7 +45,8 @@ import org.junit.runners.Suite.SuiteClasses;
         LoopTest.class,
         MultiInstanceTest.class,
         TenantAccessorTest.class,
-        ReportingAPIIT.class
+        ReportingAPIIT.class, 
+        MultiThreadCallsTest.class
 })
 public class BPMRemoteTests {
 
