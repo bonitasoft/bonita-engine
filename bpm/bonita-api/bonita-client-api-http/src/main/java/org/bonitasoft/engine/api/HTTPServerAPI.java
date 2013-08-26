@@ -40,6 +40,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
@@ -86,7 +87,13 @@ public class HTTPServerAPI implements ServerAPI {
 
     private String applicationName = null;
 
-    public HTTPServerAPI(final Map<String, String> parameters) {
+    private static final DefaultHttpClient httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+
+    private static final XStream xstream = new XStream();
+
+    private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
+
+    public HTTPServerAPI(final Map<String, String> parameters)  {
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
     }
@@ -96,7 +103,6 @@ public class HTTPServerAPI implements ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
         String response = null;
         try {
-            final XStream xstream = new XStream();
             response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
             return checkInvokeMethodReturn(response, xstream);
         } catch (final UndeclaredThrowableException e) {
@@ -124,8 +130,6 @@ public class HTTPServerAPI implements ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException,
             ClientProtocolException {
         final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
-        final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
-        final DefaultHttpClient httpclient = new DefaultHttpClient();
         return httpclient.execute(httpost, responseHandler);
     }
 
