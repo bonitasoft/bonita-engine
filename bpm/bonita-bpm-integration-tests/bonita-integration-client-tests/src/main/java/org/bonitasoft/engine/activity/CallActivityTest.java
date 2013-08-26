@@ -49,6 +49,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.EndEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.IntermediateCatchEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -244,7 +245,6 @@ public class CallActivityTest extends CommonAPITest {
         executeCallAtivityUntilEndOfProcess(true, true, "2.0", false);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway", "Message" }, jira = "ENGINE-1713")
     @Test
     public void callActivityAndGatewayAndMessage() throws Exception {
         final Expression processVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
@@ -269,10 +269,11 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessDefinitionBuilder receiveProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("Receive", PROCESS_VERSION);
         receiveProcessDefinitionBuilder.addActor(ACTOR_NAME);
         receiveProcessDefinitionBuilder.addStartEvent("ReceiveStart").addEndEvent("ReceiveEnd");
-        receiveProcessDefinitionBuilder.addLongTextData("copymsg", null);
         receiveProcessDefinitionBuilder.addUserTask("Read", ACTOR_NAME);
         final Operation operation = buildAssignOperation("copymsg", "MSG", ExpressionType.TYPE_VARIABLE, String.class.getName());
-        receiveProcessDefinitionBuilder.addIntermediateCatchEvent("ReceiveMsg").addMessageEventTrigger("ping").addOperation(operation);
+        final IntermediateCatchEventDefinitionBuilder intermediateCatchEvent = receiveProcessDefinitionBuilder.addIntermediateCatchEvent("ReceiveMsg");
+        intermediateCatchEvent.addMessageEventTrigger("ping").addOperation(operation);
+        intermediateCatchEvent.addLongTextData("copymsg", null);
         // Transitions
         receiveProcessDefinitionBuilder.addTransition("ReceiveStart", "ReceiveMsg").addTransition("ReceiveMsg", "Read").addTransition("Read", "ReceiveEnd");
         final ProcessDefinition receiveProcessDefinition = deployAndEnableWithActor(receiveProcessDefinitionBuilder.done(), ACTOR_NAME, cascao);
