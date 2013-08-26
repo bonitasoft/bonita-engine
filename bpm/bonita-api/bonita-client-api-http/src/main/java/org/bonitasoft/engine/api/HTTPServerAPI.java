@@ -87,13 +87,18 @@ public class HTTPServerAPI implements ServerAPI {
 
     private String applicationName = null;
 
-    private static final DefaultHttpClient httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+    private static DefaultHttpClient httpclient = null;
 
     private static final XStream xstream = new XStream();
 
     private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
 
-    public HTTPServerAPI(final Map<String, String> parameters)  {
+    public HTTPServerAPI(final Map<String, String> parameters) {
+        // initialize httpclient in the constructor to avoid incompatibility when running tests:
+        // java.security.NoSuchAlgorithmException: class configured for SSLContext: sun.security.ssl.SSLContextImpl$TLS10Context not a SSLContext
+        if (httpclient == null) {
+            httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+        }
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
     }
