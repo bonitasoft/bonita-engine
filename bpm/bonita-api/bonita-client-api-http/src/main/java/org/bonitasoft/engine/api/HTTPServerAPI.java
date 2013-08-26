@@ -96,7 +96,9 @@ public class HTTPServerAPI implements ServerAPI {
     public HTTPServerAPI(final Map<String, String> parameters) {
         // initialize httpclient in the constructor to avoid incompatibility when running tests:
         // java.security.NoSuchAlgorithmException: class configured for SSLContext: sun.security.ssl.SSLContextImpl$TLS10Context not a SSLContext
-        httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+        if (httpclient == null) {
+            httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+        }
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
     }
