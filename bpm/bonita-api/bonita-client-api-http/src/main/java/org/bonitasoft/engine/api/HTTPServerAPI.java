@@ -46,7 +46,6 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
@@ -88,13 +87,16 @@ public class HTTPServerAPI implements ServerAPI {
 
     private String applicationName = null;
 
-    private static final DefaultHttpClient httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+    private static DefaultHttpClient httpclient;
 
     private static final XStream xstream = new XStream();
 
     private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
 
-    public HTTPServerAPI(final Map<String, String> parameters) throws ServerAPIException {
+    public HTTPServerAPI(final Map<String, String> parameters) {
+        // initialize httpclient in the constructor to avoid incompatibility when running tests:
+        // java.security.NoSuchAlgorithmException: class configured for SSLContext: sun.security.ssl.SSLContextImpl$TLS10Context not a SSLContext
+        httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
     }
