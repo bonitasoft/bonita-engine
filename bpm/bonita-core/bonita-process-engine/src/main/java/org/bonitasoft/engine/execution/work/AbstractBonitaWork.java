@@ -123,4 +123,9 @@ public abstract class AbstractBonitaWork implements BonitaWork {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Work[" + getDescription() + "]";
+    }
 }

@@ -19,6 +19,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 /**
  * This service must be configured as a singleton.
@@ -29,8 +30,8 @@ public class MemoryLockService extends AbstractLockService {
 
     private static final Object lock = new Object();
 
-    public MemoryLockService(final TechnicalLoggerService logger, int lockTimeout) {
-        super(logger, lockTimeout);
+    public MemoryLockService(final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
+        super(logger, sessionAccessor, lockTimeout);
     }
 
     final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();

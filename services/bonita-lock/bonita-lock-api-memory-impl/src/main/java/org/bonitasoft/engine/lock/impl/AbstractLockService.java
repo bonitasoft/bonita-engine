@@ -8,6 +8,8 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 public abstract class AbstractLockService implements LockService {
 
@@ -17,13 +19,20 @@ public abstract class AbstractLockService implements LockService {
 
     protected final int lockTimeout;
 
-    public AbstractLockService(TechnicalLoggerService logger, int lockTimeout) {
+    private final ReadSessionAccessor sessionAccessor;
+
+    public AbstractLockService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
         this.logger = logger;
+        this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
     }
 
     private String buildKey(final long objectToLockId, final String objectType) {
-        return objectType + SEPARATOR + objectToLockId;
+        try {
+            return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
+        } catch (TenantIdNotSetException e) {
+            throw new IllegalStateException("Tenant not set");
+        }
     }
 
     @Override
