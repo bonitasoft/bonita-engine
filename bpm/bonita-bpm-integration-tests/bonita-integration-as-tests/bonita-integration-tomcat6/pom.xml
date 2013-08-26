@@ -150,6 +150,7 @@
 		
 										<mkdir dir="${report.xml}" />
 										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="512m">
+<!-- 											<jvmarg line="-Xdebug -Xmx512m -Xms128m -XX:MaxPermSize=256m -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8500"/> -->
 											<classpath refid="test.path" />
 											<sysproperty key="bonita.home" value="${bonita.home}" />
 											<formatter type="xml" />
@@ -208,6 +209,12 @@
 								<home>${tomcat.home}</home>
 								<properties>
 									<cargo.servlet.port>${provider.port}</cargo.servlet.port>
+<!-- 									<cargo.jvmargs> -->
+<!-- 							          -Xdebug -->
+<!-- 							          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -->
+<!-- 							          -Xnoagent -->
+<!-- 							          -Djava.compiler=NONE -->
+<!-- 							        </cargo.jvmargs> -->
 								</properties>
 							</configuration>
 							<wait>false</wait>
