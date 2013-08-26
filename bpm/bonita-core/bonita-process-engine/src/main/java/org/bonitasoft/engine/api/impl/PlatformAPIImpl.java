@@ -386,8 +386,12 @@ public class PlatformAPIImpl implements PlatformAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    final STenant tenant = getDefaultTenant();
-                    deactiveTenant(tenant.getId());
+                	try {
+                      final STenant tenant = getDefaultTenant();
+                      deactiveTenant(tenant.getId());
+                	} catch (STenantNotFoundException e) {
+                		
+                	}
                     clean.execute();
                     deleteAll.execute();
 
