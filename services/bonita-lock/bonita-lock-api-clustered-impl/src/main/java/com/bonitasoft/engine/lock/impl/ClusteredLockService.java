@@ -12,6 +12,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.bonitasoft.engine.lock.impl.AbstractLockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
@@ -26,8 +27,9 @@ public class ClusteredLockService extends AbstractLockService {
 
     private final HazelcastInstance hazelcastInstance;
 
-    public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, int lockTimeout) {
-        super(logger, lockTimeout);
+    public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor,
+            int lockTimeout) {
+        super(logger, sessionAccessor, lockTimeout);
         this.hazelcastInstance = hazelcastInstance;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
@@ -41,7 +43,6 @@ public class ClusteredLockService extends AbstractLockService {
 
     @Override
     protected void removeLockFromMapIfnotUsed(String key) {
-        // nothing to do
     }
 
 }

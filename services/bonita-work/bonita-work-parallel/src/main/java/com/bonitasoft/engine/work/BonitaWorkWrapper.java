@@ -42,4 +42,9 @@ public class BonitaWorkWrapper extends BonitaRunnable {
         cancelled = true;
     }
 
+    @Override
+    public String toString() {
+        return work.toString();
+    }
+
 }
