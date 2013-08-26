@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
@@ -52,7 +53,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
 
     public static final String DEFAULT_EXTERNAL_CONNECTOR_VERSION = "1.0";
 
-    protected User johnUser;
+    protected User user;
 
     @After
     public void afterTest() throws BonitaException {
@@ -64,8 +65,8 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
     @Before
     public void beforeTest() throws BonitaException {
         login();
-        johnUser = createUser(JOHN, "bpm");
-        johnUserId = johnUser.getId();
+        user = createUser(JOHN, "bpm");
+        johnUserId = user.getId();
         logout();
         loginWith(JOHN, "bpm");
     }
@@ -107,24 +108,29 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         return resources;
     }
 
-    protected ProcessDefinition deployProcessWithExternalTestConnector(final ProcessDefinitionBuilderExt processDefBuilder, final String delivery,
-            final long userId) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                processDefBuilder.done());
-
-        addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestExternalConnector.impl", "TestExternalConnector.impl",
-                TestExternalConnector.class, "TestExternalConnector.jar");
-
+    protected ProcessDefinition deployProcessWithExternalTestConnectorAndActor(final ProcessDefinitionBuilderExt processDefBuilder, final String delivery,
+            final User user) throws BonitaException, IOException {
+        final BusinessArchiveBuilder businessArchiveBuilder = addExternalTestConnector(processDefBuilder);
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, userId, processDefinition);
+        addMappingOfActorsForUser(delivery, user.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
 
-    private void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
+    private BusinessArchiveBuilder addExternalTestConnector(final ProcessDefinitionBuilderExt processDefBuilder) throws InvalidProcessDefinitionException,
+            IOException {
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
+                processDefBuilder.done());
+        addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestExternalConnector.impl", "TestExternalConnector.impl",
+                TestExternalConnector.class, "TestExternalConnector.jar");
+        return businessArchiveBuilder;
+    }
+
+    private void addConnectorImplemWithDependency(final BusinessArchiveBuilder businessArchiveBuilder, final String implemPath, final String implemName,
             final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
-        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
-        bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
+        businessArchiveBuilder
+                .addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
+        businessArchiveBuilder.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
 
     private List<BarResource> generateDefaultConnectorDependencies() throws IOException {
@@ -135,9 +141,9 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         return resources;
     }
 
-    protected ProcessDefinition deployProcessWithTestConnector(final String actor, final long userId, final ProcessDefinitionBuilderExt designProcessDefinition)
-            throws BonitaException, IOException {
-        return deployProcessWithTestConnectorAndParameter(actor, userId, designProcessDefinition, null);
+    protected ProcessDefinition deployProcessWithTestConnectorAndActor(final ProcessDefinitionBuilderExt designProcessDefinition, final String actor,
+            final User user) throws BonitaException, IOException {
+        return deployProcessWithTestConnectorAndParameter(actor, user, designProcessDefinition, null);
     }
 
     protected void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
@@ -162,7 +168,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         return resources;
     }
 
-    protected ProcessDefinition deployProcessWithTestConnectorAndParameter(final String actorName, final long userId,
+    protected ProcessDefinition deployProcessWithTestConnectorAndParameter(final String actorName, final User user,
             final ProcessDefinitionBuilderExt designProcessDefinition, final Map<String, String> parameters) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         if (parameters != null) {
@@ -180,7 +186,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         }
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(actorName, userId, processDefinition);
+        addMappingOfActorsForUser(actorName, user.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }

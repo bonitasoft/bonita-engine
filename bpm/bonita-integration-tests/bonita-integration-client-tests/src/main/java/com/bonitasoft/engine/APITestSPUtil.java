@@ -19,14 +19,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -240,6 +243,15 @@ public class APITestSPUtil extends APITestUtil {
             messages.add(messageBuilder.toString());
         }
         return messages;
+    }
+
+    public void assignAndExecuteStep(final ActivityInstance activityInstance, final User user) throws BonitaException {
+        assignAndExecuteStep(activityInstance.getId(), user.getId());
+    }
+
+    protected void waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
+        final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstance);
+        assignAndExecuteStep(waitForUserTask, user);
     }
 
 }
