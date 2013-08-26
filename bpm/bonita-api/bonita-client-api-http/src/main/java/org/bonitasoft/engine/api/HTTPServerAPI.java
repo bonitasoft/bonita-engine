@@ -48,6 +48,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 
 /**
  * @author Baptiste Mesta
@@ -108,7 +109,7 @@ public class HTTPServerAPI implements ServerAPI {
         }
     }
 
-    private Object checkInvokeMethodReturn(String response, final XStream xstream) throws Throwable {
+    private Object checkInvokeMethodReturn(final String response, final XStream xstream) throws Throwable {
         Object invokeMethodReturn = null;
         if (response != null && !response.isEmpty() && !response.equals("null")) {
             invokeMethodReturn = fromXML(response, xstream);
@@ -205,6 +206,8 @@ public class HTTPServerAPI implements ServerAPI {
             } catch (final IOException e) {
                 throw new BonitaRuntimeException("unable to deserialize object " + object, e);
             } catch (final ClassNotFoundException e) {
+                throw new BonitaRuntimeException("unable to deserialize object " + object, e);
+            } catch (final CannotResolveClassException e) {
                 throw new BonitaRuntimeException("unable to deserialize object " + object, e);
             } finally {
                 in.close();
