@@ -174,7 +174,6 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final Long processDefinitionId = processDefinition.getId();
         final SExpressionContext expressionContext = new SExpressionContext(parentContainerId, getParentContainerType(sendTaskInstance).name(),
                 processDefinitionId);
-
         handleThrowMessage(messageTrigger, eventInstanceId, eventInstanceName, processDefinitionId, expressionContext);
     }
 
@@ -207,7 +206,6 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
                     expressionContext, expressionResolverService, dataInstanceService, sDataInstanceBuilders);
-
             dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name());
         }
     }

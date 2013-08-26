@@ -209,7 +209,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         FlowNodeState state = null;
         boolean failed = false;
         SBonitaException failedException = null;
-        SFlowNodeInstance fFlowNodeInstance = null;
+        SFlowNodeInstance sFlowNodeInstance = null;
         SProcessDefinition processDefinition = null;
         // retrieve the activity and execute its state
 
@@ -217,11 +217,11 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         try {
 
             try {
-                fFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+                sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
                 if (processInstanceId == null) {
-                    processInstanceId = fFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex());
+                    processInstanceId = sFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex());
                 }
-                final long processDefinitionId = fFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder()
+                final long processDefinitionId = sFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder()
                         .getProcessDefinitionIndex());
                 final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
                 Thread.currentThread().setContextClassLoader(localClassLoader);
@@ -230,27 +230,27 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     lockService.createSharedLockAccess(processInstanceId, objectType);
                 }
                 sharedLockCreated = true;
-                if (!fFlowNodeInstance.isStateExecuting()) {
-                    archiveFlowNodeInstance(fFlowNodeInstance, false, processDefinition);
-                    if (executedBy != null && executedBy > 0 && fFlowNodeInstance.getExecutedBy() != executedBy) {
-                        activityInstanceService.setExecutedBy(fFlowNodeInstance, executedBy);
+                if (!sFlowNodeInstance.isStateExecuting()) {
+                    archiveFlowNodeInstance(sFlowNodeInstance, false, processDefinition);
+                    if (executedBy != null && executedBy > 0 && sFlowNodeInstance.getExecutedBy() != executedBy) {
+                        activityInstanceService.setExecutedBy(sFlowNodeInstance, executedBy);
                     }
                     if (operations != null) {
                         for (final SOperation operation : operations) {
-                            operationService.execute(operation, fFlowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
+                            operationService.execute(operation, sFlowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
                         }
                     }
                 }
-                final StateCode stateCode = executeState(processDefinition, fFlowNodeInstance, flowNodeStateManager.getState(fFlowNodeInstance.getStateId()));
+                final StateCode stateCode = executeState(processDefinition, sFlowNodeInstance, flowNodeStateManager.getState(sFlowNodeInstance.getStateId()));
                 if (StateCode.DONE.equals(stateCode)) {
-                    state = flowNodeStateManager.getNextNormalState(processDefinition, fFlowNodeInstance, fFlowNodeInstance.getStateId());
-                    if (fFlowNodeInstance.getStateId() != state.getId()) {
+                    state = flowNodeStateManager.getNextNormalState(processDefinition, sFlowNodeInstance, sFlowNodeInstance.getStateId());
+                    if (sFlowNodeInstance.getStateId() != state.getId()) {
                         // this also unset the executing flag
-                        activityInstanceService.setState(fFlowNodeInstance, state);
+                        activityInstanceService.setState(sFlowNodeInstance, state);
                     }
                 } else if (StateCode.EXECUTING.equals(stateCode)) {
                     // the state is still executing set the executing flag
-                    activityInstanceService.setExecuting(fFlowNodeInstance);
+                    activityInstanceService.setExecuting(sFlowNodeInstance);
                 }
             } catch (final SFlowNodeNotFoundException e) {
                 handleExecutionException(e);
@@ -272,11 +272,11 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     throw new SFlowNodeExecutionException(e);
                 }
                 if (failed) {
-                    setFlowNodeFailedInTransaction(fFlowNodeInstance, processDefinition, failedException);
+                    setFlowNodeFailedInTransaction(sFlowNodeInstance, processDefinition, failedException);
                 }
             }
             // notify the parent container the state changed
-            notifyParentStateIsFinished(processDefinition, fFlowNodeInstance, state);
+            notifyParentStateIsFinished(processDefinition, sFlowNodeInstance, state);
 
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -483,7 +483,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     @Override
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
             final Long processInstanceId) throws SFlowNodeExecutionException, SActivityInterruptedException, SActivityReadException {
-        gotoNextStableState(flowNodeInstanceId, null, null, null, processInstanceId);
+        gotoNextStableState(flowNodeInstanceId, null, operations, null, processInstanceId);
     }
 
     @Override
