@@ -8,6 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.command.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -59,10 +63,6 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ProcessAPI;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ruiheng Fan
@@ -153,7 +153,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
-    public void testInstantiateProcessWithDataConversionOperation() throws Exception {
+    public void instantiateProcessWithDataConversionOperation() throws Exception {
         final String myDdataName = "mon_entier_1";
         final String actorName = "Employee";
         final String userTaskName = "Étape1";
@@ -198,7 +198,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
-    public void testExecuteActionsAndStartInstanceExt() throws Exception {
+    public void executeActionsAndStartInstanceExt() throws Exception {
         final String userName = "first";
         final String password = "user";
         final User firstUser = createUser(userName, password);
@@ -275,7 +275,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     // Connector in Form: for Input parameter, try type_input for ExpressionType.TYPE_READ_ONLY_SCRIPT
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndTerminateTaskExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
-    public void testExecuteActionsAndTerminate() throws Exception {
+    public void executeActionsAndTerminate() throws Exception {
         createAndDeployProcess2();
         final String valueOfInput1 = "Lily";
         final String valueOfInput2 = "Lucy";
@@ -358,7 +358,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndTerminateTaskExt" }, jira = "ENGINE-1053")
     @Test
-    public void testExecuteActionsAndTerminateDataExpression() throws Exception {
+    public void executeActionsAndTerminateDataExpression() throws Exception {
         // deploy and start a process containing a integer data
         createAndDeployProcess2();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -392,7 +392,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     // Connector in Form: for Input parameter, try type_input for ExpressionType.TYPE_INPUT
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndTerminateTaskExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
-    public void testExecuteActionsAndTerminate2() throws Exception {
+    public void executeActionsAndTerminate2() throws Exception {
         createAndDeployProcess2();
         final String mainInputName1 = "param1";
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -524,7 +524,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Action" }, story = "Execute actions and terminate with custom jar.", jira = "ENGINE-928")
     @Test
-    public void testExecuteActionsAndTerminateWithCustomJarInOperation() throws Exception {
+    public void executeActionsAndTerminateWithCustomJarInOperation() throws Exception {
         // process is deployed here with a custom jar
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
@@ -565,5 +565,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
         // just check the operation is executed normally
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
+
+        waitForUserTask("Approval", processInstanceID);
     }
 }
