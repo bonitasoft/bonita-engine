@@ -30,6 +30,13 @@ public interface WorkService {
      * @since 6.0
      */
     void registerWork(final BonitaWork runnable) throws WorkRegisterException;
+    
+    /**
+     * @param runnable
+     * @throws WorkRegisterException
+     * @since 6.0
+     */
+    void executeWork(final BonitaWork runnable) throws WorkRegisterException;
 
     /**
      * 

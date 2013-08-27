@@ -26,6 +26,10 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
 
     private final ThreadLocal<Map.Entry<Long, Long>> sessionData = new ThreadLocal<Map.Entry<Long, Long>>();
 
+    public ThreadLocalSessionAccessor() {
+	    System.err.println("\n\n\n\n\n\n\n\n*********************\nCREATING A THREADLOCALSESSIONACCESSOR\n*****************\n\n\n\n\n\n\n\n");
+    }
+    
     @Override
     public long getSessionId() throws SessionIdNotSetException {
         Long sessionId = null;
@@ -45,6 +49,9 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
     @Override
     public void setSessionInfo(final long sessionId, final long tenantId) {
         synchronized (mutex) {
+        	if (sessionData.get() != null) {
+        		throw new IllegalStateException("Session is already set to: " + sessionData.get() + ". Impossible to set it to: " + sessionId + ". Please delete it before trying to set a new value.");
+        	}
             sessionData.set(new SessionInfo(sessionId, tenantId));
         }
     }

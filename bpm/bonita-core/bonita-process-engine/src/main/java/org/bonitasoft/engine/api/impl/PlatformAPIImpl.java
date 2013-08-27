@@ -239,13 +239,18 @@ public class PlatformAPIImpl implements PlatformAPI {
                 final SessionService sessionService = platformAccessor.getSessionService();
                 for (final Long tenantId : tenantIds) {
                     long sessionId = -1;
+                    long platformSessionId = -1;
                     try {
+                    	platformSessionId = sessionAccessor.getSessionId();
+                        sessionAccessor.deleteSessionId();
                         sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
                         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
                         final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
                     } finally {
-                        sessionService.deleteSession(sessionId);
+                    	sessionService.deleteSession(sessionId);
+                    	cleanSessionAccessor(sessionAccessor);
+                        sessionAccessor.setSessionInfo(platformSessionId, -1);
                     }
                 }
                 workService.startup();
@@ -465,6 +470,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         final String description = "Default tenant";
         String userName = "";
         SessionAccessor sessionAccessor = null;
+        long platformSessionId = -1;
         try {
 
             // add tenant to database
@@ -511,6 +517,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
+            
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+            
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
             createDefaultDataSource(sDataSourceModelBuilder, dataService);
             final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
@@ -520,6 +530,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         } finally {
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -596,6 +607,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
         final boolean schedulerStarted = false;
+        long platformSessionId = -1; 
         try {
             platformAccessor = getPlatformAccessor();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -610,6 +622,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
             schedulerService.start();
+            
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+            
             final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
                     platformAccessor.getTechnicalLoggerService(), workService);
@@ -635,6 +651,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
             }
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -654,6 +671,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
+        long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -661,7 +679,11 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final WorkService workService = platformAccessor.getWorkService();
-            final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
+            final long sessionId = createSession(tenantId, sessionService);
+            
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+            
             final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
@@ -674,6 +696,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new STenantDeactivationException("Tenant deactivation failed.", e);
         } finally {
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 

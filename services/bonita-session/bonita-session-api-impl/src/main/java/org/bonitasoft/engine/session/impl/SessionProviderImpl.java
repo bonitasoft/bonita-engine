@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import org.bonitasoft.engine.session.SSessionAlreadyExistsException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -34,6 +36,9 @@ public final class SessionProviderImpl implements SessionProvider {
     static {
         sessions = new HashMap<Long, SSession>();
     }
+    
+    private final ArrayBlockingQueue<Long> removedSessions = new ArrayBlockingQueue<Long>(100000);
+    private final ArrayBlockingQueue<Long> cleanedSessions = new ArrayBlockingQueue<Long>(100000);
 
     public SessionProviderImpl() {
     }
@@ -49,6 +54,14 @@ public final class SessionProviderImpl implements SessionProvider {
 
     @Override
     public void removeSession(final long sessionId) throws SSessionNotFoundException {
+    	if (removedSessions.remainingCapacity() < 100) {
+    		removedSessions.poll();
+    	}
+    	try {
+	        removedSessions.put(sessionId);
+        } catch (InterruptedException e) {
+	        e.printStackTrace();
+        }
         final SSession session = sessions.remove(sessionId);
         if (session == null) {
             throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
@@ -59,7 +72,13 @@ public final class SessionProviderImpl implements SessionProvider {
     public SSession getSession(final long sessionId) throws SSessionNotFoundException {
         final SSession session = sessions.get(sessionId);
         if (session == null) {
-            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
+        	if (removedSessions.contains(sessionId)) {
+        		throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\", it has been removed.");	
+        	}
+        	if (cleanedSessions.contains(sessionId)) {
+        		throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\", it has been cleaned");	
+        	}
+            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\". RemovedSessions.size=" + removedSessions.size() + ". cleanedSessions.size= " +cleanedSessions.size());
         }
         return session;
     }
@@ -90,6 +109,14 @@ public final class SessionProviderImpl implements SessionProvider {
             }
         }
         for (final Long invalidSessionId : invalidSessionIds) {
+        	if (cleanedSessions.remainingCapacity() < 100) {
+        		cleanedSessions.poll();
+        	}
+        	try {
+	            cleanedSessions.put(invalidSessionId);
+            } catch (InterruptedException e) {
+	            e.printStackTrace();
+            }
             sessions.remove(invalidSessionId);
         }
     }

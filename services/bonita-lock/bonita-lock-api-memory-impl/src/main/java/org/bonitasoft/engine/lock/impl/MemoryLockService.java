@@ -13,11 +13,14 @@
  **/
 package org.bonitasoft.engine.lock.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.bonitasoft.engine.lock.RejectedLockHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
@@ -28,32 +31,58 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
  */
 public class MemoryLockService extends AbstractLockService {
 
-    private static final Object lock = new Object();
+	private static final Object lock = new Object();
 
-    public MemoryLockService(final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
-        super(logger, sessionAccessor, lockTimeout);
-    }
+	private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
+	private final Map<String, List<RejectedLockHandler>> rejectedLockHandlers = new HashMap<String, List<RejectedLockHandler>>();
 
-    final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
+	public MemoryLockService(final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
+		super(logger, sessionAccessor, lockTimeout);
+	}
 
-    @Override
-    protected Lock getLock(final String key) {
-        synchronized (lock) {
-            if (!locks.containsKey(key)) {
-                // use fair mode?
-                locks.put(key, new ReentrantLock());
-            }
-            return locks.get(key);
-        }
-    }
+	@Override
+	protected RejectedLockHandler getOneRejectedHandler(final String key) {
+		synchronized (lock) {
+			if (rejectedLockHandlers.containsKey(key)) {
+				final RejectedLockHandler handler = rejectedLockHandlers.get(key).remove(0);
+				if (rejectedLockHandlers.get(key).size() == 0) {
+					rejectedLockHandlers.remove(key);
+				}
+				return handler;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	protected void storeRejectedLock(final String key, final RejectedLockHandler handler) {
+		synchronized (lock) {
+			if (!rejectedLockHandlers.containsKey(key)) {
+				rejectedLockHandlers.put(key, new ArrayList<RejectedLockHandler>());
+			}
+			rejectedLockHandlers.get(key).add(handler);
+		}
+	    
+	}
 
-    @Override
-    protected void removeLockFromMapIfnotUsed(final String key) {
-        synchronized (lock) {
-            ReentrantLock reentrantLock = locks.get(key);
-            if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
-                locks.remove(key);
-            }
-        }
-    }
+	@Override
+	protected Lock getLock(final String key) {
+		synchronized (lock) {
+			if (!locks.containsKey(key)) {
+				// use fair mode?
+						locks.put(key, new ReentrantLock());
+			}
+			return locks.get(key);
+		}
+	}
+
+	@Override
+	protected void removeLockFromMapIfnotUsed(final String key) {
+		synchronized (lock) {
+			ReentrantLock reentrantLock = locks.get(key);
+			if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
+				locks.remove(key);
+			}
+		}
+	}
 }

@@ -28,7 +28,7 @@ public interface LockService {
 
     void unlock(BonitaLock lock) throws SLockException;
 
-    BonitaLock tryLock(long objectToLockId, String objectType) throws SLockException;
+    BonitaLock tryLock(long objectToLockId, String objectType, RejectedLockHandler rejectedLockHandler) throws SLockException;
 
     BonitaLock lock(long objectToLockId, String objectType) throws SLockException;
 
