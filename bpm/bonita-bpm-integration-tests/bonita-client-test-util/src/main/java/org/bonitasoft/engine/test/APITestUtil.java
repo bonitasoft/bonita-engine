@@ -565,11 +565,13 @@ public class APITestUtil {
     }
 
     protected void disableAndDeleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
-        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        if (deploymentInfo.getActivationState().equals(ActivationState.ENABLED)) {
-            disableAndDeleteProcess(processDefinition.getId());
-        } else {
-            deleteProcess(processDefinition);
+        if (processDefinition != null) {
+            final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+            if (deploymentInfo.getActivationState().equals(ActivationState.ENABLED)) {
+                disableAndDeleteProcess(processDefinition.getId());
+            } else {
+                deleteProcess(processDefinition);
+            }
         }
     }
 

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProcessRuntimeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -28,6 +29,8 @@ import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ActivityStates;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -47,6 +50,7 @@ import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
@@ -56,6 +60,7 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -1160,4 +1165,75 @@ public class MessageEventTest extends CommonAPITest {
         getProcessAPI().sendMessage(MESSAGE, targetProcessExpression, targetFlowNodeExpression, null, correlations);
     }
 
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Message", "Loop", "Terminate", "Process" }, jira = "ENGINE-1723")
+    @Test
+     public void sendMessageToTerminateProcessWithLoop() throws Exception {
+        ProcessDefinition processToKillDefinition = null;
+        ProcessDefinition killerProcessDefinition = null;
+        try {
+            // Process to kill
+            final Expression falseExpr = new ExpressionBuilder().createConstantBooleanExpression(false);
+            final Expression dataExpr = new ExpressionBuilder().createDataExpression("endtask", Boolean.class.getName());
+            final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("check", "!endtask", Boolean.class.getName(), dataExpr);
+            final Expression loopMax = new ExpressionBuilder().createConstantIntegerExpression(10);
+            final ProcessDefinitionBuilder processToKillDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessToKill", PROCESS_VERSION);
+            processToKillDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("ToKillStart").addEndEvent("ToKillEnd").addTerminateEventTrigger();
+            processToKillDefinitionBuilder.addData("endtask", Boolean.class.getName(), falseExpr);
+            processToKillDefinitionBuilder.addUserTask("Step1", ACTOR_NAME).addLoop(false, condition, loopMax);
+            processToKillDefinitionBuilder.addUserTask("Step2", ACTOR_NAME);
+            processToKillDefinitionBuilder.addGateway("Gateway", GatewayType.PARALLEL);
+            // Catch Message Event
+            final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processToKillDefinitionBuilder
+                    .addIntermediateCatchEvent(CATCH_EVENT_NAME).addMessageEventTrigger("msgKiller");
+            final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(1);
+            final Expression correlationKey = new ExpressionBuilder().createConstantStringExpression("key");
+            final Expression correlationValue = new ExpressionBuilder().createGroovyScriptExpression("getId", "processInstanceId", Long.class.getName(),
+                    new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID));
+            correlations.add(new BEntry<Expression, Expression>(correlationKey, correlationValue));
+            addCorrelations(correlations, catchMessageEventTriggerDefinitionBuilder);
+            // Transitions
+            processToKillDefinitionBuilder.addTransition("ToKillStart", "Gateway");
+            processToKillDefinitionBuilder.addTransition("Gateway", "Step1");
+            processToKillDefinitionBuilder.addTransition("Step1", "Step2");
+            processToKillDefinitionBuilder.addTransition("Step2", "ToKillEnd");
+            processToKillDefinitionBuilder.addTransition("Gateway", CATCH_EVENT_NAME);
+            processToKillDefinitionBuilder.addTransition(CATCH_EVENT_NAME, "ToKillEnd");
+            processToKillDefinition = deployAndEnableWithActor(processToKillDefinitionBuilder.done(), ACTOR_NAME, user);
+
+            final StartProcessUntilStep toKillStartProcessAndWaitForTask = startProcessAndWaitForTask(processToKillDefinition.getId(), "Step1");
+            final ProcessInstance processToKillInstance = toKillStartProcessAndWaitForTask.getProcessInstance();
+
+            // Killer process
+            final ProcessDefinitionBuilder killerProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("KillerProcess", PROCESS_VERSION);
+            killerProcessDefinitionBuilder.addActor(ACTOR_NAME).addStartEvent("KillerStart");
+            killerProcessDefinitionBuilder.addUserTask("Step3", ACTOR_NAME);
+            // Throw Message Event
+            final Expression targetProcess = new ExpressionBuilder().createConstantStringExpression("ProcessToKill");
+            final Expression targetFlowNode = new ExpressionBuilder().createConstantStringExpression(CATCH_EVENT_NAME);
+            final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder = killerProcessDefinitionBuilder.addEndEvent("KillerEnd")
+                    .addMessageEventTrigger("msgKiller", targetProcess, targetFlowNode);
+            final ArrayList<BEntry<Expression, Expression>> endCorrelations = new ArrayList<BEntry<Expression, Expression>>(1);
+            final Expression endCorrelationKey = new ExpressionBuilder().createConstantStringExpression("key");
+            final Expression endCorrelationValue = new ExpressionBuilder().createConstantLongExpression(processToKillInstance
+                    .getId());
+            endCorrelations.add(new BEntry<Expression, Expression>(endCorrelationKey, endCorrelationValue));
+            addCorrelations(endCorrelations, throwMessageEventTriggerBuilder);
+            // Transitions
+            killerProcessDefinitionBuilder.addTransition("KillerStart", "Step3");
+            killerProcessDefinitionBuilder.addTransition("Step3", "KillerEnd");
+            killerProcessDefinition = deployAndEnableWithActor(killerProcessDefinitionBuilder.done(), ACTOR_NAME, user);
+
+            final StartProcessUntilStep killerStartProcessAndWaitForTask = startProcessAndWaitForTask(killerProcessDefinition.getId(), "Step3");
+            assignAndExecuteStep(killerStartProcessAndWaitForTask.getActivityInstance(), user.getId());
+            waitForProcessToFinish(killerStartProcessAndWaitForTask.getProcessInstance());
+
+            // Check that process to kill is terminated
+            waitForProcessToFinish(processToKillInstance);
+            final ArchivedActivityInstance step1 = getProcessAPI().getArchivedActivityInstance(toKillStartProcessAndWaitForTask.getActivityInstance().getId());
+            assertEquals(ActivityStates.ABORTED_STATE, step1.getState());
+        } finally {
+            // Clean up
+            disableAndDeleteProcess(processToKillDefinition, killerProcessDefinition);
+        }
+    }
 }
