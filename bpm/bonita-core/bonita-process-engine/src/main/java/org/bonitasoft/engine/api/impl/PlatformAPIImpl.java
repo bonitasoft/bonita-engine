@@ -386,12 +386,12 @@ public class PlatformAPIImpl implements PlatformAPI {
 
                 @Override
                 public Void call() throws Exception {
-                	try {
-                      final STenant tenant = getDefaultTenant();
-                      deactiveTenant(tenant.getId());
-                	} catch (STenantNotFoundException e) {
-                		
-                	}
+                    try {
+                        final STenant tenant = getDefaultTenant();
+                        deactiveTenant(tenant.getId());
+                    } catch (STenantNotFoundException e) {
+
+                    }
                     clean.execute();
                     deleteAll.execute();
 
@@ -662,9 +662,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SessionService sessionService = platformAccessor.getSessionService();
             final WorkService workService = platformAccessor.getWorkService();
             final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
+            sessionService.deleteSessionsOfTenant(tenantId);
         } catch (final STenantDeactivationException stde) {
             log(platformAccessor, stde);
             throw stde;

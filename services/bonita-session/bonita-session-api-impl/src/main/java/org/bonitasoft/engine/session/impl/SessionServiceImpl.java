@@ -180,6 +180,11 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public void deleteSessionsOfTenant(long tenantId) {
+        sessionProvider.deleteSessionsOfTenant(tenantId);
+    }
+
+    @Override
     public void deleteSessions() {
         sessionProvider.removeSessions();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
