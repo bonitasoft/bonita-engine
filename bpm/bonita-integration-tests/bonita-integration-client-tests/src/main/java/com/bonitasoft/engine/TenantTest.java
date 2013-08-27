@@ -8,6 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -22,6 +26,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -36,9 +41,6 @@ import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Yanyan Liu
@@ -110,6 +112,23 @@ public class TenantTest {
         assertEquals(1, users.size());
 
         identityAPI.deleteUser("auser1");
+    }
+
+    @Test
+    public void deactivateTenantDeleteSession() throws Exception {
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        final APISession apiSession = loginAPI.login(tenantId, userName, password);
+        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
+        // will work
+        identityAPI.getNumberOfUsers();
+        platformAPI.deactiveTenant(tenantId);
+        try {
+            identityAPI.getNumberOfUsers();
+            fail("should not be able to call an api on a deactivated tenant");
+        } catch (InvalidSessionException e) {
+            platformAPI.activateTenant(tenantId);
+        }
+
     }
 
     @Test

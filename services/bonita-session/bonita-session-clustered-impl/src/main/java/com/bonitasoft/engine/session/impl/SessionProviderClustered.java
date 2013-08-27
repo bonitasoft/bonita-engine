@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.session.impl;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import org.bonitasoft.engine.session.SSessionAlreadyExistsException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
@@ -81,6 +84,17 @@ public final class SessionProviderClustered implements SessionProvider {
     @Override
     public synchronized void removeSessions() {
         sessions.clear();
+    }
+
+    @Override
+    public synchronized void deleteSessionsOfTenant(long tenantId) {
+        Iterator<Entry<Long, SSession>> iterator = sessions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Entry<Long, SSession> sSession = iterator.next();
+            if (tenantId == sSession.getValue().getTenantId()) {
+                sessions.remove(sSession.getKey());
+            }
+        }
     }
 
 }

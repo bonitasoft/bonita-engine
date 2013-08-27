@@ -318,7 +318,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Get the binary content of a report, from its name.
-     *
+     * 
      * @param reportFolder
      *            the folder where to look.
      * @param reportName
@@ -344,7 +344,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Get the binary screenshot of a report, from its name.
-     *
+     * 
      * @param reportFolder
      *            the folder where to look.
      * @param reportName
@@ -481,9 +481,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
+            sessionService.deleteSessionsOfTenant(tenantId);
         } catch (final TenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
             throw new TenantNotFoundException(tenantId);
