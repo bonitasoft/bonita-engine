@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -28,8 +29,6 @@ public class SynchroServiceImpl extends AbstractSynchroService {
 
     private final Map<Map<String, Serializable>, SynchroObject> waiters;
 
-    private final Map<Map<String, Serializable>, Serializable> fired;
-
     private final Object mutex = new Object();
 
     /**
@@ -38,20 +37,14 @@ public class SynchroServiceImpl extends AbstractSynchroService {
      * @param logger
      *            the technical logger service
      */
-    private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger) {
-        super(logger);
-        fired = new HashMap<Map<String, Serializable>, Serializable>(initialCapacity);
+    private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger, final CommonCacheService cacheService) {
+        super(logger, cacheService);
         waiters = new HashMap<Map<String, Serializable>, SynchroObject>(initialCapacity);
     }
 
     @Override
     protected Map<Map<String, Serializable>, SynchroObject> getWaitersMap() {
         return waiters;
-    }
-
-    @Override
-    protected Map<Map<String, Serializable>, Serializable> getFiredMap() {
-        return fired;
     }
 
     @Override
