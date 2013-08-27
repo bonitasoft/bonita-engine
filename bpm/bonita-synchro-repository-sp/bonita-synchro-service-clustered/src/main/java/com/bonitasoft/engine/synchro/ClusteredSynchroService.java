@@ -16,6 +16,7 @@ package com.bonitasoft.engine.synchro;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.synchro.AbstractSynchroService;
 import org.bonitasoft.engine.synchro.SynchroObject;
@@ -38,8 +39,8 @@ public class ClusteredSynchroService extends AbstractSynchroService implements S
 
     private final HazelcastInstance hazelcastInstance;
 
-    public ClusteredSynchroService(final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance) {
-        super(logger);
+    public ClusteredSynchroService(final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance, final CommonCacheService cacheService) {
+        super(logger, cacheService);
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
@@ -51,11 +52,6 @@ public class ClusteredSynchroService extends AbstractSynchroService implements S
     @Override
     protected Map<Map<String, Serializable>, SynchroObject> getWaitersMap() {
         return hazelcastInstance.getMap(CLUSTERED_SYNCHRO_SERVICE_WAITERS);
-    }
-
-    @Override
-    protected Map<Map<String, Serializable>, Serializable> getFiredMap() {
-        return hazelcastInstance.getMap(CLUSTERED_SYNCHRO_SERVICE_FIRED);
     }
 
     @Override
