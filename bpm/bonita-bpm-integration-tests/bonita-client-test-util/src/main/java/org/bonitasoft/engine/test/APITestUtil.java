@@ -88,6 +88,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
@@ -261,12 +262,18 @@ public class APITestUtil {
         return null;
     }
 
-    protected User createUser(final String userName, final String password) throws AlreadyExistsException, CreationException {
-        return getIdentityAPI().createUser(userName, password);
+    protected User createUser(final String userName, final String password) throws BonitaException {
+        final User user = getIdentityAPI().createUser(userName, password);
+        final UserUpdater updater = new UserUpdater();
+        updater.setEnabled(true);
+        return getIdentityAPI().updateUser(user.getId(), updater);
     }
 
     protected User createUser(final String userName, final String password, final String firstName, final String lastName) throws BonitaException {
-        return getIdentityAPI().createUser(userName, password, firstName, lastName);
+        final User user = getIdentityAPI().createUser(userName, password, firstName, lastName);
+        final UserUpdater updater = new UserUpdater();
+        updater.setEnabled(true);
+        return getIdentityAPI().updateUser(user.getId(), updater);
     }
 
     protected User createUser(final UserCreator creator) throws BonitaException {
@@ -280,11 +287,12 @@ public class APITestUtil {
     protected User createUser(final String userName, final String password, final long managerId) throws BonitaException {
         final UserCreator creator = new UserCreator(userName, password);
         creator.setManagerUserId(managerId);
+        creator.setEnabled(true);
         return getIdentityAPI().createUser(creator);
     }
 
     protected User createUserAndLogin(final String userName, final String password) throws BonitaException {
-        final User user = getIdentityAPI().createUser(userName, password);
+        final User user = createUser(userName, password);
         logout();
         loginWith(userName, password);
         return user;
@@ -1134,6 +1142,9 @@ public class APITestUtil {
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         final User user = identityAPI.createUser(userName, password);
         assertNull(user.getLastConnection());
+        final UserUpdater updater = new UserUpdater();
+        updater.setEnabled(true);
+        identityAPI.updateUser(user.getId(), updater);
         APITestUtil.logoutTenant(session);
         return user;
     }

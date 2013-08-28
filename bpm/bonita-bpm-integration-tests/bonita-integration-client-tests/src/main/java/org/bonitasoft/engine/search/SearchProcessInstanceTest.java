@@ -736,7 +736,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
     public void searchOpenProcessInstancesStartedBy() throws Exception {
         final String USERNAME = "jack";
         final String PASSWORD = "bpm";
-        final User user = getIdentityAPI().createUser(USERNAME, PASSWORD);
+        final User user = createUser(USERNAME, PASSWORD);
         // change login user to jack
         logout();
         loginWith(USERNAME, PASSWORD);
@@ -1244,7 +1244,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
 
         // Disabled jack
         final UserUpdater updateDescriptor = new UserUpdater();
-        updateDescriptor.setEnabled(true);
+        updateDescriptor.setEnabled(false);
         getIdentityAPI().updateUser(jack.getId(), updateDescriptor);
 
         final DesignProcessDefinition designProcessDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION,
@@ -1258,7 +1258,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanStartProcessDefinition(processDefinition.getId(), searchBuilder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> users = searchResult.getResult();
-        assertEquals(jack.getId(), users.get(0).getId());
+        assertEquals(john.getId(), users.get(0).getId());
 
         // clean up
         deleteUsers(john, jack);

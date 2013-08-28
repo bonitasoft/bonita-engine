@@ -89,7 +89,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         final BusinessArchive businessArchive = businessArchiveBuilder.setProcessDefinition(designProcessDefinition).done();
         processDefinition = getProcessAPI().deploy(businessArchive);
-        user = getIdentityAPI().createUser(USERNAME, PASSWORD);
+        user = createUser(USERNAME, PASSWORD);
 
         final ActorInstance processActor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
         getProcessAPI().addUserToActor(processActor.getId(), user.getId());
