@@ -7,8 +7,9 @@ import javax.naming.Context;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.search.SearchProcessInstanceTest;
+import org.bonitasoft.engine.test.APIMethodTest;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -18,7 +19,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({ SearchProcessInstanceTest.class })
+@SuiteClasses({
+        BPMLocalSuiteTests.class,
+        BPMRemoteTests.class,
+        APIMethodTest.class
+})
 public class LocalIntegrationTests {
 
     private static final String TMP_BONITA_HOME = "target/eclipse-bonita-home";
