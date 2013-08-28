@@ -1346,7 +1346,7 @@ public class APITestUtil {
         if (searchResult.getCount() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("FlowNodes are still present: ");
             for (final FlowNodeInstance flowNodeInstance : flowNodeInstances) {
-                messageBuilder.append(flowNodeInstance.getName()).append(", ");
+                messageBuilder.append("{" + flowNodeInstance.getName() + " - ").append(flowNodeInstance.getType() + "}").append(", ");
             }
             messages.add(messageBuilder.toString());
         }
