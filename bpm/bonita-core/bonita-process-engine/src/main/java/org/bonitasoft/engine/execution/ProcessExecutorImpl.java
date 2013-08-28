@@ -290,7 +290,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private int getNumberOfTokenToMerge(final SFlowNodeInstance sFlownodeInstance) {
         if (SFlowNodeType.GATEWAY.equals(sFlownodeInstance.getType())) {
-            return Integer.parseInt(((SGatewayInstance) sFlownodeInstance).getHitBys().substring(GatewayInstanceService.FINISH.length()));
+        	final String hitBys = ((SGatewayInstance) sFlownodeInstance).getHitBys();
+        	final String nbOfTokenToMerge = hitBys.substring(GatewayInstanceService.FINISH.length());
+            return Integer.parseInt(nbOfTokenToMerge);
         } else {
             return 1;
         }
