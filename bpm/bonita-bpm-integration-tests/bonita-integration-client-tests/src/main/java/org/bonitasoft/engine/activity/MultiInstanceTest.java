@@ -428,11 +428,14 @@ public class MultiInstanceTest extends CommonAPITest {
                     .addTransition("Step2", "End");
             processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance step1 = waitForUserTask("Step1");
+            waitForUserTask("Step1");
             waitForUserTaskAndExecuteIt("Step2", processInstance, john.getId());
+
+            final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
+            for (final ActivityInstance activityInstance : activities) {
+                waitForArchivedActivity(activityInstance.getId(), ActivityStates.ABORTED_STATE);
+            }
             waitForProcessToFinish(processInstance, 20000);
-            final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
-            assertEquals(ActivityStates.ABORTED_STATE, archivedStep1.getState());
         } finally {
             disableAndDeleteProcess(processDefinition);
         }

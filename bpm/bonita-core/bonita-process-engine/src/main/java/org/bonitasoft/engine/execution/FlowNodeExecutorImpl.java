@@ -202,8 +202,16 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 lockService.createSharedLockAccess(processInstanceId, objectType);
                 sharedLockCreated = true;
             }
+            lockService.createExclusiveLockAccess(flowNodeInstanceId, FLOWNODE_COMPLETION_LOCK);// lock activity in order to avoid hit 2 times at the same time
             txOpened = transactionExecutor.openTransaction();
         } catch (final SBonitaException e) {
+            try {
+                releaseSharedLock(objectType, sharedLockCreated, processInstanceId);
+                lockService.releaseExclusiveLockAccess(flowNodeInstanceId, FLOWNODE_COMPLETION_LOCK);
+            } catch (final SLockException e1) {
+                throw new SFlowNodeExecutionException("Error when unlock process instance with id = " + processInstanceId
+                        + ", and flownode instance with id = " + flowNodeInstanceId, e);
+            }
             throw new SFlowNodeExecutionException(e);
         }
         FlowNodeState state = null;
@@ -215,7 +223,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-
             try {
                 sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
                 if (processInstanceId == null) {
@@ -262,9 +269,11 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 try {
                     transactionExecutor.completeTransaction(txOpened);
                     releaseSharedLock(objectType, sharedLockCreated, processInstanceId);
+                    lockService.releaseExclusiveLockAccess(flowNodeInstanceId, FLOWNODE_COMPLETION_LOCK);
                 } catch (final STransactionException e) {
                     try {
                         releaseSharedLock(objectType, sharedLockCreated, processInstanceId);
+                        lockService.releaseExclusiveLockAccess(flowNodeInstanceId, FLOWNODE_COMPLETION_LOCK);
                     } catch (final SLockException e1) {
                         throw new SFlowNodeExecutionException(e1);
                     }

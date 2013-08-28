@@ -30,7 +30,6 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -1228,9 +1227,11 @@ public class MessageEventTest extends CommonAPITest {
             waitForProcessToFinish(killerStartProcessAndWaitForTask.getProcessInstance());
 
             // Check that process to kill is terminated
+            final List<ActivityInstance> activities = getProcessAPI().getActivities(processToKillInstance.getId(), 0, 10);
+            for (final ActivityInstance activityInstance : activities) {
+                waitForArchivedActivity(activityInstance.getId(), ActivityStates.ABORTED_STATE);
+            }
             waitForProcessToFinish(processToKillInstance, 20000);
-            final ArchivedActivityInstance step1 = getProcessAPI().getArchivedActivityInstance(toKillStartProcessAndWaitForTask.getActivityInstance().getId());
-            assertEquals(ActivityStates.ABORTED_STATE, step1.getState());
         } finally {
             // Clean up
             disableAndDeleteProcess(processToKillDefinition, killerProcessDefinition);

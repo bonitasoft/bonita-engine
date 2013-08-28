@@ -1308,11 +1308,11 @@ public class APITestUtil {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<FlowNodeInstance> searchEvents = getProcessAPI().searchFlowNodeInstances(build.done());
-        final List<FlowNodeInstance> events = searchEvents.getResult();
+        final List<FlowNodeInstance> flowNodeInstances = searchEvents.getResult();
         if (searchEvents.getCount() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("FlowNodes are still present: ");
-            for (final FlowNodeInstance event : events) {
-                messageBuilder.append(event.getName()).append(", ");
+            for (final FlowNodeInstance flowNodeInstance : flowNodeInstances) {
+                messageBuilder.append("{" + flowNodeInstance.getName() + " - ").append(flowNodeInstance.getType() + "}").append(", ");
             }
             messages.add(messageBuilder.toString());
         }

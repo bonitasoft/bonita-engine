@@ -99,9 +99,9 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
         try {
             final SLoopActivityInstance loopActivity = (SLoopActivityInstance) activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());// get it
             if (loopActivity.getStateCategory() != SStateCategory.NORMAL) {
-                // if is not a normal state (aborting / canceling) the cancel algorithm will schedule a work to execute the parent,
-                // so hit must return false to avoid executing twice the parent activity (once in the cancel algorithm and once in childReachState).
-                return false;
+                // if is not a normal state (aborting / canceling), return true to change state from executing to aborting / cancelling (ChildReadstate),
+                // without create a new child task
+                return true;
             }
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SActivityDefinition activity = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
