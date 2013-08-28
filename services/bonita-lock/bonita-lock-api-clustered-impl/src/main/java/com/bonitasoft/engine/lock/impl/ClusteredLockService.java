@@ -30,7 +30,6 @@ public class ClusteredLockService extends AbstractLockService {
 
 	private final HazelcastInstance hazelcastInstance;
 	private final MultiMap<String, RejectedLockHandler> rejectedLockHandlers;
-	private final Lock lock;
 
 	public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor,
 			int lockTimeout) {
@@ -39,7 +38,6 @@ public class ClusteredLockService extends AbstractLockService {
 		if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
 			throw new IllegalStateException("The clustering is not an active feature.");
 		}
-		this.lock = this.hazelcastInstance.getLock("ClusteredLockService-lock");
 		this.rejectedLockHandlers = this.hazelcastInstance.getMultiMap("rejectedLockHandlers");
 	}
 
@@ -54,30 +52,20 @@ public class ClusteredLockService extends AbstractLockService {
 
 	@Override
 	protected RejectedLockHandler getOneRejectedHandler(final String key) {
-		lock.lock();
-		try {
-			if (rejectedLockHandlers.containsKey(key)) {
-				final Collection<RejectedLockHandler> handlers = this.rejectedLockHandlers.get(key);
-				final RejectedLockHandler handler = handlers.iterator().next();
-				rejectedLockHandlers.remove(key, handler);
-				if (handlers.size() == 0) {
-					rejectedLockHandlers.remove(key);
-				}
-				return handler;
+		if (rejectedLockHandlers.containsKey(key)) {
+			final Collection<RejectedLockHandler> handlers = this.rejectedLockHandlers.get(key);
+			final RejectedLockHandler handler = handlers.iterator().next();
+			rejectedLockHandlers.remove(key, handler);
+			if (handlers.size() == 0) {
+				rejectedLockHandlers.remove(key);
 			}
-		} finally {
-			lock.unlock();
+			return handler;
 		}
 		return null;
 	}
 
 	@Override
 	protected void storeRejectedLock(final String key, final RejectedLockHandler handler) {
-		lock.lock();
-		try {
-			rejectedLockHandlers.put(key, handler);
-		} finally {
-			lock.unlock();
-		}
+		rejectedLockHandlers.put(key, handler);
 	}
 }
