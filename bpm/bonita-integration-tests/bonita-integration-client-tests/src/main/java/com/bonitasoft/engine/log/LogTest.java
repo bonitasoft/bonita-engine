@@ -145,13 +145,13 @@ public class LogTest extends CommonAPISPTest {
     }
 
     private void getPaginatedLogsByCreatedBy(final String orderByType) throws BonitaException {
-        final User user3 = getIdentityAPI().createUser("loguser3", "bpm");
+        final User user3 = createUser("loguser3", "bpm");
         logout();
         loginWith("loguser3", "bpm");
-        final User user2 = getIdentityAPI().createUser("loguser2", "bpm");
+        final User user2 = createUser("loguser2", "bpm");
         logout();
         loginWith("loguser2", "bpm");
-        final User user1 = getIdentityAPI().createUser("loguser1", "bpm");
+        final User user1 = createUser("loguser1", "bpm");
         logout();
         login();
         getIdentityAPI().deleteUser(user1.getId());
