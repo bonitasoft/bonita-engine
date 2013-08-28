@@ -120,6 +120,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             if (miActivity.getStateCategory() != SStateCategory.NORMAL) {
                 // if is not a normal state (aborting / canceling) the cancel algorithm will schedule a work to execute the parent,
                 // so hit must return false to avoid executing twice the parent activity (once in the cancel algorithm and once in childReachState).
+                abortNonCompletedChildren(processDefinition, miActivity);
                 return false;
             }
 
