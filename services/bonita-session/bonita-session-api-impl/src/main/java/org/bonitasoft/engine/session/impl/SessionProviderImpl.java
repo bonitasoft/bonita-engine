@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.bonitasoft.engine.session.SSessionAlreadyExistsException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -32,16 +30,7 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public final class SessionProviderImpl implements SessionProvider {
 
-    private static Map<Long, SSession> sessions;
-    static {
-        sessions = new HashMap<Long, SSession>();
-    }
-    
-    private final ArrayBlockingQueue<Long> removedSessions = new ArrayBlockingQueue<Long>(100000);
-    private final ArrayBlockingQueue<Long> cleanedSessions = new ArrayBlockingQueue<Long>(100000);
-
-    public SessionProviderImpl() {
-    }
+    private static Map<Long, SSession> sessions = new HashMap<Long, SSession>();
 
     @Override
     public synchronized void addSession(final SSession session) throws SSessionAlreadyExistsException {
@@ -53,15 +42,7 @@ public final class SessionProviderImpl implements SessionProvider {
     }
 
     @Override
-    public void removeSession(final long sessionId) throws SSessionNotFoundException {
-    	if (removedSessions.remainingCapacity() < 100) {
-    		removedSessions.poll();
-    	}
-    	try {
-	        removedSessions.put(sessionId);
-        } catch (InterruptedException e) {
-	        e.printStackTrace();
-        }
+    public synchronized void removeSession(final long sessionId) throws SSessionNotFoundException {
         final SSession session = sessions.remove(sessionId);
         if (session == null) {
             throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
@@ -69,16 +50,10 @@ public final class SessionProviderImpl implements SessionProvider {
     }
 
     @Override
-    public SSession getSession(final long sessionId) throws SSessionNotFoundException {
+    public synchronized SSession getSession(final long sessionId) throws SSessionNotFoundException {
         final SSession session = sessions.get(sessionId);
         if (session == null) {
-        	if (removedSessions.contains(sessionId)) {
-        		throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\", it has been removed.");	
-        	}
-        	if (cleanedSessions.contains(sessionId)) {
-        		throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\", it has been cleaned");	
-        	}
-            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\". RemovedSessions.size=" + removedSessions.size() + ". cleanedSessions.size= " +cleanedSessions.size());
+            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
         }
         return session;
     }
@@ -88,7 +63,7 @@ public final class SessionProviderImpl implements SessionProvider {
      * @see org.bonitasoft.engine.session.impl.SessionProvider#updateSession(org.bonitasoft.engine.session.model.SSession)
      */
     @Override
-    public void updateSession(final SSession session) throws SSessionNotFoundException {
+    public synchronized void updateSession(final SSession session) throws SSessionNotFoundException {
         final long id = session.getId();
         if (!sessions.containsKey(id)) {
             throw new SSessionNotFoundException("No session found with id \"" + id + "\"");
@@ -109,14 +84,6 @@ public final class SessionProviderImpl implements SessionProvider {
             }
         }
         for (final Long invalidSessionId : invalidSessionIds) {
-        	if (cleanedSessions.remainingCapacity() < 100) {
-        		cleanedSessions.poll();
-        	}
-        	try {
-	            cleanedSessions.put(invalidSessionId);
-            } catch (InterruptedException e) {
-	            e.printStackTrace();
-            }
             sessions.remove(invalidSessionId);
         }
     }
