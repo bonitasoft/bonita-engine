@@ -26,10 +26,6 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
 
     private final ThreadLocal<Map.Entry<Long, Long>> sessionData = new ThreadLocal<Map.Entry<Long, Long>>();
 
-    public ThreadLocalSessionAccessor() {
-	    System.err.println("\n\n\n\n\n\n\n\n*********************\nCREATING A THREADLOCALSESSIONACCESSOR\n*****************\n\n\n\n\n\n\n\n");
-    }
-    
     @Override
     public long getSessionId() throws SessionIdNotSetException {
         Long sessionId = null;

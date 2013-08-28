@@ -58,17 +58,6 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
             technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
         } catch (final SSessionNotFoundException e) {
             technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-            try {
-	            System.err.println("****** sessionAccessor.getTenantId()" + sessionAccessor.getTenantId());
-            } catch (TenantIdNotSetException e1) {
-	            e1.printStackTrace();
-            }
-            try {
-            	sessionService.getSession(session.getId());
-            	System.err.println("****** sessionService.getSession(session.getId()) " + session.getId() + "   OK");
-            } catch (SSessionNotFoundException e2) {
-            	System.err.println("****** sessionService.getSession(session.getId()) " + session.getId() + "   KO");
-            }
         }
         return session;
     }

@@ -1023,9 +1023,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 workService.registerWork(new ExecuteFlowNodeWork(Type.PROCESS, gatewayInstance.getId(), null, null, processInstanceId));
             }
         }
-        if (token.getParentRefId() != null) {
-        	System.err.println("$$$$$ token.getParentRefId() != null, numberOfTokenToMerge="+numberOfTokenToMerge+", tokenRefId="+tokenRefId);
-        }
         // consume on token parent if there is one and if there is no other token having the same refId
         if (token.getParentRefId() != null && tokenService.getNumberOfToken(processInstanceId, tokenRefId) == 0) {
             implicitEnd(processDefinition, processInstanceId, 1, token.getParentRefId());

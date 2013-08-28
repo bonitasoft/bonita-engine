@@ -136,16 +136,16 @@ public abstract class AbstractBonitaWork implements BonitaWork {
 		this.tenantId = tenantId;
 	}
 
-	protected TenantServiceAccessor getTenantAccessor() {
-		try {
-			return TenantServiceSingleton.getInstance(getTenantId());
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            return TenantServiceSingleton.getInstance(getTenantId());
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	@Override
-	public String toString() {
-		return "Work[" + getDescription() + "]";
-	}
+    @Override
+    public String toString() {
+        return "Work[" + getDescription() + "]";
+    }
 }

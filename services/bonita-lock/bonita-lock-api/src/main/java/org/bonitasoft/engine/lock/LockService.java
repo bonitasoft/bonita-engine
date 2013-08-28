@@ -28,8 +28,34 @@ public interface LockService {
 
     void unlock(BonitaLock lock) throws SLockException;
 
+    /**
+     * 
+     * Try to acquire the lock for the object having type and id in parameters<br>
+     * 
+     * This method don't wait for the lock to be available
+     * 
+     * If the lock was not acquired the rejectedLockHandler is called
+     * 
+     * @param objectToLockId
+     *            The id of the object to lock
+     * @param objectType
+     *            the type of the object to lock
+     * @param rejectedLockHandler
+     * @return
+     * @throws SLockException
+     */
     BonitaLock tryLock(long objectToLockId, String objectType, RejectedLockHandler rejectedLockHandler) throws SLockException;
 
+    /**
+     * Acquire the lock for the object having type and id in parameters<br>
+     * 
+     * This method wait for the lock to be available
+     * 
+     * @param objectToLockId
+     * @param objectType
+     * @return
+     * @throws SLockException
+     */
     BonitaLock lock(long objectToLockId, String objectType) throws SLockException;
 
 }
