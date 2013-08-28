@@ -33,99 +33,119 @@ import org.bonitasoft.engine.work.BonitaWork;
  */
 public abstract class AbstractBonitaWork implements BonitaWork {
 
-    private static final long serialVersionUID = -3346630968791356467L;
+	private static final long serialVersionUID = -3346630968791356467L;
 
-    protected transient TechnicalLoggerService loggerService;
+	protected transient TechnicalLoggerService loggerService;
 
-    private transient SessionService sessionService;
+	private transient SessionService sessionService;
 
-    private transient SessionAccessor sessionAccessor;
+	private transient SessionAccessor sessionAccessor;
 
-    private long tenantId;
+	private long tenantId;
 
-    protected transient TransactionService transactionService;
+	protected transient TransactionService transactionService;
 
-    public AbstractBonitaWork() {
-        super();
-    }
+	public AbstractBonitaWork() {
+		super();
+	}
 
-    @Override
-    public final void run() {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        loggerService = tenantAccessor.getTechnicalLoggerService();
-        sessionAccessor = tenantAccessor.getSessionAccessor();
-        sessionService = tenantAccessor.getSessionService();
-        transactionService = tenantAccessor.getTransactionService();
-        SSession session = null;
-        try {
-            session = sessionService.createSession(tenantId, "workservice");
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+	@Override
+	public final void run() {
+		TenantServiceAccessor tenantAccessor = getTenantAccessor();
+		loggerService = tenantAccessor.getTechnicalLoggerService();
+		sessionAccessor = tenantAccessor.getSessionAccessor();
+		sessionService = tenantAccessor.getSessionService();
+		transactionService = tenantAccessor.getTransactionService();
+		SSession session = null;
+		boolean canBeExecuted = false; 
+		try {
+			session = sessionService.createSession(tenantId, "workservice");
+			sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
-            if (isTransactional()) {
-                workInTransaction();
-            } else {
-                work();
-            }
-        } catch (final SBonitaException e) {
-            handleError(e);
-        } catch (final Exception e) {
-            // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
-                    "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
-        } finally {
-            if (session != null) {
-                try {
-                    sessionAccessor.deleteSessionId();
-                    sessionService.deleteSession(session.getId());
-                } catch (final SSessionNotFoundException e) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+			loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+			canBeExecuted = preWork();
+			if (canBeExecuted) {
+				if (isTransactional()) {
+					workInTransaction();
+				} else {
+					work();
+				}
+			}
+		} catch (final SBonitaException e) {
+			handleError(e);
+		} catch (final Exception e) {
+			// Edge case we cannot manage
+			loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+					"Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
+		} finally {
+			if (canBeExecuted) {
+				try {
+	                afterWork();
+                } catch (Exception e) {
+                	loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
                 }
-            }
-        }
-    }
+			}
+			if (session != null) {
+				try {
+					sessionAccessor.deleteSessionId();
+					sessionService.deleteSession(session.getId());
+				} catch (final SSessionNotFoundException e) {
+					loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+				}
+			}
+		}
+	}
 
-    protected abstract boolean isTransactional();
+	protected abstract boolean isTransactional();
 
-    protected abstract void work() throws Exception;
+	protected boolean preWork() throws Exception {
+		//DO NOTHING BY DEFAULT
+		return true;
+	}
 
-    protected void workInTransaction() throws Exception {
-        final Callable<Void> runWork = new Callable<Void>() {
+	protected void afterWork() throws Exception {
+		//DO NOTHING BY DEFAULT   
+	}
 
-            @Override
-            public Void call() throws Exception {
-                work();
-                return null;
-            }
-        };
+	protected abstract void work() throws Exception;
 
-        // Call the method work() wrapped in a transaction.
-        transactionService.executeInTransaction(runWork);
-    }
+	protected void workInTransaction() throws Exception {
+		final Callable<Void> runWork = new Callable<Void>() {
 
-    protected void handleError(final SBonitaException e) {
-        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.", e);
-    }
+			@Override
+			public Void call() throws Exception {
+				work();
+				return null;
+			}
+		};
 
-    protected long getTenantId() {
-        return tenantId;
-    }
+		// Call the method work() wrapped in a transaction.
+		transactionService.executeInTransaction(runWork);
+	}
 
-    @Override
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
+	protected void handleError(final SBonitaException e) {
+		throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.", e);
+	}
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+	protected long getTenantId() {
+		return tenantId;
+	}
 
-    @Override
-    public String toString() {
-        return "Work[" + getDescription() + "]";
-    }
+	@Override
+	public void setTenantId(final long tenantId) {
+		this.tenantId = tenantId;
+	}
+
+	protected TenantServiceAccessor getTenantAccessor() {
+		try {
+			return TenantServiceSingleton.getInstance(getTenantId());
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "Work[" + getDescription() + "]";
+	}
 }

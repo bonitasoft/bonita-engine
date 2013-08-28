@@ -20,7 +20,7 @@ import org.bonitasoft.engine.execution.ContainerRegistry;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class NotifyChildFinishedWork extends TxBonitaWork {
+public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
 
     private static final long serialVersionUID = -8987586943379865375L;
 
@@ -34,9 +34,9 @@ public class NotifyChildFinishedWork extends TxBonitaWork {
 
     private final long parentId;
 
-    public NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType,
+    public NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId, final String parentType,
             final int stateId) {
-        super();
+        super(processInstanceId);
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.parentId = parentId;

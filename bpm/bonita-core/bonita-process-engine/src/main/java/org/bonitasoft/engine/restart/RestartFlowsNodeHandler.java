@@ -44,7 +44,6 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
             final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
-            final int processInstanceIndex = bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex();
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
             List<SFlowNodeInstance> sFlowNodeInstances;
             do {
@@ -56,13 +55,13 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                         // if it is terminal it means the notify was not called yet
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":"
                                 + sFlowNodeInstance.getId());
-                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getId(),
+                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(),
                                 sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
                     } else {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":"
                                 + sFlowNodeInstance.getId());
                         workService.registerWork(new ExecuteFlowNodeWork(Type.PROCESS, sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
-                                .getLogicalGroup(processInstanceIndex)));
+                                .getParentProcessInstanceId()));
                     }
                 }
             } while (sFlowNodeInstances.size() == queryOptions.getNumberOfResults());

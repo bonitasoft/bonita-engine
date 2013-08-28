@@ -31,8 +31,6 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
  */
 public class MemoryLockService extends AbstractLockService {
 
-	private static final Object lock = new Object();
-
 	private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
 	private final Map<String, List<RejectedLockHandler>> rejectedLockHandlers = new HashMap<String, List<RejectedLockHandler>>();
 
@@ -42,47 +40,39 @@ public class MemoryLockService extends AbstractLockService {
 
 	@Override
 	protected RejectedLockHandler getOneRejectedHandler(final String key) {
-		synchronized (lock) {
-			if (rejectedLockHandlers.containsKey(key)) {
-				final RejectedLockHandler handler = rejectedLockHandlers.get(key).remove(0);
-				if (rejectedLockHandlers.get(key).size() == 0) {
-					rejectedLockHandlers.remove(key);
-				}
-				return handler;
+		if (rejectedLockHandlers.containsKey(key)) {
+			final RejectedLockHandler handler = rejectedLockHandlers.get(key).remove(0);
+			if (rejectedLockHandlers.get(key).size() == 0) {
+				rejectedLockHandlers.remove(key);
 			}
+			return handler;
 		}
 		return null;
 	}
-	
+
 	@Override
 	protected void storeRejectedLock(final String key, final RejectedLockHandler handler) {
-		synchronized (lock) {
-			if (!rejectedLockHandlers.containsKey(key)) {
-				rejectedLockHandlers.put(key, new ArrayList<RejectedLockHandler>());
-			}
-			rejectedLockHandlers.get(key).add(handler);
+		if (!rejectedLockHandlers.containsKey(key)) {
+			rejectedLockHandlers.put(key, new ArrayList<RejectedLockHandler>());
 		}
-	    
+		rejectedLockHandlers.get(key).add(handler);
+
 	}
 
 	@Override
 	protected Lock getLock(final String key) {
-		synchronized (lock) {
-			if (!locks.containsKey(key)) {
-				// use fair mode?
-						locks.put(key, new ReentrantLock());
-			}
-			return locks.get(key);
+		if (!locks.containsKey(key)) {
+			// use fair mode?
+			locks.put(key, new ReentrantLock());
 		}
+		return locks.get(key);
 	}
 
 	@Override
 	protected void removeLockFromMapIfnotUsed(final String key) {
-		synchronized (lock) {
-			ReentrantLock reentrantLock = locks.get(key);
-			if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
-				locks.remove(key);
-			}
+		ReentrantLock reentrantLock = locks.get(key);
+		if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
+			locks.remove(key);
 		}
 	}
 }

@@ -25,7 +25,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class ExecuteFlowNodeWork extends TxBonitaWork {
+public class ExecuteFlowNodeWork extends TxLockProcessInstanceWork {
 
     private static final long serialVersionUID = -5873526992671300038L;
 
@@ -41,15 +41,13 @@ public class ExecuteFlowNodeWork extends TxBonitaWork {
 
     private final SExpressionContext contextDependency;
 
-    private final Long processInstanceId;
-
     public ExecuteFlowNodeWork(final Type executorType, final long flowNodeInstanceId, final List<SOperation> operations,
             final SExpressionContext contextDependency, final long processInstanceId) {
+    	super(processInstanceId);
         this.executorType = executorType;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.operations = operations;
         this.contextDependency = contextDependency;
-        this.processInstanceId = processInstanceId;
     }
 
     @Override

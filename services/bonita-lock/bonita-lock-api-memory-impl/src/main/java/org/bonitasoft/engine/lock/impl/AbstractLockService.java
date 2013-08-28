@@ -25,6 +25,8 @@ public abstract class AbstractLockService implements LockService {
 
 	protected abstract RejectedLockHandler getOneRejectedHandler(final String key);
 
+	private Object mutex = new Object();
+
 	public AbstractLockService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
 		this.logger = logger;
 		this.sessionAccessor = sessionAccessor;
@@ -41,50 +43,51 @@ public abstract class AbstractLockService implements LockService {
 
 	@Override
 	public void unlock(final BonitaLock lock) throws SLockException {
-		final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
-		try {
-			lock.getLock().unlock();
-			//System.err.println("Thread" + Thread.currentThread().getId() + ": unlocking key: " + key);
-			final RejectedLockHandler handler = getOneRejectedHandler(key);
-			if (handler != null) {
-				//System.err.println("Thread" + Thread.currentThread().getId() + ": executing handler for key: " + key);
-				handler.executeOnLockFree();
+		synchronized (mutex) {
+			final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
+			try {
+				lock.getLock().unlock();
+				final RejectedLockHandler handler = getOneRejectedHandler(key);
+				if (handler != null) {
+					handler.executeOnLockFree();
+				}
+			} finally {
+				removeLockFromMapIfnotUsed(key);
 			}
-		} finally {
-			removeLockFromMapIfnotUsed(key);
 		}
 	}
 
 	@Override
 	public BonitaLock tryLock(final long objectToLockId, final String objectType, final RejectedLockHandler rejectedLockHandler) throws SLockException {
-		final String key = buildKey(objectToLockId, objectType);
-		//System.err.println("Thread" + Thread.currentThread().getId() + ": trying to get lock for key: " + key);
-		final Lock lock = getLock(key);
-		if (lock.tryLock()) {
-			//System.err.println("Thread" + Thread.currentThread().getId() + ": got the lock for key: " + key);
-			return new BonitaLock(lock, objectType, objectToLockId);
+		synchronized (mutex) {
+			final String key = buildKey(objectToLockId, objectType);
+			final Lock lock = getLock(key);
+			if (lock.tryLock()) {
+				return new BonitaLock(lock, objectType, objectToLockId);
+			}
+			storeRejectedLock(key, rejectedLockHandler);
+			return null;
 		}
-		//System.err.println("Thread" + Thread.currentThread().getId() + ": did not get the lock for key: " + key);
-		storeRejectedLock(key, rejectedLockHandler);
-		return null;
 	}
 
 	@Override
 	public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
-		final String key = buildKey(objectToLockId, objectType);
-		final Lock lock = getLock(key);
-		final long before = System.currentTimeMillis();
-		lock.lock();
-		final long time = System.currentTimeMillis() - before;
+		synchronized (mutex) {
+			final String key = buildKey(objectToLockId, objectType);
+			final Lock lock = getLock(key);
+			final long before = System.currentTimeMillis();
+			lock.lock();
+			final long time = System.currentTimeMillis() - before;
 
-		final TechnicalLogSeverity severity = selectSeverity(time);
-		if (severity != null) {
-			logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
-					if (TechnicalLogSeverity.DEBUG.equals(severity)) {
-						logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
-					}
+			final TechnicalLogSeverity severity = selectSeverity(time);
+			if (severity != null) {
+				logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
+				if (TechnicalLogSeverity.DEBUG.equals(severity)) {
+					logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
+				}
+			}
+			return new BonitaLock(lock, objectType, objectToLockId);
 		}
-		return new BonitaLock(lock, objectType, objectToLockId);
 	}
 
 	TechnicalLogSeverity selectSeverity(final long time) {

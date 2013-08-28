@@ -21,7 +21,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class ExecuteTransitionWork extends TxBonitaWork {
+public class ExecuteTransitionWork extends TxLockProcessInstanceWork {
 
     private static final long serialVersionUID = 3875386133862872479L;
 
@@ -29,7 +29,8 @@ public class ExecuteTransitionWork extends TxBonitaWork {
 
     private final long transitionInstanceId;
 
-    public ExecuteTransitionWork(final long processDefinitionId, final long transitionInstanceId) {
+    public ExecuteTransitionWork(final long processDefinitionId, final long processInstanceId, final long transitionInstanceId) {
+    	super(processInstanceId);
         this.processDefinitionId = processDefinitionId;
         this.transitionInstanceId = transitionInstanceId;
     }

@@ -50,7 +50,7 @@ public class RestartTransitionsHandler implements TenantRestartHandler {
                 for (final STransitionInstance transitionInstance : search) {
                     final long processDefinitionId = transitionInstance.getLogicalGroup(processDefinitionIndex);
                     final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-                    workService.registerWork(new ExecuteTransitionWork(processDefinition.getId(), transitionInstance.getId()));
+                    workService.registerWork(new ExecuteTransitionWork(processDefinition.getId(), transitionInstance.getParentProcessInstanceId(), transitionInstance.getId()));
                 }
 
             } while (search.size() == searchOptions.getNumberOfResults());

@@ -107,7 +107,6 @@ import org.bonitasoft.engine.execution.work.ExecuteConnectorOfProcess;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.execution.work.ExecuteTransitionWork;
-import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -116,16 +115,13 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.RejectedLockHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -138,8 +134,6 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Celine Souchet
  */
 public class ProcessExecutorImpl implements ProcessExecutor {
-
-    private static final String GATEWAY_LOCK = SFlowNodeType.GATEWAY.name();
 
     private final BPMInstanceBuilders instanceBuilders;
 
@@ -179,8 +173,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected final BPMInstancesCreator bpmInstancesCreator;
 
-    private final LockService lockService;
-
     protected final EventsHandler eventsHandler;
 
     private final ConnectorInstanceService connectorInstanceService;
@@ -188,8 +180,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final SExpressionBuilders expressionBuilders;
 
     private final SOperationBuilders operationBuilders;
-
-    private final TransactionService transactionService;
 
     public ProcessExecutorImpl(final BPMInstanceBuilders instanceBuilders, final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
@@ -208,7 +198,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.connectorInstanceService = connectorInstanceService;
         this.expressionBuilders = expressionBuilders;
         this.tokenService = tokenService;
-        this.transactionService = transactionService;
         this.logger = logger;
         this.flowNodeExecutor = flowNodeExecutor;
         this.workService = workService;
@@ -225,7 +214,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.documentBuilder = documentBuilder;
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
-        this.lockService = lockService;
         this.eventsHandler = eventsHandler;
         for (final Entry<String, SProcessInstanceHandler<SEvent>> handler : handlers.entrySet()) {
             try {
@@ -284,7 +272,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void executeTransitions(final SProcessDefinition sDefinition, final List<STransitionInstance> chosenTransitions) throws SBonitaException {
         for (final STransitionInstance sTransitionInstance : chosenTransitions) {
-            workService.registerWork(new ExecuteTransitionWork(sDefinition.getId(), sTransitionInstance.getId()));
+            workService.registerWork(new ExecuteTransitionWork(sDefinition.getId(), sTransitionInstance.getParentProcessInstanceId(), sTransitionInstance.getId()));
         }
     }
 
@@ -536,34 +524,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final STransitionInstanceBuilder transitionInstanceBuilder = bpmInstancesCreator.getBPMInstanceBuilders().getSTransitionInstanceBuilder();
         final long parentProcessInstanceId = sTransitionInstance.getLogicalGroup(transitionInstanceBuilder.getParentProcessInstanceIndex());
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionInstance.getName());
-        final String objectType = SFlowElementsContainerType.PROCESS.name();
         final Long processDefinitionId = sProcessDefinition.getId();
-        
-        final BonitaWork work1 = new ExecuteTransitionWork(processDefinitionId, sTransitionInstance.getId());
-    	final RejectedLockHandler handler1 = new RescheduleWorkRejectedLockHandler(logger, workService, work1);
-    	
-        BonitaLock lock = lockService.tryLock(parentProcessInstanceId, objectType, handler1);
-        if (lock == null) {
-            return;
-        }
-        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock));
 
         final boolean isGateway = SFlowNodeType.GATEWAY.equals(sFlowNodeDefinition.getType());
         boolean toExecute = false;
-        long gatewayLockId = -1;
-        if (isGateway) {
-            // if flownode definition is gateway we have an exclusive lock on the transitioninstance.getTarget for this process instance
-            gatewayLockId = parentProcessInstanceId + sFlowNodeDefinition.getId();
-            
-            final BonitaWork work2 = new ExecuteTransitionWork(processDefinitionId, sTransitionInstance.getId());
-        	final RejectedLockHandler handler2 = new RescheduleWorkRejectedLockHandler(logger, workService, work2);
-            
-            BonitaLock lock2 = lockService.tryLock(gatewayLockId, GATEWAY_LOCK, handler2);
-            if (lock2 == null) {
-                return;
-            }
-            transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock2));
-        }
         // refresh because the transition was get in an other transaction
         final STransitionInstance transitionInstance = transitionService.get(sTransitionInstance.getId());
         final Long nextFlowNodeInstanceId;
@@ -757,17 +721,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SUserTaskInstanceBuilder flowNodeKeyProvider = bpmInstancesCreator.getBPMInstanceBuilders().getUserTaskInstanceBuilder();
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
-        
-        final BonitaWork work = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId,
-                sFlowNodeInstanceChild.getParentContainerId(), sFlowNodeInstanceChild.getParentContainerType().name(), stateId);
-    	final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(logger, workService, work);
-    	
-        BonitaLock lock = lockService.tryLock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), handler);
-        if (lock == null) {// lock process in order to avoid hit 2 times at the same time
-            return;
-        }
 
-        transactionService.registerBonitaSynchronization(new UnlockSynchronization(lockService, lock));
         try {
             SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
             final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
