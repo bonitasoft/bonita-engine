@@ -1167,7 +1167,7 @@ public class MessageEventTest extends CommonAPITest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Message", "Loop", "Terminate", "Process" }, jira = "ENGINE-1723")
     @Test
-     public void sendMessageToTerminateProcessWithLoop() throws Exception {
+    public void sendMessageToTerminateProcessWithLoop() throws Exception {
         ProcessDefinition processToKillDefinition = null;
         ProcessDefinition killerProcessDefinition = null;
         try {
@@ -1228,7 +1228,7 @@ public class MessageEventTest extends CommonAPITest {
             waitForProcessToFinish(killerStartProcessAndWaitForTask.getProcessInstance());
 
             // Check that process to kill is terminated
-            waitForProcessToFinish(processToKillInstance);
+            waitForProcessToFinish(processToKillInstance, 20000);
             final ArchivedActivityInstance step1 = getProcessAPI().getArchivedActivityInstance(toKillStartProcessAndWaitForTask.getActivityInstance().getId());
             assertEquals(ActivityStates.ABORTED_STATE, step1.getState());
         } finally {

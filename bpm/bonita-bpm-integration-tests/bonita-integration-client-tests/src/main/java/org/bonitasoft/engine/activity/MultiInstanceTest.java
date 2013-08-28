@@ -416,24 +416,26 @@ public class MultiInstanceTest extends CommonAPITest {
 
     @Test
     public void abortAMultiInstanceSequential() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        builder.addStartEvent("Start").addEndEvent("End").addTerminateEventTrigger();
-        builder.addUserTask("Step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(20))
-                .addCompletionCondition(new ExpressionBuilder().createConstantBooleanExpression(false));
-        builder.addGateway("Gateway", GatewayType.PARALLEL).addUserTask("Step2", ACTOR_NAME);
-        builder.addTransition("Start", "Gateway").addTransition("Gateway", "Step1").addTransition("Step1", "End").addTransition("Gateway", "Step2")
-                .addTransition("Step2", "End");
-
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("Step1");
-        waitForUserTaskAndExecuteIt("Step2", processInstance, john.getId());
-        waitForProcessToFinish(processInstance);
-        final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(ActivityStates.ABORTED_STATE, archivedStep1.getState());
-
-        disableAndDeleteProcess(processDefinition);
+        ProcessDefinition processDefinition = null;
+        try {
+            final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+            builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+            builder.addStartEvent("Start").addEndEvent("End").addTerminateEventTrigger();
+            builder.addUserTask("Step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(20))
+                    .addCompletionCondition(new ExpressionBuilder().createConstantBooleanExpression(false));
+            builder.addGateway("Gateway", GatewayType.PARALLEL).addUserTask("Step2", ACTOR_NAME);
+            builder.addTransition("Start", "Gateway").addTransition("Gateway", "Step1").addTransition("Step1", "End").addTransition("Gateway", "Step2")
+                    .addTransition("Step2", "End");
+            processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            final ActivityInstance step1 = waitForUserTask("Step1");
+            waitForUserTaskAndExecuteIt("Step2", processInstance, john.getId());
+            waitForProcessToFinish(processInstance, 20000);
+            final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
+            assertEquals(ActivityStates.ABORTED_STATE, archivedStep1.getState());
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+        }
     }
 
     /**
