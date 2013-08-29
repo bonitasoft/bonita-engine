@@ -65,7 +65,6 @@ public class ExecutorWorkService implements WorkService {
 		final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
 		if (synchro != null) {
 			synchro.addWork(work);
-		} else {
 		}
 	}
 
