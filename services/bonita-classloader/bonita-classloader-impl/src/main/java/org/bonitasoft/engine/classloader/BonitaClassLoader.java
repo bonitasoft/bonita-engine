@@ -118,7 +118,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     @Override
-    protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
         Class<?> c = null;
         //me
         if (c == null) {
