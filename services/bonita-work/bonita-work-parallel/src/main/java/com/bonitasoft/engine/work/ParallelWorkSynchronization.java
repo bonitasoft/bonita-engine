@@ -23,13 +23,10 @@ import org.bonitasoft.engine.work.ExecutorWorkService;
  */
 public class ParallelWorkSynchronization extends AbstractWorkSynchronization {
 
-    // private final RunnableListener runnableListener;
-
     public ParallelWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService,
             final SessionAccessor sessionAccessor,
             final ExecutorWorkService threadPoolWorkService) {
         super(threadPoolWorkService, executorService, sessionAccessor);
-        // runnableListener = threadPoolWorkService;
     }
 
     @Override
