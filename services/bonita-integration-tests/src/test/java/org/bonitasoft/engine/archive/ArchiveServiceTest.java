@@ -57,6 +57,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
 
     private void createSession(final long tenantId) throws SBonitaException {
         getTransactionService().begin();
+        getSessionAccessor().deleteSessionId();
         final SSession session = getSessionService().createSession(tenantId, "me");
         getSessionAccessor().setSessionInfo(session.getId(), tenantId);
         sessionId = session.getId();
