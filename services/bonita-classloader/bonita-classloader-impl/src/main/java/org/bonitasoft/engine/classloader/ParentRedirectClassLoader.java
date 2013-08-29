@@ -27,7 +27,7 @@ public class ParentRedirectClassLoader extends ClassLoader {
 	}
 
 	@Override
-	public synchronized InputStream getResourceAsStream(final String name) {
+	public InputStream getResourceAsStream(final String name) {
 		try {
 			return this.parentClassLoaderResolver.getParent(classLoaderService, childClassLoaderType, childClassLoaderId).getResourceAsStream(name);
 		} catch (ClassLoaderException e) {
