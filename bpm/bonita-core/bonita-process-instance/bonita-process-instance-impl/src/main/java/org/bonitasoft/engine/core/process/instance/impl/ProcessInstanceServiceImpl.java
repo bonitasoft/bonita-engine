@@ -93,7 +93,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -143,8 +142,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final TechnicalLoggerService logger;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     private final TransitionService transitionService;
 
     private final ProcessDefinitionService processDefinitionService;
@@ -186,7 +183,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         this.dataInstanceService = dataInstanceService;
         this.archiveService = archiveService;
         this.logger = logger;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     private ProcessInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
@@ -198,7 +194,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public void createProcessInstance(final SProcessInstance processInstance) throws SProcessInstanceCreationException {
-        final ProcessInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process Instance");
         final InsertRecord insertRecord = new InsertRecord(processInstance);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.CREATED)) {
@@ -207,10 +202,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(processInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createProcessInstance");
             setProcessState(processInstance, ProcessInstanceState.INITIALIZING);
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(processInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProcessInstance");
             throw new SProcessInstanceCreationException(sre);
         } catch (final SProcessInstanceModificationException spicme) {
             throw new SProcessInstanceCreationException(spicme);
@@ -293,7 +286,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public void deleteArchivedProcessInstance(final SAProcessInstance archivedProcessInstance) throws SProcessInstanceModificationException {
         final DeleteRecord deleteRecord = new DeleteRecord(archivedProcessInstance);
-        final ProcessInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting process instance");
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {
             final SEventBuilder eventBuilder = eventService.getEventBuilder();
@@ -301,9 +293,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(archivedProcessInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteArchivedProcessInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(archivedProcessInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteArchivedProcessInstance");
             throw new SProcessInstanceModificationException(e);
         }
     }
@@ -393,7 +383,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public void deleteProcessInstance(final SProcessInstance sProcessInstance) throws SProcessInstanceModificationException {
-        final ProcessInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting process instance");
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final long processDefinitionId = sProcessInstance.getProcessDefinitionId();
@@ -407,9 +396,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PROCESSINSTANCE).setObject(sProcessInstance).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(sProcessInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProcessInstance");
         } catch (final SBonitaException e) {
-            initiateLogBuilder(sProcessInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProcessInstance");
             throw new SProcessInstanceModificationException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -621,7 +608,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private void updateProcessInstance(final SProcessInstance processInstance, final String message, final EntityUpdateDescriptor descriptor,
             final String eventType) throws SProcessInstanceModificationException {
-        final ProcessInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, message);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(processInstance, descriptor);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(eventType, EventActionType.UPDATED)) {
@@ -630,9 +616,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(processInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProcessInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProcessInstance");
             throw new SProcessInstanceModificationException(e);
         }
     }
@@ -872,7 +856,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public void updateProcess(final SProcessInstance processInstance, final EntityUpdateDescriptor descriptor) throws SProcessInstanceModificationException {
-        final ProcessInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "process instance is updated");
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(processInstance, descriptor);
             SUpdateEvent updateEvent = null;
@@ -880,20 +863,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(PROCESSINSTANCE).setObject(processInstance).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(processInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProcess");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProcess");
             throw new SProcessInstanceModificationException(e);
-        }
-    }
-
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 

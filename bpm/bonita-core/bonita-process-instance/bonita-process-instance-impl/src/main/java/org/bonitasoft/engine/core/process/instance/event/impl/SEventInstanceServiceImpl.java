@@ -36,7 +36,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.impl.FlowNodeInstanceServiceImpl;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SEventTriggerInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
@@ -66,9 +65,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -86,8 +83,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
 
     private final SEventBuilders eventBuilders;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     private final EventService eventService;
 
     public SEventInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
@@ -96,12 +91,10 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         super(recorder, persistenceRead, eventService, instanceBuilders, queriableLoggerService, logger);
         this.eventService = eventService;
         this.eventBuilders = eventBuilders;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     @Override
     public void createEventInstance(final SEventInstance eventInstance) throws SEventInstanceCreationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new event Instance", eventInstance);
         try {
             final InsertRecord insertRecord = new InsertRecord(eventInstance);
             SInsertEvent insertEvent = null;
@@ -109,9 +102,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
                 insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(EVENT_INSTANCE).setObject(eventInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(eventInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createEventInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(eventInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createEventInstance");
             throw new SEventInstanceCreationException(e);
         }
 
@@ -172,7 +163,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
 
     @Override
     public void createEventTriggerInstance(final SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceCreationException {
-        final SEventTriggerInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new event trigger Instance", eventTriggerInstance);
         try {
             final InsertRecord insertRecord = new InsertRecord(eventTriggerInstance);
             SInsertEvent insertEvent = null;
@@ -180,9 +170,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
                 insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createEventTriggerInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createEventTriggerInstance");
             throw new SEventTriggerInstanceCreationException(e);
         }
     }
@@ -227,7 +215,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
 
     @Override
     public void createWaitingEvent(final SWaitingEvent waitingEvent) throws SWaitingEventCreationException {
-        final SWaitingEventLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a waiting");
         try {
             final InsertRecord insertRecord = new InsertRecord(waitingEvent);
             SInsertEvent insertEvent = null;
@@ -235,9 +222,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
                 insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(EVENT_TRIGGER_INSTANCE).setObject(waitingEvent).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(waitingEvent.getId(), SQueriableLog.STATUS_OK, logBuilder, "createWaitingEvent");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(waitingEvent.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createWaitingEvent");
             throw new SWaitingEventCreationException(e);
         }
 
@@ -295,7 +280,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
 
     @Override
     public void deleteWaitingEvent(final SWaitingEvent waitingEvent) throws SWaitingEventModificationException {
-        final SWaitingEventLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting wating event");
         try {
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.DELETED)) {
@@ -303,9 +287,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             }
             final DeleteRecord deleteRecord = new DeleteRecord(waitingEvent);
             getRecorder().recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(waitingEvent.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteWaitingEvent");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(waitingEvent.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteWaitingEvent");
             throw new SWaitingEventModificationException(e);
         }
     }
@@ -352,7 +334,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
     @Override
     public void updateWaitingMessage(final SWaitingMessageEvent waitingMessageEvent, final EntityUpdateDescriptor descriptor)
             throws SWaitingEventModificationException {
-        final SWaitingEventLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "updating waiting message instance");
         try {
             final SWaitingMessageEvent oldWaitingMessage = getInstanceBuilders().getSWaitingMessageEventBuilder().createNewInstance(waitingMessageEvent).done();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(waitingMessageEvent, descriptor);
@@ -362,9 +343,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
                 updateEvent.setOldObject(oldWaitingMessage);
             }
             getRecorder().recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(waitingMessageEvent.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateWaitingMessage");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(waitingMessageEvent.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateWaitingMessage");
             throw new SWaitingEventModificationException(e);
         }
     }
@@ -480,16 +459,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         return selectOne;
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
-    }
-
     @Override
     public SWaitingErrorEvent getBoundaryWaitingErrorEvent(final long relatedActivityInstanceId, final String errorCode) throws SWaitingEventReadException {
         SelectListDescriptor<SWaitingErrorEvent> selectDescriptor;
@@ -564,9 +533,7 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
                 deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(EVENT_TRIGGER_INSTANCE).setObject(eventTriggerInstance).done();
             }
             getRecorder().recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteEventTriggerInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(eventTriggerInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteEventTriggerInstance");
             throw new SEventTriggerInstanceDeletionException(e);
         }
     }

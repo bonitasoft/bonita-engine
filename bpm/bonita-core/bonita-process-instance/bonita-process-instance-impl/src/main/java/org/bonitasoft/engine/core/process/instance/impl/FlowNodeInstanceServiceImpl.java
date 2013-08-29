@@ -54,7 +54,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -78,8 +77,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
 
     private final ReadPersistenceService persistenceRead;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     private final TechnicalLoggerService logger;
 
     public FlowNodeInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
@@ -90,7 +87,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         this.logger = logger;
         activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
         this.eventService = eventService;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     protected <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
@@ -109,27 +105,8 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         return logBuilder;
     }
 
-    private SFlowNodeInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SAFlowNodeInstance activityInstance) {
-        final SFlowNodeInstanceLogBuilder logBuilder = instanceBuilders.getActivityInstanceLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        logBuilder.processInstanceId(activityInstance.getRootContainerId());
-        return logBuilder;
-    }
-
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(getClass().getName(), callerMethodName, log);
-        }
-    }
-
     @Override
     public void setState(final SFlowNodeInstance flowNodeInstance, final FlowNodeState state) throws SFlowNodeModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
         final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getPreviousStateIdKey(), flowNodeInstance.getStateId());
@@ -154,16 +131,13 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
                 .done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setState");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
             throw new SFlowNodeModificationException(e);
         }
     }
 
     @Override
     public void setExecuting(final SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
         final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getStateExecutingKey(), true);
@@ -182,9 +156,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
                 .done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setState");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
             throw new SFlowNodeModificationException(e);
         }
     }
@@ -200,7 +172,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
 
     private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String displayDescription, final String event, final String lastUpdateKey)
             throws SFlowNodeModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, event, flowNodeInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(lastUpdateKey, displayDescription);
 
@@ -208,11 +179,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(event).setObject(flowNodeInstance).done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateOneField");
-
         } catch (final SRecorderException e) {
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateOneField");
-
             throw new SFlowNodeModificationException(e);
         }
     }
@@ -228,7 +195,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
 
     @Override
     public void setTaskPriority(final SFlowNodeInstance flowNodeInstance, final STaskPriority priority) throws SFlowNodeModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
 
@@ -238,11 +204,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
                 .done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setTaskPriority");
-
         } catch (final SRecorderException e) {
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setTaskPriority");
-
             throw new SFlowNodeModificationException(e);
         }
     }
@@ -314,7 +276,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
 
     @Override
     public void setStateCategory(final SFlowElementInstance flowElementInstance, final SStateCategory stateCategory) throws SFlowNodeModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "update stateCategory", flowElementInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getStateCategoryKey(), stateCategory);
 
@@ -323,10 +284,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
                 .done();
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(flowElementInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setStateCategory");
-
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(flowElementInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setStateCategory");
             throw new SFlowNodeModificationException(sre);
         }
 
@@ -355,14 +313,11 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
 
     protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName, final EntityUpdateDescriptor descriptor)
             throws SFlowNodeModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, eventName, flowNodeInstance);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(eventName).setObject(flowNodeInstance).done();
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateActivity");
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(flowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateActivity");
             throw new SFlowNodeModificationException(sre);
         }
     }
@@ -438,7 +393,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
 
     @Override
     public void deleteFlowNodeInstance(final SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting flow node instance", sFlowNodeInstance);
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(sFlowNodeInstance);
             SDeleteEvent deleteEvent = null;
@@ -447,16 +401,13 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
                 deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(FLOWNODE_INSTANCE).setObject(sFlowNodeInstance).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(sFlowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteFlowNodeInstance");
         } catch (final SBonitaException e) {
-            initiateLogBuilder(sFlowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteFlowNodeInstance");
             throw new SFlowNodeDeletionException(e);
         }
     }
 
     @Override
     public void deleteArchivedFlowNodeInstance(final SAFlowNodeInstance saFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting archived flow node instance", saFlowNodeInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(saFlowNodeInstance);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(ARCHIVED_FLOWNODE_INSTANCE, EventActionType.DELETED)) {
@@ -465,9 +416,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(saFlowNodeInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteArchivedFlowNodeInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(saFlowNodeInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteArchivedFlowNodeInstance");
             throw new SFlowNodeDeletionException(e);
         }
     }

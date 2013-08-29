@@ -49,7 +49,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -72,8 +71,6 @@ public class TransitionServiceImpl implements TransitionService {
 
     private final ArchiveService archiveService;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     public TransitionServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
             final BPMInstanceBuilders instanceBuilders, final ArchiveService archiveService, final QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
@@ -81,7 +78,6 @@ public class TransitionServiceImpl implements TransitionService {
         this.persistenceRead = persistenceRead;
         this.instanceBuilders = instanceBuilders;
         this.archiveService = archiveService;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
@@ -92,25 +88,8 @@ public class TransitionServiceImpl implements TransitionService {
         logBuilder.setActionType(actionType);
     }
 
-    private STransitionInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final STransitionInstance transitionInstance) {
-        final STransitionInstanceLogBuilder logBuilder = this.instanceBuilders.getSTransitionInstanceLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.processInstanceId(transitionInstance.getParentContainerId());
-        return logBuilder;
-    }
-
-    private STransitionInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SATransitionInstance transitionInstance) {
-        final STransitionInstanceLogBuilder logBuilder = this.instanceBuilders.getSTransitionInstanceLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.processInstanceId(transitionInstance.getParentContainerId());
-        return logBuilder;
-    }
-
     @Override
     public void create(final STransitionInstance transitionInstance) throws STransitionCreationException {
-        final STransitionInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Transition Instance", transitionInstance);
         final InsertRecord insertRecord = new InsertRecord(transitionInstance);
         SInsertEvent insertEvent = null;
         if (this.eventService.hasHandlers(TRANSITIONINSTANCE, EventActionType.CREATED)) {
@@ -118,9 +97,7 @@ public class TransitionServiceImpl implements TransitionService {
         }
         try {
             this.recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(transitionInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "create");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(transitionInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "create");
             throw new STransitionCreationException(e);
         }
 
@@ -128,7 +105,6 @@ public class TransitionServiceImpl implements TransitionService {
 
     @Override
     public void delete(final STransitionInstance transitionInstance) throws STransitionDeletionException {
-        final STransitionInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a Transition Instance", transitionInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(transitionInstance);
         SDeleteEvent deleteEvent = null;
         if (this.eventService.hasHandlers(TRANSITIONINSTANCE, EventActionType.DELETED)) {
@@ -136,9 +112,7 @@ public class TransitionServiceImpl implements TransitionService {
         }
         try {
             this.recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(transitionInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "delete");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(transitionInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new STransitionDeletionException(e);
         }
 
@@ -254,16 +228,6 @@ public class TransitionServiceImpl implements TransitionService {
         return logBuilder;
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (this.queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            this.queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
-    }
-
     @Override
     public List<SATransitionInstance> getArchivedTransitionOfProcessInstance(final long processInstanceId, final int from, final int numberOfResult)
             throws STransitionReadException {
@@ -278,13 +242,10 @@ public class TransitionServiceImpl implements TransitionService {
 
     @Override
     public void delete(final SATransitionInstance saTransitionInstance) throws STransitionDeletionException {
-        final STransitionInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a Transition Instance", saTransitionInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(saTransitionInstance);
         try {
             this.archiveService.recordDelete(deleteRecord, null);
-            initiateLogBuilder(saTransitionInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "delete");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(saTransitionInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new STransitionDeletionException(e);
         }
     }

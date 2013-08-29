@@ -33,7 +33,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFou
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayReadException;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.GatewayInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
@@ -45,12 +44,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -73,10 +66,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private final SGatewayInstanceBuilder sGatewayInstanceBuilder;
 
-    private final BPMInstanceBuilders instanceBuilders;
-
-    private final QueriableLoggerService queriableLoggerService;
-
     private final TokenService tokenService;
 
     private final TechnicalLoggerService logger;
@@ -87,8 +76,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
-        this.instanceBuilders = instanceBuilders;
-        this.queriableLoggerService = queriableLoggerService;
         this.logger = logger;
         this.tokenService = tokenService;
         sGatewayInstanceBuilder = instanceBuilders.getSGatewayInstanceBuilder();
@@ -96,7 +83,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public void createGatewayInstance(final SGatewayInstance gatewayInstance) throws SGatewayCreationException {
-        final GatewayInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Gateway Instance", gatewayInstance);
         final InsertRecord insertRecord = new InsertRecord(gatewayInstance);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(GATEWAYINSTANCE, EventActionType.CREATED)) {
@@ -104,10 +90,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(gatewayInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createGatewayInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(gatewayInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createGatewayInstance");
-
             throw new SGatewayCreationException(e);
         }
 
@@ -201,7 +184,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private void updateOneColum(final SGatewayInstance gatewayInstance, final String columnName, final Serializable columnValue, final String event)
             throws SGatewayModificationException {
-        final GatewayInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating gateway instance " + columnName, gatewayInstance);
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(columnName, columnValue);
 
@@ -213,27 +195,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(gatewayInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateOneColum");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(gatewayInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateOneColum");
             throw new SGatewayModificationException(e);
         }
-    }
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
-    private GatewayInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SGatewayInstance gatewayInstance) {
-        final GatewayInstanceLogBuilder logBuilder = instanceBuilders.getGatewayInstanceLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.processInstanceId(gatewayInstance.getRootContainerId());
-        return logBuilder;
     }
 
     @Override
@@ -250,16 +214,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             throw new SGatewayNotFoundException(parentProcessInstanceId, name);
         }
         return selectOne;
-    }
-
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
     }
 
     @Override
