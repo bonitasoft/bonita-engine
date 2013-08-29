@@ -161,6 +161,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public User createUser(final String userName, final String password) throws AlreadyExistsException, CreationException {
         final UserCreator creator = new UserCreator(userName, password);
+        creator.setEnabled(true);
         return createUser(creator);
     }
 
@@ -169,6 +170,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             CreationException {
         final UserCreator creator = new UserCreator(userName, password);
         creator.setFirstName(firstName).setLastName(lastName);
+        creator.setEnabled(true);
         return createUser(creator);
     }
 
@@ -185,6 +187,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         final String password = (String) fields.get(org.bonitasoft.engine.identity.UserCreator.UserField.PASSWORD);
         if (password == null || password.trim().isEmpty()) {
             throw new CreationException("The password cannot be null or empty.");
+        }
+        final Boolean isEnabled = (Boolean) fields.get(org.bonitasoft.engine.identity.UserCreator.UserField.ENABLED);
+        if (isEnabled == null) {
+            creator.setEnabled(true);
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SUser sUser = ModelConvertor.constructSUser(creator, tenantAccessor.getIdentityModelBuilder());
@@ -695,7 +701,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public void deleteRoles(final List<Long> roleIds) throws DeletionException {
         try {
             NullCheckingUtil.checkArgsNotNull(roleIds);
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             throw new DeletionException(e);
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -1382,8 +1388,13 @@ public class IdentityAPIImpl implements IdentityAPI {
 
         final QueryOptions queryOptions = new QueryOptions(0, 1);
         try {
-            if (processInstanceService.getNumberOfProcessInstances(queryOptions) == 0 &&
-                    activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0) { // FIXME : Delete when fix bug ENGINE-1658
+            if (processInstanceService.getNumberOfProcessInstances(queryOptions) == 0 && activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0) { // FIXME
+                                                                                                                                                             // :
+                                                                                                                                                             // Delete
+                                                                                                                                                             // when
+                                                                                                                                                             // fix
+                                                                                                                                                             // bug
+                                                                                                                                                             // ENGINE-1658
 
                 // FIXME : Uncomment when fix bug ENGINE-1658
                 // activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0 &&

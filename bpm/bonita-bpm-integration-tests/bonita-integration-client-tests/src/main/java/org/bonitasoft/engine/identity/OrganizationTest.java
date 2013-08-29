@@ -506,7 +506,7 @@ public class OrganizationTest extends CommonAPITest {
         importFirstSimpleOrganization();
         final User userToDisable = getIdentityAPI().getUserByUserName(userName);
         final UserUpdater updateDescriptor = new UserUpdater();
-        updateDescriptor.setEnabled(true);
+        updateDescriptor.setEnabled(false);
         getIdentityAPI().updateUser(userToDisable.getId(), updateDescriptor);
         assertEquals(2, getIdentityAPI().getNumberOfUsers());
         try {
@@ -520,7 +520,7 @@ public class OrganizationTest extends CommonAPITest {
             final User persistedUser = getIdentityAPI().getUserByUserName(userName);
             assertNotNull(persistedUser);
             assertEquals(jobTitle, persistedUser.getJobTitle());
-            assertEquals(true, persistedUser.isEnabled());
+            assertFalse(persistedUser.isEnabled());
             final Role persistedRole = getIdentityAPI().getRoleByName(roleName);
             assertNotNull(persistedRole);
             assertEquals(roleDisplayName, persistedRole.getDisplayName());
@@ -1215,6 +1215,9 @@ public class OrganizationTest extends CommonAPITest {
     public void exportOrganizationWithDisabledUsers() throws Exception {
         // create records for user
         final User persistedUser = getIdentityAPI().createUser("liuyanyan", "bpm");
+        final UserUpdater updater = new UserUpdater();
+        updater.setEnabled(false);
+        getIdentityAPI().updateUser(persistedUser.getId(), updater);
 
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();

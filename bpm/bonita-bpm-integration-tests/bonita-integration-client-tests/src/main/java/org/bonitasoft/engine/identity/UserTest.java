@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.identity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -81,13 +82,13 @@ public class UserTest extends CommonAPITest {
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
     @Test
-    public void createDisabledUserByUsernameAndPassword() throws BonitaException {
+    public void createEnabledUserByUsernameAndPassword() throws BonitaException {
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(userCreated);
 
         final User user = getIdentityAPI().getUserByUserName("bonitasoft");
         assertNotNull(user);
-        assertEquals(false, user.isEnabled());
+        assertTrue(user.isEnabled());
 
         getIdentityAPI().deleteUser("bonitasoft");
     }
@@ -137,22 +138,22 @@ public class UserTest extends CommonAPITest {
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
     @Test
-    public void createDisabledUserByAUser() throws BonitaException {
+    public void createEnabledUserByAUser() throws BonitaException {
         final User user = getIdentityAPI().createUser("bonitasoft", "bpm");
         assertNotNull(user);
-        assertEquals(false, user.isEnabled());
+        assertTrue(user.isEnabled());
 
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
     @Test
-    public void createEnabledUserByAUser() throws BonitaException {
+    public void createDisabledUserByAUser() throws BonitaException {
         final UserCreator creator = new UserCreator("bonitasoft", "bpm");
-        creator.setEnabled(true);
+        creator.setEnabled(false);
         final User user = getIdentityAPI().createUser(creator);
         assertNotNull(user);
-        assertEquals(true, user.isEnabled());
+        assertFalse(user.isEnabled());
 
         getIdentityAPI().deleteUser("bonitasoft");
     }
@@ -487,13 +488,32 @@ public class UserTest extends CommonAPITest {
         // Create user, and updateDescriptor
         final User user = getIdentityAPI().createUser("bonitasoft", "123456");
         assertNotNull(user);
+        assertTrue(user.isEnabled());
         final UserUpdater updateDescriptor = new UserUpdater();
         updateDescriptor.setEnabled(true);
 
         // Update user
         final User updatedUser = getIdentityAPI().updateUser(user.getId(), updateDescriptor);
         assertNotNull(updatedUser);
-        assertEquals(true, updatedUser.isEnabled());
+        assertTrue(updatedUser.isEnabled());
+
+        // Clean
+        getIdentityAPI().deleteUser("bonitasoft");
+    }
+
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Update" }, jira = "ENGINE-577")
+    @Test
+    public void updateUserToBeDisabled() throws BonitaException {
+        // Create user, and updateDescriptor
+        final User user = getIdentityAPI().createUser("bonitasoft", "123456");
+        assertNotNull(user);
+        assertTrue(user.isEnabled());
+        final UserUpdater updateDescriptor = new UserUpdater();
+        updateDescriptor.setEnabled(false);
+
+        // Update user
+        final User updatedUser = getIdentityAPI().updateUser(user.getId(), updateDescriptor);
+        assertFalse(updatedUser.isEnabled());
 
         // Clean
         getIdentityAPI().deleteUser("bonitasoft");
@@ -756,7 +776,7 @@ public class UserTest extends CommonAPITest {
 
         // Disabled jack
         final UserUpdater updateDescriptor = new UserUpdater();
-        updateDescriptor.setEnabled(true);
+        updateDescriptor.setEnabled(false);
         final User updatedJack = getIdentityAPI().updateUser(jack.getId(), updateDescriptor);
 
         // Search enabled users
@@ -766,7 +786,7 @@ public class UserTest extends CommonAPITest {
         assertNotNull(searchUsers);
         assertEquals(1, searchUsers.getCount());
         List<User> users = searchUsers.getResult();
-        assertEquals(updatedJack, users.get(0));
+        assertEquals(john, users.get(0));
 
         // Search disabled users
         builder = new SearchOptionsBuilder(0, 10);
@@ -775,7 +795,7 @@ public class UserTest extends CommonAPITest {
         assertNotNull(searchUsers);
         assertEquals(1, searchUsers.getCount());
         users = searchUsers.getResult();
-        assertEquals(john, users.get(0));
+        assertEquals(updatedJack, users.get(0));
 
         // Clean up
         deleteUsers(john, jack);
