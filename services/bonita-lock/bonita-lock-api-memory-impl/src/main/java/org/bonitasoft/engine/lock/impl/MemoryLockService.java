@@ -21,6 +21,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.RejectedLockHandler;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
@@ -31,48 +32,59 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
  */
 public class MemoryLockService extends AbstractLockService {
 
-	private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
-	private final Map<String, List<RejectedLockHandler>> rejectedLockHandlers = new HashMap<String, List<RejectedLockHandler>>();
+    private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
 
-	public MemoryLockService(final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
-		super(logger, sessionAccessor, lockTimeout);
-	}
+    private final Map<String, List<RejectedLockHandler>> rejectedLockHandlers = new HashMap<String, List<RejectedLockHandler>>();
 
-	@Override
-	protected RejectedLockHandler getOneRejectedHandler(final String key) {
-		if (rejectedLockHandlers.containsKey(key)) {
-			final RejectedLockHandler handler = rejectedLockHandlers.get(key).remove(0);
-			if (rejectedLockHandlers.get(key).size() == 0) {
-				rejectedLockHandlers.remove(key);
-			}
-			return handler;
-		}
-		return null;
-	}
+    public MemoryLockService(final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
+        super(logger, sessionAccessor, lockTimeout);
+    }
 
-	@Override
-	protected void storeRejectedLock(final String key, final RejectedLockHandler handler) {
-		if (!rejectedLockHandlers.containsKey(key)) {
-			rejectedLockHandlers.put(key, new ArrayList<RejectedLockHandler>());
-		}
-		rejectedLockHandlers.get(key).add(handler);
+    @Override
+    protected RejectedLockHandler getOneRejectedHandler(final String key) {
+        if (rejectedLockHandlers.containsKey(key)) {
+            final RejectedLockHandler handler = rejectedLockHandlers.get(key).remove(0);
+            if (rejectedLockHandlers.get(key).size() == 0) {
+                rejectedLockHandlers.remove(key);
+            }
+            return handler;
+        }
+        return null;
+    }
 
-	}
+    @Override
+    protected void storeRejectedLock(final String key, final RejectedLockHandler handler) {
+        if (!rejectedLockHandlers.containsKey(key)) {
+            rejectedLockHandlers.put(key, new ArrayList<RejectedLockHandler>());
+        }
+        rejectedLockHandlers.get(key).add(handler);
 
-	@Override
-	protected Lock getLock(final String key) {
-		if (!locks.containsKey(key)) {
-			// use fair mode?
-			locks.put(key, new ReentrantLock());
-		}
-		return locks.get(key);
-	}
+    }
 
-	@Override
-	protected void removeLockFromMapIfnotUsed(final String key) {
-		ReentrantLock reentrantLock = locks.get(key);
-		if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
-			locks.remove(key);
-		}
-	}
+    @Override
+    protected Lock getLock(final String key) {
+        if (!locks.containsKey(key)) {
+            // use fair mode?
+            locks.put(key, new ReentrantLock());
+        }
+        return locks.get(key);
+    }
+
+    @Override
+    protected void removeLockFromMapIfnotUsed(final String key) {
+        ReentrantLock reentrantLock = locks.get(key);
+        /*
+         * The reentrant lock must not have waiting thread that try to lock it, nor a lockservice.lock that locked it nor rejectedlockhandlers waiting for it
+         */
+        if (reentrantLock != null && !reentrantLock.hasQueuedThreads() && !reentrantLock.isLocked()
+                && (rejectedLockHandlers.get(key) == null || rejectedLockHandlers.get(key).isEmpty())) {
+            if (debugEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "removed from map " + reentrantLock.hashCode() + " id=" + key
+                        + " by thread " + Thread.currentThread().getId()
+                        + " "
+                        + Thread.currentThread().getName());
+            }
+            locks.remove(key);
+        }
+    }
 }

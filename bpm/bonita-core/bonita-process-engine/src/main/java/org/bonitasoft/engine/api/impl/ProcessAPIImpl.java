@@ -881,6 +881,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        LockService lockService = tenantAccessor.getLockService();
         TransactionContent transactionContent = new TransactionContent() {
 
             @Override
@@ -900,7 +901,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         };
 
         try {
-            executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
+            GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
+            executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
+            BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name());
+            try {
+                executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
+            } finally {
+                lockService.unlock(lock);
+            }
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
