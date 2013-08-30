@@ -17,9 +17,9 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
 
 /**
@@ -47,13 +47,13 @@ public class InsertBatchLogsJob implements StatelessJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException, FireEventException {
+    public void execute() throws SJobExecutionException, FireEventException {
         final List<SQueriableLog> logs = BatchLogBuffer.getInstance().clearLogs();
         if (logs.size() > 0) {
             try {
                 persistenceService.insertInBatch(new ArrayList<PersistentObject>(logs));
             } catch (final SBonitaException e) {
-                throw new JobExecutionException(e);
+                throw new SJobExecutionException(e);
             }
         }
     }

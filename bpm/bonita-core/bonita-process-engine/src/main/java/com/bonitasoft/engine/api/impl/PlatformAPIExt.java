@@ -62,8 +62,8 @@ import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.SessionService;
@@ -194,10 +194,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
             final SessionService sessionService = platformAccessor.getSessionService();
             final SSession session = sessionService.createSession(tenantId, -1L, "dummy", true);
-            
+
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
-            
+
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
             // This part is specific to SP: reporting.
@@ -213,8 +213,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (Exception e) {
             throw new CreationException(e);
         } finally {
-        	cleanSessionAccessor(sessionAccessor);
-        	sessionAccessor.setSessionInfo(platformSessionId, -1);
+            cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -282,10 +282,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     try {
                         sessionAccessor = serviceAccessorFactory.createSessionAccessor();
                         final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
-                        
+
                         platformSessionId = sessionAccessor.getSessionId();
                         sessionAccessor.deleteSessionId();
-                        
+
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
                         createDefaultDataSource(sDataSourceModelBuilder, dataService);
@@ -450,10 +450,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
-            
+
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
-            
+
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
                     platformAccessor.getTechnicalLoggerService(), workService);
@@ -502,10 +502,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final WorkService workService = platformAccessor.getWorkService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
-            
+
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
-            
+
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
             transactionContent.execute();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2009, 2012-2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,13 +14,14 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class DeleteBatchJob implements StatelessJob {
 
@@ -45,12 +46,12 @@ public class DeleteBatchJob implements StatelessJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException, FireEventException {
+    public void execute() throws SJobExecutionException, FireEventException {
         for (final String classToPurge : classesToPurge) {
             try {
                 persistenceService.purge(classToPurge);
             } catch (final SBonitaException e) {
-                throw new JobExecutionException(e);
+                throw new SJobExecutionException(e);
             }
         }
     }

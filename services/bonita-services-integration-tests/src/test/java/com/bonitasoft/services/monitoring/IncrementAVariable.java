@@ -8,9 +8,9 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
 
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 
 public class IncrementAVariable implements StatelessJob {
 
@@ -29,7 +29,7 @@ public class IncrementAVariable implements StatelessJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() throws SJobExecutionException {
         final WaitFor check = new WaitFor(50, 5000) {
 
             final VariableStorageForMonitoring storage = VariableStorageForMonitoring.getInstance();
@@ -41,7 +41,7 @@ public class IncrementAVariable implements StatelessJob {
         };
         try {
             if (!check.waitFor()) {
-                throw new JobExecutionException("geek is chic");
+                throw new SJobExecutionException("geek is chic");
             }
         } catch (final InterruptedException e) {
             e.printStackTrace();

@@ -15,8 +15,8 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.Test;
 
