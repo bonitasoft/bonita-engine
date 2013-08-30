@@ -29,7 +29,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -107,8 +106,8 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -147,8 +146,6 @@ public class StateBehaviors {
 
     private final ActorMappingService actorMappingService;
 
-    private final ConnectorService connectorService;
-
     private final ExpressionResolverService expressionResolverService;
 
     private final ProcessDefinitionService processDefinitionService;
@@ -171,10 +168,10 @@ public class StateBehaviors {
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
-            final BPMInstanceBuilders instanceBuilders, final ActorMappingService actorMappingService, final ConnectorService connectorService,
-            final ConnectorInstanceService connectorInstanceService, final ExpressionResolverService expressionResolverService,
-            final ProcessDefinitionService processDefinitionService, final DataInstanceService dataInstanceService, final OperationService operationService,
-            final WorkService workService, final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice,
+            final BPMInstanceBuilders instanceBuilders, final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
+            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
+            final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
+            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice,
             final SchedulerService schedulerService, final TechnicalLoggerService logger) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
@@ -184,7 +181,6 @@ public class StateBehaviors {
         this.classLoaderService = classLoaderService;
         this.instanceBuilders = instanceBuilders;
         this.actorMappingService = actorMappingService;
-        this.connectorService = connectorService;
         this.connectorInstanceService = connectorInstanceService;
         this.expressionResolverService = expressionResolverService;
         this.processDefinitionService = processDefinitionService;

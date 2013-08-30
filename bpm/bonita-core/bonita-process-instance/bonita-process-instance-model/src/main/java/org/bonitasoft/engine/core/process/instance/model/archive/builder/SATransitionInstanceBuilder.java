@@ -23,9 +23,12 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionIns
  * @author Hongwen Zang
  */
 public interface SATransitionInstanceBuilder extends SAFlowElementInstanceBuilder {
+
     SATransitionInstanceBuilder createNewTransitionInstance(STransitionInstance sTransitionInstance, long sFlowNodeInstanceId, TransitionState state);
 
-    SATransitionInstanceBuilder createNewTransitionInstance(STransitionDefinition sTransitionDefinition, SFlowNodeInstance sFlowNodeInstance, TransitionState state);
+    SATransitionInstanceBuilder createNewTransitionInstance(STransitionDefinition sTransitionDefinition, SFlowNodeInstance sFlowNodeInstance,
+            TransitionState state);
 
     SATransitionInstance done();
+
 }

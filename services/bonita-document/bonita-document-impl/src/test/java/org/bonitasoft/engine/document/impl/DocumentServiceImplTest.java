@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.document.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.bonitasoft.engine.document.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentException;
 import org.bonitasoft.engine.document.model.SDocumentBuilders;
@@ -27,10 +31,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -48,19 +48,16 @@ public class DocumentServiceImplTest {
 
     private SDocumentBuilders documentBuilders;
 
-    private TechnicalLoggerService logger;
-
     private DocumentServiceImpl documentServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
         queriableLoggerService = mock(QueriableLoggerService.class);
         eventBuilders = mock(SEventBuilders.class);
         documentBuilders = mock(SDocumentBuilders.class);
-        logger = mock(TechnicalLoggerService.class);
-        documentServiceImpl = new DocumentServiceImpl(recorder, eventBuilders, persistence, documentBuilders, logger, queriableLoggerService);
+        documentServiceImpl = new DocumentServiceImpl(recorder, eventBuilders, persistence, documentBuilders, queriableLoggerService);
     }
 
     /**

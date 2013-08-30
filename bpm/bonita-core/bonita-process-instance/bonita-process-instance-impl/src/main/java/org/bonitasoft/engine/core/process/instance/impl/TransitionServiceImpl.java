@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.impl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -31,6 +30,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionRea
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SATransitionInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
@@ -38,11 +38,13 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -58,6 +60,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 /**
  * @author Zhao Na
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class TransitionServiceImpl implements TransitionService {
 
@@ -156,9 +159,9 @@ public class TransitionServiceImpl implements TransitionService {
     }
 
     @Override
-    public List<STransitionInstance> search(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<STransitionInstance> search(final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
-            return this.persistenceRead.searchEntity(STransitionInstance.class, searchOptions, null);
+            return this.persistenceRead.searchEntity(STransitionInstance.class, queryOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
@@ -174,9 +177,9 @@ public class TransitionServiceImpl implements TransitionService {
     }
 
     @Override
-    public List<SATransitionInstance> searchArchived(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SATransitionInstance> searchArchivedTransitionInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
-            return this.persistenceRead.searchEntity(SATransitionInstance.class, searchOptions, null);
+            return this.persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
@@ -218,7 +221,7 @@ public class TransitionServiceImpl implements TransitionService {
     private void archiveTransitionInstanceInsertRecord(final SATransitionInstance saTransitionInstance, final long archiveDate) throws SRecorderException,
             SDefinitiveArchiveNotFound {
         final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saTransitionInstance);
-        this.archiveService.recordInsert(archiveDate, insertRecord, getQueriableLog(ActionType.CREATED, "archive the transition instance").done());
+        this.archiveService.recordInsert(archiveDate, insertRecord);
     }
 
     protected STransitionInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
@@ -229,32 +232,28 @@ public class TransitionServiceImpl implements TransitionService {
     }
 
     @Override
-    public List<SATransitionInstance> getArchivedTransitionOfProcessInstance(final long processInstanceId, final int from, final int numberOfResult)
-            throws STransitionReadException {
-        try {
-            final Map<String, Object> singletonMap = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
-            return this.persistenceRead.selectList(new SelectListDescriptor<SATransitionInstance>("getArchivedTransitionOfProcessInstance", singletonMap,
-                    SATransitionInstance.class));
-        } catch (final SBonitaReadException e) {
-            throw new STransitionReadException(e);
-        }
-    }
-
-    @Override
     public void delete(final SATransitionInstance saTransitionInstance) throws STransitionDeletionException {
         final DeleteRecord deleteRecord = new DeleteRecord(saTransitionInstance);
         try {
-            this.archiveService.recordDelete(deleteRecord, null);
+            this.archiveService.recordDelete(deleteRecord);
         } catch (final SRecorderException e) {
             throw new STransitionDeletionException(e);
         }
     }
 
     @Override
-    public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, STransitionReadException {
+    public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, SBonitaSearchException {
+        final SATransitionInstanceBuilder saTransitionInstanceBuilder = instanceBuilders.getSATransitionInstanceBuilder();
+        final String rootContainerIdKey = saTransitionInstanceBuilder.getRootContainerIdKey();
+        final String idKey = saTransitionInstanceBuilder.getIdKey();
+
         List<SATransitionInstance> transitionInstances;
         do {
-            transitionInstances = getArchivedTransitionOfProcessInstance(processInstanceId, 0, 100);
+            final List<FilterOption> filters = Collections.singletonList(new FilterOption(SATransitionInstance.class, rootContainerIdKey, processInstanceId));
+            final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SATransitionInstance.class, idKey, OrderByType.ASC));
+            final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions, filters, null);
+            transitionInstances = searchArchivedTransitionInstances(queryOptions);
+
             for (final SATransitionInstance saTransitionInstance : transitionInstances) {
                 delete(saTransitionInstance);
             }

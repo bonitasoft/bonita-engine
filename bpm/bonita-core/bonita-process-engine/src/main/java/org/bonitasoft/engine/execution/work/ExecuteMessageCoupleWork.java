@@ -11,11 +11,10 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.jobs;
+package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.execution.work.TxBonitaWork;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
@@ -51,6 +50,7 @@ public class ExecuteMessageCoupleWork extends TxBonitaWork {
         return getClass().getSimpleName() + ": messageInstanceId: " + messageInstanceId + ", waitingMessageId: " + waitingMessageId;
     }
 
+    @Override
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             return TenantServiceSingleton.getInstance(getTenantId());

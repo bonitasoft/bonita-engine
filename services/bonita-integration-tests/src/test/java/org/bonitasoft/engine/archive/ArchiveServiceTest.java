@@ -154,7 +154,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
 
     private Laptop insertLaptopRecordIntoArchiveWithYesterdayDate(final SQueriableLog queriableLog) throws SRecorderException, SDefinitiveArchiveNotFound {
         final Laptop laptop = new Laptop("Dell", "1800");
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(laptop), queriableLog);
+        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(laptop));
         return laptop;
     }
 
@@ -162,7 +162,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
             SDefinitiveArchiveNotFound {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(employee), queriableLog);
+        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(employee));
         return employee;
     }
 
@@ -170,7 +170,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
             SDefinitiveArchiveNotFound {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
-        archiveService.recordInsert(START_OF_2009, new ArchiveInsertRecord(employee), queriableLog);
+        archiveService.recordInsert(START_OF_2009, new ArchiveInsertRecord(employee));
         return employee;
     }
 
@@ -178,7 +178,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
             SDefinitiveArchiveNotFound {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
-        archiveService.recordInsert(BEFORE_2009, new ArchiveInsertRecord(employee), queriableLog);
+        archiveService.recordInsert(BEFORE_2009, new ArchiveInsertRecord(employee));
         return employee;
     }
 
@@ -186,20 +186,20 @@ public class ArchiveServiceTest extends CommonServiceTest {
             SDefinitiveArchiveNotFound {
         final Address address = new Address("China");
         address.setEmployeeId(employee.getId());
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(address), queriableLog);
+        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(address));
         return address;
     }
 
     private Project insertProjectRecordIntoArchiveWithYesterdayDate(final SQueriableLog queriableLog) throws SRecorderException, SDefinitiveArchiveNotFound {
         final Project project = new Project("BOS6");
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(project), queriableLog);
+        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(project));
         return project;
     }
 
     private EmployeeProjectMapping insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(final SQueriableLog queriableLog, final Employee employee,
             final Project project) throws SRecorderException, SDefinitiveArchiveNotFound {
         final EmployeeProjectMapping epMapping = new EmployeeProjectMapping(employee, project);
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(epMapping), queriableLog);
+        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(epMapping));
         return epMapping;
     }
 
@@ -228,15 +228,15 @@ public class ArchiveServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        archiveService.recordDelete(new DeleteRecord(employeeProjectMapping), queriableLog);
+        archiveService.recordDelete(new DeleteRecord(employeeProjectMapping));
 
-        archiveService.recordDelete(new DeleteRecord(project), queriableLog);
+        archiveService.recordDelete(new DeleteRecord(project));
 
-        archiveService.recordDelete(new DeleteRecord(address), queriableLog);
+        archiveService.recordDelete(new DeleteRecord(address));
 
-        archiveService.recordDelete(new DeleteRecord(laptop), queriableLog);
+        archiveService.recordDelete(new DeleteRecord(laptop));
 
-        archiveService.recordDelete(new DeleteRecord(employee), queriableLog);
+        archiveService.recordDelete(new DeleteRecord(employee));
 
         getTransactionService().complete();
     }

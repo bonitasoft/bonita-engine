@@ -212,7 +212,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public SProcessInstance getProcessInstance(final long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException {
-        SProcessInstance instance;
+        final SProcessInstance instance;
         try {
             instance = persistenceRead.selectById(SelectDescriptorBuilder.getElementById(SProcessInstance.class, "ProcessInstance", processInstanceId));
         } catch (final SBonitaReadException sbre) {
@@ -625,7 +625,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final SAProcessInstance saProcessInstance = bpmInstanceBuilders.getSAProcessInstanceBuilder().createNewInstance(processInstance).done();
         final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saProcessInstance);
         try {
-            archiveService.recordInsert(System.currentTimeMillis(), insertRecord, getQueriableLog(ActionType.CREATED, "archive the process instance").done());
+            archiveService.recordInsert(System.currentTimeMillis(), insertRecord);
         } catch (final SRecorderException e) {
             throw new SProcessInstanceModificationException(e);
         } catch (final SDefinitiveArchiveNotFound e) {

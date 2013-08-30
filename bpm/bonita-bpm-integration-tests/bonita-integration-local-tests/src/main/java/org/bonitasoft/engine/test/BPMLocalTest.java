@@ -177,7 +177,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
             public void execute() throws SBonitaException {
                 final OrderByOption orderByOption = new OrderByOption(SATransitionInstance.class, "id", OrderByType.ASC);
                 final QueryOptions searchOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption));
-                searchArchivedTransitions = transitionInstanceService.searchArchived(searchOptions);
+                searchArchivedTransitions = transitionInstanceService.searchArchivedTransitionInstances(searchOptions);
             }
 
             @Override

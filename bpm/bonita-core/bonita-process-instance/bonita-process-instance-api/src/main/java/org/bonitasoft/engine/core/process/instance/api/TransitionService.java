@@ -82,13 +82,13 @@ public interface TransitionService {
     /**
      * Retrieve transition instances according to searchOptions
      * 
-     * @param searchOptions
+     * @param queryOptions
      *            define filters, range and order by options
      * @return
      * @throws SBonitaSearchException
      *             if a problem is found during the search
      */
-    List<STransitionInstance> search(QueryOptions searchOptions) throws SBonitaSearchException;
+    List<STransitionInstance> search(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * Archive a transition from its instance
@@ -126,11 +126,11 @@ public interface TransitionService {
     void delete(STransitionInstance transitionInstance) throws STransitionDeletionException;
 
     /**
-     * @param searchOptions
+     * @param queryOptions
      * @return
      * @throws SBonitaSearchException
      */
-    List<SATransitionInstance> searchArchived(QueryOptions searchOptions) throws SBonitaSearchException;
+    List<SATransitionInstance> searchArchivedTransitionInstances(QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * @param countOptions
@@ -138,13 +138,6 @@ public interface TransitionService {
      * @throws SBonitaSearchException
      */
     long getNumberOfArchivedTransitionInstances(QueryOptions countOptions) throws SBonitaSearchException;
-
-    /**
-     * @param processInstanceId
-     * @return
-     * @throws STransitionReadException
-     */
-    List<SATransitionInstance> getArchivedTransitionOfProcessInstance(long processInstanceId, int from, int numberOfResult) throws STransitionReadException;
 
     /**
      * @param saTransitionInstance
@@ -156,9 +149,9 @@ public interface TransitionService {
      * 
      * @param processInstanceId
      * @throws STransitionDeletionException
-     * @throws STransitionReadException
+     * @throws SBonitaSearchException
      * @since 6.1
      */
-    void deleteArchivedTransitionsOfProcessInstance(long processInstanceId) throws STransitionDeletionException, STransitionReadException;
+    void deleteArchivedTransitionsOfProcessInstance(long processInstanceId) throws STransitionDeletionException, SBonitaSearchException;
 
 }

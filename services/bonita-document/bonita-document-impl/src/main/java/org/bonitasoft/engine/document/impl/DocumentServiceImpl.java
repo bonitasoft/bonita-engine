@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ import org.bonitasoft.engine.document.model.SDocumentLogBuilder;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -62,17 +61,14 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final SDocumentBuilders documentBuilders;
 
-    private final TechnicalLoggerService logger;
-
     private final QueriableLoggerService queriableLoggerService;
 
     public DocumentServiceImpl(final Recorder recorder, final SEventBuilders eventBuilders, final ReadPersistenceService persistenceService,
-            final SDocumentBuilders documentBuilders, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+            final SDocumentBuilders documentBuilders, final QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
         this.eventBuilders = eventBuilders;
         this.persistenceService = persistenceService;
         this.documentBuilders = documentBuilders;
-        this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
     }
 

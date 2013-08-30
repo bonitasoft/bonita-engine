@@ -122,7 +122,6 @@
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
-		<constructor-arg name="connectorService" ref="connectorService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />

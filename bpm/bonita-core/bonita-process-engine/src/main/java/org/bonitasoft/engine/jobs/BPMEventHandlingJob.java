@@ -33,6 +33,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.execution.work.ExecuteMessageCoupleWork;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.JobExecutionException;
 import org.bonitasoft.engine.scheduler.SJobConfigurationException;
