@@ -18,3 +18,5 @@ INSERT INTO sequence VALUES(${tenantid}, 10095, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10110, 1)
 GO
+INSERT INTO sequence VALUES(${tenantid}, 10019, 1)
+GO

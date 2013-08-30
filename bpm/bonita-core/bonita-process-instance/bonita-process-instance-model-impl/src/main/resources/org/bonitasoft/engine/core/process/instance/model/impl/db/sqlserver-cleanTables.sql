@@ -27,3 +27,6 @@ GO
 
 DELETE FROM process_instance
 GO
+
+DELETE FROM breakpoint
+GO

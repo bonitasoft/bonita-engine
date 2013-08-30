@@ -2,6 +2,7 @@
 ALTER TABLE actor DROP CONSTRAINT fk_actor_tenantId;
 ALTER TABLE actormember DROP CONSTRAINT fk_actormember_tenantId;
 ALTER TABLE actormember DROP CONSTRAINT fk_actormember_actorId;
+ALTER TABLE breakpoint DROP CONSTRAINT fk_breakpoint_tenantId;
 -- ALTER TABLE queriable_log DROP CONSTRAINT fk_queriable_log_tenantId;
 ALTER TABLE queriablelog_p DROP CONSTRAINT fk_queriablelog_p_tenantId;
 ALTER TABLE category DROP CONSTRAINT fk_category_tenantId;
@@ -45,10 +46,6 @@ ALTER TABLE waiting_event DROP CONSTRAINT fk_waiting_event_tenantId;
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId;
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId;
 -- ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_process_instanceId;
-
-
-
-
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------

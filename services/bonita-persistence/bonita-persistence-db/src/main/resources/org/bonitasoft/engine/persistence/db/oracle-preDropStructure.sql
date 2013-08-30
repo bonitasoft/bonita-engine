@@ -1,3 +1,4 @@
+ALTER TABLE breakpoint DROP CONSTRAINT fk_breakpoint_tenantId;
 ALTER TABLE transition_instance DROP CONSTRAINT fk_transInst_tenId;
 ALTER TABLE processcategorymapping DROP CONSTRAINT fk_procCatMap_tenId;
 ALTER TABLE external_identity_mapping DROP CONSTRAINT fk_extIdMap_tenId;

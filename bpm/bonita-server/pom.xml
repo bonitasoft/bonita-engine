@@ -464,7 +464,14 @@
 			<artifactId>bonita-recorder-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
+		<!-- Reporting -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.reporting</groupId>
+			<artifactId>bonita-reporting-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Scheduler -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
@@ -803,6 +810,8 @@
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
+									<!-- Reporting -->
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>

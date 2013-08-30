@@ -1,6 +1,7 @@
 -- ------------------------------------------------ Foreign Keys -----------------------------------------------
 ALTER TABLE actor DROP FOREIGN KEY fk_actor_tenantId;
 ALTER TABLE actormember DROP FOREIGN KEY fk_actormember_tenantId;
+ALTER TABLE breakpoint DROP FOREIGN KEY fk_breakpoint_tenantId;
 -- ALTER TABLE queriable_log DROP FOREIGN KEY fk_queriable_log_tenantId;
 ALTER TABLE queriablelog_p DROP FOREIGN KEY fk_queriablelog_p_tenantId;
 ALTER TABLE category DROP FOREIGN KEY fk_category_tenantId;
@@ -69,6 +70,9 @@ DROP INDEX fk_actormember_user_Id_idx on actormember;
 DROP INDEX fk_actormember_roleId_idx on actormember;
 DROP INDEX fk_actormember_group_Id_idx on actormember;
 DROP INDEX fk_actormember_tenantId_idx on actormember;
+DROP INDEX fk_breakpoint_tenantId_idx on breakpoint;
+DROP INDEX fk_breakpoint_process_definitionId_idx on breakpoint;
+DROP INDEX fk_breakpoint_process_instanceId_idx on breakpoint;
 DROP INDEX fk_data_instance_tenantId_idx on data_instance;
 DROP INDEX fk_data_mapping_data_instanceId_idx on data_mapping;
 DROP INDEX fk_data_mapping_tenantId_idx on data_mapping;
