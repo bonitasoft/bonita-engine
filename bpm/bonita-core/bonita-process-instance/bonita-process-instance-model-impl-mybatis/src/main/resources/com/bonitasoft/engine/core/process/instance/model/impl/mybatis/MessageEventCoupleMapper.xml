@@ -6,23 +6,11 @@
 	<resultMap id="messageEventCoupleResultMap" type="message_event_couple">
 		<result property="waitingMessageId" column="waitingMessageId" />
 		<result property="eventType" column="eventType" />
-		<result property="waitingProcessefinitionId" column="waitingProcessefinitionId" />
-		<result property="processName" column="processName" />
-		<result property="waitingFlowNodeDefinitionId" column="waitingFlowNodeDefinitionId" />
-		<result property="waitingFlowNodeName" column="waitingFlowNodeName" />
-		<result property="waitingMessageName" column="waitingMessageName" />
 		<result property="messageId" column="messageId" />
-		<result property="messageName" column="messageName" />
-		<result property="targetProcess" column="targetProcess" />
-		<result property="targetFlowNode" column="targetFlowNode" />
-		<result property="sendMessageProcessefinitionId" column="sendMessageProcessefinitionId" />
-		<result property="sendMessageFlowNodeName" column="sendMessageFlowNodeName" />
 	</resultMap>
 
 	<select id="getMessageEventCouples" parameterType="List" resultMap="messageEventCoupleResultMap">
-		SELECT w.id AS waitingMessageId, w.eventType, w.processDefinitionId AS waitingProcessefinitionId, w.processName, w.flowNodeDefinitionId, w.flowNodeName,
-			w.messageName AS waitingMessageName, m.id AS messageId, m.messageName, m.targetProcess, m.targetFlowNode,
-			m.processDefinitionId AS sendMessageProcessefinitionId, m.flowNodeName AS sendMessageFlowNodeName
+		SELECT w.id AS waitingMessageId, w.eventType, m.id AS messageId
 		FROM waiting_event w, message_instance m
 		WHERE m.tenantid = #{tenantid}
 		AND w.tenantid = #{tenantid}

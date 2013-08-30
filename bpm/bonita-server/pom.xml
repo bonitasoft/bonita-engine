@@ -69,7 +69,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-
 		<!-- Category -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.category</groupId>
@@ -569,6 +568,11 @@
 
 		<!-- Reporting -->
 		<dependency>
+			<groupId>org.bonitasoft.engine.core.reporting</groupId>
+			<artifactId>bonita-reporting-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.bonitasoft.engine.core.reporting</groupId>
 			<artifactId>bonita-reporting-impl</artifactId>
 			<version>${project.version}</version>
@@ -989,6 +993,7 @@
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<!-- Reporting -->
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
 									<!-- Security Manager -->
