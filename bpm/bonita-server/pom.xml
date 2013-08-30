@@ -667,6 +667,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-service-clustered</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.synchro</groupId>
 			<artifactId>bonita-synchro-register</artifactId>
 			<version>${project.version}</version>
@@ -1027,6 +1032,7 @@
 									<!-- Synchro-repository -->
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-service</include>
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
+									<include>com.bonitasoft.engine.synchro:bonita-synchro-service-clustered</include>
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-register</include>
 									<!-- Transaction -->
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
