@@ -5,7 +5,7 @@
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="lockTimeout" value="50" />
+		<constructor-arg name="lockTimeout" value="60" />
 	</bean>
 
 </beans>
