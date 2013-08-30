@@ -537,7 +537,7 @@ public class OrganizationTest extends CommonAPITest {
 
             final User persistedUser1 = getIdentityAPI().getUserByUserName(userName1);
             assertNotNull(persistedUser1);
-            assertEquals(false, persistedUser1.isEnabled());
+            assertTrue(persistedUser1.isEnabled());
             final Role persistedRole1 = getIdentityAPI().getRoleByName(roleName1);
             assertNotNull(persistedRole1);
             assertEquals(roleDisplayName1, persistedRole1.getDisplayName());
@@ -898,11 +898,11 @@ public class OrganizationTest extends CommonAPITest {
 
         final User persistedUser = getIdentityAPI().getUserByUserName("johnnyfootball");
         assertNotNull(persistedUser);
-        assertEquals(false, persistedUser.isEnabled());
+        assertFalse(persistedUser.isEnabled());
 
         final User persistedUser1 = getIdentityAPI().getUserByUserName("liuyanyan");
         assertNotNull(persistedUser1);
-        assertEquals(false, persistedUser1.isEnabled());
+        assertTrue(persistedUser1.isEnabled());
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser.getId());
