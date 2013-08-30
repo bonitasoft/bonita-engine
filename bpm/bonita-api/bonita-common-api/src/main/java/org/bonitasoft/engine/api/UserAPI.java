@@ -43,7 +43,7 @@ public interface UserAPI {
     /**
      * Creates a user.
      * <b>
-     * The password can be empty.
+     * The password can't be empty.
      * 
      * @param userName
      *            the name of the user
@@ -63,7 +63,7 @@ public interface UserAPI {
     /**
      * Creates a user.
      * <b>
-     * The password can be empty.
+     * The password can't be empty.
      * 
      * @param userName
      *            the name of the user
