@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.lock.impl;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -109,7 +110,15 @@ public abstract class AbstractLockService implements LockService {
                     + Thread.currentThread().getId() + " "
                     + Thread.currentThread().getName());
         }
-        lock.lock();
+        // outside mutex because it's a long lock
+        try {
+            boolean tryLock = lock.tryLock(lockTimeout, TimeUnit.SECONDS);
+            if (!tryLock) {
+                throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
+            }
+        } catch (InterruptedException e) {
+            throw new SLockException(e);
+        }
 
         if (debugEnable) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "locked " + lock.hashCode() + " id=" + objectToLockId + " by thread "

@@ -36,6 +36,13 @@ public class MemoryLockService extends AbstractLockService {
 
     private final Map<String, List<RejectedLockHandler>> rejectedLockHandlers = new HashMap<String, List<RejectedLockHandler>>();
 
+    /**
+     * 
+     * @param logger
+     * @param sessionAccessor
+     * @param lockTimeout
+     *            timeout to obtain a lock in seconds
+     */
     public MemoryLockService(final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
         super(logger, sessionAccessor, lockTimeout);
     }

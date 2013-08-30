@@ -4,7 +4,7 @@
 	<bean id="lockService" class="org.bonitasoft.engine.lock.impl.MemoryLockService" scope="singleton" >
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="lockTimeout" value="50" />
+		<constructor-arg name="lockTimeout" value="60" />
 	</bean>
 
 </beans>
