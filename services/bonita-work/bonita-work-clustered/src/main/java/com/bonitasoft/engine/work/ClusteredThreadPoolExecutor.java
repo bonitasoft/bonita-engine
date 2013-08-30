@@ -16,8 +16,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.work.BonitaRunnable;
-
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
@@ -26,20 +24,18 @@ import com.hazelcast.core.MembershipListener;
 import com.hazelcast.core.MultiMap;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements MembershipListener {
 
     private static BlockingQueue<Runnable> workQueue;
 
-    private final MultiMap<String, BonitaRunnable> executingWorks;
+    private final MultiMap<String, Runnable> executingWorks;
 
     private final String localMemberUUID;
 
-    public ClusteredThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-            ThreadFactory threadFactory, RejectedExecutionHandler handler, HazelcastInstance hazelcastInstance) {
+    public ClusteredThreadPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
+            final ThreadFactory threadFactory, final RejectedExecutionHandler handler, final HazelcastInstance hazelcastInstance) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, createWorkQueue(hazelcastInstance), threadFactory, handler);
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
@@ -49,42 +45,41 @@ public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements M
         localMemberUUID = hazelcastInstance.getCluster().getLocalMember().getUuid();
     }
 
-    private static BlockingQueue<Runnable> createWorkQueue(HazelcastInstance hazelcastInstance) {
+    private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
         workQueue = hazelcastInstance.getQueue("WorkQueue");
         return workQueue;
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
+    public Future<?> submit(final Runnable task) {
         execute(task);
         return null;
     }
 
     @Override
-    protected void beforeExecute(Thread t, Runnable r) {
-        BonitaRunnable runnable = (BonitaRunnable) r;
-        executingWorks.put(localMemberUUID, runnable);
+    protected void beforeExecute(final Thread t, final Runnable r) {
+        executingWorks.put(localMemberUUID, r);
     }
 
     @Override
-    protected void afterExecute(Runnable r, Throwable t) {
+    protected void afterExecute(final Runnable r, final Throwable t) {
         executingWorks.remove(r);
     }
 
     @Override
-    public void memberAdded(MembershipEvent membershipEvent) {
+    public void memberAdded(final MembershipEvent membershipEvent) {
 
     }
 
     @Override
-    public void memberRemoved(MembershipEvent membershipEvent) {
+    public void memberRemoved(final MembershipEvent membershipEvent) {
         // reschedule executing work that are on the node that is gone
         // will be done on all node but it's ok because we lock the map on this key
         String memberUUID = membershipEvent.getMember().getUuid();
         executingWorks.lock(memberUUID);
-        Collection<BonitaRunnable> collection = executingWorks.get(memberUUID);
-        for (BonitaRunnable bonitaRunnable : collection) {
-            workQueue.add(bonitaRunnable);
+        Collection<Runnable> collection = executingWorks.get(memberUUID);
+        for (Runnable runnable : collection) {
+            workQueue.add(runnable);
         }
         executingWorks.unlock(memberUUID);
     }
