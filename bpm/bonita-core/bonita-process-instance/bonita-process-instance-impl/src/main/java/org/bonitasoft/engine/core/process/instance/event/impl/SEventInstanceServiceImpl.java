@@ -36,8 +36,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.impl.FlowNodeInstanceServiceImpl;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SEventTriggerInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
@@ -65,7 +63,6 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -144,21 +141,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
         } catch (final SBonitaReadException e) {
             throw new SEventInstanceReadException(e);
         }
-    }
-
-    protected SEventTriggerInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SEventTriggerInstance eventTrigger) {
-        final SEventTriggerInstanceLogBuilder logBuilder = getInstanceBuilders().getSEventTriggerInstanceLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.eventInstanceId(eventTrigger.getEventInstanceId());
-        return logBuilder;
-    }
-
-    protected SWaitingEventLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SWaitingEventLogBuilder logBuilder = getInstanceBuilders().getSStartEventTriggerInstanceLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        return logBuilder;
     }
 
     @Override
@@ -524,7 +506,6 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
 
     @Override
     public void deleteEventTriggerInstance(final SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException {
-        final SEventTriggerInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting eventTrigger instance", eventTriggerInstance);
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(eventTriggerInstance);
             SDeleteEvent deleteEvent = null;
