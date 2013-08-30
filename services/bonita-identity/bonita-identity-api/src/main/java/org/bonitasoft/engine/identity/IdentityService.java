@@ -1098,7 +1098,7 @@ public interface IdentityService {
      *            Do we want personal contact information (or professional) ?
      * @return the corresponding SContactInfo, if found
      * @throws SIdentityException
-     *             if a Read problem occured
+     *             if a Read problem occurred
      */
     SContactInfo getUserContactInfo(long userId, boolean isPersonal) throws SIdentityException;
 
