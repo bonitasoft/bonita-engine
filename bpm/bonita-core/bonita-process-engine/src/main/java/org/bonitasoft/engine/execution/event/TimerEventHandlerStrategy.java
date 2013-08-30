@@ -41,12 +41,12 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.jobs.TriggerTimerEventJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.OneShotTrigger;
-import org.bonitasoft.engine.scheduler.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.SJobParameter;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.Trigger;
-import org.bonitasoft.engine.scheduler.UnixCronTrigger;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
+import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 
 /**
  * @author Baptiste Mesta
@@ -71,8 +71,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     @Override
-    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SCatchEventInstance eventInstance,
-            final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
+    public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final SCatchEventInstance eventInstance, final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, eventInstance);
         final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
         final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, eventInstance);
@@ -156,7 +156,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId()).done());
         if (SFlowNodeType.START_EVENT.equals(eventDefinition.getType())) {
             final SStartEventDefinition startEvent = (SStartEventDefinition) eventDefinition;
-            jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("isInterrupting", startEvent.isInterrupting()).done());
+            jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("isInterrupting", startEvent.isInterrupting())
+                    .done());
         }
         if (eventInstance != null) {
             jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance("flowNodeInstanceId", eventInstance.getId()).done());

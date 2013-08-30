@@ -15,7 +15,7 @@ package org.bonitasoft.engine.log.asyncflush;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.scheduler.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger;
 
 /**
  * @author Elias Ricken de Medeiros

@@ -16,6 +16,12 @@ package org.bonitasoft.engine.scheduler;
 import java.util.List;
 
 import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilder;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
+import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.scheduler.trigger.Trigger;
 
 /**
  * @author Matthieu Chaffotte
@@ -143,14 +149,14 @@ public interface SchedulerService {
      * 
      * @return job descriptor builder
      */
-    JobDescriptorBuilder getJobDescriptorBuilder();
+    SJobDescriptorBuilder getJobDescriptorBuilder();
 
     /**
      * Get the builder of job parameter
      * 
      * @return job parameter builder
      */
-    JobParameterBuilder getJobParameterBuilder();
+    SJobParameterBuilder getJobParameterBuilder();
 
     /**
      * Get all jobs on all tenants

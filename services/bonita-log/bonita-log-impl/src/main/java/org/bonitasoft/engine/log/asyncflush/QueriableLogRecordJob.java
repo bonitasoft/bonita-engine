@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +41,9 @@ public class QueriableLogRecordJob extends AbstractJob {
     private transient QueriableLoggerService queriableLogService;
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() throws SJobExecutionException {
         if (queriableLogService == null) {
-            throw new JobExecutionException("Missing mandatory service: QueriableLoggerService");
+            throw new SJobExecutionException("Missing mandatory service: QueriableLoggerService");
         }
         LOGGER.debug("QueriableLogRecordJob calling logger service");
         final SQueriableLog[] logsArray = new SQueriableLog[logs.size()];

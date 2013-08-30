@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011,2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,6 +20,7 @@ import org.quartz.JobExecutionException;
 /**
  * @author Matthieu Chaffotte
  * @author Baptsite Mesta : the bos job is set before the execution.
+ * @author Celine Souchet
  */
 public class QuartzJob implements org.quartz.Job {
 
@@ -34,7 +35,11 @@ public class QuartzJob implements org.quartz.Job {
         }
     }
 
-    public void setBOSJob(final StatelessJob bosJob) {
+    public StatelessJob getBosJob() {
+        return bosJob;
+    }
+
+    public void setBosJob(StatelessJob bosJob) {
         this.bosJob = bosJob;
     }
 

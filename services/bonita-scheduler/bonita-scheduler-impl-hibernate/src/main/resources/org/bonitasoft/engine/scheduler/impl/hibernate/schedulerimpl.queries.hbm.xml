@@ -3,12 +3,44 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
 
-
-
 	<query name="getSJobParameterImplByJobId">
 		SELECT jp
-		FROM org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl AS jp
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
 		WHERE jp.jobDescriptorId = :jobDescriptorId
+	</query>
+	
+	
+	<!-- Job Descriptor -->
+	<query name="getNumberOfSJobDescriptor">
+		SELECT COUNT(DISTINCT jd)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
+	</query>
+	
+	<query name="searchSJobDescriptor">
+		SELECT DISTINCT jd
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
+	</query>
+	
+	<!-- Job Parameter -->
+	<query name="getNumberOfSJobParameter">
+		SELECT COUNT(DISTINCT jp)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
+	</query>
+	
+	<query name="searchSJobParameter">
+		SELECT DISTINCT jp
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
+	</query>
+	
+	<!-- Job Log -->
+	<query name="getNumberOfSJobLog">
+		SELECT COUNT(DISTINCT jl)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl
+	</query>
+	
+	<query name="searchSJobLog">
+		SELECT DISTINCT jl
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl
 	</query>
   
 

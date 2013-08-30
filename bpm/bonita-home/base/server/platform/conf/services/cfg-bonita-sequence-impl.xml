@@ -81,8 +81,9 @@
 				<entry key="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" value="26" />
 				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="30" />
 				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="31" />
-				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobDescriptorImpl" value="70" />
-				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl" value="71" />
+				<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl" value="70" />
+				<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" value="71" />
+				<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" value="72" />
 				<entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="90" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="9990" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="9991" />

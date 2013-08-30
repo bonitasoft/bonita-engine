@@ -10,8 +10,9 @@
 		</property>
 		<property name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobDescriptorImpl" value="jd" />
-				<entry key="org.bonitasoft.engine.scheduler.impl.model.SJobParameterImpl" value="jp" />
+				<entry key="org.bonitasoft.engine.scheduler.model.SJobDescriptor" value="jd" />
+				<entry key="org.bonitasoft.engine.scheduler.model.SJobParameter" value="jp" />
+				<entry key="org.bonitasoft.engine.scheduler.model.SJobLog" value="jl" />
 			</map>
 		</property>
 	</bean>
