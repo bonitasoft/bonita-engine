@@ -8,3 +8,4 @@ DROP TABLE waiting_event;
 DROP TABLE message_instance;
 DROP TABLE hidden_activity;
 DROP TABLE token;
+DROP TABLE breakpoint;

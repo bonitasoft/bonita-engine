@@ -21,8 +21,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface SMessageEventCouple extends PersistentObject {
 
-    SWaitingMessageEvent getWaitingMessage();
+    long getWaitingMessageId();
 
-    SMessageInstance getMessageInstance();
+    long getMessageInstanceId();
+
+	SBPMEventType getWaitingMessageEventType();
 
 }

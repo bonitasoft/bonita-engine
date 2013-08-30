@@ -8,3 +8,4 @@ DROP TABLE waiting_event cascade constraints purge;
 DROP TABLE message_instance cascade constraints purge;
 DROP TABLE hidden_activity cascade constraints purge;
 DROP TABLE token cascade constraints purge;
+DROP TABLE breakpoint cascade constraints purge;

@@ -23,8 +23,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.junit.Test;
 
 /**
@@ -38,38 +36,26 @@ public class BPMEventHandlingJobTest {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi1 = mock(SMessageInstance.class);
-        when(couple1.getMessageInstance()).thenReturn(mi1);
-        when(mi1.getId()).thenReturn(1L);
-        final SWaitingMessageEvent wm1 = mock(SWaitingMessageEvent.class);
-        when(couple1.getWaitingMessage()).thenReturn(wm1);
-        when(wm1.getId()).thenReturn(10L);
+        when(couple1.getMessageInstanceId()).thenReturn(1L);
+        when(couple1.getWaitingMessageId()).thenReturn(10L);
 
         final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi2 = mock(SMessageInstance.class);
-        when(couple2.getMessageInstance()).thenReturn(mi2);
-        when(mi2.getId()).thenReturn(2L);
-        final SWaitingMessageEvent wm2 = mock(SWaitingMessageEvent.class);
-        when(couple2.getWaitingMessage()).thenReturn(wm2);
-        when(wm2.getId()).thenReturn(20L);
+        when(couple2.getMessageInstanceId()).thenReturn(2L);
+        when(couple2.getWaitingMessageId()).thenReturn(20L);
 
         final SMessageEventCouple couple3 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi3 = mock(SMessageInstance.class);
-        when(couple3.getMessageInstance()).thenReturn(mi3);
-        when(mi3.getId()).thenReturn(1L);
-        final SWaitingMessageEvent wm3 = mock(SWaitingMessageEvent.class);
-        when(couple3.getWaitingMessage()).thenReturn(wm3);
-        when(wm3.getId()).thenReturn(30L);
+        when(couple3.getMessageInstanceId()).thenReturn(1L);
+        when(couple3.getWaitingMessageId()).thenReturn(30L);
 
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
         final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstance().getId());
-        assertEquals(10L, first.getWaitingMessage().getId());
+        assertEquals(1L, first.getMessageInstanceId());
+        assertEquals(10L, first.getWaitingMessageId());
         final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(2L, second.getMessageInstance().getId());
-        assertEquals(20L, second.getWaitingMessage().getId());
+        assertEquals(2L, second.getMessageInstanceId());
+        assertEquals(20L, second.getWaitingMessageId());
     }
 
     @Test
@@ -77,38 +63,26 @@ public class BPMEventHandlingJobTest {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi1 = mock(SMessageInstance.class);
-        when(couple1.getMessageInstance()).thenReturn(mi1);
-        when(mi1.getId()).thenReturn(1L);
-        final SWaitingMessageEvent wm1 = mock(SWaitingMessageEvent.class);
-        when(couple1.getWaitingMessage()).thenReturn(wm1);
-        when(wm1.getId()).thenReturn(10L);
+        when(couple1.getMessageInstanceId()).thenReturn(1L);
+        when(couple1.getWaitingMessageId()).thenReturn(10L);
 
         final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi2 = mock(SMessageInstance.class);
-        when(couple2.getMessageInstance()).thenReturn(mi2);
-        when(mi2.getId()).thenReturn(2L);
-        final SWaitingMessageEvent wm2 = mock(SWaitingMessageEvent.class);
-        when(couple2.getWaitingMessage()).thenReturn(wm2);
-        when(wm2.getId()).thenReturn(10L);
+        when(couple2.getMessageInstanceId()).thenReturn(2L);
+        when(couple2.getWaitingMessageId()).thenReturn(10L);
 
         final SMessageEventCouple couple3 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi3 = mock(SMessageInstance.class);
-        when(couple3.getMessageInstance()).thenReturn(mi3);
-        when(mi3.getId()).thenReturn(3L);
-        final SWaitingMessageEvent wm3 = mock(SWaitingMessageEvent.class);
-        when(couple3.getWaitingMessage()).thenReturn(wm3);
-        when(wm3.getId()).thenReturn(30L);
+        when(couple3.getMessageInstanceId()).thenReturn(3L);
+        when(couple3.getWaitingMessageId()).thenReturn(30L);
 
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
         final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstance().getId());
-        assertEquals(10L, first.getWaitingMessage().getId());
+        assertEquals(1L, first.getMessageInstanceId());
+        assertEquals(10L, first.getWaitingMessageId());
         final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(3L, second.getMessageInstance().getId());
-        assertEquals(30L, second.getWaitingMessage().getId());
+        assertEquals(3L, second.getMessageInstanceId());
+        assertEquals(30L, second.getWaitingMessageId());
     }
 
     @Test
@@ -116,32 +90,24 @@ public class BPMEventHandlingJobTest {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi1 = mock(SMessageInstance.class);
-        when(couple1.getMessageInstance()).thenReturn(mi1);
-        when(mi1.getId()).thenReturn(1L);
-        final SWaitingMessageEvent wm1 = mock(SWaitingMessageEvent.class);
-        when(couple1.getWaitingMessage()).thenReturn(wm1);
-        when(wm1.getEventType()).thenReturn(SBPMEventType.START_EVENT);
-        when(wm1.getId()).thenReturn(10L);
+        when(couple1.getMessageInstanceId()).thenReturn(1L);
+        when(couple1.getWaitingMessageId()).thenReturn(10L);
+        when(couple1.getWaitingMessageEventType()).thenReturn(SBPMEventType.START_EVENT);
 
         final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi2 = mock(SMessageInstance.class);
-        when(couple2.getMessageInstance()).thenReturn(mi2);
-        when(mi2.getId()).thenReturn(2L);
-        final SWaitingMessageEvent wm2 = mock(SWaitingMessageEvent.class);
-        when(couple2.getWaitingMessage()).thenReturn(wm2);
-        when(wm2.getId()).thenReturn(10L);
-        when(wm2.getEventType()).thenReturn(SBPMEventType.START_EVENT);
+        when(couple2.getMessageInstanceId()).thenReturn(2L);
+        when(couple2.getWaitingMessageId()).thenReturn(10L);
+        when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.START_EVENT);
 
         messageCouples.addAll(Arrays.asList(couple1, couple2));
         final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstance().getId());
-        assertEquals(10L, first.getWaitingMessage().getId());
+        assertEquals(1L, first.getMessageInstanceId());
+        assertEquals(10L, first.getWaitingMessageId());
         final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(2L, second.getMessageInstance().getId());
-        assertEquals(10L, second.getWaitingMessage().getId());
+        assertEquals(2L, second.getMessageInstanceId());
+        assertEquals(10L, second.getWaitingMessageId());
     }
 
     @Test
@@ -149,29 +115,21 @@ public class BPMEventHandlingJobTest {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi1 = mock(SMessageInstance.class);
-        when(couple1.getMessageInstance()).thenReturn(mi1);
-        when(mi1.getId()).thenReturn(1L);
-        final SWaitingMessageEvent wm1 = mock(SWaitingMessageEvent.class);
-        when(couple1.getWaitingMessage()).thenReturn(wm1);
-        when(wm1.getEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
-        when(wm1.getId()).thenReturn(10L);
+        when(couple1.getMessageInstanceId()).thenReturn(1L);
+        when(couple1.getWaitingMessageId()).thenReturn(10L);
+        when(couple1.getWaitingMessageEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
 
         final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi2 = mock(SMessageInstance.class);
-        when(couple2.getMessageInstance()).thenReturn(mi2);
-        when(mi2.getId()).thenReturn(2L);
-        final SWaitingMessageEvent wm2 = mock(SWaitingMessageEvent.class);
-        when(couple2.getWaitingMessage()).thenReturn(wm2);
-        when(wm2.getId()).thenReturn(10L);
-        when(wm2.getEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
+        when(couple2.getMessageInstanceId()).thenReturn(2L);
+        when(couple2.getWaitingMessageId()).thenReturn(10L);
+        when(couple2.getWaitingMessageEventType()).thenReturn(SBPMEventType.EVENT_SUB_PROCESS);
 
         messageCouples.addAll(Arrays.asList(couple1, couple2));
         final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
         assertEquals(1, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstance().getId());
-        assertEquals(10L, first.getWaitingMessage().getId());
+        assertEquals(1L, first.getMessageInstanceId());
+        assertEquals(10L, first.getWaitingMessageId());
     }
 
     @Test
@@ -179,46 +137,30 @@ public class BPMEventHandlingJobTest {
         List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
 
         final SMessageEventCouple couple1 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi1 = mock(SMessageInstance.class);
-        when(couple1.getMessageInstance()).thenReturn(mi1);
-        when(mi1.getId()).thenReturn(1L);
-        final SWaitingMessageEvent wm1 = mock(SWaitingMessageEvent.class);
-        when(couple1.getWaitingMessage()).thenReturn(wm1);
-        when(wm1.getId()).thenReturn(10L);
+        when(couple1.getMessageInstanceId()).thenReturn(1L);
+        when(couple1.getWaitingMessageId()).thenReturn(10L);
 
         final SMessageEventCouple couple2 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi2 = mock(SMessageInstance.class);
-        when(couple2.getMessageInstance()).thenReturn(mi2);
-        when(mi2.getId()).thenReturn(2L);
-        final SWaitingMessageEvent wm2 = mock(SWaitingMessageEvent.class);
-        when(couple2.getWaitingMessage()).thenReturn(wm2);
-        when(wm2.getId()).thenReturn(20L);
+        when(couple2.getMessageInstanceId()).thenReturn(2L);
+        when(couple2.getWaitingMessageId()).thenReturn(20L);
 
         final SMessageEventCouple couple3 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi3 = mock(SMessageInstance.class);
-        when(couple3.getMessageInstance()).thenReturn(mi3);
-        when(mi3.getId()).thenReturn(2L);
-        final SWaitingMessageEvent wm3 = mock(SWaitingMessageEvent.class);
-        when(couple3.getWaitingMessage()).thenReturn(wm3);
-        when(wm3.getId()).thenReturn(10L);
+        when(couple3.getMessageInstanceId()).thenReturn(2L);
+        when(couple3.getWaitingMessageId()).thenReturn(10L);
 
         final SMessageEventCouple couple4 = mock(SMessageEventCouple.class);
-        final SMessageInstance mi4 = mock(SMessageInstance.class);
-        when(couple4.getMessageInstance()).thenReturn(mi4);
-        when(mi4.getId()).thenReturn(2L);
-        final SWaitingMessageEvent wm4 = mock(SWaitingMessageEvent.class);
-        when(couple4.getWaitingMessage()).thenReturn(wm4);
-        when(wm4.getId()).thenReturn(20L);
+        when(couple4.getMessageInstanceId()).thenReturn(2L);
+        when(couple4.getWaitingMessageId()).thenReturn(20L);
 
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3, couple4));
         final List<SMessageEventCouple> uniqueCouples = new BPMEventHandlingJob().makeMessageUniqueCouples(messageCouples);
         assertEquals(2, uniqueCouples.size());
         final SMessageEventCouple first = uniqueCouples.get(0);
-        assertEquals(1L, first.getMessageInstance().getId());
-        assertEquals(10L, first.getWaitingMessage().getId());
+        assertEquals(1L, first.getMessageInstanceId());
+        assertEquals(10L, first.getWaitingMessageId());
         final SMessageEventCouple second = uniqueCouples.get(1);
-        assertEquals(2L, second.getMessageInstance().getId());
-        assertEquals(20L, second.getWaitingMessage().getId());
+        assertEquals(2L, second.getMessageInstanceId());
+        assertEquals(20L, second.getWaitingMessageId());
     }
 
 }
