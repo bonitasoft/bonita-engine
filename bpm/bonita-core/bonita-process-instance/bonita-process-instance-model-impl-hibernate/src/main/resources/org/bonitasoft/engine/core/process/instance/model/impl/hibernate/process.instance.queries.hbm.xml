@@ -505,8 +505,7 @@
 	</query>
 
 	<query name="getMessageEventCouples">
-		SELECT new org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl(s.id, s.eventType, s.processDefinitionId, s.processName, s.flowNodeDefinitionId, s.flowNodeName, 
-				s.messageName, m.id, m.messageName, m.targetProcess, m.targetFlowNode, m.processDefinitionId, m.flowNodeName)
+		SELECT new org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl(s.id, s.eventType, m.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s,
 			 org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
 		WHERE m.messageName = s.messageName
