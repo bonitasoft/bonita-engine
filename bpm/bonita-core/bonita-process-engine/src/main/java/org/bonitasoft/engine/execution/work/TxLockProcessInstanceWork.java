@@ -18,16 +18,12 @@ import org.bonitasoft.engine.execution.RescheduleWorkRejectedLockHandler;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.RejectedLockHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
- * 
  * Transactional work that lock the process instance
  * 
  * @author Charles Souillard
  * @author Baptiste Mesta
- * 
  */
 public abstract class TxLockProcessInstanceWork extends TxBonitaWork {
 
@@ -39,7 +35,7 @@ public abstract class TxLockProcessInstanceWork extends TxBonitaWork {
 
     private transient BonitaLock lock;
 
-    public TxLockProcessInstanceWork(long processInstanceId) {
+    public TxLockProcessInstanceWork(final long processInstanceId) {
         super();
         this.processInstanceId = processInstanceId;
 
@@ -47,24 +43,22 @@ public abstract class TxLockProcessInstanceWork extends TxBonitaWork {
 
     @Override
     protected boolean preWork() throws Exception {
-        this.lockService = getTenantAccessor().getLockService();
-        final WorkService workService = getTenantAccessor().getWorkService();
-        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
+        lockService = getTenantAccessor().getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
-        final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(logger, workService, this);
+        final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(getTenantId(), this);
 
-        this.lock = lockService.tryLock(processInstanceId, objectType, handler);
+        lock = lockService.tryLock(processInstanceId, objectType, handler);
         if (lock == null) {
             return false;
         }
         return true;
     }
 
-	@Override
-	protected void afterWork() throws Exception {
-		if (lock != null) {
-			lockService.unlock(lock);
-		}
-	}
+    @Override
+    protected void afterWork() throws Exception {
+        if (lock != null) {
+            lockService.unlock(lock);
+        }
+    }
 }

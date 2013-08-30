@@ -17,35 +17,37 @@ import org.bonitasoft.engine.lock.RejectedLockHandler;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
- * 
  * A RejectedLockHandler that reschedule the work when the call to lockService.tryLock was unable to acquire the lock
  * 
  * @author Charles Souillard
  * @author Baptiste Mesta
- * 
  */
 public class RescheduleWorkRejectedLockHandler implements RejectedLockHandler {
 
-    private final TechnicalLoggerService logger;
-
-    private final WorkService workService;
+    private static final long serialVersionUID = -7637148464673118019L;
 
     private final BonitaWork work;
 
-    public RescheduleWorkRejectedLockHandler(final TechnicalLoggerService logger, final WorkService workService, final BonitaWork work) {
+    private final long tenantId;
+
+    public RescheduleWorkRejectedLockHandler(final long tenantId, final BonitaWork work) {
         super();
-        this.logger = logger;
-        this.workService = workService;
+        this.tenantId = tenantId;
         this.work = work;
     }
 
     @Override
     public void executeOnLockFree() throws SLockException {
+        TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);
+        final WorkService workService = tenantServiceAccessor.getWorkService();
+        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Failed to lock, the work will be rescheduled: " + work.getDescription());
         }

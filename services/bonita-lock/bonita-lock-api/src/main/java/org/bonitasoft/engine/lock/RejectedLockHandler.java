@@ -13,15 +13,15 @@
  **/
 package org.bonitasoft.engine.lock;
 
+import java.io.Serializable;
+
 /**
- * 
  * A handler that is called when the LockService.tryLock was unable to acquire the lock
  * 
  * @author Charles Souillard
  * @author Baptiste Mesta
- * 
  */
-public interface RejectedLockHandler {
+public interface RejectedLockHandler extends Serializable {
 
     void executeOnLockFree() throws SLockException;
 
