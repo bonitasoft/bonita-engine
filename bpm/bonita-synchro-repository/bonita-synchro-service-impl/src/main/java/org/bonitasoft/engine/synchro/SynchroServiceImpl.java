@@ -16,6 +16,11 @@ package org.bonitasoft.engine.synchro;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -27,9 +32,13 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class SynchroServiceImpl extends AbstractSynchroService {
 
-    private final Map<Map<String, Serializable>, SynchroObject> waiters;
+    private final Map<Map<String, Serializable>, String> waiters;
 
-    private final Object mutex = new Object();
+    private final Map<String, Serializable> eventKeyAndIdMap;
+
+    private final Map<String, Semaphore> eventSemaphores;
+
+    private final Lock lock = new ReentrantLock();
 
     /**
      * @param initialCapacity
@@ -39,16 +48,66 @@ public class SynchroServiceImpl extends AbstractSynchroService {
      */
     private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger, final CommonCacheService cacheService) {
         super(logger, cacheService);
-        waiters = new HashMap<Map<String, Serializable>, SynchroObject>(initialCapacity);
+        waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
+        eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);
+        eventSemaphores = new HashMap<String, Semaphore>();
     }
 
     @Override
-    protected Map<Map<String, Serializable>, SynchroObject> getWaitersMap() {
+    protected Map<Map<String, Serializable>, String> getWaitersMap() {
         return waiters;
     }
 
     @Override
-    protected Object getMutex() {
-        return mutex;
+    protected Map<String, Serializable> getEventKeyAndIdMap() {
+        return eventKeyAndIdMap;
     }
+
+    @Override
+    protected Lock getServiceLock() {
+        return lock;
+    }
+
+    @Override
+    protected void releaseWaiter(final String semaphoreKey) {
+        Semaphore semaphore = eventSemaphores.get(semaphoreKey);
+        if (semaphore != null) {
+            semaphore.release();
+        }
+    }
+
+    @Override
+    public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
+        Serializable id = null;
+        String semaphoreKey = null;
+        Semaphore semaphore = null;
+        getServiceLock().lock();
+        try {
+            id = getFiredAndRemoveIt(event);
+            if (id == null) {
+                semaphoreKey = String.valueOf(event.hashCode());
+                semaphore = new Semaphore(1);
+                eventSemaphores.put(semaphoreKey, semaphore);
+                semaphore.acquire(1);
+                getWaitersMap().put(event, semaphoreKey);
+            }
+        } finally {
+            getServiceLock().unlock();
+        }
+        if (semaphore != null) {
+            try {
+                if (!semaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+                    throwTimeout(event, timeout);
+                }
+            } catch (final InterruptedException e) {
+                throwTimeout(event, timeout);
+            } finally {
+                getWaitersMap().remove(event);
+            }
+            return getEventKeyAndIdMap().get(semaphoreKey);
+        } else {
+            return id;
+        }
+    }
+
 }

@@ -18,11 +18,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -31,51 +32,25 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public abstract class AbstractSynchroService implements SynchroService {
 
-    /**
-     * @author Emmanuel Duchastenier
-     */
-    private final class EventAndIdEntry<K, V> implements Map.Entry<K, V> {
-
-        private final K k;
-
-        private V v;
-
-        public EventAndIdEntry(final K k, final V v) {
-            this.k = k;
-            this.v = v;
-        }
-
-        @Override
-        public K getKey() {
-            return k;
-        }
-
-        @Override
-        public V getValue() {
-            return v;
-        }
-
-        @Override
-        public V setValue(final V value) {
-            v = value;
-            return v;
-        }
-    }
-
-    private static final String SYNCHRO_SERVICE_CACHE = "SYNCHRO_SERVICE_CACHE";
+    protected static final String SYNCHRO_SERVICE_CACHE = "SYNCHRO_SERVICE_CACHE";
 
     /**
-     * Long value is an identifier of the sempaphore for the current event.
-     * 
-     * @return
+     * String value is an identifier of the sempaphore for the current event.
      */
-    protected abstract Map<Map<String, Serializable>, SynchroObject> getWaitersMap();
+    protected abstract Map<Map<String, Serializable>, String> getWaitersMap();
 
-    protected abstract Object getMutex();
+    /**
+     * Maitains a map of <EventKey, ID of the object being waited for>
+     */
+    protected abstract Map<String, Serializable> getEventKeyAndIdMap();
 
-    private final TechnicalLoggerService logger;
+    protected abstract void releaseWaiter(String semaphoreKey);
 
-    private final CommonCacheService cacheService;
+    protected abstract Lock getServiceLock();
+
+    protected final TechnicalLoggerService logger;
+
+    protected final CommonCacheService cacheService;
 
     public AbstractSynchroService(final TechnicalLoggerService logger, final CommonCacheService cacheService) {
         this.logger = logger;
@@ -84,25 +59,33 @@ public abstract class AbstractSynchroService implements SynchroService {
 
     @Override
     public void fireEvent(final Map<String, Serializable> event, final Serializable id) {
-        synchronized (getMutex()) {
-            final SynchroObject waiter = getWaiterAndRemoveIt(event);
-            if (waiter == null) {
+        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Firing event " + event + " with id " + id);
+        getServiceLock().lock();
+        try {
+            final String semaphoreKey = getWaiterAndRemoveIt(event);
+            if (semaphoreKey == null) {
+                // No waiter found yet:
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "No waiter found, storing event " + event);
                 try {
                     cacheService.store(SYNCHRO_SERVICE_CACHE, (Serializable) event, id);
                 } catch (CacheException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                waiter.setId(id);
-                waiter.release();
+                // Waiter already exists, let's release waiter:
+                getEventKeyAndIdMap().put(semaphoreKey, id);
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "releasing waiter for event " + event + " and id " + id);
+                releaseWaiter(semaphoreKey);
             }
+        } finally {
+            getServiceLock().unlock();
         }
     }
 
-    protected SynchroObject getWaiterAndRemoveIt(final Map<String, Serializable> event) {
-        for (final Iterator<Entry<Map<String, Serializable>, SynchroObject>> iterator = getWaitersMap().entrySet().iterator(); iterator.hasNext();) {
-            final Entry<Map<String, Serializable>, SynchroObject> waiter = iterator.next();
-            if (containsAllEntries(waiter.getKey(), event)) {
+    protected String getWaiterAndRemoveIt(final Map<String, Serializable> event) {
+        for (final Iterator<Entry<Map<String, Serializable>, String>> iterator = getWaitersMap().entrySet().iterator(); iterator.hasNext();) {
+            final Entry<Map<String, Serializable>, String> waiter = iterator.next();
+            if (matchedAtLeastAllExpectedEntries(waiter.getKey(), event)) {
                 iterator.remove();
                 return waiter.getValue();
             }
@@ -110,10 +93,10 @@ public abstract class AbstractSynchroService implements SynchroService {
         return null;
     }
 
-    private boolean containsAllEntries(final Map<String, Serializable> subSet, final Map<String, Serializable> container) {
-        for (final Entry<String, Serializable> entry : subSet.entrySet()) {
-            final Serializable value = entry.getValue();
-            if (!value.equals(container.get(entry.getKey()))) {
+    protected boolean matchedAtLeastAllExpectedEntries(final Map<String, Serializable> expectedEventEntries, final Map<String, Serializable> actualEventEntries) {
+        for (final Entry<String, Serializable> expectedEventEntry : expectedEventEntries.entrySet()) {
+            final Serializable expectedValue = expectedEventEntry.getValue();
+            if (!expectedValue.equals(actualEventEntries.get(expectedEventEntry.getKey()))) {
                 return false;
             }
         }
@@ -121,15 +104,14 @@ public abstract class AbstractSynchroService implements SynchroService {
     }
 
     @SuppressWarnings("unchecked")
-    private Entry<Map<String, Serializable>, Serializable> getFiredAndRemoveIt(final Map<String, Serializable> event) {
+    protected Serializable getFiredAndRemoveIt(final Map<String, Serializable> expectedEvent) {
         try {
-            List<?> keys = cacheService.getKeys(SYNCHRO_SERVICE_CACHE);
-            for (Map<String, Serializable> key : ((List<Map<String, Serializable>>) keys)) {
-                if (containsAllEntries(event, key)) {
-                    Serializable id;
-                    id = (Serializable) cacheService.get(SYNCHRO_SERVICE_CACHE, key);
-                    cacheService.remove(SYNCHRO_SERVICE_CACHE, key);
-                    return new EventAndIdEntry<Map<String, Serializable>, Serializable>(key, id);
+            List<?> firedEvents = cacheService.getKeys(SYNCHRO_SERVICE_CACHE);
+            for (Map<String, Serializable> firedEvent : ((List<Map<String, Serializable>>) firedEvents)) {
+                if (matchedAtLeastAllExpectedEntries(expectedEvent, firedEvent)) {
+                    Serializable id = (Serializable) cacheService.get(SYNCHRO_SERVICE_CACHE, firedEvent);
+                    cacheService.remove(SYNCHRO_SERVICE_CACHE, firedEvent);
+                    return id;
                 }
             }
         } catch (CacheException e) {
@@ -138,37 +120,7 @@ public abstract class AbstractSynchroService implements SynchroService {
         return null;
     }
 
-    @Override
-    public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
-        SynchroObject waiter = null;
-        Serializable id = null;
-        synchronized (getMutex()) {
-            final Entry<Map<String, Serializable>, Serializable> entry = getFiredAndRemoveIt(event);
-            if (entry != null) {
-                id = entry.getValue();
-            } else {
-                waiter = new SynchroObject();
-                waiter.acquire(1);
-                getWaitersMap().put(event, waiter);
-            }
-        }
-        if (waiter != null) {
-            try {
-                if (!waiter.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
-                    throwTimeout(event, timeout);
-                }
-            } catch (final InterruptedException e) {
-                throwTimeout(event, timeout);
-            } finally {
-                getWaitersMap().remove(event);
-            }
-            return waiter.getObjectId();
-        } else {
-            return id;
-        }
-    }
-
-    private void throwTimeout(final Map<String, Serializable> event, final long timeout) throws TimeoutException {
+    protected void throwTimeout(final Map<String, Serializable> event, final long timeout) throws TimeoutException {
         throw new TimeoutException("Event '" + event + "' has not been received on time after waiting '" + timeout + " ms'");
     }
 
@@ -186,4 +138,5 @@ public abstract class AbstractSynchroService implements SynchroService {
     public boolean hasWaiters() {
         return !getWaitersMap().isEmpty();
     }
+
 }

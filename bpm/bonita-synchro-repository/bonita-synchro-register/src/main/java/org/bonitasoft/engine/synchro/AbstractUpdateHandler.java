@@ -53,6 +53,7 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
             TransactionService transactionService = tenantServiceAccessor.getTransactionService();
             transactionService.registerBonitaSynchronization(synchronization);
+            // System.out.println("++++++++++++++++++++ " + this.getClass().getSimpleName() + " executing for event " + event + " +++++++++++++++++++++");
         } catch (final STransactionNotFoundException e) {
             e.printStackTrace();
             throw new SHandlerExecutionException(e);

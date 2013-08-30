@@ -46,7 +46,7 @@ public class EventServiceImpl implements EventService {
 
     private final SEventBuilders eventBuilders;
 
-    private final TechnicalLoggerService logger;
+    protected final TechnicalLoggerService logger;
 
     public EventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) {
         super();
@@ -123,7 +123,8 @@ public class EventServiceImpl implements EventService {
             }
         } else {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "addHandler", "Event type is null"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "addHandler", "Event type and/or handler is null"));
             }
             throw new HandlerRegistrationException();
         }
@@ -137,7 +138,7 @@ public class EventServiceImpl implements EventService {
         if (handler == null) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogOnExceptionMethod(this.getClass(), "removeAllHandlers", "Unable remove a null event"));
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "removeAllHandlers", "Unable to remove a null event"));
             }
             throw new HandlerUnregistrationException();
         } else {
@@ -219,7 +220,7 @@ public class EventServiceImpl implements EventService {
         return containsHandlerFor(key);
     }
 
-    protected boolean containsHandlerFor(String key) {
+    protected boolean containsHandlerFor(final String key) {
         return registeredHandlers.containsKey(key);
     }
 
@@ -232,7 +233,9 @@ public class EventServiceImpl implements EventService {
         return registeredHandlers;
     }
 
-    protected void addHandlerFor(String eventType, SHandler<SEvent> handler) throws HandlerRegistrationException {
+    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "NON-cluster implementation of addHandlerFor() method for eventType=" + eventType
+                + ", handler=" + handler.getClass().getSimpleName());
         // check if the given event type is already registered in the Event Service
         if (containsHandlerFor(eventType)) {
             // if the handler already exists for the same eventType, an Exception is thrown

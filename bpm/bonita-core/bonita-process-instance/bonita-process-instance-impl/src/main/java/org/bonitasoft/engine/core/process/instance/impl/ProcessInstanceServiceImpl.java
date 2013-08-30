@@ -351,8 +351,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!activityInstances.isEmpty());
     }
 
-    private void deleteArchivedFlowNodeInstanceElements(final SAFlowNodeInstance activityInstance) throws SFlowNodeReadException,
-            SBonitaSearchException, SConnectorInstanceDeletionException, SDataInstanceException {
+    private void deleteArchivedFlowNodeInstanceElements(final SAFlowNodeInstance activityInstance) throws SFlowNodeReadException, SBonitaSearchException,
+            SConnectorInstanceDeletionException, SDataInstanceException {
         if (activityInstance instanceof SAActivityInstance) {
             dataInstanceService.deleteLocalArchivedDataInstances(activityInstance.getSourceObjectId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
             connectorInstanceService.deleteArchivedConnectorInstances(activityInstance.getSourceObjectId(), SConnectorInstance.FLOWNODE_TYPE);
