@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-identity</artifactId>
 		<groupId>org.bonitasoft.engine.identity</groupId>
-		<version>6.0.3-rc-02</version>
+		<version>6.0.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-identity-impl</artifactId>
