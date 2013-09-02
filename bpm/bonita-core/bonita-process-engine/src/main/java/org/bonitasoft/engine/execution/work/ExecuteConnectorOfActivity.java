@@ -69,8 +69,8 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void evaluateOutput(final ConnectorResult result) throws STransactionException, SBonitaException {
-        evaluateOutput(result, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name());
+    protected void evaluateOutput(final ConnectorResult result, SConnectorDefinition sConnectorDefinition) throws STransactionException, SBonitaException {
+        evaluateOutput(result, sConnectorDefinition, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name());
     }
 
     @Override
@@ -132,19 +132,18 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail() throws SBonitaException {
+    protected void errorEventOnFail(SConnectorDefinition sConnectorDefinition) throws SBonitaException {
         setConnectorOnlyToFailed();
-        handleErrorEventOnFail();
+        handleErrorEventOnFail(sConnectorDefinition);
     }
 
-    void handleErrorEventOnFail() throws SBonitaException {
+    void handleErrorEventOnFail(SConnectorDefinition sConnectorDefinition) throws SBonitaException {
         final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders();
         final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
         final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SConnectorDefinition sConnectorDefinition = getSConnectorDefinition(tenantAccessor);
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
@@ -171,8 +170,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected SConnectorDefinition getSConnectorDefinition(final TenantServiceAccessor tenantAccessor) throws SBonitaException {
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+    protected SConnectorDefinition getSConnectorDefinition(final ProcessDefinitionService processDefinitionService) throws SBonitaException {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowNodeDefinition flowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(flowNodeDefinitionId);
 

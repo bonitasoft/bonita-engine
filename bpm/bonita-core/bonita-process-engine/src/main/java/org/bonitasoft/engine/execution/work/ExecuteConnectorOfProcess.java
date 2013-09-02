@@ -69,8 +69,8 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void evaluateOutput(final ConnectorResult result) throws SBonitaException {
-        evaluateOutput(result, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
+    protected void evaluateOutput(final ConnectorResult result, SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+        evaluateOutput(result, sConnectorDefinition, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
     }
 
     @Override
@@ -110,14 +110,13 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail() throws SBonitaException {
+    protected void errorEventOnFail(SConnectorDefinition sConnectorDefinition) throws SBonitaException {
         final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders();
         final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
         final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SConnectorDefinition sConnectorDefinition = getSConnectorDefinition(tenantAccessor);
 
         setConnectorOnlyToFailed();
         // create a fake definition
@@ -143,9 +142,8 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected SConnectorDefinition getSConnectorDefinition(final TenantServiceAccessor tenantAccessor) throws SProcessDefinitionNotFoundException,
+    protected SConnectorDefinition getSConnectorDefinition(final ProcessDefinitionService processDefinitionService) throws SProcessDefinitionNotFoundException,
             SProcessDefinitionReadException, SConnectorDefinitionNotFoundException {
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         // final SConnectorDefinition sConnectorDefinition = processContainer.getConnectorDefinition(connectorDefinitionId);// FIXME: Uncomment when generate id
@@ -155,4 +153,5 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         }
         return sConnectorDefinition;
     }
+
 }

@@ -34,7 +34,8 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
 
     private final long parentId;
 
-    public NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId, final String parentType,
+    public NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId,
+            final String parentType,
             final int stateId) {
         super(processInstanceId);
         this.processDefinitionId = processDefinitionId;
@@ -59,6 +60,11 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
+    }
+
+    @Override
+    protected void handleError(SBonitaException e) {
+
     }
 
     @Override
