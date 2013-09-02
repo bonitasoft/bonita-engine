@@ -53,8 +53,8 @@ public interface SchedulerExecutor {
 
     List<String> getAllJobs() throws SSchedulerException;
 
-    void executeNow(long jobId, long tenantId, String jobName) throws SSchedulerException;
+    void executeNow(long jobId, long tenantId, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
 
-    void schedule(long jobId, long tenantId, String jobName, Trigger trigger) throws SSchedulerException;
+    void schedule(long jobId, long tenantId, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
 
 }

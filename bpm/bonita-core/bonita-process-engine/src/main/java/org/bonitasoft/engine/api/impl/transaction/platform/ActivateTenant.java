@@ -89,7 +89,7 @@ public final class ActivateTenant implements TransactionContent {
         final String jobClassName = BPMEventHandlingJob.class.getName();
         if (schedulerService.isStarted()) {
             if (plaformConfiguration.shouldStartEventHandlingJob()) {
-                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, BPM_EVENT_HANDLING).done();
+                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, BPM_EVENT_HANDLING, true).done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final String cron = plaformConfiguration.getEventHandlingJobCron(); //
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
@@ -108,7 +108,7 @@ public final class ActivateTenant implements TransactionContent {
         if (schedulerService.isStarted()) {
             final String cron = plaformConfiguration.getCleanInvalidSessionsJobCron();
             if (!cron.equalsIgnoreCase("none")) {
-                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS).done();
+                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true).done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
                 logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency: " + cron);

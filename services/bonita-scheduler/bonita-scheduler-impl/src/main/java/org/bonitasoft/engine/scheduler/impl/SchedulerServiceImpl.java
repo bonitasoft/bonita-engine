@@ -183,9 +183,9 @@ public class SchedulerServiceImpl implements SchedulerService {
                 "Scheduled job with name " + createdJobDescriptor.getJobName(), createdJobDescriptor.getJobName());
         try {
             if (trigger == null) {
-                schedulerExecutor.executeNow(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName());
+                schedulerExecutor.executeNow(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName(), sJobDescriptor.disallowConcurrentExecution());
             } else {
-                schedulerExecutor.schedule(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName(), trigger);
+                schedulerExecutor.schedule(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName(), trigger, sJobDescriptor.disallowConcurrentExecution());
             }
             schedulingLogBuilder.actionStatus(SQueriableLog.STATUS_OK);
         } catch (final Throwable e) {

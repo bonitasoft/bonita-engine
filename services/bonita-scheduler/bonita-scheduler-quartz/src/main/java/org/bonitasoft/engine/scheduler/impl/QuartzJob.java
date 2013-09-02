@@ -22,7 +22,7 @@ import org.quartz.JobExecutionException;
  * @author Baptsite Mesta : the bos job is set before the execution.
  * @author Celine Souchet
  */
-public class QuartzJob implements org.quartz.Job {
+public abstract class QuartzJob implements org.quartz.Job {
 
     private StatelessJob bosJob;
 

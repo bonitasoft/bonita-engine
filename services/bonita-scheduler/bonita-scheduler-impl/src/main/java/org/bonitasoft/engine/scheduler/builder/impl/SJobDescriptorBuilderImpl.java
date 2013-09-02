@@ -30,8 +30,14 @@ public class SJobDescriptorBuilderImpl implements SJobDescriptorBuilder {
     private SJobDescriptorImpl entity;
 
     @Override
+    public SJobDescriptorBuilder createNewInstance(final String jobClassName, final String jobName, final boolean disallowConcurrentExecution) {
+        entity = new SJobDescriptorImpl(jobClassName, jobName, disallowConcurrentExecution);
+        return this;
+    }
+    
+    @Override
     public SJobDescriptorBuilder createNewInstance(final String jobClassName, final String jobName) {
-        entity = new SJobDescriptorImpl(jobClassName, jobName);
+        entity = new SJobDescriptorImpl(jobClassName, jobName, false);
         return this;
     }
 

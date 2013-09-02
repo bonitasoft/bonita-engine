@@ -75,10 +75,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void schedule(final long jobId, final long tenantId, final String jobName, final Trigger trigger) throws SSchedulerException {
+    public void schedule(final long jobId, final long tenantId, final String jobName, final Trigger trigger, final boolean disallowConcurrentExecution) throws SSchedulerException {
         try {
             checkSchedulerState();
-            final JobDetail jobDetail = getJobDetail(jobId, tenantId, jobName);
+            final JobDetail jobDetail = getJobDetail(jobId, tenantId, jobName, disallowConcurrentExecution);
             final JobKey jobKey = jobDetail.getKey();
             final org.quartz.Trigger quartzTrigger = getQuartzTrigger(trigger, jobKey.getName(), jobKey.getGroup());
             scheduler.scheduleJob(jobDetail, quartzTrigger);
@@ -117,8 +117,14 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private JobDetail getJobDetail(final long jobId, final long tenantId, final String jobName) {
-        final JobDetail jobDetail = JobBuilder.newJob(QuartzJob.class).withIdentity(jobName, String.valueOf(tenantId)).build();
+    private JobDetail getJobDetail(final long jobId, final long tenantId, final String jobName, final boolean disallowConcurrentExecution) {
+    	Class<? extends QuartzJob> clazz = null;
+    	if (disallowConcurrentExecution) {
+    		clazz = NonConcurrentQuartzJob.class;
+    	} else {
+    		clazz = ConcurrentQuartzJob.class;
+    	}
+        final JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobName, String.valueOf(tenantId)).build();
         jobDetail.getJobDataMap().put("tenantId", tenantId);
         jobDetail.getJobDataMap().put("jobId", jobId);
         jobDetail.getJobDataMap().put("jobName", jobName);
@@ -126,10 +132,10 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void executeNow(final long jobId, final long tenantId, final String jobName) throws SSchedulerException {
+    public void executeNow(final long jobId, final long tenantId, final String jobName, final boolean disallowConcurrentExecution) throws SSchedulerException {
         try {
             checkSchedulerState();
-            final JobDetail jobDetail = getJobDetail(jobId, tenantId, jobName);
+            final JobDetail jobDetail = getJobDetail(jobId, tenantId, jobName, disallowConcurrentExecution);
             scheduler.addJob(jobDetail, true);
             scheduler.triggerJob(jobDetail.getKey());
         } catch (final Exception e) {

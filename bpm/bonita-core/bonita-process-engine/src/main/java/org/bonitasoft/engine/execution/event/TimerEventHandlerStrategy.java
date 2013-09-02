@@ -177,7 +177,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     private SJobDescriptor getJobDescriptor(final String jobName) {
-        return schedulerService.getJobDescriptorBuilder().createNewInstance(TriggerTimerEventJob.class.getName(), jobName).done();
+        return schedulerService.getJobDescriptorBuilder().createNewInstance(TriggerTimerEventJob.class.getName(), jobName, false).done();
     }
 
     @Override

@@ -139,7 +139,7 @@ public class FileJobListener implements JobListener {
     private String getJobType(final Job job) {
         final String jobType;
         final Class<? extends Job> jobClass = job.getClass();
-        if (jobClass == QuartzJob.class) {
+        if (QuartzJob.class.isAssignableFrom(jobClass)) {
             final StatelessJob bosJob = ((QuartzJob) job).getBosJob();
             if (bosJob instanceof JobWrapper) {
                 jobType = ((JobWrapper) bosJob).getStatelessJob().getClass().getName();

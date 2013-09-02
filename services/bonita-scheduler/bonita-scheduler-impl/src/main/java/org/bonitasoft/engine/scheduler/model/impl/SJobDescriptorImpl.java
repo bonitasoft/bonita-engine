@@ -24,21 +24,25 @@ public class SJobDescriptorImpl extends SPersistentObjectImpl implements SJobDes
     private String jobName;
 
     private String description;
+    
+    private boolean disallowConcurrentExecution;
 
     public SJobDescriptorImpl() {
     }
 
-    public SJobDescriptorImpl(final String jobClassName, final String jobName, final String description) {
+    public SJobDescriptorImpl(final String jobClassName, final String jobName, final String description, final boolean disallowConcurrentExecution) {
         super();
         this.jobClassName = jobClassName;
         this.jobName = jobName;
         this.description = description;
+        this.disallowConcurrentExecution = disallowConcurrentExecution;
     }
 
-    public SJobDescriptorImpl(final String jobClassName, final String jobName) {
+    public SJobDescriptorImpl(final String jobClassName, final String jobName, final boolean disallowConcurrentExecution) {
         super();
         this.jobClassName = jobClassName;
         this.jobName = jobName;
+        this.disallowConcurrentExecution = disallowConcurrentExecution;
     }
 
     @Override
@@ -71,6 +75,11 @@ public class SJobDescriptorImpl extends SPersistentObjectImpl implements SJobDes
 
     public void setJobName(final String jobName) {
         this.jobName = jobName;
+    }
+    
+    @Override
+    public boolean disallowConcurrentExecution() {
+        return disallowConcurrentExecution;
     }
 
 }
