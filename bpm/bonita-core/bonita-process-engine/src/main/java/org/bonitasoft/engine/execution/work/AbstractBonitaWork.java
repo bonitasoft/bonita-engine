@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -71,12 +70,23 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                     work();
                 }
             }
-        } catch (final SBonitaException e) {
-            handleError(e);
         } catch (final Exception e) {
             // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
-                    "Unexpected error while executing work. You may consider restarting the system. This will restart all works.", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
+                    "A work failed, The failure will be handled " + getDescription());
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
+            }
+            try {
+                handleFailure(e);
+            } catch (Exception e1) {
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                        "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
+                        e);
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
+                logAlert();
+            }
+
         } finally {
             if (canBeExecuted) {
                 try {
@@ -94,6 +104,10 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                 }
             }
         }
+    }
+
+    protected void logAlert() {
+        // TODO log an alert here
     }
 
     protected abstract boolean isTransactional();
@@ -123,8 +137,15 @@ public abstract class AbstractBonitaWork implements BonitaWork {
         transactionService.executeInTransaction(runWork);
     }
 
-    protected void handleError(final SBonitaException e) {
-        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or log severe message with procedure to restart.", e);
+    /**
+     * try to handle failure,
+     * 
+     * @param e
+     *            the exception in the work
+     * @throws Exception
+     */
+    protected void handleFailure(final Exception e) throws Exception {
+        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or throw an other exception to alert of the failure", e);
     }
 
     protected long getTenantId() {

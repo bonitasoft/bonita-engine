@@ -63,11 +63,6 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
     }
 
     @Override
-    protected void handleError(SBonitaException e) {
-
-    }
-
-    @Override
     public String getDescription() {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
