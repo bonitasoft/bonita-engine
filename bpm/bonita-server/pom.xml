@@ -56,6 +56,11 @@
 			<artifactId>bonita-authentication-jaas</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.authentication</groupId>
+			<artifactId>bonita-authentication-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Cache -->
 		<dependency>
@@ -809,6 +814,7 @@
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
 									<include>com.bonitasoft.engine.authentication:bonita-authentication-jaas</include>
+									<include>com.bonitasoft.engine.authentication:bonita-authentication-impl</include>
 									<!-- Cache -->
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
