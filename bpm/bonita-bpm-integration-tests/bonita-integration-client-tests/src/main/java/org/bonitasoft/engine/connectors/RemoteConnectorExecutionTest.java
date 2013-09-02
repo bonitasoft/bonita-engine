@@ -818,6 +818,28 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" })
+    @Test
+    public void executeConnectorThatThrowRuntimeExceptionInConnectFailUserTaskOnEnter() throws Exception {
+        final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("connect", FailAction.FAIL, false);
+        final long processDefinitionId = processDefinition.getId();
+        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
+        waitForTaskToFail(startProcess);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" })
+    @Test
+    public void executeConnectorThatThrowRuntimeExceptionInDisconnectFailUserTaskOnEnter() throws Exception {
+        final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("disconnect", FailAction.FAIL, false);
+        final long processDefinitionId = processDefinition.getId();
+        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
+        waitForTaskToFail(startProcess);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "Automatic task" }, jira = "ENGINE-936")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionFailAutomaticTaskOnEnter() throws Exception {
@@ -1247,11 +1269,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
         final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-        // .addData(
-        // "data",
-        // "org.bonitasoft.dfgdfg.Restaurant",
-        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
-        // "org.bonitasoft.dfgdfg.Restaurant"))
+                // .addData(
+                // "data",
+                // "org.bonitasoft.dfgdfg.Restaurant",
+                // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
+                // "org.bonitasoft.dfgdfg.Restaurant"))
                 .addUserTask("step1", "actor");
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));

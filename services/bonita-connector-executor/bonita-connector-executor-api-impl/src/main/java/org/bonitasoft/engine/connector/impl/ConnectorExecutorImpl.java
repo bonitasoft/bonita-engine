@@ -111,7 +111,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     @Override
     public void disconnect(final SConnector sConnector) throws SConnectorException {
-        sConnector.disconnect();
+        try {
+            sConnector.disconnect();
+        } catch (SConnectorException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new SConnectorException(t);
+        }
     }
 
     /**

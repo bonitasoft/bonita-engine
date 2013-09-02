@@ -25,7 +25,7 @@ public class TestConnectorThatThrowException extends AbstractConnector {
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
         final Object inputParameter = getInputParameter("kind");
-        if (!"normal".equals(inputParameter) && !"runtime".equals(inputParameter) && !"none".equals(inputParameter)) {
+        if (!"normal".equals(inputParameter) && !"runtime".equals(inputParameter) && !"none".equals(inputParameter) && !"connect".equals(inputParameter)) {
             throw new ConnectorValidationException("bad kind of exception");
         }
     }
@@ -37,6 +37,22 @@ public class TestConnectorThatThrowException extends AbstractConnector {
             throw new ConnectorException("unexpected");
         } else if (kind.equals("runtime")) {
             throw new RuntimeException("unexpected");
+        }
+    }
+
+    @Override
+    public void connect() throws ConnectorException {
+        final String kind = (String) getInputParameter("kind");
+        if (kind.equals("connect")) {
+            throw new RuntimeException("unexpected error in connect");
+        }
+    }
+
+    @Override
+    public void disconnect() throws ConnectorException {
+        final String kind = (String) getInputParameter("kind");
+        if (kind.equals("disconnect")) {
+            throw new RuntimeException("unexpected error in connect");
         }
     }
 
