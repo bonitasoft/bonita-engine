@@ -626,7 +626,9 @@ public class PlatformAPIImpl implements PlatformAPI {
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
             schedulerService.start();
-            schedulerStarted = true;
+            // FIXME: commented out for the tests to not restart the scheduler all the time. Will need to be refactored. (It should be the responsibility of
+            // startNode() method to start the scheduler, not ActivateTenant)
+            // schedulerStarted = true;
 
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
