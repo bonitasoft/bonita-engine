@@ -185,4 +185,12 @@ public interface PlatformAPI {
      */
     PlatformState getPlatformState() throws PlatformNotFoundException;
 
+    /**
+     * Is the current node started?
+     * 
+     * @return true if the node is started, false if not started or if its state cannot be determined.
+     * @since 6.1
+     */
+    boolean isNodeStarted();
+
 }

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.NoSessionRequired;
+import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
@@ -38,6 +39,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -59,6 +61,8 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Baptiste Mesta
  */
 public class ServerAPIImpl implements ServerAPI {
+
+    private static final String IS_NODE_STARTED_METHOD_NAME = "isNodeStarted";
 
     private static final long serialVersionUID = -161775388604256321L;
 
@@ -204,11 +208,42 @@ public class ServerAPIImpl implements ServerAPI {
 
         final Object apiImpl = accessResolver.getAPIImplementation(apiInterfaceName);
         final Method method = ClassReflector.getMethod(apiImpl.getClass(), methodName, parameterTypes);
+        if (!isNodeInAValidStateFor(method)) {
+            logNodeNotStartedMessage(apiInterfaceName, methodName);
+            throw new NodeNotStartedException();
+        }
         // No session required means that there is no transaction
         if (method.isAnnotationPresent(CustomTransactions.class) || method.isAnnotationPresent(NoSessionRequired.class)) {
             return invokeAPI(parametersValues, apiImpl, method);
         } else {
             return invokeAPIInTransaction(parametersValues, apiImpl, method, session);
+        }
+    }
+
+    private void logNodeNotStartedMessage(final String apiInterfaceName, final String methodName) {
+        String message = "Node not started. Method '" + apiInterfaceName + "." + methodName
+                + "' cannot be called until node has been started (PlatformAPI.startNode())";
+        if (technicalLogger != null) {
+            technicalLogger.log(this.getClass(), TechnicalLogSeverity.ERROR, message);
+        } else {
+            System.err.println(message);
+        }
+    }
+
+    private boolean isNodeInAValidStateFor(final Method method) {
+        return method.isAnnotationPresent(AvailableOnStoppedNode.class) || isNodeStarted();
+    }
+
+    /**
+     * @return true if the node is started, false otherwise.
+     */
+    private boolean isNodeStarted() {
+        try {
+            final Object apiImpl = accessResolver.getAPIImplementation(PlatformAPI.class.getName());
+            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_NODE_STARTED_METHOD_NAME, new Class[0]);
+            return (Boolean) invokeAPI(new Object[0], apiImpl, method);
+        } catch (Throwable e) {
+            return false;
         }
     }
 

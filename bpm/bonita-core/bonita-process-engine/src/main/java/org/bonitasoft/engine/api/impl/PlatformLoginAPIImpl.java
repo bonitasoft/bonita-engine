@@ -36,11 +36,11 @@ import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class PlatformLoginAPIImpl extends
-        AbstractLoginApiImpl implements PlatformLoginAPI {
+public class PlatformLoginAPIImpl extends AbstractLoginApiImpl implements PlatformLoginAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public PlatformSession login(final String userName, final String password) throws PlatformLoginException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -73,6 +73,7 @@ public class PlatformLoginAPIImpl extends
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void logout(final PlatformSession session) throws PlatformLogoutException, SessionNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {

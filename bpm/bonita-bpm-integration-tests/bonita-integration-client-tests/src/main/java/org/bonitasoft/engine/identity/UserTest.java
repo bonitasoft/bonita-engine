@@ -14,16 +14,20 @@ import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -40,6 +44,28 @@ public class UserTest extends CommonAPITest {
     @Before
     public void beforeTest() throws BonitaException {
         login();
+    }
+
+    /**
+     * This test is here for arbitrary reason: it has to be tested on ANY API call.
+     */
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "Get exception when calling a platform method on node not started", jira = "ENGINE-1780")
+    @Test(expected = NodeNotStartedException.class)
+    public void unableToCallPlatformMethodOnStoppedNode() throws Exception {
+        logout();
+        PlatformSession session = loginPlatform();
+        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        platformAPI.stopNode();
+        logoutPlatform(session);
+        try {
+            login();
+        } finally {
+            session = loginPlatform();
+            platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+            platformAPI.startNode();
+            logoutPlatform(session);
+            login();
+        }
     }
 
     @Test(expected = CreationException.class)
