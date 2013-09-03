@@ -31,21 +31,22 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefini
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
@@ -74,25 +75,14 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void continueFlow() {
+    protected void continueFlow() throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
-        String containerType = SFlowElementsContainerType.PROCESS.name();
-
-        try {
-            final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-            if (sFlowNodeInstance.getLogicalGroup(2) > 0) {
-                containerType = SFlowElementsContainerType.FLOWNODE.name();
-            }
-            // no need to set the classloader: done in the flowNodeExecutor.gotoNextStableState
-            final long parentProcessInstanceId = sFlowNodeInstance.getLogicalGroup(getTenantAccessor().getBPMInstanceBuilders().getSUserTaskInstanceBuilder()
-                    .getParentProcessInstanceIndex());
-            containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceId, null, null, containerType, parentProcessInstanceId);
-        } catch (SBonitaException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        FlowNodeInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        WorkService workService = tenantAccessor.getWorkService();
+        final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+        final long parentProcessInstanceId = sFlowNodeInstance.getParentProcessInstanceId();
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(Type.FLOWNODE, flowNodeInstanceId, null, null, parentProcessInstanceId);
+        workService.registerWork(executeFlowNodeWork);
     }
 
     @Override

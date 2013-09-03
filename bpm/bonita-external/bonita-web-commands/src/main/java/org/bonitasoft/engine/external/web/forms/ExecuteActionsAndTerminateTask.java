@@ -123,6 +123,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         try {
             final long userId = getUserIdFromSession();
+            // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
             processExecutor.executeFlowNode(activityInstanceId, null, null, processDefinitionID, userId, userId);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);

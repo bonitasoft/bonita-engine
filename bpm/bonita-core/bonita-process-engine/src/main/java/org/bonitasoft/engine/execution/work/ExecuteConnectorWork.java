@@ -32,6 +32,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
@@ -118,11 +119,12 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
             final SConnectorInstance connectorInstance = callable.getConnectorInstance();
             final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
                     callable.getInputParameters());
-            transactionService.executeInTransaction(new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition));
+            // evaluate output and trigger the execution of the flow node
+            WorkService workService = tenantAccessor.getWorkService();
+            transactionService.executeInTransaction(new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, workService));
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        transactionService.executeInTransaction(new ContinueFlowTxContent());
     }
 
     @Override
@@ -246,8 +248,9 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
         /**
          * @param result
          * @param sConnectorDefinition
+         * @param workService
          */
-        private EvaluateConnectorOutputsTxContent(final ConnectorResult result, SConnectorDefinition sConnectorDefinition) {
+        private EvaluateConnectorOutputsTxContent(final ConnectorResult result, SConnectorDefinition sConnectorDefinition, WorkService workService) {
             this.result = result;
             this.sConnectorDefinition = sConnectorDefinition;
         }
@@ -255,6 +258,7 @@ public abstract class ExecuteConnectorWork extends NonTxBonitaWork {
         @Override
         public Void call() throws Exception {
             evaluateOutput(result, sConnectorDefinition);
+            continueFlow();
             return null;
         }
     }

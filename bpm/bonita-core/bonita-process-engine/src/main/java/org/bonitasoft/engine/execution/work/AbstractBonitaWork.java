@@ -73,7 +73,9 @@ public abstract class AbstractBonitaWork implements BonitaWork {
         } catch (final Exception e) {
             // Edge case we cannot manage
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "A work failed, The failure will be handled " + getDescription());
+                    "A work failed, The failure will be handled, work is:  " + getDescription());
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
+                    "Exception was:" + e.getMessage());
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }

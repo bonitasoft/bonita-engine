@@ -895,6 +895,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
 
                 SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId,
                         getUserIdFromSession());
             }
@@ -4777,6 +4778,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             // execute the flow node only if it is not the final state
             if (!state.isTerminal()) {
                 final long userIdFromSession = getUserIdFromSession();
+                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(activityInstanceId, null, null, activity.getParentProcessInstanceId(), userIdFromSession, userIdFromSession);
             }
         } catch (final SBonitaException e) {

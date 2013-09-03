@@ -26,14 +26,12 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -50,7 +48,6 @@ import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -70,11 +67,6 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Matthieu Chaffotte
  */
 public class FlowNodeExecutorImpl implements FlowNodeExecutor {
-
-    /**
-     * timeout for the thread that set flow nodes in fail
-     */
-    private final int setInFailThreadTimeout;
 
     private final FlowNodeStateManager flowNodeStateManager;
 
@@ -100,8 +92,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final ClassLoaderService classLoaderService;
 
-    private final TechnicalLoggerService logger;
-
     private final WorkService workService;
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
@@ -125,33 +115,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         containerRegistry.addContainerExecutor(this);
         this.processDefinitionService = processDefinitionService;
         this.commentService = commentService;
-        this.logger = logger;
-        setInFailThreadTimeout = 3000;
-    }
-
-    public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-            final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
-            final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
-            final LockService lockService, final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
-            final WorkService workService, final TransactionService transactionService, final int setInFailThreadTimeout) {
-        super();
-        this.flowNodeStateManager = flowNodeStateManager;
-        activityInstanceService = activityInstanceManager;
-        this.operationService = operationService;
-        this.archiveService = archiveService;
-        this.dataInstanceService = dataInstanceService;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
-        this.containerRegistry = containerRegistry;
-        this.processInstanceService = processInstanceService;
-        this.connectorInstanceService = connectorInstanceService;
-        this.classLoaderService = classLoaderService;
-        this.workService = workService;
-        containerRegistry.addContainerExecutor(this);
-        this.processDefinitionService = processDefinitionService;
-        this.commentService = commentService;
-        this.logger = logger;
-        this.setInFailThreadTimeout = setInFailThreadTimeout;
     }
 
     @Override
@@ -217,10 +180,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     // the state is still executing set the executing flag
                     activityInstanceService.setExecuting(sFlowNodeInstance);
                 }
-            } catch (final SFlowNodeNotFoundException e) {
-                throw new SFlowNodeExecutionException(e);
             } catch (final SBonitaException e) {
-                setFlowNodeFailedInTransaction(sFlowNodeInstance, processDefinitionId, e);
                 throw new SFlowNodeExecutionException(e);
             }
 
@@ -247,43 +207,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         return state;
-    }
-
-    @Override
-    public void setFlowNodeFailedInTransaction(final SFlowNodeInstance fFlowNodeInstance, final long processDefinitionId, final SBonitaException sbe)
-            throws SFlowNodeExecutionException {
-        long flowNodeInstanceId = fFlowNodeInstance.getId();
-        // we put the step in failed if the boundary attached to it fails
-        if (SFlowNodeType.BOUNDARY_EVENT.equals(fFlowNodeInstance.getType())) {
-            flowNodeInstanceId = fFlowNodeInstance.getParentContainerId();
-        }
-        // we do that is an other thread to avoid issues with nested transactions
-        SetFlowNodeInFailedThread setInFailedThread;
-        try {
-            setInFailedThread = new SetFlowNodeInFailedThread(flowNodeInstanceId, processDefinitionId, this);
-        } catch (final Exception e) {
-            throw new SFlowNodeExecutionException("Unable to put the failed state on flow node instance with id " + fFlowNodeInstance, e);
-        }
-        setInFailedThread.start();
-        final StringBuilder msg = new StringBuilder("Flownode with id " + fFlowNodeInstance + " named '" + setInFailedThread.getFlowNodeInstanceName()
-                + "' on process instance with id " + setInFailedThread.getParentFlowNodeInstanceId() + " has failed: " + sbe.getMessage());
-        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, msg.toString(), sbe);
-
-        try {
-            setInFailedThread.join(setInFailThreadTimeout);
-        } catch (final InterruptedException e) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The thread that set in fail flownode was interrupted: " + e.getMessage());
-        }
-
-        if (!setInFailedThread.isFinished()) {
-            setInFailedThread.interrupt();
-            throw new SFlowNodeExecutionException("Unable to put the failed state on flownode instance with id " + fFlowNodeInstance
-                    + ": execution not finished", setInFailedThread.getThrowable());
-        }
-        if (setInFailedThread.getThrowable() != null) {
-            throw new SFlowNodeExecutionException("Unable to put the failed state on flownode instance with id " + fFlowNodeInstance + ": "
-                    + setInFailedThread.getThrowable());
-        }
     }
 
     protected <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {

@@ -698,23 +698,19 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SUserTaskInstanceBuilder flowNodeKeyProvider = bpmInstancesCreator.getBPMInstanceBuilders().getUserTaskInstanceBuilder();
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
-        try {
-            SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-            final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
-            if (tokensOfProcess == 0) {
-                boolean hasActionsToExecute = false;
-                if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
-                    hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, sFlowNodeInstanceChild);
-                    // the process instance has maybe changed
-                    if (hasActionsToExecute) {
-                        sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-                    }
-                    eventsHandler.unregisterEventSubProcess(sProcessDefinition, sProcessInstance);
+        SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+        final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
+        if (tokensOfProcess == 0) {
+            boolean hasActionsToExecute = false;
+            if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
+                hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, sFlowNodeInstanceChild);
+                // the process instance has maybe changed
+                if (hasActionsToExecute) {
+                    sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
                 }
-                handleProcessCompletion(sProcessDefinition, sProcessInstance, hasActionsToExecute);
+                eventsHandler.unregisterEventSubProcess(sProcessDefinition, sProcessInstance);
             }
-        } catch (final SBonitaException e) {
-            flowNodeExecutor.setFlowNodeFailedInTransaction(sFlowNodeInstanceChild, processDefinitionId, e);
+            handleProcessCompletion(sProcessDefinition, sProcessInstance, hasActionsToExecute);
         }
     }
 

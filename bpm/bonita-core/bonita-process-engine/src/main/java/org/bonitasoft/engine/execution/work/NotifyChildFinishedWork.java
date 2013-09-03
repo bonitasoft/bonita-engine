@@ -14,9 +14,18 @@
 package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
+ * 
+ * Work that notify a container that a flow node is in completed state
+ * 
+ * e.g. when a flow node of a process finish we evaluate the outgoing transitions of this flow node.
+ * 
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
@@ -67,4 +76,12 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
+    @Override
+    protected void handleFailure(Exception e) throws Exception {
+        final ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = getTenantAccessor().getFlowNodeStateManager();
+        final FlowNodeExecutor flowNodeExecutor = getTenantAccessor().getFlowNodeExecutor();
+        TransactionService transactionService = getTenantAccessor().getTransactionService();
+        transactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
+    }
 }

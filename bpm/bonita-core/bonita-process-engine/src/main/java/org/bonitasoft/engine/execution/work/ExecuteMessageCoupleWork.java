@@ -14,7 +14,13 @@
 package org.bonitasoft.engine.execution.work;
 
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
+import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
@@ -57,6 +63,20 @@ public class ExecuteMessageCoupleWork extends TxBonitaWork {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected void handleFailure(Exception e) throws Exception {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService(), tenantAccessor.getBPMInstanceBuilders());
+    }
+
+    private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService,
+            final BPMInstanceBuilders instanceBuilders) throws SWaitingEventModificationException, SWaitingEventNotFoundException, SWaitingEventReadException {
+        final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(instanceBuilders.getSWaitingMessageEventBuilder().getProgressKey(), SWaitingMessageEventBuilder.PROGRESS_FREE_KEY);
+        eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 
 }
