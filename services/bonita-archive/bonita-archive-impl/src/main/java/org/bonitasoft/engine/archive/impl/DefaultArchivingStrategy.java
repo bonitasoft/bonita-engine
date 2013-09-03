@@ -39,6 +39,8 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy implemen
         archives.put("org.bonitasoft.engine.core.process.instance.model.SConnectorInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping", true);
+        //is the archived version because there is no not archived version
+        archives.put("org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance", true);
     }
 
 }

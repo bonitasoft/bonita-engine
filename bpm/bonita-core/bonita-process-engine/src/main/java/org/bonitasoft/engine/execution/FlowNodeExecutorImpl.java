@@ -40,7 +40,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -229,8 +228,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 if (state.isTerminal()) {
                     try {
                         // reschedule this work but without the operations
-                        workService.registerWork(new NotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance
-                                .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
+                        workService.registerWork(new NotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
+                                sFlowNodeInstance.getId(), sFlowNodeInstance
+                                        .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
                     } catch (final WorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
@@ -311,8 +311,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             if (state.isTerminal()) {
                 try {
                     // reschedule this work but without the operations
-                    workService.registerWork(new NotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance
-                            .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
+                    workService.registerWork(new NotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
+                            sFlowNodeInstance.getId(), sFlowNodeInstance
+                                    .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
                 } catch (final WorkRegisterException e) {
                     throw new SFlowNodeExecutionException(e);
                 }
@@ -361,11 +362,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private boolean isTerminalState(final ProcessInstanceState childState) {
         return ProcessInstanceState.COMPLETED.equals(childState) || ProcessInstanceState.CANCELLED.equals(childState)
                 || ProcessInstanceState.ABORTED.equals(childState);
-    }
-
-    @Override
-    public void executeTransition(final SProcessDefinition sDefinition, final STransitionInstance transitionInstance) {
-        // do nothing: no transition in a flow node for now
     }
 
     @Override

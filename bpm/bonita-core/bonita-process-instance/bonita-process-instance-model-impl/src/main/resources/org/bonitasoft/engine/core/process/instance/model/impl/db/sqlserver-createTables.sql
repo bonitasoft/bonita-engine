@@ -96,27 +96,6 @@ GO
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
 GO
 
-CREATE TABLE transition_instance (
-  tenantid NUMERIC(19, 0) NOT NULL,
-  id NUMERIC(19, 0) NOT NULL,
-  rootContainerId NUMERIC(19, 0) NOT NULL,
-  parentContainerId NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(255) NOT NULL,
-  source NUMERIC(19, 0),
-  terminal BIT NOT NULL,
-  stable BIT ,
-  stateCategory NVARCHAR(50) NOT NULL,
-  logicalGroup1 NUMERIC(19, 0) NOT NULL,
-  logicalGroup2 NUMERIC(19, 0) NOT NULL,
-  logicalGroup3 NUMERIC(19, 0),
-  logicalGroup4 NUMERIC(19, 0) NOT NULL,
-  description NVARCHAR(255),
-  deleted BIT DEFAULT 0,
-  token_ref_id NUMERIC(19, 0) NULL,
-  PRIMARY KEY (tenantid, id)
-)
-GO
-
 CREATE TABLE connector_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

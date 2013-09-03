@@ -73,8 +73,6 @@ ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId
 GO
 ALTER TABLE role DROP CONSTRAINT fk_role_tenantId
 GO
-ALTER TABLE transition_instance DROP CONSTRAINT fk_transition_instance_tenantId
-GO
 ALTER TABLE user_ DROP CONSTRAINT fk_user__tenantId
 GO
 ALTER TABLE user_membership DROP CONSTRAINT fk_user_membership_tenantId

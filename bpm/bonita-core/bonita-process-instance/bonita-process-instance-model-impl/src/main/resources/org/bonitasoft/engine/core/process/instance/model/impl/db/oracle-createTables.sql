@@ -91,26 +91,6 @@ CREATE TABLE flownode_instance (
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
 
-CREATE TABLE transition_instance (
-  tenantid NUMBER(19, 0) NOT NULL,
-  id NUMBER(19, 0) NOT NULL,
-  rootContainerId NUMBER(19, 0) NOT NULL,
-  parentContainerId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(255) NOT NULL,
-  source NUMBER(19, 0),
-  terminal NUMBER(1) NOT NULL,
-  stable NUMBER(1) ,
-  stateCategory VARCHAR2(50) NOT NULL,
-  logicalGroup1 NUMBER(19, 0) NOT NULL,
-  logicalGroup2 NUMBER(19, 0) NOT NULL,
-  logicalGroup3 NUMBER(19, 0),
-  logicalGroup4 NUMBER(19, 0) NOT NULL,
-  description VARCHAR2(255),
-  deleted NUMBER(1) DEFAULT 0,
-  token_ref_id NUMBER(19, 0) NULL,
-  PRIMARY KEY (tenantid, id)
-);
-
 CREATE TABLE connector_instance (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,

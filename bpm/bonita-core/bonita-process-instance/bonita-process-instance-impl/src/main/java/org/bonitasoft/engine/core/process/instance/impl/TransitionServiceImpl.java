@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
@@ -25,19 +24,12 @@ import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SATransitionInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -45,7 +37,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
@@ -54,7 +45,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
-import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
@@ -92,82 +82,6 @@ public class TransitionServiceImpl implements TransitionService {
     }
 
     @Override
-    public void create(final STransitionInstance transitionInstance) throws STransitionCreationException {
-        final InsertRecord insertRecord = new InsertRecord(transitionInstance);
-        SInsertEvent insertEvent = null;
-        if (this.eventService.hasHandlers(TRANSITIONINSTANCE, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) this.eventService.getEventBuilder().createInsertEvent(TRANSITIONINSTANCE).setObject(transitionInstance).done();
-        }
-        try {
-            this.recorder.recordInsert(insertRecord, insertEvent);
-        } catch (final SRecorderException e) {
-            throw new STransitionCreationException(e);
-        }
-
-    }
-
-    @Override
-    public void delete(final STransitionInstance transitionInstance) throws STransitionDeletionException {
-        final DeleteRecord deleteRecord = new DeleteRecord(transitionInstance);
-        SDeleteEvent deleteEvent = null;
-        if (this.eventService.hasHandlers(TRANSITIONINSTANCE, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) this.eventService.getEventBuilder().createDeleteEvent(TRANSITIONINSTANCE).setObject(transitionInstance).done();
-        }
-        try {
-            this.recorder.recordDelete(deleteRecord, deleteEvent);
-        } catch (final SRecorderException e) {
-            throw new STransitionDeletionException(e);
-        }
-
-    }
-
-    @Override
-    public STransitionInstance get(final long transitionId) throws STransitionReadException, STransitionInstanceNotFoundException {
-        STransitionInstance selectOne;
-        try {
-            selectOne = this.persistenceRead.selectById(SelectDescriptorBuilder.getElementById(STransitionInstance.class, "STransitionInstance", transitionId));
-        } catch (final SBonitaReadException e) {
-            throw new STransitionReadException(e);
-        }
-        if (selectOne == null) {
-            throw new STransitionInstanceNotFoundException(transitionId);
-        }
-        return selectOne;
-    }
-
-    @Override
-    public boolean containsActiveTransition(final long rootContainerId) throws STransitionReadException {
-        final HashMap<String, Object> hashMap = new HashMap<String, Object>(2);
-        hashMap.put("rootContainerId", rootContainerId);
-        Long selectOne;
-        try {
-            selectOne = this.persistenceRead.selectOne(new SelectOneDescriptor<Long>("getNumberOfActiveTransitionOnRootContainer", hashMap,
-                    STransitionInstance.class));
-        } catch (final SBonitaReadException e) {
-            throw new STransitionReadException(e);
-        }
-        return selectOne != null && selectOne > 0;
-    }
-
-    @Override
-    public long getNumberOfTransitionInstances(final QueryOptions countOptions) throws SBonitaSearchException {
-        try {
-            return this.persistenceRead.getNumberOfEntities(STransitionInstance.class, countOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
-    }
-
-    @Override
-    public List<STransitionInstance> search(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return this.persistenceRead.searchEntity(STransitionInstance.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
-    }
-
-    @Override
     public long getNumberOfArchivedTransitionInstances(final QueryOptions countOptions) throws SBonitaSearchException {
         try {
             return this.persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
@@ -182,23 +96,6 @@ public class TransitionServiceImpl implements TransitionService {
             return this.persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
-        }
-    }
-
-    @Override
-    public void archive(final STransitionInstance sTransitionInstance, final long sFlowNodeInstanceId, final TransitionState transitionState)
-            throws STransitionCreationException {
-        final SATransitionInstance saTransitionInstance = this.instanceBuilders.getSATransitionInstanceBuilder()
-                .createNewTransitionInstance(sTransitionInstance, sFlowNodeInstanceId, transitionState).done();
-        if (saTransitionInstance != null) {
-            final long archiveDate = System.currentTimeMillis();
-            try {
-                archiveTransitionInstanceInsertRecord(saTransitionInstance, archiveDate);
-            } catch (final SRecorderException e) {
-                throw new STransitionCreationException(e);
-            } catch (final SDefinitiveArchiveNotFound e) {
-                throw new STransitionCreationException(e);
-            }
         }
     }
 

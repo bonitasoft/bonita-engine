@@ -16,9 +16,6 @@ GO
 DELETE FROM connector_instance
 GO
 
-DELETE FROM transition_instance
-GO
-
 DELETE FROM flownode_instance
 GO
 

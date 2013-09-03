@@ -17,7 +17,6 @@ import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
@@ -49,16 +48,6 @@ public class SATransitionInstanceImpl extends SAFlowElementInstanceImpl implemen
 
     public SATransitionInstanceImpl() {
         super();
-    }
-
-    public SATransitionInstanceImpl(final STransitionInstance sTransitionInstance) {
-        super(sTransitionInstance);
-        source = sTransitionInstance.getSource();
-        sourceObjectId = sTransitionInstance.getId();
-        description = sTransitionInstance.getDescription();
-        terminal = sTransitionInstance.isTerminal();
-        stable = sTransitionInstance.isStable();
-        stateCategory = sTransitionInstance.getStateCategory();
     }
 
     public SATransitionInstanceImpl(final STransitionDefinition sTransitionDefinition, final SFlowNodeInstance sourceFlowNode) {
@@ -133,6 +122,7 @@ public class SATransitionInstanceImpl extends SAFlowElementInstanceImpl implemen
         this.description = description;
     }
 
+    @Override
     public boolean isTerminal() {
         return terminal;
     }
@@ -159,7 +149,8 @@ public class SATransitionInstanceImpl extends SAFlowElementInstanceImpl implemen
 
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return STransitionInstance.class;
+        // no source class, transitions are only archived
+        return SATransitionInstance.class;
     }
 
 }

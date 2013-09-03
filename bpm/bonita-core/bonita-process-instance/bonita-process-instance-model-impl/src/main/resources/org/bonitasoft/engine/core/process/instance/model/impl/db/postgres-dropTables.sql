@@ -1,5 +1,4 @@
 DROP TABLE pending_mapping;
-DROP TABLE transition_instance;
 DROP TABLE connector_instance;
 DROP TABLE flownode_instance;
 DROP TABLE process_instance;

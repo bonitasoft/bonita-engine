@@ -1,7 +1,5 @@
 DROP TABLE pending_mapping
 GO
-DROP TABLE transition_instance
-GO
 DROP TABLE connector_instance
 GO
 DROP TABLE flownode_instance

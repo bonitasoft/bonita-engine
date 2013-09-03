@@ -47,7 +47,6 @@ CREATE INDEX fk_process_instance_tenantId_idx ON process_instance(tenantid ASC);
 CREATE INDEX fk_process_instance_process_definitionId_idx ON process_instance(processDefinitionId ASC, tenantid ASC);
 CREATE INDEX fk_flownode_instance_actorId_idx ON flownode_instance(actorId ASC, tenantid ASC);
 CREATE INDEX fk_flownode_instance_tenantId_idx ON flownode_instance(tenantid ASC);
-CREATE INDEX fk_transition_instance_tenantId_idx ON transition_instance(tenantid ASC);
 CREATE INDEX fk_connector_instance_tenantId_idx ON connector_instance(tenantid ASC);
 CREATE INDEX fk_event_trigger_instance_tenantId_idx ON event_trigger_instance(tenantid ASC);
 CREATE INDEX fk_waiting_event_flownode_instanceId_idx ON waiting_event(flowNodeInstanceId ASC, tenantid ASC);
@@ -132,7 +131,6 @@ ALTER TABLE profile ADD CONSTRAINT fk_profile_tenantId FOREIGN KEY (tenantId) RE
 ALTER TABLE profileentry ADD CONSTRAINT fk_profileentry_tenantId FOREIGN KEY (tenantId) REFERENCES tenant(id);
 ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_tenantId FOREIGN KEY (tenantId) REFERENCES tenant(id);
 ALTER TABLE role ADD CONSTRAINT fk_role_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
-ALTER TABLE transition_instance ADD CONSTRAINT fk_transition_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE user_ ADD CONSTRAINT fk_user__tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE user_membership ADD CONSTRAINT fk_user_membership_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE waiting_event ADD CONSTRAINT fk_waiting_event_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);

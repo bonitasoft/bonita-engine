@@ -1,5 +1,4 @@
 DELETE FROM connector_instance WHERE tenantid = ${tenantid};
-DELETE FROM transition_instance WHERE tenantid = ${tenantid};
 DELETE FROM hidden_activity WHERE tenantid = ${tenantid};
 DELETE FROM message_instance WHERE tenantid = ${tenantid};
 DELETE FROM pending_mapping WHERE tenantid = ${tenantid};

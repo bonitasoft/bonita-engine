@@ -61,33 +61,6 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="STransitionInstanceImpl" table="transition_instance">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="rootContainerId" column="rootContainerId" />
-		<property name="parentContainerId" column="parentContainerId" />
-		<property name="name" column="name" />
-		<property name="source" column="source" type="long" />
-		<property name="stable" column="stable" type="boolean" />
-		<property name="terminal" column="terminal" type="boolean" />
-		<property name="tokenRefId" column="token_ref_id" type="long" />
-		<property name="stateCategory" column="stateCategory">
-			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-				<param name="enumClass">
-					org.bonitasoft.engine.core.process.instance.model.SStateCategory
-				</param>
-			</type>
-		</property>
-		<property name="logicalGroup1" column="logicalGroup1" type="long" />
-		<property name="logicalGroup2" column="logicalGroup2" type="long" />
-		<property name="logicalGroup3" column="logicalGroup3" type="long" />
-		<property name="logicalGroup4" column="logicalGroup4" type="long" />
-		<property name="description" column="description" />
-		<property name="deleted" column="deleted" />
-		<filter name="tenantFilter" />
-	</class>
 
 	<class name="SFlowNodeInstanceImpl" abstract="true" table="flownode_instance">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
