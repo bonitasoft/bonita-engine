@@ -15,16 +15,15 @@ package org.bonitasoft.engine.scheduler;
 
 import java.util.List;
 
-import org.bonitasoft.engine.scheduler.impl.SchedulerImpl;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl;
+import org.bonitasoft.engine.scheduler.trigger.Trigger;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface SchedulerExecutor {
-
-    void schedule(final JobIdentifier job, final Trigger trigger) throws SSchedulerException;
-
-    void executeNow(JobIdentifier jobIdentifier) throws SSchedulerException;
 
     boolean isStarted() throws SSchedulerException;
 
@@ -34,24 +33,28 @@ public interface SchedulerExecutor {
 
     void shutdown() throws SSchedulerException;
 
-    void reschedule(final String triggerName, final Trigger newTrigger) throws SSchedulerException;
+    void reschedule(String triggerName, Trigger newTrigger) throws SSchedulerException;
 
-    void resume(final String jobName) throws SSchedulerException;
+    void resume(String jobName) throws SSchedulerException;
 
     void resumeJobs() throws SSchedulerException;
 
-    void pause(final String jobName) throws SSchedulerException;
+    void pause(String jobName) throws SSchedulerException;
 
     void pauseJobs() throws SSchedulerException;
 
-    boolean delete(final String jobName) throws SSchedulerException;
+    boolean delete(String jobName) throws SSchedulerException;
 
     void deleteJobs() throws SSchedulerException;
 
     List<String> getJobs() throws SSchedulerException;
 
-    void setBOSSchedulerService(SchedulerImpl schedulerService);
+    void setBOSSchedulerService(SchedulerServiceImpl schedulerService);
 
     List<String> getAllJobs() throws SSchedulerException;
+
+    void executeNow(long jobId, long tenantId, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
+
+    void schedule(long jobId, long tenantId, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
 
 }

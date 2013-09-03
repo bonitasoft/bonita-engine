@@ -3,7 +3,7 @@ package org.bonitasoft.engine.scheduler.job;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.scheduler.JobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.impl.VariableStorage;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
@@ -22,20 +22,20 @@ public class IncrementVariableJobWithMultiTenancy extends GroupJob {
     private static ReadSessionAccessor readSessionAccessor;
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() throws SJobExecutionException {
         synchronized (IncrementVariableJobWithMultiTenancy.class) {
 
             VariableStorage storage;
             try {
                 storage = VariableStorage.getInstance(readSessionAccessor.getTenantId());
             } catch (final TenantIdNotSetException e) {
-                throw new JobExecutionException(e);
+                throw new SJobExecutionException(e);
             }
             final Integer value = (Integer) storage.getVariableValue(variableName);
             if (value == null) {
                 storage.setVariable(variableName, 1);
             } else if (value + 1 == throwExceptionAfterNIncrements) {
-                throw new JobExecutionException("Increment reached");
+                throw new SJobExecutionException("Increment reached");
             } else {
                 storage.setVariable(variableName, value + 1);
             }

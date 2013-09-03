@@ -24,7 +24,7 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class BonitaSchedulerFactory extends StdSchedulerFactory {
 
-    private SchedulerImpl schedulerService;
+    private SchedulerServiceImpl schedulerService;
 
     public BonitaSchedulerFactory(final Properties props) throws SchedulerException {
         super(props);
@@ -37,7 +37,7 @@ public class BonitaSchedulerFactory extends StdSchedulerFactory {
         return scheduler;
     }
 
-    public void setBOSSchedulerService(final SchedulerImpl schedulerService) {
+    public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
         this.schedulerService = schedulerService;
     }
 

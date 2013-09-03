@@ -279,8 +279,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
                     .createNewArchivedConnectorInstance(connectorInstance).done();
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saConnectorInstance);
             try {
-                archiveService.recordInsert(archiveDate, insertRecord, getQueriableLog(ActionType.CREATED, "archive the connector instance", connectorInstance)
-                        .done());
+                archiveService.recordInsert(archiveDate, insertRecord);
             } catch (final SBonitaException e) {
                 throw new SConnectorInstanceCreationException("Unable to archive the connectorInstance instance with id " + connectorInstance.getId(), e);
             }

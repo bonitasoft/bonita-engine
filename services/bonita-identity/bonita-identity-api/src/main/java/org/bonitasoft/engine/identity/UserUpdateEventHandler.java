@@ -18,11 +18,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 
 public abstract class UserUpdateEventHandler implements SHandler<SUpdateEvent> {
 
-    @Override
-    public abstract void execute(SUpdateEvent updateEvent);
-
-    @Override
-    public abstract boolean isInterested(SUpdateEvent updateEvent);
+    private static final long serialVersionUID = 1L;
 
     public abstract String getPassword(String userName);
 

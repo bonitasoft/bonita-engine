@@ -13,15 +13,16 @@
  **/
 package org.bonitasoft.engine.session.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.session.impl.SessionServiceImpl;
+import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.model.builder.SSessionBuilders;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -40,6 +41,9 @@ public class SessionServiceImplTest {
 
     @Mock
     private TechnicalLoggerService logger;
+
+    @Mock
+    private SessionProvider sessionProvider;
 
     @InjectMocks
     private SessionServiceImpl sessionServiceImpl;
@@ -134,7 +138,8 @@ public class SessionServiceImplTest {
      */
     @Test
     public final void cleanInvalidSessions() {
-        // TODO : Not yet implemented
+        sessionServiceImpl.cleanInvalidSessions();
+        verify(sessionProvider, times(1)).cleanInvalidSessions();
     }
 
     /**
@@ -142,7 +147,13 @@ public class SessionServiceImplTest {
      */
     @Test
     public final void deleteSessions() {
-        // TODO : Not yet implemented
+        sessionServiceImpl.deleteSessions();
+        verify(sessionProvider, times(1)).removeSessions();
     }
 
+    @Test
+    public final void deleteSessionsOfTenant() {
+        sessionServiceImpl.deleteSessionsOfTenant(12l);
+        verify(sessionProvider, times(1)).deleteSessionsOfTenant(12l);
+    }
 }

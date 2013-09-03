@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 
 /**
  * Interface of a scheduled job. A job is classified using a name and a group name. A job has a unique name and group name. It
@@ -53,12 +55,12 @@ public interface StatelessJob extends Serializable {
     /**
      * Execute the content of the job.
      * 
-     * @throws JobExecutionException
+     * @throws SJobExecutionException
      *             if an exception occurs
      * @throws FireEventException
      * @since 6.0
      */
-    void execute() throws JobExecutionException, FireEventException;
+    void execute() throws SJobExecutionException, FireEventException;
 
     /**
      * This method is called by the scheduler service before the execution of the job

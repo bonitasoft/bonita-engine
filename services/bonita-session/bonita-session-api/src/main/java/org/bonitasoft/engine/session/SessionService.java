@@ -121,4 +121,12 @@ public interface SessionService {
      */
     void deleteSessions();
 
+    /**
+     * 
+     * Delete all sessions of a tenant
+     * 
+     * @param tenantId
+     */
+    void deleteSessionsOfTenant(long tenantId);
+
 }

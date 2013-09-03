@@ -16,6 +16,7 @@ package org.bonitasoft.engine.execution.handler;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
@@ -31,6 +32,8 @@ import org.bonitasoft.engine.events.model.SHandlerExecutionException;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
  * @author Baptiste Mesta
@@ -38,52 +41,51 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<SUpdateEvent> {
 
-    private final ArchiveService archiveService;
+    private static final long serialVersionUID = 1L;
 
-    private ProcessInstanceService processInstanceService;
+    private final long tenantId;
 
-    private final BPMInstanceBuilders instancesBuilders;
-
-    private final TechnicalLoggerService logger;
-
-    private final DataInstanceService dataInstanceService;
-
-    private final SDataInstanceBuilders sDataInstanceBuilders;
-
-    private final DocumentMappingService documentMappingService;
-
-    private final SCommentService commentService;
-
-    private final SACommentBuilder saCommentBuilder;
-
-    private final ProcessDefinitionService processDefinitionService;
-
-    private final ConnectorInstanceService connectorInstanceService;
-
-    public ArchiveProcessInstancesHandler(final ArchiveService archiveService, final BPMInstanceBuilders instancesBuilders,
-            final TechnicalLoggerService logger, final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders,
-            final DocumentMappingService documentMappingService, final SCommentService commentService, final SACommentBuilder saCommentBuilder,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
-        this.archiveService = archiveService;
-        this.instancesBuilders = instancesBuilders;
-        this.logger = logger;
-        this.dataInstanceService = dataInstanceService;
-        this.sDataInstanceBuilders = sDataInstanceBuilders;
-        this.documentMappingService = documentMappingService;
-        this.commentService = commentService;
-        this.saCommentBuilder = saCommentBuilder;
-        this.processDefinitionService = processDefinitionService;
-        this.connectorInstanceService = connectorInstanceService;
+    public ArchiveProcessInstancesHandler(final long tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Override
     public void execute(final SUpdateEvent event) throws SHandlerExecutionException {
         final SProcessInstance processInstance = (SProcessInstance) event.getObject();
         try {
+            TenantServiceAccessor tenantServiceAccessor;
+            tenantServiceAccessor = getTenantServiceAccessor();
+            final ArchiveService archiveService = tenantServiceAccessor.getArchiveService();
+            final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
+            final BPMInstanceBuilders instancesBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
+            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+            final DataInstanceService dataInstanceService = tenantServiceAccessor.getDataInstanceService();
+            final SDataInstanceBuilders sDataInstanceBuilders = tenantServiceAccessor.getSDataInstanceBuilders();
+            final DocumentMappingService documentMappingService = tenantServiceAccessor.getDocumentMappingService();
+            final SCommentService commentService = tenantServiceAccessor.getCommentService();
+            final SACommentBuilder saCommentBuilder = tenantServiceAccessor.getSACommentBuilders();
+            final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
+            final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
+
             ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, dataInstanceService, documentMappingService,
                     logger, instancesBuilders, sDataInstanceBuilders, commentService, saCommentBuilder, processDefinitionService, connectorInstanceService);
         } catch (final SArchivingException e) {
             throw new SHandlerExecutionException(e);
+        } catch (SBonitaException e) {
+            throw new SHandlerExecutionException(e);
+        }
+    }
+    /**
+     * @param serviceAccessorFactory
+     * @return
+     * @throws SHandlerExecutionException
+     */
+    private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
+        try {
+            ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
+            return serviceAccessorFactory.createTenantServiceAccessor(tenantId);
+        } catch (Exception e) {
+            throw new SHandlerExecutionException(e.getMessage(), null);
         }
     }
 
@@ -101,11 +103,6 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             isInterested = isTerminal && (processInstance.getCallerId() <= 0 || SFlowNodeType.SUB_PROCESS.equals(processInstance.getCallerType()));
         }
         return isInterested;
-    }
-
-    @Override
-    public void setProcessInstanceService(final ProcessInstanceService processInstanceService) {
-        this.processInstanceService = processInstanceService;
     }
 
 }

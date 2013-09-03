@@ -16,7 +16,7 @@ package org.bonitasoft.engine.jobs;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.scheduler.JobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
@@ -39,13 +39,13 @@ public class CleanInvalidSessionsJob extends InternalJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() throws SJobExecutionException {
         try {
             final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final SessionService sessionService = platformServiceAccessor.getSessionService();
             sessionService.cleanInvalidSessions();
         } catch (final Exception e) {
-            throw new JobExecutionException("Unable to clean invalid sessions", e);
+            throw new SJobExecutionException("Unable to clean invalid sessions", e);
         }
     }
 

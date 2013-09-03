@@ -11,6 +11,8 @@ import org.bonitasoft.engine.events.model.SHandler;
  */
 public class TestHandler implements SHandler<SEvent> {
 
+    private static final long serialVersionUID = 1L;
+
     private boolean isCalled = false;
 
     private List<SEvent> receivedEvent;

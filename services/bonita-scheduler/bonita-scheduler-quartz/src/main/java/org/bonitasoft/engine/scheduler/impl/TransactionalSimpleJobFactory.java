@@ -14,9 +14,9 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import org.bonitasoft.engine.scheduler.JobIdentifier;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.quartz.Job;
-import org.quartz.JobDetail;
+import org.quartz.JobDataMap;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.simpl.SimpleJobFactory;
@@ -28,12 +28,13 @@ import org.quartz.spi.TriggerFiredBundle;
  * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
 
-    private final SchedulerImpl schedulerService;
+    private final SchedulerServiceImpl schedulerService;
 
-    public TransactionalSimpleJobFactory(final SchedulerImpl schedulerService) {
+    public TransactionalSimpleJobFactory(final SchedulerServiceImpl schedulerService) {
         this.schedulerService = schedulerService;
     }
 
@@ -42,14 +43,16 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
         final Job newJob = super.newJob(bundle, scheduler);
         if (newJob instanceof QuartzJob) {
             final QuartzJob quartzJob = (QuartzJob) newJob;
-            final JobDetail jobDetail = bundle.getJobDetail();
-            final JobIdentifier jobIdentifier = (JobIdentifier) jobDetail.getJobDataMap().get("jobIdentifier");
+            final JobDataMap jobDataMap = bundle.getJobDetail().getJobDataMap();
+            final Long tenantId = (Long) jobDataMap.get("tenantId");
+            final Long jobId = (Long) jobDataMap.get("jobId");
+            final String jobName = (String) jobDataMap.get("jobName");
+            final JobIdentifier jobIdentifier = new JobIdentifier(jobId, tenantId, jobName);
             try {
-                quartzJob.setBOSJob(schedulerService.getPersistedJob(jobIdentifier));
+                quartzJob.setBosJob(schedulerService.getPersistedJob(jobIdentifier));
             } catch (final SSchedulerException e) {
                 throw new org.quartz.SchedulerException("unable to create the BOS job", e);
             }
-
             return quartzJob;
         }
         // FIXME a job that is not a BOS job was scheduled... not possible

@@ -5,6 +5,8 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 
 public class SEmployeeHandlerImpl implements SHandler<SUpdateEvent> {
 
+    private static final long serialVersionUID = 1L;
+
     private static final String EMPLOYEE_UPDATED = "EMPLOYEE_UPDATED";
 
     private boolean isUpdated = false;

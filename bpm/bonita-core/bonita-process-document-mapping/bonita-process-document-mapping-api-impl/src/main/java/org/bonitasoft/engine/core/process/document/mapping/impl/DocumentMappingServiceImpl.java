@@ -267,8 +267,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final SADocumentMapping sArchivedDocumentMapping = buildMappingToArchive(docMapping);
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(sArchivedDocumentMapping);
             try {
-                archiveService.recordInsert(archiveDate, insertRecord, getQueriableLog(ActionType.CREATED, "archive the document mapping instance", docMapping)
-                        .done());
+                archiveService.recordInsert(archiveDate, insertRecord);
             } catch (final Exception e) {
                 technicalLogger.log(this.getClass(), TechnicalLogSeverity.WARNING, "the document mapping was not archived id=" + docMapping.getId(), e);
                 throw new SDocumentMappingException("Unable to archive the document with id " + docMapping.getId(), e);

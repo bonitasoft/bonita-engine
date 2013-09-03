@@ -17,7 +17,6 @@ import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
 import org.bonitasoft.engine.archive.SArchiveDescriptor;
-import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -25,7 +24,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -62,8 +60,7 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public void recordInsert(final long time, final ArchiveInsertRecord record, final SQueriableLog queriableLog) throws SDefinitiveArchiveNotFound,
-            SRecorderException {
+    public void recordInsert(final long time, final ArchiveInsertRecord record) throws SRecorderException {
         if (isArchivable(record.getEntity().getPersistentObjectInterface())) {
             if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordInsert"));
@@ -133,7 +130,7 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public void recordDelete(final DeleteRecord record, final SQueriableLog queriableLog) throws SRecorderException {
+    public void recordDelete(final DeleteRecord record) throws SRecorderException {
         try {
             if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordDelete"));

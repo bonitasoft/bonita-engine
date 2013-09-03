@@ -365,7 +365,7 @@ public class SCommentServiceImpl implements SCommentService {
         do {
             searchArchivedComments = searchArchivedComments(queryOptions);
             for (final SAComment saComment : searchArchivedComments) {
-                archiveService.recordDelete(new DeleteRecord(saComment), null);
+                archiveService.recordDelete(new DeleteRecord(saComment));
             }
         } while (!searchArchivedComments.isEmpty());
     }

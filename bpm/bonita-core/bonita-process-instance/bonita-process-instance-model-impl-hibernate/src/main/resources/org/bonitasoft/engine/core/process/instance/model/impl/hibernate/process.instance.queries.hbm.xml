@@ -170,31 +170,6 @@
 		AND g.deleted = FALSE
 	</query>
 
-	<query name="getSTransitionInstanceById">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl AS t
-		WHERE t.id = :id
-		AND t.deleted = FALSE
-	</query>
-
-	<query name="getNumberOfActiveTransitionOnRootContainer">
-		SELECT count(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl AS t
-		WHERE t.rootContainerId = :rootContainerId 
-		AND t.deleted = FALSE
-	</query>
-	
-	<query name="getNumberOfSTransitionInstance">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl AS t
-		WHERE t.deleted = FALSE
-	</query>
-	
-	<query name="searchSTransitionInstance">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl AS t
-		WHERE t.deleted = FALSE
-	</query>
 
 	<query name="getSEventInstanceById">
 		SELECT e
@@ -505,8 +480,7 @@
 	</query>
 
 	<query name="getMessageEventCouples">
-		SELECT new org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl(s.id, s.eventType, s.processDefinitionId, s.processName, s.flowNodeDefinitionId, s.flowNodeName, 
-				s.messageName, m.id, m.messageName, m.targetProcess, m.targetFlowNode, m.processDefinitionId, m.flowNodeName)
+		SELECT new org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl(s.id, s.eventType, m.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl AS s,
 			 org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
 		WHERE m.messageName = s.messageName
@@ -1331,10 +1305,6 @@
 		WHERE flowNode.deleted = TRUE
 	</query>
 
-	<query name="purgeSTransitionInstanceImpl">
-		DELETE FROM org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl AS t
-		WHERE t.deleted = TRUE
-	</query>
 	
 	
 	

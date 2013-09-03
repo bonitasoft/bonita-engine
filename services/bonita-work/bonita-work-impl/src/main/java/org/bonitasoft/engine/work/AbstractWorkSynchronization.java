@@ -17,45 +17,29 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
 
 public abstract class AbstractWorkSynchronization implements BonitaTransactionSynchronization {
 
-    private final Collection<AbstractBonitaWork> works;
+    private final Collection<BonitaWork> works;
 
     protected final ExecutorService executorService;
 
     private boolean executed = false;
-
-    protected final TechnicalLoggerService loggerService;
-
-    private final SessionAccessor sessionAccessor;
-
-    private final SessionService sessionService;
-
-    private final TransactionService transactionService;
 
     private long tenantId;
 
     private final ExecutorWorkService threadPoolWorkService;
 
     public AbstractWorkSynchronization(final ExecutorWorkService threadPoolWorkService, final ExecutorService executorService,
-            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final TransactionService transactionService) {
+            final SessionAccessor sessionAccessor) {
         super();
         this.threadPoolWorkService = threadPoolWorkService;
         this.executorService = executorService;
-        this.loggerService = loggerService;
-        this.sessionAccessor = sessionAccessor;
-        this.sessionService = sessionService;
-        this.transactionService = transactionService;
-        works = new HashSet<AbstractBonitaWork>();
+        works = new HashSet<BonitaWork>();
         try {
             tenantId = sessionAccessor.getTenantId();
         } catch (final TenantIdNotSetException e) {
@@ -67,7 +51,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         return tenantId;
     }
 
-    public void addWork(final AbstractBonitaWork work) {
+    public void addWork(final BonitaWork work) {
         works.add(work);
     }
 
@@ -79,11 +63,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
     @Override
     public void afterCompletion(final TransactionState transactionStatus) {
         if (TransactionState.COMMITTED == transactionStatus) {
-            for (final AbstractBonitaWork work : works) {
-                work.setTechnicalLogger(loggerService);
-                work.setSessionAccessor(sessionAccessor);
-                work.setSessionService(sessionService);
-                work.setTransactionService(transactionService);
+            for (final BonitaWork work : works) {
                 work.setTenantId(tenantId);
             }
             if (!threadPoolWorkService.isStopped(tenantId)) {
@@ -93,7 +73,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         executed = true;
     }
 
-    protected abstract void executeRunnables(Collection<AbstractBonitaWork> works);
+    protected abstract void executeRunnables(Collection<BonitaWork> works);
 
     public boolean isExecuted() {
         return executed;

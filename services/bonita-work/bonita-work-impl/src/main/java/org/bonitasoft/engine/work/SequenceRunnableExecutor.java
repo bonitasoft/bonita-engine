@@ -22,24 +22,24 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  * @author Charles Souillard
  * @author Baptiste Mesta
  */
-public class SequenceRunnableExecutor extends NotifyingRunnable {
+public class SequenceRunnableExecutor extends BonitaRunnable {
 
-    private final Collection<AbstractBonitaWork> works;
+    private final Collection<BonitaWork> works;
 
     private boolean cancelled = false;
 
     private final TechnicalLoggerService loggerService;
 
-    public SequenceRunnableExecutor(final Collection<AbstractBonitaWork> works, final RunnableListener runnableListener, final long tenantId,
+    public SequenceRunnableExecutor(final Collection<BonitaWork> works, final long tenantId,
             final TechnicalLoggerService loggerService) {
-        super(runnableListener, tenantId);
+        super(tenantId);
         this.works = works;
         this.loggerService = loggerService;
     }
 
     @Override
     public void innerRun() {
-        for (final AbstractBonitaWork work : works) {
+        for (final BonitaWork work : works) {
             if (!cancelled) {
                 try {
                     work.run();

@@ -83,47 +83,6 @@ public class BPMLocalTest extends CommonAPILocalTest {
         identityAPI.getGroup(12);
     }
 
-    @Test
-    public void checkTransitionAreArchived() throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransitionService transitionInstanceService = tenantAccessor.getTransitionInstanceService();
-        final TransactionService transactionService = tenantAccessor.getTransactionService();
-        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
-        processDef.addStartEvent("start");
-        processDef.addUserTask("step1", "delivery");
-        processDef.addEndEvent("end");
-        processDef.addTransition("start", "step1");
-        processDef.addTransition("step1", "end");
-        processDef.addActor("delivery");
-        final ProcessDefinition definition = deployAndEnableWithActor(processDef.done(), "delivery", john);
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final TransactionContentWithResult<Long> getNumberOfTr = new TransactionContentWithResult<Long>() {
-
-            private long numberOfTransitionInstances;
-
-            @Override
-            public void execute() throws SBonitaException {
-                numberOfTransitionInstances = transitionInstanceService.getNumberOfTransitionInstances(QueryOptions.defaultQueryOptions());
-            }
-
-            @Override
-            public Long getResult() {
-                return numberOfTransitionInstances;
-            }
-        };
-        executeInTransaction(transactionService, getNumberOfTr);
-        assertEquals(0, (long) getNumberOfTr.getResult());
-        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        executeInTransaction(transactionService, getNumberOfTr);
-        assertEquals(0, (long) getNumberOfTr.getResult());// transition instance should be archived
-        assignAndExecuteStep(waitForUserTask, john.getId());
-        waitForProcessToFinish(processInstance);
-        assertEquals(0, (long) getNumberOfTr.getResult());// transition instance should be archived
-        disableAndDeleteProcess(definition);
-    }
-
     @Cover(classes = { TransitionService.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Transition", "Activity" }, jira = "ENGINE-528")
     @Test
     public void checkTransitionWhenNextFlowNodeIsActivity() throws Exception {
@@ -143,29 +102,12 @@ public class BPMLocalTest extends CommonAPILocalTest {
         // Execute process
         final ProcessDefinition definition = deployAndEnableWithActor(processDef.done(), "delivery", john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final TransactionContentWithResult<Long> getNumberOfTr = new TransactionContentWithResult<Long>() {
-
-            private long numberOfTransitionInstances;
-
-            @Override
-            public void execute() throws SBonitaException {
-                numberOfTransitionInstances = transitionInstanceService.getNumberOfTransitionInstances(QueryOptions.defaultQueryOptions());
-            }
-
-            @Override
-            public Long getResult() {
-                return numberOfTransitionInstances;
-            }
-        };
-        executeInTransaction(transactionService, getNumberOfTr);
-        assertEquals(0, (long) getNumberOfTr.getResult());
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
         // Execute step1
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
         assignAndExecuteStep(waitForUserTask, john.getId());
         waitForProcessToFinish(processInstance);
-        assertEquals(0, (long) getNumberOfTr.getResult());// transition instance should be archived
 
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         // Check
@@ -177,7 +119,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
             public void execute() throws SBonitaException {
                 final OrderByOption orderByOption = new OrderByOption(SATransitionInstance.class, "id", OrderByType.ASC);
                 final QueryOptions searchOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption));
-                searchArchivedTransitions = transitionInstanceService.searchArchived(searchOptions);
+                searchArchivedTransitions = transitionInstanceService.searchArchivedTransitionInstances(searchOptions);
             }
 
             @Override

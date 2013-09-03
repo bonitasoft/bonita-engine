@@ -60,5 +60,4 @@ public interface ProcessExecutor extends ContainerExecutor {
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
             throws SBonitaException;
-
 }

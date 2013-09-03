@@ -16,4 +16,6 @@ public interface SessionProvider {
 
     public abstract void addSession(final SSession session) throws SSessionAlreadyExistsException, SSessionAlreadyExistsException;
 
+    public abstract void deleteSessionsOfTenant(long tenantId);
+
 }

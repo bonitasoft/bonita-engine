@@ -23,9 +23,10 @@ import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.JobTruster;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -97,7 +98,7 @@ public class JobWrapper implements StatelessJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException, FireEventException {
+    public void execute() throws SJobExecutionException, FireEventException {
         SSession session = null;
         try {
             session = createSession();// FIXME get the technical user of the tenant
@@ -119,7 +120,7 @@ public class JobWrapper implements StatelessJob {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
             }
-            throw new JobExecutionException(e);
+            throw new SJobExecutionException(e);
         } finally {
             if (eventService.hasHandlers(JOB_COMPLETED, null)) {
                 jobCompleted.setObject(this);
@@ -143,6 +144,10 @@ public class JobWrapper implements StatelessJob {
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         statelessJob.setAttributes(attributes);
+    }
+
+    public StatelessJob getStatelessJob() {
+        return statelessJob;
     }
 
 }

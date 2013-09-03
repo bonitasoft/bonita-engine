@@ -1,7 +1,5 @@
 DELETE FROM connector_instance WHERE tenantid = ${tenantid}
 GO
-DELETE FROM transition_instance WHERE tenantid = ${tenantid}
-GO
 DELETE FROM hidden_activity WHERE tenantid = ${tenantid}
 GO
 DELETE FROM message_instance WHERE tenantid = ${tenantid}
@@ -17,4 +15,6 @@ GO
 DELETE FROM flownode_instance WHERE tenantid = ${tenantid}
 GO
 DELETE FROM token WHERE tenantid = ${tenantid}
+GO
+DELETE FROM breakpoint WHERE tenantid = ${tenantid}
 GO

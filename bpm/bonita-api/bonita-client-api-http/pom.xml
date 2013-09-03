@@ -15,11 +15,10 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-client-api</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>

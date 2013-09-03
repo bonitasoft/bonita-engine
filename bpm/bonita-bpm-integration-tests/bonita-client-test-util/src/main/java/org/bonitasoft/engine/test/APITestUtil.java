@@ -261,7 +261,7 @@ public class APITestUtil {
         return null;
     }
 
-    protected User createUser(final String userName, final String password) throws AlreadyExistsException, CreationException {
+    protected User createUser(final String userName, final String password) throws BonitaException {
         return getIdentityAPI().createUser(userName, password);
     }
 
@@ -284,7 +284,7 @@ public class APITestUtil {
     }
 
     protected User createUserAndLogin(final String userName, final String password) throws BonitaException {
-        final User user = getIdentityAPI().createUser(userName, password);
+        final User user = createUser(userName, password);
         logout();
         loginWith(userName, password);
         return user;
@@ -562,11 +562,13 @@ public class APITestUtil {
     }
 
     protected void disableAndDeleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
-        final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        if (deploymentInfo.getActivationState().equals(ActivationState.ENABLED)) {
-            disableAndDeleteProcess(processDefinition.getId());
-        } else {
-            deleteProcess(processDefinition);
+        if (processDefinition != null) {
+            final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+            if (deploymentInfo.getActivationState().equals(ActivationState.ENABLED)) {
+                disableAndDeleteProcess(processDefinition.getId());
+            } else {
+                deleteProcess(processDefinition);
+            }
         }
     }
 
@@ -896,13 +898,26 @@ public class APITestUtil {
         return waitForEvent(processInstance, eventName, TestStates.getWaitingState());
     }
 
+    public WaitForEvent waitForEventInWaitingState(final long processInstanceId, final String eventName) throws Exception {
+        return waitForEvent(processInstanceId, eventName, TestStates.getWaitingState());
+    }
+
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
-        return waitForEvent(100, 5000, processInstance, eventName, state);
+        return waitForEvent(50, 5000, processInstance, eventName, state);
+    }
+
+    public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final String state) throws Exception {
+        return waitForEvent(100, 5000, processInstanceId, eventName, state);
     }
 
     public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String eventName, final String state)
             throws Exception {
-        final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstance.getId(), state, getProcessAPI());
+        return waitForEvent(100, 5000, processInstance.getId(), eventName, state);
+    }
+
+    public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final long processInstanceId, final String eventName, final String state)
+            throws Exception {
+        final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstanceId, state, getProcessAPI());
         assertTrue("Expected 1 activities in " + state + " state", waitForEvent.waitUntil());
         return waitForEvent;
     }
@@ -1331,7 +1346,7 @@ public class APITestUtil {
         if (searchResult.getCount() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("FlowNodes are still present: ");
             for (final FlowNodeInstance flowNodeInstance : flowNodeInstances) {
-                messageBuilder.append(flowNodeInstance.getName()).append(", ");
+                messageBuilder.append("{" + flowNodeInstance.getName() + " - ").append(flowNodeInstance.getType() + "}").append(", ");
             }
             messages.add(messageBuilder.toString());
         }

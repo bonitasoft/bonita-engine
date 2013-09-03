@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.events.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,15 +46,7 @@ public class EventServiceImpl implements EventService {
 
     private final SEventBuilders eventBuilders;
 
-    private final TechnicalLoggerService logger;
-
-    /**
-     * @return the registeredHandlers
-     */
-    @Override
-    public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
-        return registeredHandlers;
-    }
+    protected final TechnicalLoggerService logger;
 
     public EventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) {
         super();
@@ -73,9 +67,9 @@ public class EventServiceImpl implements EventService {
         }
         if (event != null) {
             // if at least 1 eventFilter contains a group of handlers for the given event type
-            if (registeredHandlers.containsKey(event.getType())) {
+            if (containsHandlerFor(event.getType())) {
                 // retrieve the handler list concerned by the given event
-                final Set<SHandler<SEvent>> handlers = registeredHandlers.get(event.getType());
+                final Collection<SHandler<SEvent>> handlers = getHandlersFor(event.getType());
 
                 if (handlers.size() > 0) {
                     FireEventException fireEventException = null;
@@ -123,25 +117,14 @@ public class EventServiceImpl implements EventService {
         }
         // the add method returns false if the given element already exists in the Set, and does nothing.
         if (handler != null && eventType != null) {
-            // check if the given event type is already registered in the Event Service
-            if (registeredHandlers.containsKey(eventType)) {
-                // if the handler already exists for the same eventType, an Exception is thrown
-                final Set<SHandler<SEvent>> handlers = registeredHandlers.get(eventType);
-                if (!handlers.add(handler)) {
-                    throw new HandlerRegistrationException("This handler is already registered for this event type");
-                }
-            } else {
-                // if the given type doesn't already exist in the eventFilters list, we create it
-                final Set<SHandler<SEvent>> newHandlerSet = new HashSet<SHandler<SEvent>>();
-                newHandlerSet.add(handler);
-                registeredHandlers.put(eventType, newHandlerSet);
-            }
+            addHandlerFor(eventType, handler);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addHandler"));
             }
         } else {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "addHandler", "Event type is null"));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "addHandler", "Event type and/or handler is null"));
             }
             throw new HandlerRegistrationException();
         }
@@ -155,15 +138,11 @@ public class EventServiceImpl implements EventService {
         if (handler == null) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogOnExceptionMethod(this.getClass(), "removeAllHandlers", "Unable remove a null event"));
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "removeAllHandlers", "Unable to remove a null event"));
             }
             throw new HandlerUnregistrationException();
         } else {
-            for (final Set<SHandler<SEvent>> handlers : registeredHandlers.values()) {
-                if (handlers.contains(handler)) {
-                    handlers.remove(handler);
-                }
-            }
+            removeHandlerInAllType(handler);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllHandlers"));
@@ -179,7 +158,7 @@ public class EventServiceImpl implements EventService {
             throw new HandlerUnregistrationException();
         }
         // check if the handler has already been registered, then remove it
-        final Set<SHandler<SEvent>> handlers = registeredHandlers.get(eventType);
+        final Collection<SHandler<SEvent>> handlers = getHandlersFor(eventType);
         if (handlers != null && handlers.contains(h)) {
             handlers.remove(h);
         } else {
@@ -195,11 +174,17 @@ public class EventServiceImpl implements EventService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getHandlers"));
         }
-        final Set<SHandler<SEvent>> setSHandler = registeredHandlers.get(eventType);
+        final Collection<SHandler<SEvent>> handlers = getHandlersFor(eventType);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getHandlers"));
         }
-        return setSHandler;
+        if (handlers == null) {
+            return Collections.emptySet();
+        }
+        HashSet<SHandler<SEvent>> hashSet = new HashSet<SHandler<SEvent>>(handlers.size());
+        hashSet.addAll(handlers);
+        return hashSet;
+
     }
 
     @Override
@@ -232,7 +217,45 @@ public class EventServiceImpl implements EventService {
                     return false;
             }
         }
+        return containsHandlerFor(key);
+    }
+
+    protected boolean containsHandlerFor(final String key) {
         return registeredHandlers.containsKey(key);
     }
 
+    protected Collection<SHandler<SEvent>> getHandlersFor(final String eventType) {
+        return registeredHandlers.get(eventType);
+    }
+
+    @Override
+    public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
+        return registeredHandlers;
+    }
+
+    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "NON-cluster implementation of addHandlerFor() method for eventType=" + eventType
+                + ", handler=" + handler.getClass().getSimpleName());
+        // check if the given event type is already registered in the Event Service
+        if (containsHandlerFor(eventType)) {
+            // if the handler already exists for the same eventType, an Exception is thrown
+            final Set<SHandler<SEvent>> handlers = registeredHandlers.get(eventType);
+            if (!handlers.add(handler)) {
+                throw new HandlerRegistrationException("This handler is already registered for this event type");
+            }
+        } else {
+            // if the given type doesn't already exist in the eventFilters list, we create it
+            final Set<SHandler<SEvent>> newHandlerSet = new HashSet<SHandler<SEvent>>();
+            newHandlerSet.add(handler);
+            registeredHandlers.put(eventType, newHandlerSet);
+        }
+    }
+
+    protected void removeHandlerInAllType(final SHandler<SEvent> handler) {
+        for (final Set<SHandler<SEvent>> handlers : registeredHandlers.values()) {
+            if (handlers.contains(handler)) {
+                handlers.remove(handler);
+            }
+        }
+    }
 }

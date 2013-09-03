@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedAutomaticTaskInstance;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescript
 import org.bonitasoft.engine.bpm.flownode.ArchivedMultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinitionImpl;
@@ -410,6 +412,28 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskSequentially(15, processInstance, true);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void abortAMultiInstanceSequential() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addStartEvent("Start").addEndEvent("End").addTerminateEventTrigger();
+        builder.addUserTask("Step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(20))
+                .addCompletionCondition(new ExpressionBuilder().createConstantBooleanExpression(false));
+        builder.addGateway("Gateway", GatewayType.PARALLEL).addUserTask("Step2", ACTOR_NAME);
+        builder.addTransition("Start", "Gateway").addTransition("Gateway", "Step1").addTransition("Step1", "End").addTransition("Gateway", "Step2")
+                .addTransition("Step2", "End");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance step1 = waitForUserTask("Step1");
+        waitForUserTaskAndExecuteIt("Step2", processInstance, john.getId());
+        waitForProcessToFinish(processInstance);
+        final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
+        assertEquals(ActivityStates.ABORTED_STATE, archivedStep1.getState());
+
         disableAndDeleteProcess(processDefinition);
     }
 

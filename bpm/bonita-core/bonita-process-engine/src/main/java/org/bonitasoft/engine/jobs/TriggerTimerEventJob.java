@@ -19,8 +19,8 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -63,7 +63,7 @@ public class TriggerTimerEventJob extends InternalJob {
     }
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() throws SJobExecutionException {
         try {
             if (subProcessId == null) {
                 eventsHandler.triggerCatchEvent(eventType, processDefinitionId, targetSFlowNodeDefinitionId, flowNodeInstanceId, containerType);
@@ -72,7 +72,7 @@ public class TriggerTimerEventJob extends InternalJob {
                         parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
             }
         } catch (final SBonitaException e) {
-            throw new JobExecutionException(e);
+            throw new SJobExecutionException(e);
         }
     }
 

@@ -21,6 +21,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Elias Ricken de Medeiros

@@ -15,9 +15,9 @@ package org.bonitasoft.engine.continuation;
 
 import java.util.List;
 
-import org.bonitasoft.engine.work.NonTxBonitaWork;
+import org.bonitasoft.engine.work.BonitaWork;
 
-public class ListAdder extends NonTxBonitaWork {
+public class ListAdder implements BonitaWork {
 
     private static final long serialVersionUID = -2980862072974732348L;
 
@@ -34,7 +34,7 @@ public class ListAdder extends NonTxBonitaWork {
     }
 
     @Override
-    protected void work() throws Exception {
+    public void run() {
         try {
             Thread.sleep(delay);
         } catch (final InterruptedException e) {
@@ -44,7 +44,12 @@ public class ListAdder extends NonTxBonitaWork {
     }
 
     @Override
-    protected String getDescription() {
+    public String getDescription() {
         return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString() + " after (ms) " + delay;
+    }
+
+    @Override
+    public void setTenantId(long tenantId) {
+
     }
 }

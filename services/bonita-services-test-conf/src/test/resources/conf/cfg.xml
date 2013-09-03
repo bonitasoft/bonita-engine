@@ -29,8 +29,11 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
-		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}" />
+	<bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.classloader.DefaultParentClassLoaderResolver"/>
+    
+    <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
+        <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
+        <constructor-arg name="temporaryFolder" value="${java.io.tmpdir}" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 

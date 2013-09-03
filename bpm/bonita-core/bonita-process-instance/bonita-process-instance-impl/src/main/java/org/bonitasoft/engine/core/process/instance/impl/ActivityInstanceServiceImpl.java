@@ -42,7 +42,6 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
@@ -69,9 +68,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
@@ -114,15 +111,12 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     private final SMultiInstanceActivityInstanceBuilder sMultiInstanceActivityInstanceBuilder;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     private final ArchiveService archiveService;
 
     public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final ArchiveService archiveService,
             final EventService eventService, final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService,
             final TechnicalLoggerService logger) {
         super(recorder, persistenceRead, eventService, instanceBuilders, queriableLoggerService, logger);
-        this.queriableLoggerService = queriableLoggerService;
         this.archiveService = archiveService;
         sUserTaskInstanceBuilder = instanceBuilders.getSUserTaskInstanceBuilder();
         sMultiInstanceActivityInstanceBuilder = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
@@ -130,7 +124,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @Override
     public void createActivityInstance(final SActivityInstance activityInstance) throws SActivityCreationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new activity instance", activityInstance);
         try {
             final InsertRecord insertRecord = new InsertRecord(activityInstance);
             SInsertEvent insertEvent = null;
@@ -139,9 +132,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
                 insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(ACTIVITYINSTANCE).setObject(activityInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createActivityInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createActivityInstance");
             throw new SActivityCreationException(e);
         }
         getLogger().log(this.getClass(), TechnicalLogSeverity.INFO, "Created " + activityInstance.getType().getValue() + " <" + activityInstance.getName() +
@@ -183,7 +174,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @Override
     public void addPendingActivityMappings(final SPendingActivityMapping mapping) throws SActivityCreationException {
-        final SPendingActivityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new pending activity mapping", mapping);
         final InsertRecord insertRecord = new InsertRecord(mapping);
         final EventService eventService = getEventService();
         SInsertEvent insertEvent = null;
@@ -193,11 +183,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         }
         try {
             getRecorder().recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(mapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "addPendingActivityMappings");
-
         } catch (final SRecorderException e) {
-            initiateLogBuilder(mapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addPendingActivityMappings");
-
             throw new SActivityCreationException(e);
         }
     }
@@ -210,16 +196,13 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         try {
             while ((mappings = getPendingMappings(humanTaskInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
                 for (final SPendingActivityMapping mapping : mappings) {
-                    final SPendingActivityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new pending activity mapping", mapping);
                     SDeleteEvent deleteEvent = null;
                     if (createEvents) {
                         deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
                     }
                     try {
                         getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
-                        initiateLogBuilder(humanTaskInstanceId, SQueriableLog.STATUS_OK, logBuilder, "deletePendingMappings");
                     } catch (final SRecorderException e) {
-                        initiateLogBuilder(humanTaskInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "deletePendingMappings");
                         throw new SActivityModificationException(e);
                     }
                 }
@@ -420,7 +403,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             SActivityModificationException {
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance(userTaskId);
         if (flowNodeInstance instanceof SHumanTaskInstance) {
-            final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance state", flowNodeInstance);
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
             descriptor.addField(sUserTaskInstanceBuilder.getAssigneeIdKey(), userId);
             if (userId > 0) {
@@ -440,10 +422,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             }
             try {
                 getRecorder().recordUpdate(updateRecord, updateEvent);
-                initiateLogBuilder(userTaskId, SQueriableLog.STATUS_OK, logBuilder, "assignHumanTask");
-
             } catch (final SRecorderException e) {
-                initiateLogBuilder(userTaskId, SQueriableLog.STATUS_FAIL, logBuilder, "assignHumanTask");
                 throw new SActivityModificationException(e);
             }
         } else {
@@ -667,7 +646,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     // FIXME synchronized on the object
     @Override
     public void incrementLoopCounter(final SLoopActivityInstance loopInstance) throws SActivityModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating loop instance", loopInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("loopCounter", loopInstance.getLoopCounter() + 1);
 
@@ -678,10 +656,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         }
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(loopInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "assignHumanTask");
-
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(loopInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "assignHumanTask");
             throw new SActivityModificationException(sre);
         }
     }
@@ -836,7 +811,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @Override
     public void setTokenCount(final SActivityInstance activityInstance, final int tokenCount) throws SFlowNodeModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating flow node instance token count", activityInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sUserTaskInstanceBuilder.getTokenCountKey(), tokenCount);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
@@ -848,11 +822,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         }
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setTokenCount");
-
         } catch (final SRecorderException e) {
-            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setTokenCount");
-
             throw new SFlowNodeModificationException(e);
         }
 
@@ -879,8 +849,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
         final SHiddenTaskInstanceBuilder hiddenTaskBuilder = instanceBuilders.getSHiddenTaskInstanceBuilder();
         final SHiddenTaskInstance hiddenTask = hiddenTaskBuilder.createNewInstance(activityInstanceId, userId).done();
-        final SHiddenTaskInstanceLogBuilder logBuilder = getHiddenTaskQueriableLog(ActionType.CREATED, "Creating a new Hidden task <-> User association",
-                hiddenTask);
         final InsertRecord insertRecord = new InsertRecord(hiddenTask);
         final EventService eventService = getEventService();
         SInsertEvent insertEvent = null;
@@ -892,11 +860,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         try {
 
             getRecorder().recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_OK, logBuilder, "hideTask");
-
         } catch (final SRecorderException e) {
-            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "hideTask");
-
             throw new STaskVisibilityException(activityInstanceId, userId, "Creation");
         }
     }
@@ -911,8 +875,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     @Override
     public void unhideTask(final long userId, final long activityInstanceId) throws STaskVisibilityException {
         final SHiddenTaskInstance hiddenTask = getHiddenTask(userId, activityInstanceId);
-        final SHiddenTaskInstanceLogBuilder logBuilder = getHiddenTaskQueriableLog(ActionType.DELETED, "Deleting a Hidden task <-> User association ",
-                hiddenTask);
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(hiddenTask);
             SDeleteEvent deleteEvent = null;
@@ -921,10 +883,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
                 deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(HIDDEN_TASK).setObject(hiddenTask).done();
             }
             getRecorder().recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_OK, logBuilder, "unhideTask");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(activityInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "unhideTask");
-
             throw new STaskVisibilityException(hiddenTask.getActivityId(), hiddenTask.getUserId(), "deletion", e);
         }
     }
@@ -1062,16 +1021,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         return selectOne == 1l;
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
-    }
-
     @Override
     public void deleteArchivedPendingMappings(final long flowNodeInstanceId) throws SActivityModificationException {
         // TODO archived pending mapping... first we need to have archived pending mapping and so on
@@ -1098,7 +1047,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @Override
     public void setAbortedByBoundaryEvent(final SActivityInstance activityInstance, final long boundaryEventId) throws SActivityModificationException {
-        final SFlowNodeInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "update aborted by boundary", activityInstance);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
 
@@ -1107,10 +1055,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
                 .done();
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setAbortedByBoundaryEvent");
-
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(activityInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setAbortedByBoundaryEvent");
             throw new SActivityModificationException(sre);
         }
 

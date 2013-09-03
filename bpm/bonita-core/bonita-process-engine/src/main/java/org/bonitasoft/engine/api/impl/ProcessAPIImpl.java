@@ -237,7 +237,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
-import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -341,6 +340,7 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -564,37 +564,38 @@ public class ProcessAPIImpl implements ProcessAPI {
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         final List<Long> lockedProcesses = new ArrayList<Long>();
+        List<BonitaLock> locks = null;
         try {
-            createLocks(lockService, objectType, lockedProcesses, processInstanceIds);
+            locks = createLocks(lockService, objectType, lockedProcesses, processInstanceIds);
             deleteProcessInstancesInTransaction(tenantAccessor, ignoreProcessInstanceNotFound, processInstanceIds);
         } finally {
-            final List<Long> unReleasedLocks = releaseLocks(tenantAccessor, lockService, objectType, lockedProcesses);
-            if (!unReleasedLocks.isEmpty()) {
-                throw new SLoginException("Some locks were not released. Object type: " + objectType + ", ids: " + unReleasedLocks);
-            }
+            releaseLocks(tenantAccessor, lockService, locks);
         }
     }
 
-    private List<Long> releaseLocks(final TenantServiceAccessor tenantAccessor, final LockService lockService, final String objectType,
-            final List<Long> lockedProcesses) {
-        final List<Long> unReleasedLocks = new ArrayList<Long>(1);
-        for (final Long lockedProcessId : lockedProcesses) {
+    private void releaseLocks(final TenantServiceAccessor tenantAccessor, final LockService lockService, final List<BonitaLock> locks) {
+        if (locks == null) {
+            return;
+        }
+        for (final BonitaLock lock : locks) {
             try {
-                lockService.unlock(lockedProcessId, objectType);
+                lockService.unlock(lock);
             } catch (final SLockException e) {
-                unReleasedLocks.add(lockedProcessId);
                 log(tenantAccessor, e);
             }
         }
-        return unReleasedLocks;
     }
 
-    private void createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses, final List<Long> processInstanceIds)
+    private ArrayList<BonitaLock> createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses,
+            final List<Long> processInstanceIds)
             throws SLockException {
+        ArrayList<BonitaLock> locks = new ArrayList<BonitaLock>(processInstanceIds.size());
         for (final Long processInstanceId : processInstanceIds) {
-            lockService.lock(processInstanceId, objectType);
+            BonitaLock lock = lockService.lock(processInstanceId, objectType);
+            locks.add(lock);
             lockedProcesses.add(processInstanceId);
         }
+        return locks;
     }
 
     private void deleteProcessInstancesInTransaction(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
@@ -880,6 +881,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        LockService lockService = tenantAccessor.getLockService();
         TransactionContent transactionContent = new TransactionContent() {
 
             @Override
@@ -899,7 +901,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         };
 
         try {
-            executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
+            GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
+            executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
+            BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name());
+            try {
+                executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
+            } finally {
+                lockService.unlock(lock);
+            }
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
@@ -3460,9 +3469,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
             final LockService lockService = tenantAccessor.getLockService();
             final String objectType = SFlowElementsContainerType.PROCESS.name();
-            final List<Long> lockedProcesses = new ArrayList<Long>();
+            List<BonitaLock> locks = null;
             try {
-                lockedProcesses.addAll(createLockProcessInstances(lockService, objectType, sProcessInstances));
+                locks = createLockProcessInstances(lockService, objectType, sProcessInstances);
                 txService.begin();
                 try {
                     return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
@@ -3473,11 +3482,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     txService.complete();
                 }
             } finally {
-                final List<Long> unReleasedLocks = releaseLocks(tenantAccessor, lockService, objectType, lockedProcesses);
-                if (!unReleasedLocks.isEmpty()) {
-                    throw new DeletionException("Some locks were not released. Object type: " + objectType + ", ids: " + unReleasedLocks);
-                }
-
+                releaseLocks(tenantAccessor, lockService, locks);
             }
 
         } catch (final SBonitaException e) {
@@ -3531,14 +3536,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         return processInstanceService.searchArchivedProcessInstances(queryOptions);
     }
 
-    private List<Long> createLockProcessInstances(final LockService lockService, final String objectType, final List<SProcessInstance> sProcessInstances)
+    private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType, final List<SProcessInstance> sProcessInstances)
             throws SLockException {
-        final List<Long> lockedObjects = new ArrayList<Long>();
+        final List<BonitaLock> locks = new ArrayList<BonitaLock>();
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
             lockService.lock(sProcessInstance.getId(), objectType);
-            lockedObjects.add(sProcessInstance.getId());
         }
-        return lockedObjects;
+        return locks;
     }
 
     @Override
@@ -3548,9 +3552,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         try {
-            lockService.lock(processInstanceId, objectType);
+            BonitaLock lock = lockService.lock(processInstanceId, objectType);
             deleteProcessInstanceInTransaction(tenantAccessor, processInstanceId);
-            lockService.unlock(processInstanceId, objectType);
+            lockService.unlock(lock);
         } catch (final SLockException e) {
             throw new DeletionException("Lock was not released. Object type: " + objectType + ", id: " + processInstanceId);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {

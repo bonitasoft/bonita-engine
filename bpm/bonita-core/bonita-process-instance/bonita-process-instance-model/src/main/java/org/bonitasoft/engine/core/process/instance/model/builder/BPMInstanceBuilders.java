@@ -111,8 +111,6 @@ public interface BPMInstanceBuilders {
 
     STransitionInstanceLogBuilder getSTransitionInstanceLogBuilder();
 
-    STransitionInstanceBuilder getSTransitionInstanceBuilder();
-
     SConnectorInstanceBuilder getSConnectorInstanceBuilder();
 
     SStartEventInstanceBuilder getSStartEventInstanceBuilder();

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.session.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -29,14 +30,7 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public final class SessionProviderImpl implements SessionProvider {
 
-    private static Map<Long, SSession> sessions;
-    static {
-        sessions = new HashMap<Long, SSession>();
-
-    }
-
-    public SessionProviderImpl() {
-    }
+    private static Map<Long, SSession> sessions = new HashMap<Long, SSession>();
 
     @Override
     public synchronized void addSession(final SSession session) throws SSessionAlreadyExistsException {
@@ -48,7 +42,7 @@ public final class SessionProviderImpl implements SessionProvider {
     }
 
     @Override
-    public void removeSession(final long sessionId) throws SSessionNotFoundException {
+    public synchronized void removeSession(final long sessionId) throws SSessionNotFoundException {
         final SSession session = sessions.remove(sessionId);
         if (session == null) {
             throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
@@ -56,7 +50,7 @@ public final class SessionProviderImpl implements SessionProvider {
     }
 
     @Override
-    public SSession getSession(final long sessionId) throws SSessionNotFoundException {
+    public synchronized SSession getSession(final long sessionId) throws SSessionNotFoundException {
         final SSession session = sessions.get(sessionId);
         if (session == null) {
             throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
@@ -69,7 +63,7 @@ public final class SessionProviderImpl implements SessionProvider {
      * @see org.bonitasoft.engine.session.impl.SessionProvider#updateSession(org.bonitasoft.engine.session.model.SSession)
      */
     @Override
-    public void updateSession(final SSession session) throws SSessionNotFoundException {
+    public synchronized void updateSession(final SSession session) throws SSessionNotFoundException {
         final long id = session.getId();
         if (!sessions.containsKey(id)) {
             throw new SSessionNotFoundException("No session found with id \"" + id + "\"");
@@ -101,6 +95,17 @@ public final class SessionProviderImpl implements SessionProvider {
     @Override
     public synchronized void removeSessions() {
         sessions.clear();
+    }
+
+    @Override
+    public synchronized void deleteSessionsOfTenant(long tenantId) {
+        Iterator<SSession> iterator = sessions.values().iterator();
+        while (iterator.hasNext()) {
+            SSession sSession = iterator.next();
+            if (tenantId == sSession.getTenantId()) {
+                iterator.remove();
+            }
+        }
     }
 
 }

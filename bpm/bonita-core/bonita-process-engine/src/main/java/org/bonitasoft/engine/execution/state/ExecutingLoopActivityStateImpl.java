@@ -97,9 +97,14 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final SFlowNodeInstance childInstance)
             throws SActivityStateExecutionException {
         try {
+            final SLoopActivityInstance loopActivity = (SLoopActivityInstance) activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());// get it
+            if (loopActivity.getStateCategory() != SStateCategory.NORMAL) {
+                // if is not a normal state (aborting / canceling), return true to change state from executing to aborting / cancelling (ChildReadstate),
+                // without create a new child task
+                return true;
+            }
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SActivityDefinition activity = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-            final SLoopActivityInstance loopActivity = (SLoopActivityInstance) activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());// get it
             final SStandardLoopCharacteristics loopCharacteristics = (SStandardLoopCharacteristics) activity.getLoopCharacteristics();
             boolean loop = false;
             final int loopCounter = loopActivity.getLoopCounter();

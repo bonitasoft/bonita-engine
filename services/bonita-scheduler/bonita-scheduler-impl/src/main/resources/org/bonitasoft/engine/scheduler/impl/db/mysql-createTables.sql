@@ -16,6 +16,18 @@ CREATE TABLE job_param (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
+CREATE TABLE job_log (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  jobDescriptorId BIGINT NOT NULL,
+  retryNumber BIGINT,
+  lastUpdateDate BIGINT,
+  lastMessage TEXT,
+  PRIMARY KEY (tenantid, id, jobDescriptorId)
+) ENGINE = INNODB;
+
+CREATE INDEX fk_job_log_jobId_idx ON job_log(jobDescriptorId ASC, tenantid ASC);
 CREATE INDEX fk_job_param_jobId_idx ON job_param(jobDescriptorId ASC, tenantid ASC);
 CREATE INDEX fk_job_desc_Id_idx ON job_desc(id ASC, tenantid ASC);
 ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id);
+ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id);

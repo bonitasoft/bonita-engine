@@ -55,6 +55,8 @@ public class HttpAPIServletCall extends ServletCall {
 
     private static final String OPTIONS = "options";
 
+    private static final XStream xstream = new XStream();
+
     public HttpAPIServletCall(final HttpServletRequest request, final HttpServletResponse response) throws FileUploadException, IOException {
         super(request, response);
     }
@@ -78,7 +80,6 @@ public class HttpAPIServletCall extends ServletCall {
             final String options = this.getParameter(OPTIONS);
             final String parametersValues = this.getParameter(PARAMETERS_VALUES);
             final String parametersClasses = this.getParameter(CLASS_NAME_PARAMETERS);
-            final XStream xstream = new XStream();
 
             Map<String, Serializable> myOptions = new HashMap<String, Serializable>();
             if (options != null && !options.isEmpty()) {
@@ -151,7 +152,6 @@ public class HttpAPIServletCall extends ServletCall {
     }
 
     private String toResponse(final Exception exception) {
-        final XStream xstream = new XStream();
         Throwable result = null;
         if (exception instanceof ServerWrappedException) {
             result = exception.getCause();

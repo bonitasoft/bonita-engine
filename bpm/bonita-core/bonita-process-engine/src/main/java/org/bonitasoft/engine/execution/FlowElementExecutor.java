@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 
 /**
  * @author Baptiste Mesta
@@ -23,7 +22,5 @@ import org.bonitasoft.engine.core.process.instance.model.STransitionInstance;
 public interface FlowElementExecutor {
 
     void executeActivity(SProcessDefinition sDefinition, SFlowNodeInstance flowNodeInstance);
-
-    void executeTransition(SProcessDefinition sDefinition, STransitionInstance transitionInstance);
 
 }

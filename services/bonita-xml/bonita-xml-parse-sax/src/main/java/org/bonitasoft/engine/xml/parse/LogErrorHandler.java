@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,11 +16,11 @@ package org.bonitasoft.engine.xml.parse;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class LogErrorHandler implements ErrorHandler {
 
@@ -31,21 +31,21 @@ public class LogErrorHandler implements ErrorHandler {
     }
 
     @Override
-    public void error(final SAXParseException spe) throws SAXException {
+    public void error(final SAXParseException spe) {
         if (this.logger != null && this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
             this.logger.log(this.getClass(), TechnicalLogSeverity.ERROR, spe.getMessage(), spe);
         }
     }
 
     @Override
-    public void fatalError(final SAXParseException spe) throws SAXException {
+    public void fatalError(final SAXParseException spe) {
         if (this.logger != null && this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
             this.logger.log(this.getClass(), TechnicalLogSeverity.ERROR, spe.getMessage(), spe);
         }
     }
 
     @Override
-    public void warning(final SAXParseException spe) throws SAXException {
+    public void warning(final SAXParseException spe) {
         if (this.logger != null && this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
             this.logger.log(this.getClass(), TechnicalLogSeverity.WARNING, spe.getMessage(), spe);
         }

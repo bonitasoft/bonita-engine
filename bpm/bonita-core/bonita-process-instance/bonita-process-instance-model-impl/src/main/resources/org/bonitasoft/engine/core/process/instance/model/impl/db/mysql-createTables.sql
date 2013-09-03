@@ -91,26 +91,6 @@ CREATE TABLE flownode_instance (
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
 
-CREATE TABLE transition_instance (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  rootContainerId BIGINT NOT NULL,
-  parentContainerId BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  source BIGINT,
-  terminal BOOLEAN NOT NULL,
-  stable BOOLEAN ,
-  stateCategory VARCHAR(50) NOT NULL,
-  logicalGroup1 BIGINT NOT NULL,
-  logicalGroup2 BIGINT NOT NULL,
-  logicalGroup3 BIGINT,
-  logicalGroup4 BIGINT NOT NULL,
-  description VARCHAR(255),
-  deleted BOOLEAN DEFAULT FALSE,
-  token_ref_id BIGINT NULL,
-  PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
-
 CREATE TABLE connector_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -201,5 +181,17 @@ CREATE TABLE hidden_activity (
   	activityId BIGINT NOT NULL,
   	userId BIGINT NOT NULL,
   	UNIQUE (tenantid, activityId, userId),
+  	PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+
+CREATE TABLE breakpoint (
+	tenantid BIGINT NOT NULL,
+  	id BIGINT NOT NULL,
+  	state_id INT NOT NULL,
+  	int_state_id INT NOT NULL,
+  	elem_name VARCHAR(255) NOT NULL,
+  	inst_scope BOOLEAN NOT NULL,
+  	inst_id BIGINT NOT NULL,
+  	def_id BIGINT NOT NULL,
   	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;

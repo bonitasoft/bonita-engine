@@ -9,6 +9,9 @@ CREATE INDEX fk_actormember_user_Id_idx ON actormember(userId ASC, tenantid ASC)
 CREATE INDEX fk_actormember_roleId_idx ON actormember(roleId ASC, tenantid ASC);
 CREATE INDEX fk_actormember_group_Id_idx ON actormember(groupId ASC, tenantid ASC);
 CREATE INDEX fk_actormember_tenantId_idx ON actormember(tenantid ASC);
+CREATE INDEX fk_breakpoint_tenantId_idx ON breakpoint(tenantid ASC);
+CREATE INDEX fk_breakpoint_process_definitionId_idx ON breakpoint(def_id ASC, tenantid ASC);
+CREATE INDEX fk_breakpoint_process_instanceId_idx ON breakpoint(inst_id ASC, tenantid ASC);
 CREATE INDEX fk_data_instance_tenantId_idx ON data_instance(tenantid ASC);
 CREATE INDEX fk_data_mapping_data_instanceId_idx ON data_mapping(dataInstanceId ASC, tenantid ASC);
 CREATE INDEX fk_data_mapping_tenantId_idx ON data_mapping(tenantid ASC);
@@ -44,7 +47,6 @@ CREATE INDEX fk_process_instance_tenantId_idx ON process_instance(tenantid ASC);
 CREATE INDEX fk_process_instance_process_definitionId_idx ON process_instance(processDefinitionId ASC, tenantid ASC);
 CREATE INDEX fk_flownode_instance_actorId_idx ON flownode_instance(actorId ASC, tenantid ASC);
 CREATE INDEX fk_flownode_instance_tenantId_idx ON flownode_instance(tenantid ASC);
-CREATE INDEX fk_transition_instance_tenantId_idx ON transition_instance(tenantid ASC);
 CREATE INDEX fk_connector_instance_tenantId_idx ON connector_instance(tenantid ASC);
 CREATE INDEX fk_event_trigger_instance_tenantId_idx ON event_trigger_instance(tenantid ASC);
 CREATE INDEX fk_waiting_event_flownode_instanceId_idx ON waiting_event(flowNodeInstanceId ASC, tenantid ASC);
@@ -94,6 +96,7 @@ CREATE INDEX fk_arch_transition_instance_tenantId_idx ON arch_transition_instanc
 -- ------------------------------------------------ Foreign Keys -----------------------------------------------
 ALTER TABLE actor ADD CONSTRAINT fk_actor_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE actormember ADD CONSTRAINT fk_actormember_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
+ALTER TABLE breakpoint ADD CONSTRAINT fk_breakpoint_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 -- ALTER TABLE queriable_log ADD CONSTRAINT fk_queriable_log_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriablelog_p_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE category ADD CONSTRAINT fk_category_tenantId FOREIGN KEY (tenantid) REFERENCES tenant (id);
@@ -128,7 +131,6 @@ ALTER TABLE profile ADD CONSTRAINT fk_profile_tenantId FOREIGN KEY (tenantId) RE
 ALTER TABLE profileentry ADD CONSTRAINT fk_profileentry_tenantId FOREIGN KEY (tenantId) REFERENCES tenant(id);
 ALTER TABLE profilemember ADD CONSTRAINT fk_profilemember_tenantId FOREIGN KEY (tenantId) REFERENCES tenant(id);
 ALTER TABLE role ADD CONSTRAINT fk_role_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
-ALTER TABLE transition_instance ADD CONSTRAINT fk_transition_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE user_ ADD CONSTRAINT fk_user__tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE user_membership ADD CONSTRAINT fk_user_membership_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE waiting_event ADD CONSTRAINT fk_waiting_event_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);

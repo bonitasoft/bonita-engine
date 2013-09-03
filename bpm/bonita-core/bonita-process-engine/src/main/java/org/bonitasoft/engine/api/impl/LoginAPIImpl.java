@@ -48,8 +48,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Matthieu Chaffotte
  * @author Zhang Bole
  */
-public class LoginAPIImpl extends
-        AbstractLoginApiImpl implements LoginAPI {
+public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
@@ -58,7 +57,7 @@ public class LoginAPIImpl extends
 
         try {
             return login(userName, password, null);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             throw new LoginException(e);
         }
     }
@@ -97,11 +96,10 @@ public class LoginAPIImpl extends
         final IdentityModelBuilder identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
         final TransactionExecutor tenantTransactionExecutor = serviceAccessor.getTransactionExecutor();
 
-        final TransactionContentWithResult<SSession> txContent = new LoginAndRetrieveUser(loginService, identityService, identityModelBuilder, localTenantId,
-                userName, password);
+        final LoginAndRetrieveUser txContent = new LoginAndRetrieveUser(loginService, identityService, identityModelBuilder, localTenantId, userName, password);
         try {
             tenantTransactionExecutor.execute(txContent);
-        } catch (BonitaRuntimeException e) {
+        } catch (final BonitaRuntimeException e) {
             throw e.getCause();
         }
 
@@ -148,14 +146,17 @@ public class LoginAPIImpl extends
                 if (!session.isTechnicalUser()) {
                     sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
                     sessionAccessor.setSessionInfo(session.getId(), tenantId);
-                    SUser sUser = identityService.getUserByUserName(userName);
+                    final SUser sUser = identityService.getUserByUserName(userName);
+                    if (!sUser.isEnabled()) {
+                        throw new LoginException("Unable to login: the user is disable");
+                    }
                     final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
                     final long lastConnection = System.currentTimeMillis();
                     final EntityUpdateDescriptor updateDescriptor = userUpdateBuilder.updateLastConnection(lastConnection).done();
                     final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null, null);
                     updateUser.execute();
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new BonitaRuntimeException(e);
             } finally {
                 if (sessionAccessor != null) {
