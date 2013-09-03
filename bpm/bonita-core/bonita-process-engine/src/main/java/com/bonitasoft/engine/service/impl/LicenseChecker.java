@@ -8,16 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.platform.StopNodeException;
 
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
@@ -75,24 +71,11 @@ public class LicenseChecker {
     private void stopNode() {
         final PlatformAPIExt platformAPI = new PlatformAPIExt();
         try {
-            final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            if (platformAPI.isPlatformStarted(platformAccessor)) {
+            if (platformAPI.isNodeStarted()) {
                 platformAPI.stopNode("an invalid license");
             }
         } catch (final StopNodeException sne) {
             throw new IllegalStateException(sne);
-        } catch (final BonitaHomeNotSetException bhnse) {
-            throw new IllegalStateException(bhnse);
-        } catch (final BonitaHomeConfigurationException bhce) {
-            throw new IllegalStateException(bhce);
-        } catch (final InstantiationException ie) {
-            throw new IllegalStateException(ie);
-        } catch (final IllegalAccessException iae) {
-            throw new IllegalStateException(iae);
-        } catch (final ClassNotFoundException cnfe) {
-            throw new IllegalStateException(cnfe);
-        } catch (final IOException ioe) {
-            throw new IllegalStateException(ioe);
         }
     }
 
