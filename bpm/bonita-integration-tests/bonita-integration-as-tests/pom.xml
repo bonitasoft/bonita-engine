@@ -28,12 +28,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-synchro-server</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-integration-client-tests-sp</artifactId>
 			<version>${project.version}</version>
@@ -94,12 +88,6 @@
 									<groupId>mysql</groupId>
 									<artifactId>mysql-connector-java</artifactId>
 									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-
-								<artifactItem>
-									<groupId>org.bonitasoft.engine</groupId>
-									<artifactId>bonita-synchro-server</artifactId>
-									<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
