@@ -52,13 +52,13 @@ public class ReportingAPIIT extends CommonAPISPTest {
     @Test
     public void reportUsers() throws BonitaException {
         final String csvUsers = getReportingAPI().selectList("SELECT userName, enabled FROM user_");
-        assertTrue(("USERNAME,ENABLED" + lineSeparator + "matti,false" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("USERNAME,ENABLED" + lineSeparator + "matti,true" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
     public void reportUsersusingAlias() throws BonitaException {
         final String csvUsers = getReportingAPI().selectList("SELECT userName AS name, enabled FROM user_");
-        assertTrue(("NAME,ENABLED" + lineSeparator + "matti,false" + lineSeparator).equalsIgnoreCase(csvUsers));
+        assertTrue(("NAME,ENABLED" + lineSeparator + "matti,true" + lineSeparator).equalsIgnoreCase(csvUsers));
     }
 
     @Test
@@ -426,7 +426,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         try {
             getReportingAPI().getReportContent(report.getId());
             fail("Report content should have been deleted along with it.");
-        } catch (ReportNotFoundException e) {
+        } catch (final ReportNotFoundException e) {
             // ok.
         }
     }
@@ -456,7 +456,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         loginWith("myTenantAdmin", "theirPassword", tenantId);
         try {
             final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).done();
-            SearchResult<Report> searchReports = getReportingAPI().searchReports(searchOptions);
+            final SearchResult<Report> searchReports = getReportingAPI().searchReports(searchOptions);
             // 3 reports by default:
             assertEquals(3, searchReports.getCount());
         } finally {

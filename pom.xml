@@ -22,7 +22,7 @@
 		<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. Then JaCoCo will add up information 
 			in the same report, so that, it will give the cross-module code coverage. -->
 		<sonar.jacoco.reportPath>${jacoco.file}</sonar.jacoco.reportPath>
-        <hazelcast.version>2.6.1</hazelcast.version>
+        <hazelcast.version>3.0</hazelcast.version>
 	</properties>
 
 	<dependencyManagement>
@@ -39,7 +39,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
-				<artifactId>hazelcast-hibernate</artifactId>
+				<artifactId>hazelcast-hibernate3</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>

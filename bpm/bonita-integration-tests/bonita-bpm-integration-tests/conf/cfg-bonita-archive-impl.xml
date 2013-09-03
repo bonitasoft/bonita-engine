@@ -7,7 +7,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="true" />
         		<entry key="org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="true" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="true" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="true" />
@@ -19,6 +18,8 @@
         		<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="true" />
         		<entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="true" />
         		<entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="true" />
+        		<!-- archived version because there is no not archived one -->
+        		<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="true" />
 			</map>
 		</constructor-arg>
 	</bean>

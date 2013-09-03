@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -55,6 +56,11 @@
 			<artifactId>bonita-authentication-jaas</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.authentication</groupId>
+			<artifactId>bonita-authentication-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Cache -->
 		<dependency>
@@ -67,7 +73,6 @@
 			<artifactId>bonita-cache-api-clustered-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 
 		<!-- Category -->
 		<dependency>
@@ -254,6 +259,11 @@
 		<dependency>
 			<groupId>com.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.events</groupId>
+			<artifactId>bonita-events-api-clustered-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -563,6 +573,11 @@
 
 		<!-- Reporting -->
 		<dependency>
+			<groupId>org.bonitasoft.engine.core.reporting</groupId>
+			<artifactId>bonita-reporting-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.bonitasoft.engine.core.reporting</groupId>
 			<artifactId>bonita-reporting-impl</artifactId>
 			<version>${project.version}</version>
@@ -645,13 +660,35 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Synchro-repository -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-service-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-service-clustered</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-register</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Transaction -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.transaction</groupId>
 			<artifactId>bonita-transaction-impl-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 
 		<!-- Transient Data -->
 		<dependency>
@@ -685,6 +722,12 @@
 			<artifactId>bonita-work-parallel</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.work</groupId>
+			<artifactId>bonita-work-clustered</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
 		<!-- XML -->
 		<dependency>
@@ -727,11 +770,11 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common-sp</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 		<!-- add hazel cast here because hibernate cache use it by configuration -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-hibernate</artifactId>
+			<artifactId>hazelcast-hibernate3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
@@ -771,6 +814,7 @@
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
 									<include>com.bonitasoft.engine.authentication:bonita-authentication-jaas</include>
+									<include>com.bonitasoft.engine.authentication:bonita-authentication-impl</include>
 									<!-- Cache -->
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
@@ -842,8 +886,9 @@
 									<include>org.bonitasoft.engine.events:bonita-events-model</include>
 									<include>org.bonitasoft.engine.events:bonita-events-model-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
-									<include>com.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
+									<include>com.bonitasoft.engine.events:bonita-events-api-impl</include>
+									<include>com.bonitasoft.engine.events:bonita-events-api-clustered-impl</include>
 									<!-- Expression -->
 									<include>org.bonitasoft.engine.expression:bonita-expression-model</include>
 									<include>org.bonitasoft.engine.expression:bonita-expression-model-impl</include>
@@ -959,6 +1004,7 @@
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
 									<!-- Reporting -->
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
 									<!-- Security Manager -->
@@ -989,6 +1035,11 @@
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl</include>
+									<!-- Synchro-repository -->
+									<include>org.bonitasoft.engine.synchro:bonita-synchro-service</include>
+									<include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
+									<include>com.bonitasoft.engine.synchro:bonita-synchro-service-clustered</include>
+									<include>org.bonitasoft.engine.synchro:bonita-synchro-register</include>
 									<!-- Transaction -->
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
@@ -1005,6 +1056,7 @@
 									<include>org.bonitasoft.engine.work:bonita-work-api</include>
 									<include>com.bonitasoft.engine.work:bonita-work-parallel</include>
 									<include>org.bonitasoft.engine.work:bonita-work-impl</include>
+									<include>com.bonitasoft.engine.work:bonita-work-clustered</include>
 									<!-- XML -->
 									<include>org.bonitasoft.engine.xml:bonita-xml-parse-api</include>
 									<include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>
@@ -1045,6 +1097,7 @@
 						<configuration>
 							<includeDependencySources>true</includeDependencySources>
 							<dependencySourceIncludes>
+								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
 								<dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude>
 							</dependencySourceIncludes>
 						</configuration>

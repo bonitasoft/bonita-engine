@@ -2,10 +2,11 @@ package com.bonitasoft.services.monitoring;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.scheduler.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class OneShotTrigger implements Trigger {
 

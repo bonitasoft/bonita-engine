@@ -11,14 +11,12 @@
 				<entry key="automatic_task_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
 				<entry key="user_task_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
 				<entry key="manual_task_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" />
-				<entry key="transition_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 				<entry key="loop_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" />
 				<entry key="multi_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" />
 				<entry key="call_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" />
 				<entry key="sub_process_activity_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" />
 				<entry key="flownode_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
 				<entry key="gateway_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
-				<entry key="transition_instance" value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 				<entry key="start_event_instance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
 				<entry key="intermediate_catch_event_instance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
 				<entry key="boundary_event_instance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" />
@@ -78,7 +76,6 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="f" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance" value="t" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="c" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="e" />
@@ -1182,7 +1179,6 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.STransitionInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" />

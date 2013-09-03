@@ -15,13 +15,6 @@
 	</properties>
 
 	<dependencies>
-	  <!-- Synchro repo -->
-    <dependency>
-    <groupId>org.bonitasoft.engine</groupId>
-      <artifactId>bonita-synchro-server</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-server-sp</artifactId>
@@ -248,7 +241,7 @@
 		<profile>
 			<id>slow</id>
 			<properties>
-				<bonita.home.classifier>performance</bonita.home.classifier>
+				<bonita.home.classifier>performance-cluster</bonita.home.classifier>
 			</properties>
 			<build>
 				<plugins>

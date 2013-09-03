@@ -8,65 +8,64 @@
  *******************************************************************************/
 package com.bonitasoft.engine.lock.impl;
 
-import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.SLockException;
+import java.util.Collection;
+import java.util.concurrent.locks.Lock;
+
+import org.bonitasoft.engine.lock.RejectedLockHandler;
+import org.bonitasoft.engine.lock.impl.AbstractLockService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ILock;
+import com.hazelcast.core.MultiMap;
 
 /**
  * create and release locks using hazelcast
  * 
  * @author Baptiste Mesta
  */
-public class ClusteredLockService implements LockService {
+public class ClusteredLockService extends AbstractLockService {
 
-    private static final String SEPARATOR = "_";
+	private final HazelcastInstance hazelcastInstance;
+	private final MultiMap<String, RejectedLockHandler> rejectedLockHandlers;
 
-    private final HazelcastInstance hazelcastInstance;
+	public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor,
+			int lockTimeout) {
+		super(logger, sessionAccessor, lockTimeout);
+		this.hazelcastInstance = hazelcastInstance;
+		if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+			throw new IllegalStateException("The clustering is not an active feature.");
+		}
+		this.rejectedLockHandlers = this.hazelcastInstance.getMultiMap("rejectedLockHandlers");
+	}
 
-    public ClusteredLockService(final HazelcastInstance hazelcastInstance) {
-        this.hazelcastInstance = hazelcastInstance;
-        if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
-            throw new IllegalStateException("The clustering is not an active feature.");
-        }
-    }
+	@Override
+	protected Lock getLock(String key) {
+		return hazelcastInstance.getLock(key);
+	}
 
-    @Override
-    public void unlock(final long objectToLockId, final String objectType) throws SLockException {
-        try {
-            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
-            lock.unlock();
-        } catch (final Exception e) {
-            throw new SLockException(e);
-        }
+	@Override
+	protected void removeLockFromMapIfnotUsed(String key) {
+	}
 
-    }
+	@Override
+	protected RejectedLockHandler getOneRejectedHandler(final String key) {
+		if (rejectedLockHandlers.containsKey(key)) {
+			final Collection<RejectedLockHandler> handlers = this.rejectedLockHandlers.get(key);
+			final RejectedLockHandler handler = handlers.iterator().next();
+			rejectedLockHandlers.remove(key, handler);
+			if (handlers.size() == 0) {
+				rejectedLockHandlers.remove(key);
+			}
+			return handler;
+		}
+		return null;
+	}
 
-    @Override
-    public boolean tryLock(final long objectToLockId, final String objectType) throws SLockException {
-        try {
-            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
-            return lock.tryLock();
-        } catch (final Exception e) {
-            throw new SLockException(e);
-        }
-    }
-
-    @Override
-    public void lock(final long objectToLockId, final String objectType) throws SLockException {
-        try {
-            final ILock lock = hazelcastInstance.getLock(buildKey(objectToLockId, objectType));
-            lock.lock();
-        } catch (final Exception e) {
-            throw new SLockException(e);
-        }
-    }
-
-    private String buildKey(final long objectToLockId, final String objectType) {
-        return objectType + SEPARATOR + objectToLockId;
-    }
-
+	@Override
+	protected void storeRejectedLock(final String key, final RejectedLockHandler handler) {
+		rejectedLockHandlers.put(key, handler);
+	}
 }

@@ -8,10 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.classloader;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -20,7 +22,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
-import com.hazelcast.core.MultiTask;
 
 /**
  * 
@@ -28,6 +29,8 @@ import com.hazelcast.core.MultiTask;
  * 
  */
 public class ClusteredClassLoaderService implements ClassLoaderService {
+
+    private static final String EXECUTOR_NAME = "default";
 
     /**
      * static in order to be accessed by the RefreshClassLoaderTask that is
@@ -109,14 +112,14 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     private void executeRefreshOnCluster(String type, long id,
             RefreshClassLoaderTask refreshClassLoaderTask)
             throws ClassLoaderException {
-        Set<Member> members = hazelcastInstance.getCluster().getMembers();
-        MultiTask<TaskStatus> multiTask = new MultiTask<TaskStatus>(
-                refreshClassLoaderTask, members);
         long before = System.currentTimeMillis();
-        hazelcastInstance.getExecutorService().submit(multiTask);
+        Map<Member, Future<TaskStatus>> submitToAllMembers = hazelcastInstance.getExecutorService(EXECUTOR_NAME).submitToAllMembers(refreshClassLoaderTask);
         // wait for result;
         try {
-            Collection<TaskStatus> results = multiTask.get();
+            List<TaskStatus> results = new ArrayList<TaskStatus>(submitToAllMembers.size());
+            for (Entry<Member, Future<TaskStatus>> result : submitToAllMembers.entrySet()) {
+                results.add(result.getValue().get());
+            }
             long after = System.currentTimeMillis();
             loggerService.log(ClusteredClassLoaderService.class,
                     TechnicalLogSeverity.INFO, "Refreshing classloader "

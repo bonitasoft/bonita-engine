@@ -5,7 +5,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
-		<!-- cache configurations are located on the hazelcast instance, the cache service is just using the hazelcast isntance -->
+		<!-- cache configurations are located on the hazelcast instance, the cache service is just using the hazelcast instance -->
 	</bean>
 
 	<bean id="cacheService" class="com.bonitasoft.engine.cache.impl.DelegatingCacheService">

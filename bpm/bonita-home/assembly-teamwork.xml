@@ -26,7 +26,7 @@
 		</fileSet>
 		<fileSet>
 			<outputDirectory>home</outputDirectory>
-			<directory>target/common/home</directory>
+			<directory>${project.build.directory}/common/home</directory>
 		</fileSet>
 	</fileSets>
 </assembly>

@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +42,6 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Baptiste Mesta
  */
@@ -59,15 +59,13 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "Connector", "Execution too long" }, jira = "ENGINE-472", story = "Test if connector fails when connector execution is too long.")
     @Test
-    public void testExecuteConnectorWithExecutionTooLong() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("testConnectorWithExecutionTooLong",
-                "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+    public void executeConnectorWithExecutionTooLong() throws Exception {
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
                 .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(350));
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -93,13 +91,11 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-865")
     @Test
-    public void testExecuteConnectorWithCustomOutputTypeWithCommands() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("testConnectorWithExecutionTooLong",
-                "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+    public void executeConnectorWithCustomOutputTypeWithCommands() throws Exception {
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addShortTextData("value", null);
-        designProcessDefinition.addUserTask("step1", delivery);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
         final List<BarResource> resources = new ArrayList<BarResource>();
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithCustomType.impl", "TestConnectorWithCustomType.impl");
@@ -109,7 +105,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         businessArchiveBuilder.addClasspathResource(resources.get(1));
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, userId, processDefinition);
+        addMappingOfActorsForUser(ACTOR_NAME, userId, processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = this.waitForUserTask("step1", process);
@@ -138,7 +134,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         @SuppressWarnings("unchecked")
         final Map<String, Serializable> updatedVariable = (Map<String, Serializable>) getCommandAPI().execute(commandName, commandParameters);
         assertEquals("value", updatedVariable.get("value"));
-        designProcessDefinition.addUserTask("step1", delivery);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
 
         disableAndDeleteProcess(processDefinition);
     }

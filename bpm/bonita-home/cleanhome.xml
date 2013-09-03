@@ -49,5 +49,35 @@
 			<fileset dir="${user.home}/lic" includes="*.lic" />
 		</copy>
 	</target>
+
+	<target name="cluster">
+		<delete dir="${basedir}/target/home" />
+		<copy todir="${basedir}/target/home">
+			<fileset dir="${bos_home}/common" excludes="**/.svn" />
+		</copy>
+		<echo>Copy default Hibernate configuration files</echo>
+		<copy todir="${basedir}/target/home">
+			<fileset dir="${bos_home}/hibernate" excludes="**/.svn" />
+		</copy>
+		<copy todir="${basedir}/target/home">
+			<fileset dir="${basedir}/base" excludes="**/.svn" />
+		</copy>
+		<echo>Override specific Hibernate SP configuration</echo>
+		<copy todir="${basedir}/target/home" overwrite="true">
+			<fileset dir="${basedir}/hibernate" excludes="**/.svn" />
+		</copy>
+		<echo>Copy specific "SP Performance edition" configuration files</echo>
+		<copy todir="${basedir}/target/home" overwrite="true">
+			<fileset dir="${basedir}/editions/performance" excludes="**/.svn" />
+		</copy>
+		<echo>Copy specific "SP Performance edition" cluster configuration files</echo>
+		<copy todir="${basedir}/target/home" overwrite="true">
+			<fileset dir="${basedir}/editions/performance-cluster" excludes="**/.svn" />
+		</copy>
+		<echo>Copy license file from your $HOME/lic folder</echo>
+		<copy todir="${basedir}/target/home/server/licenses" failonerror="true">
+			<fileset dir="${user.home}/lic" includes="*.lic" />
+		</copy>
+	</target>
 	
 </project>

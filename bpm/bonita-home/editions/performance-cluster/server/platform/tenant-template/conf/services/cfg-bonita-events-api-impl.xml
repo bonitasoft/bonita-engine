@@ -1,0 +1,14 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="eventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
+		<constructor-arg name="eventBuilders" ref="eventBuilders" />
+		<constructor-arg name="handlers">
+			<map />
+		</constructor-arg>
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+		<constructor-arg name="tenantId" value="${tenantId}" />
+	</bean>
+
+</beans>

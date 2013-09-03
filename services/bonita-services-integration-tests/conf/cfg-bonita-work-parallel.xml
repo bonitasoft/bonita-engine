@@ -8,7 +8,6 @@
 		</constructor-arg>
 		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
 	</bean>
 

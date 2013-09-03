@@ -763,7 +763,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
         try {
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-            final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getRootContainerId());
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getParentContainerId());
             final long processDefinitionId = processInstance.getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);

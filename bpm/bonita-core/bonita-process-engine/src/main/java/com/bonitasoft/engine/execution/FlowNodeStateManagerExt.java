@@ -15,7 +15,6 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -56,8 +55,8 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
     private final BreakpointService breakpointService;
 
     public FlowNodeStateManagerExt(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService, final ConnectorService connectorService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService,
             final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService, final DataInstanceService dataInstanceService,
             final EventInstanceService eventInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders,
             final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry,
@@ -65,7 +64,7 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final SCommentService commentService, final SACommentBuilder saCommentBuilder, final BreakpointService breakpointService,
             final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
             final ActorMappingService actorMappingService, final WorkService workService, TokenService tokenService) {
-        super(processDefinitionService, processInstanceService, activityInstanceService, connectorService, connectorInstanceService, classLoaderService,
+        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, sDataInstanceBuilders, instanceBuilders,
                 operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService, saCommentBuilder,
                 lockService, eventsHandler, userFilterService, actorMappingService, workService, tokenService);

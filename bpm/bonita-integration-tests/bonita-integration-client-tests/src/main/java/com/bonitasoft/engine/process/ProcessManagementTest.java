@@ -69,7 +69,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         john = createUser(JOHN_USERNAME, PASSWORD);
     }
 
-    // @Test
+    @Test
     public void searchArchivedSubTasks() throws Exception {
         // create user and process
         final String actor = "acting";
@@ -151,7 +151,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    // @Test
+    @Test
     public void searchSubTasks() throws Exception {
         // create user and process
         final String delivery = "Delivery men";
@@ -355,7 +355,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    // @Test
+    @Test
     public void getProcessInstancesWithLabelOnStringIndex() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);
@@ -399,7 +399,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         deleteUser(USERNAME);
     }
 
-    // @Test
+    @Test
     public void getProcessInstancesWithStringIndex() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("1" + PROCESS_NAME, PROCESS_VERSION);

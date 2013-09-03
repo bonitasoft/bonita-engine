@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
@@ -62,7 +63,6 @@ import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -116,18 +116,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
     }
 
-    public boolean isPlatformStarted(final PlatformServiceAccessor platformAccessor) {
-        final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        try {
-            return schedulerService.isStarted();
-        } catch (final SSchedulerException e) {
-            log(platformAccessor, e, TechnicalLogSeverity.ERROR);
-        }
-        return false;
-    }
-
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public final long createTenant(final TenantCreator creator) throws CreationException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
@@ -160,6 +151,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void initializePlatform() throws CreationException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -187,11 +179,17 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
 
+        long platformSessionId = -1;
+        SessionAccessor sessionAccessor = null;
         try {
             final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
-            SessionAccessor sessionAccessor = serviceAccessorFactory.createSessionAccessor();
+            sessionAccessor = serviceAccessorFactory.createSessionAccessor();
             final SessionService sessionService = platformAccessor.getSessionService();
             final SSession session = sessionService.createSession(tenantId, -1L, "dummy", true);
+
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
             // This part is specific to SP: reporting.
@@ -206,6 +204,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             });
         } catch (Exception e) {
             throw new CreationException(e);
+        } finally {
+            cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -269,9 +270,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 @Override
                 public Long call() throws Exception {
                     SessionAccessor sessionAccessor = null;
+                    long platformSessionId = -1;
                     try {
                         sessionAccessor = serviceAccessorFactory.createSessionAccessor();
                         final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
+
+                        platformSessionId = sessionAccessor.getSessionId();
+                        sessionAccessor.deleteSessionId();
+
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
                         createDefaultDataSource(sDataSourceModelBuilder, dataService);
@@ -283,6 +289,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         return tenantId;
                     } finally {
                         cleanSessionAccessor(sessionAccessor);
+                        sessionAccessor.setSessionInfo(platformSessionId, -1);
                     }
                 }
             };
@@ -318,7 +325,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Get the binary content of a report, from its name.
-     *
+     * 
      * @param reportFolder
      *            the folder where to look.
      * @param reportName
@@ -344,7 +351,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Get the binary screenshot of a report, from its name.
-     *
+     * 
      * @param reportFolder
      *            the folder where to look.
      * @param reportName
@@ -387,6 +394,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void deleteTenant(final long tenantId) throws DeletionException {
         PlatformServiceAccessor platformAccessor = null;
         try {
@@ -418,9 +426,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @AvailableOnStoppedNode
     public void activateTenant(final long tenantId) throws TenantNotFoundException, TenantActivationException {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
+        long platformSessionId = -1;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final Tenant alreadyActivateTenant = getTenantById(tenantId);
@@ -434,6 +444,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
+
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
                     platformAccessor.getTechnicalLoggerService(), workService);
@@ -447,6 +461,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new TenantActivationException("Tenant activation: failed.", e);
         } finally {
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -465,9 +480,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @AvailableOnStoppedNode
     public void deactiveTenant(final long tenantId) throws TenantNotFoundException, TenantDeactivationException {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
+        long platformSessionId = -1;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final Tenant alreadyDeactivateTenant = getTenantById(tenantId);
@@ -480,10 +497,15 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final WorkService workService = platformAccessor.getWorkService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
+
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
+            sessionService.deleteSessionsOfTenant(tenantId);
         } catch (final TenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
             throw new TenantNotFoundException(tenantId);
@@ -492,6 +514,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new TenantDeactivationException("Tenant deactivation failed.", e);
         } finally {
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -638,6 +661,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @AvailableOnStoppedNode
     public Tenant updateTenant(final long tenantId, final TenantUpdater udpater) throws UpdateException {
         if (udpater == null || udpater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
@@ -738,6 +762,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
         LicenseChecker.getInstance().checkLicence();
         super.startNode();

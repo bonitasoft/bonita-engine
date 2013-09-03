@@ -8,9 +8,9 @@ import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.Instance;
-import com.hazelcast.core.Prefix;
+import com.hazelcast.core.IMap;
 
 public class PlatformClusteredCacheService extends CommonClusteredCacheService implements PlatformCacheService {
 
@@ -25,14 +25,13 @@ public class PlatformClusteredCacheService extends CommonClusteredCacheService i
 
     @Override
     public List<String> getCachesNames() {
-        final Collection<Instance> instances = hazelcastInstance.getInstances();
-        final ArrayList<String> cacheNamesList = new ArrayList<String>(instances.size());
+        final Collection<DistributedObject> distributedObjects = hazelcastInstance.getDistributedObjects();
+        final ArrayList<String> cacheNamesList = new ArrayList<String>(distributedObjects.size());
 
-        // Hazelcast Maps are internally named with a prefix
-        final String prefix = Prefix.MAP + "P_";
-        for (final Instance instance : instances) {
-            if (instance.getInstanceType().isMap() && ((String) instance.getId()).startsWith(prefix)) {
-                cacheNamesList.add(getCacheNameFromKey(((String) instance.getId()).substring(Prefix.MAP.length())));
+        final String prefix = "P_";
+        for (final DistributedObject instance : distributedObjects) {
+            if (instance instanceof IMap<?, ?> && instance.getName().startsWith(prefix)) {
+                cacheNamesList.add(getCacheNameFromKey(instance.getName()));
             }
         }
 
