@@ -9,7 +9,6 @@
 		<constructor-arg name="classesToPurge">
 			<list>
 				<value>org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl</value>
-				<value>org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl</value>
 			</list>
 		</constructor-arg>
 		<constructor-arg name="repeat" value="${delete.job.frequency:0 0 0/1 * * ?}" />

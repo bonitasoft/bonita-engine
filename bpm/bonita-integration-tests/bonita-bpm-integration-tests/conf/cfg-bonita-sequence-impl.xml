@@ -114,7 +114,6 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" value="10011" />
 				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="10012" />
 				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SActorImpl" value="10013" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STransitionInstanceImpl" value="10013" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="10014" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" value="10015" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" value="10015" />
