@@ -47,12 +47,6 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.2-1003-jdbc4</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-synchro-server</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -132,11 +126,6 @@
 									<groupId>org.postgresql</groupId>
 									<artifactId>postgresql</artifactId>
 									<outputDirectory>${project.build.directory}/driver</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.bonitasoft.engine</groupId>
-									<artifactId>bonita-synchro-server</artifactId>
-									<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
