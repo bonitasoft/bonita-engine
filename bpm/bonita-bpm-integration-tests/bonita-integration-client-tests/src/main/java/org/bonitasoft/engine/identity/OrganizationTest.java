@@ -13,9 +13,11 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.CommonAPITest;
@@ -27,6 +29,8 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.identity.GroupCreator.GroupField;
+import org.bonitasoft.engine.identity.RoleCreator.RoleField;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -502,7 +506,7 @@ public class OrganizationTest extends CommonAPITest {
         importFirstSimpleOrganization();
         final User userToDisable = getIdentityAPI().getUserByUserName(userName);
         final UserUpdater updateDescriptor = new UserUpdater();
-        updateDescriptor.setEnabled(true);
+        updateDescriptor.setEnabled(false);
         getIdentityAPI().updateUser(userToDisable.getId(), updateDescriptor);
         assertEquals(2, getIdentityAPI().getNumberOfUsers());
         try {
@@ -516,7 +520,7 @@ public class OrganizationTest extends CommonAPITest {
             final User persistedUser = getIdentityAPI().getUserByUserName(userName);
             assertNotNull(persistedUser);
             assertEquals(jobTitle, persistedUser.getJobTitle());
-            assertEquals(true, persistedUser.isEnabled());
+            assertFalse(persistedUser.isEnabled());
             final Role persistedRole = getIdentityAPI().getRoleByName(roleName);
             assertNotNull(persistedRole);
             assertEquals(roleDisplayName, persistedRole.getDisplayName());
@@ -533,7 +537,7 @@ public class OrganizationTest extends CommonAPITest {
 
             final User persistedUser1 = getIdentityAPI().getUserByUserName(userName1);
             assertNotNull(persistedUser1);
-            assertEquals(false, persistedUser1.isEnabled());
+            assertTrue(persistedUser1.isEnabled());
             final Role persistedRole1 = getIdentityAPI().getRoleByName(roleName1);
             assertNotNull(persistedRole1);
             assertEquals(roleDisplayName1, persistedRole1.getDisplayName());
@@ -894,11 +898,11 @@ public class OrganizationTest extends CommonAPITest {
 
         final User persistedUser = getIdentityAPI().getUserByUserName("johnnyfootball");
         assertNotNull(persistedUser);
-        assertEquals(false, persistedUser.isEnabled());
+        assertFalse(persistedUser.isEnabled());
 
         final User persistedUser1 = getIdentityAPI().getUserByUserName("liuyanyan");
         assertNotNull(persistedUser1);
-        assertEquals(false, persistedUser1.isEnabled());
+        assertTrue(persistedUser1.isEnabled());
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser.getId());
@@ -1037,6 +1041,112 @@ public class OrganizationTest extends CommonAPITest {
         getIdentityAPI().deleteGroup(persistedGroup2.getId());
     }
 
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Export", "Organization", "Special characters" }, jira = "ENGINE-1517")
+    @Test
+    public void exportOrganizationWithSpecialCharacters() throws Exception {
+        // create records for user role, group and membership
+        final User user = getIdentityAPI().createUser("Céline*^$", "ploµ¨µ%§");
+        final User user2 = getIdentityAPI().createUser("ééééééééééééééééééé", "éééééééééééééééé");
+
+        final RoleCreator roleCreator = new RoleCreator("Développeur");
+        roleCreator.setDisplayName("'(-è");
+        roleCreator.setDescription("è-__ç_");
+        roleCreator.setIconName("(-è_");
+        roleCreator.setIconPath("^*_ç");
+        final Role role = getIdentityAPI().createRole(roleCreator);
+
+        final GroupCreator groupCreator = new GroupCreator("µ£¨µ");
+        groupCreator.setDisplayName(".?/5434%¨%¨%");
+        groupCreator.setDescription("è-__ç_2");
+        groupCreator.setIconName("(-è_2");
+        groupCreator.setIconPath("^*_ç2");
+        groupCreator.setParentPath("$*ù$^ù");
+        final Group group = getIdentityAPI().createGroup(groupCreator);
+
+        final UserMembership membership = getIdentityAPI().addUserMembership(user.getId(), group.getId(), role.getId());
+
+        // export and check
+        final String organizationContent = getIdentityAPI().exportOrganization();
+
+        // Role
+        for (final Entry<RoleField, Serializable> entry : roleCreator.getFields().entrySet()) {
+            assertTrue(organizationContent.indexOf((String) entry.getValue()) != -1);
+        }
+
+        // Group
+        for (final Entry<GroupField, Serializable> entry : groupCreator.getFields().entrySet()) {
+            assertTrue(organizationContent.indexOf((String) entry.getValue()) != -1);
+        }
+
+        // User
+        assertTrue(organizationContent.indexOf("Céline*^$") != -1);
+        assertTrue(organizationContent.indexOf("ééééééééééééééééééé") != -1);
+
+        // UserMembership
+        assertTrue(organizationContent.indexOf(getIdentityAPI().getUserMembership(membership.getId()).getGroupName()) != -1);
+
+        // Verify all tags
+        assertTrue(organizationContent.indexOf("<organization:Organization") != -1);
+        assertTrue(organizationContent.indexOf("<users>") != -1);
+        assertTrue(organizationContent.indexOf("<user") != -1);
+        assertTrue(organizationContent.indexOf("</user>") != -1);
+        assertTrue(organizationContent.indexOf("</users>") != -1);
+        assertTrue(organizationContent.indexOf("<roles>") != -1);
+        assertTrue(organizationContent.indexOf("<role") != -1);
+        assertTrue(organizationContent.indexOf("</role>") != -1);
+        assertTrue(organizationContent.indexOf("</roles>") != -1);
+        assertTrue(organizationContent.indexOf("<groups>") != -1);
+        assertTrue(organizationContent.indexOf("<group") != -1);
+        assertTrue(organizationContent.indexOf("</group>") != -1);
+        assertTrue(organizationContent.indexOf(" </groups>") != -1);
+        assertTrue(organizationContent.indexOf("<memberships") != -1);
+        assertTrue(organizationContent.indexOf("</memberships>") != -1);
+        assertTrue(organizationContent.indexOf("</organization:Organization>") != -1);
+
+        // clean-up
+        deleteUsers(user, user2);
+        getIdentityAPI().deleteRole(role.getId());
+        getIdentityAPI().deleteGroup(group.getId());
+    }
+
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Export", "Organization", "Special characters" }, jira = "ENGINE-1517")
+    @Test
+    public void importAndExportOrganizationWithSpecialCharacters() throws Exception {
+        importOrganization("OrganizationWithSpecialCharacters.xml");
+
+        // export and check
+        final String organizationContent = getIdentityAPI().exportOrganization();
+
+        // Role
+        assertTrue(organizationContent.indexOf("ééé") != -1);
+
+        // Group
+        assertTrue(organizationContent.indexOf("ééééééééé") != -1);
+
+        // User
+        assertTrue(organizationContent.indexOf("éé") != -1);
+
+        // Verify all tags
+        assertTrue(organizationContent.indexOf("<organization:Organization") != -1);
+        assertTrue(organizationContent.indexOf("<users>") != -1);
+        assertTrue(organizationContent.indexOf("<user") != -1);
+        assertTrue(organizationContent.indexOf("</user>") != -1);
+        assertTrue(organizationContent.indexOf("</users>") != -1);
+        assertTrue(organizationContent.indexOf("<roles>") != -1);
+        assertTrue(organizationContent.indexOf("<role") != -1);
+        assertTrue(organizationContent.indexOf("</role>") != -1);
+        assertTrue(organizationContent.indexOf("</roles>") != -1);
+        assertTrue(organizationContent.indexOf("<groups>") != -1);
+        assertTrue(organizationContent.indexOf("<group") != -1);
+        assertTrue(organizationContent.indexOf("</group>") != -1);
+        assertTrue(organizationContent.indexOf(" </groups>") != -1);
+        assertTrue(organizationContent.indexOf("<memberships/>") != -1);
+        assertTrue(organizationContent.indexOf("</organization:Organization>") != -1);
+
+        // clean-up
+        getIdentityAPI().deleteOrganization();
+    }
+
     @Test
     public void exportAndImportOrganization() throws Exception {
         // create records for user role, group and membership
@@ -1105,6 +1215,9 @@ public class OrganizationTest extends CommonAPITest {
     public void exportOrganizationWithDisabledUsers() throws Exception {
         // create records for user
         final User persistedUser = getIdentityAPI().createUser("liuyanyan", "bpm");
+        final UserUpdater updater = new UserUpdater();
+        updater.setEnabled(false);
+        getIdentityAPI().updateUser(persistedUser.getId(), updater);
 
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();

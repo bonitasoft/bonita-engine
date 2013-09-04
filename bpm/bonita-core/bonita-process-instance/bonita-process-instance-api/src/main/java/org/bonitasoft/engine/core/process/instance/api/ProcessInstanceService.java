@@ -267,7 +267,7 @@ public interface ProcessInstanceService {
      * @param queryOptions
      *            a map of specific parameters of a query
      * @return total number of process instances
-     * @throws SProcessInstanceReadException
+     * @throws SBonitaSearchException
      */
     long getNumberOfProcessInstances(QueryOptions queryOptions) throws SBonitaSearchException;
 

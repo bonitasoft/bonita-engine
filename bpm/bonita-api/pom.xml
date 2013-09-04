@@ -17,7 +17,6 @@
 	<modules>
 		<module>bonita-common-api</module>
 		<module>bonita-common-api-ejb2</module>
-		<module>bonita-client-api</module>
 		<module>bonita-client-api-local</module>
 		<module>bonita-client-api-http</module>
 		<module>bonita-client-api-ejb2</module>

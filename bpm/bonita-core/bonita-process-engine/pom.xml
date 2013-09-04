@@ -90,6 +90,11 @@
 			<artifactId>bonita-supervisor-mapping-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Services -->
 		<dependency>

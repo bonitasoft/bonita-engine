@@ -20,28 +20,38 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener" />
+	
 	<bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
 		<constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
+		<constructor-arg name="jobListener" ref="jdbcJobListener" />
 		<constructor-arg ref="sessionAccessor" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="useOptimization" value="true" />
 	</bean>
 
-	<bean id="schedulerBuilderAccessor" class="org.bonitasoft.engine.scheduler.builder.impl.SchedulerBuilderAccessorImpl" />
+	<bean id="schedulerBuilderAccessor" class="org.bonitasoft.engine.scheduler.builder.impl.SSchedulerBuilderAccessorImpl" />
 
-	<bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerImpl">
-		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
+	<bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
 		<constructor-arg name="builderAccessor" ref="schedulerBuilderAccessor" />
 		<constructor-arg name="queriableLogService" ref="syncQueriableLoggerService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="readPersistenceService" ref="persistenceService" />
+	</bean>
+
+	<bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl">
+		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
+		<constructor-arg name="builderAccessor" ref="schedulerBuilderAccessor" />
+		<constructor-arg name="jobService" ref="jobService" />
+		<constructor-arg name="queriableLogService" ref="syncQueriableLoggerService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="jobTruster">
-			<bean class="org.bonitasoft.engine.scheduler.impl.JobTruster">
+			<bean class="org.bonitasoft.engine.scheduler.JobTruster">
 				<constructor-arg name="trusted">
 					<list>
 						<value>org.bonitasoft.engine.log.asyncflush.QueriableLogRecordJob</value>

@@ -36,7 +36,7 @@ public class SignalEventTest extends CommonAPITest {
     @Before
     public void setUp() throws Exception {
         login();
-        john = getIdentityAPI().createUser("john", "bpm");
+        john = createUser("john", "bpm");
     }
 
     @After

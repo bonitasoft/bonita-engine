@@ -46,4 +46,9 @@ public class JobIdentifier implements Serializable {
         return jobName;
     }
 
+    @Override
+    public String toString() {
+        return "jobName=" + jobName + ";jobId=" + id + ";tenantId=" + tenantId;
+    }
+
 }

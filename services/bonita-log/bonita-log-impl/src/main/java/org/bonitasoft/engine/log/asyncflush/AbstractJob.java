@@ -17,8 +17,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 
 /**
  * @author Elias Ricken de Medeiros

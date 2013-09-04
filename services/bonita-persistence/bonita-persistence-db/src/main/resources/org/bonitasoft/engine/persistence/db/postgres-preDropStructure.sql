@@ -1,7 +1,8 @@
 -- ------------------------------------------------ Foreign Keys -----------------------------------------------
 ALTER TABLE actor DROP CONSTRAINT fk_actor_tenantId;
 ALTER TABLE actormember DROP CONSTRAINT fk_actormember_tenantId;
-ALTER TABLE queriable_log DROP CONSTRAINT fk_queriable_log_tenantId;
+ALTER TABLE breakpoint DROP CONSTRAINT fk_breakpoint_tenantId;
+-- ALTER TABLE queriable_log DROP CONSTRAINT fk_queriable_log_tenantId;
 ALTER TABLE queriablelog_p DROP CONSTRAINT fk_queriablelog_p_tenantId;
 ALTER TABLE category DROP CONSTRAINT fk_category_tenantId;
 ALTER TABLE command DROP CONSTRAINT fk_command_tenantId;
@@ -35,7 +36,6 @@ ALTER TABLE profile DROP CONSTRAINT fk_profile_tenantId;
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_tenantId;
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId;
 ALTER TABLE role DROP CONSTRAINT fk_role_tenantId;
-ALTER TABLE transition_instance DROP CONSTRAINT fk_transition_instance_tenantId;
 ALTER TABLE user_ DROP CONSTRAINT fk_user__tenantId;
 ALTER TABLE user_membership DROP CONSTRAINT fk_user_membership_tenantId;
 ALTER TABLE waiting_event DROP CONSTRAINT fk_waiting_event_tenantId;

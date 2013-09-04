@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.process.task;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,10 +71,6 @@ import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Julien Molinaro
@@ -158,7 +158,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        waitForStep(50, 5000, "userTask1", receiveMessageProcessInstance);
+        waitForUserTask("userTask1", receiveMessageProcessInstance);
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());

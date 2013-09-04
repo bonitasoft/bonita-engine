@@ -18,8 +18,8 @@ import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
@@ -104,6 +104,7 @@ public class TestUtil {
         }
         final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService, tenantBuilder);
         final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
+        sessionAccessor.deleteSessionId();
         sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);
         return defaultTenantId;
     }
@@ -127,6 +128,7 @@ public class TestUtil {
 
     public static void deleteDefaultTenantAndPlatForm(final TransactionService txService, final PlatformService platformService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) throws Exception {
+        sessionAccessor.deleteSessionId();
         PlatformUtil.deleteDefaultTenant(txService, platformService, sessionAccessor, sessionService);
         PlatformUtil.deletePlatform(txService, platformService);
         sessionAccessor.deleteSessionId();
@@ -135,6 +137,7 @@ public class TestUtil {
     public static void createSessionOn(final SessionAccessor sessionAccessor, final SessionService sessionService, final long tenantId) throws SBonitaException {
         try {
             sessionService.deleteSession(sessionAccessor.getSessionId());
+            sessionAccessor.deleteSessionId();
         } catch (final SessionIdNotSetException e) {
             // do nothing
         } catch (final SSessionNotFoundException e) {

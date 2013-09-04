@@ -194,8 +194,8 @@ public class MembershipTest extends CommonAPITest {
 
     @Test
     public void getAssignedByOnUserMembership() throws BonitaException, InterruptedException {
-        final User userM = getIdentityAPI().createUser("aTest", "engine");
-        final User plop = getIdentityAPI().createUser("plop", "bpm");
+        final User userM = createUser("aTest", "engine");
+        final User plop = createUser("plop", "bpm");
         final Role roleM = getIdentityAPI().createRole("roleM");
         final Group groupM = getIdentityAPI().createGroup("groupM", null);
         logout();
@@ -404,12 +404,12 @@ public class MembershipTest extends CommonAPITest {
     }
 
     private void createTestedUserMemberships() throws BonitaException, InterruptedException {
-        user1 = getIdentityAPI().createUser("userM1", "engine1");
+        user1 = createUser("userM1", "engine1");
         logout();
         loginWith(user1.getUserName(), "engine1");
-        user2 = getIdentityAPI().createUser("userM2", "engine2");
-        user3 = getIdentityAPI().createUser("userM3", "engine3");
-        user4 = getIdentityAPI().createUser("userM4", "engine4");
+        user2 = createUser("userM2", "engine2");
+        user3 = createUser("userM3", "engine3");
+        user4 = createUser("userM4", "engine4");
         final RoleCreator roleCreator1 = new RoleCreator("roleM1");
         roleCreator1.setDisplayName("roleLabel").setDescription("create role for userMembership");
         role1 = getIdentityAPI().createRole(roleCreator1);

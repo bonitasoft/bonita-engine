@@ -2,8 +2,6 @@ package org.bonitasoft.engine.scheduler.trigger;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.scheduler.CronTrigger;
-
 /**
  * @author Matthieu Chaffotte
  */

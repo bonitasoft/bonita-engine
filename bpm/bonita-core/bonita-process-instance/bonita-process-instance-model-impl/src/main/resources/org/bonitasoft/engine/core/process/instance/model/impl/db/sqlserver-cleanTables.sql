@@ -16,9 +16,6 @@ GO
 DELETE FROM connector_instance
 GO
 
-DELETE FROM transition_instance
-GO
-
 DELETE FROM flownode_instance
 GO
 
@@ -26,4 +23,7 @@ DELETE FROM token
 GO
 
 DELETE FROM process_instance
+GO
+
+DELETE FROM breakpoint
 GO

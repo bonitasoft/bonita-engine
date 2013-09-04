@@ -19,15 +19,13 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.execution.ContainerExecutor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class ExecuteFlowNodeWork extends TxBonitaWork {
+public class ExecuteFlowNodeWork extends TxLockProcessInstanceWork {
 
     private static final long serialVersionUID = -5873526992671300038L;
 
@@ -43,15 +41,13 @@ public class ExecuteFlowNodeWork extends TxBonitaWork {
 
     private final SExpressionContext contextDependency;
 
-    private final Long processInstanceId;
-
     public ExecuteFlowNodeWork(final Type executorType, final long flowNodeInstanceId, final List<SOperation> operations,
             final SExpressionContext contextDependency, final long processInstanceId) {
+    	super(processInstanceId);
         this.executorType = executorType;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.operations = operations;
         this.contextDependency = contextDependency;
-        this.processInstanceId = processInstanceId;
     }
 
     @Override
@@ -69,14 +65,6 @@ public class ExecuteFlowNodeWork extends TxBonitaWork {
     @Override
     public String getDescription() {
         return getClass().getSimpleName() + ": processInstanceId:" + processInstanceId + ", flowNodeInstanceId: " + flowNodeInstanceId;
-    }
-
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

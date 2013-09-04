@@ -150,7 +150,8 @@ public class EventsHandler {
         final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
         for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
             final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
-            eventHandlerStrategy.handleCatchEvent(processDefinition, eventDefinition, (SCatchEventInstance) eventInstance, sEventTriggerDefinition);
+            eventHandlerStrategy.handleCatchEvent(processDefinition, eventDefinition, (SCatchEventInstance) eventInstance,
+                    sEventTriggerDefinition);
         }
     }
 
@@ -174,12 +175,14 @@ public class EventsHandler {
      * @param parentProcessInstance
      * @throws SBonitaException
      */
-    private void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final long subProcessId,
+    private void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
+            final long subProcessId,
             final SProcessInstance parentProcessInstance) throws SBonitaException {
         final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
         for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
             final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());
-            eventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefinition, sEventTriggerDefinition, subProcessId, parentProcessInstance);
+            eventHandlerStrategy.handleEventSubProcess(processDefinition, eventDefinition, sEventTriggerDefinition, subProcessId,
+                    parentProcessInstance);
         }
     }
 

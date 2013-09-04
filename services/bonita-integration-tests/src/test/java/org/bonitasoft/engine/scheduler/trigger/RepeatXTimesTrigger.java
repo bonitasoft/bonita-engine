@@ -2,8 +2,6 @@ package org.bonitasoft.engine.scheduler.trigger;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.scheduler.RepeatTrigger;
-
 /**
  * @author Matthieu Chaffotte
  */

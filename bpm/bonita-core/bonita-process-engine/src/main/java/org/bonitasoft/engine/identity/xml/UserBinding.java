@@ -27,6 +27,8 @@ public class UserBinding extends ElementBinding {
 
     private final ExportedUserBuilder userBuilder;
 
+    private boolean containsEnabled = false;
+
     public UserBinding() {
         userBuilder = new ExportedUserBuilder();
     }
@@ -58,6 +60,7 @@ public class UserBinding extends ElementBinding {
         } else if (OrganizationMappingConstants.MANAGER.equals(name)) {
             userBuilder.setManagerUserName(value);
         } else if (OrganizationMappingConstants.ENABLED.equals(name)) {
+            containsEnabled = true;
             userBuilder.setEnabled(Boolean.parseBoolean(value));
         }
     }
@@ -80,6 +83,9 @@ public class UserBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
+        if (!containsEnabled) {
+            userBuilder.setEnabled(true);
+        }
         return userBuilder.done();
     }
 

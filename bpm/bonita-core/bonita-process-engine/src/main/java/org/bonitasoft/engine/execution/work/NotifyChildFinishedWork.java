@@ -13,16 +13,14 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.work.TxBonitaWork;
 
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class NotifyChildFinishedWork extends TxBonitaWork {
+public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
 
     private static final long serialVersionUID = -8987586943379865375L;
 
@@ -36,9 +34,10 @@ public class NotifyChildFinishedWork extends TxBonitaWork {
 
     private final long parentId;
 
-    public NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType,
+    public NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId,
+            final String parentType,
             final int stateId) {
-        super();
+        super(processInstanceId);
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.parentId = parentId;
@@ -46,10 +45,21 @@ public class NotifyChildFinishedWork extends TxBonitaWork {
         this.stateId = stateId;
     }
 
+    protected ClassLoader getClassLoader() throws SBonitaException {
+        return getTenantAccessor().getClassLoaderService().getLocalClassLoader("process", processDefinitionId);
+    }
+
     @Override
     protected void work() throws Exception {
-        final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
-        containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
+        final ClassLoader processClassloader = getClassLoader();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(processClassloader);
+            final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
+            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
     }
 
     @Override
@@ -57,11 +67,4 @@ public class NotifyChildFinishedWork extends TxBonitaWork {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

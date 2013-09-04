@@ -102,8 +102,10 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
+import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
@@ -117,7 +119,6 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
- *
  */
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
@@ -267,6 +268,10 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private SACommentBuilder saCommentBuilder;
 
+    private SessionAccessor sessionAccessor;
+
+    private SynchroService synchroService;
+
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
         this.tenantId = tenantId;
@@ -278,6 +283,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
         }
         return readSessionAccessor;
+    }
+
+    @Override
+    public SessionAccessor getSessionAccessor() {
+        if (sessionAccessor == null) {
+            sessionAccessor = beanAccessor.getService(SessionAccessor.class);
+        }
+        return sessionAccessor;
     }
 
     @Override
@@ -914,6 +927,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             saCommentBuilder = beanAccessor.getService(SACommentBuilder.class);
         }
         return saCommentBuilder;
+    }
+
+    @Override
+    public SynchroService getSynchroService() {
+        if (synchroService == null) {
+            synchroService = beanAccessor.getService(SynchroService.class);
+        }
+        return synchroService;
     }
 
 }

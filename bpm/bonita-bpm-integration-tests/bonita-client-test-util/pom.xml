@@ -25,36 +25,4 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
-
-<!-- works only for maven... :( -->
-
-<!-- 	<build> -->
-<!-- 		<plugins> -->
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-dependency-plugin</artifactId> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>copy</id> -->
-<!-- 						<goals> -->
-<!-- 							<goal>copy</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<artifactItems> -->
-<!-- 								<artifactItem> -->
-<!-- 									<groupId>org.bonitasoft.engine</groupId> -->
-<!-- 									<version>${project.version}</version> -->
-<!-- 									<artifactId>bonita-synchro-server</artifactId> -->
-<!-- 									<type>jar</type> -->
-<!-- 									<overWrite>false</overWrite> -->
-<!-- 									<outputDirectory>${project.build.directory}/classes</outputDirectory> -->
-<!-- 									<destFileName>server-command.bak</destFileName> -->
-<!-- 								</artifactItem> -->
-<!-- 							</artifactItems> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
-<!-- 		</plugins> -->
-<!-- 	</build> -->
 </project>

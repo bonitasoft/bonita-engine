@@ -40,6 +40,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
@@ -48,6 +49,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 
 /**
  * @author Baptiste Mesta
@@ -85,7 +87,18 @@ public class HTTPServerAPI implements ServerAPI {
 
     private String applicationName = null;
 
+    private static DefaultHttpClient httpclient = null;
+
+    private static final XStream xstream = new XStream();
+
+    private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
+
     public HTTPServerAPI(final Map<String, String> parameters) {
+        // initialize httpclient in the constructor to avoid incompatibility when running tests:
+        // java.security.NoSuchAlgorithmException: class configured for SSLContext: sun.security.ssl.SSLContextImpl$TLS10Context not a SSLContext
+        if (httpclient == null) {
+            httpclient = new DefaultHttpClient(new PoolingClientConnectionManager());
+        }
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
     }
@@ -95,7 +108,6 @@ public class HTTPServerAPI implements ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
         String response = null;
         try {
-            final XStream xstream = new XStream();
             response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
             return checkInvokeMethodReturn(response, xstream);
         } catch (final UndeclaredThrowableException e) {
@@ -108,7 +120,7 @@ public class HTTPServerAPI implements ServerAPI {
         }
     }
 
-    private Object checkInvokeMethodReturn(String response, final XStream xstream) throws Throwable {
+    private Object checkInvokeMethodReturn(final String response, final XStream xstream) throws Throwable {
         Object invokeMethodReturn = null;
         if (response != null && !response.isEmpty() && !response.equals("null")) {
             invokeMethodReturn = fromXML(response, xstream);
@@ -123,8 +135,6 @@ public class HTTPServerAPI implements ServerAPI {
             final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException,
             ClientProtocolException {
         final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);
-        final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
-        final DefaultHttpClient httpclient = new DefaultHttpClient();
         return httpclient.execute(httpost, responseHandler);
     }
 
@@ -205,6 +215,8 @@ public class HTTPServerAPI implements ServerAPI {
             } catch (final IOException e) {
                 throw new BonitaRuntimeException("unable to deserialize object " + object, e);
             } catch (final ClassNotFoundException e) {
+                throw new BonitaRuntimeException("unable to deserialize object " + object, e);
+            } catch (final CannotResolveClassException e) {
                 throw new BonitaRuntimeException("unable to deserialize object " + object, e);
             } finally {
                 in.close();

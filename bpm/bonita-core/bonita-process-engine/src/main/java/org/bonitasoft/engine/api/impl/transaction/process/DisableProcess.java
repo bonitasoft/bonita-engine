@@ -27,8 +27,8 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 
 /**
  * @author Baptiste Mesta

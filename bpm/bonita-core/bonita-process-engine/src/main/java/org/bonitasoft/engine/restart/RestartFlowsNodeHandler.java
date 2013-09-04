@@ -44,7 +44,6 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
             final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
-            final int processInstanceIndex = bpmInstanceBuilders.getSUserTaskInstanceBuilder().getParentProcessInstanceIndex();
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
             List<SFlowNodeInstance> sFlowNodeInstances;
             do {
@@ -61,7 +60,7 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                             logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":"
                                     + sFlowNodeInstance.getId());
                         }
-                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getId(),
+                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(),
                                 sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
                     } else {
                         if (info) {
@@ -70,7 +69,7 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                         }
 
                         workService.registerWork(new ExecuteFlowNodeWork(Type.PROCESS, sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
-                                .getLogicalGroup(processInstanceIndex)));
+                                .getParentProcessInstanceId()));
                     }
                 }
             } while (sFlowNodeInstances.size() == queryOptions.getNumberOfResults());

@@ -148,8 +148,7 @@ public class ProcessArchiver {
             final SAProcessInstance saProcessInstance, final long archiveDate) throws SArchivingException {
         try {
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saProcessInstance);
-            archiveService.recordInsert(archiveDate, insertRecord, getQueriableLog(instancesBuilders, ActionType.CREATED, "Archive the process instance")
-                    .done());
+            archiveService.recordInsert(archiveDate, insertRecord);
 
             if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.DEBUG)) {
                 logger.log(ProcessArchiver.class, TechnicalLogSeverity.DEBUG, MessageFormat.format("archiving {0} with id {1} and state {2}", processInstance
@@ -208,8 +207,7 @@ public class ProcessArchiver {
                 if (saComment != null) {
                     final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
                     try {
-                        archiveService.recordInsert(archiveDate, insertRecord,
-                                getQueriableLog(instancesBuilders, ActionType.CREATED, "archive the process comment").done());
+                        archiveService.recordInsert(archiveDate, insertRecord);
                     } catch (final SRecorderException e) {
                         throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
                     } catch (final SDefinitiveArchiveNotFound e) {
@@ -238,8 +236,7 @@ public class ProcessArchiver {
                     if (saDataInstance != null) {
                         final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saDataInstance);
                         try {
-                            archiveService.recordInsert(archiveDate, insertRecord,
-                                    getQueriableLog(instancesBuilders, ActionType.CREATED, "archive the data instance").done());
+                            archiveService.recordInsert(archiveDate, insertRecord);
                         } catch (final SRecorderException e) {
                             throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
                         } catch (final SDefinitiveArchiveNotFound e) {
@@ -370,8 +367,7 @@ public class ProcessArchiver {
             }
             if (saFlowNodeInstance != null) {
                 final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saFlowNodeInstance);
-                archiveService.recordInsert(archiveDate, insertRecord,
-                        getQueriableLog(bpmInstanceBuilders, ActionType.CREATED, "archive the activity instance").done());
+                archiveService.recordInsert(archiveDate, insertRecord);
             }
             if (deleteAfterArchive) {
                 // Reconnect the persisted object before deleting it:

@@ -195,6 +195,7 @@ public class CommonBPMServicesTest {
     public static void setUpClass() throws Exception {
         // Call directly the API because we want the files to be copied:
         final PlatformAPIImpl platformAPI = new PlatformAPIImpl();
+        sessionAccessor.setSessionInfo(1l, -1);
         platformAPI.createAndInitializePlatform();
         platformAPI.startNode();
         TestUtil.startScheduler(bpmServicesBuilder.getSchedulerService());

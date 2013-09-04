@@ -84,8 +84,8 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.restart.TenantRestartHandler;
-import org.bonitasoft.engine.scheduler.SSchedulerException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -109,8 +109,11 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
+    private static boolean isNodeStarted = false;
+
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void createPlatform() throws CreationException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -147,6 +150,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void initializePlatform() throws CreationException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -179,6 +183,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void createAndInitializePlatform() throws CreationException {
         createPlatform();
         initializePlatform();
@@ -204,18 +209,9 @@ public class PlatformAPIImpl implements PlatformAPI {
         return platformBuilder.createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
     }
 
-    private boolean isPlatformStarted(final PlatformServiceAccessor platformAccessor) {
-        final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        try {
-            return schedulerService.isStarted();
-        } catch (final SSchedulerException e) {
-            log(platformAccessor, e);
-            return false;
-        }
-    }
-
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
         final PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
@@ -239,17 +235,23 @@ public class PlatformAPIImpl implements PlatformAPI {
                 final SessionService sessionService = platformAccessor.getSessionService();
                 for (final Long tenantId : tenantIds) {
                     long sessionId = -1;
+                    long platformSessionId = -1;
                     try {
+                        platformSessionId = sessionAccessor.getSessionId();
+                        sessionAccessor.deleteSessionId();
                         sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
                         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
                         final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
                     } finally {
                         sessionService.deleteSession(sessionId);
+                        cleanSessionAccessor(sessionAccessor);
+                        sessionAccessor.setSessionInfo(platformSessionId, -1);
                     }
                 }
+                // FIXME: shouldn't we also stop the workService?:
                 workService.startup();
-                if (!isPlatformStarted(platformAccessor)) {
+                if (!isNodeStarted()) {
                     if (platformConfiguration.shouldStartScheduler()) {
                         schedulerService.start();
                     }
@@ -310,6 +312,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             } finally {
                 cleanSessionAccessor(sessionAccessor);
             }
+            isNodeStarted = true;
         } catch (final StartNodeException e) {
             // If an exception is thrown, stop the platform that was started.
             try {
@@ -328,6 +331,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
@@ -342,6 +346,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
+            isNodeStarted = false;
         } catch (final SBonitaException e) {
             throw new StopNodeException(e);
         } catch (final BonitaHomeNotSetException e) {
@@ -363,13 +368,14 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private void shutdownScheduler(final PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService) throws SSchedulerException,
             FireEventException {
-        if (isPlatformStarted(platformAccessor)) {
+        if (isNodeStarted()) {
             schedulerService.shutdown();
         }
     }
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void cleanPlatform() throws DeletionException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -386,8 +392,12 @@ public class PlatformAPIImpl implements PlatformAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    final STenant tenant = getDefaultTenant();
-                    deactiveTenant(tenant.getId());
+                    try {
+                        final STenant tenant = getDefaultTenant();
+                        deactiveTenant(tenant.getId());
+                    } catch (STenantNotFoundException e) {
+
+                    }
                     clean.execute();
                     deleteAll.execute();
 
@@ -401,6 +411,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void deletePlatform() throws DeletionException {
         // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor;
@@ -431,12 +442,14 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public void cleanAndDeletePlaftorm() throws DeletionException {
         cleanPlatform();
         deletePlatform();
     }
 
     @Override
+    @AvailableOnStoppedNode
     public Platform getPlatform() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -461,6 +474,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         final String description = "Default tenant";
         String userName = "";
         SessionAccessor sessionAccessor = null;
+        long platformSessionId = -1;
         try {
 
             // add tenant to database
@@ -507,6 +521,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
+
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
             createDefaultDataSource(sDataSourceModelBuilder, dataService);
             final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
@@ -516,6 +534,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         } finally {
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -591,7 +610,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
-        final boolean schedulerStarted = false;
+        boolean schedulerStarted = false;
+        long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -606,6 +626,11 @@ public class PlatformAPIImpl implements PlatformAPI {
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
             schedulerService.start();
+            schedulerStarted = true;
+
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+
             final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
                     platformAccessor.getTechnicalLoggerService(), workService);
@@ -631,6 +656,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
             }
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -653,6 +679,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
+        long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -660,10 +687,15 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final WorkService workService = platformAccessor.getWorkService();
-            final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
+            final long sessionId = createSession(tenantId, sessionService);
+
+            platformSessionId = sessionAccessor.getSessionId();
+            sessionAccessor.deleteSessionId();
+
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
+            sessionService.deleteSessionsOfTenant(tenantId);
         } catch (final STenantDeactivationException stde) {
             log(platformAccessor, stde);
             throw stde;
@@ -672,6 +704,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new STenantDeactivationException("Tenant deactivation failed.", e);
         } finally {
             cleanSessionAccessor(sessionAccessor);
+            sessionAccessor.setSessionInfo(platformSessionId, -1);
         }
     }
 
@@ -684,6 +717,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public boolean isPlatformCreated() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
@@ -704,19 +738,12 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnStoppedNode
     public PlatformState getPlatformState() throws PlatformNotFoundException {
-        // TODO: find an other way to check if bonita_home is set
-        getPlatform();
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
+        if (isNodeStarted()) {
+            return PlatformState.STARTED;
         }
-        if (!isPlatformStarted(platformAccessor)) {
-            return PlatformState.STOPPED;
-        }
-        return PlatformState.STARTED;
+        return PlatformState.STOPPED;
     }
 
     private STenant getDefaultTenant() throws STenantNotFoundException {
@@ -732,6 +759,15 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
             throw new STenantNotFoundException("Unable to retrieve the defaultTenant", e);
         }
+    }
+
+    /**
+     * @return true if the current node is started, false otherwise
+     */
+    @Override
+    @AvailableOnStoppedNode
+    public boolean isNodeStarted() {
+        return isNodeStarted;
     }
 
 }

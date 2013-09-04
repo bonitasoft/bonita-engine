@@ -117,6 +117,12 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
 
         try {
             final SMultiInstanceActivityInstance miActivity = (SMultiInstanceActivityInstance) flowNodeInstance;
+            if (miActivity.getStateCategory() != SStateCategory.NORMAL) {
+                // if is not a normal state (aborting / canceling), return true to change state from executing to aborting / cancelling (ChildReadstate),
+                // without create a new child task
+                return true;
+            }
+
             if (childInstance.isAborting() || childInstance.isCanceling()) {
                 // TODO add synchronization
                 activityInstanceService.addMultiInstanceNumberOfTerminatedActivities(miActivity, 1);

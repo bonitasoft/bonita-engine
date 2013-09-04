@@ -136,7 +136,7 @@ public class SupervisorCommandTest extends CommonAPITest {
         return getProcessAPI().deploy(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
     }
 
-    private User createUser() throws AlreadyExistsException, CreationException {
+    private User createUser() throws BonitaException {
         // create user
         final String userName = "Richard";
         return createUser(userName, "bpm");

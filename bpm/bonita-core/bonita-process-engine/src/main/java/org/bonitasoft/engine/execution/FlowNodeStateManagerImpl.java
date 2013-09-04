@@ -26,7 +26,6 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -189,8 +188,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     protected CancellingReceiveTaskStateImpl cancellingReceiveTask;
 
     public FlowNodeStateManagerImpl(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService, final ConnectorService connectorService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService,
             final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService, final DataInstanceService dataInstanceService,
             final EventInstanceService eventInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders,
             final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry,
@@ -198,9 +197,9 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final SCommentService commentService, final SACommentBuilder saCommentBuilder, final LockService lockService, final EventsHandler eventsHandler,
             final UserFilterService userFilterService, final ActorMappingService actorMappingService, final WorkService workService,
             final TokenService tokenService) {
-        initStates(connectorService, connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService,
-                eventInstanceService, sDataInstanceBuilders, instanceBuilders, operationService, activityInstanceService, bpmInstancesCreator,
-                containerRegistry, processDefinitionService, processInstanceService, archiveService, logger, documentMappingService, commentService,
+        initStates(connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
+                sDataInstanceBuilders, instanceBuilders, operationService, activityInstanceService, bpmInstancesCreator, containerRegistry,
+                processDefinitionService, processInstanceService, archiveService, logger, documentMappingService, commentService,
                 saCommentBuilder, lockService, eventsHandler, userFilterService, actorMappingService, workService, tokenService);
         defineTransitionsForAllNodesType();
         initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
@@ -330,18 +329,18 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         defineCancelTransitionForFlowNode(SFlowNodeType.MULTI_INSTANCE_ACTIVITY, cancellingActivityWithBoundary, cancellingContainer, cancelled);
     }
 
-    private void initStates(final ConnectorService connectorService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService, final SDataInstanceBuilders sDataInstanceBuilders,
-            final BPMInstanceBuilders instanceBuilders, final OperationService operationService, final ActivityInstanceService activityInstanceService,
-            final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
+    private void initStates(final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService, final DataInstanceService dataInstanceService,
+            final EventInstanceService eventInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders,
+            final OperationService operationService, final ActivityInstanceService activityInstanceService, final BPMInstancesCreator bpmInstancesCreator,
+            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final TechnicalLoggerService logger,
             final DocumentMappingService documentMappingService, final SCommentService commentService, final SACommentBuilder saCommentBuilder,
             final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
             final ActorMappingService actorMappingService, final WorkService workService, TokenService tokenService) {
-        stateBehaviors = new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService,
-                classLoaderService, instanceBuilders, actorMappingService, connectorService, connectorInstanceService, expressionResolverService,
-                processDefinitionService, dataInstanceService, operationService, workService, containerRegistry, eventInstanceService, schedulerService, logger);
+        stateBehaviors = new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService,
+                instanceBuilders, actorMappingService, connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService,
+                operationService, workService, containerRegistry, eventInstanceService, schedulerService, logger);
         failed = new FailedActivityStateImpl();
         initializing = new InitializingActivityStateImpl(stateBehaviors);
         initializingActivityWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(stateBehaviors);

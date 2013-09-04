@@ -65,7 +65,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SReceiveTaskIns
 import org.bonitasoft.engine.core.process.instance.model.builder.SSendTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SSubProcessActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.STokenBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilder;
@@ -205,11 +204,6 @@ public class BPMinstanceBuildersImpl implements BPMInstanceBuilders {
     @Override
     public STransitionInstanceLogBuilder getSTransitionInstanceLogBuilder() {
         return new STransitionInstanceLogBuilderImpl();
-    }
-
-    @Override
-    public STransitionInstanceBuilder getSTransitionInstanceBuilder() {
-        return new STransitionInstanceBuilderImpl();
     }
 
     @Override

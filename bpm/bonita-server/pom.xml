@@ -464,7 +464,14 @@
 			<artifactId>bonita-recorder-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
+		<!-- Reporting -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.reporting</groupId>
+			<artifactId>bonita-reporting-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Scheduler -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
@@ -519,6 +526,23 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
 			<artifactId>bonita-supervisor-mapping-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Synchro-repository -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-service-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-register</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -786,6 +810,8 @@
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
+									<!-- Reporting -->
+									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
@@ -809,6 +835,10 @@
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl</include>
 									<include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl-hibernate</include>
+									<!-- Synchro-repository -->
+									<include>org.bonitasoft.engine.synchro:bonita-synchro-service</include>
+									<include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
+									<include>org.bonitasoft.engine.synchro:bonita-synchro-register</include>
 									<!-- Transaction -->
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>

@@ -57,7 +57,7 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     @Override
-    protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
         if (this.classloader != null) {
             return this.classloader.loadClass(name, resolve);
         }
@@ -65,7 +65,7 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     @Override
-    public synchronized InputStream getResourceAsStream(final String name) {
+    public InputStream getResourceAsStream(final String name) {
         if (this.classloader != null) {
             return this.classloader.getResourceAsStream(name);
         }

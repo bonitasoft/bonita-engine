@@ -993,7 +993,7 @@ public class GatewayExecutionTest extends CommonAPITest {
                 }
             }.waitUntil());
         } else {
-            final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 300, 5000, true, expected.length, user);
+            final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 300, 10000, true, expected.length, user);
             // assertTrue("there was no pending task for john", checkNbPendingTaskOf.waitUntil());
             checkNbPendingTaskOf.waitUntil();
             assertEquals(expected.length, checkNbPendingTaskOf.getPendingHumanTaskInstances().size());

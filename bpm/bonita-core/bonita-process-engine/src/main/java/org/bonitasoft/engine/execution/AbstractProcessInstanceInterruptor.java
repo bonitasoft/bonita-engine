@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
+import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -56,13 +57,13 @@ public abstract class AbstractProcessInstanceInterruptor {
         List<Long> stableChildrenIds = null;
         // lock process execution
         final String objectType = SFlowElementsContainerType.PROCESS.name();
-        lockService.lock(processInstanceId, objectType);
+        BonitaLock lock = lockService.lock(processInstanceId, objectType);
         try {
             setProcessStateCategory(processInstanceId, stateCategory);
             stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory);
         } finally {
             // unlock process execution
-            lockService.unlock(processInstanceId, objectType);
+            lockService.unlock(lock);
         }
         if (stableChildrenIds != null) {
             for (final Long childId : stableChildrenIds) {
@@ -76,13 +77,13 @@ public abstract class AbstractProcessInstanceInterruptor {
         List<Long> stableChildrenIds = null;
         // lock process execution
         final String objectType = SFlowElementsContainerType.PROCESS.name();
-        lockService.lock(processInstanceId, objectType);
+        BonitaLock lock = lockService.lock(processInstanceId, objectType);
         try {
             setProcessStateCategory(processInstanceId, stateCategory);
             stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, exceptionChildId);
         } finally {
             // unlock process execution
-            lockService.unlock(processInstanceId, objectType);
+            lockService.unlock(lock);
         }
         if (stableChildrenIds != null) {
             for (final Long childId : stableChildrenIds) {

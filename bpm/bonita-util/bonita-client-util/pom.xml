@@ -16,11 +16,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-client-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-client-api-local</artifactId>
 			<version>${project.version}</version>
 		</dependency>

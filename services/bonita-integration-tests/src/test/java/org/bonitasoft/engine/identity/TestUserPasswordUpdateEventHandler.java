@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.identity.UserUpdateEventHandler;
 import org.bonitasoft.engine.identity.model.SUser;
 
 /**
  * @author Feng Hui
  */
 public class TestUserPasswordUpdateEventHandler extends UserUpdateEventHandler {
+
+    private static final long serialVersionUID = 1L;
 
     private static final String USER_UPDATED = "USER_UPDATED";
 

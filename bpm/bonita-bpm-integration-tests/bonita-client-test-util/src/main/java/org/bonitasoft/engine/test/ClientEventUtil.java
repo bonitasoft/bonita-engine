@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.test;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,8 +26,6 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +40,6 @@ public class ClientEventUtil {
     private static final String ADD_HANDLER_COMMAND = "addHandlerCommand";
 
     private static final String WAIT_SERVER_COMMAND = "waitServerCommand";
-
-    private static final String SYNCHRO_REGISTER = "synchroRepositoryRegister";
 
     private static final String FLOW_NODE = "flowNode";
 
@@ -96,7 +91,6 @@ public class ClientEventUtil {
         try {
             commandAPI.unregister(WAIT_SERVER_COMMAND);
             commandAPI.unregister(ADD_HANDLER_COMMAND);
-            commandAPI.removeDependency(SYNCHRO_REGISTER);
             LOGGER.debug("commands undeployed");
         } catch (final BonitaException e) {
             // ok
@@ -107,20 +101,13 @@ public class ClientEventUtil {
     public static void deployCommand(final APISession apiSession) throws BonitaException {
 
         final CommandAPI commandAPI = TenantAPIAccessor.getCommandAPI(apiSession);
-        byte[] registerJar;
-        try {
-            registerJar = IOUtil.getAllContentFrom(APITestUtil.class.getResourceAsStream("/bonita-synchro-register.bak"));
-        } catch (final IOException e) {
-            throw new RetrieveException(e);
-        }
-        commandAPI.addDependency(SYNCHRO_REGISTER, registerJar);
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
 
         final CommandDescriptor waitServerCommand = commandAPI.register(WAIT_SERVER_COMMAND, WAIT_SERVER_COMMAND,
-                "org.bonitasoft.engine.test.synchro.WaitServerCommand");
+                "org.bonitasoft.engine.synchro.WaitServerCommand");
         final CommandDescriptor addHandlerCommand = commandAPI.register(ADD_HANDLER_COMMAND, ADD_HANDLER_COMMAND,
-                "org.bonitasoft.engine.test.synchro.AddHandlerCommand");
+                "org.bonitasoft.engine.synchro.AddHandlerCommand");
 
         parameters.put("commands", (Serializable) Arrays.asList(waitServerCommand.getId(), addHandlerCommand.getId()));
         commandAPI.execute(ADD_HANDLER_COMMAND, parameters);

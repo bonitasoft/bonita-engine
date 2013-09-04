@@ -17,9 +17,7 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Charles Souillard
@@ -27,18 +25,20 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class SequenceWorkSynchronization extends AbstractWorkSynchronization {
 
-    private final RunnableListener runnableListener;
+    private final TechnicalLoggerService loggerService;
+
+    // private final RunnableListener runnableListener;
 
     public SequenceWorkSynchronization(final ExecutorWorkService runnableListener, final ExecutorService executorService,
-            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final TransactionService transactionService) {
-        super(runnableListener, executorService, loggerService, sessionAccessor, sessionService, transactionService);
-        this.runnableListener = runnableListener;
+            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor) {
+        super(runnableListener, executorService, sessionAccessor);
+        // this.runnableListener = runnableListener;
+        this.loggerService = loggerService;
     }
 
     @Override
-    protected void executeRunnables(final Collection<AbstractBonitaWork> works) {
-        executorService.submit(new SequenceRunnableExecutor(works, runnableListener, getTenantId(), loggerService));
+    protected void executeRunnables(final Collection<BonitaWork> works) {
+        executorService.submit(new SequenceRunnableExecutor(works, getTenantId(), loggerService));
     }
 
 }

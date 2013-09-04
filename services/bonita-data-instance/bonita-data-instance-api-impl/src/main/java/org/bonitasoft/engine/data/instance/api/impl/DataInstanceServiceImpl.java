@@ -184,7 +184,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             try {
                 final SADataInstance saDataInstance = dataInstanceBuilders.getSADataInstanceBuilder().createNewInstance(dataInstance).done();
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
-                archiveService.recordInsert(System.currentTimeMillis(), archiveInsertRecord, getQueriableLog(ActionType.CREATED, "archive the SADataInstance"));
+                archiveService.recordInsert(System.currentTimeMillis(), archiveInsertRecord);
             } catch (final SDefinitiveArchiveNotFound e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateDataInstance", e));
@@ -564,7 +564,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final SADataInstanceVisibilityMapping archivedMapping = dataInstanceBuilders.getArchivedDataInstanceVisibilityMappingBuilder()
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
         logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new archived data visibility mapping", archivedMapping);
-        archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping), logBuilder.done());
+        archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
         return mapping;
     }
 

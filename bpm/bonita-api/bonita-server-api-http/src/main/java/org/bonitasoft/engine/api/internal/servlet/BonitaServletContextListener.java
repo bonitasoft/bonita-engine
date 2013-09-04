@@ -16,22 +16,55 @@ package org.bonitasoft.engine.api.internal.servlet;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.platform.session.PlatformSessionService;
+import org.bonitasoft.engine.platform.session.model.SPlatformSession;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.service.impl.SpringPlatformFileSystemBeanAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * 
- * Used to initialize the spring context if not yet initialized
- * 
+ * Used to initialize the spring context if not yet initialized.
+ * Also, starts the node if the platform exists.
  * 
  * @author Baptiste Mesta
- * 
  */
 public class BonitaServletContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
-        SpringPlatformFileSystemBeanAccessor.initializeContext(null);
+        try {
+            SpringPlatformFileSystemBeanAccessor.initializeContext(null);
 
+            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
+            SPlatformSession createSession = platformSessionService.createSession("john");
+            sessionAccessor.setSessionInfo(createSession.getId(), -1);
+            System.out.println("BonitaServletContextListener CreateSession " + createSession);
+            PlatformAPIImpl platformAPI = new PlatformAPIImpl();
+            if (platformAPI.isPlatformCreated()) {
+                System.out.println("BonitaServletContextListener platform created, starting the node");
+                platformAPI.startNode();
+                System.out.println("BonitaServletContextListener platform created, node started");
+            }
+            platformSessionService.deleteSession(createSession.getId());
+            sessionAccessor.deleteSessionId();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    protected PlatformServiceAccessor getPlatformAccessor() {
+        try {
+            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
     }
 
     @Override

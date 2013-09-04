@@ -33,9 +33,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.execution.work.ExecuteMessageCoupleWork;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.scheduler.JobExecutionException;
-import org.bonitasoft.engine.scheduler.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -74,7 +75,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     }
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() throws SJobExecutionException {
         try {
             final List<SMessageEventCouple> potentialMessageCouples = eventInstanceService.getMessageEventCouples();
 
@@ -82,18 +83,19 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
             final List<SMessageEventCouple> uniqueCouples = makeMessageUniqueCouples(potentialMessageCouples);
 
             for (final SMessageEventCouple couple : uniqueCouples) {
-                final SMessageInstance messageInstance = couple.getMessageInstance();
-                final SWaitingMessageEvent waitingMessage = couple.getWaitingMessage();
-
+                final long messageInstanceId = couple.getMessageInstanceId();
+                final long waitingMessageId = couple.getWaitingMessageId();
+                final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
+                
                 // Mark messages that will be treated as "treatment in progress":
-                markMessageAsInProgress(messageInstance);
-                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
-                    markWaitingMessageAsInProgress(waitingMessage);
+                markMessageAsInProgress(messageInstanceId);
+                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
+                    markWaitingMessageAsInProgress(waitingMessageId);
                 }
-                workService.registerWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId()));
+                workService.registerWork(new ExecuteMessageCoupleWork(messageInstanceId, waitingMessageId));
             }
         } catch (final SBonitaException e) {
-            throw new JobExecutionException(e);
+            throw new SJobExecutionException(e);
         }
     }
 
@@ -112,13 +114,14 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
         final List<Long> takenWaitings = new ArrayList<Long>(messageCouples.size());
         final List<SMessageEventCouple> pairs = new ArrayList<SMessageEventCouple>();
         for (final SMessageEventCouple couple : messageCouples) {
-            final SMessageInstance messageInstance = couple.getMessageInstance();
-            final SWaitingMessageEvent waitingMessage = couple.getWaitingMessage();
-            if (!takenMessages.contains(messageInstance.getId()) && !takenWaitings.contains(waitingMessage.getId())) {
-                takenMessages.add(messageInstance.getId());
+            final long messageInstanceId = couple.getMessageInstanceId();
+            final long waitingMessageId = couple.getWaitingMessageId();
+            final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
+            if (!takenMessages.contains(messageInstanceId) && !takenWaitings.contains(waitingMessageId)) {
+                takenMessages.add(messageInstanceId);
                 // Starting events and Starting event sub-processes must not be considered as taken if they appear several times:
-                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessage.getEventType())) {
-                    takenWaitings.add(waitingMessage.getId());
+                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
+                    takenWaitings.add(waitingMessageId);
                 }
                 pairs.add(couple);
             }
@@ -133,17 +136,17 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
         workService = getTenantServiceAccessor().getWorkService();
     }
 
-    private void markMessageAsInProgress(final SMessageInstance messageInstanceToUpdate) throws SMessageModificationException,
+    private void markMessageAsInProgress(final long messageInstanceIdToUpdate) throws SMessageModificationException,
             SMessageInstanceNotFoundException, SMessageInstanceReadException {
-        final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceToUpdate.getId());
+        final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceIdToUpdate);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(instanceBuilders.getSMessageInstanceBuilder().getHandledKey(), true);
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
-    private void markWaitingMessageAsInProgress(final SWaitingMessageEvent waitingMessage) throws SWaitingEventModificationException,
+    private void markWaitingMessageAsInProgress(final long waitingMessageInstanceIdToUpdate) throws SWaitingEventModificationException,
             SWaitingEventNotFoundException, SWaitingEventReadException {
-        final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessage.getId());
+        final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageInstanceIdToUpdate);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(instanceBuilders.getSWaitingMessageEventBuilder().getProgressKey(), SWaitingMessageEventBuilder.PROGRESS_IN_TREATMENT_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);

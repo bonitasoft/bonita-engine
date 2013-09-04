@@ -30,4 +30,7 @@ public class SLockException extends SBonitaException {
         super(cause);
     }
 
+    public SLockException(String message) {
+        super(message);
+    }
 }

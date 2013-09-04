@@ -17,5 +17,20 @@ CREATE TABLE job_param (
   PRIMARY KEY (tenantid, id)
 )
 GO
+
+CREATE TABLE job_log (
+  tenantid NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  jobDescriptorId NUMERIC(19, 0) NOT NULL,
+  retryNumber NUMERIC(19, 0),
+  lastUpdateDate NUMERIC(19, 0),
+  lastMessage NVARCHAR(MAX),
+  PRIMARY KEY (tenantid, id, jobDescriptorId)
+)
+GO
+
+ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id)
+GO
+
 ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id)
 GO

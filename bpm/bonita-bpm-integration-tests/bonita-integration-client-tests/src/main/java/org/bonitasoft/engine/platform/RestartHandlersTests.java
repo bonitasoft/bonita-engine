@@ -121,7 +121,7 @@ public class RestartHandlersTests extends CommonAPITest {
         login();
         // check all are not already pending
         assertTrue(getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()) < names.size() - 5);
-        final WaitUntil waitUntil = new WaitUntil(100, 5000, false) {
+        final WaitUntil waitUntil = new WaitUntil(100, 20000, false) {
 
             @Override
             protected boolean check() {

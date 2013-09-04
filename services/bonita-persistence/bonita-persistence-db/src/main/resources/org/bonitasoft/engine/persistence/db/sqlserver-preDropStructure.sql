@@ -3,8 +3,10 @@ ALTER TABLE actor DROP CONSTRAINT fk_actor_tenantId
 GO
 ALTER TABLE actormember DROP CONSTRAINT fk_actormember_tenantId
 GO
-ALTER TABLE queriable_log DROP CONSTRAINT fk_queriable_log_tenantId
+ALTER TABLE breakpoint DROP CONSTRAINT fk_breakpoint_tenantId
 GO
+-- ALTER TABLE queriable_log DROP CONSTRAINT fk_queriable_log_tenantId
+-- GO
 ALTER TABLE queriablelog_p DROP CONSTRAINT fk_queriablelog_p_tenantId
 GO
 ALTER TABLE category DROP CONSTRAINT fk_category_tenantId
@@ -70,8 +72,6 @@ GO
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId
 GO
 ALTER TABLE role DROP CONSTRAINT fk_role_tenantId
-GO
-ALTER TABLE transition_instance DROP CONSTRAINT fk_transition_instance_tenantId
 GO
 ALTER TABLE user_ DROP CONSTRAINT fk_user__tenantId
 GO

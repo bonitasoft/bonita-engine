@@ -15,7 +15,6 @@ package org.bonitasoft.engine.archive;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 
@@ -33,12 +32,10 @@ public interface ArchiveService {
      *            The archive date
      * @param record
      *            Archive insert record containing the entity to be archived
-     * @param queriableLog
-     *            Log information for entity archive
      * @throws SRecorderException
      * @throws SDefinitiveArchiveNotFound
      */
-    void recordInsert(long time, ArchiveInsertRecord record, SQueriableLog queriableLog) throws SRecorderException, SDefinitiveArchiveNotFound;
+    void recordInsert(long time, ArchiveInsertRecord record) throws SRecorderException, SDefinitiveArchiveNotFound;
 
     /**
      * Archive the given entities in the definitive archive
@@ -57,11 +54,9 @@ public interface ArchiveService {
      * 
      * @param record
      *            The delete record containing archived entity to be deleted
-     * @param queriableLog
-     *            Log information for the record deletion
      * @throws SRecorderException
      */
-    void recordDelete(DeleteRecord record, SQueriableLog queriableLog) throws SRecorderException;
+    void recordDelete(DeleteRecord record) throws SRecorderException;
 
     /**
      * Get the ReadPersistenceService corresponding to the definitive archive

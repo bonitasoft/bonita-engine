@@ -19,11 +19,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-client-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.ow2.spec.ee</groupId>
 			<artifactId>ow2-ejb-3.0-spec</artifactId>
 			<version>1.0.2</version>

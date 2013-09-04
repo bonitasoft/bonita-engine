@@ -3,7 +3,7 @@ package org.bonitasoft.engine.scheduler.job;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.scheduler.JobExecutionException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.impl.VariableStorage;
 
 /**
@@ -18,7 +18,7 @@ public class IncrementVariableJob extends GroupJob {
     private int throwExceptionAfterNIncrements;
 
     @Override
-    public void execute() throws JobExecutionException {
+    public void execute() throws SJobExecutionException {
         synchronized (IncrementVariableJob.class) {
 
             final VariableStorage storage = VariableStorage.getInstance();
@@ -26,7 +26,7 @@ public class IncrementVariableJob extends GroupJob {
             if (value == null) {
                 storage.setVariable(variableName, 1);
             } else if (value + 1 == throwExceptionAfterNIncrements) {
-                throw new JobExecutionException("Increment reached");
+                throw new SJobExecutionException("Increment reached");
             } else {
                 storage.setVariable(variableName, value + 1);
             }
