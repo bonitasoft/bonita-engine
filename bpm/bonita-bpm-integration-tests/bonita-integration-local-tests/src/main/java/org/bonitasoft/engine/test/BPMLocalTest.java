@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionIns
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.execution.work.AbstractBonitaWork;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -43,6 +46,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -379,6 +383,47 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
         // Check there is no actor left:
         assertEquals(0, actorMembers.size());
+    }
+
+    @Test
+    public void incidentIsLogged() throws Exception {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        WorkService workService = tenantAccessor.getWorkService();
+        workService.executeWork(new AbstractBonitaWork() {
+
+            @Override
+            public String getDescription() {
+                return "MyJob";
+            }
+
+            @Override
+            protected void work() throws Exception {
+                throw new Exception("an unexpected exception");
+
+            }
+
+            @Override
+            protected boolean isTransactional() {
+                return true;
+            }
+
+            @Override
+            protected void handleFailure(Exception e) throws Exception {
+                throw new Exception("unable to handle failure");
+            }
+
+            @Override
+            protected String getRecoveryProcedure() {
+                return "The recovy procedure";
+            }
+        });
+        Thread.sleep(100);
+        String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
+        File file = new File(tenantFolder + File.separatorChar + "INCIDENT.log");
+        String content = org.bonitasoft.engine.io.IOUtil.read(file);
+        assertTrue(content.contains("An incident happened: MyJob"));
+        assertTrue(content.contains("Procedure to recover: The recovy procedure"));
+
     }
 
     private ProcessDefinition deployAndEnableProcessWithOneHumanTask(final String processName, final String actorName, final String userTaskName)

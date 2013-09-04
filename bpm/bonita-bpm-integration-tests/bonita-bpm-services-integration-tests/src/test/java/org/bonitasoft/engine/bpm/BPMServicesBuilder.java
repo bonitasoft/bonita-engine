@@ -81,6 +81,7 @@ import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingSe
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -644,6 +645,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public SynchroService getSynchroService() {
         return getInstanceOf(SynchroService.class);
+    }
+
+    @Override
+    public IncidentService getIncidentService() {
+        return getInstanceOf(IncidentService.class);
     }
 
 }

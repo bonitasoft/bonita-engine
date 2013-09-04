@@ -533,8 +533,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         } finally {
-            cleanSessionAccessor(sessionAccessor);
-            sessionAccessor.setSessionInfo(platformSessionId, -1);
+            if (sessionAccessor != null) {
+                cleanSessionAccessor(sessionAccessor);
+                sessionAccessor.setSessionInfo(platformSessionId, -1);
+            }
         }
     }
 

@@ -15,6 +15,8 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.incident.Incident;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -86,7 +88,7 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                         "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
                         e);
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
-                logAlert();
+                logIncident();
             }
 
         } finally {
@@ -108,8 +110,14 @@ public abstract class AbstractBonitaWork implements BonitaWork {
         }
     }
 
-    protected void logAlert() {
-        // TODO log an alert here
+    protected void logIncident() {
+        Incident incident = new Incident(getDescription(), getRecoveryProcedure());
+        IncidentService incidentService = getTenantAccessor().getIncidentService();
+        incidentService.report(incident);
+    }
+
+    protected String getRecoveryProcedure() {
+        return null;
     }
 
     protected abstract boolean isTransactional();
