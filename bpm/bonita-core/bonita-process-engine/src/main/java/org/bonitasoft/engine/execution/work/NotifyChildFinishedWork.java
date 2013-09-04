@@ -84,4 +84,9 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
         TransactionService transactionService = getTenantAccessor().getTransactionService();
         transactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
+
+    @Override
+    protected String getRecoveryProcedure() {
+        return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
+    }
 }

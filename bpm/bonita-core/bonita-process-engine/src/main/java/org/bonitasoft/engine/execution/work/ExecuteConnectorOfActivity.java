@@ -170,4 +170,9 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         }
         return sConnectorDefinition;
     }
+
+    @Override
+    protected String getRecoveryProcedure() {
+        return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
+    }
 }

@@ -86,4 +86,9 @@ public class ExecuteFlowNodeWork extends TxLockProcessInstanceWork {
         transactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
 
+    @Override
+    protected String getRecoveryProcedure() {
+        return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
+    }
+
 }
