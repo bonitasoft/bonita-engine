@@ -252,7 +252,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 // FIXME: shouldn't we also stop the workService?:
                 workService.startup();
                 if (!isNodeStarted()) {
-                    if (platformConfiguration.shouldStartScheduler()) {
+                    if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
                         schedulerService.start();
                     }
                     if (platformConfiguration.shouldResumeElements()) {
