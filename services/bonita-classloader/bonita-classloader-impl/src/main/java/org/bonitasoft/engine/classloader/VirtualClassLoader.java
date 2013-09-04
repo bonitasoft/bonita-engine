@@ -69,7 +69,7 @@ public class VirtualClassLoader extends ClassLoader {
         if (this.classloader != null) {
             return this.classloader.getResourceAsStream(name);
         }
-        return null;
+        return getParent().getResourceAsStream(name);
     }
 
     public BonitaClassLoader getClassLoader() {
