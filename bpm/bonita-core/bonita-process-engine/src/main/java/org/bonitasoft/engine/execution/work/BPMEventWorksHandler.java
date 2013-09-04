@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.restart;
+package org.bonitasoft.engine.execution.work;
 
 import java.util.List;
 
@@ -33,6 +33,8 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * Resets all "In Progress" BPMN Message couples so that they can be triggered again on next cron.
+ * 
+ * Restart work {@link ExecuteMessageCoupleWork}
  * 
  * @author Emmanuel Duchastenier
  */

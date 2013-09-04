@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,20 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.restart;
+package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
  */
-public interface TenantRestartHandler {
+public class RestartException extends BonitaException {
+
+    private static final long serialVersionUID = 6724312254693245291L;
 
     /**
-     * @param tenantServiceAccessor
+     * @param message
+     * @param cause
      */
-    void handleRestart(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor) throws RestartException;
+    public RestartException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

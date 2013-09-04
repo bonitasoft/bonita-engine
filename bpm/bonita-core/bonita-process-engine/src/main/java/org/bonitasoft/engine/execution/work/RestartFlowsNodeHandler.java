@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.restart;
+package org.bonitasoft.engine.execution.work;
 
 import java.util.List;
 
@@ -19,9 +19,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
-import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -31,6 +29,13 @@ import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
+ * 
+ * Restart flow nodes for works:
+ * 
+ * {@link ExecuteFlowNodeWork} {@link ExecuteConnectorOfActivity} {@link NotifyChildFinishedWork}
+ * 
+ * 
+ * 
  * @author Baptiste Mesta
  * @author Celine Souchet
  * @author Matthieu Chaffotte
@@ -52,12 +57,15 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                 queryOptions = QueryOptions.getNextPage(queryOptions);
                 for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
                     if (sFlowNodeInstance.isTerminal()) {
+                        // NotifyChildFinishedWork
                         // if it is terminal it means the notify was not called yet
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":"
                                 + sFlowNodeInstance.getId());
-                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(),
+                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
+                                .getParentProcessInstanceId(), sFlowNodeInstance.getId(),
                                 sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
                     } else {
+                        // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":"
                                 + sFlowNodeInstance.getId());
                         workService.registerWork(new ExecuteFlowNodeWork(Type.PROCESS, sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
