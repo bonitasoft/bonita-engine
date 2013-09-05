@@ -85,7 +85,7 @@ public class DeleteBatchJobRegister implements JobRegister {
                     System.err.println("Register delete batch job with repeat cron: " + repeat);
                     loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register delete batch job with repeat cron: " + repeat);
                     final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
-                            .createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB).done();
+                            .createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB, true).done();
                     final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                     final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), repeat);
                     schedulerService.schedule(jobDescriptor, jobParameters, trigger);

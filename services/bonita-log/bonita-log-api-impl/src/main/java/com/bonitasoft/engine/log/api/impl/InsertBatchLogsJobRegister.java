@@ -77,7 +77,7 @@ public class InsertBatchLogsJobRegister implements JobRegister {
                         loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register insert batch logs with repeat cron: " + cronExpression);
                     }
                     final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
-                            .createNewInstance(InsertBatchLogsJob.class.getName(), INSERT_BATCH_LOGS_JOB).done();
+                            .createNewInstance(InsertBatchLogsJob.class.getName(), INSERT_BATCH_LOGS_JOB, true).done();
                     final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                     final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cronExpression);
                     schedulerService.schedule(jobDescriptor, jobParameters, trigger);
