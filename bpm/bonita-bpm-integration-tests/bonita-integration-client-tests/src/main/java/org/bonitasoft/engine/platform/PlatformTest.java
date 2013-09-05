@@ -136,12 +136,8 @@ public class PlatformTest {
         assertEquals(PlatformState.STOPPED, state);
         // test exception:PlatformNotFoundException
         platformAPI.cleanAndDeletePlaftorm();
-        try {
-            platformAPI.getPlatformState();
-            fail();
-        } catch (final PlatformNotFoundException e) {
-            // ok
-        }
+        // when platform does not exists it return STOPPED now
+        assertEquals(PlatformState.STOPPED, platformAPI.getPlatformState());
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "Get exception when starting node.", jira = "ENGINE-621")
