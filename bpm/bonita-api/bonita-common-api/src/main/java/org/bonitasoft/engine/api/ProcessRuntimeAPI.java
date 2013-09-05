@@ -54,7 +54,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -81,81 +80,83 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 public interface ProcessRuntimeAPI {
 
     /**
-     * Search for the hidden tasks for the specified user. Only searches for pending tasks for the current user: if a hidden task has been assigned,
-     * executed, ... it will not be retrieved.
+     * Search for pending hidden tasks that are available to the specified user.
+     * 
+     * Only searches for pending tasks for the current user: if a hidden task has been assigned
+     * or executed, it will not be retrieved.
      * 
      * @param userId
-     *            the ID of the user for whom to retrieve the hidden tasks
+     *            the ID of the user for whom to list the hidden tasks.
      * @param searchOptions
-     *            the search options parameters
-     * @return the list of hidden tasks for the specified user
+     *            the search criterion.
+     * @return the list of hidden tasks for the specified user.
      * @throws SearchException
-     *             in case a search problem occurs
+     *             if an exception occurs when getting the list of tasks.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchPendingHiddenTasks(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * List all open process instances
+     * List all open process instances.
      * 
      * @param searchOptions
-     *            The criterion used to search process instance
-     * @return A processInstance object
+     *            the search criterion.
+     * @return a processInstance object.
      * @throws SearchException
-     *             The search failed
+     *             if an exception occurs when getting the list of tasks.
      * @since 6.0
      */
     SearchResult<ProcessInstance> searchOpenProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
      * List all open process instances supervised by a user.
-     * If userId is not bound to any user, returns an empty SearchResult
+     * If the specified userId does not correspond to a user, an empty SearchResult is returned.
      * 
      * @param userId
-     *            Identifier of the user
+     *            the identifier of the user.
      * @param searchOptions
-     *            The criterion used to search process instance
-     * @return The list of process instances supervised by the user bound to userId
+     *            the search criterion.
+     * @return the list of process instances supervised by the specified user.
      * @throws SearchException
-     *             The search failed
+     *             if an exception occurs when getting the list of process instances.
      * @since 6.0
      */
     SearchResult<ProcessInstance> searchOpenProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Get number of all process data instances by id
+     * Get the number of process data instances by process id.
      * 
      * @param processInstanceId
-     *            Identifier of the activity instance
-     * @return The number of process data instances
+     *            the identifier of the process instance.
+     * @return the number of process data instances.
      * @throws ProcessInstanceNotFoundException
-     *             Error thrown if no ProcessInstance have an id corresponding to the parameter.
+     *             if the specified ProcessInstance does not refer to a process instance.
      * @since 6.0
      */
     long getNumberOfProcessDataInstances(long processInstanceId) throws ProcessInstanceNotFoundException;
 
     /**
-     * Get number of all activity data instances by id
+     * Get the number of activity data instances by activity id.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return Number of all activity data instances
+     *            identifier of the activity instance.
+     * @return the number of activity data instances.
      * @throws ActivityInstanceNotFoundException
-     *             Error thrown if no activity instance have an id corresponding to the parameter.
+     *             if the specified activity instance does not refer to an activity instance.
      * @since 6.0
      */
     long getNumberOfActivityDataInstances(long activityInstanceId) throws ActivityInstanceNotFoundException;
 
     /**
-     * Get all process instances, the returned list is paginated
+     * Get a paged list of all process instances.
      * 
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            Number of documents per page. Maximum number of documents returned.
+     *            the maximum number of results per page.
      * @param criterion
-     *            the criterion for sort result.
-     * @return The list of process instance
+     *            the sort criterion.
+     * @return the list of process instances.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -163,85 +164,92 @@ public interface ProcessRuntimeAPI {
     List<ProcessInstance> getProcessInstances(int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Get all archived process instances, the returned list is paginated
+     * Get a paged list of archived process instances.
      * 
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            Number of result per page. Maximum number of result returned.
+     *            the maximum number of results per page.
      * @param criterion
-     *            the criterion for sort result.
-     * @return The list of archived process instances
+     *            the sort criterion.
+     * @return the list of archived process instances.
      * @since 6.0
      */
     List<ArchivedProcessInstance> getArchivedProcessInstances(int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Get a list of archived activity instances, the returned list is paginated
+     * Get a paged list of archived activity instances for a process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
+     *            identifier of the process instance.
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            Number of result per page. Maximum number of result returned.
+     *            the maximum number of result per page.
      * @param criterion
-     *            aging criterion to sort the results
-     * @return this list of activities from the first definitive archive
+     *            the sort criterion.
+     * @return the list of archived activity instances.
      * @since 6.0
      */
     List<ArchivedActivityInstance> getArchivedActivityInstances(long processInstanceId, int startIndex, int maxResults, ActivityInstanceCriterion criterion);
 
     /**
-     * Retrieve a list of open activities for a given process instance, the returned list is paginated
+     * Retrieve a paged list of open activities for a given process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
+     *            the identifier of the process instance.
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            Number of result per page. Maximum number of result returned.
+     *            the maximum number of results per page.
      * @param criterion
-     *            paging criterion to sort the results
-     * @return The list of activity instances
+     *            the sort criterion.
+     * @return the list of activity instances.
      * @since 6.0
      */
     List<ActivityInstance> getOpenActivityInstances(long processInstanceId, int startIndex, int maxResults, ActivityInstanceCriterion criterion);
 
     /**
-     * Get total number of open activity instances by its id
+     * Get the total number of open activity instances by process instance id.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
-     * @return Number of open activity instances
+     *            the identifier of the process instance.
+     * @return the number of open activity instances.
+     *         #throws ProcessInstanceNotFoundException
+     *         if the specified process instacne id does not refer to a process instance.
      * @since 6.0
      */
     int getNumberOfOpenedActivityInstances(long processInstanceId) throws ProcessInstanceNotFoundException;
 
     /**
-     * Get the number of running process instances.
+     * Get the number of open process instances.
      * 
-     * @return The total number of process instances, whatever the process definition.
+     * An open process instance is a process instance that has not been archived.
+     * 
+     * @return the total number of open process instances.
      * @since 6.0
      */
     long getNumberOfProcessInstances();
 
     /**
-     * Get the number of distinct archived process instances. "Archived" means in the definitive archive.
-     * Only state Process Instances are retrieved.
+     * Get the number of archived process instances.
      * 
-     * @return The number of archived process instances
+     * Process instances in state COMPLETED are counted.
+     * 
+     * @return the number of archived process instances.
      * @since 6.0
      */
     long getNumberOfArchivedProcessInstances();
 
     /**
-     * Delete the process instance having the identifier in parameter
+     * Delete the specified process instance.
      * 
      * @param processInstanceId
-     *            identifier of the process instance to delete
+     *            the identifier of the process instance to delete.
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance can't be deleted because of a parent that is still existing.
+     *             if a process instance cannot be deleted because of a parent that is still active.
+     * @throws DeletionException
+     *             if an error occurs during deletion.
      * @since 6.0
      */
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
@@ -296,17 +304,17 @@ public interface ProcessRuntimeAPI {
     long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
 
     /**
-     * Start an instance of the process definition having processDefinitionId, and using the current session user
+     * Start an instance of the process with the specified process definition, using the current session user.
      * 
      * @param processDefinitionId
-     *            Identifier of the process definition will be started
-     * @return an instance of the process
+     *            the identifier of the process definition for which an instance will be started.
+     * @return an instance of the process.
      * @throws ProcessDefinitionNotFoundException
-     *             No matching process definition found
+     *             if no matching process definition is found.
      * @throws ProcessActivationException
-     *             if the process is disabled
+     *             if an exception occurs during activation.
      * @throws ProcessExecutionException
-     *             The process failed to execute
+     *             if a problem occurs when starting the process.
      * @since 6.0
      */
     ProcessInstance startProcess(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
@@ -322,92 +330,90 @@ public interface ProcessRuntimeAPI {
      *            the couples of initial variable/value
      * @return a ProcessInstance object
      * @throws ProcessDefinitionNotFoundException
-     *             If the identifier of process definition does not refer to any existing process definition
+     *             if the identifier of process definition does not refer to any existing process definition
      * @throws ProcessExecutionException
-     *             If the process fails to start
+     *             if the process fails to start
      * @throws ProcessActivationException
-     *             If the process is disable
+     *             if the process is disable
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
             ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start a process by process definition id
+     * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            the identifier of the process definition for which an instance will be started.
      * @param operations
-     *            The operations to start process
+     *            the operations to execute to set the initial values of the data.
      * @param context
-     *            The context in which operations are executed
-     * @throws ExecutionException
-     *             The process failed to start
+     *            the context in which operations are executed.
+     * @return an instance of the process.
      * @throws ProcessDefinitionNotFoundException
-     *             The process definition corresponding to processDefinitionId is not found
-     * @return a ProcessInstance object
-     * @throws ProcessExecutionException
+     *             if no matching process definition is found.
      * @throws ProcessActivationException
-     *             if the process is disabled
+     *             if an exception occurs during activation.
+     * @throws ProcessExecutionException
+     *             if a problem occurs when starting the process.
      * @since 6.0
      */
     ProcessInstance startProcess(long processDefinitionId, List<Operation> operations, Map<String, Serializable> context)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process definition on behalf of a given user
-     * If userId equals 0, the logged-in user is declared as the starter of the process.
-     * The user, who started the process on behalf of a given user, is declared as a starter delegate.
+     * Start an instance of the process with the specified process definition id on behalf of a given user.
      * 
      * @param userId
-     *            the identifier of the user for which you want to start the process
+     *            the user id of the user.
      * @param processDefinitionId
-     *            Identifier of the processDefinition
-     * @return The ProcessInstance Objects
+     *            the identifier of the process definition for which an instance will be started.
+     * @return an instance of the process.
+     * @throws ProcessDefinitionNotFoundException
+     *             if no matching process definition is found.
      * @throws ProcessActivationException
-     *             if the process is disabled
+     *             if a problem occurs when starting the process.
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
             ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process definition on behalf of a given user, and set the initial values of the data with the given operations.
-     * If userId equals 0, the logged-in user is declared as the starter of the process.
-     * The user, who started the process on behalf of a given user, is declared as a starter delegate.
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
+     * given operations.
      * 
      * @param userId
-     *            the identifier of the user for which you want to start the process
+     *            the id of the user.
      * @param processDefinitionId
-     *            Identifier of the process definition will be started
+     *            the identifier of the process definition for which an instance will be started.
      * @param operations
-     *            the operations to execute to set the initial values of the data
+     *            the operations to execute to set the initial values of the data.
      * @param context
-     *            TODO
-     * @return an instance of the process
+     *            the context in which the operations are executed.
+     * @return an instance of the process.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessDefinitionNotFoundException
-     *             No matching process definition found
+     *             if no matching process definition is found.
      * @throws ProcessActivationException
-     *             a primary precondition of starting a process is the status of matching process definition should be enabled, if not,the exception occur.
+     *             if an exception occurs during activation.
      * @throws UserNotFoundException
-     *             in case this userId is not found.
+     *             if there is no user with the specified userId.
      * @throws ProcessExecutionException
-     *             if a problem occurs when starting the process
+     *             if a problem occurs when starting the process.
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context)
             throws UserNotFoundException, ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Execute an flowNode that is is a non stable state
-     * Will make the flow node go in the next stable state and then continue the execution of the process
+     * Execute an activity that is in an unstable state.
+     * Will move the activity to the next stable state and then continue the execution of the process.
      * 
      * @param flownodeInstanceId
-     *            the identifier of the flow node to execute
+     *            the identifier of the flow node to execute.
      * @throws FlowNodeExecutionException
-     *             if an execution exception occurs
+     *             if an execution exception occurs.
      * @since 6.0
      */
     void executeFlowNode(long flownodeInstanceId) throws FlowNodeExecutionException;
@@ -429,107 +435,109 @@ public interface ProcessRuntimeAPI {
     void executeFlowNode(long userId, long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
-     * Returns all currently active activities of a process instance.
+     * Returns all activities (active and finished) of a process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
+     *            the identifier of the process instance,
      * @param startIndex
-     *            the index
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            the number of results to get
-     * @return the matching set of activity instances
+     *            the maximum number of results to get.
+     * @return the matching set of activity instances.
      * @since 6.0
      */
     List<ActivityInstance> getActivities(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Get an instance of process from its processInstance ID.
+     * Get the specified process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
-     * @return the matching instance of process
+     *            the identifier of the process instance.
+     * @return the matching instance of process.
      * @throws ProcessInstanceNotFoundException
-     *             if no process instance can be found with the provided ID.
+     *             if there is no process instance with the specified identifier.
      * @since 6.0
      */
     ProcessInstance getProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException;
 
     /**
-     * Get an instance of activity using its activity instance id.
+     * Get the specified activity instance.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return the matching instance of activity
+     *            the identifier of the activity instance.
+     * @return the matching activity instance.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *             if the activity cannot be found
+     *             if the activity cannot be found.
      * @throws RetrieveException
-     *             can't retrieve an instance of activity
+     *             if the activity instance cannot be retrieved.
      * @since 6.0
      */
     ActivityInstance getActivityInstance(long activityInstanceId) throws ActivityInstanceNotFoundException;
 
     /**
-     * Get an instance of flow node using its flow node instance id.
+     * Get a specified flow node instance.
      * 
      * @param flowNodeInstanceId
-     *            Identifier of the flow node instance
-     * @return the matching instance of activity
+     *            the identifier of the flow node instance.
+     * @return the matching flow node instance.
      * @since 6.0
      */
     FlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws FlowNodeInstanceNotFoundException;
 
     /**
-     * Get an activity instance that already was archived.
+     * Get an activity instance that is archived.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return the matching activity instance that already was archived
+     *            the identifier of the activity instance.
+     * @return the matching archived activity instance.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *             if the archived activity cannot be found
+     *             if the archived activity instance cannot be found.
      * @throws RetrieveException
-     *             can't retrieve an instance of activity
+     *             if the archived activity instance cannot be retrieved.
      * @since 6.0
      */
     ArchivedActivityInstance getArchivedActivityInstance(long activityInstanceId) throws ActivityInstanceNotFoundException;
 
     /**
-     * Retrieve a list of assigned human task instances related to given userId.
+     * Get the list of human task instances assigned to the specified user.
      * 
      * @param userId
-     *            the user identifier
+     *            the identifier of the user.
      * @param startIndex
-     *            the index
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            the max number of elements to retrieve per page
+     *            the maximum number of elements to get per page.
      * @param criterion
-     *            the sort criterion
-     * @return the matching list
+     *            the sort criterion.
+     * @return the matching list of task instances.
      * @throws InvalidSessionException
      *             occurs when the session is invalid.
      * @throws RetrieveException
-     *             can't retrieve an instance of activity
+     *             if a task instance cannot be retrieved.
      * @since 6.0
      */
     List<HumanTaskInstance> getAssignedHumanTaskInstances(long userId, int startIndex, int maxResults, ActivityInstanceCriterion criterion);
 
     /**
-     * Retrieve a list of pending human task instances related to a given userId. A human task is pending for a given user if it is not yet assigned and if the
-     * user is a candidate either through an {@link ActorMember} or through a {@link UserFilter}. In addition, hidden tasks for this user are not retrieved (see
-     * {@link #hideTasks(long, Long...)})
+     * Get the list of pending human task instances available to the specified user.
+     * 
+     * A human task is pending for a given user if it is not yet assigned and if the
+     * user is a candidate either through an {@link ActorMember} or through a {@link UserFilter}. Hidden tasks for this user are not retrieved (see
+     * {@link #hideTasks(long, Long...)}).
      * 
      * @param userId
-     *            the user identifier
+     *            the identifier of the user.
      * @param startIndex
-     *            the index
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            the max number of elements to retrieve per page
+     *            the maximum number of elements to get per page.
      * @param pagingCriterion
-     *            the Criterion is for how to separate all items gotten to many pages.
-     * @return the matching list
+     *            the criterion for sorting the items over pages.
+     * @return the list of matching task instances.
      * @throws InvalidSessionException
      *             occurs when the session is invalid.
      * @since 6.0
@@ -537,25 +545,25 @@ public interface ProcessRuntimeAPI {
     List<HumanTaskInstance> getPendingHumanTaskInstances(long userId, int startIndex, int maxResults, ActivityInstanceCriterion pagingCriterion);
 
     /**
-     * Count total number of human task instances assigned that is related to the given userId.
+     * Count the total number of human task instances assigned to the specified user.
      * 
      * @param userId
-     *            Identifier of a user
-     * @return a number of human task instances assigned
+     *            the identifier of a user.
+     * @return a number of human task instances assigned.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
-     *             errors happen in while retrieving the instance of activity
+     *             if an error occurs while retrieving an instance of an activity.
      * @since 6.0
      */
     long getNumberOfAssignedHumanTaskInstances(long userId);
 
     /**
-     * Return userIds and corresponding open task's id.
+     * For a specified list of users, get the number of pending tasks.
      * 
      * @param userIds
-     *            a list of Identifiers for users
-     * @return a map with userId as key and task id as value
+     *            a list of user identifiers.
+     * @return a map with userId as key and number of tasks as value.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
@@ -565,45 +573,47 @@ public interface ProcessRuntimeAPI {
     Map<Long, Long> getNumberOfOpenTasks(List<Long> userIds);
 
     /**
-     * Count number of pending human task instances.
+     * Count the number of pending human task instances available to a specified user.
      * 
      * @param userId
-     *            Identifier of a user
-     * @return a number of pending human task instances
+     *            the identifier of a user.
+     * @return a number of pending human task instances.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
-     *             errors happen in while retrieving the instance of activity
+     *             if an error occurs while retrieving an instance of an activity.
      * @since 6.0
      */
     long getNumberOfPendingHumanTaskInstances(long userId);
 
     /**
-     * Retrieve a human task instance using corresponding activity instance id.
+     * Retrieve a human task instance by the corresponding activity instance id.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return the matching instance of human task
+     *            the identifier of the activity instance.
+     * @return the matching instance of human task.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *             if the human task cannot be found
+     *             if the human task cannot be found.
      * @throws RetrieveException
-     *             errors happen in while retrieving the instance of activity
+     *             if an error occurs while retrieving the instance of the activity.
      * @since 6.0
      */
     HumanTaskInstance getHumanTaskInstance(long activityInstanceId) throws ActivityInstanceNotFoundException;
 
     /**
-     * Get a event instance list according to all given conditions
+     * Get a list of event instances related to a process instance that match the specified conditions.
      * 
      * @param rootContainerId
-     *            id of the top-level container
+     *            the id of the containing root process instance.
      * @param startIndex
-     *            the index
+     *            the index of the first result (starting from 0).
      * @param maxResults
-     *            the number of results to get
-     * @return the matching list of event instances
+     *            the maximum number of results to get.
+     * @param sortingType
+     *            the criterion for sorting event instances.
+     * @return the matching list of event instances.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -611,14 +621,16 @@ public interface ProcessRuntimeAPI {
     List<EventInstance> getEventInstances(long rootContainerId, int startIndex, int maxResults, EventCriterion sortingType);
 
     /**
-     * Assign a task to a user with given user name.
+     * Assign a task to a user with given user identifier.
      * 
      * @param userTaskId
-     *            Identifier of user task
+     *            the identifier of the user task.
      * @param userId
-     *            id of user
+     *            the identifier of the user.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *             if an error occurs while updating the activity instance.
      * @since 6.0
      */
     void assignUserTask(long userTaskId, long userId) throws UpdateException;
@@ -635,119 +647,122 @@ public interface ProcessRuntimeAPI {
     void updateActorsOfUserTask(long userTaskId) throws UpdateException;
 
     /**
-     * Returns all data of a process instance
+     * Returns all data of a process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
+     *            the identifier of the process instance.
      * @param startIndex
-     *            the index of the page of results to get
+     *            the index of the page of results to get (starting from 0).
      * @param maxResults
-     *            the number of results to get
-     * @return the matching list of dataInstances
+     *            the maximum number of results to get.
+     * @return the matching list of dataInstances.
      * @since 6.0
      */
     List<DataInstance> getProcessDataInstances(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Get a DataInstance by dataName, processInstanceId.
+     * Get the value of named data item from a specified process instance.
+     * The value is returned in a DataInstance object.
      * 
      * @param dataName
-     *            name of data
+     *            the name of the data item.
      * @param processInstanceId
-     *            Identifier of the process instance
+     *            the identifier of the process instance.
      * @return an instance of the data
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws DataNotFoundException
-     *             Error thrown if can't get the corresponding data.
+     *             if the specified data value cannot be found.
      * @since 6.0
      */
     DataInstance getProcessDataInstance(String dataName, long processInstanceId) throws DataNotFoundException;
 
     /**
-     * Update data instance with given data name, value and process instance id that the data belongs to.
+     * Update the value of a named data item in a specified process instance.
      * 
      * @param dataName
-     *            name of data
+     *            the name of the data item.
      * @param processInstanceId
-     *            Identifier of process instance the data belongs to
+     *            the identifier of the process instance.
      * @param dataValue
-     *            the new value of data to set
+     *            the new value for the data item.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws UpdateException
-     *             if an data update problem occurs
+     *             if a problem occurs while updating the data value.
      * @since 6.0
      */
     void updateProcessDataInstance(String dataName, long processInstanceId, Serializable dataValue) throws UpdateException;
 
     /**
-     * Get data instances under the activity with given activity id.
+     * Get a list of the data instances from a specified activity instance.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @param startIndex
-     *            the index
+     *            the index of the first result (starting at 0).
      * @param maxResults
-     *            the number of results to get
-     * @return the matching list of dataInstances
+     *            the maximum number of results to get.
+     * @return the list of matching DataInstances.
      * @since 6.0
      */
     List<DataInstance> getActivityDataInstances(long activityInstanceId, int startIndex, int maxResults);
 
     /**
-     * Get a data instance in activity with data name and activity instance id.
+     * Get a named data instance from a specified activity instance.
      * 
      * @param dataName
-     *            name of data
+     *            the name of the data item.
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return an instance of data
+     *            the identifier of the activity instance.
+     * @return an instance of data.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws DataNotFoundException
-     *             Error thrown if can't get the corresponding data.
+     *             if the specified data value cannot be found.
      * @since 6.0
      */
     DataInstance getActivityDataInstance(String dataName, long activityInstanceId) throws DataNotFoundException;
 
     /**
-     * Update a data instance's value which in activity using data name and activity instance id.
+     * Update the value of a named data instance in a specified activity instance.
      * 
      * @param dataName
-     *            name of data
+     *            the name of the data instance.
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws UpdateException
+     *             if an error occurs during the update.
      * @since 6.0
      */
     void updateActivityDataInstance(String dataName, long activityInstanceId, Serializable dataValue) throws UpdateException;
 
     /**
-     * Get the date when the activity with given activityInstanceId reaches the given state.
+     * Get the date when the specified activity instance reached the given state.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @param state
-     *            representing state of the activity existed
-     * @return the matching date
+     *            the state of interest.
+     * @return the date at which the activity instance reached the state.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
-     *             errors happen in while retrieving the instance of activity
+     *             if an error occurs while retrieving the activity instance.
      * @since 6.0
      */
     Date getActivityReachedStateDate(long activityInstanceId, String state);
 
     /**
      * Update the given variables of an activity instance.
+     * The updates are treated as a single transaction, so if any variable update fails, none of the values is changed.
      * 
      * @param activityInstanceId
-     *            the activity identifier
+     *            the activity identifier.
      * @param variables
-     *            a map which contains several couple the variable name/value
+     *            a map which contains several pairs of variable name and value.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -755,213 +770,229 @@ public interface ProcessRuntimeAPI {
     void updateActivityInstanceVariables(long activityInstanceId, Map<String, Serializable> variables) throws UpdateException;
 
     /**
-     * Update a variable data's expression in an activity instance which has left and right sides.
+     * Update the values of variables in an activity instance using expressions.
      * 
      * @param operations
-     *            using this parameter to update expression's left and right side for different operation type.
+     *            a sequence of operations on expressions that update the values variables.
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @param expressionContexts
-     *            store all parameters that related to container which the data belongs to.
+     *            store all information identifying the container that the data belongs to.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *             if an error occurs during the update.
      * @since 6.0
      */
     void updateActivityInstanceVariables(List<Operation> operations, long activityInstanceId, Map<String, Serializable> expressionContexts)
             throws UpdateException;
 
     /**
-     * Update the due date of a task
+     * Update the due date of a task.
      * 
      * @param userTaskId
-     *            identifier of the task to update
+     *            teh identifier of the task to update.
      * @param dueDate
-     *            new due date for the task
+     *            the new due date for the task.
      * @throws InvalidSessionException
-     *             if the activity does not exists
+     *             if the activity does not exist.
      * @since 6.0
      */
     void updateDueDateOfTask(long userTaskId, Date dueDate) throws UpdateException;
 
     /**
-     * Get an instance of userTask assigned in an instance of process.
+     * Get an instance of a task asssigned to a given user for the specified process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
+     *            the identifier of the process instance.
      * @param userId
-     *            Identifier of a user
-     * @return id of assigned userTask instance in process instance
+     *            the identifier of the user.
+     * @return the id of a user task from the process instance that is assigned to the user.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws UserNotFoundException
-     *             Error thrown if no user have an id corresponding to the value of userId parameter
+     *             if there is no user with the specified id.
      * @throws RetrieveException
-     *             errors happen in while retrieving the instance of activity
+     *             if an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessInstance(long processInstanceId, long userId) throws ProcessInstanceNotFoundException, UserNotFoundException;
 
     /**
-     * Get an instance of userTask assigned in a processDefinition.
+     * Get an instance of a task asssigned to a given user for the specified process definition.
      * 
      * @param processDefinitionId
-     *            Identifier of the process definition
+     *            the identifier of the process definition.
      * @param userId
-     *            Identifier of a user
-     * @return the matching userTask id
+     *            the identifier of a user.
+     * @return the id of a user task from the process definition that is assigned to the user.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
-     *             Error thrown if can't retrieve corresponding instance of process.
+     *             if an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
             UserNotFoundException;
 
     /**
-     * Get an activity instance's state according to its activityInstanceId.
+     * Get the state of a specified activity instance.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return the matching activity's state
+     *            the identifier of the activity instance.
+     * @return the state of the activity instance.
      * @throws ActivityInstanceNotFoundException
-     *             if the activity cannot be found
+     *             if the activity cannot be found.
      * @since 6.0
      */
     String getActivityInstanceState(long activityInstanceId) throws ActivityInstanceNotFoundException;
 
     /**
-     * Check if the task can be executed
+     * Check whether a specified task can be executed by a given user.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @param userId
-     *            Identifier of a user
-     * @return a flag that indicates the task can be executed
+     *            the identifier of a user.
+     * @return a flag that indicates whether task can be executed by the user.
      * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *             if the activity cannot be found
+     *             if the activity cannot be found.
      * @throws UserNotFoundException
-     *             Error thrown if no user have an id corresponding to the value of userId parameter
+     *             if there is no user with the specified userId.
      * @throws RetrieveException
-     *             errors happen in while retrieving the instance of activity
+     *             if an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
     boolean canExecuteTask(long activityInstanceId, long userId) throws ActivityInstanceNotFoundException, UserNotFoundException;
 
     /**
-     * release a task (un_claim or un_assign). After the operation, the task should be in the pending task list
+     * Release a task (unclaim or unassign). After the operation, the task is in the pending task list.
      * 
      * @param userTaskId
-     *            Identifier of user task
+     *            the identifier of the user task.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *             errors thrown if can't find corresponding activity
+     *             if the activity cannot be found.
      * @since 6.0
      */
     void releaseUserTask(long userTaskId) throws ActivityInstanceNotFoundException, UpdateException;
 
     /**
+     * List the archived process instances for the specified process instance.
+     * A process instance is archived when it changes state, so there are several archived process instances for each process instance.
+     * 
      * @param processInstanceId
-     *            the process instance ID to retrieve the list of archives from
+     *            the identifier of the process instance.
      * @param startIndex
-     *            the index of the page of results to get
+     *            the index of the page of results to get.
      * @param maxResults
-     *            the number of results to get
-     * @return the list found
+     *            the maximum number of results to get.
+     * @return the list of archived process instances.
      * @throws InvalidSessionException
-     *             if no current valid session is found
+     *             if no current valid session is found.
      * @throws RetrieveException
-     *             if search failed for a read reason
+     *             if the search fails because an archived process instance cannot be read.
      * @since 6.0
      */
     List<ArchivedProcessInstance> getArchivedProcessInstances(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Get the last archived instance of process.
+     * Get the last archived instance of a process instance.
+     * A process instance is archived when it changes state, so there are several archived process instances for each process instance.
+     * The last archived instance is returned.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
-     * @return an instance of process archived
+     *            the identifier of the process instance.
+     * @return an archived process instance.
      * @throws InvalidSessionException
-     *             if no current valid session is found
+     *             if no current valid session is found.
      * @throws RetrieveException
-     *             if search failed for a read reason
+     *             if the search fails because an archived process instance cannot be read.
      * @since 6.0
      */
     ArchivedProcessInstance getFinalArchivedProcessInstance(long processInstanceId) throws ArchivedProcessInstanceNotFoundException;
 
     /**
-     * Set a activity's state with state id.
+     * Set the state of an activity instance.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @param stateId
-     *            Identifier of state
+     *            the identifier of the required state.
      * @throws InvalidSessionException
-     *             if no current valid session is found
+     *             if no current valid session is found.
+     * @throws UpdateException
+     *             if an error occurs during the update.
      * @since 6.0
      */
     void setActivityStateById(long activityInstanceId, int stateId) throws UpdateException;
 
     /**
-     * Set a activity's state with state name.
+     * Set the state of an activity instance.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @param state
-     *            representing new state of the activity
+     *            the name of the required state.
      * @throws InvalidSessionException
-     *             if no current valid session is found
+     *             if no current valid session is found.
+     * @throws UpdateException
+     *             if an error occurs during the update.
      * @since 6.0
      */
     void setActivityStateByName(long activityInstanceId, String state) throws UpdateException;
 
     /**
-     * Set a process instance's state.
+     * Set a state of a process instance.
      * 
      * @param processInstance
-     *            an instance of process
+     *            a process instance.
      * @param state
-     *            representing new state of the activity
+     *            the name of the required state.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *             if an error occurs during the update.
      * @since 6.0
      */
     void setProcessInstanceState(ProcessInstance processInstance, String state) throws UpdateException;
 
     /**
-     * Set this userTask instance's priority.
+     * Set the priority of a user task.
      * 
      * @param userTaskInstanceId
-     *            Identifier of user task instance
+     *            the identifier of user task instance.
      * @param priority
-     *            new priority of this task
+     *            the new priority of this task.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *             if an error occurs during the update.
      * @since 6.0
      */
     void setTaskPriority(long userTaskInstanceId, TaskPriority priority) throws UpdateException;
 
     /**
-     * Execute connector in given processDefinition.
+     * Execute a connector in a specified processDefinition.
      * 
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *            the identifier of connector definition.
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *            the version of the connector definition.
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *            the expressions related to the connector input paramters.
      * @param inputValues
-     *            all parameters values for expression need when evaluate the connector
+     *            the parameters values for expression needed when evaluating the connector.
      * @param processDefinitionId
-     *            Identifier of the process definition
-     * @return a map with connector parameter name and parameter value object
+     *            the identifier of the process definition.
+     * @return a map with connector parameter names and parameter value objects.
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if an error occurs during connector execution.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if there is no connector definition with the specified identifier or version.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -971,27 +1002,27 @@ public interface ProcessRuntimeAPI {
             throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
-     * Execute connector in given processDefinition with operations.
+     * Execute a connector in a specified processDefinition with operations.
      * 
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *            the identifier of connector definition.
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *            the version of the connector definition.
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *            the expressions related to the connector input parameters.
      * @param inputValues
-     *            all parameters values for expression need when evaluate the connector
+     *            the parameters values for expression needed when evaluating the connector.
      * @param operations
-     *            map of operations having each a special context (input values)
+     *            the operations used when executing the connector.
      * @param operationInputValues
-     *            TODO
+     *            the input values for the operations.
      * @param processDefinitionId
-     *            Identifier of the process definition
-     * @return a map with new values of elements set by the operations
+     *            the identifier of the process definition.
+     * @return a map with connector parameter names and parameter value objects after operations and connector execution.
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if an error occurs during connector execution.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if there is no connector definition with the specified identifier or version.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1001,11 +1032,11 @@ public interface ProcessRuntimeAPI {
             Map<String, Serializable> operationInputValues, long processDefinitionId) throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
-     * Search task archived.
+     * Search the archived human tasks for tasks that match the search options.
      * 
      * @param searchOptions
-     *            search conditions and set sort,paging properties.
-     * @return the number of human tasks found and the matching human tasks
+     *            the search conditions and the options for sorting and paging the results.
+     * @return the archived human tasks that match the search conditions.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1013,69 +1044,69 @@ public interface ProcessRuntimeAPI {
     SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasks(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search human tasks administered by the given user.
+     * Search the assigned human tasks for tasks that match the search options and are administered by the specified user.
      * 
      * @param managerUserId
-     *            Identifier of a user
+     *            the identifier of the user.
      * @param searchOptions
-     *            search conditions and set sort,paging properties.
-     * @return the number of human tasks found and the matching human tasks
+     *            the search conditions and the options for sorting and paging the results.
+     * @return the assigned human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
-     *             if there's wrong search condition, error happened.e.g,set a String value to long attribute.
+     *             if there is an error in the search conditions.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchAssignedTasksManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search pending human tasks supervised by the given user.
+     * Search the pending human tasks for tasks that match the search options and are supervised by the specified user.
      * 
      * @param userId
-     *            Identifier of a user
+     *            the identifier of the user.
      * @param searchOptions
-     *            search conditions and set sort,paging properties.
-     * @return the number of human tasks found and the matching human tasks
+     *            the search conditions and the options for sorting and paging the results.
+     * @return the pending human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
-     *             if there's wrong search condition, error happened.e.g,set a String value to long attribute.
+     *             if there is an error in the search conditions.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchPendingTasksSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search pending human tasks for the given user.
+     * Search the pending human tasks for tasks available to the specified user.
      * 
      * @param userId
-     *            Identifier of a user
+     *            the identifier of the user.
      * @param searchOptions
-     *            search conditions and set sort,paging properties.
-     * @return the number of human tasks found and the matching human tasks
+     *            the search conditions and the options for sorting and paging the results.
+     * @return the pending human tasks that match the search conditions and are available to the user.
      * @throws SearchException
-     *             if there's wrong search condition, error happened.e.g,set a String value to long attribute.
+     *             if there is an error in the search conditions.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchPendingTasksForUser(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search pending human tasks administered by the given user.
+     * Search the pending human tasks for tasks that match the search options and are managed by the specified user.
      * 
      * @param managerUserId
-     *            same to user id
+     *            the identifier of the user.
      * @param searchOptions
-     *            search conditions and set sort,paging properties.
-     * @return the number of human tasks found and the matching human tasks
+     *            the search conditions and the options for sorting and paging the results.
+     * @return the pending human tasks that match the search conditions and are managed by the user.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if there's wrong search condition, error happened.e.g,set a String value to long attribute.
+     *             if there is an error in the search conditions.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Get the number of both assigned and pending overdue tasks for each user
+     * Get the number of assigned and pending overdue tasks for the specified users.
      * 
      * @param userIds
-     *            a list of user identifiers
-     * @return a map with user id and relative number of overdue tasks
+     *            a list of user identifiers.
+     * @return a map of user identifiers and numbers of overdue tasks.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1083,270 +1114,278 @@ public interface ProcessRuntimeAPI {
     Map<Long, Long> getNumberOfOverdueOpenTasks(List<Long> userIds);
 
     /**
-     * Cancel an instance of process with the given processInstanceId.
+     * Cancel a specified process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the process instance
+     *            the identifier of the process instance.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
-     *             if no process instance have an id corresponding to the value of processInstanceId parameter.
+     *             if there is no process instance with the specified identifier.
      * @throws RetrieveException
-     *             Error happened when can't retrieve the instance of process.
+     *             if an error occurs while retreiving the process instance.
      * @since 6.0
      */
     void cancelProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException;
 
     /**
-     * set state of activity to its previous state and then execute.
-     * precondition: the activity is in state FAILED
+     * Reset the state of a failed activity instance to its previous state and then execute it.
+     * The activity must be in state FAILED.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            the identifier of the activity instance.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *             errors thrown if can't find corresponding activity
+     *             if there is no activity instance with the specified identifier.
      * @throws ActivityExecutionException
-     *             errors happened when one of the two step that re-set state of the task and execute it again failed.
+     *             if an error occurs either while resetting the state of while executing the activity instance.
      * @since 6.0
      */
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
     /**
-     * Hides a list of tasks from a specified user. A task "hidden" is then not retrieved anymore by method "searchPendingTasksForUser".
-     * As soon as a task is claimed by / assigned to a user, it is not "hidden" anymore for anyone.
+     * Hides a list of tasks from a specified user. A task that is "hidden" for a user is not pending for that user,
+     * so is not retrieved by #searchPendingTasksForUser.
+     * As soon as a task is claimed by or assigned to a user, it is no longer hidden from any users.
      * 
      * @param userId
-     *            the ID of the user to hide the tasks for.
+     *            the identifier of the user.
      * @param activityInstanceId
-     *            the ID of the task to hide
+     *            the list of identifiers of the tasks to be hidden.
      * @throws InvalidSessionException
-     *             in there is no current valid session.
+     *             if there is no current valid session.
      * @throws UpdateException
-     *             in case a problem occurs when hiding one of the tasks.
+     *             if a problem occurs when hiding one of the tasks.
      * @see #unhideTasks(long, Long...)
      * @since 6.0
      */
     void hideTasks(long userId, Long... activityInstanceId) throws UpdateException;
 
     /**
-     * Un-hides a list of tasks from a specified user. Un-hiding a task makes it available for a user if the task is pending for that user.
+     * Un-hides a list of tasks for a specified user. Un-hiding a task makes it available for a user if the task is pending for that user.
      * 
      * @param userId
-     *            the ID of the user to un-hide the tasks for.
+     *            the identifier of the user.
      * @param activityInstanceId
-     *            the ID of the task to un-hide
+     *            the list of identifiers of the tasks to be hidden.
      * @throws InvalidSessionException
-     *             in there is no current valid session.
+     *             if there is no current valid session.
      * @throws UpdateException
-     *             in case a problem occurs when un-hiding one of the tasks.
+     *             if a problem occurs when un-hiding one of the tasks.
      * @see #hideTasks(long, Long...)
      * @since 6.0
      */
     void unhideTasks(long userId, Long... activityInstanceId) throws UpdateException;
 
     /**
-     * Evaluate the expression in the context of the process having the processDefinitionId.
+     * Evaluate an expression in the context of the specified process.
      * Some context values can also be provided
      * 
      * @param expression
-     *            the expression to evaluate
+     *            the expression to evaluate.
      * @param context
-     *            context values that is provided to evaluate the expression
+     *            context values that are provided for evaluating the expression.
      * @param processDefinitionId
-     *            the id of the process of which the context will be used to evaluate the expression
+     *            the id of the process definition in which the expression is evaluated.
      * @return
-     *         the result of the evaluation
+     *         the result of the evaluation.
      * @throws InvalidSessionException
+     *             if there is no current valid session.
      * @throws ExpressionEvaluationException
+     *             if an error occurs while evaluating the expression.
      * @since 6.0
      */
     Serializable evaluateExpressionOnProcessDefinition(Expression expression, Map<String, Serializable> context, long processDefinitionId)
             throws ExpressionEvaluationException;
 
     /**
-     * return true if the task have the identifier userTaskId is hidden for the logged user
+     * Checks whether a specified task is hidden from a given user.
      * 
      * @param userTaskId
-     *            id of the task to check
+     *            the identifier of the task to check.
      * @param userId
-     *            id of the user
+     *            the identifier of the user.
      * @return
-     *         true if it is hidden for the logged user
+     *         true if the task is hidden from the user.
      * @throws InvalidSessionException
+     *             if there is no current valid session
      * @throws RetrieveException
+     *             if an error occurs while retreiving the task.
      * @since 6.0
      */
     boolean isTaskHidden(long userTaskId, long userId);
 
     /**
-     * Query the engine to get the number of comments depending on the search options
+     * Get the number of comments matching the search conditions.
      * 
      * @param searchOptions
-     *            Search conditions and set sort, paging properties
+     *            the search conditions and the options for sorting and paging the results.
      * @return
-     *         The number of comments matching the search options
+     *         the number of comments matching the search conditions.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     long countComments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Query the engine to get the number of attachments depending on the search options
+     * Get the number of attachments matching the search conditions.
      * 
      * @param searchOptions
-     *            Search conditions and set sorts, paging properties
+     *            the search conditions and the options for sorting and paging the results.
      * @return
-     *         The number of attachments
+     *         the number of attachments matching the search conditions.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
 
     long countAttachments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Send a BPMN signal event. Invoking this method act as executing a Throw Signal Event
+     * Send a BPMN signal event. Invoking this method acts as executing a Throw Signal Event.
      * 
      * @param signalName
-     *            the signal name
+     *            the signal name.
      * @throws InvalidSessionException
+     *             if there is no current valid session.
      * @throws SendEventException
-     *             if an Exception occurs while sending signal
+     *             if an exception occurs while sending signal.
      * @since 6.0
      */
     void sendSignal(String signalName) throws SendEventException;
 
     /**
-     * Send a BPMN message event. Invoking this method act as executing a Throw Message Event
+     * Send a BPMN message event. Invoking this method acts as executing a Throw Message Event.
      * 
      * @param messageName
-     *            the message name
+     *            the message name.
      * @param targetProcess
-     *            expression representing the target process name
+     *            an expression representing the target process name.
      * @param targetFlowNode
-     *            expression representing the target flow node name
+     *            an expression representing the target flow node name.
      * @param messageContent
-     *            a map representing the message data. The key is used for the data name and the value is used for the data value
+     *            a key->value map containing the message data, with the data name as key.
      * @throws InvalidSessionException
+     *             if there is no current valid session.
      * @throws SendEventException
-     *             if an Exception occurs while sending message
+     *             if an exception occurs while sending message.
      * @since 6.0
      */
     void sendMessage(String messageName, Expression targetProcess, Expression targetFlowNode, Map<Expression, Expression> messageContent)
             throws SendEventException;
 
     /**
-     * Send a BPMN message event. Invoking this method act as executing a Throw Message Event
+     * Send a BPMN message event, with message correlation. Invoking this method acts as executing a Throw Message Event.
      * 
      * @param messageName
-     *            the message name
+     *            the message name.
      * @param targetProcess
-     *            expression representing the target process name
+     *            an expression representing the target process name.
      * @param targetFlowNode
-     *            expression representing the target flow node name
+     *            an expression representing the target flow node name.
      * @param messageContent
-     *            The message data. The key is used for the data name and the value is used for the data value
+     *            a key->value map containing the message data, with the data name as key.
      * @param correlations
      *            the message correlations (five maximum).
      * @throws InvalidSessionException
+     *             if there is no current valid session.
      * @throws SendEventException
-     *             if there are too many correlations (more than 5) or an Exception occurs while sending message
+     *             if there are too many correlations (more than 5) or an exception occurs while sending message.
      * @since 6.0
      */
     void sendMessage(String messageName, Expression targetProcess, Expression targetFlowNode, Map<Expression, Expression> messageContent,
             Map<Expression, Expression> correlations) throws SendEventException;
 
     /**
-     * Retrieves an <code>ArchivedProcessInstance</code> from its id.
+     * Retrieve an <code>ArchivedProcessInstance</code> specified by its identifier.
      * 
      * @param archivedProcessInstanceId
-     *            the ID of the <code>ArchivedProcessInstance</code> to retrieve.
-     * @return the found <code>ArchivedProcessInstance</code> instance.
+     *            the identifier of the <code>ArchivedProcessInstance</code> to be retrieved.
+     * @return the <code>ArchivedProcessInstance</code> instance.
      * @throws ArchivedProcessInstanceNotFoundException
      *             if the <code>ArchivedProcessInstance</code> was not found.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
-     *             if a problem occurs while trying to retrieve the <code>ArchivedFlowNodeInstance</code>.
+     *             if an error occurs while trying to retrieve the <code>ArchivedProcessInstance</code>.
      * @since 6.0
      */
     ArchivedProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId) throws ArchivedProcessInstanceNotFoundException;
 
     /**
-     * Retrieves an <code>ArchivedFlowNodeInstance</code> from its id.
+     * Retrieve an <code>ArchivedFlowNodeInstance</code> specified by its identifier.
      * 
      * @param archivedFlowNodeInstanceId
-     *            the ID of the <code>ArchivedFlowNodeInstance</code> to retrieve.
-     * @return the found <code>ArchivedFlowNodeInstance</code> instance.
+     *            the identifier of the <code>ArchivedFlowNodeInstance</code> to be retrieved.
+     * @return the <code>ArchivedFlowNodeInstance</code> instance.
      * @throws ArchivedFlowNodeInstanceNotFoundException
      *             if the <code>ArchivedFlowNodeInstance</code> was not found.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
-     *             if a problem occurs while trying to retrieve the <code>ArchivedFlowNodeInstance</code>.
+     *             if an error occurs while trying to retrieve the <code>ArchivedFlowNodeInstance</code>.
      * @since 6.0
      */
     ArchivedFlowNodeInstance getArchivedFlowNodeInstance(long archivedFlowNodeInstanceId) throws ArchivedFlowNodeInstanceNotFoundException;
 
     /**
-     * Retrieves an <code>ArchivedComment</code> from its id.
+     * Retrieve an <code>ArchivedComment</code> specified by its identifier.
      * 
      * @param archivedCommentId
-     *            the ID of the <code>ArchivedComment</code> to retrieve.
-     * @return the found <code>ArchivedComment</code> instance.
+     *            the identifier of the <code>ArchivedComment</code> to be retrieved.
+     * @return the <code>ArchivedComment</code> instance.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
-     *             if a problem occurs while trying to retrieve the <code>ArchivedComment</code>
+     *             if an error occurs while trying to retrieve the <code>ArchivedComment</code>.
      * @throws NotFoundException
-     *             if not <code>ArchivedComment</code> was found with id archivedCommentId
+     *             if no <code>ArchivedComment</code> was found with the specified archivedCommentId.
      * @since 6.0
      */
     ArchivedComment getArchivedComment(long archivedCommentId) throws NotFoundException;
 
     /**
-     * Searches for connector instances.
+     * Search for connector instances.
      * 
      * @param searchOptions
-     *            the search options parameters
-     * @return the {@link SearchResult} containing the <code>ConnectorInstance</code>s matching the search options
+     *            the search conditions and the options for sorting and paging the results.
+     * @return the {@link SearchResult} containing the <code>ConnectorInstance</code>s matching the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ConnectorInstance> searchConnectorInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for archived connector instances.
+     * Search for archived connector instances.
      * 
      * @param searchOptions
      *            the search options parameters
-     * @return the {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search options
+     * @return the {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ArchivedConnectorInstance> searchArchivedConnectorInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Get all tasks having given name and belonging to the process instance having given id
+     * List the named human tasks belonging to the specified process instance.
      * 
      * @param processInstanceId
-     *            the ID of the process instance to look the <code>HumanTaskInstance</code>s for.
+     *            the identifier of the process instance.
      * @param taskName
-     *            the name of the tasks to search
+     *            the name of the required human tasks.
      * @param startIndex
-     *            the result start index
+     *            the result start index (strating from 0).
      * @param maxResults
-     *            the max number of results to retrieve
-     * @return The list of matching <code>HumanTaskInstance</code>s
+     *            the maximum number of results to retrieve.
+     * @return the list of matching human task instances.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1354,15 +1393,15 @@ public interface ProcessRuntimeAPI {
     List<HumanTaskInstance> getHumanTaskInstances(long processInstanceId, String taskName, int startIndex, int maxResults);
 
     /**
-     * Returns the last created HumanTask, in the given process instance, named taskName
+     * Return the last created human task instance with the specified name for the given process instance.
      * 
      * @param processInstanceId
-     *            the Identifier of the process instance for which to search the <code>HumanTaskInstance</code>
+     *            the identifier of the process instance.
      * @param taskName
-     *            the task
-     * @return The HumanTaskInstance, in its last state, in the given process instance, named taskName
+     *            the name of the required human task.
+     * @return a HumanTaskInstance, in its latest state.
      * @throws NotFoundException
-     *             if no current task with provided name could be found
+     *             if no current task with provided name is found.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1370,101 +1409,102 @@ public interface ProcessRuntimeAPI {
     HumanTaskInstance getLastStateHumanTaskInstance(long processInstanceId, String taskName) throws NotFoundException;
 
     /**
-     * Searches for archived activity instances (only terminal states, intermediate states are not considered)
+     * Search for archived activity instances in terminal states. Archived activity instances in intermediate states are not considered.
      * 
      * @param searchOptions
-     *            The criterion used to search for archived activity instances
-     * @return A {@link SearchResult} containing the search result
+     *            the criterion used to search for archived activity instances.
+     * @return a {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if has exceptions during the process to search archived activity instance
+     *             if an exception occurs during the search.
      * @since 6.0
      */
     SearchResult<ArchivedActivityInstance> searchArchivedActivities(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for activity instances
+     * Search for activity instances.
      * 
      * @param searchOptions
-     *            The criterion used to activity instance
-     * @return A {@link SearchResult} containing the search result
+     *            the criterion used to search for activity instances.
+     * @return a {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ActivityInstance> searchActivities(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for flow node instances (activities, gateways and events)
+     * Search for flow node instances (activities, gateways and events).
      * 
      * @param searchOptions
-     *            the search options parameters
-     * @return A {@link SearchResult} containing the search result
+     *            the criterion used to search for flow node instances.
+     * @return a {@link SearchResult} containing the search result
      * @throws InvalidSessionException
-     *             If API Session is invalid, e.g session has expired.
+     *             if the ession is invalid, e.g session has expired.
      * @throws SearchException
-     *             if an exception occurs while performing the search
+     *             if an exception occurs during the search.
      * @since 6.0
      */
     SearchResult<FlowNodeInstance> searchFlowNodeInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for archived flow node instances (activities, gateways and events)
+     * Search for archived flow node instances (activities, gateways and events)
      * 
      * @param searchOptions
-     *            the search options parameters
-     * @return A {@link SearchResult} containing the found archived flown node instances.
+     *            the options used to search for flow node instances.
+     * @return a {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
-     *             If API Session is invalid, e.g session has expired.
+     *             if the session is invalid, e.g session has expired.
      * @throws SearchException
-     *             if an exception occurs while performing the search
+     *             if an exception occurs during the search.
      * @see {@link ArchivedFlowNodeInstance}
      * @since 6.0
      */
     SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches, for a specific user, for all tasks pending for that user, or already assigned to that user. (=Available)
+     * Search for all tasks available to a specified user.
+     * A task is available to a user if is assigned to the user or it is pending for that user.
      * Hidden tasks are not retrieved.
      * 
      * @param userId
-     *            the user for whom to retrieve the tasks
+     *            the identifier of the user for whom the tasks are available.
      * @param searchOptions
-     *            the search options parameters
-     * @return the list of tasks matching the provided criteria
+     *            the options used to search for tasks.
+     * @return the list of tasks matching the search options.
      * @throws InvalidSessionException
-     *             if the current session is invalid
+     *             if the current session is invalid.
      * @throws SearchException
-     *             in case a search problem occurs
+     *             if an exception occurs during the search.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchMyAvailableHumanTasks(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for comments related to the specified Process Instance.
+     * Search for comments related to the specified process instance.
      * 
      * @param searchOptions
-     *            The options used to search for Comments
-     * @return The matching comments
+     *            the options used to search for comments.
+     * @return the matching comments.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             in case a search problem occurs
+     *             if an exception occurs during the search.
      * @since 6.0
      */
     SearchResult<Comment> searchComments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Add a comment on a process instance
+     * Add a comment on a process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the processInstance
+     *            the identifier of the process instance.
      * @param comment
-     *            The content of comment
-     * @return The newly created Comment
+     *            the content of the comment.
+     * @return the newly created comment.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1472,11 +1512,11 @@ public interface ProcessRuntimeAPI {
     Comment addComment(long processInstanceId, String comment);
 
     /**
-     * Get all comments by its process instance id
+     * Get all comments in a specified process instance.
      * 
      * @param processInstanceId
-     *            Identifier of the processInstance
-     * @return The list of comment
+     *            the identifier of the process instance.
+     * @return the list of comments.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1484,37 +1524,37 @@ public interface ProcessRuntimeAPI {
     List<Comment> getComments(long processInstanceId);
 
     /**
-     * Lists all comments managed by user.
-     * A comment is said to be managed by a user A if :
-     * - the author of the comment is a subordinate of user A ( or A the author's manager ).
+     * Get all the comments managed by the specified user.
+     * A comment is considered to be managed by user A if one or more of the following conditions is true:
+     * - the author of the comment is a subordinate of user A (A the author's manager).
      * - the comment belongs to a process started by a subordinate of user A.
      * - the comment belongs to a process where at least one human task is assigned to a subordinate of user A.
      * 
      * @param managerUserId
-     *            Identifier of the user
+     *            the identifier of the user.
      * @param searchOptions
-     *            The criterion used to search Comment
-     * @return comments managed by a user, and matching the provided search options
+     *            the options used to search for comments.
+     * @return the comments managed by the user that match the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<Comment> searchCommentsManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches the comments on process instances that the user can access
+     * Get the comments on process instances that the specified user can access.
      * 
      * @param userId
-     *            Identifier of the user
+     *            the identifier of the user.
      * @param searchOptions
-     *            The criterion used to search Comment
-     * @return the comments on process instances that the user can access
+     *            the options used to search for comments.
+     * @return the comments on process instances that the user can access.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<Comment> searchCommentsInvolvingUser(long userId, SearchOptions searchOptions) throws SearchException;
@@ -1523,14 +1563,14 @@ public interface ProcessRuntimeAPI {
      * Get the children instances (sub process or call activity) of a process instance. The returned list is paginated.
      * 
      * @param processInstanceId
-     *            Identifier of the processDefinition
+     *            the identifier of the process definition.
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            the index of the page to be returned (starting at 0).
      * @param maxResults
-     *            Number of result per page. Maximum number of result returned.
+     *            the maximum number of results per page.
      * @param criterion
-     *            The criterion used to sort the result
-     * @return The list of children instance id
+     *            the criterion used to sort the result.
+     * @return the list of children instance identifiers.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1538,57 +1578,62 @@ public interface ProcessRuntimeAPI {
     List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId, int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Whether or not a user is involved in an instance of process (has tasks pending?)
+     * Check whether a specified user is involved in a process instance.
+     * User A is involved with a process instance if any of the following is true:
+     * - a task in the process instance is assigned to user A
+     * - a task in the process instance is pending for user A
+     * - a task in the process instance is assigned to a user managed by user A
+     * - a task in the process instance is pending for a user managed by user A
      * 
      * @param userId
-     *            Identifier of the user
+     *            the identifier of the user.
      * @param processInstanceId
-     *            Identifier of the processDefinition
-     * @return An boolean type to get if a process instance is involved with given user
+     *            the identifier of the process instance.
+     * @return true if the user is involved with the process instance.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
-     *             if no processInstance have an id corresponding to the parameter.
+     *             if there is no processInstance with the specified identifier.
      * @throws UserNotFoundException
-     *             if no user have an id corresponding to the parameter.
+     *             if there is no user with the specified identifier.
      * @since 6.0
      */
     boolean isInvolvedInProcessInstance(long userId, long processInstanceId) throws ProcessInstanceNotFoundException, UserNotFoundException;
 
     /**
-     * Get process instance id from its activity instance id
+     * Get the process instance id from an activity instance id.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return the found process instance id
+     *            the identifier of the activity instance.
+     * @return the corresponding process instance id.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
-     *             if no processInstance have an id corresponding to the parameter.
+     *             if there is no process instance with the specified identifier.
      * @since 6.0
      */
     long getProcessInstanceIdFromActivityInstanceId(long activityInstanceId) throws ProcessInstanceNotFoundException;
 
     /**
-     * Get process definition id from its process instance id
+     * Get the process definition id from an process instance id.
      * 
      * @param processInstanceId
-     *            Identifier of the activity instance
-     * @return the found process definition id
+     *            the identifier of the process instance.
+     * @return the corresponding process definition id.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessDefinitionNotFoundException
-     *             if no ProcessDefinition have an id corresponding to the parameter.
+     *             if there is no process definition with the specified identifier.
      * @since 6.0
      */
     long getProcessDefinitionIdFromProcessInstanceId(long processInstanceId) throws ProcessDefinitionNotFoundException;
 
     /**
-     * Get process definition id from its activity instance id
+     * Get the process definition id from an activity instance id.
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
-     * @return the found process definition id
+     *            the identifier of the activity instance.
+     * @return the corresponding process definition id.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessDefinitionNotFoundException
@@ -1598,59 +1643,59 @@ public interface ProcessRuntimeAPI {
     long getProcessDefinitionIdFromActivityInstanceId(long activityInstanceId) throws ProcessDefinitionNotFoundException;
 
     /**
-     * Searches for archived comments
+     * Search for archived comments.
      * 
      * @param searchOptions
-     *            The ArchivedComment search options
+     *            the options used to search for comments.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
-     * @return the <code>ArchivedComment</code> matching the search options
+     * @return the <code>ArchivedComment</code> items that match the search options.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ArchivedComment> searchArchivedComments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for archived human tasks performed by users managed by a specific user
+     * Search for archived human tasks managed by the specified user.
      * 
      * @param managerUserId
-     *            Identifier of the user manager
+     *            the identifier of the user manager,
      * @param searchOptions
-     *            The ArchivedHumanTaskInstance search options
-     * @return archived humanTask instances managed by a user, and matching the search options
+     *            the options used to search for tasks.
+     * @return archived humanTask instances managed by the specified user that match the search options.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for open process instances that the user can access
+     * Search for open process instances that the specified user can access.
      * 
      * @param userId
-     *            Identifier of the user
+     *            the identifier of the user.
      * @param searchOptions
-     *            The criterion used to search ProcessInstance
-     * @return the found <code>ProcessInstance</code>s matching the search options
+     *            the options used to search for process instance.
+     * @return the <code>ProcessInstance</code>s that match the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUser(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for open process instances that all subordinates of the specific manager can access
+     * Search for open process instances that all subordinates of the specified user can access.
      * 
      * @param managerUserId
-     *            the ID of the user manager
+     *            the identifier of the user manager.
      * @param searchOptions
-     *            the ProcessInstance search options (pagination, filter, order sort)
-     * @return the found <code>ProcessInstance</code>s matching the search options
+     *            the search options (pagination, filter, order sort).
+     * @return the <code>ProcessInstance</code>s that match the search options.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1658,13 +1703,13 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for archived process instances
+     * Search for archived process instances.
      * 
      * @param searchOptions
-     *            the ArchivedProcessInstance search options (pagination, filter, order sort)
-     * @return the matching archived process instances
+     *            the search options (pagination, filter, order sort).
+     * @return the archived process instances that match the search options.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be fullfilled correctly
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1672,79 +1717,79 @@ public interface ProcessRuntimeAPI {
     SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for archived process instances supervised by a user
+     * Search for archived process instances supervised by the specified user.
      * 
      * @param userId
-     *            Identifier of the user
+     *            the identifier of the user.
      * @param searchOptions
-     *            the ArchivedProcessInstance search options (pagination, filter, order sort)
-     * @return matching archived process instances supervised by a user
+     *            the search options (pagination, filter, order sort).
+     * @return the archived process instances supervised by the user that match the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for the archived process instances that the user can access
+     * Search for archived process instances that the specified user can access.
      * 
      * @param userId
-     *            Identifier of the user
+     *            the identifier of the user.
      * @param searchOptions
-     *            the ArchivedProcessInstance search options (pagination, filter, order sort)
-     * @return the archived process instances that the user can access
+     *            the search options (pagination, filter, order sort).
+     * @return the archived process instances that the user can access that match the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInvolvingUser(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches for humanTask instances
+     * Search for human task instances.
      * 
      * @param searchOptions
-     *            the HumanTaskInstance search options (pagination, filter, order sort)
-     * @return the resulting <code>HumanTaskInstance</code>s matching the provided search options
+     *            the search options (pagination, filter, order sort).
+     * @return the human task instances that match the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchHumanTaskInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches tasks assigned to users supervised by a specific user.
+     * Search for tasks assigned to users supervised by the specified user.
      * 
      * @param supervisorId
-     *            the id of the process Supervisor user
+     *            the identifier of supervising user.
      * @param searchOptions
-     *            the HumanTaskInstance search options (pagination, filter, order sort)
-     * @return the resulting <code>HumanTaskInstance</code>s matching the provided search options
+     *            the search options (pagination, filter, order sort).
+     * @return the human task instances that match the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<HumanTaskInstance> searchAssignedTasksSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Searches archived tasks assigned to users supervised by a specific user.
+     * Search for archived tasks assigned to users supervised by the specified user.
      * 
      * @param supervisorId
-     *            the id of the process Supervisor user
+     *            the identifier of the supervising user.
      * @param searchOptions
-     *            the ArchivedHumanTaskInstance search options (pagination, filter, order sort)
-     * @return the resulting <code>ArchivedHumanTaskInstance</code>s matching the provided search options
+     *            the search options (pagination, filter, order sort).
+     * @return the archived human task instances that match the search options.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws SearchException
-     *             if search could not be fullfilled correctly
+     *             if the search could not be completed correctly.
      * @since 6.0
      */
     SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
@@ -1753,15 +1798,15 @@ public interface ProcessRuntimeAPI {
      * Evaluate expressions with values valid at process instantiation scope.
      * 
      * @param processInstanceId
-     *            The identifier of process instance
+     *            the identifier of the process instance.
      * @param expressions
-     *            Map of expressions to evaluate
+     *            a map of expressions to evaluate.
      * @return the result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is the name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
-     *             occurs when an exception is thrown during expression evaluation
+     *             occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
     Map<String, Serializable> evaluateExpressionsAtProcessInstanciation(long processInstanceId, Map<Expression, Map<String, Serializable>> expressions)
@@ -1771,15 +1816,15 @@ public interface ProcessRuntimeAPI {
      * Evaluate expressions with values valid on a completed process instance scope.
      * 
      * @param processInstanceId
-     *            The identifier of process instance
+     *            the identifier of the process instance.
      * @param expressions
-     *            Map of expressions to evaluate
+     *            a map of expressions to evaluate.
      * @return the result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is the name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
-     *             occurs when an exception is thrown during expression evaluation
+     *             occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
     Map<String, Serializable> evaluateExpressionOnCompletedProcessInstance(long processInstanceId, Map<Expression, Map<String, Serializable>> expressions)
@@ -1789,15 +1834,15 @@ public interface ProcessRuntimeAPI {
      * Evaluate expressions with values valid on a process instance scope.
      * 
      * @param processInstanceId
-     *            The identifier of process instance
+     *            the identifier of the process instance.
      * @param expressions
-     *            Map of expressions to evaluate
+     *            a map of expressions to evaluate.
      * @return the result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is the name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
-     *             occurs when an exception is thrown during expression evaluation
+     *             occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
     Map<String, Serializable> evaluateExpressionsOnProcessInstance(long processInstanceId, Map<Expression, Map<String, Serializable>> expressions)
@@ -1807,15 +1852,15 @@ public interface ProcessRuntimeAPI {
      * Evaluate expressions with values valid on a process definition scope.
      * 
      * @param processDefinitionId
-     *            The identifier of process definition
+     *            the identifier of the process definition.
      * @param expressions
-     *            Map of expressions to evaluate
+     *            a map of expressions to evaluate.
      * @return the result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is the name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
-     *             occurs when an exception is thrown during expression evaluation
+     *             occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
     Map<String, Serializable> evaluateExpressionsOnProcessDefinition(long processDefinitionId, Map<Expression, Map<String, Serializable>> expressions)
@@ -1825,15 +1870,15 @@ public interface ProcessRuntimeAPI {
      * Evaluate expressions with values valid on an activity instance scope.
      * 
      * @param activityInstanceId
-     *            The identifier of activity instance
+     *            the identifier of the activity instance.
      * @param expressions
-     *            Map of expressions to evaluate
+     *            a map of expressions to evaluate.
      * @return the result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is the name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
-     *             occurs when an exception is thrown during expression evaluation
+     *             occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
     Map<String, Serializable> evaluateExpressionsOnActivityInstance(long activityInstanceId, Map<Expression, Map<String, Serializable>> expressions)
@@ -1843,15 +1888,15 @@ public interface ProcessRuntimeAPI {
      * Evaluate expressions with values valid on a completed activity instance scope.
      * 
      * @param activityInstanceId
-     *            The identifier of activity instance
+     *            the identifier of the activity instance.
      * @param expressions
-     *            Map of expressions to evaluate
+     *            a map of expressions to evaluate.
      * @return the result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is the name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *             if the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
-     *             occurs when an exception is thrown during expression evaluation
+     *             occurs when an exception is thrown during expression evaluation.
      * @since 6.0
      */
     Map<String, Serializable> evaluateExpressionsOnCompletedActivityInstance(long activityInstanceId, Map<Expression, Map<String, Serializable>> expressions)

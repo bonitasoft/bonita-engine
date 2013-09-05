@@ -63,7 +63,7 @@ public abstract class AbstractBonitaWork implements BonitaWork {
             session = sessionService.createSession(tenantId, "workservice");
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+            loggerService.log(BonitaWork.class, TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
             canBeExecuted = preWork();
             if (canBeExecuted) {
                 if (isTransactional()) {
@@ -74,20 +74,20 @@ public abstract class AbstractBonitaWork implements BonitaWork {
             }
         } catch (final Exception e) {
             // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
+            loggerService.log(BonitaWork.class, TechnicalLogSeverity.WARNING,
                     "A work failed, The failure will be handled, work is:  " + getDescription());
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
+            loggerService.log(BonitaWork.class, TechnicalLogSeverity.WARNING,
                     "Exception was:" + e.getMessage());
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
+            if (loggerService.isLoggable(BonitaWork.class, TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(BonitaWork.class, TechnicalLogSeverity.DEBUG, e);
             }
             try {
                 handleFailure(e);
             } catch (Exception e1) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                loggerService.log(BonitaWork.class, TechnicalLogSeverity.ERROR,
                         "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
                         e);
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
+                loggerService.log(BonitaWork.class, TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
                 logIncident();
             }
 
@@ -96,7 +96,7 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                 try {
                     afterWork();
                 } catch (Exception e) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+                    loggerService.log(BonitaWork.class, TechnicalLogSeverity.ERROR, e);
                 }
             }
             if (session != null) {
@@ -104,7 +104,7 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                     sessionAccessor.deleteSessionId();
                     sessionService.deleteSession(session.getId());
                 } catch (final SSessionNotFoundException e) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+                    loggerService.log(BonitaWork.class, TechnicalLogSeverity.DEBUG, e);
                 }
             }
         }
