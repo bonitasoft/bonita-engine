@@ -49,6 +49,7 @@ import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutorImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -85,12 +86,12 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final LockService lockService, final TokenService tokenService, final EventsHandler eventsHandler,
-            final SOperationBuilders operationBuilders, final TransactionService transactionService) {
+            final SOperationBuilders operationBuilders, final TransactionService transactionService, final FlowNodeStateManager flowNodeStateManager) {
         super(instanceBuilders, activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService,
                 gatewayInstanceService, transitionService, eventInstanceService, connectorService,
                 connectorInstanceService, classLoaderService, operationService, expressionBuilders, expressionResolverService, eventService, handlers,
                 processDocumentService, documentBuilder, sessionAccessor, containerRegistry, bpmInstancesCreator, lockService, tokenService,
-                eventsHandler, operationBuilders, transactionService);
+                eventsHandler, operationBuilders, transactionService, flowNodeStateManager);
 
         this.instanceBuilders = instanceBuilders;
     }

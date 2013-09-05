@@ -146,6 +146,7 @@
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="operationBuilders" ref="sOperationBuilders"/>
 		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
 	</bean>
 	
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
