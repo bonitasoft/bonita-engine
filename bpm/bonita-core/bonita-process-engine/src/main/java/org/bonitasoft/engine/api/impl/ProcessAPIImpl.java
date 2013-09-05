@@ -5366,7 +5366,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<Expression, Map<String, Serializable>> expressions) throws ExpressionEvaluationException {
         try {
             final ActivityInstance activityInstance = getActivityInstance(activityInstanceId);
-            final ProcessInstance processInstance = getProcessInstance(activityInstance.getRootContainerId());
+            final ProcessInstance processInstance = getProcessInstance(activityInstance.getParentContainerId());
 
             return evaluateExpressionsInstanceLevel(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE, processInstance.getProcessDefinitionId());
         } catch (final BonitaException e) {
@@ -5382,7 +5382,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final ArchivedActivityInstance activityInstance = getArchivedActivityInstance(activityInstanceId);
             // same archive time to process even if there're many activities in the process
-            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getRootContainerId());
+            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getParentContainerId());
 
             return evaluateExpressionsInstanceLevelAndArchived(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
                     lastArchivedProcessInstance.getProcessDefinitionId(), activityInstance.getArchiveDate().getTime());
