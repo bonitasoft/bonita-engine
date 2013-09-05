@@ -20,6 +20,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.execution.ProcessExecutor;
 
 /**
  * @author Baptiste Mesta
@@ -52,5 +53,7 @@ public interface FlowNodeStateManager {
     FlowNodeState getSkippedState(SFlowNodeInstance flownNodeInstance);
 
     FlowNodeState getCanceledState(SFlowNodeInstance flownNodeInstance);
+
+    void setProcessExecutor(ProcessExecutor processExecutor);
 
 }

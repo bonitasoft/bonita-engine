@@ -100,6 +100,7 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorOfProcess;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
@@ -186,7 +187,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final LockService lockService, final TokenService tokenService,
-            final EventsHandler eventsHandler, final SOperationBuilders operationBuilders, final TransactionService transactionService) {
+            final EventsHandler eventsHandler, final SOperationBuilders operationBuilders, final TransactionService transactionService,
+            FlowNodeStateManager flowNodeStateManager) {
         super();
         this.instanceBuilders = instanceBuilders;
         this.activityInstanceService = activityInstanceService;
@@ -211,6 +213,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
+        // dependency injection because of circular references...
+        flowNodeStateManager.setProcessExecutor(this);
+        eventsHandler.setProcessExecutor(this);
         for (final Entry<String, SProcessInstanceHandler<SEvent>> handler : handlers.entrySet()) {
             try {
                 eventService.addHandler(handler.getKey(), handler.getValue());// TODO check if it's already here?

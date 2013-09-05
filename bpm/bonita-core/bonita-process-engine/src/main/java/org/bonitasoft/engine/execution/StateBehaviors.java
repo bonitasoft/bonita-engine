@@ -65,6 +65,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -92,7 +93,6 @@ import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.EndingIntermediateCatchEventExceptionStateImpl;
 import org.bonitasoft.engine.execution.work.ExecuteConnectorOfActivity;
-import org.bonitasoft.engine.execution.work.InstantiateProcessWork;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -166,6 +166,8 @@ public class StateBehaviors {
 
     private final ConnectorInstanceService connectorInstanceService;
 
+    private ProcessExecutor processExecutor;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final BPMInstanceBuilders instanceBuilders, final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
@@ -191,6 +193,10 @@ public class StateBehaviors {
         eventInstanceService = eventInstanceSevice;
         this.schedulerService = schedulerService;
         this.logger = logger;
+    }
+
+    public void setProcessExecutor(ProcessExecutor processExecutor) {
+        this.processExecutor = processExecutor;
     }
 
     public DataInstanceContainer getParentContainerType(final SFlowNodeInstance flowNodeInstance) {
@@ -501,15 +507,14 @@ public class StateBehaviors {
     }
 
     private void instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
-            final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws WorkRegisterException {
+            final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws SProcessInstanceCreationException {
         final long callerProcessDefinitionId = callerProcessDefinition.getId();
         final long callerId = callActivityInstance.getId();
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
         final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
         final OperationsWithContext operations = new OperationsWithContext(context, operationList);
-        final InstantiateProcessWork instantiateProcessWork = new InstantiateProcessWork(targetProcessDefinitionId, operations);
-        instantiateProcessWork.setCallerId(callerId);
-        workService.registerWork(instantiateProcessWork);
+        processExecutor.start(targetProcessDefinitionId, -1, 0, 0, operations.getContext(), operations.getOperations(),
+                null, null, callerId, -1);
     }
 
     public void updateDisplayNameAndDescription(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
