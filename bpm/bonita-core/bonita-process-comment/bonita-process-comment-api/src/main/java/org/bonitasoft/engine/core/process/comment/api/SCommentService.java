@@ -78,14 +78,32 @@ public interface SCommentService {
     SComment addSystemComment(long processInstanceId, String comment) throws SCommentAddException;
 
     /**
-     * Get all comments for the given processInstance
+     * Get the first 20 comments for the given processInstance
      * 
      * @param processInstanceId
      *            identifier of processInstance
      * @return a list of SComment object
      * @throws SBonitaReadException
+     *             in case of read error
+     * @see {@link QueryOptions#DEFAULT_NUMBER_OF_RESULTS}
+     * @deprecated use {@link #getComments(long, QueryOptions)} instead
      */
+    @Deprecated
     List<SComment> getComments(long processInstanceId) throws SBonitaReadException;
+
+    /**
+     * Get comments for the given processInstance
+     * 
+     * @param processInstanceId
+     *            identifier of processInstance
+     * @param queryOptions
+     *            the query options to filter the results
+     * @return a list of SComment object
+     * @throws SBonitaReadException
+     *             in case of read error
+     * @since 6.1
+     */
+    List<SComment> getComments(long processInstanceId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search number of Comment for a specific supervisor

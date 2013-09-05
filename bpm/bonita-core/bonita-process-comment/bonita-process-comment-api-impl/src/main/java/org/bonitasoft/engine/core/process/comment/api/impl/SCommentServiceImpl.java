@@ -162,6 +162,13 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
+    public List<SComment> getComments(final long processInstanceId, final QueryOptions queryOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
+        final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class, queryOptions);
+        return persistenceService.selectList(selectDescriptor);
+    }
+
+    @Override
     public SComment addComment(final long processInstanceId, final String comment) throws SCommentAddException {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
