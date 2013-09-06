@@ -53,6 +53,7 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
@@ -1503,9 +1504,27 @@ public interface ProcessRuntimeAPI {
      * @return the newly created comment.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
+     * @deprecated use {@link #addProcessComment(long, String)} instead, that can throw CreationException is case of inexistant Process Instance
      * @since 6.0
      */
+    @Deprecated
     Comment addComment(long processInstanceId, String comment);
+
+    /**
+     * Add a comment on a process instance.
+     * 
+     * @param processInstanceId
+     *            the identifier of the process instance.
+     * @param comment
+     *            the content of the comment.
+     * @return the newly created comment.
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws CreationException
+     *             if the parameter processInstanceId does not refer to any active process instance (existing and non-archived).
+     * @since 6.1
+     */
+    Comment addProcessComment(final long processInstanceId, final String comment) throws CreationException;
 
     /**
      * Get the first 20 comments of the specified process instance.

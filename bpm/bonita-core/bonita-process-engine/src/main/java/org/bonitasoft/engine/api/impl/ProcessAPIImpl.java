@@ -4059,6 +4059,17 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public Comment addProcessComment(final long processInstanceId, final String comment) throws CreationException {
+        try {
+            // TODO: refactor this method when deprecated addComment() method is removed from API:
+            return addComment(processInstanceId, comment);
+        } catch (RetrieveException e) {
+            throw new CreationException("Cannot add a comment on a finished or inexistant process instance", e.getCause());
+        }
+    }
+
+    @Override
+    @Deprecated
     public Comment addComment(final long processInstanceId, final String comment) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {

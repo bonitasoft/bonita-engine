@@ -188,7 +188,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final long numberOfInitialArchivedComments = getNumberOfArchivedComment.getResult();
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
-        getProcessAPI().addComment(processInstance.getId(), "kikoo lol");
+        getProcessAPI().addProcessComment(processInstance.getId(), "kikoo lol");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         executeInTransaction(transactionService, getNumberOfComment);
         executeInTransaction(transactionService, getNumberOfArchivedComment);

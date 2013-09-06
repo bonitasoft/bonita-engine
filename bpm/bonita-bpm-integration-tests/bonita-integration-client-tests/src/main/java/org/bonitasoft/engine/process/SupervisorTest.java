@@ -364,9 +364,9 @@ public class SupervisorTest extends CommonAPITest {
         final ProcessInstance pi0 = getProcessAPI().startProcess(definition1.getId());
 
         // add comment to processInstance
-        getProcessAPI().addComment(pi0.getId(), commentContent1);
-        getProcessAPI().addComment(pi0.getId(), commentContent2);
-        getProcessAPI().addComment(pi0.getId(), commentContent3);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent1);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent2);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent3);
 
         loginWith("john", "bpm");
         final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder().createNewInstance("secondProcess", "2.0");
@@ -376,8 +376,8 @@ public class SupervisorTest extends CommonAPITest {
         final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, delivery, matti);
         final ProcessInstance pi1 = getProcessAPI().startProcess(definition2.getId());
 
-        getProcessAPI().addComment(pi1.getId(), commentContent4);
-        getProcessAPI().addComment(pi1.getId(), commentContent5);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent4);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent5);
 
         // create supervisor for definition1
         final ProcessSupervisor createdSupervisor1 = getProcessAPI().createProcessSupervisorForUser(definition1.getId(), matti.getId());

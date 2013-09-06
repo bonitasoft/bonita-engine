@@ -41,9 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
  * @author Celine Souchet
- * 
  */
 public class ProcessDeletionTest extends CommonAPITest {
 
@@ -265,8 +263,8 @@ public class ProcessDeletionTest extends CommonAPITest {
         return deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, pedro);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName,
-            final String userTaskName, final String callActivityName) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName, final String userTaskName,
+            final String callActivityName) throws BonitaException {
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
 
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
@@ -405,8 +403,8 @@ public class ProcessDeletionTest extends CommonAPITest {
         assertEquals(0, processInstances.size());
     }
 
-    private ProcessDefinition deployAndEnableProcessWithSignalEventSubProcess(final String parentTaskName, final String childTaskName,
-            final String signalName) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithSignalEventSubProcess(final String parentTaskName, final String childTaskName, final String signalName)
+            throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
         builder.addStartEvent("start");
@@ -581,8 +579,8 @@ public class ProcessDeletionTest extends CommonAPITest {
         assertEquals(0, documentsSearchResult.getCount());
     }
 
-    private ProcessDefinition deployAndEnableProcessWithDocument(final String processName, final String userTaskName, final String docName,
-            final String url) throws BonitaException {
+    private ProcessDefinition deployAndEnableProcessWithDocument(final String processName, final String userTaskName, final String docName, final String url)
+            throws BonitaException {
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
         processDefBuilder.addActor(ACTOR_NAME);
         final DocumentDefinitionBuilder documentDefinitionBuilder = processDefBuilder.addDocumentDefinition(docName);
@@ -606,7 +604,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         waitForUserTask(userTaskName, processInstance.getId());
 
         // add a comment
-        getProcessAPI().addComment(processInstance.getId(), "just do it.");
+        getProcessAPI().addProcessComment(processInstance.getId(), "just do it.");
 
         SearchResult<Comment> searchResult = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 10).done());
         assertTrue(searchResult.getCount() > 0);
@@ -630,7 +628,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
 
         // add a comment
-        getProcessAPI().addComment(processInstance.getId(), "just do it.");
+        getProcessAPI().addProcessComment(processInstance.getId(), "just do it.");
         assignAndExecuteStep(userTask, pedro.getId());
         waitForProcessToFinish(processInstance);
 
@@ -655,7 +653,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
 
         // add a comment
-        getProcessAPI().addComment(processInstance.getId(), "just do it2.");
+        getProcessAPI().addProcessComment(processInstance.getId(), "just do it2.");
         assignAndExecuteStep(userTask, pedro.getId());
         waitForProcessToFinish(processInstance);
 

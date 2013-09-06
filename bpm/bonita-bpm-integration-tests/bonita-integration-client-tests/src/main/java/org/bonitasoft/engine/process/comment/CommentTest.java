@@ -49,7 +49,7 @@ public class CommentTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         final String commentContent = "abc";
-        final Comment comment = getProcessAPI().addComment(pi0.getId(), commentContent);
+        final Comment comment = getProcessAPI().addProcessComment(pi0.getId(), commentContent);
         assertNotNull(comment);
         assertEquals(commentContent, comment.getContent());
         disableAndDeleteProcess(processDefinition);
@@ -70,9 +70,9 @@ public class CommentTest extends CommonAPITest {
                 new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done()).getResult();
         // add comments
         final String commentContent = "abc";
-        getProcessAPI().addComment(pi0.getId(), commentContent);
-        getProcessAPI().addComment(pi0.getId(), commentContent);
-        getProcessAPI().addComment(pi0.getId(), commentContent);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent);
         // get comments again.
         final List<Comment> comments2 = getProcessAPI().searchComments(
                 new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done()).getResult();
@@ -93,7 +93,7 @@ public class CommentTest extends CommonAPITest {
 
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < 21; i++) {
-            getProcessAPI().addComment(pi.getId(), "myComment_" + i);
+            getProcessAPI().addProcessComment(pi.getId(), "myComment_" + i);
         }
         waitForUserTaskAndExecuteIt(activityName, pi, user.getId());
         waitForProcessToFinish(pi);
