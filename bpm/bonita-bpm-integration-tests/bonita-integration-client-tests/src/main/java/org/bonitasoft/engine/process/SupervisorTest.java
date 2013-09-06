@@ -355,10 +355,12 @@ public class SupervisorTest extends CommonAPITest {
 
         // login with user and create a processDefinition
         loginWith("matti", "bpm");
+        String delivery = "totor";
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder1.addDescription("definition1 description");
+        processBuilder1.addActor(delivery).addUserTask("temporize", delivery);
         final DesignProcessDefinition designprocessDefinition1 = processBuilder1.done();
-        final ProcessDefinition definition1 = deployAndEnableProcess(designprocessDefinition1);
+        final ProcessDefinition definition1 = deployAndEnableWithActor(designprocessDefinition1, delivery, matti);
         final ProcessInstance pi0 = getProcessAPI().startProcess(definition1.getId());
 
         // add comment to processInstance
@@ -369,8 +371,9 @@ public class SupervisorTest extends CommonAPITest {
         loginWith("john", "bpm");
         final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder().createNewInstance("secondProcess", "2.0");
         processBuilder2.addDescription("definition2 description");
+        processBuilder2.addActor(delivery).addUserTask("temporize", delivery);
         final DesignProcessDefinition designprocessDefinition2 = processBuilder2.done();
-        final ProcessDefinition definition2 = deployAndEnableProcess(designprocessDefinition2);
+        final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, delivery, matti);
         final ProcessInstance pi1 = getProcessAPI().startProcess(definition2.getId());
 
         getProcessAPI().addComment(pi1.getId(), commentContent4);

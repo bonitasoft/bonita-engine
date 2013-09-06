@@ -587,8 +587,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private ArrayList<BonitaLock> createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses,
-            final List<Long> processInstanceIds)
-            throws SLockException {
+            final List<Long> processInstanceIds) throws SLockException {
         ArrayList<BonitaLock> locks = new ArrayList<BonitaLock>(processInstanceIds.size());
         for (final Long processInstanceId : processInstanceIds) {
             BonitaLock lock = lockService.lock(processInstanceId, objectType);
@@ -2107,7 +2106,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public long removeCategoriesFromProcessDefinition(long processDefinitionId, int startIndex, int maxResults) throws DeletionException {
+    public long removeCategoriesFromProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
@@ -2127,15 +2126,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public long removeProcessDefinitionsFromCategory(long categoryId, int startIndex, int maxResults) throws DeletionException {
+    public long removeProcessDefinitionsFromCategory(final long categoryId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder = tenantAccessor.getCategoryModelBuilderAccessor()
                 .getSProcessCategoryMappingBuilder();
 
         try {
-            final FilterOption filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getCategoryIdKey(),
-                    categoryId);
+            final FilterOption filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getCategoryIdKey(), categoryId);
             final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getIdKey(), OrderByType.ASC);
             final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Collections.singletonList(order),
                     Collections.singletonList(filterOption), null);
@@ -4063,7 +4061,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Comment addComment(final long processInstanceId, final String comment) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
+        try {
+            tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
+        } catch (SProcessInstanceReadException e) {
+            throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
+        } catch (SProcessInstanceNotFoundException e) {
+            throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
+        }
         final SCommentService commentService = tenantAccessor.getCommentService();
         final AddComment addComment = new AddComment(commentService, processInstanceId, comment);
         try {
@@ -4736,8 +4740,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public SearchResult<ArchivedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final SearchOptions searchOptions)
-            throws SearchException {
+    public SearchResult<ArchivedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4770,8 +4773,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
             if (!ActivityStates.FAILED_STATE.equals(flowNodeState.getName())) {
                 throw new ActivityExecutionException("Unable to retry a task that is not failed - task name=" + activity.getName() + " id="
-                        + activityInstanceId
-                        + " that was in state " + flowNodeState);
+                        + activityInstanceId + " that was in state " + flowNodeState);
             }
 
             flowNodeExecutor.setStateByStateId(processDefinitionId, activity.getId(), stateId);

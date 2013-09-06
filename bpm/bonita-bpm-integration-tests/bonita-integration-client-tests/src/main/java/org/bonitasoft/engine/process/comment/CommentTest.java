@@ -11,6 +11,7 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -65,14 +66,16 @@ public class CommentTest extends CommonAPITest {
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         // get comments before add new.
-        final List<Comment> comments1 = getProcessAPI().getComments(pi0.getId());
+        final List<Comment> comments1 = getProcessAPI().searchComments(
+                new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done()).getResult();
         // add comments
         final String commentContent = "abc";
         getProcessAPI().addComment(pi0.getId(), commentContent);
         getProcessAPI().addComment(pi0.getId(), commentContent);
         getProcessAPI().addComment(pi0.getId(), commentContent);
         // get comments again.
-        final List<Comment> comments2 = getProcessAPI().getComments(pi0.getId());
+        final List<Comment> comments2 = getProcessAPI().searchComments(
+                new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done()).getResult();
         assertEquals(comments1.size() + 3, comments2.size());
         assertEquals(commentContent, comments2.get(1).getContent());
 

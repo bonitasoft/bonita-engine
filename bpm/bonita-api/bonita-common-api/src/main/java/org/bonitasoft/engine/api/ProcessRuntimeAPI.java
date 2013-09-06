@@ -81,7 +81,6 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Search for pending hidden tasks that are available to the specified user.
-     * 
      * Only searches for pending tasks for the current user: if a hidden task has been assigned
      * or executed, it will not be retrieved.
      * 
@@ -223,7 +222,6 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of open process instances.
-     * 
      * An open process instance is a process instance that has not been archived.
      * 
      * @return the total number of open process instances.
@@ -233,7 +231,6 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the number of archived process instances.
-     * 
      * Process instances in state COMPLETED are counted.
      * 
      * @return the number of archived process instances.
@@ -524,7 +521,6 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Get the list of pending human task instances available to the specified user.
-     * 
      * A human task is pending for a given user if it is not yet assigned and if the
      * user is a candidate either through an {@link ActorMember} or through a {@link UserFilter}. Hidden tasks for this user are not retrieved (see
      * {@link #hideTasks(long, Long...)}).
@@ -1512,15 +1508,17 @@ public interface ProcessRuntimeAPI {
     Comment addComment(long processInstanceId, String comment);
 
     /**
-     * Get all comments in a specified process instance.
+     * Get the first 20 comments of the specified process instance.
      * 
      * @param processInstanceId
      *            the identifier of the process instance.
-     * @return the list of comments.
+     * @return the list of comments found
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
+     * @deprecated use paginated version {@link #searchComments(SearchOptions)} instead, passing a filter on processInstanceId field.
      * @since 6.0
      */
+    @Deprecated
     List<Comment> getComments(long processInstanceId);
 
     /**

@@ -217,10 +217,15 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteComments(final long processInstanceId) throws SBonitaException {
-        final List<SComment> sComments = getComments(processInstanceId);
-        for (final SComment sComment : sComments) {
-            delete(sComment);
-        }
+        List<SComment> sComments = null;
+        do {
+            sComments = getComments(processInstanceId, new QueryOptions(0, 100));
+            if (sComments != null) {
+                for (final SComment sComment : sComments) {
+                    delete(sComment);
+                }
+            }
+        } while (sComments.size() > 0);
     }
 
     private long getUserId() throws SSessionNotFoundException, SessionIdNotSetException {

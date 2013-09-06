@@ -210,7 +210,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         disableAndDeleteProcess(definition);
     }
 
-    private static void executeInTransaction(TransactionService transactionService, TransactionContent tc) throws SBonitaException {
+    private static void executeInTransaction(final TransactionService transactionService, final TransactionContent tc) throws SBonitaException {
         transactionService.begin();
         tc.execute();
         transactionService.complete();
@@ -408,21 +408,21 @@ public class BPMLocalTest extends CommonAPILocalTest {
             }
 
             @Override
-            protected void handleFailure(Exception e) throws Exception {
+            protected void handleFailure(final Exception e) throws Exception {
                 throw new Exception("unable to handle failure");
             }
 
             @Override
             protected String getRecoveryProcedure() {
-                return "The recovy procedure";
+                return "The recovery procedure";
             }
         });
         Thread.sleep(100);
         String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
         File file = new File(tenantFolder + File.separatorChar + "INCIDENT.log");
         String content = org.bonitasoft.engine.io.IOUtil.read(file);
-        assertTrue(content.contains("An incident happened: MyJob"));
-        assertTrue(content.contains("Procedure to recover: The recovy procedure"));
+        assertTrue("File content is: " + content, content.contains("An incident happened: MyJob"));
+        assertTrue(content.contains("Procedure to recover: The recovery procedure"));
 
     }
 
