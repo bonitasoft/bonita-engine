@@ -93,9 +93,10 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         } catch (final SRecorderException e) {
             throw new SGatewayCreationException(e);
         }
-
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO,
-                "Created gateway instance <" + gatewayInstance.getName() + "> with id <" + gatewayInstance.getId() + ">");
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                    "Created gateway instance <" + gatewayInstance.getName() + "> with id <" + gatewayInstance.getId() + ">");
+        }
     }
 
     @Override

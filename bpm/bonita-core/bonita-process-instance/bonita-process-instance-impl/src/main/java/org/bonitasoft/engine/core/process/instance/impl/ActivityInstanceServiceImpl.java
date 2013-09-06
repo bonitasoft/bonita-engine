@@ -135,8 +135,10 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         } catch (final SRecorderException e) {
             throw new SActivityCreationException(e);
         }
-        getLogger().log(this.getClass(), TechnicalLogSeverity.INFO, "Created " + activityInstance.getType().getValue() + " <" + activityInstance.getName() +
-                "> with id <" + activityInstance.getId() + ">");
+        if (getLogger().isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                    "Created " + activityInstance.getType().getValue() + " <" + activityInstance.getName() + "> with id <" + activityInstance.getId() + ">");
+        }
     }
 
     @Override
@@ -709,7 +711,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField("loopMax", loopMap);
         try {
             updateFlowNode(loopActivity, LOOPINSTANCE_LOOPMAX_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
+        } catch (final SFlowNodeModificationException e) {
             throw new SActivityModificationException(e);
         }
     }
@@ -720,7 +722,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(sMultiInstanceActivityInstanceBuilder.getLoopCardinalityKey(), intLoopCardinality);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_LOOPCARDINALITY_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
+        } catch (final SFlowNodeModificationException e) {
             throw new SActivityModificationException(e);
         }
     }
@@ -732,7 +734,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
+        } catch (final SFlowNodeModificationException e) {
             throw new SActivityModificationException(e);
         }
     }
@@ -746,7 +748,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
                 + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
+        } catch (final SFlowNodeModificationException e) {
             throw new SActivityModificationException(e);
         }
     }
@@ -756,11 +758,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfActiveInstancesKey(), flowNodeInstance.getNumberOfActiveInstances() - number);
-        descriptor.addField(sMultiInstanceActivityInstanceBuilder.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances()
-                + number);
+        descriptor
+                .addField(sMultiInstanceActivityInstanceBuilder.getNumberOfCompletedInstancesKey(), flowNodeInstance.getNumberOfCompletedInstances() + number);
         try {
             updateFlowNode(flowNodeInstance, MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED, descriptor);
-        } catch (SFlowNodeModificationException e) {
+        } catch (final SFlowNodeModificationException e) {
             throw new SActivityModificationException(e);
         }
     }

@@ -64,7 +64,8 @@ public class ExpressionServiceImpl implements ExpressionService {
     @Override
     public Object evaluate(final SExpression expression, Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+        final boolean isTraceEnable = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
+        if (isTraceEnable) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
         }
         Object expressionResult;
@@ -75,18 +76,20 @@ public class ExpressionServiceImpl implements ExpressionService {
         final ExpressionExecutorStrategy expressionExecutorStrategy = expressionExecutorsMap.get(expression.getExpressionKind());
         final String expressContent = expression.getContent();
         if (expressionExecutorStrategy == null) {
-            logger.log(
-                    this.getClass(),
-                    TechnicalLogSeverity.TRACE,
-                    LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate",
-                            "Unable to find an executor for expression type " + expression.getExpressionKind()));
+            if (isTraceEnable) {
+                logger.log(
+                        this.getClass(),
+                        TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate",
+                                "Unable to find an executor for expression type " + expression.getExpressionKind()));
+            }
             throw new SExpressionTypeUnknownException("Unable to find an executor for expression type " + expression.getExpressionKind());
         }
         try {
             // this will throw exception if the expression is invalid
             expressionExecutorStrategy.validate(expression);
         } catch (final SInvalidExpressionException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            if (isTraceEnable) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                         LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate", "Invalid Expression: " + expressContent));
             }
@@ -95,7 +98,7 @@ public class ExpressionServiceImpl implements ExpressionService {
         expressionResult = expressionExecutorStrategy.evaluate(expression, dependencyValues, resolvedExpressions);
         checkReturnType(expression, expressionResult);
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+        if (isTraceEnable) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "evaluate"));
         }
         return expressionResult;

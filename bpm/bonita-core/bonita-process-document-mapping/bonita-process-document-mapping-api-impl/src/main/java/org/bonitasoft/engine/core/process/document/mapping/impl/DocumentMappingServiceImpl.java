@@ -144,8 +144,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     public SDocumentMapping get(final long documentMappingId) throws SDocumentMappingNotFoundException {
         try {
             final SDocumentMapping documentMapping = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SDocumentMapping.class,
-                    "DocumentMapping",
-                    documentMappingId));
+                    "DocumentMapping", documentMappingId));
             if (documentMapping == null) {
                 throw new SDocumentMappingNotFoundException("Cannot get documentMapping with id: " + documentMappingId);
             }
@@ -195,14 +194,14 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     private SDocumentMappingNotFoundException handleNotFoundError(final String message, final Exception e) {
-        if (e != null) {
+        if (e != null && technicalLogger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
             technicalLogger.log(this.getClass(), TechnicalLogSeverity.ERROR, message, e);
         }
         return new SDocumentMappingNotFoundException(message, e);
     }
 
     private SDocumentMappingDeletionException handleDeletionError(final String message, final Exception e) {
-        if (e != null) {
+        if (e != null && technicalLogger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
             technicalLogger.log(this.getClass(), TechnicalLogSeverity.ERROR, message, e);
         }
         return new SDocumentMappingDeletionException(message, e);
@@ -269,7 +268,9 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             try {
                 archiveService.recordInsert(archiveDate, insertRecord);
             } catch (final Exception e) {
-                technicalLogger.log(this.getClass(), TechnicalLogSeverity.WARNING, "the document mapping was not archived id=" + docMapping.getId(), e);
+                if (technicalLogger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                    technicalLogger.log(this.getClass(), TechnicalLogSeverity.ERROR, "the document mapping was not archived id=" + docMapping.getId(), e);
+                }
                 throw new SDocumentMappingException("Unable to archive the document with id " + docMapping.getId(), e);
             }
         }

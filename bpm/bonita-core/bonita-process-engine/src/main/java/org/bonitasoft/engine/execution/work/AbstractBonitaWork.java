@@ -63,7 +63,9 @@ public abstract class AbstractBonitaWork implements BonitaWork {
             session = sessionService.createSession(tenantId, "workservice");
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-            loggerService.log(BonitaWork.class, TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+            }
             canBeExecuted = preWork();
             if (canBeExecuted) {
                 if (isTransactional()) {
@@ -104,7 +106,9 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                     sessionAccessor.deleteSessionId();
                     sessionService.deleteSession(session.getId());
                 } catch (final SSessionNotFoundException e) {
-                    loggerService.log(BonitaWork.class, TechnicalLogSeverity.DEBUG, e);
+                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+                    }
                 }
             }
         }

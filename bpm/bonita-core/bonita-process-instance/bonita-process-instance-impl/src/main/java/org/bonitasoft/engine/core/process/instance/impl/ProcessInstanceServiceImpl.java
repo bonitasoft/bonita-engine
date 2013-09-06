@@ -238,9 +238,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             try {
                 deleteParentProcessInstanceAndElements(sProcessInstance);
                 nbDeleted = +1;
-            } catch (SBonitaException e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage() + ". It has probably completed.");
+            } catch (final SBonitaException e) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It has probably completed.");
                 }
             }
         }
@@ -267,7 +267,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             try {
                 deleteParentArchivedProcessInstanceAndElements(saProcessInstance);
                 nbDeleted = +1;
-            } catch (SBonitaException e) {
+            } catch (final SBonitaException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
                 }
@@ -542,8 +542,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                     stb.append(flowNodeInstance.getName());
                     stb.append("]. This process may be already finished");
                     // if the child process is not found, it's because it has already finished and archived or it was not created
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
+                    }
                 }
             }
         }
@@ -629,8 +631,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } catch (final SRecorderException e) {
             throw new SProcessInstanceModificationException(e);
         } catch (final SDefinitiveArchiveNotFound e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The process instance was not archived. Id:" + processInstance.getId(), e);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The process instance was not archived. Id:" + processInstance.getId(), e);
             }
         }
     }

@@ -100,9 +100,14 @@ public class DependencyResolver {
             }
             changeResolutionStatus(processDefinitionId, tenantAccessor, processDefinitionService, dependencyService, dependencyBuilderAccessor, resolved);
         } catch (final SBonitaException e) {
-            loggerService.log(DependencyResolver.class, TechnicalLogSeverity.DEBUG, e);
-            loggerService.log(DependencyResolver.class, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of "
-                    + e.getMessage() + ". Please retry it manually");
+            final Class<DependencyResolver> clazz = DependencyResolver.class;
+            if (loggerService.isLoggable(clazz, TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(clazz, TechnicalLogSeverity.DEBUG, e);
+            }
+            if (loggerService.isLoggable(clazz, TechnicalLogSeverity.WARNING)) {
+                loggerService.log(clazz, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of " + e.getMessage()
+                        + ". Please retry it manually");
+            }
         } catch (final BonitaHomeNotSetException e) {
             throw new BonitaRuntimeException("Bonita home not set", e);
         }

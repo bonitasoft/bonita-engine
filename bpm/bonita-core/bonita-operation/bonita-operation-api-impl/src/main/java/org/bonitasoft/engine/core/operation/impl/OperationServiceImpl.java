@@ -121,12 +121,12 @@ public class OperationServiceImpl implements OperationService {
                 expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
                 updates.put(operation.getLeftOperand(), operationExecutorStrategy);
             }
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 if (dataContainerType != null) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed operation on " + dataContainerType + " <" + dataContainerId + "> : "
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed operation on " + dataContainerType + " <" + dataContainerId + "> : "
                             + operation.getLeftOperand().getName() + " " + operation.getOperator() + " " + operationValue);
                 } else {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed operation " + " <" + dataContainerId + "> : "
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed operation " + " <" + dataContainerId + "> : "
                             + operation.getLeftOperand().getName() + " " + operation.getOperator() + " " + operationValue);
                 }
             }

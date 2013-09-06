@@ -155,7 +155,9 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                 stringBuilder.append(sEventDefinition.getName());
             }
             stringBuilder.append(". This throw error event will act as a Terminate Event.");
-            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, stringBuilder.toString());
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, stringBuilder.toString());
+            }
         }
         return hasActionToExecute;
     }

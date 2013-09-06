@@ -187,7 +187,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessIsnstance.getId(), subProcessId);
         final boolean delete = schedulerService.delete(jobName);
         if (!delete) {
-            if (logger.isLoggable(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.WARNING)) {
+            if (logger.isLoggable(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.DEBUG)) {
                 final StringBuilder stb = new StringBuilder();
                 stb.append("No job found with name '");
                 stb.append(jobName);
@@ -200,7 +200,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 stb.append("]");
                 stb.append("'. It was probably already triggered.");
                 final String message = stb.toString();
-                logger.log(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.WARNING, message);
+                logger.log(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.DEBUG, message);
             }
         }
 

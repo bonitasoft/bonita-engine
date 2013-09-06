@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.SPlatformNotFoundException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -44,7 +45,10 @@ public class AbstractLoginApiImpl {
                     // Second call that will look into the cache and fetches it from the DB but this time the
                     platformService.getPlatform();
                 } catch (final SPlatformNotFoundException e) {
-                    platformAccessor.getTechnicalLoggerService().log(getClass(), TechnicalLogSeverity.INFO, "Platform not yet created");
+                    final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, "Platform not yet created");
+                    }
                 } finally {
                     transactionService.complete();
                 }

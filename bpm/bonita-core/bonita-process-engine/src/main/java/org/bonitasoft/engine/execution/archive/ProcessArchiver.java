@@ -162,7 +162,9 @@ public class ProcessArchiver {
         } catch (final SRecorderException e) {
             throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
         } catch (final SDefinitiveArchiveNotFound e) {
-            logger.log(ProcessArchiver.class, TechnicalLogSeverity.WARNING, "the process instance was not archived id=" + processInstance.getId(), e);
+            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "the process instance was not archived id=" + processInstance.getId(), e);
+            }
         }
     }
 
@@ -196,7 +198,9 @@ public class ProcessArchiver {
             try {
                 sComments = commentService.getComments(processInstance.getId(), new QueryOptions(startIndex, BATCH_SIZE));
             } catch (final SBonitaReadException e) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.WARNING, "No process comment found for process with id: " + processInstance.getId(), e);
+                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "No process comment found for process with id: " + processInstance.getId(), e);
+                }
             }
             if (sComments != null) {
                 for (final SComment sComment : sComments) {
@@ -217,7 +221,9 @@ public class ProcessArchiver {
             } catch (final SRecorderException e) {
                 throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
             } catch (final SDefinitiveArchiveNotFound e) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.WARNING, "the process instance was not archived id=" + processInstance.getId(), e);
+                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "the process instance was not archived id=" + processInstance.getId(), e);
+                }
             }
         }
     }
@@ -241,8 +247,10 @@ public class ProcessArchiver {
                         } catch (final SRecorderException e) {
                             throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
                         } catch (final SDefinitiveArchiveNotFound e) {
-                            logger.log(ProcessArchiver.class, TechnicalLogSeverity.WARNING,
-                                    "the process instance was not archived id=" + processInstance.getId(), e);
+                            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR,
+                                        "the process instance was not archived id=" + processInstance.getId(), e);
+                            }
                         }
                     }
                 }
@@ -252,7 +260,9 @@ public class ProcessArchiver {
             }
         } catch (final SDataInstanceException e) {
             // /FIXME: improve data service to make difference between invalid container and container without data
-            logger.log(ProcessArchiver.class, TechnicalLogSeverity.WARNING, "no data instances found for process. id=" + processInstance.getId(), e);
+            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.WARNING)) {
+                logger.log(ProcessArchiver.class, TechnicalLogSeverity.WARNING, "no data instances found for process. id=" + processInstance.getId(), e);
+            }
             // return;
         }
     }

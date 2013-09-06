@@ -108,8 +108,8 @@ public class UserFilterServiceImpl implements UserFilterService {
             throw new SUserFilterExecutionException(e);
         }
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Executed userFilter <" + sUserFilterDefinition.getName() + "> with userFilter id <"
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed userFilter <" + sUserFilterDefinition.getName() + "> with userFilter id <"
                     + sUserFilterDefinition.getUserFilterId() + ">, and version <" + sUserFilterDefinition.getVersion() + ">");
         }
         return filterResult;

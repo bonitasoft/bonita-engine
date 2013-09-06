@@ -70,8 +70,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      *            the core, this is the maximum time that excess idle threads
      *            will wait for new tasks before terminating. (in seconds)
      */
-    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService,
-            final int maximumPoolSize, final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor) {
+    public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
+            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor) {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
         final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
@@ -166,7 +166,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            logger.log(ThreadPoolExecutor.class, TechnicalLogSeverity.WARNING, "The work was rejected, requeue work: " + task.toString());
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(ThreadPoolExecutor.class, TechnicalLogSeverity.WARNING, "The work was rejected, requeue work: " + task.toString());
+            }
             try {
                 executor.getQueue().put(task);
             } catch (final InterruptedException e) {
