@@ -389,34 +389,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void incidentIsLogged() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         WorkService workService = tenantAccessor.getWorkService();
-        workService.executeWork(new AbstractBonitaWork() {
-
-            @Override
-            public String getDescription() {
-                return "MyJob";
-            }
-
-            @Override
-            protected void work() throws Exception {
-                throw new Exception("an unexpected exception");
-
-            }
-
-            @Override
-            protected boolean isTransactional() {
-                return true;
-            }
-
-            @Override
-            protected void handleFailure(final Exception e) throws Exception {
-                throw new Exception("unable to handle failure");
-            }
-
-            @Override
-            protected String getRecoveryProcedure() {
-                return "The recovery procedure";
-            }
-        });
+        AbstractBonitaWork runnable = new FailingWork();
+        workService.executeWork(runnable);
         Thread.sleep(100);
         String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
         File file = new File(tenantFolder + File.separatorChar + "INCIDENT.log");
