@@ -12,7 +12,7 @@
 
 	<bean name="sExternalIdentityMappingBuilders" class="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingBuildersImpl" />
 
-	<bean id="db-bos-external-identity-mapping" name="DBConfiguration" class="org.bonitasoft.engine.persistence.DBConfiguration">
+	<bean id="db-bos-external-identity-mapping" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/external/identity/mapping/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/external/identity/mapping/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/external/identity/mapping/db/${db.vendor}-cleanTables.sql" />
