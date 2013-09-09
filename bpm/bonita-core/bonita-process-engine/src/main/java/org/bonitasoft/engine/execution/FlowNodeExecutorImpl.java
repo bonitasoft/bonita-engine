@@ -295,7 +295,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     @Override
     public FlowNodeState executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
             final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
-        return stepForward(flowNodeInstanceId, null, operations, processInstanceId, executerId, executerDelegateId);
+        return stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerDelegateId);
     }
 
     @Override
