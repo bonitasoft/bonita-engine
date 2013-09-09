@@ -47,6 +47,7 @@ public abstract class AbstractLockService implements LockService {
 
     @Override
     public void unlock(final BonitaLock lock) throws SLockException {
+        RejectedLockHandler handler = null;
         synchronized (mutex) {
             final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
             try {
@@ -57,13 +58,14 @@ public abstract class AbstractLockService implements LockService {
                             + Thread.currentThread().getName());
                 }
                 lock.getLock().unlock();
-                final RejectedLockHandler handler = getOneRejectedHandler(key);
-                if (handler != null) {
-                    handler.executeOnLockFree();
-                }
+                handler = getOneRejectedHandler(key);
+
             } finally {
                 removeLockFromMapIfnotUsed(key);
             }
+        }
+        if (handler != null) {
+            handler.executeOnLockFree();
         }
     }
 

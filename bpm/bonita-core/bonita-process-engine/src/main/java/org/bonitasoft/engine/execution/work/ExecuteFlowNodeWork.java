@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.execution.ContainerExecutor;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -63,13 +62,7 @@ public class ExecuteFlowNodeWork extends TxLockProcessInstanceWork {
     @Override
     protected void work() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ContainerExecutor containerExecutor = null;
-        if (Type.PROCESS.equals(executorType)) {
-            containerExecutor = tenantAccessor.getProcessExecutor();
-        } else {
-            containerExecutor = tenantAccessor.getFlowNodeExecutor();
-        }
-        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
+        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
     }
 
     @Override
@@ -78,7 +71,7 @@ public class ExecuteFlowNodeWork extends TxLockProcessInstanceWork {
     }
 
     @Override
-    protected void handleFailure(Exception e) throws Exception {
+    protected void handleFailure(final Exception e) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = getTenantAccessor().getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = getTenantAccessor().getFlowNodeExecutor();
