@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
  */
 public interface SACommentBuilder {
 
+    @Deprecated
     SACommentBuilder createNewInstance(SComment sComment);
 
     SAComment done();

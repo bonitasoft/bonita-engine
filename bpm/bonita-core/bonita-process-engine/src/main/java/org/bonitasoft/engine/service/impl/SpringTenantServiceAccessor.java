@@ -47,7 +47,6 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
@@ -266,8 +265,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ReadSessionAccessor readSessionAccessor;
 
     private TransactionalProcessInstanceInterruptor transactionalProcessInstanceInterruptor;
-
-    private SACommentBuilder saCommentBuilder;
 
     private SessionAccessor sessionAccessor;
 
@@ -922,14 +919,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             workService = beanAccessor.getService(WorkService.class);
         }
         return workService;
-    }
-
-    @Override
-    public SACommentBuilder getSACommentBuilders() {
-        if (saCommentBuilder == null) {
-            saCommentBuilder = beanAccessor.getService(SACommentBuilder.class);
-        }
-        return saCommentBuilder;
     }
 
     @Override
