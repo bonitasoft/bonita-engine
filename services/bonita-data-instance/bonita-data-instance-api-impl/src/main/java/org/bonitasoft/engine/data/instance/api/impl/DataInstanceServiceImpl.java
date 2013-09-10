@@ -35,7 +35,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping;
-import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceLogBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceLogBuilder;
 import org.bonitasoft.engine.data.model.SDataSource;
@@ -69,7 +68,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 /**
  * General mechanism for lookup is to look in specific flownode to search a data instance. When refering to "local" data instance, it means the lookup is
  * performed only on the specific element, and not on inherited data for parent containers.
- * 
+ *
  * @author Zhao Na
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
@@ -542,7 +541,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     /**
      * Insert mapping to be able to tell which is the data that is visible from the container:
      * i.e. with the given name on the given container the visible data have the id given by the visibility mapping
-     * 
+     *
      * @param containerId
      * @param containerType
      * @param dataName
@@ -678,13 +677,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             }
             throw new SDataInstanceException("Unable to read SADataInstance", e);
         }
-    }
-
-    private SQueriableLog getQueriableLog(final ActionType actionType, final String message) {
-        final SADataInstanceLogBuilder saDataInstanceLogBuilder = dataInstanceBuilders.getSADataInstanceLogBuilder();
-        saDataInstanceLogBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-        saDataInstanceLogBuilder.setActionType(actionType);
-        return saDataInstanceLogBuilder.done();
     }
 
     @Override
