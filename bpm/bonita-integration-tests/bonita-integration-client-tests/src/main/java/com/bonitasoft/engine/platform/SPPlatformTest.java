@@ -514,16 +514,12 @@ public class SPPlatformTest {
         assertEquals(4, platformAPI.getNumberOfTenants());
     }
 
-    @Test
-    public void canCreateTeantWithNodeStopped() throws BonitaException {
+    @Test(expected = NodeNotStartedException.class)
+    public void cannotCreateTeantWithNodeStopped() throws BonitaException {
         platformAPI.stopNode();
-        long tenantId = -1;
         try {
-            tenantId = createATenant("TENANT_1");
+            createATenant("TENANT_1");
         } finally {
-            if (tenantId != -1) {
-                deleteATenant(tenantId);
-            }
             platformAPI.startNode();
         }
     }
@@ -538,7 +534,7 @@ public class SPPlatformTest {
         }
     }
 
-    @Test
+    @Test(expected = NodeNotStartedException.class)
     public void canDeleteTenantWithStoppedNode() throws BonitaException {
         final long tenantId = createATenant("TENANT_1");
         try {
@@ -546,17 +542,29 @@ public class SPPlatformTest {
             platformAPI.deleteTenant(tenantId);
         } finally {
             platformAPI.startNode();
+            platformAPI.deleteTenant(tenantId);
         }
     }
 
-    @Test
-    public void canActivatedDeactivateTenantWithNodeStopped() throws BonitaException {
+    @Test(expected = NodeNotStartedException.class)
+    public void cannotActivatedTenantWithNodeStopped() throws BonitaException {
         platformAPI.stopNode();
         try {
             platformAPI.activateTenant(tenantId1);
+        } finally {
+            platformAPI.startNode();
+        }
+    }
+
+    @Test(expected = NodeNotStartedException.class)
+    public void cannotDeactivateTenantWithNodeStopped() throws BonitaException {
+        platformAPI.activateTenant(tenantId1);
+        platformAPI.stopNode();
+        try {
             platformAPI.deactiveTenant(tenantId1);
         } finally {
             platformAPI.startNode();
+            platformAPI.deactiveTenant(tenantId1);
         }
     }
 
@@ -654,8 +662,8 @@ public class SPPlatformTest {
         platformAPI.updateTenant(-10, udpateDescriptor);
     }
 
-    @Test
-    public void canUpdateTenantWithNodeNotStarted() throws Exception {
+    @Test(expected = NodeNotStartedException.class)
+    public void cannotUpdateTenantWithNodeNotStarted() throws Exception {
         // stop platform
         platformAPI.stopNode();
         // update tenant
@@ -664,8 +672,6 @@ public class SPPlatformTest {
         try {
             platformAPI.updateTenant(tenantId1, udpateDescriptor);
         } finally {
-            udpateDescriptor.setName(tenantName1);
-            platformAPI.updateTenant(tenantId1, udpateDescriptor);
             platformAPI.startNode();
         }
     }

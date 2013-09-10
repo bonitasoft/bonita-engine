@@ -118,7 +118,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
-    @AvailableOnStoppedNode
     public final long createTenant(final TenantCreator creator) throws CreationException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
@@ -392,7 +391,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @CustomTransactions
-    @AvailableOnStoppedNode
     public void deleteTenant(final long tenantId) throws DeletionException {
         PlatformServiceAccessor platformAccessor = null;
         try {
@@ -424,7 +422,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    @AvailableOnStoppedNode
     public void activateTenant(final long tenantId) throws TenantNotFoundException, TenantActivationException {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
@@ -474,7 +471,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    @AvailableOnStoppedNode
     public void deactiveTenant(final long tenantId) throws TenantNotFoundException, TenantDeactivationException {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
@@ -654,7 +650,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    @AvailableOnStoppedNode
     public Tenant updateTenant(final long tenantId, final TenantUpdater udpater) throws UpdateException {
         if (udpater == null || udpater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
