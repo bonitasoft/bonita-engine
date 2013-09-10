@@ -112,7 +112,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     void deletePendingMappings(long humanTaskInstanceId) throws SActivityModificationException;
 
     /**
-     * 
      * Delete all pending mappings for the connected tenant
      * 
      * @throws SActivityModificationException
@@ -177,15 +176,17 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
             Set<Integer> stateIds) throws SActivityReadException;
 
     /**
-     * Get archived activity instance for specified activity instance
+     * Get the most recent archived version of a specified activity instance
      * 
      * @param activityInstanceId
      *            identifier of activity instance
      * @return an SAActivityInstance object
      * @throws SActivityReadException
+     *             if a Read error occurs
      * @throws SActivityInstanceNotFoundException
+     *             it the provided activityInstanceId does not refer to an existing Activity Instance
      */
-    SAActivityInstance getArchivedActivityInstance(long activityInstanceId) throws SActivityReadException, SActivityInstanceNotFoundException;
+    SAActivityInstance getMostRecentArchivedActivityInstance(long activityInstanceId) throws SActivityReadException, SActivityInstanceNotFoundException;
 
     /**
      * Get pending tasks for the user in specific actors. This is used for pagination
@@ -440,8 +441,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityInstanceNotFoundException
      */
 
-    SAActivityInstance getArchivedActivityInstance(long activityInstanceId, int stateId)
-            throws SActivityReadException, SActivityInstanceNotFoundException;
+    SAActivityInstance getArchivedActivityInstance(long activityInstanceId, int stateId) throws SActivityReadException, SActivityInstanceNotFoundException;
 
     /**
      * Search archived human tasks according to specific search criteria
@@ -503,8 +503,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SBonitaSearchException
      *             in case a search error occurs
      */
-    long getNumberOfArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions)
-            throws SBonitaSearchException;
+    long getNumberOfArchivedTasksManagedBy(long managerUserId, QueryOptions searchOptions) throws SBonitaSearchException;
 
     /**
      * get the archived tasks assigned to subordinates of specified manager, limited to, sorted, paginated with the specifies QueryOptions
@@ -853,7 +852,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     void deleteArchivedPendingMappings(long flowNodeInstanceId) throws SActivityModificationException;
 
     /**
-     * 
      * @param activityInstance
      * @param boundaryEventId
      * @throws SActivityModificationException

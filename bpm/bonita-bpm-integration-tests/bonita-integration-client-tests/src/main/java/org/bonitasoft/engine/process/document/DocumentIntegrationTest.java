@@ -73,6 +73,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
@@ -462,12 +463,13 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final HumanTaskInstance humanTaskInstance = pendingHumanTaskInstances.get(0);
             assignAndExecuteStep(humanTaskInstance, user.getId());
 
+            waitForArchivedActivity(humanTaskInstance.getId(), TestStates.getNormalFinalState());
+
             final Document doc2 = buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(pi.getId(), beforeUpdate.getName(), doc2.getContentFileName(), doc2.getContentMimeType(),
                     "contentOfTheDoc".getBytes());
-            final Document afterUpdate2 = getAttachmentWithoutItsContent(pi);
             final Document documentAtActivityInstanciation = getProcessAPI().getDocumentAtActivityInstanceCompletion(humanTaskInstance.getId(),
-                    afterUpdate2.getName());
+                    beforeUpdate.getName());
             assertEquals(afterUpdate, documentAtActivityInstanciation);
         } finally {
             disableAndDeleteProcess(pi.getProcessDefinitionId());

@@ -50,7 +50,7 @@ public class GetArchivedActivityInstance implements TransactionContentWithResult
         if (stateId > -1) {
             activity = activityInstanceService.getArchivedActivityInstance(activityInstanceId, stateId);
         } else {
-            activity = activityInstanceService.getArchivedActivityInstance(activityInstanceId);
+            activity = activityInstanceService.getMostRecentArchivedActivityInstance(activityInstanceId);
         }
     }
 
