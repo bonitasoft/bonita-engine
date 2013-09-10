@@ -24,6 +24,7 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.io.PropertiesManager;
+import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -170,13 +171,12 @@ public class SPPlatformTest {
         assertEquals(tenantId1, tenantList.get(0).getId());
     }
 
-    @Cover(classes = { PlatformAPI.class }, concept = BPMNConcept.NONE, keywords = { "Search", "Tenants", "Order", "Pagination",
-            "Column not unique" }, jira = "ENGINE-1557")
+    @Cover(classes = { PlatformAPI.class }, concept = BPMNConcept.NONE, keywords = { "Search", "Tenants", "Order", "Pagination", "Column not unique" }, jira = "ENGINE-1557")
     @Test
     public void searchTenantsWithNotUniqueDescription() throws Exception {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(TenantSearchDescriptor.DESCRIPTION, Order.ASC);
-        List<Tenant> allTenants = platformAPI.searchTenants(builder.done()).getResult();
+        final List<Tenant> allTenants = platformAPI.searchTenants(builder.done()).getResult();
         assertEquals(4, allTenants.size());
 
         builder = new SearchOptionsBuilder(0, 3);
@@ -487,19 +487,13 @@ public class SPPlatformTest {
         platformAPI.getPlatform();
     }
 
-    @Test
-    public void actionsWithPlatformStopped() throws BonitaException {
+    @Test(expected = NodeNotStartedException.class)
+    public void cannotExecuteActionsWithPlatformStopped() throws BonitaException {
         platformAPI.stopNode();
         try {
             final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1000);
             builder.filter(TenantSearchDescriptor.DEFAULT_TENANT, true);
-            final SearchResult<Tenant> searchTenants = platformAPI.searchTenants(builder.done());
-            assertEquals(1, searchTenants.getCount());
-            final long defaultTenantId = searchTenants.getResult().get(0).getId();
-            final Tenant tenant = platformAPI.getTenantById(defaultTenantId);
-            assertEquals(defaultTenantId, tenant.getId());
-            final Tenant defaultTenant = platformAPI.getDefaultTenant();
-            assertEquals(defaultTenant.getId(), defaultTenantId);
+            platformAPI.searchTenants(builder.done());
         } finally {
             platformAPI.startNode();
         }
@@ -534,12 +528,11 @@ public class SPPlatformTest {
         }
     }
 
-    @Test
-    public void canGetTenantByNameWithNodeStopped() throws BonitaException {
+    @Test(expected = NodeNotStartedException.class)
+    public void cannotGetTenantByNameWithNodeStopped() throws BonitaException {
         platformAPI.stopNode();
         try {
-            final Tenant tenant = platformAPI.getTenantByName(tenantName1);
-            assertEquals(tenantName1, tenant.getName());
+            platformAPI.getTenantByName(tenantName1);
         } finally {
             platformAPI.startNode();
         }
@@ -567,7 +560,7 @@ public class SPPlatformTest {
         }
     }
 
-    @Test(expected = PlatformNotFoundException.class)
+    @Test
     public void getPlatformState() throws Exception {
         // test started state
         PlatformState state = platformAPI.getPlatformState();
@@ -580,7 +573,7 @@ public class SPPlatformTest {
         platformAPI.cleanPlatform();
         platformAPI.deletePlatform();
         state = platformAPI.getPlatformState();
-        fail();
+        assertEquals(PlatformState.STOPPED, state);
     }
 
     @Test
