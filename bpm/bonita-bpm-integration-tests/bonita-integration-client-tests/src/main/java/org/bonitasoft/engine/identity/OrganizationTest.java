@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +40,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class OrganizationTest extends CommonAPITest {
+
+    private static final String UTF_8 = "UTF-8";
 
     @Before
     public void before() throws BonitaException {
@@ -125,11 +128,13 @@ public class OrganizationTest extends CommonAPITest {
 
     private void importOrganization(final String fileName) throws IOException, OrganizationImportException {
         final InputStream xmlStream = OrganizationTest.class.getResourceAsStream(fileName);
+        final InputStreamReader reader = new InputStreamReader(xmlStream);
         try {
-            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
-            getIdentityAPI().importOrganization(new String(organisationContent));
+            final byte[] organisationContent = IOUtils.toByteArray(reader);
+            getIdentityAPI().importOrganization(new String(organisationContent, UTF_8));
         } finally {
             xmlStream.close();
+            reader.close();
         }
     }
 

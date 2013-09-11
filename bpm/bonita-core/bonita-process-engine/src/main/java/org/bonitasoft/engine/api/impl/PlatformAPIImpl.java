@@ -245,8 +245,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
                     } finally {
                         sessionService.deleteSession(sessionId);
-                        cleanSessionAccessor(sessionAccessor);
-                        sessionAccessor.setSessionInfo(platformSessionId, -1);
+                        cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
                 }
                 // FIXME: shouldn't we also stop the workService?:
@@ -310,7 +309,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             } catch (final Exception e) {
                 throw new StartNodeException("Platform starting failed.", e);
             } finally {
-                cleanSessionAccessor(sessionAccessor);
+                cleanSessionAccessor(sessionAccessor, -1);
             }
             isNodeStarted = true;
         } catch (final StartNodeException e) {
@@ -395,7 +394,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     try {
                         final STenant tenant = getDefaultTenant();
                         deactiveTenant(tenant.getId());
-                    } catch (STenantNotFoundException e) {
+                    } catch (final STenantNotFoundException e) {
 
                     }
                     clean.execute();
@@ -533,16 +532,16 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         } finally {
-            if (sessionAccessor != null) {
-                cleanSessionAccessor(sessionAccessor);
-                sessionAccessor.setSessionInfo(platformSessionId, -1);
-            }
+            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 
-    private void cleanSessionAccessor(final SessionAccessor sessionAccessor) {
+    protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
         if (sessionAccessor != null) {
             sessionAccessor.deleteSessionId();
+            if (platformSessionId != -1) {
+                sessionAccessor.setSessionInfo(platformSessionId, -1);
+            }
         }
     }
 
@@ -659,8 +658,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     throw new STenantActivationException(e);
                 }
             }
-            cleanSessionAccessor(sessionAccessor);
-            sessionAccessor.setSessionInfo(platformSessionId, -1);
+            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 
@@ -707,8 +705,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
             throw new STenantDeactivationException("Tenant deactivation failed.", e);
         } finally {
-            cleanSessionAccessor(sessionAccessor);
-            sessionAccessor.setSessionInfo(platformSessionId, -1);
+            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 
