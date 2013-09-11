@@ -58,7 +58,7 @@ public final class EnableProcess implements TransactionContent {
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + userName + "> has enabled process <" + sProcessDefinition.getName()
-                    + "> in version <" + sProcessDefinition.getVersion() + ">");
+                    + "> in version <" + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
         }
     }
 

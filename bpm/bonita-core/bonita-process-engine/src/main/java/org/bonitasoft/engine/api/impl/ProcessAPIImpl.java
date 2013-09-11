@@ -415,6 +415,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorAlreadyExistsException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorCreationException;
@@ -587,11 +588,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private ArrayList<BonitaLock> createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses,
-            final List<Long> processInstanceIds)
-            throws SLockException {
-        ArrayList<BonitaLock> locks = new ArrayList<BonitaLock>(processInstanceIds.size());
+            final List<Long> processInstanceIds) throws SLockException {
+        final ArrayList<BonitaLock> locks = new ArrayList<BonitaLock>(processInstanceIds.size());
         for (final Long processInstanceId : processInstanceIds) {
-            BonitaLock lock = lockService.lock(processInstanceId, objectType);
+            final BonitaLock lock = lockService.lock(processInstanceId, objectType);
             locks.add(lock);
             lockedProcesses.add(processInstanceId);
         }
@@ -740,7 +740,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO,
                     "The user <" + getUserNameFromSession() + "> has installed process <" + sProcessDefinition.getName() + "> in version <"
-                            + sProcessDefinition.getVersion() + ">");
+                            + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
         }
         return processDefinition;
     }
@@ -881,29 +881,48 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        LockService lockService = tenantAccessor.getLockService();
-        TransactionContent transactionContent = new TransactionContent() {
+        final LockService lockService = tenantAccessor.getLockService();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final TransactionContent transactionContent = new TransactionContent() {
 
             @Override
             public void execute() throws SBonitaException {
-
+                final SSession session = getSession();
                 final long starterId;
                 if (userId == 0) {
-                    starterId = getUserIdFromSession();
+                    starterId = session.getUserId();
                 } else {
                     starterId = userId;
                 }
 
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-                processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId,
-                        getUserIdFromSession());
+                processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId, session.getId());
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                    final StringBuilder stb = new StringBuilder();
+                    stb.append("The user <");
+                    stb.append(session.getUserName());
+                    if (starterId != session.getUserId()) {
+                        stb.append("> acting as delegate of user with id <");
+                        stb.append(starterId);
+                    }
+                    stb.append("> has performed the task [display name: <");
+                    stb.append(flowNodeInstance.getDisplayName());
+                    stb.append(">, id: <");
+                    stb.append(flowNodeInstance.getId());
+                    stb.append(">, process instance: <");
+                    stb.append(flowNodeInstance.getParentProcessInstanceId());
+                    stb.append(">, process definition: <");
+                    stb.append(flowNodeInstance.getProcessDefinitionId());
+                    stb.append(">]");
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+                }
             }
         };
 
         try {
-            GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
+            final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
             executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
-            BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name());
+            final BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name());
             try {
                 executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
             } finally {
@@ -3120,32 +3139,25 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private long getUserIdFromSession() {
-        SessionAccessor sessionAccessor;
-        long userId;
+    private SSession getSession() {
+        SSession session;
         try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = sessionAccessor.getSessionId();
             final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            userId = platformServiceAccessor.getSessionService().getSession(sessionId).getUserId();
+            session = platformServiceAccessor.getSessionService().getSession(sessionId);
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
-        return userId;
+        return session;
+    }
+
+    private long getUserIdFromSession() {
+        return getSession().getUserId();
     }
 
     private String getUserNameFromSession() {
-        SessionAccessor sessionAccessor;
-        final String userName;
-        try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            userName = platformServiceAccessor.getSessionService().getSession(sessionId).getUserName();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        return userName;
+        return getSession().getUserName();
     }
 
     @Override
@@ -3193,16 +3205,23 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstance processInstance = ModelConvertor.toProcessInstance(sProcessDefinition, startedInstance);
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            if (starterId == getUserIdFromSession()) {
-                logger.log(
-                        this.getClass(),
-                        TechnicalLogSeverity.INFO,
-                        "The user <" + getUserNameFromSession() + "> has started instance <" + processInstance.getId() + "> of process <"
-                                + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
-            } else {
-                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user with id <" + starterId + "> has started instance <" + processInstance.getId()
-                        + "> of process <" + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + ">");
+            final StringBuilder stb = new StringBuilder();
+            stb.append("The user <");
+            stb.append(getUserNameFromSession());
+            if (starterId != getUserIdFromSession()) {
+                stb.append(">acting as delegate of user with id <");
+                stb.append(starterId);
             }
+            stb.append("> has started instance <");
+            stb.append(processInstance.getId());
+            stb.append("> of process <");
+            stb.append(sProcessDefinition.getName());
+            stb.append("> in version <");
+            stb.append(sProcessDefinition.getVersion());
+            stb.append("> and id <");
+            stb.append(sProcessDefinition.getId());
+            stb.append(">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
         }
         return processInstance;
     }
@@ -3553,7 +3572,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         try {
-            BonitaLock lock = lockService.lock(processInstanceId, objectType);
+            final BonitaLock lock = lockService.lock(processInstanceId, objectType);
             deleteProcessInstanceInTransaction(tenantAccessor, processInstanceId);
             lockService.unlock(lock);
         } catch (final SLockException e) {

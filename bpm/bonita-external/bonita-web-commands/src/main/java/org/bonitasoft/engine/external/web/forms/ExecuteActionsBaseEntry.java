@@ -55,6 +55,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
@@ -180,13 +181,13 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
             return classLoaderService.getLocalClassLoader("process", processDefinitionId);
-        } catch (org.bonitasoft.engine.classloader.ClassLoaderException e) {
+        } catch (final org.bonitasoft.engine.classloader.ClassLoaderException e) {
             throw new ClassLoaderException(e);
         }
     }
 
-    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID,
-            final ProcessDefinitionService processDefinitionService) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID, final ProcessDefinitionService processDefinitionService)
+            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionUUID,
                 processDefinitionService);
         try {
@@ -201,32 +202,18 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         }
     }
 
-    protected long getUserIdFromSession() {
+    protected SSession getSession() {
         SessionAccessor sessionAccessor = null;
-        long userId;
+        SSession session;
         try {
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = sessionAccessor.getSessionId();
             final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            userId = platformServiceAccessor.getSessionService().getSession(sessionId).getUserId();
+            session = platformServiceAccessor.getSessionService().getSession(sessionId);
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
-        return userId;
-    }
-
-    protected String getUserNameFromSession() {
-        SessionAccessor sessionAccessor = null;
-        String userName;
-        try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            userName = platformServiceAccessor.getSessionService().getSession(sessionId).getUserName();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        return userName;
+        return session;
     }
 
     protected SProcessDefinition getProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId)

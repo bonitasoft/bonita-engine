@@ -30,11 +30,14 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationExecutionException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Ruiheng Fan
@@ -54,13 +57,12 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final long sActivityInstanceID = getActivityInstanceId(parameters);
 
         try {
+            final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
             final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
-            final ClassLoader processClassloader;
-            final long processDefinitionID;
             final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
-            processDefinitionID = flowNodeInstance.getLogicalGroup(0);
-            processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
+            final long processDefinitionID = flowNodeInstance.getProcessDefinitionId();
+            final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
@@ -68,7 +70,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-            executeActivity(sActivityInstanceID, processDefinitionID);
+            executeActivity(flowNodeInstance, logger);
         } catch (final BonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminateTask(List<Operation>, Map<String, Serializable>, long activityInstanceId)'",
@@ -118,16 +120,32 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         }
     }
 
-    protected void executeActivity(final long activityInstanceId, final long processDefinitionID) throws BonitaException {
+    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger) throws BonitaException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         try {
-            final long userId = getUserIdFromSession();
-            processExecutor.executeFlowNode(activityInstanceId, null, null, processDefinitionID, userId, userId);
+            final SSession session = getSession();
+            final long userId = session.getUserId();
+            final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+            processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, processDefinitionId, userId, userId);
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                final StringBuilder stb = new StringBuilder();
+                stb.append("The user <");
+                stb.append(session.getUserName());
+                stb.append("> has performed the task [display name: <");
+                stb.append(flowNodeInstance.getDisplayName());
+                stb.append(">, id: <");
+                stb.append(flowNodeInstance.getId());
+                stb.append(">, process instance: <");
+                stb.append(flowNodeInstance.getParentProcessInstanceId());
+                stb.append(">, process definition: <");
+                stb.append(processDefinitionId);
+                stb.append(">]");
+                logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+            }
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new BonitaException(e.getMessage());
         }
     }
-
 }
