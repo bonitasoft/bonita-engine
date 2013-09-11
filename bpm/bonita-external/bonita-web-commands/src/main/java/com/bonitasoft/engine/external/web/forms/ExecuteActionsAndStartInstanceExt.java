@@ -44,51 +44,28 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Ruiheng Fan
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
-    @SuppressWarnings("unchecked")
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final List<Operation> operations;
-        final List<ConnectorDefinitionWithInputValues> connectorsWithInput;
-        final Map<String, Object> operationsInputValues;
-        try {
-            operations = (List<Operation>) parameters.get(OPERATIONS_LIST_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_LIST_KEY + " is missing or not convertible to List.", e);
-        }
-        try {
-            operationsInputValues = (Map<String, Object>) parameters.get(OPERATIONS_INPUT_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_INPUT_KEY + " is missing or not convertible to Map.", e);
-        }
+        final List<Operation> operations = getParameter(parameters, OPERATIONS_LIST_KEY, "Mandatory parameter " + OPERATIONS_LIST_KEY
+                + " is missing or not convertible to List.");
+        final Map<String, Object> operationsInputValues = getParameter(parameters, OPERATIONS_INPUT_KEY, "Mandatory parameter " + OPERATIONS_INPUT_KEY
+                + " is missing or not convertible to Map.");
+        final List<ConnectorDefinitionWithInputValues> connectorsWithInput = getParameter(parameters, CONNECTORS_LIST_KEY, "Mandatory parameter "
+                + CONNECTORS_LIST_KEY + " is missing or not convertible to List.");
+        final long sProcessDefinitionID = getParameter(parameters, PROCESS_DEFINITION_ID_KEY, "Mandatory parameter " + PROCESS_DEFINITION_ID_KEY
+                + " is missing or not convertible to long.");
+
+        final long userId = getParameter(parameters, USER_ID_KEY, "Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.");
 
         try {
-            connectorsWithInput = (List<ConnectorDefinitionWithInputValues>) parameters.get(CONNECTORS_LIST_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + CONNECTORS_LIST_KEY + " is missing or not convertible to List.", e);
-        }
 
-        long sProcessDefinitionID = 0L;
-        try {
-            sProcessDefinitionID = (Long) parameters.get(PROCESS_DEFINITION_ID_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + PROCESS_DEFINITION_ID_KEY + " is missing or not convertible to long.", e);
-        }
-
-        long userId;
-        try {
-            userId = (Long) parameters.get(USER_ID_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.", e);
-        }
-
-        try {
-            final ClassLoader processClassloader;
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
-            processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
+            final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
