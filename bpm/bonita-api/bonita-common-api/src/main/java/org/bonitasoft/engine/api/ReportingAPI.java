@@ -29,7 +29,8 @@ public interface ReportingAPI {
     /**
      * Executes a SELECT query (rollback only) and returns the result in a CSV format.
      * <p>
-     * If the query is not a SELECT one a RetrieveException is thrown.
+     * If the query is not a SELECT one a RetrieveException is thrown. The result can differ from a database to another one due to the way the database stores
+     * values. (for example: with a boolean it can be a number for some databases)
      * 
      * @param selectQuery
      *            the SELECT query.
