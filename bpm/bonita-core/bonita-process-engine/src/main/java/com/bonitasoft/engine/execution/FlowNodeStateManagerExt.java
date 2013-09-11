@@ -19,7 +19,7 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
+import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
@@ -47,7 +47,7 @@ import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 
 /**
  * SP implementation of the activity state manager.
- * 
+ *
  * @author Celine Souchet
  */
 public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
@@ -61,12 +61,12 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final EventInstanceService eventInstanceService, final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders,
             final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry,
             final ArchiveService archiveService, final TechnicalLoggerService logger, final DocumentMappingService documentMappingService,
-            final SCommentService commentService, final SACommentBuilder saCommentBuilder, final BreakpointService breakpointService,
+            final SCommentService commentService, final SCommentBuilders commentBuilders, final BreakpointService breakpointService,
             final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService, final WorkService workService, TokenService tokenService) {
+            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, sDataInstanceBuilders, instanceBuilders,
-                operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService, saCommentBuilder,
+                operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService, commentBuilders,
                 lockService, eventsHandler, userFilterService, actorMappingService, workService, tokenService);
         this.breakpointService = breakpointService;
     }
