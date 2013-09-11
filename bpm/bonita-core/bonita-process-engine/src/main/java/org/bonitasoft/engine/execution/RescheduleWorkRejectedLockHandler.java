@@ -57,4 +57,9 @@ public class RescheduleWorkRejectedLockHandler implements RejectedLockHandler {
             throw new SLockException(e);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Rescheduler for work " + work;
+    }
 }

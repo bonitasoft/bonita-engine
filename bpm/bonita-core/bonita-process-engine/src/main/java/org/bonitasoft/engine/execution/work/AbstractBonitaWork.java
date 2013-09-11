@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
+import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -59,6 +60,7 @@ public abstract class AbstractBonitaWork implements BonitaWork {
         transactionService = tenantAccessor.getTransactionService();
         SSession session = null;
         boolean canBeExecuted = false;
+        BonitaLock preWork = null;
         try {
             session = sessionService.createSession(tenantId, "workservice");
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
@@ -74,31 +76,42 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                     work();
                 }
             }
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Finished work(wasExecuted:" + canBeExecuted + ", lock=" + preWork + ") : "
+                        + getDescription());
+            }
         } catch (final Exception e) {
             // Edge case we cannot manage
-            loggerService.log(BonitaWork.class, TechnicalLogSeverity.WARNING,
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
                     "A work failed, The failure will be handled, work is:  " + getDescription());
-            loggerService.log(BonitaWork.class, TechnicalLogSeverity.WARNING,
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
                     "Exception was:" + e.getMessage());
-            if (loggerService.isLoggable(BonitaWork.class, TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(BonitaWork.class, TechnicalLogSeverity.DEBUG, e);
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }
             try {
                 handleFailure(e);
             } catch (Exception e1) {
-                loggerService.log(BonitaWork.class, TechnicalLogSeverity.ERROR,
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
                         "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
                         e);
-                loggerService.log(BonitaWork.class, TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
                 logIncident();
             }
 
         } finally {
             if (canBeExecuted) {
                 try {
+                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "calling afterwork: " + getDescription());
+                    }
                     afterWork();
+
+                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "afterwork executed: " + getDescription());
+                    }
                 } catch (Exception e) {
-                    loggerService.log(BonitaWork.class, TechnicalLogSeverity.ERROR, e);
+                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, e);
                 }
             }
             if (session != null) {

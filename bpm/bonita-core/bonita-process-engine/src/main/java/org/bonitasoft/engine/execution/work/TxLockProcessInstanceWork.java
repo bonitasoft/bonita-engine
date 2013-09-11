@@ -33,7 +33,7 @@ public abstract class TxLockProcessInstanceWork extends TxBonitaWork {
 
     private transient LockService lockService;
 
-    private transient BonitaLock lock;
+    private BonitaLock lock;
 
     public TxLockProcessInstanceWork(final long processInstanceId) {
         super();
@@ -49,16 +49,14 @@ public abstract class TxLockProcessInstanceWork extends TxBonitaWork {
         final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(getTenantId(), this);
 
         lock = lockService.tryLock(processInstanceId, objectType, handler);
-        if (lock == null) {
-            return false;
-        }
-        return true;
+        return lock != null;
     }
 
     @Override
     protected void afterWork() throws Exception {
-        if (lock != null) {
-            lockService.unlock(lock);
+        if (lock == null) {
+            throw new IllegalStateException("The lock was null for work " + getDescription());
         }
+        lockService.unlock(lock);
     }
 }

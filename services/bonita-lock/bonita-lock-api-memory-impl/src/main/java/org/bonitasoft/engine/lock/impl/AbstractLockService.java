@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2013 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.lock.impl;
 
 import java.util.concurrent.TimeUnit;
@@ -12,6 +25,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
+/**
+ * 
+ * 
+ * @author Baptiste Mesta
+ * 
+ */
 public abstract class AbstractLockService implements LockService {
 
     private static final String SEPARATOR = "_";
@@ -30,11 +49,14 @@ public abstract class AbstractLockService implements LockService {
 
     protected final boolean debugEnable;
 
+    private final boolean traceEnable;
+
     public AbstractLockService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
         debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
+        traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
     }
 
     private String buildKey(final long objectToLockId, final String objectType) {
@@ -47,19 +69,19 @@ public abstract class AbstractLockService implements LockService {
 
     @Override
     public void unlock(final BonitaLock lock) throws SLockException {
+        final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);
+        }
         RejectedLockHandler handler = null;
         synchronized (mutex) {
-            final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
             try {
-                if (debugEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "unlock " + lock.getLock().hashCode() + " id=" + lock.getObjectToLockId()
-                            + " by thread " + Thread.currentThread().getId()
-                            + " "
-                            + Thread.currentThread().getName());
-                }
                 lock.getLock().unlock();
                 handler = getOneRejectedHandler(key);
-
+                if (traceEnable) {
+                    logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + lock.getLock().hashCode() + " id=" + key + ", execute rejectedLockHandler:"
+                            + handler);
+                }
             } finally {
                 removeLockFromMapIfnotUsed(key);
             }
@@ -74,29 +96,34 @@ public abstract class AbstractLockService implements LockService {
         synchronized (mutex) {
             final String key = buildKey(objectToLockId, objectType);
             final Lock lock = getLock(key);
-            if (debugEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "tryLock " + lock.hashCode() + " id=" + objectToLockId + " by thread "
-                        + Thread.currentThread().getId() + " "
-                        + Thread.currentThread().getName());
+            if (traceEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "tryLock " + lock.hashCode() + " id=" + key);
             }
-            if (lock.tryLock()) {
-                if (debugEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "locked " + lock.hashCode() + " id=" + objectToLockId + " by thread "
-                            + Thread.currentThread().getId() + " "
-                            + Thread.currentThread().getName());
+
+            if (!isOwnedByCurrentThread(lock, key) && lock.tryLock()) {
+                if (traceEnable) {
+                    logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
                 }
                 return new BonitaLock(lock, objectType, objectToLockId);
-            } else {
-                if (debugEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "not locked " + lock.hashCode() + " id=" + objectToLockId + " by thread "
-                            + Thread.currentThread().getId() + " "
-                            + Thread.currentThread().getName());
-                }
+            }
+            if (traceEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "not locked " + lock.hashCode() + " id=" + key + "store rejectedLockHandler:"
+                        + rejectedLockHandler);
             }
             storeRejectedLock(key, rejectedLockHandler);
             return null;
         }
     }
+
+    /**
+     * 
+     * Check if the lock is own by the current thread: should not happen
+     * 
+     * @param lock
+     * @param key
+     * @return
+     */
+    protected abstract boolean isOwnedByCurrentThread(Lock lock, String key);
 
     @Override
     public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
@@ -107,10 +134,8 @@ public abstract class AbstractLockService implements LockService {
             lock = getLock(key);
         }
         final long before = System.currentTimeMillis();
-        if (debugEnable) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "lock " + lock.hashCode() + " id=" + objectToLockId + " by thread "
-                    + Thread.currentThread().getId() + " "
-                    + Thread.currentThread().getName());
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock " + lock.hashCode() + " id=" + key);
         }
         // outside mutex because it's a long lock
         try {
@@ -122,10 +147,8 @@ public abstract class AbstractLockService implements LockService {
             throw new SLockException(e);
         }
 
-        if (debugEnable) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "locked " + lock.hashCode() + " id=" + objectToLockId + " by thread "
-                    + Thread.currentThread().getId() + " "
-                    + Thread.currentThread().getName());
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
         }
         final long time = System.currentTimeMillis() - before;
 

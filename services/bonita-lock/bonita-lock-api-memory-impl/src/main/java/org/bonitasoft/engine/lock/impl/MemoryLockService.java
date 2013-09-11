@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.RejectedLockHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -32,7 +31,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
  */
 public class MemoryLockService extends AbstractLockService {
 
-    private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
+    private final Map<String, BonitaReentrantLock> locks = new HashMap<String, BonitaReentrantLock>();
 
     private final Map<String, List<RejectedLockHandler>> rejectedLockHandlers = new HashMap<String, List<RejectedLockHandler>>();
 
@@ -43,7 +42,7 @@ public class MemoryLockService extends AbstractLockService {
      * @param lockTimeout
      *            timeout to obtain a lock in seconds
      */
-    public MemoryLockService(final TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, int lockTimeout) {
+    public MemoryLockService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
         super(logger, sessionAccessor, lockTimeout);
     }
 
@@ -72,26 +71,37 @@ public class MemoryLockService extends AbstractLockService {
     protected Lock getLock(final String key) {
         if (!locks.containsKey(key)) {
             // use fair mode?
-            locks.put(key, new ReentrantLock());
+            locks.put(key, new BonitaReentrantLock());
         }
         return locks.get(key);
     }
 
     @Override
     protected void removeLockFromMapIfnotUsed(final String key) {
-        ReentrantLock reentrantLock = locks.get(key);
+        BonitaReentrantLock reentrantLock = locks.get(key);
         /*
          * The reentrant lock must not have waiting thread that try to lock it, nor a lockservice.lock that locked it nor rejectedlockhandlers waiting for it
          */
         if (reentrantLock != null && !reentrantLock.hasQueuedThreads() && !reentrantLock.isLocked()
                 && (rejectedLockHandlers.get(key) == null || rejectedLockHandlers.get(key).isEmpty())) {
             if (debugEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "removed from map " + reentrantLock.hashCode() + " id=" + key
-                        + " by thread " + Thread.currentThread().getId()
-                        + " "
-                        + Thread.currentThread().getName());
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "removed from map " + reentrantLock.hashCode() + " id=" + key);
             }
             locks.remove(key);
         }
+    }
+
+    @Override
+    protected boolean isOwnedByCurrentThread(final Lock lock, final String key) {
+        BonitaReentrantLock bonitaReentrantLock = (BonitaReentrantLock) lock;
+        Thread owner = bonitaReentrantLock.getOwner();
+        if (owner == null) {
+            return false;
+        }
+        boolean isCurrentThread = owner.getId() != Thread.currentThread().getId();
+        if (debugEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "the lock is owned by the same thread key=" + key);
+        }
+        return isCurrentThread;
     }
 }
