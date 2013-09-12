@@ -183,8 +183,8 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertEquals(parentTask.getName(), toDoTasks.get(0).getName());
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());
-        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask'1", "newTask'1", jack.getId(), "add new manual user task",
-                dueDate, TaskPriority.HIGHEST);
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask'1", "newTask'1", jack.getId(), "add new manual user task", dueDate,
+                TaskPriority.HIGHEST);
         getProcessAPI().addManualUserTask(taskCreator);
 
         taskCreator = buildManualTaskCreator(parentTask.getId(), "newTask'2", "newTask'2", john.getId(), "add new manual user task", dueDate,
@@ -272,7 +272,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         // assertTrue(new WaitForCompletedArchivedStep(50, 1000, manualUserTask2.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
 
         executeFlowNodeUntilEnd(parentTask.getId());
-        assertTrue(new WaitForCompletedArchivedStep(50, 1000, parentTask.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
+        assertTrue(new WaitForCompletedArchivedStep(50, 5000, parentTask.getName(), processDefinition.getId(), getProcessAPI()).waitUntil());
 
         disableAndDeleteProcess(processDefinition);
     }
