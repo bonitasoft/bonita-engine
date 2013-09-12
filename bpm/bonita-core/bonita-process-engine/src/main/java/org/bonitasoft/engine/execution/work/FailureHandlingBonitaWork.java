@@ -13,11 +13,10 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import java.util.concurrent.Callable;
+import java.util.Map;
 
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -26,16 +25,15 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
-public abstract class AbstractBonitaWork implements BonitaWork {
+public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
-    private static final long serialVersionUID = -3346630968791356467L;
+    private static final long serialVersionUID = 1L;
 
     protected transient TechnicalLoggerService loggerService;
 
@@ -43,43 +41,40 @@ public abstract class AbstractBonitaWork implements BonitaWork {
 
     private transient SessionAccessor sessionAccessor;
 
-    private long tenantId;
+    public FailureHandlingBonitaWork(final BonitaWork work) {
+        super(work);
+    }
 
-    protected transient TransactionService transactionService;
+    protected void logIncident() {
+        Incident incident = new Incident(getDescription(), getRecoveryProcedure());
+        IncidentService incidentService = getTenantAccessor().getIncidentService();
+        incidentService.report(incident);
+    }
 
-    public AbstractBonitaWork() {
-        super();
+    protected TenantServiceAccessor getTenantAccessor() {
+        try {
+            return TenantServiceSingleton.getInstance(getTenantId());
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public final void run() {
+    public void work(final Map<String, Object> context) {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         loggerService = tenantAccessor.getTechnicalLoggerService();
         sessionAccessor = tenantAccessor.getSessionAccessor();
         sessionService = tenantAccessor.getSessionService();
-        transactionService = tenantAccessor.getTransactionService();
+        context.put(TENANT_ACCESSOR, tenantAccessor);
         SSession session = null;
-        boolean canBeExecuted = false;
-        BonitaLock preWork = null;
         try {
-            session = sessionService.createSession(tenantId, "workservice");
+            session = sessionService.createSession(getTenantId(), "workservice");
             sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
             }
-            canBeExecuted = preWork();
-            if (canBeExecuted) {
-                if (isTransactional()) {
-                    workInTransaction();
-                } else {
-                    work();
-                }
-            }
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Finished work(wasExecuted:" + canBeExecuted + ", lock=" + preWork + ") : "
-                        + getDescription());
-            }
+            getWrappedWork().work(context);
         } catch (final Exception e) {
             // Edge case we cannot manage
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
@@ -90,7 +85,7 @@ public abstract class AbstractBonitaWork implements BonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }
             try {
-                handleFailure(e);
+                getWrappedWork().handleFailure(e, context);;
             } catch (Exception e1) {
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
                         "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
@@ -100,20 +95,6 @@ public abstract class AbstractBonitaWork implements BonitaWork {
             }
 
         } finally {
-            if (canBeExecuted) {
-                try {
-                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "calling afterwork: " + getDescription());
-                    }
-                    afterWork();
-
-                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "afterwork executed: " + getDescription());
-                    }
-                } catch (Exception e) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, e);
-                }
-            }
             if (session != null) {
                 try {
                     sessionAccessor.deleteSessionId();
@@ -127,73 +108,4 @@ public abstract class AbstractBonitaWork implements BonitaWork {
         }
     }
 
-    protected void logIncident() {
-        Incident incident = new Incident(getDescription(), getRecoveryProcedure());
-        IncidentService incidentService = getTenantAccessor().getIncidentService();
-        incidentService.report(incident);
-    }
-
-    protected String getRecoveryProcedure() {
-        return null;
-    }
-
-    protected abstract boolean isTransactional();
-
-    protected boolean preWork() throws Exception {
-        // DO NOTHING BY DEFAULT
-        return true;
-    }
-
-    protected void afterWork() throws Exception {
-        // DO NOTHING BY DEFAULT
-    }
-
-    protected abstract void work() throws Exception;
-
-    protected void workInTransaction() throws Exception {
-        final Callable<Void> runWork = new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-                work();
-                return null;
-            }
-        };
-
-        // Call the method work() wrapped in a transaction.
-        transactionService.executeInTransaction(runWork);
-    }
-
-    /**
-     * try to handle failure,
-     * 
-     * @param e
-     *            the exception in the work
-     * @throws Exception
-     */
-    protected void handleFailure(final Exception e) throws Exception {
-        throw new IllegalStateException("Must be implemented in sub-classes to handle Set Failed, or throw an other exception to alert of the failure", e);
-    }
-
-    protected long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            return TenantServiceSingleton.getInstance(getTenantId());
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Work[" + getDescription() + "]";
-    }
 }

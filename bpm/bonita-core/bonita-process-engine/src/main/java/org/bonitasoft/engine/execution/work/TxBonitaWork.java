@@ -13,17 +13,48 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.BonitaWork;
+
 /**
+ * 
+ * A work that wrap an other work in a transaction
+ * 
+ * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  * @author Charles Souillard
  * @author Celine Souchet
  */
-public abstract class TxBonitaWork extends AbstractBonitaWork {
+public class TxBonitaWork extends WrappingBonitaWork {
 
-    private static final long serialVersionUID = 9220497862331957402L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public TxBonitaWork(final BonitaWork wrappedWork) {
+        super(wrappedWork);
+    }
 
     @Override
-    protected boolean isTransactional() {
-        return true;
+    public void work(final Map<String, Object> context) throws Exception {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+        TransactionService transactionService = tenantAccessor.getTransactionService();
+
+        final Callable<Void> runWork = new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                getWrappedWork().work(context);
+                return null;
+            }
+        };
+        // Call the method work() wrapped in a transaction.
+        transactionService.executeInTransaction(runWork);
     }
+
 }

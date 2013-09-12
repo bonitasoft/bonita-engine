@@ -33,7 +33,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionIns
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.execution.work.AbstractBonitaWork;
+import org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
@@ -46,6 +46,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
 import org.junit.Before;
@@ -389,7 +390,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     public void incidentIsLogged() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         WorkService workService = tenantAccessor.getWorkService();
-        AbstractBonitaWork runnable = new FailingWork();
+        BonitaWork runnable = new FailureHandlingBonitaWork(new FailingWork());
         workService.executeWork(runnable);
         Thread.sleep(100);
         String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -43,9 +45,9 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
+import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -60,7 +62,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private final long flowNodeDefinitionId;
 
-    public ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
+    ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(),
@@ -70,24 +72,25 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void evaluateOutput(final ConnectorResult result, SConnectorDefinition sConnectorDefinition) throws STransactionException, SBonitaException {
-        evaluateOutput(result, sConnectorDefinition, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name());
+    protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition)
+            throws STransactionException, SBonitaException {
+        evaluateOutput(context, result, sConnectorDefinition, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name());
     }
 
     @Override
-    protected void continueFlow() throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+    protected void continueFlow(final Map<String, Object> context) throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         FlowNodeInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         WorkService workService = tenantAccessor.getWorkService();
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final long parentProcessInstanceId = sFlowNodeInstance.getParentProcessInstanceId();
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(Type.FLOWNODE, flowNodeInstanceId, null, null, parentProcessInstanceId);
+        BonitaWork executeFlowNodeWork = WorkFactory.createExecuteFlowNodeWork(flowNodeInstanceId, null, null, parentProcessInstanceId);
         workService.registerWork(executeFlowNodeWork);
     }
 
     @Override
-    protected void setContainerInFail() throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+    protected void setContainerInFail(final Map<String, Object> context) throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -104,8 +107,9 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected SThrowEventInstance createThrowErrorEventInstance(final SEndEventDefinition eventDefinition) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+    protected SThrowEventInstance createThrowErrorEventInstance(final Map<String, Object> context, final SEndEventDefinition eventDefinition)
+            throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
         final SEndEventInstanceBuilder endEventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
@@ -122,16 +126,16 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(SConnectorDefinition sConnectorDefinition) throws SBonitaException {
-        setConnectorOnlyToFailed();
-        handleErrorEventOnFail(sConnectorDefinition);
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+        setConnectorOnlyToFailed(context);
+        handleErrorEventOnFail(context, sConnectorDefinition);
     }
 
-    void handleErrorEventOnFail(SConnectorDefinition sConnectorDefinition) throws SBonitaException {
-        final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders();
+    private void handleErrorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+        final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders(context);
         final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
         final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -145,12 +149,12 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(errorCode)
                 .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
         // create an instance using this definition
-        final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(eventDefinition);
+        final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(context, eventDefinition);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, sFlowNodeInstance);
         if (!hasActionToExecute) {
-            setConnectorAndContainerToFailed();
+            setConnectorAndContainerToFailed(context);
         }
     }
 
@@ -172,7 +176,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected String getRecoveryProcedure() {
+    public String getRecoveryProcedure() {
         return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
     }
 }

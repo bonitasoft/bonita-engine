@@ -13,11 +13,14 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.execution.RescheduleWorkRejectedLockHandler;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.RejectedLockHandler;
+import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Transactional work that lock the process instance
@@ -25,38 +28,43 @@ import org.bonitasoft.engine.lock.RejectedLockHandler;
  * @author Charles Souillard
  * @author Baptiste Mesta
  */
-public abstract class TxLockProcessInstanceWork extends TxBonitaWork {
+public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     private static final long serialVersionUID = -4604852239659029393L;
 
     protected final long processInstanceId;
 
-    private transient LockService lockService;
-
-    private transient BonitaLock lock;
-
-    public TxLockProcessInstanceWork(final long processInstanceId) {
-        super();
+    public LockProcessInstanceWork(final BonitaWork wrappedWork, final long processInstanceId) {
+        super(wrappedWork);
         this.processInstanceId = processInstanceId;
-
     }
 
     @Override
-    protected boolean preWork() throws Exception {
-        lockService = getTenantAccessor().getLockService();
+    public void work(final Map<String, Object> context) throws Exception {
+        LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
-        final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(getTenantId(), this);
+        BonitaWork rootWork = getRootParent();
+        final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(getTenantId(), rootWork);
 
-        lock = lockService.tryLock(processInstanceId, objectType, handler);
-        return lock != null;
+        BonitaLock lock = lockService.tryLock(processInstanceId, objectType, handler);
+        if (lock == null) {
+            // not locked but the work will be rescheduled by the rejectedLockHandler
+            return;
+        }
+        try {
+            getWrappedWork().work(context);
+        } finally {
+            lockService.unlock(lock);
+        }
+
     }
 
-    @Override
-    protected void afterWork() throws Exception {
-        if (lock == null) {
-            throw new IllegalStateException("The lock was null for work " + getDescription());
+    private BonitaWork getRootParent() {
+        BonitaWork root = this;
+        while (root.getParent() != null) {
+            root = root.getParent();
         }
-        lockService.unlock(lock);
+        return root;
     }
 }

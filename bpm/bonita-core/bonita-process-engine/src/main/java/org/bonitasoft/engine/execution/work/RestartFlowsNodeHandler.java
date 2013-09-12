@@ -19,7 +19,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -66,16 +65,15 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                             logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":"
                                     + sFlowNodeInstance.getId());
                         }
-                        workService.registerWork(new NotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
-                                .getParentProcessInstanceId(), sFlowNodeInstance.getId(),
-                                sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
+                        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
+                                .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
                     } else {
                         if (info) {
-                        logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":"
-                                + sFlowNodeInstance.getId());
+                            logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":"
+                                    + sFlowNodeInstance.getId());
                         }
                         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
-                        workService.registerWork(new ExecuteFlowNodeWork(Type.PROCESS, sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
+                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
                                 .getParentProcessInstanceId()));
                     }
                 }
