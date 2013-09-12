@@ -355,26 +355,29 @@ public class SupervisorTest extends CommonAPITest {
 
         // login with user and create a processDefinition
         loginWith("matti", "bpm");
+        String delivery = "totor";
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         processBuilder1.addDescription("definition1 description");
+        processBuilder1.addActor(delivery).addUserTask("temporize", delivery);
         final DesignProcessDefinition designprocessDefinition1 = processBuilder1.done();
-        final ProcessDefinition definition1 = deployAndEnableProcess(designprocessDefinition1);
+        final ProcessDefinition definition1 = deployAndEnableWithActor(designprocessDefinition1, delivery, matti);
         final ProcessInstance pi0 = getProcessAPI().startProcess(definition1.getId());
 
         // add comment to processInstance
-        getProcessAPI().addComment(pi0.getId(), commentContent1);
-        getProcessAPI().addComment(pi0.getId(), commentContent2);
-        getProcessAPI().addComment(pi0.getId(), commentContent3);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent1);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent2);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent3);
 
         loginWith("john", "bpm");
         final ProcessDefinitionBuilder processBuilder2 = new ProcessDefinitionBuilder().createNewInstance("secondProcess", "2.0");
         processBuilder2.addDescription("definition2 description");
+        processBuilder2.addActor(delivery).addUserTask("temporize", delivery);
         final DesignProcessDefinition designprocessDefinition2 = processBuilder2.done();
-        final ProcessDefinition definition2 = deployAndEnableProcess(designprocessDefinition2);
+        final ProcessDefinition definition2 = deployAndEnableWithActor(designprocessDefinition2, delivery, matti);
         final ProcessInstance pi1 = getProcessAPI().startProcess(definition2.getId());
 
-        getProcessAPI().addComment(pi1.getId(), commentContent4);
-        getProcessAPI().addComment(pi1.getId(), commentContent5);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent4);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent5);
 
         // create supervisor for definition1
         final ProcessSupervisor createdSupervisor1 = getProcessAPI().createProcessSupervisorForUser(definition1.getId(), matti.getId());

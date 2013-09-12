@@ -18,11 +18,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
@@ -38,8 +35,6 @@ import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
-import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -68,7 +63,6 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -305,14 +299,6 @@ public class CallActivityTest extends CommonAPITest {
             final ActivityInstance step1 = waitForUserTask("Step1");
             assignAndExecuteStep(step1, cascao.getId());
 
-            // Check waiting message
-            final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-            searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, "ReceiveMsg");
-            final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
-            parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
-            final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
-            assertEquals(1, searchResult.getCount());
-
             final ActivityInstance read = waitForUserTask("Read");
             final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
             assertEquals("data", copyMsg.getValue());
@@ -380,13 +366,6 @@ public class CallActivityTest extends CommonAPITest {
             final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
             final ActivityInstance step1 = waitForUserTask("Step1");
             assignAndExecuteStep(step1, cascao.getId());
-            // Check waiting message
-            final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-            searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, "ReceiveMsg");
-            final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
-            parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
-            final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
-            assertEquals(1, searchResult.getCount());
             final ActivityInstance read = waitForUserTask("Read", 20000);
             final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
             assertEquals("data", copyMsg.getValue());

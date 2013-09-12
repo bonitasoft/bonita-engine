@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,18 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.incident;
 
 /**
+ * 
  * @author Baptiste Mesta
- * @author Celine Souchet
+ * 
  */
-public abstract class NonTxBonitaWork extends AbstractBonitaWork {
+public interface IncidentHandler {
 
-    private static final long serialVersionUID = -8482398866704257129L;
-
-    @Override
-    protected boolean isTransactional() {
-        return false;
-    }
+    void handle(Incident incident);
 }

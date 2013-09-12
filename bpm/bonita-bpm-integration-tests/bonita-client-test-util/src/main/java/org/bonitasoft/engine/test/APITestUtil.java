@@ -162,7 +162,7 @@ public class APITestUtil {
 
     public static final int DEFAULT_REPEAT = 50;
 
-    public static final int DEFAULT_TIMEOUT = 10000;
+    public static final int DEFAULT_TIMEOUT = 15000;
 
     @After
     public void clearSynchroRepository() {

@@ -57,7 +57,7 @@ public interface DocumentAPI {
      * @param fileName
      *            The filename of the document content
      * @param mimeType
-     *            The MimeType of the document content
+     *            The MimeType of the document content (optional)
      * @param url
      *            The URL of the document content
      * @return a document object
@@ -83,7 +83,7 @@ public interface DocumentAPI {
      * @param fileName
      *            The name of the file containing the document
      * @param mimeType
-     *            The MimeType of the document content
+     *            The MimeType of the document content (optional)
      * @param documentContent
      *            The content of the document
      * @return a document object
@@ -109,7 +109,7 @@ public interface DocumentAPI {
      * @param fileName
      *            The name of the file containing the document
      * @param mimeType
-     *            The MimeType of the document content
+     *            The MimeType of the document content (optional)
      * @param url
      *            The URL of the document content
      * @return a document object
@@ -133,7 +133,7 @@ public interface DocumentAPI {
      * @param contentFileName
      *            The name of the file containing the content of the document
      * @param contentMimeType
-     *            The MimeType of the document content
+     *            The MimeType of the document content (optional)
      * @param documentContent
      *            The content of the document
      * @return a document object

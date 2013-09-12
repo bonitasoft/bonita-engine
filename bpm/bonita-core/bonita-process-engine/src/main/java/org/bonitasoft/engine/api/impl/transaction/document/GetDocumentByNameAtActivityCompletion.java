@@ -48,7 +48,7 @@ public class GetDocumentByNameAtActivityCompletion implements TransactionContent
 
     @Override
     public void execute() throws SBonitaException {
-        final SAActivityInstance aactivity = activityInstanceService.getArchivedActivityInstance(activityInstanceId);
+        final SAActivityInstance aactivity = activityInstanceService.getMostRecentArchivedActivityInstance(activityInstanceId);
         result = processDocumentService.getDocument(aactivity.getRootContainerId(), documentName, aactivity.getArchiveDate());
     }
 

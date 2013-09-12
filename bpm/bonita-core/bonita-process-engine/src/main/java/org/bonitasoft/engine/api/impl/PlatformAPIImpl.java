@@ -63,6 +63,7 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -83,7 +84,6 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.restart.TenantRestartHandler;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -245,14 +245,13 @@ public class PlatformAPIImpl implements PlatformAPI {
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
                     } finally {
                         sessionService.deleteSession(sessionId);
-                        cleanSessionAccessor(sessionAccessor);
-                        sessionAccessor.setSessionInfo(platformSessionId, -1);
+                        cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
                 }
                 // FIXME: shouldn't we also stop the workService?:
                 workService.startup();
                 if (!isNodeStarted()) {
-                    if (platformConfiguration.shouldStartScheduler()) {
+                    if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
                         schedulerService.start();
                     }
                     if (platformConfiguration.shouldResumeElements()) {
@@ -310,7 +309,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             } catch (final Exception e) {
                 throw new StartNodeException("Platform starting failed.", e);
             } finally {
-                cleanSessionAccessor(sessionAccessor);
+                cleanSessionAccessor(sessionAccessor, -1);
             }
             isNodeStarted = true;
         } catch (final StartNodeException e) {
@@ -395,7 +394,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     try {
                         final STenant tenant = getDefaultTenant();
                         deactiveTenant(tenant.getId());
-                    } catch (STenantNotFoundException e) {
+                    } catch (final STenantNotFoundException e) {
 
                     }
                     clean.execute();
@@ -533,14 +532,16 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         } finally {
-            cleanSessionAccessor(sessionAccessor);
-            sessionAccessor.setSessionInfo(platformSessionId, -1);
+            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 
-    private void cleanSessionAccessor(final SessionAccessor sessionAccessor) {
+    protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
         if (sessionAccessor != null) {
             sessionAccessor.deleteSessionId();
+            if (platformSessionId != -1) {
+                sessionAccessor.setSessionInfo(platformSessionId, -1);
+            }
         }
     }
 
@@ -626,7 +627,9 @@ public class PlatformAPIImpl implements PlatformAPI {
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
             schedulerService.start();
-            schedulerStarted = true;
+            // FIXME: commented out for the tests to not restart the scheduler all the time. Will need to be refactored. (It should be the responsibility of
+            // startNode() method to start the scheduler, not ActivateTenant)
+            // schedulerStarted = true;
 
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
@@ -655,8 +658,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     throw new STenantActivationException(e);
                 }
             }
-            cleanSessionAccessor(sessionAccessor);
-            sessionAccessor.setSessionInfo(platformSessionId, -1);
+            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 
@@ -703,8 +705,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
             throw new STenantDeactivationException("Tenant deactivation failed.", e);
         } finally {
-            cleanSessionAccessor(sessionAccessor);
-            sessionAccessor.setSessionInfo(platformSessionId, -1);
+            cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
 

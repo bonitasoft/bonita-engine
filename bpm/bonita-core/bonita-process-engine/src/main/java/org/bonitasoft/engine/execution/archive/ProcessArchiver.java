@@ -193,29 +193,36 @@ public class ProcessArchiver {
             final BPMInstanceBuilders instancesBuilders, final SCommentService commentService, final SACommentBuilder saCommentBuilder, final long archiveDate)
             throws SArchivingException {
         List<SComment> sComments = null;
-        try {
-            sComments = commentService.getComments(processInstance.getId());
-        } catch (final SBonitaReadException e1) {
-            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "Unable to retrive process comments. Process: id=" + processInstance.getId(), e1);
+        int startIndex = 0;
+        do {
+            try {
+                sComments = commentService.getComments(processInstance.getId(), new QueryOptions(startIndex, BATCH_SIZE));
+            } catch (final SBonitaReadException e) {
+                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "No process comment found for process with id: " + processInstance.getId(), e);
+                }
             }
-        }
+            if (sComments != null) {
+                for (final SComment sComment : sComments) {
+                    archiveComment(processInstance, archiveService, logger, saCommentBuilder, archiveDate, sComment);
+                }
+            }
+            startIndex += BATCH_SIZE;
+        } while (sComments.size() > 0);
+    }
 
-        if (sComments != null) {
-            for (final SComment sComment : sComments) {
-                final SAComment saComment = saCommentBuilder.createNewInstance(sComment).done();
-                if (saComment != null) {
-                    final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
-                    try {
-                        archiveService.recordInsert(archiveDate, insertRecord);
-                    } catch (final SRecorderException e) {
-                        throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
-                    } catch (final SDefinitiveArchiveNotFound e) {
-                        if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                            logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR,
-                                    "the process instance was not archived id=" + processInstance.getId(), e);
-                        }
-                    }
+    private static void archiveComment(final SProcessInstance processInstance, final ArchiveService archiveService, final TechnicalLoggerService logger,
+            final SACommentBuilder saCommentBuilder, final long archiveDate, final SComment sComment) throws SArchivingException {
+        final SAComment saComment = saCommentBuilder.createNewInstance(sComment).done();
+        if (saComment != null) {
+            final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
+            try {
+                archiveService.recordInsert(archiveDate, insertRecord);
+            } catch (final SRecorderException e) {
+                throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
+            } catch (final SDefinitiveArchiveNotFound e) {
+                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "the process instance was not archived id=" + processInstance.getId(), e);
                 }
             }
         }

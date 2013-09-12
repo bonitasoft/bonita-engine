@@ -42,6 +42,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowM
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -60,8 +61,9 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
-import org.bonitasoft.engine.execution.work.InstantiateProcessWork;
+import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -107,6 +109,8 @@ public class EventsHandler {
 
     private final BPMDefinitionBuilders bpmDefinitionBuilders;
 
+    private ProcessExecutor processExecutor;
+
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders, final BPMDefinitionBuilders bpmDefinitionBuilders,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
@@ -132,6 +136,11 @@ public class EventsHandler {
                 containerRegistry, lockService, logger));
         handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(instanceBuilders, eventInstanceService, processInstanceService, containerRegistry,
                 lockService, processDefinitionService, this, logger));
+    }
+
+    public void setProcessExecutor(final ProcessExecutor processExecutor) {
+        this.processExecutor = processExecutor;
+
     }
 
     /**
@@ -368,7 +377,6 @@ public class EventsHandler {
         // FIXME: the token count will be inconsistent if a ProcessExecutor.childReachedState is called at same time.
         final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
         tokenService.createToken(parentProcessInstanceId, parentProcessInstance.getProcessDefinitionId(), null);
-        final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionId, operations);
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
@@ -376,14 +384,14 @@ public class EventsHandler {
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         } else if (isInterrupting) {
             // other interrupting catch
-            work.setProcessToInterruptId(parentProcessInstanceId);
-            work.setSubProcflowNodeInstanceId(subProcflowNodeInstance.getId());
+            TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(bpmInstancesCreator.getBPMInstanceBuilders(),
+                    processInstanceService, eventInstanceService, processExecutor, lockService, logger);
+            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        work.setCallerId(subProcflowNodeInstance.getId());
-        work.setSubProcessId(subProcessId);
-        work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
+                null, null, subProcflowNodeInstance.getId(), subProcessId);
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
-        workService.registerWork(work);
+
     }
 
     public void triggerCatchEvent(final String eventType, final Long processDefinitionId, final Long targetSFlowNodeDefinitionId,
@@ -400,16 +408,16 @@ public class EventsHandler {
                 subProcessId, parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
-    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, long processInstanceId) throws WorkRegisterException {
+    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, final long processInstanceId)
+            throws WorkRegisterException {
         containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
                 processInstanceId);
     }
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
-            throws WorkRegisterException {
-        final InstantiateProcessWork work = new InstantiateProcessWork(processDefinitionId, operations);
-        work.setTargetSFlowNodeDefinitionId(targetSFlowNodeDefinitionId);
-        workService.registerWork(work);
+            throws SProcessInstanceCreationException {
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
+                null, null, -1, -1);
     }
 
     public EventHandlerStrategy getHandler(final SEventTriggerType triggerType) {

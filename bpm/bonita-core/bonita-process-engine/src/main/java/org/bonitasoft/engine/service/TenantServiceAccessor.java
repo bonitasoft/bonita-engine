@@ -69,6 +69,7 @@ import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingSe
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
@@ -250,5 +251,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     SessionAccessor getSessionAccessor();
 
     SynchroService getSynchroService();
+
+    IncidentService getIncidentService();
 
 }

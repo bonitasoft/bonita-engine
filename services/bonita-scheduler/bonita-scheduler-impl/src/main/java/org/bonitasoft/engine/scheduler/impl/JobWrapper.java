@@ -25,18 +25,48 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobTruster;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class JobWrapper implements StatelessJob {
+
+    private final class BonitaTransactionSynchronizationImplementation implements BonitaTransactionSynchronization {
+
+        private final long sessionId;
+
+        public BonitaTransactionSynchronizationImplementation(final long sessionId) {
+            this.sessionId = sessionId;
+            // TODO Auto-generated constructor stub
+        }
+
+        @Override
+        public void beforeCommit() {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void afterCompletion(final TransactionState txState) {
+            try {
+                sessionAccessor.deleteSessionId();
+                sessionService.deleteSession(sessionId);
+            } catch (final SSessionNotFoundException e) {
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
+            }
+        }
+    }
 
     private static final long serialVersionUID = 7145451610635400449L;
 
@@ -58,9 +88,11 @@ public class JobWrapper implements StatelessJob {
 
     private final SessionService sessionService;
 
+    private final TransactionService transactionService;
+
     public JobWrapper(final String name, final QueriableLoggerService logService, final StatelessJob statelessJob, final TechnicalLoggerService logger,
             final long tenantId, final EventService eventService, final JobTruster jobTruster, final SessionService sessionService,
-            final SessionAccessor sessionAccessor) {
+            final SessionAccessor sessionAccessor, final TransactionService transactionService) {
         this.name = name;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
@@ -68,6 +100,7 @@ public class JobWrapper implements StatelessJob {
         this.logger = logger;
         this.tenantId = tenantId;
         this.eventService = eventService;
+        this.transactionService = transactionService;
         jobExecuting = eventService.getEventBuilder().createNewInstance(JOB_EXECUTING).done();
         jobCompleted = eventService.getEventBuilder().createNewInstance(JOB_COMPLETED).done();
         if (jobTruster.isTrusted(statelessJob)) {// FIXME
@@ -127,10 +160,9 @@ public class JobWrapper implements StatelessJob {
             }
             if (session != null) {
                 try {
-                    sessionAccessor.deleteSessionId();
-                    sessionService.deleteSession(session.getId());
-                } catch (final SSessionNotFoundException e) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
+                    transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImplementation(session.getId()));
+                } catch (STransactionNotFoundException e) {
+                    throw new SJobExecutionException(e);
                 }
             }
         }

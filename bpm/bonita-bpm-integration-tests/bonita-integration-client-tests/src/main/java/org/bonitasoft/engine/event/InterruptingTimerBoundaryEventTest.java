@@ -33,7 +33,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
             "Interrupting" }, story = "Execute timer boundary event triggerd.", jira = "ENGINE-500")
     @Test
     public void timerBoundaryEventTriggered() throws Exception {
-        final long timerDuration = 1000;
+        final int timerDuration = 1000;
         final ProcessDefinition processDefinition = deployProcessWithTimerBoundaryEvent(timerDuration, true, "step1", "exceptionStep", "step2");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -41,9 +41,8 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final ActivityInstance waitForStep1 = waitForUserTask("step1", processInstance.getId());
         assertNotNull(waitForStep1);
 
-        Thread.sleep(timerDuration); // wait timer trigger
-
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
+        // wait timer trigger
+        final WaitForStep waitForExceptionStep = waitForStep(50, timerDuration + 2000, "exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -83,7 +82,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
             "Timer", "Call Activity" }, story = "Execute timer boundary event triggered on call activity.", jira = "ENGINE-547")
     @Test
     public void timerBoundaryEventTriggeredOnCallActivity() throws Exception {
-        final long timerDuration = 2000;
+        final int timerDuration = 2000;
         final String simpleProcessName = "targetProcess";
         final String simpleTaskName = "stepCA";
         final String parentUserTaskName = "step2";
@@ -100,10 +99,9 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForStepCA = waitForUserTask(simpleTaskName, processInstance.getId());
         assertNotNull(waitForStepCA);
-        Thread.sleep(timerDuration); // wait timer trigger
-
+        // wait timer trigger
         // check that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, exceptionFlowTaskName, processInstance, TestStates.getReadyState());
+        final WaitForStep waitForExceptionStep = waitForStep(50, timerDuration + 2000, exceptionFlowTaskName, processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -128,7 +126,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     @Test
     public void timerBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         // deploy a process with a interrupting timer boundary event attached to a sequential multi-instance
-        final long timerDuration = 1000;
+        final int timerDuration = 1000;
         final String multiTaskName = "step1";
         final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, multiTaskName, 4, true, "step2",
                 "exceptionStep");
@@ -136,10 +134,9 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // start the process and wait the timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance.getId());
-        Thread.sleep(timerDuration); // wait timer trigger
-
+        // wait timer trigger
         // check that the exception flow was taken
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
+        final WaitForStep waitForExceptionStep = waitForStep(50, timerDuration + 2000, "exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -161,7 +158,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
             "MultiInstance", "Parallel" }, story = "Execute timer boundary event triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
     public void timerBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
-        final long timerDuration = 1000;
+        final int timerDuration = 1000;
         final int loopCardinality = 4;
         final boolean isSequential = false;
 
@@ -172,9 +169,8 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // start the process and wait for process to be triggered
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForStep waitForStep1 = waitForStep(50, 2000, "step1", processInstance);
-        Thread.sleep(timerDuration); // wait timer trigger
-
-        final WaitForStep waitForExceptionStep = waitForStep(50, 2000, "exceptionStep", processInstance, TestStates.getReadyState());
+        // wait timer trigger
+        final WaitForStep waitForExceptionStep = waitForStep(50, timerDuration + 2000, "exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
@@ -234,7 +230,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
             "Exception" }, story = "Execute a process with a long data and a human task with a timer boundary event that throw a exception", jira = "ENGINE-1383")
     @Test
     public void timerBoundaryEventTriggeredAndLongData() throws Exception {
-        final long timerDuration = 1000;
+        final int timerDuration = 1000;
         final ProcessDefinition processDefinition = deployProcessWithTimerEventOnHumanTask(timerDuration, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -243,8 +239,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         getProcessAPI().assignUserTask(step1.getId(), getUser().getId());
 
         // Wait timer trigger
-        Thread.sleep(timerDuration);
-        final WaitForStep waitForExceptionStep = waitForStep(100, 500, "exceptionStep", processInstance, TestStates.getReadyState());
+        final WaitForStep waitForExceptionStep = waitForStep(100, timerDuration + 2000, "exceptionStep", processInstance, TestStates.getReadyState());
         // Check that step1 is aborted
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());

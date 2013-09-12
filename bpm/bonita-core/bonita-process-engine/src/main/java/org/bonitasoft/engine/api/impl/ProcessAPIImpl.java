@@ -587,8 +587,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private ArrayList<BonitaLock> createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses,
-            final List<Long> processInstanceIds)
-            throws SLockException {
+            final List<Long> processInstanceIds) throws SLockException {
         ArrayList<BonitaLock> locks = new ArrayList<BonitaLock>(processInstanceIds.size());
         for (final Long processInstanceId : processInstanceIds) {
             BonitaLock lock = lockService.lock(processInstanceId, objectType);
@@ -895,6 +894,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
 
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId,
                         getUserIdFromSession());
             }
@@ -4061,9 +4061,26 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public Comment addProcessComment(final long processInstanceId, final String comment) throws CreationException {
+        try {
+            // TODO: refactor this method when deprecated addComment() method is removed from API:
+            return addComment(processInstanceId, comment);
+        } catch (RetrieveException e) {
+            throw new CreationException("Cannot add a comment on a finished or inexistant process instance", e.getCause());
+        }
+    }
+
+    @Override
+    @Deprecated
     public Comment addComment(final long processInstanceId, final String comment) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
+        try {
+            tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
+        } catch (SProcessInstanceReadException e) {
+            throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
+        } catch (SProcessInstanceNotFoundException e) {
+            throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
+        }
         final SCommentService commentService = tenantAccessor.getCommentService();
         final AddComment addComment = new AddComment(commentService, processInstanceId, comment);
         try {
@@ -4776,6 +4793,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             // execute the flow node only if it is not the final state
             if (!state.isTerminal()) {
                 final long userIdFromSession = getUserIdFromSession();
+                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(activityInstanceId, null, null, activity.getParentProcessInstanceId(), userIdFromSession, userIdFromSession);
             }
         } catch (final SBonitaException e) {
@@ -5363,7 +5381,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<Expression, Map<String, Serializable>> expressions) throws ExpressionEvaluationException {
         try {
             final ActivityInstance activityInstance = getActivityInstance(activityInstanceId);
-            final ProcessInstance processInstance = getProcessInstance(activityInstance.getRootContainerId());
+            final ProcessInstance processInstance = getProcessInstance(activityInstance.getParentContainerId());
 
             return evaluateExpressionsInstanceLevel(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE, processInstance.getProcessDefinitionId());
         } catch (final BonitaException e) {
@@ -5379,7 +5397,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final ArchivedActivityInstance activityInstance = getArchivedActivityInstance(activityInstanceId);
             // same archive time to process even if there're many activities in the process
-            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getRootContainerId());
+            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getParentContainerId());
 
             return evaluateExpressionsInstanceLevelAndArchived(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
                     lastArchivedProcessInstance.getProcessDefinitionId(), activityInstance.getArchiveDate().getTime());

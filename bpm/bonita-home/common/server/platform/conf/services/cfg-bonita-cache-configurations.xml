@@ -12,7 +12,7 @@
 
 	<bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<property name="name" value="SYNCHRO_SERVICE_CACHE" />
-		<property name="timeToLiveSeconds" value="30" />
+		<property name="timeToLiveSeconds" value="120" />
 		<property name="maxElementsInMemory" value="10000" />
 		<property name="inMemoryOnly" value="true" />
 	</bean>

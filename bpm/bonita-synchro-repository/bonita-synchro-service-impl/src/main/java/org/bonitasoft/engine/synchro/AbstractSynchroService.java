@@ -107,11 +107,12 @@ public abstract class AbstractSynchroService implements SynchroService {
     protected Serializable getFiredAndRemoveIt(final Map<String, Serializable> expectedEvent) {
         try {
             List<?> firedEvents = cacheService.getKeys(SYNCHRO_SERVICE_CACHE);
-            for (Map<String, Serializable> firedEvent : ((List<Map<String, Serializable>>) firedEvents)) {
+            for (Map<String, Serializable> firedEvent : (List<Map<String, Serializable>>) firedEvents) {
                 if (matchedAtLeastAllExpectedEntries(expectedEvent, firedEvent)) {
-                    Serializable id = (Serializable) cacheService.get(SYNCHRO_SERVICE_CACHE, firedEvent);
+                    // Serializable id = (Serializable) cacheService.get(SYNCHRO_SERVICE_CACHE, firedEvent);
+                    // System.out.println("id=" + id);
                     cacheService.remove(SYNCHRO_SERVICE_CACHE, firedEvent);
-                    return id;
+                    return firedEvent.get("id");
                 }
             }
         } catch (CacheException e) {

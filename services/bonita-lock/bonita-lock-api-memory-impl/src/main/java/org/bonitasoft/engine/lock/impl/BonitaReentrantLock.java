@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,20 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.restart;
+package org.bonitasoft.engine.lock.impl;
 
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * 
+ * A lock with getOwner accessible
+ * 
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * 
  */
-public interface TenantRestartHandler {
+public class BonitaReentrantLock extends ReentrantLock {
 
     /**
-     * @param tenantServiceAccessor
+     * 
      */
-    void handleRestart(PlatformServiceAccessor platformServiceAccessor, TenantServiceAccessor tenantServiceAccessor) throws RestartException;
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected Thread getOwner() {
+        // TODO Auto-generated method stub
+        return super.getOwner();
+    }
 
 }

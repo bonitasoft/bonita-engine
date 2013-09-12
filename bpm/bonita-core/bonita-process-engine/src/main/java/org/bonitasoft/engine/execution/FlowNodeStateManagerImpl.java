@@ -217,6 +217,11 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         bpmInstancesCreator.setFirstStateNames(firstStateNames);
     }
 
+    @Override
+    public void setProcessExecutor(ProcessExecutor processExecutor) {
+        stateBehaviors.setProcessExecutor(processExecutor);
+    }
+
     private void defineTransitionsForAllNodesType() {
         defineTransitionsForAutomaticTask();
         defineTransitionsForUserTask();

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.RestartHandler;
-import org.bonitasoft.engine.restart.TenantRestartHandler;
+import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.scheduler.JobRegister;
 
 /**

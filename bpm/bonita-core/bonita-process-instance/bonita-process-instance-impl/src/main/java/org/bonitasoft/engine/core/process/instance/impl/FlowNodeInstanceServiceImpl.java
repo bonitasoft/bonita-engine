@@ -215,7 +215,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
             final SelectListDescriptor<SFlowNodeInstance> selectListDescriptor = SelectDescriptorBuilder.getActiveFlowNodes(rootContainerId);
             return persistenceRead.selectList(selectListDescriptor);
         } catch (final SBonitaReadException bre) {
-            // TODO log the exception
             throw new SFlowNodeReadException(bre);
         }
     }

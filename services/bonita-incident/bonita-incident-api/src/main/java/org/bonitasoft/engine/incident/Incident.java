@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,23 +11,36 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.restart;
-
-import org.bonitasoft.engine.exception.BonitaException;
+package org.bonitasoft.engine.incident;
 
 /**
+ * 
  * @author Baptiste Mesta
+ * 
  */
-public class RestartException extends BonitaException {
+public class Incident {
 
-    private static final long serialVersionUID = 6724312254693245291L;
+    private final String description;
 
-    /**
-     * @param message
-     * @param cause
-     */
-    public RestartException(final String message, final Throwable cause) {
-        super(message, cause);
+    private final String recoveryProcedure;
+
+    public Incident(String description, String recoveryProcedure) {
+        super();
+        this.description = description;
+        this.recoveryProcedure = recoveryProcedure;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getRecoveryProcedure() {
+        return recoveryProcedure;
+    }
+
+    @Override
+    public String toString() {
+        return "Incident [description=" + description + ", recoveryProcedure=" + recoveryProcedure + "]";
     }
 
 }

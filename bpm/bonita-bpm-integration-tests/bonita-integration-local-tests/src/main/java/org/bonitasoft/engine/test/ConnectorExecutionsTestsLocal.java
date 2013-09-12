@@ -21,12 +21,17 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
@@ -62,6 +67,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -942,4 +948,63 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Ignore("must decide the behavior with anthony")
+    @Cover(classes = Expression.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Failed", "Database", "Connector", "On finish", "Automatic activity" }, jira = "ENGINE-1814", story = "execute expression on process that is in initializing, e.g. process execute a connector on on enter, the result must be no exception and variables have value null")
+    @Test
+    public void executeExpressionWithOnProcessInInitializing() throws Exception {
+        // will block the connector
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithBlockingConnector", "1.0");
+        processBuilder.addConnector("myConnector", "blocking-connector", "1.0", ConnectorEvent.ON_ENTER);
+        processBuilder.addData("a", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("avalue"));
+        processBuilder.addData("b", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("bvalue"));
+        processBuilder.addData("c", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("cvalue"));
+        processBuilder.addAutomaticTask("step1");
+        BusinessArchive businessArchive = new BusinessArchiveBuilder()
+                .createNewBusinessArchive()
+                .setProcessDefinition(processBuilder.done())
+                .addConnectorImplementation(
+                        new BarResource("blocking-connector.impl", getConnectorImplementationFile("blocking-connector", "1.0", "blocking-connector-impl",
+                                "1.0",
+                                BlockingConnector.class.getName()))).done();
+
+        ProcessDefinition processDefinition = deployAndEnableProcess(businessArchive);
+
+        BlockingConnector.semaphore.acquire();
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions.put(new ExpressionBuilder().createGroovyScriptExpression("ascripte", "a+b+c", String.class.getName(),
+                new ExpressionBuilder().createDataExpression("a", String.class.getName()),
+                new ExpressionBuilder().createDataExpression("b", String.class.getName()),
+                new ExpressionBuilder().createDataExpression("c", String.class.getName())),
+                Collections.<String, Serializable> emptyMap());
+        expressions.put(new ExpressionBuilder().createDataExpression("a", String.class.getName()),
+                Collections.<String, Serializable> emptyMap());
+        Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsAtProcessInstanciation(
+                processInstance.getId(), expressions);
+        assertEquals("nullnullnull", evaluateExpressionsAtProcessInstanciation.get("aScripte"));
+        assertEquals(null, evaluateExpressionsAtProcessInstanciation.get("a"));
+        Map<String, Serializable> evaluateExpressionsOnProcessInstance = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(),
+                expressions);
+        assertEquals("nullnullnull", evaluateExpressionsOnProcessInstance.get("aScripte"));
+        assertEquals(null, evaluateExpressionsOnProcessInstance.get("a"));
+
+        BlockingConnector.semaphore.release();
+        waitForProcessToFinish(processInstance.getId());
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private byte[] getConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
+            final String implementationVersion,
+            final String implementationClassname) {
+        StringBuilder stb = new StringBuilder();
+        stb.append("<connectorImplementation>");
+        stb.append("");
+        stb.append("<definitionId>" + definitionId + "</definitionId>");
+        stb.append("<definitionVersion>" + definitionVersion + "</definitionVersion>");
+        stb.append("<implementationClassname>" + implementationClassname + "</implementationClassname>");
+        stb.append("<implementationId>" + implementationId + "</implementationId>");
+        stb.append("<implementationVersion>" + implementationVersion + "</implementationVersion>");
+        stb.append("</connectorImplementation>");
+        return stb.toString().getBytes();
+    }
 }
