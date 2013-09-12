@@ -36,9 +36,12 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Ruiheng Fan
@@ -63,14 +66,14 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final long userId = getParameter(parameters, USER_ID_KEY, "Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.");
 
         try {
-
+            final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
             final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
 
-                return startProcess(sProcessDefinitionID, userId, operations, operationsInputValues, connectorsWithInput).getId();
+                return startProcess(sProcessDefinitionID, userId, operations, operationsInputValues, connectorsWithInput, logger).getId();
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
@@ -86,16 +89,17 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
     }
 
     private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
-            final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws ProcessDefinitionNotFoundException,
-            CreationException, RetrieveException, ProcessDefinitionNotEnabledException {
+            final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final TechnicalLoggerService logger)
+            throws ProcessDefinitionNotFoundException, CreationException, RetrieveException, ProcessDefinitionNotEnabledException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final SSession session = getSession();
         final long starterId;
         if (userId == 0) {
-            starterId = getUserIdFromSession();
+            starterId = session.getUserId();
         } else {
             starterId = userId;
         }
@@ -117,11 +121,30 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessInstance startedInstance;
         try {
             final List<SOperation> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
-            startedInstance = processExecutor.start(sDefinition, starterId, getUserIdFromSession(), sOperations, context, connectorsWithInput);
+            startedInstance = processExecutor.start(sDefinition, starterId, session.getUserId(), sOperations, context, connectorsWithInput);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e);
         }// FIXME in case process instance creation exception -> put it in failed
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            final StringBuilder stb = new StringBuilder();
+            stb.append("The user <");
+            stb.append(session.getUserName());
+            if (starterId != session.getUserId()) {
+                stb.append("> acting as delegate of user with id <");
+                stb.append(starterId);
+            }
+            stb.append("> has started instance <");
+            stb.append(startedInstance.getId());
+            stb.append("> of process <");
+            stb.append(sDefinition.getName());
+            stb.append("> in version <");
+            stb.append(sDefinition.getVersion());
+            stb.append("> and id <");
+            stb.append(sDefinition.getId());
+            stb.append(">");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+        }
         return ModelConvertor.toProcessInstance(sDefinition, startedInstance);
     }
 
