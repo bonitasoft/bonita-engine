@@ -42,7 +42,7 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
     private static long tenantId;
 
     static {
-        monitoringService = getServicesBuilder().buildTenantMonitoringService(false);
+        monitoringService = getServicesBuilder().buildTenantMonitoringService();
         identityService = getServicesBuilder().buildIdentityService();
     }
 

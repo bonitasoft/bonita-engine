@@ -138,7 +138,7 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
     @Test
     public void isSchedulerStartedTest() throws Exception {
         // TODO how to improve that?
-        assertTrue(getPlatformMonitoringAPI().isSchedulerStarted());
+        assertTrue("The scheduler should be started", getPlatformMonitoringAPI().isSchedulerStarted());
     }
 
     @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Transaction", "Active" }, story = "Get number of active transactions.")

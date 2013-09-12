@@ -3,8 +3,6 @@
 
 	<bean id="transactionHandler" class="com.bonitasoft.engine.monitoring.impl.STransactionHandlerImpl" />
 
-	<bean id="schedulerHandler" class="com.bonitasoft.engine.monitoring.impl.SSchedulerHandlerImpl" />
-
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
 
 	<bean id="platformMonitoringService" class="com.bonitasoft.engine.monitoring.impl.PlatformMonitoringServiceImpl">
@@ -12,7 +10,7 @@
 		<constructor-arg name="jvmMBean" ref="jvmMXBean" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionHandler" ref="transactionHandler" />
-		<constructor-arg name="schedulerHandler" ref="schedulerHandler" />
+		<constructor-arg name="schedulerService" ref="scheduler" />
 		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
 	</bean>
 

@@ -6,8 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        TenantMonitoringServiceWithCacheIntegrationTest.class,
-        TenantMonitoringServiceWithoutCacheIntegrationTest.class,
+        TenantMonitoringServiceIntegrationTest.class,
 
         // Beans
         SEntityMXBeanTest.class,
