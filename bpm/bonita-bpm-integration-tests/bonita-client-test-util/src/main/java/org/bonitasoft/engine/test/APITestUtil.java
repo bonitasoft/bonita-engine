@@ -855,7 +855,7 @@ public class APITestUtil {
     }
 
     public WaitForStep waitForStep(final String taskName, final ProcessInstance processInstance) throws Exception {
-        return waitForStep(50, 3000, taskName, processInstance);
+        return waitForStep(50, 5000, taskName, processInstance);
     }
 
     public WaitForStep waitForStep(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance) throws Exception {
