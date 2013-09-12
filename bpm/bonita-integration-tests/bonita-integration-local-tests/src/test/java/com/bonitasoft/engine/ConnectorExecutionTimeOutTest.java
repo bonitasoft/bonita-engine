@@ -63,7 +63,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
-                .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(350));
+                .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(2000));
 
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -71,7 +71,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorExecutorTimedOut connectorExecutor = (ConnectorExecutorTimedOut) tenantAccessor.getConnectorExecutor();
         final long oldTimeout = connectorExecutor.getTimeout();
-        connectorExecutor.setTimeout(300);
+        connectorExecutor.setTimeout(1);
         try {
             final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
             final ActivityInstance failedTask = waitForTaskToFail(process);

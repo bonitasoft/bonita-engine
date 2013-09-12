@@ -25,10 +25,10 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class ConnectorExecutorTimedOut extends ConnectorExecutorImpl {
 
-    public ConnectorExecutorTimedOut(int queueCapacity, int corePoolSize, TechnicalLoggerService loggerService, int maximumPoolSize, long keepAliveTimeSeconds,
-            SessionAccessor sessionAccessor, int timeout) {
+    public ConnectorExecutorTimedOut(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
+            final long keepAliveTimeSeconds,
+            final SessionAccessor sessionAccessor, final int timeout) {
         super(queueCapacity, corePoolSize, loggerService, maximumPoolSize, keepAliveTimeSeconds, sessionAccessor);
-        // TODO Auto-generated constructor stub
         this.timeout = timeout;
     }
 
@@ -44,6 +44,6 @@ public class ConnectorExecutorTimedOut extends ConnectorExecutorImpl {
 
     @Override
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
-        return submit.get(getTimeout(), TimeUnit.MILLISECONDS);
+        return submit.get(getTimeout(), TimeUnit.SECONDS);
     }
 }
