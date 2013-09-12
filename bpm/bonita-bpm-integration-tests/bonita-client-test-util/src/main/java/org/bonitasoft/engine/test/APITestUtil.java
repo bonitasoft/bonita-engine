@@ -162,7 +162,7 @@ public class APITestUtil {
 
     public static final int DEFAULT_REPEAT = 50;
 
-    public static final int DEFAULT_TIMEOUT = 15000;
+    public static final int DEFAULT_TIMEOUT = 20000;
 
     @After
     public void clearSynchroRepository() {
@@ -855,7 +855,7 @@ public class APITestUtil {
     }
 
     public WaitForStep waitForStep(final String taskName, final ProcessInstance processInstance) throws Exception {
-        return waitForStep(50, 3000, taskName, processInstance);
+        return waitForStep(50, 5000, taskName, processInstance);
     }
 
     public WaitForStep waitForStep(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance) throws Exception {
@@ -903,16 +903,16 @@ public class APITestUtil {
     }
 
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
-        return waitForEvent(50, 5000, processInstance, eventName, state);
+        return waitForEvent(50, 8000, processInstance, eventName, state);
     }
 
     public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final String state) throws Exception {
-        return waitForEvent(100, 5000, processInstanceId, eventName, state);
+        return waitForEvent(100, 8000, processInstanceId, eventName, state);
     }
 
     public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String eventName, final String state)
             throws Exception {
-        return waitForEvent(100, 5000, processInstance.getId(), eventName, state);
+        return waitForEvent(100, 8000, processInstance.getId(), eventName, state);
     }
 
     public WaitForEvent waitForEvent(final int repeatEach, final int timeout, final long processInstanceId, final String eventName, final String state)

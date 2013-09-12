@@ -170,7 +170,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForStep waitForStep1 = waitForStep(50, 2000, "step1", processInstance);
         // wait timer trigger
-        final WaitForStep waitForExceptionStep = waitForStep(50, timerDuration + 2000, "exceptionStep", processInstance, TestStates.getReadyState());
+        final WaitForStep waitForExceptionStep = waitForStep(50, timerDuration + 4000, "exceptionStep", processInstance, TestStates.getReadyState());
         assignAndExecuteStep(waitForExceptionStep.getResult(), getUser().getId());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 

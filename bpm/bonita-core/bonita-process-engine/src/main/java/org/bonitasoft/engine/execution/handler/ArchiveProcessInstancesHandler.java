@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
+import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
@@ -63,12 +63,12 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final SDataInstanceBuilders sDataInstanceBuilders = tenantServiceAccessor.getSDataInstanceBuilders();
             final DocumentMappingService documentMappingService = tenantServiceAccessor.getDocumentMappingService();
             final SCommentService commentService = tenantServiceAccessor.getCommentService();
-            final SACommentBuilder saCommentBuilder = tenantServiceAccessor.getSACommentBuilders();
+            final SCommentBuilders commentBuilders = tenantServiceAccessor.getSCommentBuilders();
             final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
             final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
 
             ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, dataInstanceService, documentMappingService,
-                    logger, instancesBuilders, sDataInstanceBuilders, commentService, saCommentBuilder, processDefinitionService, connectorInstanceService);
+                    logger, instancesBuilders, sDataInstanceBuilders, commentService, commentBuilders, processDefinitionService, connectorInstanceService);
         } catch (final SArchivingException e) {
             throw new SHandlerExecutionException(e);
         } catch (SBonitaException e) {

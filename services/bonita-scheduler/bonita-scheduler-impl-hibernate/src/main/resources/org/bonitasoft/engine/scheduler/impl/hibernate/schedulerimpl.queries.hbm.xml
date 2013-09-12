@@ -8,40 +8,38 @@
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
 		WHERE jp.jobDescriptorId = :jobDescriptorId
 	</query>
-	
-	
+
 	<!-- Job Descriptor -->
 	<query name="getNumberOfSJobDescriptor">
-		SELECT COUNT(DISTINCT jd)
+		SELECT COUNT(jd)
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
 	</query>
-	
+
 	<query name="searchSJobDescriptor">
-		SELECT DISTINCT jd
+		SELECT jd
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
 	</query>
-	
+
 	<!-- Job Parameter -->
 	<query name="getNumberOfSJobParameter">
-		SELECT COUNT(DISTINCT jp)
+		SELECT COUNT(jp)
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
 	</query>
-	
+
 	<query name="searchSJobParameter">
-		SELECT DISTINCT jp
+		SELECT jp
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
 	</query>
-	
+
 	<!-- Job Log -->
 	<query name="getNumberOfSJobLog">
-		SELECT COUNT(DISTINCT jl)
+		SELECT COUNT(jl)
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl
 	</query>
-	
+
 	<query name="searchSJobLog">
-		SELECT DISTINCT jl
+		SELECT jl
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl
 	</query>
-  
 
 </hibernate-mapping>

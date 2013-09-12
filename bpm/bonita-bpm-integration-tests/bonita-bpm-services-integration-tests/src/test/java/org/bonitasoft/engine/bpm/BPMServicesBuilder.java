@@ -40,7 +40,6 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
@@ -635,11 +634,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public ReadSessionAccessor getReadSessionAccessor() {
         return getInstanceOf(ReadSessionAccessor.class);
-    }
-
-    @Override
-    public SACommentBuilder getSACommentBuilders() {
-        return getInstanceOf(SACommentBuilder.class);
     }
 
     @Override

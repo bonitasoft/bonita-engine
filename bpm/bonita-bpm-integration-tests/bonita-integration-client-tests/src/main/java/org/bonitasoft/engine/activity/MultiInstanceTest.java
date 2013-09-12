@@ -130,7 +130,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         assignAndExecuteStep(pendingTask, john.getId());
 
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 500, false, 1, john).waitUntil());
+        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 1, john).waitUntil());
         pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         pendingTask = pendingTasks.get(0);
 

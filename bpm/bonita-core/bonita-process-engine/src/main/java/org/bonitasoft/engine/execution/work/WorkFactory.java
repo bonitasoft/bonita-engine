@@ -59,6 +59,6 @@ public class WorkFactory {
             final long flowNodeInstanceId,
             final long parentId, final String parentType, final int stateId) {
         return new FailureHandlingBonitaWork(new LockProcessInstanceWork(new TxBonitaWork(new NotifyChildFinishedWork(processDefinitionId, processInstanceId,
-                flowNodeInstanceId, parentId, parentType, stateId)), parentId));
+                flowNodeInstanceId, parentId, parentType, stateId)), processInstanceId));
     }
 }
