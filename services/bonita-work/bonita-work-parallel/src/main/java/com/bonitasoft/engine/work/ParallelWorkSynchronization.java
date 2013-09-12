@@ -32,7 +32,7 @@ public class ParallelWorkSynchronization extends AbstractWorkSynchronization {
     @Override
     protected void executeRunnables(final Collection<BonitaWork> works) {
         for (final BonitaWork work : works) {
-            executorService.submit(new BonitaWorkWrapper(getTenantId(), work));
+            executorService.submit(work);
         }
     }
 }

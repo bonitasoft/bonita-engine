@@ -7,8 +7,8 @@
 			<bean class="com.hazelcast.config.Config">
 				<property name="groupConfig">
 					<bean class="com.hazelcast.config.GroupConfig">
-						<property name="name" value="bonita" />
-						<property name="password" value="bpm" />
+						<property name="name" value="${bonita.cluster.group.name:bonita}" />
+						<property name="password" value="${bonita.cluster.group.password:bpm}" />
 					</bean>
 				</property>
 				<property name="instanceName" value="bonita" />

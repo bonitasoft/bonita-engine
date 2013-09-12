@@ -127,8 +127,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         final String commentContent2 = "commentContent2";
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
         waitForStep("step1", pi);
-        getProcessAPI().addComment(pi.getId(), commentContent1);
-        getProcessAPI().addComment(pi.getId(), commentContent2);
+        getProcessAPI().addProcessComment(pi.getId(), commentContent1);
+        getProcessAPI().addProcessComment(pi.getId(), commentContent2);
         logout();
 
         final long tenant1 = SPBPMTestUtil.constructTenant("suomenlinna", null, null, "hamme", "saari");
@@ -141,8 +141,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         waitForStep("step1", pi1);
         final String commentContent11 = "commentContent11";
         final String commentContent12 = "commentContent12";
-        getProcessAPI().addComment(pi1.getId(), commentContent11);
-        getProcessAPI().addComment(pi1.getId(), commentContent12);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent11);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent12);
 
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 5);
         builder0.filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi1.getId());
@@ -169,8 +169,8 @@ public class SPProcessManagementTest extends CommonAPISPTest {
             if (i >= 0 && i < 10) {
                 processName += "0";
             }
-            final DesignProcessDefinition processDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION
-                    + i, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+            final DesignProcessDefinition processDefinition = createProcessDefinitionWithHumanAndAutomaticSteps(processName + i, PROCESS_VERSION + i,
+                    Arrays.asList("step1", "step2"), Arrays.asList(true, true));
             ids.add(getProcessAPI().deploy(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done()).getId());
         }
         return ids;

@@ -816,7 +816,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
-            final SAActivityInstance aactivityInstance = activityInstanceService.getArchivedActivityInstance(activityInstanceId);
+            final SAActivityInstance aactivityInstance = activityInstanceService.getMostRecentArchivedActivityInstance(activityInstanceId);
 
             final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
                     aactivityInstance.getRootContainerId(), tenantAccessor.getSearchEntitiesDescriptor());

@@ -19,5 +19,8 @@
 <!--   <logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" /> -->
 <!--   Show lock acquire/release-->
 <!--   <logger name="org.bonitasoft.engine.lock.impl.MemoryLockService" level="DEBUG" /> -->
+<!-- 	<logger name="org.bonitasoft.engine.work.BonitaWork" level="DEBUG" /> -->
+<!-- 	<logger name="org.bonitasoft.engine.synchro.SynchroServiceImpl" level="DEBUG" /> -->
+<!-- 	<logger name="com.bonitasoft.engine.synchro.ClusteredSynchroService" level="DEBUG" /> -->
   
 </configuration>
