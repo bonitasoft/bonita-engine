@@ -30,7 +30,7 @@ public class WaitForVariableValue extends WaitUntil {
     private final String valueExpected;
 
     public WaitForVariableValue(final ProcessAPI processAPI, final long processInstanceId, final String variableName, final String valueExpected) {
-        super(40, 1000);
+        super(40, 3000);
         this.processAPI = processAPI;
         this.processInstanceId = processInstanceId;
         this.variableName = variableName;
