@@ -51,7 +51,7 @@ public class SCommentLogBuilderImpl extends CRUDELogBuilder implements SCommment
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(COMMENT_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "comment Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "comment Id");
         }
     }
 
