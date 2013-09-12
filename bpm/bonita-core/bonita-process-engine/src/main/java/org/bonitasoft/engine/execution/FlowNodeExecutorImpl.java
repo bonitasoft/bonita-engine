@@ -45,8 +45,8 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
-import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
 import org.bonitasoft.engine.execution.work.NotifyChildFinishedWork;
+import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -188,16 +188,15 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 if (state.isTerminal()) {
                     try {
                         // reschedule this work but without the operations
-                        workService.registerWork(new NotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
-                                sFlowNodeInstance.getId(), sFlowNodeInstance
-                                        .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
+                        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance
+                                .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
                     } catch (final WorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
                 } else if (!state.isStable() && !state.isInterrupting()) {
                     try {
                         // reschedule this work but without the operations
-                        workService.registerWork(new ExecuteFlowNodeWork(Type.FLOWNODE, flowNodeInstanceId, null, null, processInstanceId));
+                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(flowNodeInstanceId, null, null, processInstanceId));
                     } catch (final WorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
@@ -234,9 +233,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             if (state.isTerminal()) {
                 try {
                     // reschedule this work but without the operations
-                    workService.registerWork(new NotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
-                            sFlowNodeInstance.getId(), sFlowNodeInstance
-                                    .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
+                    workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance
+                            .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
                 } catch (final WorkRegisterException e) {
                     throw new SFlowNodeExecutionException(e);
                 }

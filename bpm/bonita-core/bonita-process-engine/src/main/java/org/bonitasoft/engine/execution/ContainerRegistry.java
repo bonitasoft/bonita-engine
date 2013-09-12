@@ -23,9 +23,8 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
-import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork.Type;
+import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -65,13 +64,7 @@ public class ContainerRegistry {
 
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
             final String containerType, final long processInstanceId) throws WorkRegisterException {
-        Type executorType = null;
-        if (SFlowElementsContainerType.PROCESS.name().equals(containerType)) {
-            executorType = Type.PROCESS;
-        } else {
-            executorType = Type.FLOWNODE;
-        }
-        workService.registerWork(new ExecuteFlowNodeWork(executorType, flowNodeInstanceId, operations, contextDependency, processInstanceId));
+        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(flowNodeInstanceId, operations, contextDependency, processInstanceId));
     }
 
     public void executeFlowNodeInSameThread(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,

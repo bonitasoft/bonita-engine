@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.execution.ContainerRegistry;
@@ -29,7 +31,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
+public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     private static final long serialVersionUID = -8987586943379865375L;
 
@@ -43,10 +45,9 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
 
     private final long parentId;
 
-    public NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId,
+    NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId,
             final String parentType,
             final int stateId) {
-        super(processInstanceId);
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.parentId = parentId;
@@ -54,17 +55,17 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
         this.stateId = stateId;
     }
 
-    protected ClassLoader getClassLoader() throws SBonitaException {
-        return getTenantAccessor().getClassLoaderService().getLocalClassLoader("process", processDefinitionId);
+    protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
+        return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader("process", processDefinitionId);
     }
 
     @Override
-    protected void work() throws Exception {
-        final ClassLoader processClassloader = getClassLoader();
+    public void work(final Map<String, Object> context) throws Exception {
+        final ClassLoader processClassloader = getClassLoader(context);
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
-            final ContainerRegistry containerRegistry = getTenantAccessor().getContainerRegistry();
+            final ContainerRegistry containerRegistry = getTenantAccessor(context).getContainerRegistry();
             containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
@@ -77,16 +78,16 @@ public class NotifyChildFinishedWork extends TxLockProcessInstanceWork {
     }
 
     @Override
-    protected void handleFailure(Exception e) throws Exception {
-        final ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
-        final FlowNodeStateManager flowNodeStateManager = getTenantAccessor().getFlowNodeStateManager();
-        final FlowNodeExecutor flowNodeExecutor = getTenantAccessor().getFlowNodeExecutor();
-        TransactionService transactionService = getTenantAccessor().getTransactionService();
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+        final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
+        final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();
+        TransactionService transactionService = getTenantAccessor(context).getTransactionService();
         transactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
 
     @Override
-    protected String getRecoveryProcedure() {
+    public String getRecoveryProcedure() {
         return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
     }
 }

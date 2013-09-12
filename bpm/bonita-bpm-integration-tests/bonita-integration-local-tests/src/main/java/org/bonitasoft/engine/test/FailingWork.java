@@ -1,8 +1,10 @@
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.execution.work.AbstractBonitaWork;
+import java.util.Map;
 
-final class FailingWork extends AbstractBonitaWork {
+import org.bonitasoft.engine.work.BonitaWork;
+
+final class FailingWork extends BonitaWork {
 
     private static final long serialVersionUID = 1L;
 
@@ -12,23 +14,18 @@ final class FailingWork extends AbstractBonitaWork {
     }
 
     @Override
-    protected void work() throws Exception {
+    public String getRecoveryProcedure() {
+        return "The recovery procedure";
+    }
+
+    @Override
+    public void work(final Map<String, Object> context) throws Exception {
         throw new Exception("an unexpected exception");
 
     }
 
     @Override
-    protected boolean isTransactional() {
-        return true;
-    }
-
-    @Override
-    protected void handleFailure(final Exception e) throws Exception {
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         throw new Exception("unable to handle failure");
-    }
-
-    @Override
-    protected String getRecoveryProcedure() {
-        return "The recovery procedure";
     }
 }
