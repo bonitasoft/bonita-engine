@@ -62,7 +62,6 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -945,10 +944,9 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Ignore("must decide the behavior with anthony")
-    @Cover(classes = Expression.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Failed", "Database", "Connector", "On finish", "Automatic activity" }, jira = "ENGINE-1814", story = "execute expression on process that is in initializing, e.g. process execute a connector on on enter, the result must be no exception and variables have value null")
+    @Cover(classes = Expression.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Failed", "Database", "Connector", "On finish", "Automatic activity" }, jira = "ENGINE-1814", story = "execute expression on process that is in initializing, e.g. process execute a connector on on enter, the result must be no exception and be able to retrive data")
     @Test
-    public void executeExpressionWithOnProcessInInitializing() throws Exception {
+    public void executeExpressionAtProcessInstantiationOnProcessInInitializing() throws Exception {
         // will block the connector
         ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithBlockingConnector", "1.0");
         processBuilder.addConnector("myConnector", "blocking-connector", "1.0", ConnectorEvent.ON_ENTER);
@@ -978,12 +976,8 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
                 Collections.<String, Serializable> emptyMap());
         Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsAtProcessInstanciation(
                 processInstance.getId(), expressions);
-        assertEquals("nullnullnull", evaluateExpressionsAtProcessInstanciation.get("aScripte"));
-        assertEquals(null, evaluateExpressionsAtProcessInstanciation.get("a"));
-        Map<String, Serializable> evaluateExpressionsOnProcessInstance = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(),
-                expressions);
-        assertEquals("nullnullnull", evaluateExpressionsOnProcessInstance.get("aScripte"));
-        assertEquals(null, evaluateExpressionsOnProcessInstance.get("a"));
+        assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstanciation.get("ascripte"));
+        assertEquals("avalue", evaluateExpressionsAtProcessInstanciation.get("a"));
 
         BlockingConnector.semaphore.release();
         waitForProcessToFinish(processInstance.getId());
