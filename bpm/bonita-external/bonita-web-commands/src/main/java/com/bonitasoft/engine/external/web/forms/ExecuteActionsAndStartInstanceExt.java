@@ -60,10 +60,10 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
                 + " is missing or not convertible to Map.");
         final List<ConnectorDefinitionWithInputValues> connectorsWithInput = getParameter(parameters, CONNECTORS_LIST_KEY, "Mandatory parameter "
                 + CONNECTORS_LIST_KEY + " is missing or not convertible to List.");
-        final long sProcessDefinitionID = getParameter(parameters, PROCESS_DEFINITION_ID_KEY, "Mandatory parameter " + PROCESS_DEFINITION_ID_KEY
+        final Long sProcessDefinitionID = getParameter(parameters, PROCESS_DEFINITION_ID_KEY, "Mandatory parameter " + PROCESS_DEFINITION_ID_KEY
                 + " is missing or not convertible to long.");
 
-        final long userId = getParameter(parameters, USER_ID_KEY, "Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.");
+        final Long userId = getParameter(parameters, USER_ID_KEY, "Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.");
 
         try {
             final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
