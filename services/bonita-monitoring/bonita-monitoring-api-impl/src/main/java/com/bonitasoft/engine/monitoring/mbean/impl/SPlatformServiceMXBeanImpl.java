@@ -12,6 +12,8 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStartException;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStopException;
@@ -31,9 +33,9 @@ public class SPlatformServiceMXBeanImpl implements SPlatformServiceMXBean {
     private final PlatformMonitoringService monitoringService;
 
     public SPlatformServiceMXBeanImpl(final PlatformMonitoringService monitoringService) throws MalformedObjectNameException {
-        this.mbserver = MBeanUtil.getMBeanServer();
-        this.strName = PlatformMonitoringService.SERVICE_MBEAN_NAME;
-        this.name = new ObjectName(this.strName);
+        mbserver = MBeanUtil.getMBeanServer();
+        strName = PlatformMonitoringService.SERVICE_MBEAN_NAME;
+        name = new ObjectName(strName);
         this.monitoringService = monitoringService;
     }
 
@@ -63,12 +65,17 @@ public class SPlatformServiceMXBeanImpl implements SPlatformServiceMXBean {
 
     @Override
     public boolean isSchedulerStarted() {
-        return monitoringService.isSchedulerStarted();
+        try {
+            return monitoringService.isSchedulerStarted();
+        } catch (SBonitaException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public String getName() {
-        return this.strName;
+        return strName;
     }
 
     @Override

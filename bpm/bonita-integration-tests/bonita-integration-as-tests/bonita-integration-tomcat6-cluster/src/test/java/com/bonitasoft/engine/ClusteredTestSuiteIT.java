@@ -13,13 +13,13 @@ public class ClusteredTestSuiteIT {
 
     @BeforeClass
     public static void beforeBeforeClass() throws Exception {
-        System.err.println("=================== BPMRemoteTestsForServers.beforeClass()");
+        System.err.println("=================== ClusteredTestSuiteIT.beforeClass()");
         APITestUtil.createPlatformStructure();
     }
 
     @AfterClass
     public static void afterAfterClass() throws Exception {
-        System.err.println("=================== BPMRemoteTestsForServers.afterClass()");
+        System.err.println("=================== ClusteredTestSuiteIT.afterClass()");
         APITestUtil.deletePlatformStructure();
     }
 }

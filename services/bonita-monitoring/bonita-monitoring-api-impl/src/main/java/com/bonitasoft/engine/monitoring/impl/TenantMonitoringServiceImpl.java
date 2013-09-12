@@ -40,27 +40,19 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
 
     private final SJobHandlerImpl jobHandler;
 
-    private final SUserHandlerImpl userHandler;
-
-    private final boolean useCache;
-
     private final TransactionService transactionService;
 
     private final SessionAccessor sessionAccessor;
 
-    private long numberOfUsers = -1;
-
-    public TenantMonitoringServiceImpl(final boolean allowMbeansRegistration, final boolean useCache, final IdentityService identityService,
-            final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService, final STransactionHandlerImpl transactionHandler, final SJobHandlerImpl jobHandler,
-            final SUserHandlerImpl userHandler, final TechnicalLoggerService technicalLog) throws HandlerRegistrationException {
+    public TenantMonitoringServiceImpl(final boolean allowMbeansRegistration, final IdentityService identityService, final EventService eventService,
+            final TransactionService transactionService, final SessionAccessor sessionAccessor, final SessionService sessionService,
+            final STransactionHandlerImpl transactionHandler, final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog)
+            throws HandlerRegistrationException {
         super(allowMbeansRegistration, technicalLog);
         this.identityService = identityService;
         this.transactionHandler = transactionHandler;
         this.jobHandler = jobHandler;
         this.eventService = eventService;
-        this.userHandler = userHandler;
-        this.useCache = useCache;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -76,15 +68,6 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
         addMBean(serviceBean);
     }
 
-    private void initializeCache() throws SMonitoringException {
-        try {
-            numberOfUsers = identityService.getNumberOfUsers();
-        } catch (final SIdentityException e) {
-            throw new SMonitoringException("Impossible to retrive the number of users", e);
-        }
-        userHandler.setNbOfUsers(numberOfUsers);// initialize the number of user
-    }
-
     private void addHandlers() throws HandlerRegistrationException {
         eventService.addHandler(STransactionHandlerImpl.TRANSACTION_ACTIVE_EVT, transactionHandler);
         eventService.addHandler(STransactionHandlerImpl.TRANSACTION_COMMITED_EVT, transactionHandler);
@@ -93,28 +76,15 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
         eventService.addHandler(SJobHandlerImpl.JOB_COMPLETED, jobHandler);
         eventService.addHandler(SJobHandlerImpl.JOB_EXECUTING, jobHandler);
         eventService.addHandler(SJobHandlerImpl.JOB_FAILED, jobHandler);
-
-        eventService.addHandler(SUserHandlerImpl.USER_CREATED, userHandler);
-        eventService.addHandler(SUserHandlerImpl.USER_DELETED, userHandler);
     }
 
     @Override
     public long getNumberOfUsers() throws SMonitoringException {
-        long nbOfUsers = 0;
-        if (useCache) {
-            if (numberOfUsers < 0) {
-                initializeCache();
-            }
-            // we use the handler information to update the MXBean's information.
-            nbOfUsers = userHandler.getNbOfUsers();
-        } else {
-            try {
-                nbOfUsers = identityService.getNumberOfUsers();
-            } catch (final SIdentityException e) {
-                throw new SMonitoringException("Impossible to retrieve number of users: ", e);
-            }
+        try {
+            return identityService.getNumberOfUsers();
+        } catch (final SIdentityException e) {
+            throw new SMonitoringException("Impossible to retrieve number of users: ", e);
         }
-        return nbOfUsers;
     }
 
     @Override

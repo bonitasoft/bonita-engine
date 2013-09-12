@@ -14,13 +14,10 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.junit.Before;
 import org.junit.Test;
@@ -197,8 +194,7 @@ public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void isSchedulerStartedTest() throws STransactionCreationException, SSchedulerException, FireEventException, STransactionCommitException,
-            STransactionRollbackException {
+    public void isSchedulerStartedTest() throws SBonitaException, STransactionRollbackException {
         getTransactionService().begin();
         assertFalse(monitoringService.isSchedulerStarted());
 

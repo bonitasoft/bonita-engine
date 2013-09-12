@@ -10,6 +10,8 @@ package com.bonitasoft.engine.monitoring;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
@@ -27,7 +29,7 @@ public interface PlatformMonitoringService extends MonitoringService {
      * @return true if the scheduler service is started, false if it is stopped, else return false.
      * @since 6.0
      */
-    boolean isSchedulerStarted();
+    boolean isSchedulerStarted() throws SBonitaException;
 
     /**
      * Get the current number of active transactions at platform level.

@@ -16,9 +16,11 @@ import java.util.Map;
 
 import javax.management.MalformedObjectNameException;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.monitoring.SGcInfo;
@@ -39,16 +41,16 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
 
     private final STransactionHandlerImpl transactionHandler;
 
-    private final SSchedulerHandlerImpl schedulerHandler;
+    private final SchedulerService schedulerService;
 
     public PlatformMonitoringServiceImpl(final boolean allowMbeansRegistration, final SJvmMXBean jvmMBean, final EventService eventService,
-            final STransactionHandlerImpl transactionHandler, final SSchedulerHandlerImpl schedulerHandler, final TechnicalLoggerService technicalLog)
+            final STransactionHandlerImpl transactionHandler, final SchedulerService schedulerService, final TechnicalLoggerService technicalLog)
             throws HandlerRegistrationException, MalformedObjectNameException {
         super(allowMbeansRegistration, technicalLog);
         this.jvmMBean = jvmMBean;
         this.eventService = eventService;
-        this.schedulerHandler = schedulerHandler;
         this.transactionHandler = transactionHandler;
+        this.schedulerService = schedulerService;
 
         addMBeans();
         addHandlers();
@@ -65,14 +67,11 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
         eventService.addHandler(STransactionHandlerImpl.TRANSACTION_ACTIVE_EVT, transactionHandler);
         eventService.addHandler(STransactionHandlerImpl.TRANSACTION_COMMITED_EVT, transactionHandler);
         eventService.addHandler(STransactionHandlerImpl.TRANSACTION_ROLLEDBACK_EVT, transactionHandler);
-
-        eventService.addHandler(SSchedulerHandlerImpl.SCHEDULER_STARTED, schedulerHandler);
-        eventService.addHandler(SSchedulerHandlerImpl.SCHEDULER_STOPPED, schedulerHandler);
     }
 
     @Override
-    public boolean isSchedulerStarted() {
-        return schedulerHandler.isSchedulerStarted();
+    public boolean isSchedulerStarted() throws SBonitaException {
+        return schedulerService.isStarted();
     }
 
     @Override

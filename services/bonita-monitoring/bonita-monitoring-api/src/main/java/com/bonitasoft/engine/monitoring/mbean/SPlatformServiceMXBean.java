@@ -15,7 +15,7 @@ package com.bonitasoft.engine.monitoring.mbean;
 public interface SPlatformServiceMXBean extends BonitaMXBean {
 
     /**
-     * Return true if the scheduler service is started, false if it is stopped.
+     * Return true if the scheduler service is started, false if it is stopped or if its state cannot be determined.
      */
     boolean isSchedulerStarted();
 

@@ -52,7 +52,7 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
 
     static {
         schedulerService = getServicesBuilder().buildSchedulerService();
-        monitoringService = getServicesBuilder().buildTenantMonitoringService(false);
+        monitoringService = getServicesBuilder().buildTenantMonitoringService();
     }
 
     @BeforeClass
