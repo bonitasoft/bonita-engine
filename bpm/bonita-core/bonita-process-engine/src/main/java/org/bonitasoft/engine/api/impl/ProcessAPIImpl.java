@@ -120,8 +120,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDe
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionIDByNameAndVersion;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDeploymentInfosFromIds;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessInstance;
-import org.bonitasoft.engine.api.impl.transaction.process.GetStartedArchivedProcessInstance;
-import org.bonitasoft.engine.api.impl.transaction.process.GetStartedProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.SetProcessInstanceState;
 import org.bonitasoft.engine.api.impl.transaction.process.UpdateProcessDeploymentInfo;
 import org.bonitasoft.engine.api.impl.transaction.task.AssignOrUnassignUserTask;
@@ -273,6 +271,7 @@ import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumen
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -5320,18 +5319,27 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> evaluateExpressionsAtProcessInstanciation(final long processInstanceId,
             final Map<Expression, Map<String, Serializable>> expressions) throws ExpressionEvaluationException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
             try {
-                final ProcessInstance processInstance = getStartedProcessInstance(processInstanceId);
-                return evaluateExpressionsInstanceLevelAndArchived(expressions, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
-                        processInstance.getProcessDefinitionId(), processInstance.getStartDate().getTime());
+                SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+                // if it exists and is initializing or started
+                int stateId = processInstance.getStateId();
+                if (stateId == 0/* initializing */|| stateId == 1/* started */) {
+                    // the evaluation date is either now (initializing) or the start date if available
+                    long evaluationDate = stateId == 0 ? System.currentTimeMillis() : processInstance.getStartDate();
+                    return evaluateExpressionsInstanceLevelAndArchived(expressions, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
+                            processInstance.getProcessDefinitionId(), evaluationDate);
+                }
             } catch (final SProcessInstanceNotFoundException spinfe) {
-                final ArchivedProcessInstance archiveProcessInstance = getStartedArchivedProcessInstance(processInstanceId);
-                final Map<String, Serializable> evaluateExpressionInArchiveProcessInstance = evaluateExpressionsInstanceLevelAndArchived(expressions,
-                        processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, archiveProcessInstance.getProcessDefinitionId(), archiveProcessInstance
-                                .getStartDate().getTime());
-                return evaluateExpressionInArchiveProcessInstance;
+                // get it in the archive
             }
+            final ArchivedProcessInstance archiveProcessInstance = getStartedArchivedProcessInstance(processInstanceId);
+            final Map<String, Serializable> evaluateExpressionInArchiveProcessInstance = evaluateExpressionsInstanceLevelAndArchived(expressions,
+                    processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, archiveProcessInstance.getProcessDefinitionId(), archiveProcessInstance
+                            .getStartDate().getTime());
+            return evaluateExpressionInArchiveProcessInstance;
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e);
         }
@@ -5442,27 +5450,25 @@ public class ProcessAPIImpl implements ProcessAPI {
         return evaluations.getResult();
     }
 
-    private ProcessInstance getStartedProcessInstance(final long processInstanceId) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final GetStartedProcessInstance getStartedProcessInstance = new GetStartedProcessInstance(processInstanceService, processDefinitionService,
-                searchEntitiesDescriptor, processInstanceId);
-        getStartedProcessInstance.execute();
-
-        return getStartedProcessInstance.getResult();
-    }
-
     private ArchivedProcessInstance getStartedArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
-        final GetStartedArchivedProcessInstance searchArchivedProcessInstances = new GetStartedArchivedProcessInstance(processInstanceService,
-                searchEntitiesDescriptor, processInstanceId);
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 2);
+        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE, Order.ASC);
+        searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
+        searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.STATE_ID, ProcessInstanceState.STARTED.getId());
+        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
+                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
-        return searchArchivedProcessInstances.getResult();
+
+        try {
+            return searchArchivedProcessInstances.getResult().getResult().get(0);
+        } catch (final IndexOutOfBoundsException e) {
+            throw new SAProcessInstanceNotFoundException(processInstanceId, ProcessInstanceState.STARTED.name());
+        }
+
     }
 
     private ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
