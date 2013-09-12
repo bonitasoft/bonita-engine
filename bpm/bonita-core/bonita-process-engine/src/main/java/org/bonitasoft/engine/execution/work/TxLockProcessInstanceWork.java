@@ -33,7 +33,7 @@ public abstract class TxLockProcessInstanceWork extends TxBonitaWork {
 
     private transient LockService lockService;
 
-    private BonitaLock lock;
+    private transient BonitaLock lock;
 
     public TxLockProcessInstanceWork(final long processInstanceId) {
         super();

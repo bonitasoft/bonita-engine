@@ -13,22 +13,15 @@
  **/
 package org.bonitasoft.engine.lock;
 
-import java.io.Serializable;
 import java.util.concurrent.locks.Lock;
 
 /**
  * 
- * is not serializable because of the Lock but still have the serializable interface to avoid serialization issue when object is null
  * 
  * @author Baptiste Mesta
  * 
  */
-public class BonitaLock implements Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+public class BonitaLock {
 
     private final Lock lock;
 
