@@ -30,7 +30,7 @@
 			<dependency>
 				<groupId>com.bonitasoft.manager</groupId>
 				<artifactId>manager</artifactId>
-				<version>1.1.0</version>
+				<version>1.1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
