@@ -37,7 +37,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * The document that will be update/created have the name given to the leftOperand (leftOperand.getName())
  * If the document already exists on the process instance (document with same name), it is update.
  * If there is no document with this name, it is created.
- *
+ * 
  * @author Baptiste Mesta
  */
 public class DocumentOperationExecutorStrategy implements OperationExecutorStrategy {
@@ -106,18 +106,20 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
                 final DocumentValue documentValue = (DocumentValue) newValue;
                 final boolean hasContent = documentValue.hasContent();
                 try {
-                    // Keep this unsused variable : we want the exception if the document does not exist.
-                    final SProcessDocument currentDocument = processDocumentService.getDocument(processInstanceId, documentName);
+                    // Let's check if the document already exists:
+                    processDocumentService.getDocument(processInstanceId, documentName);
 
                     // a document exist, update it with the new values
-                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent);
+                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
+                            documentValue.getUrl());
                     if (hasContent) {
                         processDocumentService.updateDocumentOfProcessInstance(document, documentValue.getContent());
                     } else {
                         processDocumentService.updateDocumentOfProcessInstance(document);
                     }
                 } catch (final SDocumentNotFoundException e) {
-                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent);
+                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
+                            documentValue.getUrl());
                     if (hasContent) {
                         processDocumentService.attachDocumentToProcessInstance(document, documentValue.getContent());
                     } else {
@@ -131,7 +133,8 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
 
     }
 
-    private SProcessDocument createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue, final boolean hasContent) {
+    private SProcessDocument createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue,
+            final boolean hasContent, final String documentUrl) {
         SProcessDocumentBuilder processDocumentBuilder = processDocumentBuilders.getSProcessDocumentBuilder();
         processDocumentBuilder.createNewInstance();
         processDocumentBuilder.setName(documentName);
@@ -141,6 +144,7 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
         processDocumentBuilder.setAuthor(authorId);
         processDocumentBuilder.setCreationDate(System.currentTimeMillis());
         processDocumentBuilder.setHasContent(hasContent);
+        processDocumentBuilder.setURL(documentUrl);
         final SProcessDocument document = processDocumentBuilder.done();
         return document;
     }
