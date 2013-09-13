@@ -35,12 +35,15 @@ import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocume
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SAProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SAProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.document.DocumentService;
 import org.bonitasoft.engine.document.SDocumentException;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.document.model.SDocument;
 import org.bonitasoft.engine.document.model.SDocumentBuilder;
+import org.bonitasoft.engine.document.model.SDocumentBuilders;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -59,24 +62,24 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
 
     private final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor;
 
-    private final SProcessDocumentBuilder processDocumentBuilder;
+    private final SProcessDocumentBuilders processDocumentBuilders;
 
-    private final SAProcessDocumentBuilder archivedProcessDocumentBuilder;
+    private final SAProcessDocumentBuilders archivedProcessDocumentBuilders;
 
-    private final SDocumentBuilder documentBuilder;
+    private final SDocumentBuilders documentBuilders;
 
     private final SDocumentDownloadURLProvider urlProvider;
 
-    public ProcessDocumentServiceImpl(final SProcessDocumentBuilder processDocumentBuilder, final DocumentService documentService,
+    public ProcessDocumentServiceImpl(final SProcessDocumentBuilders processDocumentBuilders, final DocumentService documentService,
             final DocumentMappingService documentMappingService, final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor,
-            final SDocumentBuilder documentBuilder, final SDocumentDownloadURLProvider urlProvider,
-            final SAProcessDocumentBuilder archivedProcessDocumentBuilder) {
+            final SDocumentBuilders documentBuilders, final SDocumentDownloadURLProvider urlProvider,
+            final SAProcessDocumentBuilders archivedProcessDocumentBuilders) {
         this.documentService = documentService;
         this.documentMappingService = documentMappingService;
         this.documentMappingBuilderAccessor = documentMappingBuilderAccessor;
-        this.documentBuilder = documentBuilder;
-        this.processDocumentBuilder = processDocumentBuilder;
-        this.archivedProcessDocumentBuilder = archivedProcessDocumentBuilder;
+        this.documentBuilders = documentBuilders;
+        this.processDocumentBuilders = processDocumentBuilders;
+        this.archivedProcessDocumentBuilders = archivedProcessDocumentBuilders;
         this.urlProvider = urlProvider;
     }
 
@@ -128,7 +131,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     private SProcessDocument toProcessDocument(final SDocumentMapping docMapping) {
-        final SProcessDocumentBuilder builder = processDocumentBuilder.createNewInstance();
+        final SProcessDocumentBuilder builder = processDocumentBuilders.getSProcessDocumentBuilder().createNewInstance();
         builder.setAuthor(docMapping.getDocumentAuthor());
         builder.setContentMimeType(docMapping.getDocumentContentMimeType());
         builder.setCreationDate(docMapping.getDocumentCreationDate());
@@ -143,7 +146,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     private SProcessDocument toProcessDocument(final SADocumentMapping docMapping) {
-        final SProcessDocumentBuilder builder = processDocumentBuilder.createNewInstance();
+        final SProcessDocumentBuilder builder = processDocumentBuilders.getSProcessDocumentBuilder().createNewInstance();
         builder.setAuthor(docMapping.getDocumentAuthor());
         builder.setContentMimeType(docMapping.getDocumentContentMimeType());
         builder.setCreationDate(docMapping.getDocumentCreationDate());
@@ -158,7 +161,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     private SAProcessDocument toAProcessDocument(final SADocumentMapping docMapping) {
-        final SAProcessDocumentBuilder builder = archivedProcessDocumentBuilder.createNewInstance();
+        final SAProcessDocumentBuilder builder = archivedProcessDocumentBuilders.getSAProcessDocumentBuilder().createNewInstance();
         builder.setAuthor(docMapping.getDocumentAuthor());
         builder.setContentMimeType(docMapping.getDocumentContentMimeType());
         builder.setCreationDate(docMapping.getDocumentCreationDate());
@@ -220,7 +223,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     private SDocument toSDocument(final SProcessDocument document) {
-        final SDocumentBuilder builder = documentBuilder.createNewInstance();
+        final SDocumentBuilder builder = documentBuilders.getSDocumentBuilder().createNewInstance();
         builder.setAuthor(document.getAuthor());
         builder.setContentFileName(document.getContentFileName());
         builder.setContentMimeType(document.getContentMimeType());

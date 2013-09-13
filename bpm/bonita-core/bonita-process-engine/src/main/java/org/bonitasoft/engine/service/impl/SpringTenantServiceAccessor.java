@@ -53,7 +53,7 @@ import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinition
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -196,7 +196,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ConnectorInstanceService connectorInstanceService;
 
-    private SProcessDocumentBuilder processDocumentBuilder;
+    private SProcessDocumentBuilders processDocumentBuilders;
 
     private ProcessDocumentService processDocumentService;
 
@@ -619,11 +619,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public SProcessDocumentBuilder getProcessDocumentBuilder() {
-        if (processDocumentBuilder == null) {
-            processDocumentBuilder = beanAccessor.getService(SProcessDocumentBuilder.class);
+    public SProcessDocumentBuilders getProcessDocumentBuilders() {
+        if (processDocumentBuilders == null) {
+            processDocumentBuilders = beanAccessor.getService(SProcessDocumentBuilders.class);
         }
-        return processDocumentBuilder;
+        return processDocumentBuilders;
     }
 
     @Override
