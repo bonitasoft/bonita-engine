@@ -46,7 +46,7 @@ import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinition
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
@@ -440,8 +440,8 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SProcessDocumentBuilder getProcessDocumentBuilder() {
-        return getInstanceOf(SProcessDocumentBuilder.class);
+    public SProcessDocumentBuilders getProcessDocumentBuilders() {
+        return getInstanceOf(SProcessDocumentBuilders.class);
     }
 
     @Override

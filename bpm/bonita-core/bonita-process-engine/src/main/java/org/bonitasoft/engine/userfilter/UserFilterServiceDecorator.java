@@ -33,7 +33,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
  * This {@link UserFilterService} implementation injects, in method {@link #executeFilter(long, SUserFilterDefinition, Map, ClassLoader)} a new expression to
  * access the {@link APIAccessor} for User filters.
  * This new expression is referenced under the name 'apiAccessor'.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */
@@ -41,7 +41,7 @@ public class UserFilterServiceDecorator implements UserFilterService {
 
     private final UserFilterService userFilterService;
 
-    private final SExpressionBuilder expressionbuilder;
+    private final SExpressionBuilders expressionbuilders;
 
     /**
      * @param userFilterService
@@ -52,13 +52,13 @@ public class UserFilterServiceDecorator implements UserFilterService {
     public UserFilterServiceDecorator(final UserFilterService userFilterService, final SExpressionBuilders expressionBuilders) {
         super();
         this.userFilterService = userFilterService;
-        expressionbuilder = expressionBuilders.getExpressionBuilder();
+        this.expressionbuilders = expressionBuilders;
     }
 
     /**
      * {@inheritDoc}. This implementation injects a new expression to access the {@link APIAccessor} for User filters.
      * This new expression is referenced under the name 'apiAccessor'.
-     * 
+     *
      * @param actors
      */
     @Override
@@ -67,8 +67,8 @@ public class UserFilterServiceDecorator implements UserFilterService {
         SExpression apiAccessorExpression;
         SExpression engineExecutionContext;
         try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilder);
-            engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext(expressionbuilder);
+            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilders.getExpressionBuilder());
+            engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext(expressionbuilders.getExpressionBuilder());
         } catch (final SInvalidExpressionException e) {
             throw new SUserFilterExecutionException(e);
         }

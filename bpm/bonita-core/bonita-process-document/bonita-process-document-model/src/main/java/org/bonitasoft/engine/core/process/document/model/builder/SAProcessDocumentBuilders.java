@@ -15,10 +15,10 @@
 package org.bonitasoft.engine.core.process.document.model.builder;
 
 /**
- * @author Nicolas Chabanoles
+ * @author Laurent Vaills
  */
-public interface SProcessDocumentBuilders {
+public interface SAProcessDocumentBuilders {
 
-    SProcessDocumentBuilder getSProcessDocumentBuilder();
+    SAProcessDocumentBuilder getSAProcessDocumentBuilder();
 
 }

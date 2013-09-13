@@ -13,8 +13,6 @@
 <!-- 		<constructor-arg name="storePath" value="${bonita.home}/server/platform/work" /> -->
 <!-- 	</bean> -->
 
-	<bean id="documentBuilder" class="org.bonitasoft.engine.document.model.impl.SDocumentBuilderImpl" />
-
 	<bean name="documentBuilders" class="org.bonitasoft.engine.document.model.impl.SDocumentBuildersImpl" />
 
 	<bean id="db-bonita-document-model" class="org.bonitasoft.engine.persistence.DBConfiguration">

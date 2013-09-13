@@ -30,12 +30,6 @@ public final class EngineConstantExpressionBuilder {
         return builder.done();
     }
 	
-    public static SExpression getAPIAccessorExpression(final SExpressionBuilder expressionbuilder) throws SInvalidExpressionException {
-        final SExpressionBuilder builder = expressionbuilder.createNewInstance();
-        builder.setContent("apiAccessor").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(APIAccessor.class.getName());
-        return builder.done();
-    }
-
     public static SExpression getEngineExecutionContext(final SExpressionBuilder expressionbuilder) throws SInvalidExpressionException {
         final SExpressionBuilder builder = expressionbuilder.createNewInstance();
         builder.setContent("engineExecutionContext").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name())

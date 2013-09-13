@@ -65,6 +65,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinitio
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -101,7 +102,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.work.ExecuteFlowNodeWork;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -163,7 +163,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final ProcessDocumentService processDocumentService;
 
-    private final SProcessDocumentBuilder documentBuilder;
+    private final SProcessDocumentBuilders processDocumentBuilders;
 
     private final ReadSessionAccessor sessionAccessor;
 
@@ -184,7 +184,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final SExpressionBuilders expressionBuilders, final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
-            final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
+            final SProcessDocumentBuilders processDocumentBuilders, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final LockService lockService, final TokenService tokenService,
             final EventsHandler eventsHandler, final SOperationBuilders operationBuilders, final TransactionService transactionService,
             final FlowNodeStateManager flowNodeStateManager) {
@@ -208,7 +208,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.operationBuilders = operationBuilders;
         this.expressionResolverService = expressionResolverService;
         this.processDocumentService = processDocumentService;
-        this.documentBuilder = documentBuilder;
+        this.processDocumentBuilders = processDocumentBuilders;
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -664,27 +664,29 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url, final long authorId) throws SBonitaException {
-        final SProcessDocument attachment = buildExternalProcessDocumentReference(documentBuilder, processInstanceId, documentName, fileName, mimeType,
+        final SProcessDocument attachment = buildExternalProcessDocumentReference(processDocumentBuilders, processInstanceId, documentName, fileName, mimeType,
                 authorId, url);
         return processDocumentService.attachDocumentToProcessInstance(attachment);
     }
 
     protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent, final long authorId) throws SBonitaException {
-        final SProcessDocument attachment = buildProcessDocument(documentBuilder, processInstanceId, documentName, fileName, mimeType, authorId);
+        final SProcessDocument attachment = buildProcessDocument(processDocumentBuilders, processInstanceId, documentName, fileName, mimeType, authorId);
         return processDocumentService.attachDocumentToProcessInstance(attachment, documentContent);
     }
 
-    private SProcessDocument buildExternalProcessDocumentReference(final SProcessDocumentBuilder documentBuilder, final long processInstanceId,
+    private SProcessDocument buildExternalProcessDocumentReference(final SProcessDocumentBuilders documentBuilders, final long processInstanceId,
             final String documentName, final String fileName, final String mimeType, final long authorId, final String url) {
+        SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
         initDocumentBuilder(documentBuilder, processInstanceId, documentName, fileName, mimeType, authorId);
         documentBuilder.setURL(url);
         documentBuilder.setHasContent(false);
         return documentBuilder.done();
     }
 
-    private SProcessDocument buildProcessDocument(final SProcessDocumentBuilder documentBuilder, final long processInstanceId, final String documentName,
+    private SProcessDocument buildProcessDocument(final SProcessDocumentBuilders documentBuilders, final long processInstanceId, final String documentName,
             final String fileName, final String mimetype, final long authorId) {
+        SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
         initDocumentBuilder(documentBuilder, processInstanceId, documentName, fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         return documentBuilder.done();
@@ -779,7 +781,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     /**
      * Evaluate the split of the element
      * The element contains the current token it received
-     * 
+     *
      * @return
      *         number of token of the process
      */
@@ -976,7 +978,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     /**
      * execute the implicit end of an element
-     * 
+     *
      * @param numberOfTokenToMerge
      * @param tokenRefId
      * @param processInstanceId

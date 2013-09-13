@@ -37,9 +37,9 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
 
     private final Logger logger;
 
-    public FileLoggerIncidentHandler(String logFile, long tenantId) throws BonitaHomeNotSetException, SecurityException, IOException {
+    public FileLoggerIncidentHandler(final String logFile, final long tenantId) throws BonitaHomeNotSetException, SecurityException, IOException {
         String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantId);
-        logger = Logger.getLogger("INDICENT");
+        logger = Logger.getLogger("INCIDENT");
         FileHandler fh;
         fh = new FileHandler(tenantFolder + File.separatorChar + logFile);
         logger.addHandler(fh);
@@ -49,8 +49,10 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
     }
 
     @Override
-    public void handle(Incident incident) {
-        logger.log(Level.SEVERE, "An incident happened: " + incident.getDescription());
+    public void handle(final Incident incident) {
+        logger.log(Level.SEVERE, "An incident occurred: " + incident.getDescription());
+        logger.log(Level.SEVERE, "Exception was", incident.getCause());
+        logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of", incident.getExceptionWhenHandlingFailure());
         String recoveryProcedure = incident.getRecoveryProcedure();
         if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
             logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);

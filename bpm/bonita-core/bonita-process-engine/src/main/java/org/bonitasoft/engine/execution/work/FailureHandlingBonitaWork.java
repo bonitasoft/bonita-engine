@@ -45,8 +45,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         super(work);
     }
 
-    protected void logIncident() {
-        Incident incident = new Incident(getDescription(), getRecoveryProcedure());
+    protected void logIncident(final Exception cause, final Exception exceptionWhenHandlingFailure) {
+        Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
         IncidentService incidentService = getTenantAccessor().getIncidentService();
         incidentService.report(incident);
     }
@@ -91,7 +91,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                         "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
                         e);
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
-                logIncident();
+                logIncident(e, e1);
             }
 
         } finally {

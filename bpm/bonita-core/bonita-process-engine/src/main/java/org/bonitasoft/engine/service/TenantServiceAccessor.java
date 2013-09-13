@@ -41,7 +41,7 @@ import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinition
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -177,7 +177,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     SDocumentMappingBuilderAccessor getDocumentMappingBuilderAccessor();
 
-    SProcessDocumentBuilder getProcessDocumentBuilder();
+    SProcessDocumentBuilders getProcessDocumentBuilders();
 
     ProcessDocumentService getProcessDocumentService();
 

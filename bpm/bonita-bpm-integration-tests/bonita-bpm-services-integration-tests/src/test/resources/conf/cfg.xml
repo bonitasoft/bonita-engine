@@ -192,7 +192,7 @@
 			</map>
 		</constructor-arg>
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />
-		<constructor-arg name="documentBuilder" ref="processDocumentBuilder" />
+		<constructor-arg name="processDocumentBuilders" ref="processDocumentBuilders" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
