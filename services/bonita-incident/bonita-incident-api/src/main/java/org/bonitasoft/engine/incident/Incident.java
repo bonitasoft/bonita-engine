@@ -24,10 +24,16 @@ public class Incident {
 
     private final String recoveryProcedure;
 
-    public Incident(String description, String recoveryProcedure) {
+    private final Exception cause;
+
+    private final Exception exceptionWhenHandlingFailure;
+
+    public Incident(final String description, final String recoveryProcedure, final Exception cause, final Exception exceptionWhenHandlingFailure) {
         super();
         this.description = description;
         this.recoveryProcedure = recoveryProcedure;
+        this.cause = cause;
+        this.exceptionWhenHandlingFailure = exceptionWhenHandlingFailure;
     }
 
     public String getDescription() {
@@ -36,6 +42,14 @@ public class Incident {
 
     public String getRecoveryProcedure() {
         return recoveryProcedure;
+    }
+
+    public Exception getCause() {
+        return cause;
+    }
+
+    public Exception getExceptionWhenHandlingFailure() {
+        return exceptionWhenHandlingFailure;
     }
 
     @Override

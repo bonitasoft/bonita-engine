@@ -396,8 +396,10 @@ public class BPMLocalTest extends CommonAPILocalTest {
         String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
         File file = new File(tenantFolder + File.separatorChar + "INCIDENT.log");
         String content = org.bonitasoft.engine.io.IOUtil.read(file);
-        assertTrue("File content is: " + content, content.contains("An incident happened: MyJob"));
-        assertTrue(content.contains("Procedure to recover: The recovery procedure"));
+        assertTrue("File content is: " + content, content.contains("An incident occurred: MyJob"));
+        assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
+        assertTrue("File content is: " + content, content.contains("an unexpected exception"));
+        assertTrue("File content is: " + content, content.contains("unable to handle failure"));
 
     }
 
