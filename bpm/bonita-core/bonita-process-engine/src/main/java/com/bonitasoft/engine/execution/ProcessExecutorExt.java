@@ -29,7 +29,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -84,13 +84,13 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final SExpressionBuilders expressionBuilders, final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
-            final SProcessDocumentBuilder documentBuilder, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
+            final SProcessDocumentBuilders processDocumentBuilders, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final LockService lockService, final TokenService tokenService, final EventsHandler eventsHandler,
             final SOperationBuilders operationBuilders, final TransactionService transactionService, final FlowNodeStateManager flowNodeStateManager) {
         super(instanceBuilders, activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService,
                 gatewayInstanceService, transitionService, eventInstanceService, connectorService,
                 connectorInstanceService, classLoaderService, operationService, expressionBuilders, expressionResolverService, eventService, handlers,
-                processDocumentService, documentBuilder, sessionAccessor, containerRegistry, bpmInstancesCreator, lockService, tokenService,
+                processDocumentService, processDocumentBuilders, sessionAccessor, containerRegistry, bpmInstancesCreator, lockService, tokenService,
                 eventsHandler, operationBuilders, transactionService, flowNodeStateManager);
 
         this.instanceBuilders = instanceBuilders;
