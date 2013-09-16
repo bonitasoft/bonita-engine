@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -18,7 +19,7 @@
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-process-engine</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 
 		<!-- Actor Mapping -->
 		<dependency>
@@ -157,7 +158,7 @@
 			<artifactId>bonita-data-instance-data-source-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Delete -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
@@ -261,6 +262,18 @@
 
 		<!-- Home Server -->
 
+		<!-- Incident -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-log</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
@@ -334,14 +347,14 @@
 			<artifactId>bonita-platform-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Platform Authentication -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.authentication</groupId>
 			<artifactId>bonita-platform-authentication-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Platform Command -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>
@@ -412,7 +425,7 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Process Definition-->
+		<!-- Process Definition -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-impl</artifactId>
@@ -428,7 +441,7 @@
 			<artifactId>bonita-process-definition-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Process Document -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.document</groupId>
@@ -552,7 +565,7 @@
 			<artifactId>bonita-transaction-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Transient Data -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
@@ -667,7 +680,7 @@
 									<!-- Connector Executor -->
 									<include>org.bonitasoft.engine.connector:bonita-connector-executor-api</include>
 									<include>org.bonitasoft.engine.connector:bonita-connector-executor-api-impl</include>
-									<!-- Connector  -->
+									<!-- Connector -->
 									<include>org.bonitasoft.engine.core.connector:bonita-connector-service-api</include>
 									<include>org.bonitasoft.engine.core.connector:bonita-connector-service-api-impl</include>
 									<!-- Data -->
@@ -683,10 +696,10 @@
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-model</include>
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-model-impl</include>
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-model-impl-hibernate</include>
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>																		
+									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-api-impl</include>
 									<!-- Data Source -->
-									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-data-source</include>									
+									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-data-source</include>
 									<include>org.bonitasoft.engine.data.instance:bonita-data-instance-data-source-impl</include>
 									<!-- Delete -->
 									<include>org.bonitasoft.engine.persistence:bonita-delete-api</include>
@@ -728,6 +741,9 @@
 									<include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl-hibernate</include>
 									<!-- Home Server -->
 									<include>org.bonitasoft.engine.core:bonita-home-server</include>
+									<!-- Incident -->
+									<include>org.bonitasoft.engine.incident:bonita-incident-api</include>
+									<include>org.bonitasoft.engine.incident:bonita-incident-log</include>
 									<!-- Identity -->
 									<include>org.bonitasoft.engine.identity:bonita-identity-model</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl</include>
@@ -760,12 +776,12 @@
 									<include>org.bonitasoft.engine.platform:bonita-platform-model</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl-hibernate</include>
-									<include>org.bonitasoft.engine.platform:bonita-platform-api</include>																																				
+									<include>org.bonitasoft.engine.platform:bonita-platform-api</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-api-impl</include>
 									<!-- Platform Authentication -->
 									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api</include>
 									<include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api-impl</include>
-									<!-- Platform Command-->
+									<!-- Platform Command -->
 									<include>org.bonitasoft.engine.platform.command:bonita-platform-command-model</include>
 									<include>org.bonitasoft.engine.platform.command:bonita-platform-command-model-impl</include>
 									<include>org.bonitasoft.engine.platform.command:bonita-platform-command-model-impl-hibernate</include>
@@ -775,7 +791,7 @@
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-impl</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl-hibernate</include>
-									<!-- Platform Login-->
+									<!-- Platform Login -->
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
 									<include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
 									<!-- Platform Session -->

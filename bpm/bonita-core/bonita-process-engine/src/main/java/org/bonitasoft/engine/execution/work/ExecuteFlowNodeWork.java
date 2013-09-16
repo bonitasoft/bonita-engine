@@ -14,18 +14,28 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.execution.ContainerExecutor;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
+ * 
+ * 
+ * Work that is responsible of executing a flow node.
+ * 
+ * If the execution fails it will put the flow node in failed state
+ * 
  * @author Baptiste Mesta
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class ExecuteFlowNodeWork extends TxLockProcessInstanceWork {
+public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     private static final long serialVersionUID = -5873526992671300038L;
 
@@ -33,38 +43,47 @@ public class ExecuteFlowNodeWork extends TxLockProcessInstanceWork {
         PROCESS, FLOWNODE;
     }
 
-    private final Type executorType;
-
     private final long flowNodeInstanceId;
 
     private final List<SOperation> operations;
 
     private final SExpressionContext contextDependency;
 
-    public ExecuteFlowNodeWork(final Type executorType, final long flowNodeInstanceId, final List<SOperation> operations,
+    private final long processInstanceId;
+
+    ExecuteFlowNodeWork(final long flowNodeInstanceId, final List<SOperation> operations,
             final SExpressionContext contextDependency, final long processInstanceId) {
-    	super(processInstanceId);
-        this.executorType = executorType;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.operations = operations;
         this.contextDependency = contextDependency;
-    }
-
-    @Override
-    protected void work() throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ContainerExecutor containerExecutor = null;
-        if (Type.PROCESS.equals(executorType)) {
-            containerExecutor = tenantAccessor.getProcessExecutor();
-        } else {
-            containerExecutor = tenantAccessor.getFlowNodeExecutor();
-        }
-        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
+        this.processInstanceId = processInstanceId;
     }
 
     @Override
     public String getDescription() {
         return getClass().getSimpleName() + ": processInstanceId:" + processInstanceId + ", flowNodeInstanceId: " + flowNodeInstanceId;
+    }
+
+    @Override
+    public String getRecoveryProcedure() {
+        return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
+    }
+
+    @Override
+    public void work(final Map<String, Object> context) throws Exception {
+
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
+
+    }
+
+    @Override
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+        final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
+        final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();
+        TransactionService transactionService = getTenantAccessor(context).getTransactionService();
+        transactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
 
 }

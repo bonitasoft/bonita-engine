@@ -40,12 +40,24 @@ public class SACommentBuilderImpl implements SACommentBuilder {
 
     private static final String SOURCEOBJECTID_KEY = "sourceObjectId";
 
-    private SACommentImpl saCommentImpl;
+    private final SACommentImpl saCommentImpl;
 
+    public SACommentBuilderImpl() {
+        this(new SACommentImpl());
+    }
+
+    public SACommentBuilderImpl(final SComment sComment) {
+        this(new SACommentImpl(sComment));
+    }
+
+    private SACommentBuilderImpl(final SACommentImpl saCommentImpl) {
+        this.saCommentImpl = saCommentImpl;
+    }
+
+    @Deprecated
     @Override
-    public SACommentBuilder createNewInstance(SComment sComment) {
-        saCommentImpl = new SACommentImpl(sComment);
-        return this;
+    public SACommentBuilder createNewInstance(final SComment sComment) {
+        return new SACommentBuilderImpl(sComment);
     }
 
     @Override

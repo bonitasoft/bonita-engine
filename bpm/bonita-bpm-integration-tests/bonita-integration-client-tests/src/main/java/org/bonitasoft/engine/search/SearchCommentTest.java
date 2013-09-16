@@ -58,7 +58,7 @@ public class SearchCommentTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForStep waitForStep = waitForStep(50, 3000, "userTask1", processInstance);
         final String commentContent1 = "commentContent1";
-        getProcessAPI().addComment(processInstance.getId(), commentContent1);
+        getProcessAPI().addProcessComment(processInstance.getId(), commentContent1);
         final ActivityInstance activityInstance = waitForStep.getResult();
         assignAndExecuteStep(activityInstance, user.getId());
         waitForProcessToFinish(processInstance);
@@ -104,7 +104,7 @@ public class SearchCommentTest extends CommonAPITest {
         waitForStep(50, 5000, activityName, processInstance);
 
         // add an comment to ProcessInstance
-        getProcessAPI().addComment(processInstance.getId(), commentContent);
+        getProcessAPI().addProcessComment(processInstance.getId(), commentContent);
 
         // test the comment is added to ProcessInstance
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 5);
@@ -168,11 +168,11 @@ public class SearchCommentTest extends CommonAPITest {
         final String commentContent3 = "commentContent3";
         final String commentContent4 = "content4";
         final String commentContent5 = "content'5";
-        getProcessAPI().addComment(pi1.getId(), commentContent1);
-        getProcessAPI().addComment(pi1.getId(), commentContent2);
-        getProcessAPI().addComment(pi1.getId(), commentContent3);
-        getProcessAPI().addComment(pi0.getId(), commentContent4);
-        getProcessAPI().addComment(pi0.getId(), commentContent5);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent1);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent2);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent3);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent4);
+        getProcessAPI().addProcessComment(pi0.getId(), commentContent5);
 
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 5);
         builder0.filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId());
@@ -238,8 +238,8 @@ public class SearchCommentTest extends CommonAPITest {
         // add an comment to ProcessInstance
         final String commentContent1 = "commentContent1";
         final String commentContent2 = "commentContent2";
-        getProcessAPI().addComment(processInstance.getId(), commentContent1);
-        getProcessAPI().addComment(processInstance2.getId(), commentContent2);
+        getProcessAPI().addProcessComment(processInstance.getId(), commentContent1);
+        getProcessAPI().addProcessComment(processInstance2.getId(), commentContent2);
 
         // get a ActivityInstance
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
@@ -316,14 +316,14 @@ public class SearchCommentTest extends CommonAPITest {
         final String commentContent1 = "jack's comment Content1";
         final String commentContent2 = "jack's comment Content3";
         final String commentContent3 = "jack's comment Content3";
-        getProcessAPI().addComment(instance1.getId(), commentContent1);
-        getProcessAPI().addComment(instance1.getId(), commentContent2);
-        getProcessAPI().addComment(instance1.getId(), commentContent3);
+        getProcessAPI().addProcessComment(instance1.getId(), commentContent1);
+        getProcessAPI().addProcessComment(instance1.getId(), commentContent2);
+        getProcessAPI().addProcessComment(instance1.getId(), commentContent3);
 
         logout();
         loginWith(johnUserName, PASSWORD);
         final String commentContent4 = "john's comment Content3";
-        getProcessAPI().addComment(instance2.getId(), commentContent4);
+        getProcessAPI().addProcessComment(instance2.getId(), commentContent4);
 
         final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
         final SearchResult<Comment> result1 = getProcessAPI().searchCommentsInvolvingUser(jack.getId(), builder1.done());
@@ -377,16 +377,16 @@ public class SearchCommentTest extends CommonAPITest {
         final String commentContent1 = "John's comment Content1";
         final String commentContent2 = "John's comment Content2";
         final String commentContent3 = "John's comment Content3";
-        getProcessAPI().addComment(pi1.getId(), commentContent1);
-        getProcessAPI().addComment(pi1.getId(), commentContent2);
-        getProcessAPI().addComment(pi1.getId(), commentContent3);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent1);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent2);
+        getProcessAPI().addProcessComment(pi1.getId(), commentContent3);
 
         logout();
         loginWith(jackUserName, PASSWORD);
 
         final ProcessInstance pi2 = getProcessAPI().startProcess(jim.getId(), processDefinition.getId());
         final String commentContent4 = "Jack's comment Content4";
-        getProcessAPI().addComment(pi2.getId(), commentContent4);
+        getProcessAPI().addProcessComment(pi2.getId(), commentContent4);
 
         logout();
         loginWith(stevenUserName, PASSWORD);
@@ -396,11 +396,11 @@ public class SearchCommentTest extends CommonAPITest {
         final long stepId3 = waitForStep3.getStepId();
         getProcessAPI().assignUserTask(stepId3, jim.getId());
         final String commentContent5 = "Steven's comment Content5";
-        getProcessAPI().addComment(pi3.getId(), commentContent5);
+        getProcessAPI().addProcessComment(pi3.getId(), commentContent5);
 
         final ProcessInstance pi4 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
         final String commentContent6 = "Steven's comment Content6";
-        getProcessAPI().addComment(pi4.getId(), commentContent6);
+        getProcessAPI().addProcessComment(pi4.getId(), commentContent6);
 
         logout();
         login();

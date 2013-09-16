@@ -127,6 +127,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
             final SSession session = getSession();
             final long userId = session.getUserId();
             final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+	    // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
             processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, processDefinitionId, userId, userId);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                 final StringBuilder stb = new StringBuilder();

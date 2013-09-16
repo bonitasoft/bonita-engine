@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionIns
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -43,6 +46,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -184,7 +189,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final long numberOfInitialArchivedComments = getNumberOfArchivedComment.getResult();
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance waitForUserTask = waitForUserTask("step1", processInstance);
-        getProcessAPI().addComment(processInstance.getId(), "kikoo lol");
+        getProcessAPI().addProcessComment(processInstance.getId(), "kikoo lol");
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         executeInTransaction(transactionService, getNumberOfComment);
         executeInTransaction(transactionService, getNumberOfArchivedComment);
@@ -206,7 +211,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         disableAndDeleteProcess(definition);
     }
 
-    private static void executeInTransaction(TransactionService transactionService, TransactionContent tc) throws SBonitaException {
+    private static void executeInTransaction(final TransactionService transactionService, final TransactionContent tc) throws SBonitaException {
         transactionService.begin();
         tc.execute();
         transactionService.complete();
@@ -379,6 +384,23 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
         // Check there is no actor left:
         assertEquals(0, actorMembers.size());
+    }
+
+    @Test
+    public void incidentIsLogged() throws Exception {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        WorkService workService = tenantAccessor.getWorkService();
+        BonitaWork runnable = new FailureHandlingBonitaWork(new FailingWork());
+        workService.executeWork(runnable);
+        Thread.sleep(100);
+        String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
+        File file = new File(tenantFolder + File.separatorChar + "INCIDENT.log");
+        String content = org.bonitasoft.engine.io.IOUtil.read(file);
+        assertTrue("File content is: " + content, content.contains("An incident occurred: MyJob"));
+        assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
+        assertTrue("File content is: " + content, content.contains("an unexpected exception"));
+        assertTrue("File content is: " + content, content.contains("unable to handle failure"));
+
     }
 
     private ProcessDefinition deployAndEnableProcessWithOneHumanTask(final String processName, final String actorName, final String userTaskName)

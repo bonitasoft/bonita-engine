@@ -11,7 +11,7 @@
 
     <bean name="sSupervisorBuilders" class="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorBuildersImpl" />
 
-	<bean id="db-bos-supervisor-mapping" name="DBConfiguration" class="org.bonitasoft.engine.persistence.DBConfiguration">
+	<bean id="db-bos-supervisor-mapping" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-initTables.sql" />
 		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-cleanTables.sql" />

@@ -47,14 +47,13 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -82,6 +81,7 @@ import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingSe
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
@@ -196,7 +196,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ConnectorInstanceService connectorInstanceService;
 
-    private SProcessDocumentBuilder processDocumentBuilder;
+    private SProcessDocumentBuilders processDocumentBuilders;
 
     private ProcessDocumentService processDocumentService;
 
@@ -266,11 +266,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private TransactionalProcessInstanceInterruptor transactionalProcessInstanceInterruptor;
 
-    private SACommentBuilder saCommentBuilder;
-
     private SessionAccessor sessionAccessor;
 
     private SynchroService synchroService;
+
+    private IncidentService incidentService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -619,11 +619,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public SProcessDocumentBuilder getProcessDocumentBuilder() {
-        if (processDocumentBuilder == null) {
-            processDocumentBuilder = beanAccessor.getService(SProcessDocumentBuilder.class);
+    public SProcessDocumentBuilders getProcessDocumentBuilders() {
+        if (processDocumentBuilders == null) {
+            processDocumentBuilders = beanAccessor.getService(SProcessDocumentBuilders.class);
         }
-        return processDocumentBuilder;
+        return processDocumentBuilders;
     }
 
     @Override
@@ -922,19 +922,19 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public SACommentBuilder getSACommentBuilders() {
-        if (saCommentBuilder == null) {
-            saCommentBuilder = beanAccessor.getService(SACommentBuilder.class);
-        }
-        return saCommentBuilder;
-    }
-
-    @Override
     public SynchroService getSynchroService() {
         if (synchroService == null) {
             synchroService = beanAccessor.getService(SynchroService.class);
         }
         return synchroService;
+    }
+
+    @Override
+    public IncidentService getIncidentService() {
+        if (incidentService == null) {
+            incidentService = beanAccessor.getService(IncidentService.class);
+        }
+        return incidentService;
     }
 
 }

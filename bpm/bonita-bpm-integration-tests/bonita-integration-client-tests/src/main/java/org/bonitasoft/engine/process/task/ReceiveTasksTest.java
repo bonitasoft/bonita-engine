@@ -261,7 +261,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 9 * 1000, true, 1, user);
+        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 20000, true, 1, user);
         assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
 
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);

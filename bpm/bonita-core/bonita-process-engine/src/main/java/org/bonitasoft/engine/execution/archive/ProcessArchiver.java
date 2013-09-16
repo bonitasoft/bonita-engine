@@ -26,6 +26,7 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
+import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -54,7 +55,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.ProcessInstanceLogBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
@@ -65,11 +65,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
@@ -83,7 +78,7 @@ public class ProcessArchiver {
     public static void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
             final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final BPMInstanceBuilders instancesBuilders,
-            final SDataInstanceBuilders sDataInstanceBuilders, final SCommentService commentService, final SACommentBuilder saCommentBuilder,
+            final SDataInstanceBuilders sDataInstanceBuilders, final SCommentService commentService, final SCommentBuilders commentBuilders,
             final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
         final SAProcessInstanceBuilder saProcessInstanceBuilder = instancesBuilders.getSAProcessInstanceBuilder();
         final SAProcessInstance saProcessInstance = saProcessInstanceBuilder.createNewInstance(processInstance).done();
@@ -104,7 +99,7 @@ public class ProcessArchiver {
             archiveDataInstances(processInstance, archiveService, dataInstanceService, logger, instancesBuilders, sDataInstanceBuilders, archiveDate);
         }
         // Archive SComment
-        archiveComments(processInstance, archiveService, logger, instancesBuilders, commentService, saCommentBuilder, archiveDate);
+        archiveComments(processInstance, archiveService, logger, instancesBuilders, commentService, commentBuilders, archiveDate);
 
         // archive document mappings
         archiveDocumentMappings(processInstance, documentMappingService, archiveDate);
@@ -190,32 +185,39 @@ public class ProcessArchiver {
     }
 
     private static void archiveComments(final SProcessInstance processInstance, final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final BPMInstanceBuilders instancesBuilders, final SCommentService commentService, final SACommentBuilder saCommentBuilder, final long archiveDate)
+            final BPMInstanceBuilders instancesBuilders, final SCommentService commentService, final SCommentBuilders commentBuilders, final long archiveDate)
             throws SArchivingException {
         List<SComment> sComments = null;
-        try {
-            sComments = commentService.getComments(processInstance.getId());
-        } catch (final SBonitaReadException e1) {
-            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "Unable to retrive process comments. Process: id=" + processInstance.getId(), e1);
+        int startIndex = 0;
+        do {
+            try {
+                sComments = commentService.getComments(processInstance.getId(), new QueryOptions(startIndex, BATCH_SIZE));
+            } catch (final SBonitaReadException e) {
+                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "No process comment found for process with id: " + processInstance.getId(), e);
+                }
             }
-        }
+            if (sComments != null) {
+                for (final SComment sComment : sComments) {
+                    archiveComment(processInstance, archiveService, logger, commentBuilders.getSACommentBuilder(), archiveDate, sComment);
+                }
+            }
+            startIndex += BATCH_SIZE;
+        } while (sComments.size() > 0);
+    }
 
-        if (sComments != null) {
-            for (final SComment sComment : sComments) {
-                final SAComment saComment = saCommentBuilder.createNewInstance(sComment).done();
-                if (saComment != null) {
-                    final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
-                    try {
-                        archiveService.recordInsert(archiveDate, insertRecord);
-                    } catch (final SRecorderException e) {
-                        throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
-                    } catch (final SDefinitiveArchiveNotFound e) {
-                        if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                            logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR,
-                                    "the process instance was not archived id=" + processInstance.getId(), e);
-                        }
-                    }
+    private static void archiveComment(final SProcessInstance processInstance, final ArchiveService archiveService, final TechnicalLoggerService logger,
+            final SACommentBuilder saCommentBuilder, final long archiveDate, final SComment sComment) throws SArchivingException {
+        final SAComment saComment = saCommentBuilder.createNewInstance(sComment).done();
+        if (saComment != null) {
+            final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
+            try {
+                archiveService.recordInsert(archiveDate, insertRecord);
+            } catch (final SRecorderException e) {
+                throw new SArchivingException("Unable to archive the process instance comments with id " + processInstance.getId(), e);
+            } catch (final SDefinitiveArchiveNotFound e) {
+                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "the process instance were not archived id=" + processInstance.getId(), e);
                 }
             }
         }
@@ -258,21 +260,6 @@ public class ProcessArchiver {
             }
             // return;
         }
-    }
-
-    private static ProcessInstanceLogBuilder getQueriableLog(final BPMInstanceBuilders instancesBuilders, final ActionType actionType, final String message) {
-        final ProcessInstanceLogBuilder logBuilder = instancesBuilders.getProcessInstanceLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        return logBuilder;
-    }
-
-    private static <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private static <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
     }
 
     private static void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive,

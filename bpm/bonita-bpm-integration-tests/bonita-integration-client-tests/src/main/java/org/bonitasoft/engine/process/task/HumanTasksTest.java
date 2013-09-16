@@ -121,7 +121,6 @@ public class HumanTasksTest extends CommonAPITest {
         } catch (FlowNodeExecutionException e) {
             assertTrue("wrong exception message", e.getMessage().contains("Incompatible assignment operation type"));
         }
-        waitForTaskToFail(processInstance);
         disableAndDeleteProcess(processDef);
     }
 

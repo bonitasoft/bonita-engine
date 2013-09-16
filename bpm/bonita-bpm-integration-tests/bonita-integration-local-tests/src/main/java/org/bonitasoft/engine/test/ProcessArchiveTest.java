@@ -185,9 +185,9 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("step1", p1);
-        getProcessAPI().addComment(p1.getId(), "A cool comment on p1");
-        getProcessAPI().addComment(p2.getId(), "A cool comment on p2");
-        getProcessAPI().addComment(p3.getId(), "A cool comment on p3");
+        getProcessAPI().addProcessComment(p1.getId(), "A cool comment on p1");
+        getProcessAPI().addProcessComment(p2.getId(), "A cool comment on p2");
+        getProcessAPI().addProcessComment(p3.getId(), "A cool comment on p3");
         final List<Comment> comments = getProcessAPI().getComments(p1.getId());
         assertEquals(1, comments.size());
         assertEquals("A cool comment on p1", comments.get(0).getContent());

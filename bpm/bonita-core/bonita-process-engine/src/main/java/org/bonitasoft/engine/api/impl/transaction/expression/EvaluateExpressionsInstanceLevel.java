@@ -42,7 +42,7 @@ public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpression
 
     private final ExpressionResolverService expressionResolver;
 
-    private final SExpressionBuilders expBuilder;
+    private final SExpressionBuilders expBuilders;
 
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
@@ -51,7 +51,7 @@ public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpression
         this.expressions = expressions;
         this.containerId = containerId;
         expressionResolver = expressionService;
-        this.expBuilder = expBuilder;
+        this.expBuilders = expBuilder;
         this.processDefinitionId = processDefinitionId;
         this.containerType = containerType;
     }
@@ -69,7 +69,7 @@ public class EvaluateExpressionsInstanceLevel extends AbstractEvaluateExpression
             for (Expression exp : exps) {
                 final Map<String, Serializable> partialContext = expressions.get(exp);
                 context.setSerializableInputValues(partialContext);
-                final SExpression sexp = ServerModelConvertor.convertExpression(expBuilder, exp);
+                final SExpression sexp = ServerModelConvertor.convertExpression(expBuilders, exp);
                 final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);
                 results.put(buildName(exp), res);// MAYBE instead of exp.getNAME
             }

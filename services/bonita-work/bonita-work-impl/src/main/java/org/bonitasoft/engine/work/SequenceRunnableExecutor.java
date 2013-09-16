@@ -58,4 +58,9 @@ public class SequenceRunnableExecutor extends BonitaRunnable {
         cancelled = true;
     }
 
+    @Override
+    public String toString() {
+        return "sequence: " + works.toString();
+    }
+
 }

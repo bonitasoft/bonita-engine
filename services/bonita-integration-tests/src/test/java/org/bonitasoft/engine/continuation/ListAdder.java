@@ -14,10 +14,11 @@
 package org.bonitasoft.engine.continuation;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.work.BonitaWork;
 
-public class ListAdder implements BonitaWork {
+public class ListAdder extends BonitaWork {
 
     private static final long serialVersionUID = -2980862072974732348L;
 
@@ -34,7 +35,12 @@ public class ListAdder implements BonitaWork {
     }
 
     @Override
-    public void run() {
+    public String getDescription() {
+        return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString() + " after (ms) " + delay;
+    }
+
+    @Override
+    public void work(final Map<String, Object> context) throws Exception {
         try {
             Thread.sleep(delay);
         } catch (final InterruptedException e) {
@@ -44,12 +50,6 @@ public class ListAdder implements BonitaWork {
     }
 
     @Override
-    public String getDescription() {
-        return getClass().getSimpleName() + ": Adding " + toAdd + " to " + list.toString() + " after (ms) " + delay;
-    }
-
-    @Override
-    public void setTenantId(long tenantId) {
-
+    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
     }
 }

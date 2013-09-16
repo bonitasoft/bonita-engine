@@ -21,6 +21,4 @@ public interface SProcessDocumentBuilders {
 
     SProcessDocumentBuilder getSProcessDocumentBuilder();
 
-    SProcessDocumentLogBuilder getSProcessDocumentLogBuilder();
-
 }

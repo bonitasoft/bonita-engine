@@ -40,14 +40,13 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
@@ -81,6 +80,7 @@ import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingSe
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -440,8 +440,8 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SProcessDocumentBuilder getProcessDocumentBuilder() {
-        return getInstanceOf(SProcessDocumentBuilder.class);
+    public SProcessDocumentBuilders getProcessDocumentBuilders() {
+        return getInstanceOf(SProcessDocumentBuilders.class);
     }
 
     @Override
@@ -637,13 +637,13 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SACommentBuilder getSACommentBuilders() {
-        return getInstanceOf(SACommentBuilder.class);
+    public SynchroService getSynchroService() {
+        return getInstanceOf(SynchroService.class);
     }
 
     @Override
-    public SynchroService getSynchroService() {
-        return getInstanceOf(SynchroService.class);
+    public IncidentService getIncidentService() {
+        return getInstanceOf(IncidentService.class);
     }
 
 }

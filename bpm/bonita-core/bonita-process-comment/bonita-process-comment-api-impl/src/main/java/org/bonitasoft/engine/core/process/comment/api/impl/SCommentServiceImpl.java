@@ -162,6 +162,13 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
+    public List<SComment> getComments(final long processInstanceId, final QueryOptions queryOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
+        final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class, queryOptions);
+        return persistenceService.selectList(selectDescriptor);
+    }
+
+    @Override
     public SComment addComment(final long processInstanceId, final String comment) throws SCommentAddException {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
@@ -210,10 +217,15 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteComments(final long processInstanceId) throws SBonitaException {
-        final List<SComment> sComments = getComments(processInstanceId);
-        for (final SComment sComment : sComments) {
-            delete(sComment);
-        }
+        List<SComment> sComments = null;
+        do {
+            sComments = getComments(processInstanceId, new QueryOptions(0, 100));
+            if (sComments != null) {
+                for (final SComment sComment : sComments) {
+                    delete(sComment);
+                }
+            }
+        } while (sComments.size() > 0);
     }
 
     private long getUserId() throws SSessionNotFoundException, SessionIdNotSetException {

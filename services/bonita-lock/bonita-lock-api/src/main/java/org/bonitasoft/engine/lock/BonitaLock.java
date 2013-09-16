@@ -17,6 +17,7 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * 
+ * 
  * @author Baptiste Mesta
  * 
  */
@@ -28,7 +29,7 @@ public class BonitaLock {
 
     private final long objectToLockId;
 
-    public BonitaLock(Lock lock, String objectType, long objectToLockId) {
+    public BonitaLock(final Lock lock, final String objectType, final long objectToLockId) {
         super();
         this.lock = lock;
         this.objectType = objectType;
@@ -45,6 +46,11 @@ public class BonitaLock {
 
     public long getObjectToLockId() {
         return objectToLockId;
+    }
+
+    @Override
+    public String toString() {
+        return "BonitaLock[" + objectType + ":" + objectToLockId + ", lock=" + lock.hashCode() + "]";
     }
 
 }

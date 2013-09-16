@@ -102,14 +102,4 @@ public interface FlowNodeExecutor extends ContainerExecutor {
     StateCode executeState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, FlowNodeState state)
             throws SActivityStateExecutionException, SActivityExecutionException;
 
-    /**
-     * 
-     * @param fFlowNodeInstance
-     * @param processDefinitionId
-     * @param sbe
-     * @throws SFlowNodeExecutionException
-     * @since 6.1
-     */
-    void setFlowNodeFailedInTransaction(SFlowNodeInstance fFlowNodeInstance, long processDefinitionId, SBonitaException sbe) throws SFlowNodeExecutionException;
-
 }

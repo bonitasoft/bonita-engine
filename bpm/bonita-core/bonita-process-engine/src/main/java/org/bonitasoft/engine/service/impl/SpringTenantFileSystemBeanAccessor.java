@@ -42,7 +42,7 @@ public class SpringTenantFileSystemBeanAccessor {
             final String tenantConfFolder = homeServer.getTenantConfFolder(tenantId);
             final File serviceFolder = new File(tenantConfFolder + File.separatorChar + "services");
             if (!serviceFolder.isDirectory()) {
-                throw new RuntimeException("Folder 'services' not found on tenant " + tenantConfFolder);
+                throw new RuntimeException("Your bonita.home is corrupted: Folder 'services' not found on tenant " + tenantConfFolder);
             }
             final FileFilter filter = new FileFilter() {
 
@@ -98,7 +98,7 @@ public class SpringTenantFileSystemBeanAccessor {
             SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext platformContext = SpringPlatformFileSystemBeanAccessor.getContext();
             // Delay the refresh so we can set our BeanFactoryPostProcessor to be able to resolve the placeholder.
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /*refresh*/, platformContext);
+            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /* refresh */, platformContext);
             context.addBeanFactoryPostProcessor(ppc);
 
             context.refresh();

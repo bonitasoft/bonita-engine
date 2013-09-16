@@ -91,8 +91,8 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkExistenceOfFlowNodes());
         messages.addAll(checkExistenceOfArchivedFlowNodes());
         messages.addAll(checkExistenceOfCategories());
-        // messages.addAll(checkExistenceOfComments());
-        // messages.addAll(checkExistenceOfArchivedComments());
+        messages.addAll(checkExistenceOfComments());
+        messages.addAll(checkExistenceOfArchivedComments());
 
         logout();
         return messages;

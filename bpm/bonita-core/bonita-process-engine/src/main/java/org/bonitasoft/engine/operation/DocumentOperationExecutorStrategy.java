@@ -23,6 +23,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -47,18 +48,18 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final SProcessDocumentBuilder processDocumentBuilder;
+    private final SProcessDocumentBuilders processDocumentBuilders;
 
     private final SessionAccessor sessionAccessor;
 
     private final SessionService sessionService;
 
     public DocumentOperationExecutorStrategy(final ProcessDocumentService processDocumentService, final ActivityInstanceService activityInstanceService,
-            final SProcessDocumentBuilder processDocumentBuilder, final SessionAccessor sessionAccessor, final SessionService sessionService) {
+            final SProcessDocumentBuilders processDocumentBuilders, final SessionAccessor sessionAccessor, final SessionService sessionService) {
         super();
         this.processDocumentService = processDocumentService;
         this.activityInstanceService = activityInstanceService;
-        this.processDocumentBuilder = processDocumentBuilder;
+        this.processDocumentBuilders = processDocumentBuilders;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
     }
@@ -100,61 +101,28 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
                     // nothing to do
                 }
             } else {
-
                 final long sessionId = sessionAccessor.getSessionId();
                 final long authorId = sessionService.getSession(sessionId).getUserId();
                 final DocumentValue documentValue = (DocumentValue) newValue;
-                if (documentValue.hasContent()) {
-                    try {
-                        final SProcessDocument currentDocument = processDocumentService.getDocument(processInstanceId, documentName);
-                        // a document exist, update it with the new values
-                        processDocumentBuilder.createNewInstance();
-                        processDocumentBuilder.setName(documentName);
-                        processDocumentBuilder.setFileName(documentValue.getFileName());
-                        processDocumentBuilder.setContentMimeType(documentValue.getMimeType());
-                        processDocumentBuilder.setProcessInstanceId(currentDocument.getProcessInstanceId());
-                        processDocumentBuilder.setAuthor(authorId);
-                        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
-                        processDocumentBuilder.setHasContent(true);
-                        final SProcessDocument document = processDocumentBuilder.done();
+                final boolean hasContent = documentValue.hasContent();
+                try {
+                    // Let's check if the document already exists:
+                    processDocumentService.getDocument(processInstanceId, documentName);
+
+                    // a document exist, update it with the new values
+                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
+                            documentValue.getUrl());
+                    if (hasContent) {
                         processDocumentService.updateDocumentOfProcessInstance(document, documentValue.getContent());
-                    } catch (final SDocumentNotFoundException e) {
-                        // not found we create a new one
-                        processDocumentBuilder.createNewInstance();
-                        processDocumentBuilder.setName(documentName);
-                        processDocumentBuilder.setFileName(documentValue.getFileName());
-                        processDocumentBuilder.setContentMimeType(documentValue.getMimeType());
-                        processDocumentBuilder.setProcessInstanceId(processInstanceId);
-                        processDocumentBuilder.setAuthor(authorId);
-                        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
-                        processDocumentBuilder.setHasContent(true);
-                        final SProcessDocument document = processDocumentBuilder.done();
-                        processDocumentService.attachDocumentToProcessInstance(document, documentValue.getContent());
-                    }
-                } else {
-                    try {
-                        final SProcessDocument currentDocument = processDocumentService.getDocument(processInstanceId, documentName);
-                        processDocumentBuilder.createNewInstance();
-                        processDocumentBuilder.setName(documentName);
-                        processDocumentBuilder.setFileName(currentDocument.getContentFileName());
-                        processDocumentBuilder.setContentMimeType(currentDocument.getContentMimeType());
-                        processDocumentBuilder.setProcessInstanceId(currentDocument.getProcessInstanceId());
-                        processDocumentBuilder.setAuthor(authorId);
-                        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
-                        processDocumentBuilder.setHasContent(false);
-                        processDocumentBuilder.setURL(documentValue.getUrl());
-                        final SProcessDocument document = processDocumentBuilder.done();
+                    } else {
                         processDocumentService.updateDocumentOfProcessInstance(document);
-                    } catch (final SDocumentNotFoundException e) {
-                        // not found we create a new one
-                        processDocumentBuilder.createNewInstance();
-                        processDocumentBuilder.setName(documentName);
-                        processDocumentBuilder.setProcessInstanceId(processInstanceId);
-                        processDocumentBuilder.setAuthor(authorId);
-                        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
-                        processDocumentBuilder.setHasContent(false);
-                        processDocumentBuilder.setURL(documentValue.getUrl());
-                        final SProcessDocument document = processDocumentBuilder.done();
+                    }
+                } catch (final SDocumentNotFoundException e) {
+                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
+                            documentValue.getUrl());
+                    if (hasContent) {
+                        processDocumentService.attachDocumentToProcessInstance(document, documentValue.getContent());
+                    } else {
                         processDocumentService.attachDocumentToProcessInstance(document);
                     }
                 }
@@ -163,6 +131,22 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
             throw new SOperationExecutionException(e);
         }
 
+    }
+
+    private SProcessDocument createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue,
+            final boolean hasContent, final String documentUrl) {
+        SProcessDocumentBuilder processDocumentBuilder = processDocumentBuilders.getSProcessDocumentBuilder();
+        processDocumentBuilder.createNewInstance();
+        processDocumentBuilder.setName(documentName);
+        processDocumentBuilder.setFileName(documentValue.getFileName());
+        processDocumentBuilder.setContentMimeType(documentValue.getMimeType());
+        processDocumentBuilder.setProcessInstanceId(processInstanceId);
+        processDocumentBuilder.setAuthor(authorId);
+        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
+        processDocumentBuilder.setHasContent(hasContent);
+        processDocumentBuilder.setURL(documentUrl);
+        final SProcessDocument document = processDocumentBuilder.done();
+        return document;
     }
 
     @Override

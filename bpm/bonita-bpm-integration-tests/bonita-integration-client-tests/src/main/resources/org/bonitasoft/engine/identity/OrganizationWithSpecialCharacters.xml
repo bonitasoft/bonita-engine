@@ -5,7 +5,7 @@
 		<user userName="ééééé">
 			<password encrypted="false">é</password>
 			<firstName>éé</firstName>
-			<lastName>éééééééééééééééééééééééééééééééééééééééééééééééééé</lastName>
+			<lastName>ééééééééééééééééééééééééé</lastName>
 			<enabled>false</enabled>
 			<personalData />
 			<professionalData />

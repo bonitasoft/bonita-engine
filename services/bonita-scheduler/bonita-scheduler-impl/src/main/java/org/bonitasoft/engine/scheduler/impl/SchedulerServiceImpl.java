@@ -183,9 +183,11 @@ public class SchedulerServiceImpl implements SchedulerService {
                 "Scheduled job with name " + createdJobDescriptor.getJobName(), createdJobDescriptor.getJobName());
         try {
             if (trigger == null) {
-                schedulerExecutor.executeNow(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName(), sJobDescriptor.disallowConcurrentExecution());
+                schedulerExecutor.executeNow(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName(),
+                        sJobDescriptor.disallowConcurrentExecution());
             } else {
-                schedulerExecutor.schedule(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName(), trigger, sJobDescriptor.disallowConcurrentExecution());
+                schedulerExecutor.schedule(createdJobDescriptor.getId(), tenantId, createdJobDescriptor.getJobName(), trigger,
+                        sJobDescriptor.disallowConcurrentExecution());
             }
             schedulingLogBuilder.actionStatus(SQueriableLog.STATUS_OK);
         } catch (final Throwable e) {
@@ -354,7 +356,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                 }
                 statelessJob.setAttributes(parameterMap);
                 final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger,
-                        jobIdentifier.getTenantId(), eventService, jobTruster, sessionService, sessionAccessor);
+                        jobIdentifier.getTenantId(), eventService, jobTruster, sessionService, sessionAccessor, transactionService);
                 return jobWrapper;
             }
         };
