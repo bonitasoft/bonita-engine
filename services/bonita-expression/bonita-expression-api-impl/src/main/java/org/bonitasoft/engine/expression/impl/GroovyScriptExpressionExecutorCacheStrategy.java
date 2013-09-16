@@ -57,16 +57,23 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
     private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws CacheException, ClassLoaderException {
         final GroovyShell shell = getShell(definitionId);
-        Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, SCRIPT_KEY + definitionId + expressionContent.hashCode());
+        /*
+         * We use the current thread id is the key because Scripts are not thread safe (because of binding)
+         * This way we store one script for each thread, it is like a thread local cache.
+         */
+        final String key = Thread.currentThread().getId() + SCRIPT_KEY + definitionId + expressionContent.hashCode();
+        Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME,
+                key);
         if (script == null) {
             script = shell.parse(expressionContent);
-            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, SCRIPT_KEY + definitionId + expressionContent.hashCode(), script);
+            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, script);
         }
         return script;
     }
 
     private GroovyShell getShell(final Long definitionId) throws ClassLoaderException, CacheException {
-        GroovyShell shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, SHELL_KEY + definitionId);
+        final String key = SHELL_KEY + definitionId;
+        GroovyShell shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
         if (shell == null) {
             ClassLoader classLoader;
             if (definitionId != null) {
@@ -75,7 +82,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
                 classLoader = Thread.currentThread().getContextClassLoader();
             }
             shell = new GroovyShell(classLoader);
-            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, SHELL_KEY + definitionId, shell);
+            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
         }
         return shell;
     }
@@ -88,7 +95,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
             final Script script = getScriptFromCache(expressionContent, (Long) dependencyValues.get(DEFINITION_ID));
             final Binding binding = new Binding(dependencyValues);
             script.setBinding(binding);
-            return script.evaluate(expressionContent);// .evaluate(expressionContent);run()
+            return script.run();
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
